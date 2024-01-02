@@ -61,6 +61,8 @@ export class SpaceRouter {
         });
 
         let nextPath: string;
+        const appContextStore = useAppContextStore(pinia);
+        const userWorkspaceStore = useUserWorkspaceStore(pinia);
 
         SpaceRouter.router.onError((error) => {
             console.error(error);
@@ -81,8 +83,6 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
-            const appContextStore = useAppContextStore(pinia);
-            const userWorkspaceStore = useUserWorkspaceStore(pinia);
             const isAdminMode = appContextStore.getters.isAdminMode;
             const accessibleWorkspaceList = userWorkspaceStore.getters.workspaceList;
 
@@ -130,36 +130,6 @@ export class SpaceRouter {
             let nextLocation;
 
 
-
-            /* After applied Browser Back Button Case, this logic is not working.
-            * So, this needs to be refactored.
-            * */
-
-            /* Redirect Logic for Workspace and Admin Modes
-            * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
-            * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
-             */
-            // const isWorkspaceOrHigherAccessLevelRoute = routeAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
-            // if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isWorkspaceOrHigherAccessLevelRoute && isAdminMode && to.name && !to.name?.startsWith('admin.')) {
-            //     const adminRouteName = makeAdminRouteName(to.name);
-            //     const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
-            //     const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
-            //     const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
-            //
-            //     if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
-            //         nextLocation = {
-            //             ...to,
-            //             name: adminRouteName,
-            //         };
-            //     } else {
-            //         nextLocation = {
-            //             name: ERROR_ROUTE._NAME,
-            //             params: { statusCode: '404' },
-            //         };
-            //     }
-            // }
-
-
             // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 // When a user need to reset password and tries to go to other pages, redirect to reset password page
@@ -200,8 +170,8 @@ export class SpaceRouter {
 
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
+            const isAdminMode = appContextStore.getters.isAdminMode;
 
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.isAdminMode;
             if (!isAdminMode) {
                 const recent = getRecentConfig(to);
                 if (recent) {
