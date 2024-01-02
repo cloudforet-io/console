@@ -33,6 +33,7 @@ import {
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 
 interface Props {
@@ -57,6 +58,7 @@ queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
+
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -124,6 +126,16 @@ const handleExport = async () => {
     }
 };
 
+const getRouteLocationByWorkspaceName = (name: string) => {
+    const targetWorkspace = workspacePageState.workspaces.find((workspace) => workspace.name === name);
+    return {
+        name: HOME_DASHBOARD_ROUTE._NAME,
+        params: {
+            workspaceId: targetWorkspace?.workspace_id,
+        },
+    };
+};
+
 
 </script>
 
@@ -135,6 +147,7 @@ const handleExport = async () => {
                          sortable
                          exportable
                          :loading="false"
+                         :multi-select="false"
                          disabled
                          :items="workspacePageState.workspaces"
                          :select-index="workspacePageState.selectedIndices"
@@ -163,6 +176,7 @@ const handleExport = async () => {
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
+                        :to="getRouteLocationByWorkspaceName(value)"
                 />
             </template>
             <template #col-state-format="{value}">

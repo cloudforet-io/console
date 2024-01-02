@@ -31,6 +31,7 @@ import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
@@ -38,7 +39,6 @@ import { sortBy } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -96,6 +96,7 @@ export default defineComponent({
         const userWorkspaceStore = useUserWorkspaceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
+        const router = useRouter();
 
         const storeState = reactive({
             currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -165,18 +166,19 @@ export default defineComponent({
 
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
+            console.debug('handleSelect', item);
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
-                if (menuInfo && SpaceRouter.router.currentRoute.name !== itemName) {
-                    SpaceRouter.router.push({ name: itemName }).catch(() => {});
+                if (menuInfo && router.currentRoute.name !== menuInfo.routeName) {
+                    router.push({ name: menuInfo.routeName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
-                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
+                router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
-                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
+                router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
                 const itemInfo: string[] = itemName.split('.');
-                SpaceRouter.router.push({
+                router.push({
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: itemInfo[0],
