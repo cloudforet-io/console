@@ -22,6 +22,7 @@ import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
@@ -55,7 +56,9 @@ export default defineComponent<FavoriteButtonProps>({
     },
     setup(props) {
         const userWorkspaceStore = useUserWorkspaceStore();
+        const appContextStore = useAppContextStore();
         const state = reactive({
+            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
             isLoading: computed(() => store.state.favorite.isLoading[props.favoriteType]),
             hasLoaded: computed(() => Array.isArray(state.favoriteItems)),
@@ -78,6 +81,7 @@ export default defineComponent<FavoriteButtonProps>({
         });
 
         const handleClickFavoriteButton = async (event: MouseEvent) => {
+            if (state.isAdminMode) return;
             event.stopPropagation();
             if (props.readOnly) return;
             if (state.favoriteItemMap[props.itemId]) {
