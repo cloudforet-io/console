@@ -11,9 +11,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
@@ -22,6 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
@@ -31,12 +29,11 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
-const appContextStore = useAppContextStore();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed(() => allReferenceStore.getters.project),
 });
 const state = reactive({
@@ -57,12 +54,12 @@ const state = reactive({
         type: 'item',
         id: d.public_dashboard_id,
         label: d.name,
-        to: {
-            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.public_dashboard_id,
             },
-        },
+        }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.public_dashboard_id,
@@ -72,12 +69,12 @@ const state = reactive({
         type: 'item',
         id: d.public_dashboard_id,
         label: d.name,
-        to: {
-            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.public_dashboard_id,
             },
-        },
+        }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.public_dashboard_id,
@@ -88,12 +85,12 @@ const state = reactive({
         type: 'item',
         id: d.private_dashboard_id,
         label: d.name,
-        to: {
-            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.private_dashboard_id,
             },
-        },
+        }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.private_dashboard_id,
@@ -106,16 +103,16 @@ const state = reactive({
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                 id: MENU_ID.DASHBOARDS,
                 foldable: false,
-                to: {
-                    name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
-                },
+                to: getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                }),
                 hideFavorite: true,
             },
             { type: 'divider' },
             { type: 'favorite-only' },
         ];
 
-        if (storeState.isAdminMode) {
+        if (isAdminMode) {
             return [
                 ...defaultMenuSet,
                 ...state.domainMenuSet,
@@ -174,12 +171,12 @@ const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LNBMenu
                 type: MENU_ITEM_TYPE.ITEM,
                 id: board.public_dashboard_id,
                 label: board.name,
-                to: {
-                    name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
+                to: getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: board.public_dashboard_id,
                     },
-                },
+                }),
                 favoriteOptions: {
                     type: FAVORITE_TYPE.DASHBOARD,
                     id: board.public_dashboard_id,
@@ -206,7 +203,7 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
 };
 
 const handleClickCreateDashboard = () => {
-    router.push({ name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) : DASHBOARDS_ROUTE.CREATE._NAME });
+    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }));
 };
 
 
@@ -217,7 +214,7 @@ const handleClickCreateDashboard = () => {
 
 <template>
     <l-n-b class="dashboards-lnb"
-           :class="{'admin-mode': storeState.isAdminMode}"
+           :class="{'admin-mode': isAdminMode}"
            :menu-set="state.menuSet"
            :show-favorite-only.sync="state.showFavoriteOnly"
     >

@@ -14,9 +14,6 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -33,6 +30,7 @@ import {
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
@@ -63,12 +61,12 @@ const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
-const appContextStore = useAppContextStore();
 
 const router = useRouter();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
@@ -78,7 +76,7 @@ const state = reactive({
                 type: 'item',
                 id: MENU_ID.BUDGET,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
-                to: { name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME) : COST_EXPLORER_ROUTE.BUDGET._NAME },
+                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
             },
         ], store.getters['user/pageAccessPermissionList']),
     ]),
@@ -108,13 +106,13 @@ const state = reactive({
                         name: 'ic_main-filled',
                         color: gray[500],
                     },
-                    to: {
-                        name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    to: getProperRouteLocation({
+                        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                         params: {
                             dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                             costQuerySetId: d.cost_query_set_id,
                         },
-                    },
+                    }),
                     favoriteOptions: {
                         type: FAVORITE_TYPE.COST_ANALYSIS,
                         id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(d.data_source_id, d.cost_query_set_id),
@@ -125,13 +123,13 @@ const state = reactive({
                 type: 'item',
                 id: d.cost_query_set_id,
                 label: d.name,
-                to: {
-                    name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                to: getProperRouteLocation({
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
                         dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                         costQuerySetId: d.cost_query_set_id,
                     },
-                },
+                }),
                 favoriteOptions: {
                     type: FAVORITE_TYPE.COST_ANALYSIS,
                 },
@@ -189,12 +187,12 @@ const relocateNotificationState = reactive({
             type: 'item',
             id: MENU_ID.DASHBOARDS,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
-            to: {
-                name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
+            to: getProperRouteLocation({
+                name: DASHBOARDS_ROUTE.ALL._NAME,
                 query: {
                     filters: dashboardQuery,
                 },
-            },
+            }),
             // TODO: may be isUpdated?
             hightlightTag: 'update',
             hideFavorite: true,
@@ -229,13 +227,13 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
     costQuerySetStore.setSelectedDataSourceId(selected);
-    router.push({
-        name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+    router.push(getProperRouteLocation({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
             costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
         },
-    }).catch(() => {});
+    })).catch(() => {});
 };
 
 const handleLearnMoreRelocateNotification = () => {

@@ -49,13 +49,11 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardFavorite
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
@@ -77,11 +75,10 @@ export default defineComponent({
         GNBSubMenu,
     },
     setup(props, { emit }: SetupContext) {
-        const appContextStore = useAppContextStore();
+        const { getProperRouteLocation } = useProperRouteLocation();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
         const state = reactive({
-            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
                 { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
@@ -90,11 +87,11 @@ export default defineComponent({
             subMenuList: computed(() => [
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
-                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME },
+                    to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                 },
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
-                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) : DASHBOARDS_ROUTE.CREATE._NAME },
+                    to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }),
                 },
             ] as DisplayMenu[]),
             isOverflown: false,

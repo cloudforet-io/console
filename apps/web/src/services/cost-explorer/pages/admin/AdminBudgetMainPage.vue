@@ -5,15 +5,15 @@ import {
     PHeading, PDivider, PButton,
 } from '@spaceone/design-system';
 
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const handleCreateBudgetSelect = () => {
-    router.push({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME) });
+    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME }));
 };
 </script>
 

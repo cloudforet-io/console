@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PButton, PDivider } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -22,14 +18,10 @@ const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,
 });
-const appContextStore = useAppContextStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
-
-const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
 
 const handleClose = () => {
     emit('update:visible', false);
@@ -49,12 +41,12 @@ const handleRouteToDashboard = () => {
         v: ['Cost'],
         o: '=',
     }]).rawQueryStrings;
-    const routeData = router.resolve({
-        name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE._NAME) : DASHBOARDS_ROUTE._NAME,
+    const routeData = router.resolve(getProperRouteLocation({
+        name: DASHBOARDS_ROUTE._NAME,
         query: {
             filters: dashboardQuery,
         },
-    });
+    }));
     window.open(routeData.href, '_blank');
 };
 
