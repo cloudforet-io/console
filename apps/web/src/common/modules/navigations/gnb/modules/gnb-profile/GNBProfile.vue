@@ -117,7 +117,7 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     if (isAdminMode.value) appContextStore.exitAdminMode();
-    const currentWorkspace = route.path.split('/')[1] ?? undefined;
+    const currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,
         ...(currentWorkspace && {
