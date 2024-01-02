@@ -70,6 +70,7 @@ const handleClickTextInput = async () => {
 const handleChangeTextInput = () => {
     if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
         fetchListUsers();
+        state.menuVisible = true;
     }
 };
 const handleEnterTextInput = () => {
@@ -209,8 +210,9 @@ onClickOutside(containerRef, clickOutside);
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
-        formState.searchText = '';
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
+        validationState.userIdInvalid = false;
+        validationState.userIdInvalidText = '';
         if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
             await fetchListUsers();
             state.independentUsersList = await userPageStore.findWorkspaceUser();
