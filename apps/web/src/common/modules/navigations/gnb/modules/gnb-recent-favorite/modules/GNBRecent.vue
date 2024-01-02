@@ -41,6 +41,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
@@ -92,16 +93,18 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
+        const userWorkspaceStore = useUserWorkspaceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
 
         const storeState = reactive({
+            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
-            recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
+            recents: computed<RecentConfig[]>(() => store.state.recent.allItems.filter((d) => d.workspaceId === storeState.currentWorkspaceId)),
         });
         const state = reactive({
             loading: true,

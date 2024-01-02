@@ -9,10 +9,11 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const createRecent = async (itemType: RecentType, itemId: string) => {
+const createRecent = async (itemType: RecentType, workspaceId: string, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.recent.visit.create({
             type: itemType,
+            workspace_id: workspaceId,
             id: itemId,
         });
     } catch (e) {
@@ -30,8 +31,9 @@ const addCommitsByItemType = {
 };
 export const addItem: Action<RecentState, any> = async ({ commit }, recent: RecentConfig): Promise<void> => {
     const itemType = recent.itemType;
+    const workspaceId = recent.workspaceId;
     const itemId = recent.itemId;
-    await createRecent(itemType, itemId);
+    await createRecent(itemType, workspaceId, itemId);
     commit(addCommitsByItemType[itemType], recent);
 };
 
@@ -55,6 +57,7 @@ export const load: Action<RecentState, any> = async ({ commit }, payload: Recent
     });
     const recents: RecentConfig[] = results.map((d) => ({
         itemType: d.data.type,
+        workspaceId: d.data.workspace_id,
         itemId: d.data.id,
         updatedAt: d.updated_at,
     }));

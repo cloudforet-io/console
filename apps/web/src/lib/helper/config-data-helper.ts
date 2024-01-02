@@ -36,6 +36,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
         const menu = find(allMenuList, { id: d.itemId });
         if (menu) {
             results.push({
+                ...d,
                 itemType: FAVORITE_TYPE.MENU,
                 itemId: menu.id,
                 name: menu.id,
