@@ -2040,7 +2040,7 @@
 			"ENABLE": "Enable",
 			"ENABLE_WORKSPACE": "Are you sure you want to enable selected workspace?",
 			"FORM": {
-				"DUPLICATED_NAME": "",
+				"DUPLICATED_NAME": "Workspace name is duplicated.",
 				"LABEL_DESC": "Description",
 				"LABEL_NAME": "Name",
 				"PLACEHOLDER_DESC": "Workspace description",
