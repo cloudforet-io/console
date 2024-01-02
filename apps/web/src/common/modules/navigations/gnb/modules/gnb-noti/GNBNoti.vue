@@ -1,55 +1,10 @@
-<template>
-    <div v-click-outside="hideNotiMenu"
-         class="gnb-notifications-notice"
-         @click.stop
-         @keydown.esc="hideNotiMenu"
-    >
-        <span :class="{'menu-button': true, 'opened': visible}"
-              tabindex="0"
-              role="button"
-              @click.stop="handleNotiButtonClick"
-              @keydown.enter="showNotiMenu"
-        >
-            <p-i class="menu-icon"
-                 :class="{ disabled: isNoRoleUser }"
-                 :name="hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
-                 :color="hasNotifications ? undefined : 'inherit'"
-                 width="1.375rem"
-                 height="1.375rem"
-            />
-        </span>
-        <p-tab v-show="visible"
-               :tabs="tabs"
-               :active-tab.sync="activeTab"
-        >
-            <template #extra="tab">
-                <p-badge v-if="count[tab.name] !== 0"
-                         :style-type="tab.name === activeTab ? 'primary3' : 'gray200'"
-                         badge-type="subtle"
-                >
-                    {{ numberFormatter((count[tab.name])) }}
-                </p-badge>
-            </template>
-            <template #notifications>
-                <g-n-b-notifications-tab :visible="visible && activeTab === 'notifications'"
-                                         :count.sync="notificationCount"
-                />
-            </template>
-            <template #notice>
-                <g-n-b-notice-tab @close="hideNotiMenu" />
-            </template>
-        </p-tab>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useDocumentVisibility } from '@vueuse/core';
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
-import type { DirectiveFunction, SetupContext } from 'vue';
 
 import {
     PI, PTab, PBadge,
@@ -71,105 +26,124 @@ import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-no
 interface Props {
     visible: boolean
 }
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 
 interface CountInfo {
   notifications: number;
   notice: number;
 }
-export default defineComponent<Props>({
-    name: 'GNBNoti',
-    components: {
-        GNBNoticeTab,
-        PI,
-        PTab,
-        PBadge,
-        GNBNotificationsTab,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || noticeGetters.unreadNoticeCount > 0),
-            isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
-            tabs: computed(() => ([
-                { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
-                { label: i18n.t('COMMON.GNB.NOTICE.TITLE'), name: 'notice', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'notifications',
-            notificationCount: 0,
-            count: computed<CountInfo>(() => ({
-                notifications: state.notificationCount,
-                notice: noticeGetters.unreadNoticeCount,
-            })),
-        });
-
-        /* Util */
-        const setVisible = (visible: boolean) => {
-            emit('update:visible', visible);
-            if (visible) {
-                store.dispatch('display/stopCheckNotification');
-            } else {
-                store.dispatch('display/startCheckNotification');
-            }
-        };
-        const showNotiMenu = () => {
-            if (!props.visible) setVisible(true);
-        };
-        const hideNotiMenu = () => {
-            if (props.visible) setVisible(false);
-        };
-
-        /* Api */
-        const noticeStore = useNoticeStore();
-        const noticeGetters = noticeStore.getters;
-
-        const documentVisibility = useDocumentVisibility();
-        watch(documentVisibility, (visibility) => {
-            if (visibility === 'hidden') {
-                store.dispatch('display/stopCheckNotification');
-            } else {
-                store.dispatch('display/startCheckNotification');
-            }
-        }, { immediate: true });
-
-        /* Event */
-        const handleNotiButtonClick = () => {
-            if (state.isNoRoleUser) return;
-            setVisible(!props.visible);
-        };
-
-        onMounted(() => {
-            store.dispatch('display/startCheckNotification');
-            noticeStore.fetchNoticeReadState();
-            noticeStore.fetchNoticeCount();
-        });
-        onUnmounted(() => {
-            store.dispatch('display/stopCheckNotification');
-        });
-
-        watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
-            if (isSessionExpired) store.dispatch('display/stopCheckNotification');
-        });
-
-
-        return {
-            ...toRefs(state),
-            showNotiMenu,
-            hideNotiMenu,
-            handleNotiButtonClick,
-            numberFormatter,
-            noticeGetters,
-        };
-    },
+const state = reactive({
+    hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || noticeGetters.unreadNoticeCount > 0),
+    isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    tabs: computed(() => ([
+        { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
+        { label: i18n.t('COMMON.GNB.NOTICE.TITLE'), name: 'notice', keepAlive: true },
+    ] as TabItem[])),
+    activeTab: 'notifications',
+    notificationCount: 0,
+    count: computed<CountInfo>(() => ({
+        notifications: state.notificationCount,
+        notice: noticeGetters.unreadNoticeCount,
+    })),
 });
+
+/* Util */
+const setVisible = (visible: boolean) => {
+    emit('update:visible', visible);
+    if (visible) {
+        store.dispatch('display/stopCheckNotification');
+    } else {
+        store.dispatch('display/startCheckNotification');
+    }
+};
+const showNotiMenu = () => {
+    if (!props.visible) setVisible(true);
+};
+const hideNotiMenu = () => {
+    if (props.visible) setVisible(false);
+};
+
+/* Api */
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
+
+const documentVisibility = useDocumentVisibility();
+watch(documentVisibility, (visibility) => {
+    if (visibility === 'hidden') {
+        store.dispatch('display/stopCheckNotification');
+    } else {
+        store.dispatch('display/startCheckNotification');
+    }
+}, { immediate: true });
+
+/* Event */
+const handleNotiButtonClick = () => {
+    if (state.isNoRoleUser) return;
+    setVisible(!props.visible);
+};
+
+onMounted(() => {
+    store.dispatch('display/startCheckNotification');
+    noticeStore.fetchNoticeReadState();
+    noticeStore.fetchNoticeCount();
+});
+onUnmounted(() => {
+    store.dispatch('display/stopCheckNotification');
+});
+
+watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
+    if (isSessionExpired) store.dispatch('display/stopCheckNotification');
+});
+
 </script>
+
+<template>
+    <div v-on-click-outside="hideNotiMenu"
+         class="gnb-notifications-notice"
+         @click.stop
+         @keydown.esc="hideNotiMenu"
+    >
+        <span :class="{'menu-button': true, 'opened': visible}"
+              tabindex="0"
+              role="button"
+              @click.stop="handleNotiButtonClick"
+              @keydown.enter="showNotiMenu"
+        >
+            <p-i class="menu-icon"
+                 :class="{ disabled: state.isNoRoleUser }"
+                 :name="state.hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
+                 :color="state.hasNotifications ? undefined : 'inherit'"
+                 width="1.375rem"
+                 height="1.375rem"
+            />
+        </span>
+        <p-tab v-show="visible"
+               :tabs="state.tabs"
+               :active-tab.sync="state.activeTab"
+        >
+            <template #extra="tab">
+                <p-badge v-if="state.count[tab.name] !== 0"
+                         :style-type="tab.name === state.activeTab ? 'primary3' : 'gray200'"
+                         badge-type="subtle"
+                >
+                    {{ numberFormatter((state.count[tab.name])) }}
+                </p-badge>
+            </template>
+            <template #notifications>
+                <g-n-b-notifications-tab :visible="props.visible && state.activeTab === 'notifications'"
+                                         :count.sync="state.notificationCount"
+                />
+            </template>
+            <template #notice>
+                <g-n-b-notice-tab @close="hideNotiMenu" />
+            </template>
+        </p-tab>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .gnb-notifications-notice {
     position: relative;

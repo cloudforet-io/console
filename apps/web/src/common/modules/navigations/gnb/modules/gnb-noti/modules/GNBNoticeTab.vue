@@ -15,7 +15,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
@@ -40,8 +39,6 @@ const emit = defineEmits<{(event: 'close'): void;
 
 const state = reactive({
     loading: true,
-    timezone: computed<string>(() => store.state.user.timezone),
-    noticeItemsRef: null as HTMLElement|null,
     noticeData: [] as PostModel[],
     items: computed<NoticeItem[]>(() => {
         const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
@@ -49,7 +46,9 @@ const state = reactive({
     }),
     pinnedItems: computed<NoticeItem[]>(() => {
         const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
-        return convertNoticeItem(filteredData);
+        const res = convertNoticeItem(filteredData);
+        console.debug('pinnedItems', res);
+        return res;
     }),
 });
 
@@ -115,9 +114,7 @@ const init = async () => {
                        :loading="state.loading"
                        :class="{ loading: state.loading && !state.items.length }"
         >
-            <div ref="noticeItemsRef"
-                 class="content-wrapper"
-            >
+            <div class="content-wrapper">
                 <template v-if="!!state.pinnedItems.length">
                     <div class="pinned-header-wrapper">
                         <p-i name="ic_pin-filled"

@@ -97,7 +97,7 @@
     </p-button-modal>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive, watch,
 } from 'vue';
