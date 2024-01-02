@@ -103,7 +103,7 @@ watch([() => state.selectedAlertState, () => state.selectedUrgency, () => state.
             >
                 {{ item.label }}
             </p-select-button>
-            <p-checkbox :value="ASSIGNED_STATE.ASSIGNED_TO_ME"
+            <p-checkbox :value="ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME"
                         :selected="state.selectedAssigned"
                         class="only-mobile"
                         @change="onSelectAssignedCheckbox"
