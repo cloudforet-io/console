@@ -16,12 +16,12 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import RoleDeleteModal
@@ -45,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
@@ -75,7 +76,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 /* Component */
 const getRowSelectable = (item) => item.role_type === ROLE_TYPE.SYSTEM_ADMIN;
 const handleEditRole = (id: string) => {
-    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME), params: { id } });
+    router.push(getProperRouteLocation({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }));
 };
 const handleSelectDropdown = (name) => {
     switch (name) {

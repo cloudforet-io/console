@@ -5,6 +5,7 @@ import { PButton, PDivider } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -17,6 +18,7 @@ const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,
 });
+const { getProperRouteLocation } = useProperRouteLocation();
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
@@ -39,12 +41,12 @@ const handleRouteToDashboard = () => {
         v: ['Cost'],
         o: '=',
     }]).rawQueryStrings;
-    const routeData = router.resolve({
+    const routeData = router.resolve(getProperRouteLocation({
         name: DASHBOARDS_ROUTE._NAME,
         query: {
             filters: dashboardQuery,
         },
-    });
+    }));
     window.open(routeData.href, '_blank');
 };
 

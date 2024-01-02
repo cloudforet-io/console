@@ -23,6 +23,7 @@ import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const route = useRoute();
 const router = useRouter();
@@ -78,7 +80,6 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
@@ -114,6 +115,12 @@ const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
 };
 
+const handleClickGoToMyPage = () => {
+    if (isAdminMode) appContextStore.exitAdminMode();
+    router.push({ name: MY_PAGE_ROUTE._NAME });
+    hideProfileMenu();
+};
+
 const handleLanguageClick = async (language) => {
     try {
         if (store.state.user.language === language) return;
@@ -131,7 +138,7 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
-    if (state.isAdminMode) appContextStore.exitAdminMode();
+    if (isAdminMode) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },
@@ -242,23 +249,20 @@ const handleClickSignOut = async () => {
                     <span class="value">{{ state.timezone }}</span>
                 </div>
                 <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
-                                 @click.native="hideProfileMenu"
+                    <p-button style-type="secondary"
+                              size="sm"
+                              class="my-page-button"
+                              @click="handleClickGoToMyPage"
                     >
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  class="my-page-button"
-                        >
-                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
-                        </p-button>
-                    </router-link>
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                    </p-button>
                 </div>
             </div>
             <template v-if="!state.isMyPage">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"
-                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 :to="getProperRouteLocation({name: INFO_ROUTE.NOTICE._NAME})"
                                  @click.native="hideProfileMenu"
                     >
                         {{ $t('MENU.INFO_NOTICE') }}

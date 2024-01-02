@@ -14,15 +14,14 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { store } from '@/store';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { gray } from '@/styles/colors';
 
@@ -33,7 +32,7 @@ import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
-const appContextStore = useAppContextStore();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 
 const budgetPageStore = useBudgetDetailPageStore();
@@ -44,7 +43,6 @@ const costTypeRef = ref<HTMLElement|null>(null);
 
 const queryHelper = new QueryHelper();
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -78,14 +76,14 @@ const state = reactive({
                 { resource_type: 'identity.Project' },
             );
         }
-        if (storeState.isAdminMode) {
+        if (isAdminMode) {
             queryHelper.setFilters([{ k: 'workspace_id', v: state.budgetData?.workspace_id, o: '=' }]);
-            return {
-                name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
+            return getProperRouteLocation({
+                name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                 },
-            };
+            });
         }
         return undefined;
     }),

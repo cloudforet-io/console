@@ -6,7 +6,7 @@ import {
     PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import RoleManagementTab from '@/services/administration/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/administration/components/RoleManagementTable.vue';
@@ -15,12 +15,13 @@ import { useRolePageStore } from '@/services/administration/store/role-page-stor
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const router = useRouter();
 
 /* Component */
 const handleCreateRole = () => {
-    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME) });
+    router.push(getProperRouteLocation({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }));
 };
 
 onUnmounted(() => {

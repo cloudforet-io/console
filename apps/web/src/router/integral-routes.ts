@@ -29,10 +29,11 @@ export const integralRoutes: RouteConfig[] = [
         name: ROOT_ROUTE._NAME,
         // TODO: need to implement with SYSTEM_ADMIN
         redirect: () => {
+            const appContextStore = useAppContextStore();
+            const isAdminMode = appContextStore.getters.isAdminMode;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             if (!isTokenAlive) return ({ name: AUTH_ROUTE.SIGN_OUT._NAME });
-            const appContextStore = useAppContextStore();
-            if (appContextStore.getters.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
+            if (isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
             return { name: ROOT_ROUTE.WORKSPACE._NAME };
         },
         component: { template: '<router-view />' },

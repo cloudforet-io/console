@@ -13,14 +13,12 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
@@ -46,13 +44,12 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
-const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
 });
 const state = reactive({
@@ -118,12 +115,12 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push({
-        name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
+    router.push(getProperRouteLocation({
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
-    });
+    }));
 };
 const handleUpdateCloneModal = (visible: boolean) => {
     if (visible) return;
@@ -188,7 +185,7 @@ watch(() => props.dashboardList, () => {
                     <template v-if="board.tags.created_by">
                         <span>{{ board.tags.created_by }}</span>
                     </template>
-                    <template v-if="!storeState.isAdminMode">
+                    <template v-if="!isAdminMode">
                         <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
@@ -198,7 +195,7 @@ watch(() => props.dashboardList, () => {
                     </template>
                 </div>
                 <div class="label-wrapper">
-                    <p-label v-if="!storeState.isAdminMode"
+                    <p-label v-if="!isAdminMode"
                              :class="{'item-label': true, 'viewers-label': true, 'private-label': !!board.private_dashboard_id}"
                              :text="!!board.private_dashboard_id ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC')"
                              :left-icon="!!board.private_dashboard_id ? 'ic_lock-filled' : 'ic_globe-filled'"

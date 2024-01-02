@@ -10,7 +10,7 @@ import {
 } from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
 
-import type { RoleInfo, UserState } from './type';
+import type { GrantInfo, RoleInfo, UserState } from './type';
 
 // TODO: temporary defence
 export const isDomainAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.DOMAIN_ADMIN;
@@ -25,6 +25,8 @@ export const hasSystemRole = (state: UserState): boolean => state.roleType === '
 export const hasPermission = (state: UserState): boolean => !!state.currentRoleInfo;
 
 export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): RoleInfo|undefined => state.currentRoleInfo;
+
+export const getCurrentGrantInfo: Getter<UserState, any> = (state: UserState): GrantInfo|undefined => state.currentGrantInfo;
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';

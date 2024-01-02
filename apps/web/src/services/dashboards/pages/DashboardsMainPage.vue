@@ -2,6 +2,7 @@
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
@@ -18,9 +19,12 @@ import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
+
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
@@ -28,9 +32,11 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
+const router = useRouter();
 const state = reactive({
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
@@ -84,7 +90,7 @@ const queryState = reactive({
     queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
 
-const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
+const handleCreateDashboard = () => { router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME })); };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);

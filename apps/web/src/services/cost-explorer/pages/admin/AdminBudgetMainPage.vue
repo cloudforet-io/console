@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router/composables';
+
 import {
     PHeading, PDivider, PButton,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const handleCreateBudgetSelect = () => {
-    SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME });
+    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME }));
 };
 </script>
 
