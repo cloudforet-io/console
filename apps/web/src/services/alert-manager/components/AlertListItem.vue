@@ -1,62 +1,6 @@
-<template>
-    <div class="alert-list-item">
-        <div class="content-wrapper">
-            <div class="left-part">
-                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
-                     width="1em"
-                     height="1em"
-                     :color="item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
-                />
-                <p-link class="title"
-                        :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
-                >
-                    <span v-tooltip.bottom="item.title">{{ item.title }}</span>
-                </p-link>
-                <p-badge v-if="showMemberName && item.assignee"
-                         style-type="primary1"
-                         badge-type="solid-outline"
-                         class="member-name"
-                >
-                    {{ userReference.name || item.assignee }}
-                </p-badge>
-            </div>
-            <div class="right-part">
-                <p-link v-if="showProjectLink"
-                        v-tooltip.bottom="projectNameFormatter(item.project_id)"
-                        class="project-link"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                        hide-icon
-                >
-                    {{ projectNameFormatter(item.project_id) }}
-                </p-link>
-                <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
-                         badge-type="subtle"
-                         class="badge"
-                >
-                    {{ alertStateI18n[item.state] }}
-                </p-badge>
-                <span class="date">{{ dateFormatter(item.created_at) }}</span>
-            </div>
-        </div>
-        <div v-if="showStatusMessage && item.status_message"
-             class="status-message"
-        >
-            <p-i name="ic_subdirectory-arrow-right"
-                 width="1rem"
-                 height="1rem"
-            />
-            <span>{{ item.status_message }}</span>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -77,78 +21,99 @@ import { red } from '@/styles/colors';
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
-
 const ALERT_URGENCY = Object.freeze({
     HIGH: 'HIGH',
     LOW: 'LOW',
 });
 
-export default {
-    name: 'AlertListItem',
-    components: {
-        PI,
-        PBadge,
-        PLink,
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => ({}),
-        },
-        showProjectLink: {
-            type: Boolean,
-            default: false,
-        },
-        showMemberName: {
-            type: Boolean,
-            default: false,
-        },
-        showStatusMessage: {
-            type: Boolean,
-            default: false,
-        },
-        projectReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: () => ({}),
-        },
-        userReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            alertStateI18n: useAlertStateI18n(),
-        });
+const props = withDefaults(defineProps<{
+    item: Record<string, any>;
+    showProjectLink?: boolean;
+    showMemberName?: boolean;
+    showStatusMessage?: boolean;
+    projectReference?: ReferenceItem;
+    userReference?: ReferenceItem;
+}>(), {
+    item: () => ({}),
+    showProjectLink: false,
+    showMemberName: false,
+    showStatusMessage: false,
+    projectReference: () => ({}),
+    userReference: () => ({}),
+});
 
-        /* util */
-        const badgeStyleTypeFormatter = (alertState) => {
-            if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
-            if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
-            return 'gray200';
-        };
-        const dateFormatter = (date) => {
-            const offset = (dayjs().tz(state.timezone).utcOffset());
-            const timezoneDate = dayjs(date).utcOffset(offset);
-            return timezoneDate.format('MM/DD HH:mm');
-        };
-        const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
+const state = reactive({
+    timezone: computed(() => store.state.user.timezone),
+    alertStateI18n: useAlertStateI18n(),
+});
 
-        return {
-            ...toRefs(state),
-            red,
-            ALERT_URGENCY,
-            ALERT_MANAGER_ROUTE,
-            ACTION_ICON,
-            referenceRouter,
-            badgeStyleTypeFormatter,
-            dateFormatter,
-            projectNameFormatter,
-        };
-    },
+/* util */
+const badgeStyleTypeFormatter = (alertState) => {
+    if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
+    if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
+    return 'gray200';
 };
+const dateFormatter = (date) => {
+    const offset = (dayjs().tz(state.timezone).utcOffset());
+    const timezoneDate = dayjs(date).utcOffset(offset);
+    return timezoneDate.format('MM/DD HH:mm');
+};
+const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
 </script>
+
+<template>
+    <div class="alert-list-item">
+        <div class="content-wrapper">
+            <div class="left-part">
+                <p-i :name="props.item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
+                     width="1em"
+                     height="1em"
+                     :color="props.item.urgency === ALERT_URGENCY.HIGH ? red[400] : undefined"
+                />
+                <p-link class="title"
+                        :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: props.item.alert_id } }"
+                >
+                    <span v-tooltip.bottom="props.item.title">{{ props.item.title }}</span>
+                </p-link>
+                <p-badge v-if="props.showMemberName && props.item.assignee"
+                         style-type="primary1"
+                         badge-type="solid-outline"
+                         class="member-name"
+                >
+                    {{ props.userReference.name || props.item.assignee }}
+                </p-badge>
+            </div>
+            <div class="right-part">
+                <p-link v-if="props.showProjectLink"
+                        v-tooltip.bottom="projectNameFormatter(props.item.project_id)"
+                        class="project-link"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="referenceRouter(props.item.project_id,{ resource_type: 'identity.Project' })"
+                        hide-icon
+                >
+                    {{ projectNameFormatter(props.item.project_id) }}
+                </p-link>
+                <p-badge :style-type="badgeStyleTypeFormatter(props.item.state)"
+                         badge-type="subtle"
+                         class="badge"
+                >
+                    {{ state.alertStateI18n[props.item.state] }}
+                </p-badge>
+                <span class="date">{{ dateFormatter(props.item.created_at) }}</span>
+            </div>
+        </div>
+        <div v-if="props.showStatusMessage && props.item.status_message"
+             class="status-message"
+        >
+            <p-i name="ic_subdirectory-arrow-right"
+                 width="1rem"
+                 height="1rem"
+            />
+            <span>{{ props.item.status_message }}</span>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .alert-list-item {
