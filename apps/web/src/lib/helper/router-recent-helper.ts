@@ -13,12 +13,13 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-export const getRecentConfig = (to: Route): Omit<RecentConfig, 'workspaceId'> | undefined => {
+export const getRecentConfig = (to: Route): RecentConfig | undefined => {
+    const workspaceId = to.params.workspaceId;
     /* DASHBOARD */
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
-        return { itemType: RECENT_TYPE.DASHBOARD, itemId: dashboardId };
+        return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
     }
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
@@ -26,14 +27,14 @@ export const getRecentConfig = (to: Route): Omit<RecentConfig, 'workspaceId'> | 
         const group = to?.params?.group;
         const name = to?.params?.name;
         if (!provider || !group || !name) return undefined;
-        return { itemType: RECENT_TYPE.CLOUD_SERVICE, itemId: `${provider}.${group}.${name}` };
+        return { itemType: RECENT_TYPE.CLOUD_SERVICE, workspaceId, itemId: `${provider}.${group}.${name}` };
     }
 
     /* PROJECT GROUP */
     if (to.name === PROJECT_ROUTE._NAME) {
         const projectGroupId = to?.query?.select_pg;
         if (projectGroupId?.length) {
-            return { itemType: RECENT_TYPE.PROJECT_GROUP, itemId: projectGroupId as string };
+            return { itemType: RECENT_TYPE.PROJECT_GROUP, workspaceId, itemId: projectGroupId as string };
         }
     }
 
@@ -41,7 +42,7 @@ export const getRecentConfig = (to: Route): Omit<RecentConfig, 'workspaceId'> | 
     if (to.name === PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME) {
         const projectId = to?.params?.id;
         if (!projectId) return undefined;
-        return { itemType: RECENT_TYPE.PROJECT, itemId: projectId };
+        return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };
     }
 
     if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) {
@@ -49,15 +50,15 @@ export const getRecentConfig = (to: Route): Omit<RecentConfig, 'workspaceId'> | 
         const costQuerySetId = to?.params?.costQuerySetId;
         if (!dataSourceId || !costQuerySetId) return undefined;
         if (MANAGED_COST_QUERY_SET_ID_LIST.includes(costQuerySetId)) {
-            return { itemType: RECENT_TYPE.COST_ANALYSIS, itemId: getCompoundKeyWithManagedCostQuerySetFavoriteKey(dataSourceId, costQuerySetId) };
+            return { itemType: RECENT_TYPE.COST_ANALYSIS, workspaceId, itemId: getCompoundKeyWithManagedCostQuerySetFavoriteKey(dataSourceId, costQuerySetId) };
         }
-        return { itemType: RECENT_TYPE.COST_ANALYSIS, itemId: costQuerySetId };
+        return { itemType: RECENT_TYPE.COST_ANALYSIS, workspaceId, itemId: costQuerySetId };
     }
 
     /* MENU */
     const menu = MENU_INFO_MAP[to.name as MenuId];
     if (menu) {
-        return { itemType: RECENT_TYPE.MENU, itemId: to.name as MenuId };
+        return { itemType: RECENT_TYPE.MENU, workspaceId, itemId: to.name as MenuId };
     }
     return undefined;
 };

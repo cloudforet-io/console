@@ -174,13 +174,12 @@ export class SpaceRouter {
             if (!store) return;
 
             const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.isAdminMode;
-            const currentWorkspaceId = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.currentWorkspaceId;
             if (!isAdminMode) {
                 const recent = getRecentConfig(to);
                 if (recent) {
                     store.dispatch('recent/addItem', {
                         itemType: recent.itemType,
-                        workspaceId: currentWorkspaceId,
+                        workspaceId: recent.workspaceId,
                         itemId: recent.itemId,
                     });
                 }
