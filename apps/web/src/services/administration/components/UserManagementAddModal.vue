@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -103,6 +105,8 @@ const handleClose = () => {
     userPageStore.$patch((_state) => {
         _state.modal.visible.add = false;
         _state.modal = cloneDeep(_state.modal);
+        _state.createdWorkspaceId = undefined;
+        _state.afterWorkspaceCreated = false;
     });
 };
 /* API */
@@ -118,6 +122,8 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     const createRoleBinding = async () => {
         if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
             await fetchCreateRoleBinding(item);
+        } else if (userPageState.afterWorkspaceCreated) {
+            await fetchCreateRoleBinding({ ...item, workspace_id: userPageState.createdWorkspaceId });
         } else {
             await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
         }
@@ -139,17 +145,29 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     }
 };
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    let roleParams: RoleCreateParameters;
     const baseRoleParams = {
         user_id: userItem.user_id || '',
         role_id: state.role.name || '',
         resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
-    const roleParams = (userPageStore.isWorkspaceOwner || state.isSetAdminRole) ? baseRoleParams : {
-        ...baseRoleParams,
-        workspace_id: item?.name || '',
-    };
+    if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+        roleParams = baseRoleParams;
+    } else if (userPageState.afterWorkspaceCreated) {
+        roleParams = {
+            ...baseRoleParams,
+            workspace_id: userPageState.createdWorkspaceId || '',
+        };
+    } else {
+        roleParams = {
+            ...baseRoleParams,
+            workspace_id: item?.name || '',
+        };
+    }
+
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
 };
+
 </script>
 
 <template>

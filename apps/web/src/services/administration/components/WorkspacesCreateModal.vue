@@ -14,6 +14,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceCreateParameters } from '@/schema/identity/workspace/api-verbs/create';
 import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -35,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm'): void;
+    (e: 'confirm', workspaceId: string): void;
     (e: 'refresh'): void;
 }>();
 
@@ -90,14 +91,14 @@ const handleConfirm = async () => {
             });
             showSuccessMessage(i18n.t('Workspace successfully updated'), '');
         } else {
-            await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters>({
+            const response = await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters, WorkspaceModel>({
                 name: state.name ?? '',
                 tags: {
                     description: state.description ?? '',
                 },
             });
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            emit('confirm');
+            emit('confirm', response.workspace_id);
         }
     } catch (e) {
         ErrorHandler.handleError(e);

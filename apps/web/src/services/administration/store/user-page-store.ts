@@ -36,6 +36,7 @@ export const useUserPageStore = defineStore('user-page', {
         searchFilters: [] as ConsoleFilter[],
         // This is for workspace created case in admin mode
         afterWorkspaceCreated: false,
+        createdWorkspaceId: undefined as string | undefined,
         modal: {
             type: '',
             title: '',

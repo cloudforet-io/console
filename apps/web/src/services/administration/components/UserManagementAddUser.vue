@@ -240,8 +240,10 @@ onMounted(() => {
                     {{ $t('IAM.USER.FORM.USER_ID') }}
                 </strong>
                 <span v-else>
-                    <span>{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
-                    <span class="and-mark">&</span>
+                    <span v-if="!userPageStore.afterWorkspaceCreated">{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
+                    <span v-if="!userPageStore.afterWorkspaceCreated"
+                          class="and-mark"
+                    >&</span>
                     <span>{{ $t('IAM.USER.FORM.USER_ID') }}</span>
                 </span>
             </template>
