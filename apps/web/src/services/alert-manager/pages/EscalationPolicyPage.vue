@@ -127,12 +127,11 @@ const state = reactive({
 });
 
 /* api */
-const escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
         const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
-            query: escalationPolicyApiQuery,
+            query: escalationPolicyApiQueryHelper.data,
         });
         state.escalationPolicies = res.results;
         state.items = res.results?.map((d) => ({
