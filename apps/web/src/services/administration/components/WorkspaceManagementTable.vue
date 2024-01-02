@@ -32,6 +32,8 @@ import {
     WORKSPACE_SEARCH_HANDLERS,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import type { WorkspaceTableModel } from '@/services/administration/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
@@ -126,15 +128,19 @@ const handleExport = async () => {
     }
 };
 
-const getRouteLocationByWorkspaceName = (name: string) => {
-    const targetWorkspace = workspacePageState.workspaces.find((workspace) => workspace.name === name);
-    return {
-        name: HOME_DASHBOARD_ROUTE._NAME,
-        params: {
-            workspaceId: targetWorkspace?.workspace_id,
-        },
-    };
-};
+const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+    name: HOME_DASHBOARD_ROUTE._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+    name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
 
 
 </script>
@@ -172,11 +178,11 @@ const getRouteLocationByWorkspaceName = (name: string) => {
                                    @select="handleSelectDropdown"
                 />
             </template>
-            <template #col-name-format="{value}">
+            <template #col-name-format="{value, item}">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
-                        :to="getRouteLocationByWorkspaceName(value)"
+                        :to="getWorkspaceRouteLocationByWorkspaceName(item)"
                 />
             </template>
             <template #col-state-format="{value}">
@@ -184,10 +190,11 @@ const getRouteLocationByWorkspaceName = (name: string) => {
                           class="capitalize"
                 />
             </template>
-            <template #col-users-format="{value}">
+            <template #col-users-format="{value, item}">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
+                        :to="getUserRouteLocationByWorkspaceName(item)"
                 />
             </template>
             <template #col-created_at-format="{value}">
