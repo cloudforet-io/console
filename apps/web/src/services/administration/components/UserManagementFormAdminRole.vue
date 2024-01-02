@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PButton,
+    PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PButton, PToggleButton,
 } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -27,18 +27,22 @@ import type { AddModalMenuItem } from '@/services/administration/types/user-type
 
 interface Props {
     role?: AddModalMenuItem
+    isChangedToggle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     role: undefined,
+    isChangedToggle: false,
 });
 
 const emit = defineEmits<{(e: 'update:role', formState): void,
+    (e: 'update:isChangedToggle', type: string): void,
 }>();
 
 const roleState = reactive({
     loading: true,
     visible: false,
+    searchText: '',
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
     selectedItems: computed(() => {
@@ -49,7 +53,7 @@ const roleState = reactive({
             role_type: roleState.proxySelectedItems.role_type,
         }];
     }),
-    searchText: '',
+    proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),
 });
 
 const roleListApiQueryHelper = new ApiQueryHelper()
@@ -64,6 +68,9 @@ const roleMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectMenuItem = (role: AddModalMenuItem) => {
     roleState.proxySelectedItems = role;
+};
+const handleChangeToggleButton = (value) => {
+    roleState.proxyIsChangedToggle = value;
 };
 
 /* API */
@@ -98,14 +105,24 @@ const fetchListRoles = async (inputText: string) => {
         roleState.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => roleState.proxySelectedItems, (role) => {
+    roleState.proxyIsChangedToggle = !!role.name;
+}, { immediate: true });
 </script>
 
 <template>
     <div class="user-admin-role-wrapper">
         <div class="title-wrapper">
             <p-field-title :label="$t('IAM.USER.FORM.ASSIGN_DOMAIN_ROLE')" />
+            <p-toggle-button :value="roleState.proxyIsChangedToggle"
+                             @change-toggle="handleChangeToggleButton"
+            />
         </div>
-        <div class="admin-role-form-view">
+        <div v-if="roleState.proxyIsChangedToggle"
+             class="admin-role-form-view"
+        >
             <span class="help-text">{{ $t('IAM.USER.FORM.ADMIN_ROLE_HELP_TEXT') }}</span>
             <p-field-group :label="$t('IAM.USER.FORM.WITH_ROLE')"
                            required
