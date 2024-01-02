@@ -124,7 +124,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 interface Props {
-    domainId?: string
     userId?: string
     visible: boolean
     email?: string
@@ -132,7 +131,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    domainId: '',
     userId: '',
     visible: false,
     email: '',

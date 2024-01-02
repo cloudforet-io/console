@@ -49,7 +49,6 @@ const state = reactive({
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
     email: computed<string>(() => store.state.user.email),
-    domainId: computed<string>(() => store.state.domain.domainId),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     hasNoWorkspace: false,
@@ -78,9 +77,11 @@ const goToSignIn = async () => {
 };
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
-watch(() => route, (value) => {
-    state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
-});
+watch(() => route.path, () => {
+    state.notificationEmailModalVisible = !state.isEmailVerified
+        && !LocalStorageAccessor.getItem('hideNotificationEmailModal')
+        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED;
+}, { immediate: true });
 
 
 watch(() => route.name, (routeName) => {
@@ -173,8 +174,8 @@ watch(() => state.userId, (userId) => {
             <has-no-workspace-modal :visible.sync="state.hasNoWorkspace" />
             <notification-email-modal
                 v-if="state.smtpEnabled"
-                :domain-id="state.domainId"
                 :user-id="state.userId"
+                :email="state.email"
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />

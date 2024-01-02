@@ -20,10 +20,9 @@ import UserAccountModuleContainer from '@/services/my-page/components/UserAccoun
 
 
 const state = reactive({
-    userType: computed(() => store.state.user.backend),
+    authType: computed(() => store.state.user.authType),
     verified: computed(() => store.state.user.emailVerified),
     userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
     loading: false,
     isModalVisible: false,
     modalType: '',
@@ -62,7 +61,7 @@ const handleClickVerifyButton = async (type: string) => {
 watch(() => store.state.user.email, (value) => {
     let result = value;
     if (value === '') {
-        if (state.userType === 'LOCAL') {
+        if (state.authType === 'LOCAL') {
             result = state.userId;
         } else {
             result = '';
@@ -130,7 +129,6 @@ watch(() => store.state.user.email, (value) => {
                 @click-button="handleClickVerifyButton"
             >
                 <notification-email-modal
-                    :domain-id="state.domainId"
                     :user-id="state.userId"
                     :email="notificationEmail"
                     :modal-type="state.modalType"
