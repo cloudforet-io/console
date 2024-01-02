@@ -52,17 +52,18 @@ export default defineComponent({
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
-            userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
-            icon: computed(() => {
-                if (state.isDomainOwner) return 'img_avatar_root-account';
-                return 'img_avatar_user';
+            userRoleType: computed(() => store.state.user.roleType),
+            icon: computed<string>(() => {
+                if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
+                if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
+                return 'img_avatar_no-role';
             }),
             memberType: computed(() => {
-                if (state.isDomainOwner) return i18n.t('MY_PAGE.ROOT_ACCOUNT');
-                return i18n.t('MY_PAGE.SPACEONE_USER');
+                if (state.isDomainOwner) return i18n.t('MY_PAGE.ADMIN');
+                return '';
             }),
             header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId) as string),
             menuSet: computed<LNBMenu[]>(() => {
@@ -72,12 +73,14 @@ export default defineComponent({
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId),
                         id: MENU_ID.MY_PAGE,
                         foldable: false,
+                        hideFavorite: true,
                     },
                     {
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
                         id: MENU_ID.ACCOUNT_PROFILE,
                         to: { name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME },
+                        hideFavorite: true,
                     },
                     {
                         type: 'item',
@@ -85,6 +88,7 @@ export default defineComponent({
                         id: MENU_ID.NOTIFICATIONS,
                         to: { name: MY_PAGE_ROUTE.NOTIFICATION._NAME },
                         hightlightTag: 'beta',
+                        hideFavorite: true,
                     },
                 ];
                 return filterLNBMenuByAccessPermission(allLnbMenu, store.getters['user/pageAccessPermissionList']);
@@ -106,7 +110,6 @@ export default defineComponent({
     padding: 1rem 2.125rem;
     margin-top: 1.5rem;
     margin-bottom: 2.125rem;
-    width: 14.75rem;
     height: 7.875rem;
     .member-icon {
         @apply mx-auto rounded-full;
