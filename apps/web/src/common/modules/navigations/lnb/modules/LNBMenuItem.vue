@@ -89,8 +89,8 @@ const handleSelect = (id: string, selected: string) => {
                 <p-i v-if="item.icon"
                      :name="item.icon.name"
                      class="top-title-icon"
-                     width="1rem"
-                     height="1rem"
+                     width="0.75rem"
+                     height="0.75rem"
                      :color="item.icon.color"
                 />
             </p>
