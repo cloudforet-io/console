@@ -33,7 +33,7 @@ interface WorkspacePageState {
     usersSearchfilters: ConsoleFilter[],
 }
 
-interface WorkspaceTableModel extends WorkspaceModel {
+export interface WorkspaceTableModel extends WorkspaceModel {
     users?: number;
 }
 

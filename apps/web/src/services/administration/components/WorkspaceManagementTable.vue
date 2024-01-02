@@ -32,7 +32,10 @@ import {
     WORKSPACE_SEARCH_HANDLERS,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import type { WorkspaceTableModel } from '@/services/administration/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 
 interface Props {
@@ -57,6 +60,7 @@ queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
+
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -124,6 +128,20 @@ const handleExport = async () => {
     }
 };
 
+const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+    name: HOME_DASHBOARD_ROUTE._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
+const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
+    name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+    params: {
+        workspaceId: item?.workspace_id,
+    },
+});
+
 
 </script>
 
@@ -135,6 +153,7 @@ const handleExport = async () => {
                          sortable
                          exportable
                          :loading="false"
+                         :multi-select="false"
                          disabled
                          :items="workspacePageState.workspaces"
                          :select-index="workspacePageState.selectedIndices"
@@ -159,10 +178,11 @@ const handleExport = async () => {
                                    @select="handleSelectDropdown"
                 />
             </template>
-            <template #col-name-format="{value}">
+            <template #col-name-format="{value, item}">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
+                        :to="getWorkspaceRouteLocationByWorkspaceName(item)"
                 />
             </template>
             <template #col-state-format="{value}">
@@ -170,10 +190,11 @@ const handleExport = async () => {
                           class="capitalize"
                 />
             </template>
-            <template #col-users-format="{value}">
+            <template #col-users-format="{value, item}">
                 <p-link :text="value"
                         action-icon="internal-link"
                         new-tab
+                        :to="getUserRouteLocationByWorkspaceName(item)"
                 />
             </template>
             <template #col-created_at-format="{value}">
