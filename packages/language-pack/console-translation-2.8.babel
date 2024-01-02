@@ -16626,7 +16626,7 @@
                                 <name>MY_PAGE</name>
                                 <children>
                                     <concept_node>
-                                        <name>BACK_LINK</name>
+                                        <name>BACK_LINK_ADMIN</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -16648,6 +16648,27 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>BACK_LINK_SHORT</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>BACK_LINK_WORKSPACE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
