@@ -64,9 +64,10 @@ const state = reactive({
     escalationRules: computed<EscalationPolicyRule[]|undefined>(() => get(props.escalationPolicy, 'rules')),
     repeatCount: computed<number|undefined>(() => get(props.escalationPolicy, 'repeat_count')),
     projectChannels: [] as ProjectChannelModel[],
-    escalationPolicyLink: computed<Location>(() => {
+    escalationPolicyLink: computed<Location|undefined>(() => {
         const filters: ConsoleFilter[] = [];
         const escalationPolicyId: string|undefined = get(props.escalationPolicy, 'escalation_policy_id');
+        if (!escalationPolicyId) return undefined;
         filters.push({ k: 'escalation_policy_id', o: '=', v: escalationPolicyId });
         return {
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
@@ -83,8 +84,9 @@ const notificationLevelFormatter = (str: string) => str.replace('LV', '');
 /* api */
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
-    apiQuery
-        .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+    if (props.projectId) {
+        apiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+    } else apiQuery.setFilters([]);
     return apiQuery.data;
 };
 const listProjectChannel = async () => {

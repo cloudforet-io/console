@@ -1,7 +1,67 @@
+<script setup lang="ts">
+import {
+    computed, onUnmounted, reactive, watch, ref,
+} from 'vue';
+
+import {
+    PContextMenu, PI, PLazyImg, PTooltip, PTextHighlighting,
+} from '@spaceone/design-system';
+
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+
+interface Props {
+    items: SuggestionItem[];
+    inputText?: string;
+    isFocused?: boolean;
+    focusingDirection?: FocusingDirection;
+    useFavorite?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    items: () => [],
+    inputText: '',
+    isFocused: false,
+    focusingDirection: undefined,
+    useFavorite: false,
+});
+
+const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number): void;
+    (event: 'close'): void;
+    (event: 'move-focus-end', direction: FocusingDirection): void;
+    (event: 'update:isFocused', value: boolean): void;
+}>();
+
+const contextMenuRef = ref<any|null>(null);
+const state = reactive({
+    refinedItems: computed(() => props.items.map((d) => ({ ...d, icon: undefined, itemIcon: d.icon }))),
+});
+
+const handleSelect = (item, index) => {
+    emit('select', item, index);
+};
+
+watch(() => props.isFocused, (isFocused) => {
+    if (!contextMenuRef.value) return;
+    if (!isFocused) return;
+    if (props.focusingDirection === 'DOWNWARD') {
+        contextMenuRef.value.focus(0);
+    } else {
+        contextMenuRef.value.focus(-1);
+    }
+});
+
+onUnmounted(() => {
+    emit('update:isFocused', false);
+});
+</script>
+
 <template>
     <p-context-menu ref="contextMenuRef"
                     class="gnb-suggestion-list"
-                    :menu="refinedItems"
+                    :menu="state.refinedItems"
                     no-select-indication
                     @keyup:up:end="$emit('move-focus-end', 'UPWARD')"
                     @keyup:down:end="$emit('move-focus-end', 'DOWNWARD')"
@@ -35,10 +95,10 @@
                 <span class="texts">
                     <template v-if="item.parents">
                         <template v-for="(parent, pIdx) in item.parents">
-                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`"
-                                               class="text-item"
-                                               :term="inputText"
-                                               :text="parent.label"
+                            <p-text-highlighting :key="`parent-${parent.label}-${pIdx}`"
+                                                 class="text-item"
+                                                 :term="props.inputText"
+                                                 :text="parent.label"
                             />
                             <span :key="`arrow-${pIdx}`">
                                 <p-i name="ic_chevron-right-thin"
@@ -48,14 +108,14 @@
                             </span>
                         </template>
                     </template>
-                    <text-highlighting :key="`leaf-${item.label}`"
-                                       class="text-item"
-                                       :term="inputText"
-                                       :text="item.label"
+                    <p-text-highlighting :key="`leaf-${item.label}`"
+                                         class="text-item"
+                                         :term="props.inputText"
+                                         :text="item.label"
                     />
                 </span>
                 <span class="favorite-button">
-                    <favorite-button v-if="useFavorite"
+                    <favorite-button v-if="props.useFavorite"
                                      :item-id="item.name"
                                      :favorite-type="item.itemType"
                                      scale="0.65"
@@ -72,97 +132,6 @@
         </template>
     </p-context-menu>
 </template>
-
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    computed,
-    defineComponent, onUnmounted,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PContextMenu, PI, PLazyImg, PTooltip,
-} from '@spaceone/design-system';
-
-import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
-
-interface Props {
-    items: SuggestionItem[];
-    inputText: string;
-    isFocused: boolean;
-    focusingDirection: FocusingDirection;
-    useFavorite: boolean;
-}
-
-export default defineComponent<Props>({
-    name: 'GNBSuggestionList',
-    components: {
-        TextHighlighting,
-        FavoriteButton,
-        PContextMenu,
-        PLazyImg,
-        PI,
-        PTooltip,
-    },
-    props: {
-        items: {
-            type: Array as PropType<SuggestionItem[]>,
-            default: () => [],
-        },
-        inputText: {
-            type: String,
-            default: '',
-        },
-        isFocused: {
-            type: Boolean,
-            default: false,
-        },
-        focusingDirection: {
-            type: String as PropType<FocusingDirection>,
-            default: undefined,
-        },
-        useFavorite: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            contextMenuRef: null as null | any,
-            refinedItems: computed(() => props.items.map((d) => ({ ...d, icon: undefined, itemIcon: d.icon }))),
-        });
-
-        const handleSelect = (item, index) => {
-            emit('select', item, index);
-        };
-
-        watch(() => props.isFocused, (isFocused) => {
-            if (!state.contextMenuRef) return;
-            if (!isFocused) return;
-            if (props.focusingDirection === 'DOWNWARD') {
-                state.contextMenuRef.focus(0);
-            } else {
-                state.contextMenuRef.focus(-1);
-            }
-        });
-
-        onUnmounted(() => {
-            emit('update:isFocused', false);
-        });
-
-        return {
-            ...toRefs(state),
-            SUGGESTION_TYPE,
-            handleSelect,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-suggestion-list {
