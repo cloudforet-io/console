@@ -11,7 +11,7 @@ const GENERAL_DEFAULT_ROUTE = Object.freeze({
 });
 
 const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+    name: MY_PAGE_ROUTE._NAME,
 });
 
 // const SYTEM_DEFAULT_ROUTE = Object.freeze({

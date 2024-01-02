@@ -53,13 +53,8 @@ export const MENU_LIST: Menu[] = [
         hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
-            {
-                id: MENU_ID.ACCOUNT,
-                subMenuList: [
-                    { id: MENU_ID.ACCOUNT_PROFILE },
-                    { id: MENU_ID.NOTIFICATIONS },
-                ],
-            },
+            { id: MENU_ID.ACCOUNT_PROFILE },
+            { id: MENU_ID.NOTIFICATIONS },
         ],
     },
     {

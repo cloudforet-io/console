@@ -62,7 +62,7 @@ const state = reactive({
     protocolList: computed<EnrichedProtocolItem[]>(() => state.protocolResp.map((d) => ({
         label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
         link: {
-            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
+            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
             params: {
                 protocol: d.name.replace(/(\s*)/g, ''),
                 protocolId: d.protocol_id,

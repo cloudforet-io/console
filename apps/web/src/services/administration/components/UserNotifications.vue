@@ -44,7 +44,7 @@ const state = reactive({
     items: [] as (UserChannelModel & {protocol_type?: string})[],
     protocolList: [] as ProtocolModel[],
     manageLink: {
-        name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
+        name: MY_PAGE_ROUTE.NOTIFICATION.MANAGE._NAME,
         params: { userId: computed(() => encodeURIComponent(props.userId)) },
     },
     timezone: computed<string>(() => store.state.user.timezone),
