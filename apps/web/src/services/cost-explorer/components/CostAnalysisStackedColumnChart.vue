@@ -108,7 +108,14 @@ const drawChart = () => {
             const convertedText = text.replace(/,/g, '');
             const num = Number(convertedText);
             if (Number.isNaN(num)) return text;
-            return numberFormatter(num) ?? '';
+
+            // set empty string for fixed axis width
+            let _text: string = numberFormatter(num) ?? '';
+            if (_text.length < 4) {
+                const emptyString = ' '.repeat(4 - _text.length);
+                _text = `${_text}${emptyString}`;
+            }
+            return _text;
         }
         return text;
     });

@@ -17,6 +17,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,8 +34,10 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
+const appContextStore = useAppContextStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
@@ -45,6 +49,9 @@ const targetRef = ref<HTMLElement | null>(null);
 
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     queryFormModalVisible: false,
@@ -169,7 +176,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div v-if="state.hasManagePermission"
+            <div v-if="state.hasManagePermission && !storeState.isAdminMode"
                  ref="rightPartRef"
                  class="right-part"
             >

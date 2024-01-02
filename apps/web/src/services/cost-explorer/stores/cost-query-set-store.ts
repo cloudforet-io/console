@@ -58,6 +58,11 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
             state.costQuerySetList = [...getters.managedCostQuerySets];
             return;
         }
+
+        if (_state.isAdminMode) {
+            state.costQuerySetList = [...getters.managedCostQuerySets];
+            return;
+        }
         try {
             const { status, response } = await fetcher({
                 data_source_id: state.selectedDataSourceId,
