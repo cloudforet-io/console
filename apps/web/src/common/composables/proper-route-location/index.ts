@@ -1,0 +1,27 @@
+import { computed, reactive, toRef } from 'vue';
+import type { Location } from 'vue-router/types/router';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+export const useProperRouteLocation = () => {
+    const appContextStore = useAppContextStore();
+    const state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
+
+    const getProperRouteLocation = (location: Location): Location => {
+        if (!location.name) throw new Error('location.name is required');
+
+        return (state.isAdminMode ? {
+            ...location,
+            name: makeAdminRouteName(location.name),
+        } : location);
+    };
+
+    return {
+        isAdminMode: toRef(state, 'isAdminMode'),
+        getProperRouteLocation,
+    };
+};
