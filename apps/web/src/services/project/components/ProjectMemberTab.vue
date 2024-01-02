@@ -259,6 +259,7 @@ watch(() => projectDetailPageGetters.projectType, () => {
             <template #col-delete-format="{ item }">
                 <div class="remove-button-wrapper">
                     <p-button style-type="tertiary"
+                              size="sm"
                               class="mr-4"
                               @click="handleClickRemoveMember(item)"
                     >
