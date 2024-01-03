@@ -56,6 +56,11 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
             );
+            if (state.selectedUser?.role_id) {
+                additionalRoleFields.push(
+                    { name: 'role_id', label: i18n.t('IAM.USER.MAIN.ROLE_NAME') },
+                );
+            }
         } else {
             additionalRoleFields.push({
                 name: 'role_binding',
@@ -125,6 +130,11 @@ const handleClickVerifyButton = async () => {
                          class="role-type-icon"
                     >
                     <span>{{ useRoleFormatter(value).name }}</span>
+                </span>
+            </template>
+            <template #data-role_id="{value}">
+                <span class="role-type">
+                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
                 </span>
             </template>
             <template #data-role_binding="{value}">

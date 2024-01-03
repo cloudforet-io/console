@@ -12,6 +12,7 @@ export interface UserModel {
     email_verified: boolean;
     auth_type: AuthType; // backend
     role_type: RoleType;
+    role_id?: string;
     mfa: UserMfa;
     language: string;
     timezone: string;
