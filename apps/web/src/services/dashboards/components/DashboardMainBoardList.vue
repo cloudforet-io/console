@@ -90,12 +90,12 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         iconName: 'ic_edit',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
         eventAction: () => {
-            router.push({
+            router.push(getProperRouteLocation({
                 name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                 params: {
                     dashboardId: dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '',
                 },
-            });
+            }));
         },
     },
     {
@@ -115,12 +115,12 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push(getProperRouteLocation({
+    router.push(getProperRouteLocation(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
-    }));
+    })));
 };
 const handleUpdateCloneModal = (visible: boolean) => {
     if (visible) return;

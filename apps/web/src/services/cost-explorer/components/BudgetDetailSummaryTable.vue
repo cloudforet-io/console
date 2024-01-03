@@ -16,6 +16,8 @@ import { i18n } from '@/translations';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
@@ -52,6 +54,7 @@ interface BudgetTarget {
 type Providers = BudgetModel['provider_filter']['providers'];
 type BudgetTimeUnit = BudgetModel['time_unit'];
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 
@@ -87,7 +90,7 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
         const ratio = getBudgetRatio(budgetTimeUnit, d.cost, totalBudgetLimit, d.limit);
         // const ratio = (budgetTimeUnit === 'TOTAL') ? `${Math.round((d.cost / totalBudgetLimit) * 100)}%`
         //     : `${Math.round((d.cost / d.limit) * 100)}%`;
-        const link = {
+        const link = getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: state.budgetData?.data_source_id,
@@ -99,7 +102,7 @@ const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUni
                 period: objectToQueryString(period),
                 filters: objectToQueryString(getConvertedConsoleFilters({ ...costTypeFilters, ...targetFilters })),
             },
-        };
+        });
         return {
             ...d, ratio, link,
         };

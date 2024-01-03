@@ -18,6 +18,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetCreateFormAmountPlan
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlan.vue';
@@ -29,6 +30,7 @@ import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/types/budget
 type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_id'|'data_source_id'|'workspace_id'>;
 
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
@@ -67,9 +69,9 @@ const createBudget = async () => {
         await SpaceConnector.clientV2.costAnalysis.budget.create<BudgetCreateParameters>(params);
 
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-        await router.push({
+        await router.push(getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        });
+        }));
     } catch (e:any) {
         const ALREADY_EXIST_ERROR_CODE = 'ERROR_BUDGET_ALREADY_EXIST';
         if (e.code === ALREADY_EXIST_ERROR_CODE) {

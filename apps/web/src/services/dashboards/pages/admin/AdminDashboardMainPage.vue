@@ -16,6 +16,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -49,7 +51,7 @@ const queryState = reactive({
     queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
 
-const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
+const handleCreateDashboard = () => { SpaceRouter.router.push({ name: makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) }); };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);

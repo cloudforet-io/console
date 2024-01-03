@@ -19,6 +19,8 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -32,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
     budgetUsage: () => ({} as BudgetUsageAnalyzeResult),
 });
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const storeState = reactive({
@@ -42,12 +45,12 @@ const storeState = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
-    linkLocation: computed<Location>(() => ({
+    linkLocation: computed<Location>(() => (getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {
             budgetId: props.budgetUsage.budget_id,
         },
-    })),
+    }))),
     isProjectTarget: computed(() => props.budgetUsage.resource_group === 'PROJECT'),
     targetLabelList: computed<string[]>(() => {
         const targetId = state.isProjectTarget ? props.budgetUsage.project_id : props.budgetUsage.workspace_id;

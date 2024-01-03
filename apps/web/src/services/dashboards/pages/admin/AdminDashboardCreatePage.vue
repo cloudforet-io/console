@@ -32,6 +32,8 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -99,7 +101,7 @@ const createDashboard = async () => {
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam) as PublicDashboardModel;
         await SpaceRouter.router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
             params: {
                 dashboardId: createdDashboard.public_dashboard_id as string,
             },
@@ -116,7 +118,7 @@ const handleClickClose = () => {
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
-    name: DASHBOARDS_ROUTE.ALL._NAME,
+    name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
 });
 
 defineExpose({ setPathFrom });
