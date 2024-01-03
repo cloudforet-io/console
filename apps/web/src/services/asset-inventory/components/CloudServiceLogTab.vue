@@ -237,11 +237,11 @@ export default defineComponent<Props>({
                 });
                 if (status === 'succeed') {
                     state.data = response;
-                    state.loading = false;
                 }
             } catch (e: any) {
                 ErrorHandler.handleError(e);
                 state.data = [];
+            } finally {
                 state.loading = false;
             }
         }, 300);
