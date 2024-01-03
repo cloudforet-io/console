@@ -96,13 +96,13 @@ export default class TokenAPI {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
-        if (!this.refreshToken) {
+        if (!this.refreshToken || !this.accessToken) {
             return false;
         }
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.refreshToken);
+                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
                 let scope = 'USER';
                 if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
                 if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
