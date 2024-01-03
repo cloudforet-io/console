@@ -45,10 +45,11 @@ const tableState = reactive({
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
-        { name: 'role', label: 'Role' },
+        {
+            name: 'role', label: 'Role', sortable: true, sortKey: 'role_type',
+        },
         { name: 'auth_type', label: 'Auth Type' },
         { name: 'last_accessed_at', label: 'Last Activity' },
-        { name: 'timezone', label: 'Timezone' },
     ]),
     valueHandlerMap: computed(() => {
         const resourceType = 'identity.WorkspaceUser';

@@ -75,9 +75,10 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa', label: 'Multi-factor Auth' },
-                { name: 'role_type', label: 'Role Type' },
-                { name: 'role_id', label: 'Admin Role', sortable: false },
+                { name: 'mfa', label: 'MFA' },
+                {
+                    name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
+                },
             );
         } else {
             additionalFields.push(

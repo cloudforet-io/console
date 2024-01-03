@@ -256,7 +256,9 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
                 </div>
-                <div class="info-menu">
+                <div v-if="!route.path.includes('my-page')"
+                     class="info-menu"
+                >
                     <p-button style-type="secondary"
                               size="sm"
                               class="my-page-button"
