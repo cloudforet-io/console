@@ -11,6 +11,7 @@ import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
@@ -50,14 +51,16 @@ const tableState = reactive({
     ]),
     valueHandlerMap: computed(() => {
         const resourceType = 'identity.WorkspaceUser';
+        // NOTE: extra params (such as workspace_id) is not included in makeDistinctValueHandler. So, added in last argument of makeDistinctValueHandle.
+        const restArgs = [undefined, undefined, { workspace_id: state.currentWorkspaceId }] as const;
         return {
-            user_id: makeDistinctValueHandler(resourceType, 'user_id'),
-            name: makeDistinctValueHandler(resourceType, 'name'),
+            user_id: makeDistinctValueHandler(resourceType, 'user_id', undefined, ...restArgs),
+            name: makeDistinctValueHandler(resourceType, 'name', undefined, ...restArgs),
             state: makeEnumValueHandler(USER_STATE),
-            email: makeDistinctValueHandler(resourceType, 'email'),
-            auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
-            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
-            timezone: makeDistinctValueHandler(resourceType, 'timezone'),
+            email: makeDistinctValueHandler(resourceType, 'email', undefined, ...restArgs),
+            auth_type: makeDistinctValueHandler(resourceType, 'auth_type', undefined, ...restArgs),
+            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime', ...restArgs),
+            timezone: makeDistinctValueHandler(resourceType, 'timezone', undefined, ...restArgs),
         };
     }),
 });
