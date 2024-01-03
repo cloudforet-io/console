@@ -10,6 +10,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 import dayjs from 'dayjs';
 import { isEqual, range } from 'lodash';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
@@ -32,7 +33,6 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-a
 import type { PeriodDropdownMenu } from '@/services/cost-explorer/types/cost-analysis-period-type';
 import type {
     Granularity, Period, RelativePeriod,
-    CostQuerySetModel,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
