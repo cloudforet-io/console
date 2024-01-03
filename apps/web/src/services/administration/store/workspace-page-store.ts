@@ -73,7 +73,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 this.totalCount = total_count || 0;
                 this.selectedIndices = [];
 
-                const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>(params);
+                const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>();
                 this.roleBindings = response.results || [];
                 this.workspaces = this.workspaces.map((workspace) => {
                     const roleBindingsFilteredByWorkspaceId = this.roleBindings.filter((roleBinding) => roleBinding.workspace_id === workspace.workspace_id);
@@ -90,7 +90,6 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 this.loading = false;
             }
         },
-
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             this.userLoading = true;
             try {

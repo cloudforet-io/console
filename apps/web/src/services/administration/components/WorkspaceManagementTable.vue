@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PSelectDropdown, PStatus, PToolboxTable, PLink,
@@ -10,7 +9,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import {
-    setApiQueryWithToolboxOptions,
+    getApiQueryWithToolboxOptions,
 } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -21,7 +20,6 @@ import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -51,11 +49,12 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
-const router = useRouter();
 const workspaceListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
     .setSort('name', true);
+let workspaceListApiQuery = workspaceListApiQueryHelper.data;
 const queryTagsHelper = useQueryTags({ keyItemSets: WORKSPACE_SEARCH_HANDLERS.keyItemSets });
-queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
+const { queryTags } = queryTagsHelper;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -103,17 +102,17 @@ const handleSelect = (index: number[]) => {
 };
 
 const handleChange = async (options: ToolboxOptions = {}) => {
-    setApiQueryWithToolboxOptions(workspaceListApiQueryHelper, options);
+    workspaceListApiQuery = getApiQueryWithToolboxOptions(workspaceListApiQueryHelper, options) ?? workspaceListApiQuery;
     if (options.queryTags !== undefined) {
-        queryTagsHelper.setQueryTags(options.queryTags);
-        await replaceUrlQuery('filters', queryTagsHelper.urlQueryStringFilters.value);
+        workspacePageStore.$patch((_state) => {
+            _state.searchFilters = workspaceListApiQueryHelper.filters;
+        });
     }
     if (options.pageStart !== undefined) workspacePageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) workspacePageStore.$patch({ pageLimit: options.pageLimit });
-    await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
+    await workspacePageStore.load({ query: workspaceListApiQuery });
 };
 
-const { queryTags } = queryTagsHelper;
 
 const handleExport = async () => {
     try {
