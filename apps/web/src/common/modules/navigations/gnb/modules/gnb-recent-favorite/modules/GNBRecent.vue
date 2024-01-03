@@ -52,6 +52,7 @@ import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -98,6 +99,7 @@ export default defineComponent({
         const userWorkspaceStore = useUserWorkspaceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
+        const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
         const router = useRouter();
 
         const storeState = reactive({
@@ -240,10 +242,12 @@ export default defineComponent({
                     store.dispatch('recent/load', { limit: RECENT_LIMIT }),
                     dashboardStore.load(),
                 ]);
-                await fetchCostQuerySet();
                 state.loading = false;
             }
         });
+        watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
+            if (hasLoaded) fetchCostQuerySet();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

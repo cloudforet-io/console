@@ -70,7 +70,9 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
@@ -93,6 +95,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -140,6 +143,7 @@ export default {
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
         const userWorkspaceStore = useUserWorkspaceStore();
+        const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
         const router = useRouter();
 
         const storeState = reactive({
@@ -395,11 +399,14 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
                 store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
                 dashboardStore.load(),
-                fetchCostQuerySet(),
                 // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
             ]);
             state.loading = false;
         })();
+
+        watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
+            if (hasLoaded) fetchCostQuerySet();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
