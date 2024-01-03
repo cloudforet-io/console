@@ -60,7 +60,6 @@ const storeState = reactive({
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
-        api_key_count: user?.api_key_count ?? 0,
         mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
@@ -72,7 +71,6 @@ const tableState = reactive({
         if (userPageState.isAdminMode) {
             additionalFields.push(
                 { name: 'mfa', label: 'Multi-factor Auth' },
-                { name: 'api_key_count', label: 'API Key', sortable: false },
                 { name: 'role_type', label: 'Role Type' },
             );
         } else {
