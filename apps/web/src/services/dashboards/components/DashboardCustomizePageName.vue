@@ -46,7 +46,7 @@ const {
     nameInput: props.dashboardId ? props.name : '',
 }, {
     nameInput(value: string) {
-        if (value === props.name) return '';
+        if (value === dashboardDetailState.dashboardInfo?.name) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
