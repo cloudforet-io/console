@@ -59,6 +59,13 @@ export const useUserPageStore = defineStore('user-page', {
             });
             return users ?? [];
         },
+        roleMap: (state) => {
+            const map: Record<string, RoleModel> = {};
+            state.roles.forEach((role) => {
+                map[role.role_id] = role;
+            });
+            return map;
+        },
     },
     actions: {
         // User

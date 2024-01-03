@@ -6,6 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
@@ -31,6 +33,7 @@ interface WorkspacePageState {
     usersPageStart: number,
     usersPageLimit: number,
     usersSearchfilters: ConsoleFilter[],
+    roles: RoleModel[],
 }
 
 export interface WorkspaceTableModel extends WorkspaceModel {
@@ -55,6 +58,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
         usersPageStart: 1,
         usersPageLimit: 15,
         usersSearchfilters: [],
+        roles: [],
     }),
     getters: {
         timezone: () => store.state.user.timezone,
@@ -63,6 +67,14 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
             return refined;
         }, []),
         roleBindingList: (state) => state.roleBindings,
+        roleMap: (state) => state.roles.reduce((map, role) => {
+            map[role.role_id] = role;
+            return map;
+        }, {}),
+        roleBindingMap: (state) => state.roleBindings.reduce((map, roleBinding) => {
+            map[roleBinding.role_binding_id] = roleBinding;
+            return map;
+        }, {}),
     },
     actions: {
         async load(params: WorkspaceListParameters) {
@@ -72,6 +84,9 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 this.workspaces = results || [];
                 this.totalCount = total_count || 0;
                 this.selectedIndices = [];
+                if (!this.roles.length) {
+                    await this.listRoles();
+                }
 
                 const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>();
                 this.roleBindings = response.results || [];
@@ -100,6 +115,18 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 ErrorHandler.handleError(e);
             } finally {
                 this.userLoading = false;
+            }
+        },
+        // Role
+        async listRoles(params?: RoleListParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                this.roles = results || [];
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.roles = [];
+                throw e;
             }
         },
     },

@@ -37,6 +37,11 @@ interface Props {
     tableHeight: number;
 }
 
+const ROLE_TYPE_LABEL_MAP = {
+    WORKSPACE_OWNER: 'Workspace Owner',
+    WORKSPACE_MEMBER: 'Workspace Member',
+};
+
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
@@ -70,8 +75,10 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa', label: 'Multi-factor Auth' },
-                { name: 'role_type', label: 'Role Type' },
+                { name: 'mfa', label: 'MFA' },
+                {
+                    name: 'role_id', label: 'Admin Role', sortable: true, sortKey: 'role_type',
+                },
             );
         } else {
             additionalFields.push(
@@ -162,7 +169,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
             role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
+        const roleName = userPageStore.roleMap[response.role_id]?.name ?? '';
         userPageStore.$patch((_state) => {
             _state.users[rowIndex].role_binding = {
                 name: roleName,
@@ -237,13 +244,15 @@ const handleClickButton = async (value: RoleBindingModel) => {
                           class="capitalize"
                 />
             </template>
-            <template #col-role_type-format="{value}">
-                <div class="role-type-wrapper">
-                    <img :src="useRoleFormatter(value).image"
+            <template #col-role_id-format="{value, item}">
+                <div v-if="userPageStore.roleMap[value]?.name"
+                     class="role-type-wrapper"
+                >
+                    <img :src="useRoleFormatter(item.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
+                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
                 </div>
             </template>
             <template #col-role_binding-format="{value, rowIndex}">
@@ -279,7 +288,7 @@ const handleClickButton = async (value: RoleBindingModel) => {
                                 >
                                 <div class="role-info-wrapper">
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ item.role_type }})</span>
+                                    <span class="role-type">({{ ROLE_TYPE_LABEL_MAP[item.role_type] }})</span>
                                 </div>
                             </div>
                         </template>

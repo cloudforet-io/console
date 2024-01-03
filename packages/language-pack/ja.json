@@ -1944,6 +1944,7 @@
 				"PROJECT": "プロジェクト ",
 				"PROJECTS": "プロジェクト",
 				"ROLE": "ロール",
+				"ROLE_NAME": "",
 				"ROLE_TYPE": "ロールタイプ",
 				"STATE": "状態",
 				"TAB_SELECTED_DATA": "選択したデータ",
