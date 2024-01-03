@@ -1944,6 +1944,7 @@
 				"PROJECT": "Project",
 				"PROJECTS": "Projects",
 				"ROLE": "Role",
+				"ROLE_NAME": "Role Name",
 				"ROLE_TYPE": "Role Type",
 				"STATE": "State",
 				"TAB_SELECTED_DATA": "Selected Data",

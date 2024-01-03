@@ -1944,6 +1944,7 @@
 				"PROJECT": "프로젝트 ",
 				"PROJECTS": "프로젝트",
 				"ROLE": "역할(Role)",
+				"ROLE_NAME": "",
 				"ROLE_TYPE": "역할(Role) 타입",
 				"STATE": "상태",
 				"TAB_SELECTED_DATA": "선택한 데이터 ",
