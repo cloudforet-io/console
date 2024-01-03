@@ -8,7 +8,7 @@ import {
     AuthorizationError, BadRequestError,
     NotFoundError,
 } from '@/space-connector/error';
-import type TokenAPI from '@/space-connector/token-api';
+import TokenAPI from '@/space-connector/token-api';
 
 export default class ServiceAPI {
     instance: AxiosInstance;
@@ -56,7 +56,7 @@ export default class ServiceAPI {
 
             // Set the access token
             const auth = request.headers?.Authorization;
-            if (!auth) request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
+            if (!auth) request.headers.Authorization = `Bearer ${TokenAPI.getAccessToken()}`;
 
             return request;
         });

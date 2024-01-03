@@ -30,7 +30,7 @@ export default class TokenAPI {
 
     private refreshInstance: AxiosInstance;
 
-    private accessToken?: string|null;
+    private static accessToken?: string|null;
 
     private refreshToken?: string;
 
@@ -54,19 +54,19 @@ export default class TokenAPI {
     }
 
     loadToken(): void {
-        this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
+        TokenAPI.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
         this.refreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
 
     flushToken(): void {
         LocalStorageAccessor.removeItem(ACCESS_TOKEN_KEY);
         LocalStorageAccessor.removeItem(REFRESH_TOKEN_KEY);
-        this.accessToken = undefined;
+        TokenAPI.accessToken = undefined;
         this.refreshToken = undefined;
     }
 
     setToken(accessToken: string, refreshToken?: string): void {
-        this.accessToken = accessToken;
+        TokenAPI.accessToken = accessToken;
         LocalStorageAccessor.setItem(ACCESS_TOKEN_KEY, accessToken);
         if (refreshToken) {
             this.refreshToken = refreshToken;
@@ -79,8 +79,8 @@ export default class TokenAPI {
         return this.refreshToken;
     }
 
-    getAccessToken(): string|undefined|null {
-        return this.accessToken;
+    static getAccessToken(): string|undefined|null {
+        return TokenAPI.accessToken;
     }
 
     static checkRefreshingState(): string|null {
@@ -96,13 +96,13 @@ export default class TokenAPI {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
-        if (!this.refreshToken) {
+        if (!this.refreshToken || !TokenAPI.accessToken) {
             return false;
         }
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.refreshToken);
+                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(TokenAPI.accessToken);
                 let scope = 'USER';
                 if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
                 if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
@@ -134,16 +134,16 @@ export default class TokenAPI {
     }
 
     async getActivatedToken() {
-        if (this.accessToken && this.refreshToken) {
+        if (TokenAPI.accessToken && this.refreshToken) {
             const isTokenValid = TokenAPI.checkToken();
-            if (isTokenValid) this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY);
-            else await this.refreshAccessToken();
+            if (!isTokenValid) await this.refreshAccessToken();
         }
     }
 
     static checkToken(): boolean {
-        const storedAccessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
-        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
+        const currentToken = this.accessToken || undefined;
+        // if (!currentToken) currentToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
+        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(currentToken);
         const currentTime = TokenAPI.getCurrentTime();
         if (VERBOSE) {
             console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
