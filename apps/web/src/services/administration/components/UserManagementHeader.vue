@@ -4,10 +4,13 @@ import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { ModalSettingState } from '@/services/administration/types/user-type';
 
+const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
@@ -22,7 +25,7 @@ const handleClickButton = (type: string) => {
     }); break;
     case USER_MODAL_TYPE.INVITE: updateModalSettings({
         type,
-        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string,
         themeColor: 'primary',
         addVisible: true,
     }); break;
