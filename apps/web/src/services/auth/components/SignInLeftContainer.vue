@@ -4,16 +4,22 @@
         :class="{ admin: props.isDomainAdmin }"
     >
         <div class="lottie-wrapper">
-            <img
-                v-if="state.signInImage"
-                :src="state.signInImage"
+            <img v-if="state.showNewYearImage"
+                 class="happy-new-year-2024"
+                 src="/images/logos/happy-new-year-2024.png"
             >
-            <lottie-vue-player v-else
-                               autoplay
-                               loop
-                               :src="props.isDomainAdmin ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
-                               :style="{ height: '100%', backgroundColor: 'transparent' }"
-            />
+            <div v-else>
+                <img
+                    v-if="state.signInImage"
+                    :src="state.signInImage"
+                >
+                <lottie-vue-player v-else
+                                   autoplay
+                                   loop
+                                   :src="props.isDomainAdmin ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
+                                   :style="{ height: '100%', backgroundColor: 'transparent' }"
+                />
+            </div>
         </div>
         <div class="version">
             <p-badge style-type="primary"
@@ -37,6 +43,7 @@
 import { computed, reactive } from 'vue';
 
 import { PBadge } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
@@ -55,6 +62,12 @@ const state = reactive({
     version: VITE_APP_VER,
     signInImage: computed<string|undefined>(() => store.getters['domain/domainSignInImage']),
     contactLink: computed(() => config.get('CONTACT_LINK')),
+    showNewYearImage: computed(() => {
+        const currentDate = dayjs();
+        const expiredDate = dayjs('2024-02-13');
+
+        return currentDate.isBefore(expiredDate);
+    }),
 });
 </script>
 
