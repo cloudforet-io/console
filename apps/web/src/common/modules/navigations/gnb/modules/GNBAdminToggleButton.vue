@@ -92,6 +92,7 @@ const handleToggleAdminMode = async () => {
         @apply relative inline-block w-full h-full rounded-full cursor-pointer border border-gray-200;
         background: rgba(221, 221, 223, 0.6);
         box-shadow: 0 0.25rem 0.25rem 0 rgba(194, 194, 198, 0.5) inset;
+        margin-top: 2px;
 
         .slider {
             @apply absolute top-0 left-0 right-0 bottom-0;

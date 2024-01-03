@@ -195,11 +195,12 @@ const selectWorkspace = (workspaceId: string): void => {
         }
 
         .selected-workspace {
-            @apply text-label-lg text-gray-800 inline-block;
+            @apply text-label-lg text-gray-800 inline-block font-bold;
             max-width: 8.4375rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            vertical-align: bottom;
 
             @screen tablet {
                 @apply hidden;
