@@ -132,7 +132,7 @@ const handleDeleteNote = async () => {
                                 toggle-position="contents"
                                 :line-clamp="2"
             >
-                <template #title="{data, title, index}">
+                <template #no-styled-title="{data, title, index}">
                     <div class="title-wrapper">
                         <p>
                             <span class="author">{{ title }}</span>
@@ -178,6 +178,7 @@ const handleDeleteNote = async () => {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        width: 100%;
     }
     .note-content {
         white-space: pre-line;

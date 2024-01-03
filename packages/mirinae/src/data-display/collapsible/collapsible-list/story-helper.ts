@@ -172,6 +172,21 @@ export const getCollapsibleListArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    noStyledTitleSlot: {
+        name: 'no-styled-title',
+        type: { name: 'string' },
+        description: 'Slot for title without style.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
     defaultSlot: {
         name: 'default',
         type: { name: 'string' },
