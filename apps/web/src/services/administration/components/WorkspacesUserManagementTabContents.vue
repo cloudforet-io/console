@@ -74,7 +74,6 @@ const handleChange = async (options: any = {}) => {
     }
     if (options.pageStart !== undefined) workspacePageStore.$patch({ usersPageStart: options.pageStart });
     if (options.pageLimit !== undefined) workspacePageStore.$patch({ usersPageLimit: options.pageLimit });
-    console.debug('workspaceUserListApiQuery', workspaceUserListApiQuery);
     await workspacePageStore.listWorkspaceUsers({
         workspace_id: state.currentWorkspaceId,
         query: workspaceUserListApiQuery,
