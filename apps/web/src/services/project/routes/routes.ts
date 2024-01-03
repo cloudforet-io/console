@@ -111,7 +111,7 @@ export default {
                     component: ProjectAlertEventRulePage,
                 },
                 {
-                    path: 'notification/:protocol/:protocolId/:userId',
+                    path: 'notification/:protocolId',
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
                     component: ProjectNotificationAddPage,
                     props: true,

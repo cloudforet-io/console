@@ -34,7 +34,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import type { UserNotificationAddPageUrlQuery } from '@/services/my-page/types/user-notification-add-page-url-query-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { ProjectNotificationAddPageUrlQuery } from '@/services/project/types/project-notification-add-page-url-query-type';
 
 
 interface EnrichedProtocolItem extends ProtocolModel {
@@ -59,28 +61,27 @@ const state = reactive({
     userId: computed<string>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : store.state.user.userId)),
     channelList: [] as NotiChannelItem[],
     protocolResp: [] as ProtocolModel[],
-    protocolList: computed<EnrichedProtocolItem[]>(() => state.protocolResp.map((d) => ({
-        label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
-        link: {
-            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
-            params: {
-                protocol: d.name.replace(/(\s*)/g, ''),
-                protocolId: d.protocol_id,
-                userId: encodeURIComponent(state.userId),
+    protocolList: computed<EnrichedProtocolItem[]>(() => state.protocolResp.map((d) => {
+        const query: ProjectNotificationAddPageUrlQuery|UserNotificationAddPageUrlQuery = {
+            protocolLabel: d.name,
+            protocolType: d.protocol_type,
+        };
+        return {
+            label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
+            link: {
+                name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
+                params: {
+                    protocolId: d.protocol_id,
+                },
+                query,
             },
-            query: {
-                protocolLabel: encodeURIComponent(d.name),
-                projectId: props.projectId ? props.projectId : undefined,
-                supported_schema: d.capability.supported_schema,
-                protocolType: d.protocol_type,
-            },
-        },
-        protocolType: d.protocol_type,
-        tags: d.tags,
-        plugin_info: d.plugin_info,
-        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
-        name: d.name,
-    }))),
+            protocolType: d.protocol_type,
+            tags: d.tags,
+            plugin_info: d.plugin_info,
+            icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+            name: d.name,
+        };
+    })),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
