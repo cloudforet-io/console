@@ -2900,6 +2900,7 @@
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",
+					"NO_RESPONDER": "",
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
