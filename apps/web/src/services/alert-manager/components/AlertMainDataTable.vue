@@ -406,7 +406,7 @@ if (!props.keepAlive) {
                          width="1em"
                          height="1em"
                          class="mr-1"
-                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[300]"
+                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
                     />
                     <span>{{ state.urgencyLabels[value] }}</span>
                 </template>
