@@ -58,7 +58,7 @@ const updateUser = async (userType: string, userRequest: UpdateUserRequest): Pro
     await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
 };
 
-export const signIn = async ({ commit, dispatch }, signInRequest: SignInRequest): Promise<void> => {
+export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
     const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
         domain_id: domainId,
@@ -72,12 +72,6 @@ export const signIn = async ({ commit, dispatch }, signInRequest: SignInRequest)
     const userInfo = await getUserInfo();
     commit('setUser', userInfo);
 
-
-    const grantRequest = {
-        scope: 'USER',
-        token: response.refresh_token,
-    };
-    await dispatch('grantRole', grantRequest);
     commit('setIsSessionExpired', false);
 };
 
@@ -112,10 +106,6 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
         }
-    } catch (e) {
-        commit('setCurrentRoleInfo', undefined);
-        console.error(`Role Grant Error: ${e}`);
-    } finally {
         /*
         * Implemented a global loading with a minimum duration of 500 milliseconds
         * during the grant process to prevent rendering of services until the process is complete.
@@ -123,6 +113,10 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         setTimeout(() => {
             dispatch('display/finishGrantRole', undefined, { root: true });
         }, 500);
+    } catch (e) {
+        commit('setCurrentRoleInfo', undefined);
+        console.error(`Role Grant Error: ${e}`);
+        SpaceConnector.flushToken();
     }
 };
 
