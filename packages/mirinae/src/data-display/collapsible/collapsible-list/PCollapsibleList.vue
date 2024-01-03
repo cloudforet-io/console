@@ -7,7 +7,9 @@
              class="collapsible-item"
         >
             <p class="top-wrapper">
-                <span class="title">
+                <span v-if="!$scopedSlots['no-styled-title']"
+                      class="title"
+                >
                     <slot name="title"
                           v-bind="{
                               data: item.data,
@@ -18,6 +20,16 @@
                           }"
                     >{{ item.title }}</slot>
                 </span>
+                <slot v-else
+                      name="no-styled-title"
+                      v-bind="{
+                          data: item.data,
+                          title: item.title,
+                          name: item.name,
+                          index: idx,
+                          isCollapsed: !proxyUnfoldedIndices.includes(idx)
+                      }"
+                />
                 <p-collapsible-toggle v-if="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.title"
                                       :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
                                       :toggle-type="toggleType"

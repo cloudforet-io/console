@@ -31,6 +31,7 @@ import type { CollapsiblePanelProps } from '@/data-display/collapsible/collapsib
 import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
+const PAD = 2;
 
 export default defineComponent<CollapsiblePanelProps>({
     name: 'PCollapsiblePanel',
@@ -61,7 +62,7 @@ export default defineComponent<CollapsiblePanelProps>({
         /* util */
         const checkTextOverflow = debounce(() => {
             if (!state.fakeTextRef) return;
-            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight;
+            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight + PAD;
         }, 150);
 
         onUpdated(() => {
