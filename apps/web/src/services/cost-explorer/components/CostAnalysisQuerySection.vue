@@ -22,6 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
@@ -45,6 +46,7 @@ const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
@@ -116,13 +118,13 @@ const handleClickSaveAsButton = () => {
 const handleUpdateQuery = async (updatedQueryId: string) => {
     await costAnalysisPageStore.getCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
-    await SpaceRouter.router.push({
+    await SpaceRouter.router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
-    });
+    }));
 };
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
