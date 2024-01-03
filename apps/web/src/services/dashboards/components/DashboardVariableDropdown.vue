@@ -19,6 +19,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { VariableSelectionType } from '@/schema/dashboard/_types/dashboard-type';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { VariableModel } from '@/lib/variable-models';
@@ -93,7 +95,12 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // event
-const handleSelectOption = (item: MenuItem, index: number, isSelected: boolean) => {
+const handleSelectOption = (selectionType: VariableSelectionType, item: MenuItem, index: number, isSelected: boolean) => {
+    if (selectionType === 'SINGLE') {
+        state.selected = [item];
+        changeVariables([item]);
+        return;
+    }
     let _selected = cloneDeep(state.selected);
     if (isSelected) {
         _selected = [..._selected, item];
@@ -258,7 +265,7 @@ const {
                         :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
                         @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
-                        @select="handleSelectOption"
+                        @select="handleSelectOption(variableProperty?.selection_type, $event)"
                         @update:search-text="handleUpdateSearchText"
         />
     </div>

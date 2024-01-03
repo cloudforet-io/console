@@ -16,6 +16,7 @@ import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/crea
 import type { UserModel } from '@/schema/identity/user/model';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,6 +31,7 @@ import UserManagementAddUser from '@/services/administration/components/UserMana
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/administration/types/user-type';
+
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
@@ -111,12 +113,15 @@ const handleClose = () => {
 };
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
-    const userInfoParams = {
+    const domainSettings = store.state.domain.config?.settings;
+    const userInfoParams: UserCreateParameters|WorkspaceUserCreateParameters = {
         user_id: item.user_id || '',
         email: item.user_id || '',
         auth_type: item.auth_type || 'LOCAL',
         password: state.password || '',
         reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
+        language: domainSettings?.language || 'en',
+        timezone: domainSettings?.timezone || 'UTC',
     };
 
     const createRoleBinding = async () => {
