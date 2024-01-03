@@ -25,6 +25,7 @@ import { useNoticeStore } from '@/store/notice';
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -36,6 +37,7 @@ const props = defineProps<{
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -103,7 +105,7 @@ const noticeStore = useNoticeStore();
 
 /* Event */
 const handleBackToListButtonClick = () => {
-    SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
+    SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME }));
 };
 
 
@@ -112,10 +114,10 @@ const handleBackToListButtonClick = () => {
 const handlePostClick = (direction: 'next'|'prev') => {
     if (direction === 'next') {
         if (!state.nextPostRoute) return;
-        SpaceRouter.router.push(state.nextPostRoute);
+        SpaceRouter.router.push(getProperRouteLocation(state.nextPostRoute));
     } else {
         if (!state.prevPostRoute) return;
-        SpaceRouter.router.push(state.prevPostRoute);
+        SpaceRouter.router.push(getProperRouteLocation(state.prevPostRoute));
     }
 };
 
