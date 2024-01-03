@@ -83,7 +83,7 @@ watch(() => props.initialData, (initialData) => {
                            :key="roleType.key"
                            :selected="state.selectedRoleType"
                            :tab-index="index"
-                           :disabled="props.formType === FORM_TYPE.UPDATE"
+                           :disabled="props.formType === FORM_TYPE.UPDATE && state.selectedRoleType !== roleType.key"
                            class="card"
                            :value="roleType.key"
                            :label="roleType.label"
@@ -139,6 +139,9 @@ watch(() => props.initialData, (initialData) => {
                 }
             }
             &.disabled {
+                .card-content {
+                    opacity: 0.2;
+                }
                 .marker {
                     @apply hidden;
                 }
