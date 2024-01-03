@@ -5,8 +5,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryModel } from '@/schema/repository/repository/model';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { PluginReferenceMap, PluginReferenceState } from '@/store/modules/reference/plugin/type';
@@ -29,31 +27,24 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const repoResponse = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({}, { timeout: 3000 });
-
         const plugins: PluginReferenceMap = {};
 
-        const promises = (repoResponse.results ?? []).map(async (repoInfo) => {
-            const pluginResponse = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
-                query: {
-                    only: ['plugin_id', 'name', 'tags'],
-                },
-                repository_id: repoInfo.repository_id,
-            }, { timeout: 3000 });
-
-            (pluginResponse.results ?? []).forEach((pluginInfo: PluginModel): void => {
-                plugins[pluginInfo.plugin_id] = {
-                    key: pluginInfo.plugin_id,
-                    label: pluginInfo.name,
-                    name: pluginInfo.name,
-                    icon: pluginInfo.tags.icon ? assetUrlConverter(pluginInfo.tags.icon) : '',
-                    description: pluginInfo.tags.description ?? '',
-                    link: pluginInfo.tags.link ?? '',
-                };
-            });
+        const pluginResponse = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
+            query: {
+                only: ['plugin_id', 'name', 'tags'],
+            },
         });
 
-        await Promise.all(promises);
+        (pluginResponse.results ?? []).forEach((pluginInfo: PluginModel): void => {
+            plugins[pluginInfo.plugin_id] = {
+                key: pluginInfo.plugin_id,
+                label: pluginInfo.name,
+                name: pluginInfo.name,
+                icon: pluginInfo.tags.icon ? assetUrlConverter(pluginInfo.tags.icon) : '',
+                description: pluginInfo.tags.description ?? '',
+                link: pluginInfo.tags.link ?? '',
+            };
+        });
 
         commit('setPlugins', plugins);
         lastLoadedTime = currentTime;
