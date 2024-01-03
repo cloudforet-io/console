@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PStatus, PToolboxTable, PHeading,
+    PStatus, PToolboxTable, PHeading, PTooltip,
 } from '@spaceone/design-system';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -35,6 +35,7 @@ const state = reactive({
     currentWorkspaceId: computed(() => workspacePageStore.selectedWorkspaces[0]?.workspace_id),
     refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
         ...user,
+        role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id].role_id],
         last_accessed_at: calculateTime(user?.last_accessed_at, workspacePageStore.timezone),
     }))),
 });
@@ -44,7 +45,7 @@ const tableState = reactive({
         { name: 'user_id', label: 'User ID' },
         { name: 'name', label: 'Name' },
         { name: 'state', label: 'State' },
-        { name: 'role_type', label: 'Role Type' },
+        { name: 'role', label: 'Role' },
         { name: 'auth_type', label: 'Auth Type' },
         { name: 'last_accessed_at', label: 'Last Activity' },
         { name: 'timezone', label: 'Timezone' },
@@ -114,13 +115,18 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
                           class="capitalize"
                 />
             </template>
-            <template #col-role_type-format="{value}">
+            <template #col-role-format="{value}">
                 <div class="role-type-wrapper">
-                    <img :src="useRoleFormatter(value).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
+                    <p-tooltip position="bottom"
+                               :contents="useRoleFormatter(value.role_type).name"
+                               class="tooltip"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
+                        <img :src="useRoleFormatter(value.role_type).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                    </p-tooltip>
+                    <span>{{ value.name }}</span>
                 </div>
             </template>
             <template #col-last_accessed_at-format="{ value }">
@@ -146,6 +152,12 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
     .role-type-wrapper {
         @apply flex items-center;
         gap: 0.25rem;
+        .tooltip {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.25rem;
+        }
         .role-type-icon {
             @apply rounded-full;
             width: 1.5rem;
