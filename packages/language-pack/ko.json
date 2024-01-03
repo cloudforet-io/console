@@ -2900,6 +2900,7 @@
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",
+					"NO_RESPONDER": "수신자가 없습니다.",
 					"RESPONDER": "수신자",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
