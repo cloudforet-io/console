@@ -238,6 +238,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
                     </p-button>
                     <p-select-dropdown
                         class="left-toolbox-dropdown-item"
+                        reset-selection-on-menu-close
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :menu="state.actionItems"
                         :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"

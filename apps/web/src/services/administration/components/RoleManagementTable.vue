@@ -162,6 +162,7 @@ const handleExport = async () => {
             <template #toolbox-left>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
                                    :menu="dropdownMenu"
+                                   reset-selection-on-menu-close
                                    :placeholder="$t('IAM.ROLE.ACTION')"
                                    @select="handleSelectDropdown"
                 />

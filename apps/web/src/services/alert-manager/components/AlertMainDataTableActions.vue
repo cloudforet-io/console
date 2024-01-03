@@ -177,6 +177,7 @@ const onConfirmResolve = () => {
             {{ button.label }}
         </p-button>
         <p-select-dropdown :menu="state.buttonGroup"
+                           reset-selection-on-menu-close
                            :placeholder="$t('PLUGIN.COLLECTOR.MAIN.ACTION')"
                            class="only-mobile"
                            @select="onSelectAction"
