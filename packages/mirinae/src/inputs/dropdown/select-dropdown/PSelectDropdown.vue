@@ -38,6 +38,7 @@ interface SelectDropdownProps {
     useFixedMenuStyle?: boolean;
     buttonIcon?: string;
     isFixedWidth?: boolean;
+    resetSelectionOnMenuClose?: boolean;
 
     /* context menu props */
     isFilterable?: boolean;
@@ -70,6 +71,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     selectionLabel: undefined,
     showDeleteAllButton: false,
     buttonIcon: undefined,
+    resetSelectionOnMenuClose: false,
     /* context menu props */
     visibleMenu: undefined,
     menu: () => [],
@@ -220,6 +222,7 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
+    if (props.resetSelectionOnMenuClose) return;
     if (props.multiSelectable) {
         state.proxySelectedItem = selected;
     } else if (Array.isArray(state.proxySelectedItem)) {
