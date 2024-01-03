@@ -1346,7 +1346,7 @@
 			"PUBLIC_DESC": "Anyone who has 'View' access to selected dashboard scope",
 			"SINGLE_PROJECT": "Single Project",
 			"STEP": "Step",
-			"STEP1_DESC": "Choose dashboard scope",
+			"STEP1_DESC": "Choose dashboard scope and access.",
 			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
