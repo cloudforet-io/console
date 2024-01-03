@@ -97,7 +97,8 @@ export default defineComponent({
             isOverflown: false,
             dashboardList: computed<GNBDashboardMenuItem[]>(() => dashboardGetters.allItems.map((item) => ({
                 name: item.name,
-                dashboardId: item.public_dashboard_id || item.private_dashboard_id,
+                dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
+                workspaceId: item.workspace_id || '',
             }))),
         });
         const hideMenu = () => {

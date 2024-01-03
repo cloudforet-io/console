@@ -12,6 +12,8 @@ import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -19,7 +21,9 @@ import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
+
 export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseWidgetState>, dateRange: ComputedRef<DateRange>, overrides: OverridableWidgetState = {}) => {
+    const { getProperRouteLocation } = useProperRouteLocation();
     const assetQueryHelper = new QueryHelper();
     const budgetQueryHelper = new QueryHelper();
 
@@ -32,7 +36,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
             if (!cloudServiceQuerySet) return undefined;
             const consoleFilters = flattenDeep(Object.values(baseState.options.filters ?? {}));
-            return {
+            return getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: cloudServiceQuerySet.data?.provider,
@@ -42,7 +46,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
                 query: {
                     filters: assetQueryHelper.setFilters(consoleFilters).rawQueryStrings,
                 },
-            };
+            });
         }),
         budgetWidgetLocation: computed<Location | undefined>(() => {
             if (Object.hasOwn(overrides, 'budgetWidgetLocation')) return isRef(overrides.budgetWidgetLocation) ? overrides.budgetWidgetLocation.value : overrides.budgetWidgetLocation;
@@ -51,13 +55,13 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const dataSourceId = baseState.options.cost_data_source;
             if (dataSourceId) budgetQueryHelper.addFilter({ k: 'data_source_id', v: [dataSourceId], o: '=' });
             if (baseState.options.filters?.provider) budgetQueryHelper.addFilter(...baseState.options.filters.provider);
-            return {
+            return getProperRouteLocation({
                 name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                 params: {},
                 query: {
                     filters: budgetQueryHelper.rawQueryStrings,
                 },
-            };
+            });
         }),
         costWidgetLocation: computed<Location | undefined>(() => {
             if (Object.hasOwn(overrides, 'costWidgetLocation')) return isRef(overrides.costWidgetLocation) ? overrides.costWidgetLocation.value : overrides.costWidgetLocation;
@@ -65,7 +69,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const dataField: string[] = [];
             if (baseState.dataField) dataField.push(baseState.dataField);
             if (baseState.secondaryDataField) dataField.push(baseState.secondaryDataField);
-            const location: Location = {
+            return getProperRouteLocation({
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
                     dataSourceId: baseState.options.cost_data_source ?? '',
@@ -77,8 +81,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
                     period: objectToQueryString(dateRange.value),
                     filters: arrayToQueryString(getWidgetLocationFilters(baseState.options.filters)),
                 },
-            };
-            return location;
+            });
         }),
     });
 

@@ -5,6 +5,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
@@ -43,7 +45,7 @@ const updateDashboardData = async () => {
             tags: { created_by: store.state.user.userId },
         });
         await SpaceRouter.router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
             params: {
                 dashboardId: props.dashboardId as string,
             },

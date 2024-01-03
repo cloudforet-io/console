@@ -13,6 +13,8 @@ import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import BudgetDetailDeleteModal from '@/services/cost-explorer/components/BudgetDetailDeleteModal.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -53,7 +56,7 @@ const handleUpdateDelete = (visible) => {
     state.deleteModalVisible = visible;
 };
 const handleConfirmDelete = () => {
-    router.push({ name: COST_EXPLORER_ROUTE.BUDGET._NAME });
+    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }));
 };
 </script>
 

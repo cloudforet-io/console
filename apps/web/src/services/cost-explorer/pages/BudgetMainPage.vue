@@ -9,15 +9,11 @@ import { SpaceRouter } from '@/router';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
-const appContextStore = useAppContextStore();
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 
@@ -29,7 +25,7 @@ const handleCreateBudgetSelect = () => {
 <template>
     <div class="budget-page">
         <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
-            <template v-if="storeState.isAdminMode || storeState.isWorkspaceOwner"
+            <template v-if="storeState.isWorkspaceOwner"
                       #extra
             >
                 <p-button style-type="primary"

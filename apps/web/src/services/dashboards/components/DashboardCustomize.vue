@@ -9,6 +9,7 @@ import { PDivider } from '@spaceone/design-system';
 import { SpaceRouter } from '@/router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardCustomizePageName
     from '@/services/dashboards/components/DashboardCustomizePageName.vue';
@@ -31,6 +32,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'go-back'): void,
     (e: 'save'): void}>();
+const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -44,7 +46,7 @@ const getDashboardData = async () => {
         await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.ALL._NAME }));
     }
 };
 

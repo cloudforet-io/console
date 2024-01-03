@@ -25,6 +25,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -77,6 +78,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => state.legends?.length ?? 0),
 });
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
@@ -89,7 +91,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         if (!widgetState.options.cost_data_source) return undefined;
         if (!widgetState.dataField || !widgetState.options.cost_data_type) return undefined;
 
-        return {
+        return getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId: widgetState.options.cost_data_source,
@@ -101,7 +103,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
                 period: objectToQueryString(widgetState.dateRange),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
-        };
+        });
     }),
 });
 

@@ -4,9 +4,13 @@ import { PButton } from '@spaceone/design-system';
 import { SpaceRouter } from '@/router';
 
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
+
 const emit = defineEmits(['update:visible-clone-modal']);
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handleVisibleCloneModal = () => {
     emit('update:visible-clone-modal');
@@ -18,10 +22,10 @@ const props = defineProps<{
 }>();
 
 const handleClickCustomize = () => {
-    SpaceRouter.router.push({
+    SpaceRouter.router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
         params: { dashboardId: props.dashboardId },
-    });
+    }));
 };
 
 </script>
