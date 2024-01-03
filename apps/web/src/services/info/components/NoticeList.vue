@@ -23,6 +23,7 @@ import { i18n } from '@/translations';
 import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -38,6 +39,7 @@ const state = reactive({
 
 const noticeStore = useNoticeStore();
 const noticeGetters = noticeStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 /* Api */
 const initNoticeApiHelper = () => {
@@ -90,12 +92,12 @@ const handleToolboxChange = (options: ToolboxOptions = {}) => {
     loadSearchListSet();
 };
 const handleClickNotice = (postId: string) => {
-    SpaceRouter.router.push({
+    SpaceRouter.router.push(getProperRouteLocation({
         name: INFO_ROUTE.NOTICE.DETAIL._NAME,
         params: {
             postId,
         },
-    });
+    }));
 };
 const handlePageChange = (page: number) => {
     noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
