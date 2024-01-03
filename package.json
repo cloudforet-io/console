@@ -1,33 +1,10 @@
 {
-  "name": "cloudforet-console",
-  "version": "2.0.0-dev11",
+  "name": "@cloudforet/language-pack",
+  "version": "1.12.0-dev11",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "start:web": "npm run build:packages && turbo run dev --filter=web",
-    "build": "turbo run build",
-    "build:packages": "turbo run build --filter=./packages/* --parallel",
-    "transpile": "turbo run transpile",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint --parallel",
-    "format": "turbo run format",
-    "test": "NODE_OPTIONS=--max_old_space_size=8192 turbo run test --parallel",
-    "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || npx husky install"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^14.1.0",
-    "@commitlint/config-conventional": "^14.1.0",
-    "eslint-config-custom": "*",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.0",
-    "turbo": "^1.10.5"
-  },
-  "engines": {
-    "npm": ">=10.2.3",
-    "node": ">=20.10.0"
-  },
-  "packageManager": "npm@10.2.3"
+  "files": [
+    "en.json",
+    "ko.json",
+    "ja.json"
+  ]
 }
