@@ -228,6 +228,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    resetSelectionOnMenuClose: {
+        name: 'resetSelectionOnMenuClose',
+        type: { name: 'boolean' },
+        description: 'reset selection when menu close.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     isFilterable: {
         name: 'isFilterable',
         type: { name: 'boolean' },
