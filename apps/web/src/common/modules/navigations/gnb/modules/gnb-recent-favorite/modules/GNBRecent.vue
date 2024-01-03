@@ -37,8 +37,10 @@ import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -50,6 +52,7 @@ import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -73,7 +76,7 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
 const RECENT_LIMIT = 30;
@@ -96,15 +99,16 @@ export default defineComponent({
         const userWorkspaceStore = useUserWorkspaceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
+        const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
         const router = useRouter();
 
         const storeState = reactive({
-            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
+            costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems.filter((d) => d.workspaceId === storeState.currentWorkspaceId)),
         });
         const state = reactive({
@@ -156,7 +160,7 @@ export default defineComponent({
                     ? convertCostAnalysisConfigToReferenceData(
                         storeState.recents.filter((d) => d.itemType === RECENT_TYPE.COST_ANALYSIS),
                         state.costQuerySets,
-                        storeState.dataSourceMap,
+                        storeState.costDataSource,
                     )
                     : [];
             }),
@@ -166,7 +170,6 @@ export default defineComponent({
 
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
-            console.debug('handleSelect', item);
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
                 if (menuInfo && router.currentRoute.name !== menuInfo.routeName) {
@@ -186,27 +189,49 @@ export default defineComponent({
                         name: itemInfo[2],
                     },
                 }).catch(() => {});
+            } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
+                router.push({
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    params: {
+                        dataSourceId: item?.dataSourceId,
+                        costQuerySetId: item.name,
+                    },
+                });
             }
             emit('close');
         };
 
-        const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
-
-        const getAllCostQuerySetList = async () => {
+        const listCostQuerySetByDataSourceId = async (dataSourceId: string): Promise<CostQuerySetModel[]> => {
             try {
-                const { status, response } = await costQuerySetFetcher({
+                const res = await SpaceConnector.clientV2.costAnalysis.costQuerySet.list<CostQuerySetListParameters, ListResponse<CostQuerySetModel>>({
+                    data_source_id: dataSourceId,
                     query: {
-                        filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                        filter: [
+                            { k: 'user_id', v: store.state.user.userId, o: 'eq' },
+                            { k: 'workspace_id', v: storeState.currentWorkspaceId, o: 'eq' },
+                        ],
                         only: ['cost_query_set_id', 'data_source_id', 'name'],
                     },
                 });
-                if (status === 'succeed' && response?.results) {
-                    state.costQuerySets = response.results;
-                }
+                return res.results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.costQuerySets = [];
+                return [];
             }
+        };
+        const fetchCostQuerySet = async () => {
+            const costQuerySetPromiseResults = await Promise.allSettled(
+                Object.keys(storeState.costDataSource).map((dataSourceId) => listCostQuerySetByDataSourceId(dataSourceId)),
+            );
+            const costQuerySets: CostQuerySetModel[] = [];
+            costQuerySetPromiseResults.forEach((res) => {
+                if (res.status === 'fulfilled' && res.value.length) {
+                    res.value.forEach((item) => {
+                        costQuerySets.push(item);
+                    });
+                }
+            });
+            state.costQuerySets = costQuerySets;
         };
 
         /* Watcher */
@@ -217,10 +242,12 @@ export default defineComponent({
                     store.dispatch('recent/load', { limit: RECENT_LIMIT }),
                     dashboardStore.load(),
                 ]);
-                await getAllCostQuerySetList();
                 state.loading = false;
             }
         });
+        watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
+            if (hasLoaded) fetchCostQuerySet();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

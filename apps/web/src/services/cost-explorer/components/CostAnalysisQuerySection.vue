@@ -15,14 +15,14 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
 import { i18n } from '@/translations';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
@@ -37,7 +37,6 @@ import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-q
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
-const appContextStore = useAppContextStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
@@ -47,11 +46,9 @@ const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     queryFormModalVisible: false,
@@ -95,8 +92,8 @@ onClickOutside(rightPartRef, hideContextMenu);
 /* event */
 const handleSaveQuerySet = async () => {
     try {
-        await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageGetters.selectedQueryId,
+        await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters>({
+            cost_query_set_id: costAnalysisPageGetters.selectedQueryId as string,
             options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
@@ -121,13 +118,13 @@ const handleClickSaveAsButton = () => {
 const handleUpdateQuery = async (updatedQueryId: string) => {
     await costAnalysisPageStore.getCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
-    await SpaceRouter.router.push({
+    await SpaceRouter.router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
-    });
+    }));
 };
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
@@ -176,7 +173,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div v-if="state.hasManagePermission && !storeState.isAdminMode"
+            <div v-if="state.hasManagePermission"
                  ref="rightPartRef"
                  class="right-part"
             >

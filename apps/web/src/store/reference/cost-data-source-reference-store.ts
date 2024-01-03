@@ -44,6 +44,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             ...REFERENCE_TYPE_INFO.cost_data_source,
             referenceMap: getters.costDataSourceItems,
         })),
+        hasLoaded: computed<boolean>(() => state.items !== null),
     });
 
     const actions = {

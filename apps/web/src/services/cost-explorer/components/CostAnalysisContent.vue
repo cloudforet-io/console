@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+
 import {
     queryStringToArray,
     queryStringToObject,
@@ -19,7 +21,7 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constant
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/types/cost-analysis-url-query-type';
 import type {
-    CostQuerySetModel, Granularity,
+    Granularity,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 

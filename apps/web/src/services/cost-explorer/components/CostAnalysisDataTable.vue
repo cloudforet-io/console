@@ -17,6 +17,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -47,7 +48,7 @@ import {
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type {
-    CostAnalyzeResponse, Granularity, Period, DisplayDataType,
+    Granularity, Period, DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -261,7 +262,7 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     }
     return '';
 };
-const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
+const getRefinedChartTableData = (results: CostAnalyzeRawData[] = [], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
@@ -297,9 +298,9 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
 
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
+const listCostAnalysisTableData = async (): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
         analyzeApiQueryHelper
@@ -332,7 +333,7 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') return response.results ?? [];
         return [];
     } catch (e) {
         ErrorHandler.handleError(e);

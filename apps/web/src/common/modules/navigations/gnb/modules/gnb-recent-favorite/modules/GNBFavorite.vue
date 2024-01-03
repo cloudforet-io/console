@@ -70,7 +70,9 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
@@ -79,8 +81,10 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -91,6 +95,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -116,7 +121,6 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -139,8 +143,16 @@ export default {
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
         const userWorkspaceStore = useUserWorkspaceStore();
+        const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
         const router = useRouter();
 
+        const storeState = reactive({
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+            costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+        });
         const state = reactive({
             loading: true,
             showAll: false,
@@ -214,19 +226,15 @@ export default {
                 ];
             }),
             //
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             costQuerySets: [] as CostQuerySetModel[],
             //
-            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
             favoriteItemsMapFilterByWorkspaceId: computed(() => ({
-                [FAVORITE_TYPE.MENU]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
-                [FAVORITE_TYPE.PROJECT]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
-                [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
-                [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
-                [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
-                [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.MENU]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+                [FAVORITE_TYPE.PROJECT]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+                [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+                [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+                [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+                [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
             })),
             favoriteMenuItems: computed<FavoriteItem[]>(() => {
                 console.debug('GNBFavorite.favoriteMenuItems', state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU]);
@@ -241,7 +249,7 @@ export default {
                     ? convertCostAnalysisConfigToReferenceData(
                         state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.COST_ANALYSIS],
                         state.costQuerySets,
-                        state.dataSourceMap,
+                        storeState.costDataSource,
                     )
                     : [];
             }),
@@ -257,17 +265,16 @@ export default {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
                     state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.CLOUD_SERVICE],
-                    state.cloudServiceTypes,
+                    storeState.cloudServiceTypes,
                 ) : [];
             }),
             favoriteProjects: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 if (!isUserAccessible) return [];
-                const favoriteProjectItems = convertProjectConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT], state.projects);
-                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT_GROUP], state.projectGroups);
+                const favoriteProjectItems = convertProjectConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT], storeState.projects);
+                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT_GROUP], storeState.projectGroups);
                 return [...favoriteProjectGroupItems, ...favoriteProjectItems];
             }),
-            dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
         });
 
         /* Util */
@@ -348,23 +355,37 @@ export default {
             emit('close');
         };
 
-        const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
-
-        const getAllCostQuerySetList = async () => {
+        const listCostQuerySetByDataSourceId = async (dataSourceId: string): Promise<CostQuerySetModel[]> => {
             try {
-                const { status, response } = await costQuerySetFetcher({
+                const res = await SpaceConnector.clientV2.costAnalysis.costQuerySet.list<CostQuerySetListParameters, ListResponse<CostQuerySetModel>>({
+                    data_source_id: dataSourceId,
                     query: {
-                        filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                        filter: [
+                            { k: 'user_id', v: store.state.user.userId, o: 'eq' },
+                            { k: 'workspace_id', v: storeState.currentWorkspaceId, o: 'eq' },
+                        ],
                         only: ['cost_query_set_id', 'data_source_id', 'name'],
                     },
                 });
-                if (status === 'succeed' && response?.results) {
-                    state.costQuerySets = response.results;
-                }
+                return res.results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.costQuerySets = [];
+                return [];
             }
+        };
+        const fetchCostQuerySet = async () => {
+            const costQuerySetPromiseResults = await Promise.allSettled(
+                Object.keys(storeState.costDataSource).map((dataSourceId) => listCostQuerySetByDataSourceId(dataSourceId)),
+            );
+            const costQuerySets: CostQuerySetModel[] = [];
+            costQuerySetPromiseResults.forEach((res) => {
+                if (res.status === 'fulfilled' && res.value.length) {
+                    res.value.forEach((item) => {
+                        costQuerySets.push(item);
+                    });
+                }
+            });
+            state.costQuerySets = costQuerySets;
         };
 
         /* Init */
@@ -378,11 +399,14 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
                 store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
                 dashboardStore.load(),
-                getAllCostQuerySetList(),
                 // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
             ]);
             state.loading = false;
         })();
+
+        watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
+            if (hasLoaded) fetchCostQuerySet();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
