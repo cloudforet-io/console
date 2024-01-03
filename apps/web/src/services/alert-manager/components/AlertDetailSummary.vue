@@ -140,6 +140,7 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
                              width="1em"
                              height="1em"
                              class="mr-2"
+                             :color="red[200]"
                         />
                         <span>{{ state.alertUrgencyList.find(d => d.name === state.alertUrgency).label }}</span>
                     </span>
