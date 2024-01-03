@@ -40,7 +40,15 @@ export const useRolePageStore = defineStore('role-page', {
             this.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
-                this.roles = results || [];
+                this.roles = results?.sort((roleA, roleB) => {
+                    if (roleA.is_managed === roleB.is_managed) {
+                        return 0;
+                    }
+                    if (roleA.is_managed) {
+                        return -1;
+                    }
+                    return 1;
+                }) || [];
                 this.totalCount = total_count || 0;
                 this.selectedIndices = [];
             } catch (e) {

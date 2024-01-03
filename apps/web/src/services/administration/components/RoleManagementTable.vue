@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PSelectDropdown, PButton,
+    PToolboxTable, PSelectDropdown, PButton, PBadge,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -63,13 +63,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.ROLE.EDIT'),
-        disabled: rolePageState.selectedIndices.length === 0,
+        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.ROLE.DELETE'),
-        disabled: rolePageState.selectedIndices.length === 0,
+        disabled: rolePageState.selectedIndices.length === 0 || rolePageStore.selectedRoles.filter((item) => item.is_managed).length > 0,
     },
 ]));
 
@@ -167,20 +167,27 @@ const handleExport = async () => {
                                    @select="handleSelectDropdown"
                 />
             </template>
-            <template #col-role_type-format="{value}">
+            <template #col-role_type-format="{value, item}">
                 <span class="role-type">
                     <img :src="useRoleFormatter(value).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
                     <span>{{ useRoleFormatter(value).name }}</span>
+                    <p-badge v-if="item?.is_managed"
+                             badge-type="solid-outline"
+                             style-type="gray500"
+                             class="managed-badge"
+                    >
+                        <span>{{ $t('IAM.ROLE.MANAGED') }}</span>
+                    </p-badge>
                 </span>
             </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #col-edit_button-format="{ item }">
-                <p-button v-if="item.role_type !== ROLE_TYPE.SYSTEM_ADMIN"
+                <p-button v-if="!item?.is_managed && item.role_type !== ROLE_TYPE.SYSTEM_ADMIN"
                           size="sm"
                           style-type="tertiary"
                           icon-left="ic_edit"
@@ -208,6 +215,12 @@ const handleExport = async () => {
             @apply rounded-full;
             width: 1.5rem;
             height: 1.5rem;
+        }
+        .managed-badge {
+            min-width: 4.15rem;
+            min-height: 0;
+            padding-top: 0.15rem;
+            padding-bottom: 0.15rem;
         }
     }
 }
