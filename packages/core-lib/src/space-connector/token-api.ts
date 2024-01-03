@@ -96,13 +96,13 @@ export default class TokenAPI {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
-        if (!this.refreshToken) {
+        if (!this.refreshToken || !this.accessToken) {
             return false;
         }
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.refreshToken);
+                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
                 let scope = 'USER';
                 if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
                 if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
@@ -135,20 +135,19 @@ export default class TokenAPI {
 
     async getActivatedToken() {
         if (this.accessToken && this.refreshToken) {
-            const isTokenValid = TokenAPI.checkToken();
-            if (isTokenValid) this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY);
-            else await this.refreshAccessToken();
+            const isTokenValid = this.checkToken();
+            if (!isTokenValid) await this.refreshAccessToken();
         }
     }
 
-    static checkToken(): boolean {
-        const storedAccessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
-        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
+    checkToken(): boolean {
+        const currentAccessToken = this.accessToken || undefined;
+        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(currentAccessToken);
         const currentTime = TokenAPI.getCurrentTime();
         if (VERBOSE) {
             console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
         }
-        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 1200
+        return (tokenExpirationTime - currentTime) > 300; // initial difference between token expiration time and current time is 300 seconds
     }
 
     static getTokenExpirationTime(token?: string): number {

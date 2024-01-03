@@ -8,7 +8,7 @@ import type {
 } from '@/space-connector/type';
 
 import ServiceAPI from './service-api';
-import TokenAPI from './token-api';
+import type TokenAPI from './token-api';
 
 const API_REFLECTION_URL = '/api/reflection';
 const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
@@ -131,7 +131,7 @@ export class SpaceConnector {
 
     static get isTokenAlive(): boolean {
         if (SpaceConnector.isDevMode && SpaceConnector.authConfig.enabled && SpaceConnector.authConfig.skipTokenCheck) return true;
-        return TokenAPI.checkToken();
+        return SpaceConnector.instance.tokenApi.checkToken();
     }
 
     static setRequestInterceptor(interceptor: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig): void {
