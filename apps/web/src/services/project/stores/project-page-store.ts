@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue';
 
 import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
-import { reverse } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -74,7 +73,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
 
                     return parents;
                 }, []);
-                return reverse(parentItems);
+                return parentItems;
             }
             return [];
         }),
