@@ -21,7 +21,7 @@ import { PButton } from '@spaceone/design-system';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 export default defineComponent({
-    name: 'KEYCLOAK',
+    name: 'KEYCLOAKODIC',
     components: {
         PButton,
     },
