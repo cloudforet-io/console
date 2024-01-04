@@ -52,8 +52,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             if (_state.isAdminMode) {
                 return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.PROJECT);
             }
-            return Object.values(GROUP_BY_ITEM_MAP);
-            // return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
         }),
     });
     const state = reactive({
@@ -185,8 +184,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             if (_state.isAdminMode) {
                 state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.PROJECT);
             } else {
-                // state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
             state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
