@@ -93,7 +93,6 @@ const tableState = reactive({
             { name: 'tags', label: 'Tags', sortable: false },
             { name: 'auth_type', label: 'Auth Type' },
             { name: 'last_accessed_at', label: 'Last Activity' },
-            { name: 'timezone', label: 'Timezone' },
         ];
         return userPageStore.isWorkspaceOwner
             ? [
@@ -111,7 +110,6 @@ const tableState = reactive({
             email: makeDistinctValueHandler(resourceType, 'email'),
             auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
             last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
-            timezone: makeDistinctValueHandler(resourceType, 'timezone'),
             tags: makeDistinctValueHandler(resourceType, 'tags'),
         };
     }),
