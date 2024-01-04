@@ -174,6 +174,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     }
 };
 const handleChange = async (options: any = {}) => {
+    userPageStore.$patch({ loading: true });
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         userPageStore.$patch((_state) => {
@@ -182,10 +183,14 @@ const handleChange = async (options: any = {}) => {
     }
     if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
-    if (userPageState.isAdminMode) {
-        await userPageStore.listUsers({ query: userListApiQuery });
-    } else {
-        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+    try {
+        if (userPageState.isAdminMode) {
+            await userPageStore.listUsers({ query: userListApiQuery });
+        } else {
+            await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+        }
+    } finally {
+        userPageStore.$patch({ loading: false });
     }
 };
 const handleClickButton = async (value: RoleBindingModel) => {
