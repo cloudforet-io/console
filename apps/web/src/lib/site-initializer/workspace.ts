@@ -1,6 +1,7 @@
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
 import { pinia } from '@/store/pinia';
+
+import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 
 export const initWorkspace = async (userId?: string): Promise<string|undefined> => {
