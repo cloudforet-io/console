@@ -27,9 +27,9 @@
                 >
                     <div class="text-group">
                         <span class="provider"
-                              :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}"
+                              :style="{ color: storeState.providers[data.provider] ? storeState.providers[data.provider].color : ''}"
                         >
-                            {{ providers[data.provider] ? providers[data.provider].label : providers[data.provider] }}
+                            {{ storeState.providers[data.provider] ? storeState.providers[data.provider].label : storeState.providers[data.provider] }}
                         </span>
                         <span class="type">{{ data.type }}</span>
                     </div>
@@ -69,6 +69,7 @@ import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -117,10 +118,14 @@ export default {
         },
     },
     setup(props) {
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const storeState = reactive({
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        });
         const state = reactive({
             loading: true,
             skeletons: range(3),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             title: computed(() => {
                 const label = props.label;
                 return i18n.t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: label });
@@ -162,7 +167,10 @@ export default {
             try {
                 state.loading = true;
                 const param = getApiParameter(type);
-                const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
+                const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+                    ...param,
+                    workspace_id: storeState.currentWorkspaceId,
+                });
                 const summaryData: SummaryData[] = [];
 
                 results.forEach((d) => {
@@ -204,6 +212,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             ASSET_INVENTORY_ROUTE,
             DATA_TYPE: HOME_DASHBOARD_DATA_TYPE,
         };

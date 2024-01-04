@@ -11,6 +11,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -58,6 +60,10 @@ const props = withDefaults(defineProps<Props>(), {
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const queryHelper = new QueryHelper();
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: true,
     data: [] as Data[],
@@ -141,7 +147,10 @@ const drawChart = () => {
 const getData = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
+        const { results } = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary({
+            ...props.extraParams,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         state.data = results;
     } catch (e) {
         ErrorHandler.handleError(e);
