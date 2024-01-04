@@ -165,7 +165,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
-        <div v-if="props.projectId && state.protocol.name === SPACEONE_USER_CHANNEL_TYPE && props.protocolType === PROTOCOL_TYPE.INTERNAL">
+        <div v-if="props.projectId && state.protocol?.name === SPACEONE_USER_CHANNEL_TYPE && props.protocolType === PROTOCOL_TYPE.INTERNAL">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
                            required
             >

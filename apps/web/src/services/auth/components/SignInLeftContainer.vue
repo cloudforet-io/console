@@ -3,22 +3,19 @@
         class="sign-in-left-container"
     >
         <div class="lottie-wrapper">
-            <img v-if="state.showNewYearImage"
+            <img v-if="state.signInImage"
+                 :src="state.signInImage"
+            >
+            <img v-else-if="state.showNewYearImage"
                  class="happy-new-year-2024"
                  src="/images/logos/happy-new-year-2024.png"
             >
-            <div v-else>
-                <img
-                    v-if="state.signInImage"
-                    :src="state.signInImage"
-                >
-                <lottie-vue-player v-else
-                                   autoplay
-                                   loop
-                                   src="/lottiefiles/lottie_floating-astronaut_signin.json"
-                                   :style="{ height: '100%', backgroundColor: 'transparent' }"
-                />
-            </div>
+            <lottie-vue-player v-else
+                               autoplay
+                               loop
+                               src="/lottiefiles/lottie_floating-astronaut_signin.json"
+                               :style="{ height: '100%', backgroundColor: 'transparent' }"
+            />
         </div>
         <div class="version">
             <p-badge style-type="primary"
