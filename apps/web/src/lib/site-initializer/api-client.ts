@@ -2,6 +2,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
+import type { GrantScope } from '@/schema/identity/token/type';
+
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -109,6 +112,23 @@ export const initApiClient = async (store, config) => {
         devConfig,
         getAfterCallApiMap(store),
     );
+    const existingRefreshToken = SpaceConnector.getRefreshToken();
+
+    if (!existingRefreshToken) return;
+    const scopePath = window.location.pathname.split('/')[1];
+    let workspaceId: string|undefined;
+    let scope: GrantScope = 'USER';
+    if (scopePath === 'admin') scope = 'DOMAIN';
+    if (scopePath.startsWith('workspace-')) {
+        scope = 'WORKSPACE';
+        workspaceId = scopePath;
+    }
+    const grantRequest: Omit<TokenGrantParameters, 'grant_type'> = {
+        token: existingRefreshToken,
+        scope,
+        workspace_id: workspaceId,
+    };
+    await store.dispatch('user/grantRole', grantRequest);
     // to be deprecated
     // const isTokenAlive = SpaceConnector.isTokenAlive;
     // store.dispatch('user/setIsSessionExpired', !isTokenAlive);

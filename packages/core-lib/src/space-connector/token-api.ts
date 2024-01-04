@@ -11,7 +11,6 @@ import type {
     SessionTimeoutCallback,
 } from '@/space-connector/type';
 
-const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/grant';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
@@ -54,12 +53,10 @@ export default class TokenAPI {
     }
 
     loadToken(): void {
-        this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
         this.refreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
 
     flushToken(): void {
-        LocalStorageAccessor.removeItem(ACCESS_TOKEN_KEY);
         LocalStorageAccessor.removeItem(REFRESH_TOKEN_KEY);
         this.accessToken = undefined;
         this.refreshToken = undefined;
@@ -67,7 +64,6 @@ export default class TokenAPI {
 
     setToken(accessToken: string, refreshToken?: string): void {
         this.accessToken = accessToken;
-        LocalStorageAccessor.setItem(ACCESS_TOKEN_KEY, accessToken);
         if (refreshToken) {
             this.refreshToken = refreshToken;
             LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
@@ -111,7 +107,7 @@ export default class TokenAPI {
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
                     grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId: wid,
                 });
-                this.setToken(response.data.access_token, response.data.refresh_token);
+                this.setToken(response.data.access_token);
                 if (VERBOSE) {
                     const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
                     console.debug('TokenAPI.refreshAccessToken: success');
