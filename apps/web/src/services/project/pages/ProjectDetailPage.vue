@@ -25,6 +25,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -62,10 +63,16 @@ const state = reactive({
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
+            {
+                name: i18n.t('MENU.PROJECT') as string,
+                to: { name: PROJECT_ROUTE._NAME },
+            },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
-            results.push({ name: state.projectGroupInfo.name, path: `/project?select_pg=${state.projectGroupId}` });
+            results.push({
+                name: state.projectGroupInfo.name,
+                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
+            });
         }
         results.push({ name: state.item?.name });
         return results;
