@@ -38,8 +38,6 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             let currentItem: WorkspaceModel|undefined;
             if (found) {
                 currentItem = found;
-            } else if (state.items.length) {
-                currentItem = state.items[0];
             } else {
                 currentItem = undefined;
             }
