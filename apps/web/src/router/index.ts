@@ -25,11 +25,11 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
-const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<void> => {
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
-    if (isDuplicateScope || isDuplicateWorkspace) return undefined;
+    if (isDuplicateScope || isDuplicateWorkspace) return;
 
     const grantRequest = {
         scope,
@@ -38,7 +38,6 @@ const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?:
     };
 
     await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
-    return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
 };
 const loadAllReferencesByGrantedRoleInfo = async (grantedRoleInfo?: RoleInfo) => {
     if (grantedRoleInfo) {
@@ -117,7 +116,8 @@ export class SpaceRouter {
                     scope = 'WORKSPACE';
                 } else scope = 'USER';
 
-                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                const grantedRoleInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
                 await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
             }
 
