@@ -3481,8 +3481,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "Move \"{name}\"",
-				"NO_PROJECT_GROUP": "No Project Group",
-				"ROOT": "Root",
+				"NO_PARENT_GROUP": "No parent group",
+				"NO_PROJECT_GROUP": "No project group",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "Select a project group to move to"
 			},
 			"MODAL_PROJECT_CREATE": {
