@@ -5,9 +5,6 @@ import jwtDecode from 'jwt-decode';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
-import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -22,6 +19,10 @@ import { setI18nLocale } from '@/translations';
 
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
+import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
@@ -30,7 +31,6 @@ interface JWTPayload {
     rol: RoleType;
 }
 
-const LAST_ACCESSED_WORKSPACE_KEY = 'console:last-accessed-workspace';
 
 const getUserInfo = async (): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.clientV2.identity.userProfile.get<UserGetParameters, UserModel>();
@@ -118,6 +118,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
+        ErrorHandler.handleError(e);
         SpaceConnector.flushToken();
     } finally {
         /*
@@ -127,27 +128,6 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         setTimeout(() => {
             dispatch('display/finishGrantRole', undefined, { root: true });
         }, 500);
-    }
-};
-
-export const setCurrentAccessedWorkspaceId = async (workspaceId: string): Promise<void> => {
-    try {
-        await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
-            name: LAST_ACCESSED_WORKSPACE_KEY,
-            data: { workspace_id: workspaceId },
-        });
-    } catch (e) {
-        console.error(`Workspace Set Error: ${e}`);
-    }
-};
-export const getLastAccessedWorkspaceId = async (): Promise<string | undefined> => {
-    try {
-        const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
-            name: LAST_ACCESSED_WORKSPACE_KEY,
-        });
-        return response.data.workspace_id;
-    } catch (e) {
-        return undefined;
     }
 };
 

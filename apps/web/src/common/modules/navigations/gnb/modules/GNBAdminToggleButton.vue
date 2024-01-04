@@ -10,7 +10,8 @@ import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
+
+import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
