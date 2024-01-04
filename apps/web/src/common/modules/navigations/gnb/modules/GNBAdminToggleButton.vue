@@ -10,6 +10,7 @@ import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
 
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -23,8 +24,13 @@ const handleToggleAdminMode = async () => {
     if (state.isAdminMode) {
         await userWorkspaceStore.load(store.state.user.userId);
         appContextStore.exitAdminMode();
-        const lastAccessedWorkspaceId = await store.dispatch('user/getLastAccessedWorkspaceId');
-        await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: lastAccessedWorkspaceId } });
+        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
+        if (lastAccessedWorkspaceId) {
+            await router.push({
+                name: ROOT_ROUTE.WORKSPACE._NAME,
+                params: { workspaceId: lastAccessedWorkspaceId },
+            });
+        } else await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',

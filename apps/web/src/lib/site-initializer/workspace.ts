@@ -1,6 +1,5 @@
-import { store } from '@/store';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
 import { pinia } from '@/store/pinia';
 
 
@@ -12,7 +11,7 @@ export const initWorkspace = async (userId?: string): Promise<string|undefined> 
 
     /* Workspace Load */
     await workspaceStore.load(userId);
-    const lastAccessedWorkspaceId = userId ? await store.dispatch('user/getLastAccessedWorkspaceId') : undefined;
+    const lastAccessedWorkspaceId = userId ? await getLastAccessedWorkspaceId() : undefined;
 
     /* Set Default Workspace */
     const { pathname } = window.location;

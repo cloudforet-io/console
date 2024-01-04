@@ -112,7 +112,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
             commit('setCurrentRoleInfo', roleInfo);
 
             if (grantRequest.scope === 'WORKSPACE' && grantRequest.workspace_id) {
-                await dispatch('setCurrentAccessedWorkspaceId', grantRequest.workspace_id);
+                await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
             }
         }
         /*
