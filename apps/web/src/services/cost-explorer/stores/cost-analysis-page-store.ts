@@ -10,6 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
 import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/modules/settings/type';
@@ -107,7 +108,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         dataSourceImageUrl: computed<string>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
+                return store.getters['reference/pluginItems'][targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }
             return '';
         }),
@@ -250,6 +251,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         setPeriod,
         setRelativePeriod,
     };
+
+    (async () => {
+        await store.dispatch('reference/plugin/load');
+    })();
 
     return {
         state,

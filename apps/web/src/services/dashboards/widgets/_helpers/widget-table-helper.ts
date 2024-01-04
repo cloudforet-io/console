@@ -6,8 +6,9 @@ import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
-import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 /**
@@ -92,7 +93,7 @@ export const fillEmptyDateToObjectArray = <Data extends RawData = RawData>(field
 };
 
 
-export const getReferenceTypeOfDataField = (allReferenceTypeInfo: AllReferenceTypeInfo, dataField?: string): ReferenceType | undefined => {
+export const getReferenceTypeOfDataField = (allReferenceTypeInfo: AllReferenceTypeInfo, dataField?: string): ManagedVariableModelKey | undefined => {
     const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
     if (referenceTypeInfo) return referenceTypeInfo.type;
     return undefined;

@@ -14,7 +14,6 @@ import { numberFormatter, getValueByPath } from '@cloudforet/utils';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
@@ -25,6 +24,7 @@ import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type {
     Field, WidgetTableData,
 } from '@/services/dashboards/widgets/_types/widget-data-table-type';

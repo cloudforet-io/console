@@ -6,8 +6,7 @@ import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type {
     Legend,
 } from '@/services/dashboards/widgets/_types/widget-type';
