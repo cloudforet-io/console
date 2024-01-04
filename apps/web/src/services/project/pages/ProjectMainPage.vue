@@ -247,7 +247,7 @@ onUnmounted(() => {
 .parents-info {
     @apply flex items-center text-gray-900;
     min-height: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     .group-name {
         @apply inline-flex items-center text-xs;
     }

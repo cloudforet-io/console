@@ -5,6 +5,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
@@ -16,20 +17,33 @@ const AppMainPage = () => import('@/services/administration/pages/AppMainPage.vu
 const administrationRoutes: RouteConfig = {
     path: 'iam',
     name: ADMINISTRATION_ROUTE.IAM._NAME,
-    meta: { menuId: MENU_ID.IAM, lnbVisible: true, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.IAM,
+        lnbVisible: true,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.IAM].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AdministrationContainer,
     children: [
         {
             path: 'user',
             name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.USER },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.USER,
+                translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
+            },
             component: UserMainPage as any,
         },
         {
             path: 'app',
             name: ADMINISTRATION_ROUTE.IAM.APP._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.APP },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.APP,
+                translationId: MENU_INFO_MAP[MENU_ID.APP].translationId,
+            },
             component: AppMainPage as any,
         },
     ],

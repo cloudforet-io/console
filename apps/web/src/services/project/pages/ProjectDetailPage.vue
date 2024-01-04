@@ -310,7 +310,7 @@ onUnmounted(() => {
     margin: 0 auto;
 }
 .p-heading {
-    margin-top: 1rem;
+    margin-top: 0.25rem;
     margin-bottom: 0;
 }
 .top-wrapper {
