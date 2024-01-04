@@ -491,7 +491,8 @@
 						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
 						"REQUIRED_TARGET": "Please select target.",
-						"SPECIFIC_PROVIDER": "Specific Provider"
+						"SPECIFIC_PROVIDER": "Specific Provider",
+						"WORKSPACE": "Workspace"
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
