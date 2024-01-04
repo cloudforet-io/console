@@ -2,6 +2,7 @@
     <div class="g-n-b-dashboard-menu">
         <p-tab :tabs="state.tabs"
                :active-tab.sync="state.activeTab"
+               :class="{ 'admin-mode': storeState.isAdminMode }"
         >
             <template #favorite>
                 <g-n-b-dashboard-favorite :dashboard-list="state.dashboardList"
@@ -133,6 +134,13 @@ const handleOverflown = (isOverflown: boolean) => {
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
         .tab-pane {
             padding-bottom: 0;
+        }
+
+        &.admin-mode {
+            border: none;
+            .tab-item-wrapper {
+                display: none;
+            }
         }
     }
     .footer-wrapper {
