@@ -25,6 +25,7 @@ import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -64,8 +65,10 @@ const MONTH_COUNT = 12;
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const queryHelper = new QueryHelper();
+const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
     loading: true,
@@ -204,6 +207,7 @@ const getCloudServiceSummary = async () => {
         const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
             project_id: props.projectId,
             labels: Object.values(SERVICE_CATEGORY),
+            workspace_id: storeState.currentWorkspaceId,
         });
 
         state.countMap = {};
@@ -233,7 +237,10 @@ const getTrend = async (type) => {
             project_id: props.projectId,
         };
         if (type !== SERVICE_CATEGORY.ALL) param.label = type;
-        const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary(param);
+        const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
+            ...param,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         const data = res.results;
 
         if (type === SERVICE_CATEGORY.STORAGE) {
@@ -316,7 +323,10 @@ const getSummaryInfo = async (type) => {
     try {
         state.loading = true;
         const param = getApiParameter(type);
-        const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
+        const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+            ...param,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         const summaryData: SummaryData[] = [];
 
         const summaryQueryHelper = new QueryHelper();

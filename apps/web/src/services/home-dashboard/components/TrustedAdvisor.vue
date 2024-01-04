@@ -2,7 +2,7 @@
     <widget-layout>
         <template #title>
             <div class="title">
-                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+                <span :style="{ 'color': storeState.providers.aws ? storeState.providers.aws.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
@@ -117,6 +117,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -173,10 +174,14 @@ export default {
     setup(props) {
         const queryHelper = new QueryHelper();
         const allReferenceStore = useAllReferenceStore();
-        const state = reactive({
-            loading: true,
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        });
+        const state = reactive({
+            loading: true,
             thisPage: 1,
             allPage: 1,
             tableData: computed(() => ([
@@ -246,7 +251,10 @@ export default {
         const getProjectSummary = async (projects: ProjectReferenceMap) => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject(props.extraParams);
+                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject({
+                    ...props.extraParams,
+                    workspace_id: storeState.currentWorkspaceId,
+                });
                 state.allPage = getAllPage(size(res), 6);
 
                 const projectSummaryData: ProjectSummaryData[] = [];
@@ -271,7 +279,7 @@ export default {
                         projectName: projects[projectId]?.name,
                         tooltipText: projects[projectId]?.label,
                         counts,
-                        isFavorite: !!find(state.favoriteProjects, { itemId: projectId }),
+                        isFavorite: !!find(storeState.favoriteProjects, { itemId: projectId }),
                     });
                 });
                 state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
@@ -298,6 +306,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             changePageNumber,
             range,
             getProjectBoxStatus,
