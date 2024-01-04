@@ -68,13 +68,14 @@ export const MENU_LIST: Menu[] = [
 ];
 
 export const ADMIN_MENU_LIST: Menu[] = [
-    {
-        id: MENU_ID.HOME_DASHBOARD,
-        hideOnGNB: true,
-    },
-    {
-        id: MENU_ID.DASHBOARDS,
-    },
+    // HACK: hide for now
+    // {
+    //     id: MENU_ID.HOME_DASHBOARD,
+    //     hideOnGNB: true,
+    // },
+    // {
+    //     id: MENU_ID.DASHBOARDS,
+    // },
     // TODO: low priority features, so hide it for now
     // {
     //     id: MENU_ID.ASSET_INVENTORY,
