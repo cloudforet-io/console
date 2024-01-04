@@ -130,9 +130,9 @@ const handleExport = async () => {
         targetFields.push({ key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } });
     }
     const excelFields: ExcelDataField[] = [
+        ...targetFields,
         { key: 'budget_id', name: 'Budget ID' },
         { key: 'name', name: 'Budget Name' },
-        ...targetFields,
         { key: 'data_source_id', name: 'Data Source ID' },
         { key: 'provider_filter.providers', name: 'Providers' },
         { key: 'total_spent', name: 'Total Spent' },
