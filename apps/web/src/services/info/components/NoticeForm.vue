@@ -21,6 +21,7 @@ import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
@@ -78,6 +79,7 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
 }));
 
 const { fileUploader } = useFileUploader();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
@@ -99,7 +101,7 @@ const handleCreateNotice = async () => {
             resource_group: 'DOMAIN',
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
-        await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
     }

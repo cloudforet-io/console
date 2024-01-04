@@ -31,6 +31,8 @@ import { PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import {
     filterLNBMenuByAccessPermission,
 } from '@/lib/access-control/page-access-helper';
@@ -49,9 +51,11 @@ export default defineComponent({
         LNB,
     },
     setup() {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
+            hasRole: computed<boolean>(() => userWorkspaceStore.getters.workspaceList.length > 0),
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
@@ -81,15 +85,17 @@ export default defineComponent({
                         to: { name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME },
                         hideFavorite: true,
                     },
-                    {
+                ];
+                if (state.hasRole) {
+                    allLnbMenu.push({
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId),
                         id: MENU_ID.NOTIFICATIONS,
                         to: { name: MY_PAGE_ROUTE.NOTIFICATION._NAME },
-                        hightlightTag: 'beta',
+                        highlightTag: 'beta',
                         hideFavorite: true,
-                    },
-                ];
+                    });
+                }
                 return filterLNBMenuByAccessPermission(allLnbMenu, store.getters['user/pageAccessPermissionList']);
             }),
         });

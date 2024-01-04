@@ -32,14 +32,10 @@ const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
     o: '',
 }, {
     k: 'data.show_popup',
-    v: false,
-    o: '=',
-}]).data;
-const apiQueryForPostList = new ApiQueryHelper().setFilters([{
-    k: 'is_popup',
     v: true,
-    o: '=',
-}]).setSort('created_at', false).data;
+    o: '!=',
+}]).data;
+const postListQueryHelper = new ApiQueryHelper().setSort('created_at', false);
 
 // API
 const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
@@ -57,7 +53,8 @@ const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
 const getPostList = async (): Promise<void> => {
     try {
         const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
-            query: apiQueryForPostList,
+            query: postListQueryHelper.data,
+            is_popup: true,
             board_type: POST_BOARD_TYPE.NOTICE,
         });
         const postIdList = await getUserConfigBoardPostIdList();

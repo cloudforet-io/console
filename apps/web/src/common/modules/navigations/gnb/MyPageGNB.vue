@@ -34,17 +34,15 @@ const state = reactive({
 });
 
 const handleBackToWorkspace = () => {
-    if (state.hasRole) {
-        if (state.beforeWorkspace === 'admin') {
-            router.push({ name: ROOT_ROUTE.ADMIN._NAME });
-            return;
-        }
-        if (state.beforeWorkspace) {
-            router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: state.beforeWorkspace } });
-            return;
-        }
-        router.push({ name: ROOT_ROUTE._NAME });
+    if (state.beforeWorkspace === 'admin') {
+        router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        return;
     }
+    if (state.beforeWorkspace) {
+        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: state.beforeWorkspace } });
+        return;
+    }
+    router.push({ name: ROOT_ROUTE._NAME });
 };
 </script>
 
@@ -54,7 +52,8 @@ const handleBackToWorkspace = () => {
             <my-page-g-n-b-header ref="gnbHeaderRef"
                                   :to="state.workspaceLink"
             />
-            <p-button style-type="transparent"
+            <p-button v-if="state.hasRole"
+                      style-type="transparent"
                       class="back-to-workspace-button"
                       icon-left="ic_arrow-left"
                       @click="handleBackToWorkspace"
