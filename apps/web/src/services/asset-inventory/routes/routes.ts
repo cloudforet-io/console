@@ -7,6 +7,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -37,13 +38,17 @@ const CollectorDetailPage = () => import('@/services/asset-inventory/pages/Colle
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.ASSET_INVENTORY,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AssetInventoryContainer,
     children: [
         {
             path: 'cloud-service',
-            meta: { menuId: MENU_ID.CLOUD_SERVICE },
+            meta: { menuId: MENU_ID.CLOUD_SERVICE, translationId: MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -89,12 +94,12 @@ const assetInventoryRoute: RouteConfig = {
         {
             path: 'server',
             name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.SERVER },
+            meta: { lnbVisible: true, menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
             component: ServerPage as any,
         },
         {
             path: 'collector',
-            meta: { menuId: MENU_ID.COLLECTOR },
+            meta: { menuId: MENU_ID.COLLECTOR, translationId: MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -141,7 +146,7 @@ const assetInventoryRoute: RouteConfig = {
         },
         {
             path: 'service-account',
-            meta: { menuId: MENU_ID.SERVICE_ACCOUNT },
+            meta: { menuId: MENU_ID.SERVICE_ACCOUNT, translationId: MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -154,7 +159,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: ':serviceAccountId',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId },
+                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, copiable: true },
                     props: true,
                     component: ServiceAccountDetailPage,
                 },
