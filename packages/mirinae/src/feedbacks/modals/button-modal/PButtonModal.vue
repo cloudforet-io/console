@@ -264,7 +264,6 @@ export default defineComponent<ButtonModalProps>({
 </script>
 <style lang="postcss">
 .p-button-modal {
-    display: inline-block;
     .modal-content {
         @apply bg-white border border-gray-200 rounded-lg;
         display: flex;

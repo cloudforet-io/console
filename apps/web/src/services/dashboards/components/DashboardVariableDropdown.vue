@@ -265,7 +265,7 @@ const {
                         :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
                         @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
-                        @select="handleSelectOption(variableProperty?.selection_type, $event)"
+                        @select="handleSelectOption(variableProperty?.selection_type, ...args)"
                         @update:search-text="handleUpdateSearchText"
         />
     </div>
