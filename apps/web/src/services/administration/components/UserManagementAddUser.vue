@@ -7,7 +7,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -67,7 +67,8 @@ const handleClickTextInput = async () => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
-const handleChangeTextInput = () => {
+const handleChangeTextInput = (value: string) => {
+    formState.searchText = value;
     if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
@@ -161,7 +162,6 @@ const initAuthTypeList = async () => {
 /* API */
 const fetchListUsers = async () => {
     state.loading = true;
-
     try {
         const results = await userPageStore.findWorkspaceUser({
             keyword: formState.searchText || '@',
@@ -260,15 +260,14 @@ onMounted(() => {
                         />
                     </div>
                     <div class="input-form-wrapper">
-                        <p-text-input ref="targetRef"
-                                      :invalid="invalid"
-                                      :value.sync="formState.searchText"
-                                      block
-                                      class="user-id-input"
-                                      @click="handleClickTextInput"
-                                      @keydown.enter="handleEnterTextInput"
-                                      @input="handleChangeTextInput"
-                        />
+                        <input ref="targetRef"
+                               :value="formState.searchText"
+                               class="user-id-input"
+                               :class="{'invalid': invalid}"
+                               @click="handleClickTextInput"
+                               @keydown.enter="handleEnterTextInput"
+                               @input="handleChangeTextInput($event.target.value)"
+                        >
                         <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
                                         ref="contextMenuRef"
                                         :loading="state.loading"
@@ -343,7 +342,13 @@ onMounted(() => {
             @apply relative;
             width: 100%;
             .user-id-input {
+                @apply text-label-md border border-gray-300 rounded;
                 width: 100%;
+                height: 2rem;
+                padding: 0.375rem 0.5rem;
+                &.invalid {
+                    @apply border-alert;
+                }
             }
             .user-context-menu {
                 @apply absolute;
