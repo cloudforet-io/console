@@ -115,6 +115,11 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
                 await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
             }
         }
+    } catch (e) {
+        commit('setCurrentRoleInfo', undefined);
+        console.error(`Role Grant Error: ${e}`);
+        SpaceConnector.flushToken();
+    } finally {
         /*
         * Implemented a global loading with a minimum duration of 500 milliseconds
         * during the grant process to prevent rendering of services until the process is complete.
@@ -122,10 +127,6 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         setTimeout(() => {
             dispatch('display/finishGrantRole', undefined, { root: true });
         }, 500);
-    } catch (e) {
-        commit('setCurrentRoleInfo', undefined);
-        console.error(`Role Grant Error: ${e}`);
-        SpaceConnector.flushToken();
     }
 };
 
