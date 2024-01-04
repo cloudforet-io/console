@@ -48,6 +48,8 @@ export default defineComponent<Props>({
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
 .text-editor-contents {
+    margin-left: 0.1rem;
+
     @mixin all-nodes-style;
 
     img:active {

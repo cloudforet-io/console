@@ -62,7 +62,7 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
                     hide-header
                     hide-header-close-button
                     hide-footer-close-button
-                    size="sm"
+                    size="md"
                     :absolute="props.popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
                     class="notice-popup"
                     @confirm="handleClose"
