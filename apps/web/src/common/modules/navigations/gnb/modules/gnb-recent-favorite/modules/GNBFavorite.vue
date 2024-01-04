@@ -150,19 +150,16 @@ const state = reactive({
     //
     favoriteItemsMapFilterByWorkspaceId: computed(() => ({
         [FAVORITE_TYPE.MENU]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.PROJECT]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.PROJECT]: (store.state.favorite.projectItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.projectGroupItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.cloudServiceItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.dashboardItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.costAnalysisItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
     })),
-    favoriteMenuItems: computed<FavoriteItem[]>(() => {
-        console.debug('GNBFavorite.favoriteMenuItems', state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU]);
-        return convertMenuConfigToReferenceData(
-            state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU],
-            store.getters['display/allMenuList'],
-        );
-    }),
+    favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
+        state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU],
+        store.getters['display/allMenuList'],
+    )),
     favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
         return isUserAccessible
