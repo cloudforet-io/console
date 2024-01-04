@@ -491,7 +491,8 @@
 						"REQUIRED_COST_TYPE": "1개 이상의 비용 발생 기준을 선택해 주세요.",
 						"REQUIRED_NAME": "이름을 입력하세요.",
 						"REQUIRED_TARGET": "타겟을 선택하세요.",
-						"SPECIFIC_PROVIDER": "특정 프로바이더"
+						"SPECIFIC_PROVIDER": "특정 프로바이더",
+						"WORKSPACE": "워크스페이스"
 					},
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
@@ -3479,6 +3480,7 @@
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" 이동하기",
 				"NO_PROJECT_GROUP": "프로젝트 그룹 없음",
+				"ROOT": "Root",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "이동 할 위치(프로젝트 그룹)를 선택하세요"
 			},
 			"MODAL_PROJECT_CREATE": {

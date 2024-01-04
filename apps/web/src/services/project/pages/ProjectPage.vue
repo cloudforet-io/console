@@ -266,6 +266,7 @@ onUnmounted(() => {
                                 <p-context-menu v-show="visibleMenu"
                                                 ref="menuRef"
                                                 class="create-context-menu"
+                                                no-select-indication
                                                 :style="contextMenuStyle"
                                                 :menu="state.createDropdownMenuItems"
                                                 @select="handleSelectCreateMenu"

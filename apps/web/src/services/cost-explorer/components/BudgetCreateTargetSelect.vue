@@ -40,6 +40,10 @@ const state = reactive({
         const costDataSourceList = Object.entries(storeState.costDataSource).filter(([, v]) => [selectedWorkspaceId, '*'].includes(v.data.workspace_id));
         return costDataSourceList.length > 0;
     }),
+    targetLabelText: computed(() => {
+        if (storeState.isAdminMode) return i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.WORKSPACE');
+        return i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROJECT');
+    }),
 });
 const {
     forms: {
@@ -96,7 +100,7 @@ watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets,
 </script>
 
 <template>
-    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_TARGET')"
+    <p-field-group :label="state.targetLabelText"
                    :invalid="invalidState.selectedTargets"
                    :invalid-text="invalidTexts.selectedTargets"
                    required

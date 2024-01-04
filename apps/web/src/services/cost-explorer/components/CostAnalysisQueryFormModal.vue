@@ -7,6 +7,7 @@ import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -42,6 +43,12 @@ const formState = reactive({
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
+    selectedQuerySet: computed<CostQuerySetModel|undefined>(() => {
+        if (props.requestType === 'EDIT') {
+            return costAnalysisPageGetters.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
+        }
+        return undefined;
+    }),
     queryNameInvalidText: computed(() => {
         if (typeof formState.queryName === 'undefined') return undefined;
         if (formState.queryName.length === 0) {
@@ -50,7 +57,7 @@ const state = reactive({
         if (formState.queryName.length > 40) {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
         }
-        if (state.mergedCostQuerySetNameList.includes(formState.queryName)) {
+        if (state.mergedCostQuerySetNameList.filter((d) => d !== state.selectedQuerySet?.name).includes(formState.queryName)) {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_DUPLICATED');
         }
         return undefined;
@@ -103,8 +110,7 @@ const handleFirstQueryNameInput = () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.requestType === 'EDIT') {
-            const selectedQuerySet = costAnalysisPageGetters.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
-            formState.queryName = selectedQuerySet?.name;
+            formState.queryName = state.selectedQuerySet?.name;
         }
         state.showValidation = true;
     } else {

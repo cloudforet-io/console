@@ -491,7 +491,8 @@
 						"REQUIRED_COST_TYPE": "一つ以上のコストタイプを選択してください",
 						"REQUIRED_NAME": "名前を入力してください",
 						"REQUIRED_TARGET": "ターゲットを選択してください",
-						"SPECIFIC_PROVIDER": "特定プロバイダ"
+						"SPECIFIC_PROVIDER": "特定プロバイダ",
+						"WORKSPACE": "ワークスペース"
 					},
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
@@ -3479,6 +3480,7 @@
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" を移動する",
 				"NO_PROJECT_GROUP": "プロジェクトグループなし",
+				"ROOT": "ルート",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "移動先（プロジェクトグループ）を選択してください"
 			},
 			"MODAL_PROJECT_CREATE": {

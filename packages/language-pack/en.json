@@ -491,7 +491,8 @@
 						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
 						"REQUIRED_TARGET": "Please select target.",
-						"SPECIFIC_PROVIDER": "Specific Provider"
+						"SPECIFIC_PROVIDER": "Specific Provider",
+						"WORKSPACE": "Workspace"
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
@@ -3479,6 +3480,7 @@
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "Move \"{name}\"",
 				"NO_PROJECT_GROUP": "No Project Group",
+				"ROOT": "Root",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "Select a project group to move to"
 			},
 			"MODAL_PROJECT_CREATE": {

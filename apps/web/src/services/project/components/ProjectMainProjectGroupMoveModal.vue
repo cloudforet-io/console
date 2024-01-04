@@ -154,7 +154,7 @@ watch(() => state.originParentGroupId, (_id?: string) => {
                          class="mt-2"
                          @change="state.selectProjectGroup = $event"
                 >
-                    {{ $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.NO_PROJECT_GROUP') }}
+                    {{ $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.ROOT') }}
                 </p-radio>
             </p-radio-group>
         </template>

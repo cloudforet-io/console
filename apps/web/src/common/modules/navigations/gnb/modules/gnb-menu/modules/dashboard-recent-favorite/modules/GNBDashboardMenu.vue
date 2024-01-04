@@ -1,23 +1,23 @@
 <template>
     <div class="g-n-b-dashboard-menu">
-        <p-tab :tabs="tabs"
-               :active-tab.sync="activeTab"
+        <p-tab :tabs="state.tabs"
+               :active-tab.sync="state.activeTab"
         >
             <template #favorite>
-                <g-n-b-dashboard-favorite :dashboard-list="dashboardList"
+                <g-n-b-dashboard-favorite :dashboard-list="state.dashboardList"
                                           @close="hideMenu"
                                           @update:is-overflown="handleOverflown"
                 />
             </template>
             <template #recent>
-                <g-n-b-dashboard-recent :visible="activeTab === 'recent'"
-                                        :dashboard-list="dashboardList"
+                <g-n-b-dashboard-recent :visible="state.activeTab === 'recent'"
+                                        :dashboard-list="state.dashboardList"
                                         @close="hideMenu"
                 />
             </template>
             <template #footer>
                 <div class="footer-wrapper">
-                    <template v-for="(subMenu, index) in subMenuList">
+                    <template v-for="(subMenu, index) in state.subMenuList">
                         <div :key="`footer-${subMenu.label}-${index}`"
                              class="sub-menu"
                         >
@@ -28,7 +28,7 @@
                             />
                         </div>
                     </template>
-                    <div v-if="isOverflown"
+                    <div v-if="state.isOverflown"
                          class="gradient-box"
                     />
                 </div>
@@ -37,10 +37,9 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
+<script lang="ts" setup>
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import { PTab } from '@spaceone/design-system';
@@ -49,6 +48,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -66,63 +66,56 @@ import type {
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
-export default defineComponent({
-    name: 'GNBDashboardMenu',
-    components: {
-        PTab,
-        GNBDashboardRecent,
-        GNBDashboardFavorite,
-        GNBSubMenu,
-    },
-    setup(props, { emit }: SetupContext) {
-        const { getProperRouteLocation } = useProperRouteLocation();
-        const dashboardStore = useDashboardStore();
-        const dashboardGetters = dashboardStore.getters;
-        const state = reactive({
-            tabs: computed(() => ([
-                { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
-                { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'favorite',
-            subMenuList: computed(() => [
-                {
-                    label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
-                    to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.ALL._NAME }),
-                },
-                {
-                    label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
-                    to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }),
-                },
-            ] as DisplayMenu[]),
-            isOverflown: false,
-            dashboardList: computed<GNBDashboardMenuItem[]>(() => dashboardGetters.allItems.map((item) => ({
-                name: item.name,
-                dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
-                workspaceId: item.workspace_id || '',
-            }))),
-        });
-        const hideMenu = () => {
-            emit('close');
-        };
-        const handleOverflown = (isOverflown: boolean) => {
-            state.isOverflown = isOverflown;
-        };
+const emit = defineEmits<{(e: 'close'): void;
+}>();
 
-        (async () => {
-            // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
-            await Promise.allSettled([
-                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-                dashboardStore.load(),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            hideMenu,
-            handleOverflown,
-        };
-    },
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
+const state = reactive({
+    tabs: computed<TabItem[]>(() => {
+        if (storeState.isAdminMode) return [];
+        return [
+            { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
+            { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
+        ];
+    }),
+    activeTab: 'favorite',
+    subMenuList: computed(() => [
+        {
+            label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
+            to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+        },
+        {
+            label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
+            to: getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }),
+        },
+    ] as DisplayMenu[]),
+    isOverflown: false,
+    dashboardList: computed<GNBDashboardMenuItem[]>(() => dashboardGetters.allItems.map((item) => ({
+        name: item.name,
+        dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
+        workspaceId: item.workspace_id || '',
+    }))),
+});
+const hideMenu = () => {
+    emit('close');
+};
+const handleOverflown = (isOverflown: boolean) => {
+    state.isOverflown = isOverflown;
+};
+
+(async () => {
+    // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
+    await Promise.allSettled([
+        store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+        dashboardStore.load(),
+    ]);
+})();
 </script>
 
 <style lang="postcss" scoped>
