@@ -425,11 +425,12 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
     margin: 1rem 1rem 0.5rem 1rem;
     .project-name-wrapper {
         .project-name {
-            @apply flex-grow flex-shrink-0 font-bold overflow-hidden;
+            @apply flex-grow flex-shrink-0 overflow-hidden;
             display: -webkit-box;
             text-overflow: ellipsis;
             word-wrap: break-word;
-            font-size: 1.125rem;
+            font-size: 1rem;
+            font-weight: 500;
             line-height: 1.2;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
@@ -444,9 +445,10 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
         }
     }
     .accounts-wrapper {
-        @apply flex-grow-0 overflow-x-hidden flex;
+        @apply flex-grow-0 flex;
         justify-content: space-between;
         align-items: center;
+        overflow: hidden;
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
             .provider {
