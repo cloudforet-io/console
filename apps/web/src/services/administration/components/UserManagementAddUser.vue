@@ -9,6 +9,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -67,13 +68,13 @@ const handleClickTextInput = async () => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
-const handleChangeTextInput = (value: string) => {
+const handleChangeTextInput = debounce((value: string) => {
     formState.searchText = value;
     if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
-};
+}, 500);
 const handleEnterTextInput = () => {
     if (formState.searchText === '') return;
     const { isValid, invalidText } = checkEmailFormat(formState.searchText);
