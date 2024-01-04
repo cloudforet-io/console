@@ -62,12 +62,17 @@ const storeState = reactive({
 const state = reactive({
     searchText: props.filters.map((d) => d.v).join(' ') || '',
     selectIndex: [] as number[],
-    fields: [
-        { label: 'User ID', name: 'user_id' },
-        { label: 'User Name', name: 'user_name' },
-        { label: 'Role', name: 'role_type' },
-        { label: ' ', name: 'delete', sortable: false },
-    ] as DataTableFieldType[],
+    fields: computed<DataTableFieldType[]>(() => {
+        const fields: DataTableFieldType[] = [
+            { label: 'User ID', name: 'user_id' },
+            { label: 'User Name', name: 'user_name' },
+            { label: 'Role', name: 'role_type' },
+        ];
+        if (projectDetailPageGetters.projectType === 'PRIVATE') {
+            fields.push({ label: ' ', name: 'delete', sortable: false });
+        }
+        return fields;
+    }),
     workspaceUserIdList: [] as string[],
     projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
