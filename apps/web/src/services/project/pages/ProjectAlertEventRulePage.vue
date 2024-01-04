@@ -6,6 +6,8 @@ import {
 import {
     PHeading, PBreadcrumbs, PCard, PI, PButton,
 } from '@spaceone/design-system';
+import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -18,7 +20,11 @@ import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api
 import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -27,6 +33,8 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
 import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
 
 type EditMode = 'CREATE' | 'UPDATE';
 
@@ -35,9 +43,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+});
 const state = reactive({
     loading: true,
-    project: {},
+    project: computed<ProjectReferenceItem>(() => storeState.projects[props.projectId]),
     cardData: [] as EventRuleModel[],
     orderedCardData: computed<EventRuleModel[]>(() => {
         const data = state.cardData;
@@ -48,12 +60,22 @@ const state = reactive({
     selectedOrder: undefined as number|undefined,
 });
 const routeState = reactive({
-    routes: computed(() => ([
-        { name: i18n.t('MENU.PROJECT'), path: '/project' },
-        { name: state.project?.project_group_info?.name, path: `/project?select_pg=${state.project?.project_group_info?.project_group_id}` },
-        { name: state.project?.name, path: `/project/${props.projectId}` },
-        { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') },
-    ])),
+    routes: computed<Route[]>(() => {
+        let results: Route[] = [
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
+        ];
+        if (!isEmpty(state.project.data.groupInfo)) {
+            results.push({
+                name: state.project.data.groupInfo?.name,
+                to: referenceRouter(state.project.data.groupInfo?.id, { resource_type: 'identity.ProjectGroup' }),
+            });
+        }
+        results = results.concat([
+            { name: state.project?.name, to: referenceRouter(props.projectId, { resource_type: 'identity.Project' }) },
+            { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
+        ]);
+        return results;
+    }),
 });
 const checkDeleteState = reactive({
     visible: false,
