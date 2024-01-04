@@ -7,7 +7,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
 } from '@spaceone/design-system';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
@@ -164,6 +164,11 @@ watch(() => state.userId, (userId) => {
                 </div>
             </template>
             <router-view v-else />
+            <p-data-loader v-if="state.isGrantInProgress"
+                           :loading="state.isGrantInProgress"
+                           :data="true"
+                           class="console-loading-wrapper"
+            />
             <p-icon-modal :visible="state.isExpired"
                           emoji="👋"
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -196,6 +201,15 @@ watch(() => state.userId, (userId) => {
     width: 100vw;
     height: 100vh;
     background-color: $bg-color;
+
+    .console-loading-wrapper {
+        position: absolute;
+        height: 100%;
+        z-index: 101;
+        & > .data-loader-container > .loader-wrapper > .loader.spinner {
+            max-height: unset;
+        }
+    }
 
     .gnb {
         position: fixed;
