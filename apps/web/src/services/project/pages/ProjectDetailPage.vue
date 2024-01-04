@@ -63,10 +63,7 @@ const state = reactive({
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            {
-                name: i18n.t('MENU.PROJECT') as string,
-                to: { name: PROJECT_ROUTE._NAME },
-            },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
             results.push({
