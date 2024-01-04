@@ -77,7 +77,7 @@ const selectWorkspace = (workspaceId: string): void => {
             <span v-if="props.isAdminMode"
                   class="admin-title"
             >
-                Admin
+                Admin Center
             </span>
             <div v-else
                  class="logo-wrapper"

@@ -62,13 +62,13 @@ const handleCreateWorkspace = () => {
     modalState.createModalVisible = true;
 };
 
-const handleConfirm = async (workspaceId: string) => {
+const handleConfirm = async ({ id, name }: {id: string, name: string}) => {
     userPageStore.$patch((_state) => {
         _state.modal.type = USER_MODAL_TYPE.ADD;
-        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
+        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string;
         _state.modal.themeColor = 'primary';
         _state.afterWorkspaceCreated = true;
-        _state.createdWorkspaceId = workspaceId;
+        _state.createdWorkspaceId = id;
         _state.modal.visible.add = true;
         _state.modal = cloneDeep(_state.modal);
     });
