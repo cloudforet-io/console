@@ -46,8 +46,6 @@ const myPageRoutes: RouteConfig = {
                     name: MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
                     meta: {
                         translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL',
-                        label: ({ params }) => params.protocolId,
-                        copiable: true,
                     },
                     props: true,
                     component: UserNotificationAddPage as any,
