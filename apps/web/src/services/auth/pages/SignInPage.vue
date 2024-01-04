@@ -33,6 +33,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 
 interface Props {
@@ -69,10 +70,20 @@ const onSignIn = async (userId:string) => {
     try {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
         const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-        const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
+        // const hasBoundRole = store.getters['user/hasPermission'] && hasBoundWorkspace;
+        const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
+        const lastAccessedWorkspaceId = await store.dispatch('user/getLastAccessedWorkspaceId');
+        const defaultRouteWithWorkspace = {
+            ...defaultRoute,
+            ...(defaultRoute.name === MY_PAGE_ROUTE._NAME ? {} : {
+                params: {
+                    workspaceId: lastAccessedWorkspaceId,
+                },
+            }),
+        };
 
         if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
-            await router.push(defaultRoute);
+            await router.push(defaultRouteWithWorkspace);
             return;
         }
 
@@ -83,7 +94,7 @@ const onSignIn = async (userId:string) => {
             if (isAdminRoute) appContextStore.enterAdminMode();
             await router.push(resolvedRoute.location);
         } else {
-            await router.push(defaultRoute);
+            await router.push(defaultRouteWithWorkspace);
         }
     } catch (e) {
         ErrorHandler.handleError(e);
