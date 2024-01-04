@@ -1922,7 +1922,7 @@
 					"ALT_S_DELETE_USER": "사용자 삭제 완료",
 					"ALT_S_DISABLE_USER": "사용자 비활성화 완료",
 					"ALT_S_ENABLE_USER": "사용자 활성화 완료",
-					"ALT_S_REMOVE_USER": "해당 워크스페이스로 부터 사용자가 제거 완료",
+					"ALT_S_REMOVE_USER": "해당 워크스페이스로부터 사용자 제거 완료",
 					"ALT_S_UPDATE_USER": "사용자 업데이트 완료",
 					"CREATE_TITLE": "사용자 추가",
 					"DELETE_DESC": "선택한 사용자를 삭제하시겠습니까?",
@@ -2191,7 +2191,7 @@
 				"ALT_S_DISABLE_API_KEY": "API 키 비활성화 완료 ",
 				"ALT_S_ENABLE": "사용자 활성화 완료",
 				"ALT_S_ENABLE_API_KEY": "API 키 활성화 완료",
-				"ALT_S_REMOVE_USER": "해당 워크스페이스로 부터 사용자가 제거 완료",
+				"ALT_S_REMOVE_USER": "해당 워크스페이스로부터 사용자 제거 완료",
 				"ALT_S_UPDATE_USER": "사용자 업데이트 완료",
 				"DOMAIN_ID": "도메인 아이디"
 			},
