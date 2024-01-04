@@ -25,6 +25,7 @@ import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
@@ -72,10 +73,10 @@ const onSignIn = async (userId:string) => {
         const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
         // const hasBoundRole = store.getters['user/hasPermission'] && hasBoundWorkspace;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
-        const lastAccessedWorkspaceId = await store.dispatch('user/getLastAccessedWorkspaceId');
+        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         const defaultRouteWithWorkspace = {
             ...defaultRoute,
-            ...(defaultRoute.name === MY_PAGE_ROUTE._NAME ? {} : {
+            ...(defaultRoute.name === MY_PAGE_ROUTE._NAME || !lastAccessedWorkspaceId ? {} : {
                 params: {
                     workspaceId: lastAccessedWorkspaceId,
                 },
