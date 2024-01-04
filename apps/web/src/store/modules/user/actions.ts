@@ -22,6 +22,8 @@ import { setI18nLocale } from '@/translations';
 
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
@@ -118,6 +120,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
+        ErrorHandler.handleError(e);
         SpaceConnector.flushToken();
     } finally {
         /*
