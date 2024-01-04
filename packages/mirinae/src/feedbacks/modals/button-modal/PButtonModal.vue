@@ -22,8 +22,8 @@
                             <slot v-if="!hideHeader"
                                   name="header"
                             >
-                                <div class="modal-header"
-                                     :class="[`${themeColor}-header`]"
+                                <span class="modal-header"
+                                      :class="[`${themeColor}-header`]"
                                 >
                                     <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
@@ -31,7 +31,7 @@
                                          color="inherit transparent"
                                     />
                                     {{ headerTitle }}
-                                </div>
+                                </span>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_close"
