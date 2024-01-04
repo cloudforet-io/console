@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router/composables';
 
 import {
     PButton,
-    PDataTable, PHeading, PI, PSelectDropdown,
+    PDataTable, PHeading, PI, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -270,10 +270,13 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
-                                <div class="role-info-wrapper">
+                                <p-tooltip position="bottom"
+                                           :contents="item.label"
+                                           class="role-label"
+                                >
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ item.role_type }})</span>
-                                </div>
+                                </p-tooltip>
+                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>
@@ -315,12 +318,12 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     width: 1rem;
                     height: 1rem;
                 }
-                .role-info-wrapper {
-                    @apply flex flex-col;
-                    gap: 0.25rem;
-                    .role-type {
-                        @apply text-gray-500;
-                    }
+                .role-label {
+                    @apply truncate;
+                    width: 14.375rem;
+                }
+                .role-type {
+                    @apply text-label-sm text-gray-400;
                 }
             }
         }
