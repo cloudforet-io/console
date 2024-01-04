@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm', workspaceId: string): void;
+    (e: 'confirm', workspaceInfo: { id: string, name: string }): void;
     (e: 'refresh'): void;
 }>();
 
@@ -98,7 +98,10 @@ const handleConfirm = async () => {
                 },
             });
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            emit('confirm', response.workspace_id);
+            emit('confirm', {
+                id: response.workspace_id,
+                name: response.name,
+            });
         }
     } catch (e) {
         ErrorHandler.handleError(e);
