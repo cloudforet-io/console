@@ -45,10 +45,14 @@ const costExplorerRoutes: RouteConfig = {
                     meta: { lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
+                            const workspaceId = to.params.workspaceId;
                             const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
                             const results = response?.results || [];
                             if (results.length === 0) { // none-data-source case
-                                next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                                next({
+                                    name: COST_EXPLORER_ROUTE.LANDING._NAME,
+                                    params: { workspaceId },
+                                });
                             } else if (to.params.dataSourceId && to.params.costQuerySetId) {
                                 next();
                             } else {
@@ -57,6 +61,7 @@ const costExplorerRoutes: RouteConfig = {
                                     params: {
                                         dataSourceId: results[0].data_source_id,
                                         costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+                                        workspaceId,
                                     },
                                 });
                             }
