@@ -145,8 +145,8 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
     analyzeCloudServiceApiQueryHelper.setFilters([
         { k: 'ref_cloud_service_type.labels', v: summaryType, o: '=' },
         { k: 'ref_cloud_service_type.is_major', v: true, o: '=' },
-        { k: 'project_id', v: projectIdList, o: '' },
     ]);
+    if (projectIdList.length > 0) analyzeCloudServiceApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: {
@@ -174,8 +174,9 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
 const listServiceAccountApiQueryHelper = new ApiQueryHelper();
 const fetchServiceAccountList = async (projectIdList: string[]) => {
     listServiceAccountApiQueryHelper
-        .setFilters([{ k: 'project_id', v: projectIdList, o: '' }])
+        .setFilters([])
         .setOnly('provider', 'project_id', 'service_account_id');
+    if (projectIdList.length > 0) listServiceAccountApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
             query: {
