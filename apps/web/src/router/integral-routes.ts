@@ -57,9 +57,14 @@ export const integralRoutes: RouteConfig[] = [
                 redirect: (to) => {
                     const userWorkspaceStore = useUserWorkspaceStore();
                     const workspaceList = userWorkspaceStore.getters.workspaceList;
-                    const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
+                    if (!workspaceList) return ({ name: MY_PAGE_ROUTE._NAME });
+
+                    const currentWorkspaceIdFromUrl = to.params.workspaceId;
+                    const currentWorkspaceId = currentWorkspaceIdFromUrl || userWorkspaceStore.getters.currentWorkspaceId;
                     const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === currentWorkspaceId);
+
                     if (currentWorkspaceId && isValidWorkspace) {
+                        userWorkspaceStore.setCurrentWorkspace(currentWorkspaceId);
                         return ({
                             name: HOME_DASHBOARD_ROUTE._NAME,
                             params: {
@@ -68,7 +73,8 @@ export const integralRoutes: RouteConfig[] = [
                             },
                         });
                     }
-                    if (workspaceList.length) {
+
+                    if (!currentWorkspaceId) {
                         const defaultWorkspaceId = workspaceList[0].workspace_id;
                         userWorkspaceStore.setCurrentWorkspace(defaultWorkspaceId);
                         return ({
@@ -79,7 +85,7 @@ export const integralRoutes: RouteConfig[] = [
                             },
                         });
                     }
-                    // TODO: handle no workspace case -> such as caution or error
+
                     return ({ name: MY_PAGE_ROUTE._NAME });
                 },
                 component: { template: '<router-view />' },
