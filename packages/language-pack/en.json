@@ -2491,7 +2491,7 @@
 				"SCHEDULE_COLLECT_DESC": "Collect data at {times} every day.",
 				"SCHEDULE_HOURLY": "Hourly Schedule",
 				"SCHEDULE_NOT_SELECTED_YET": "Schedule frequency hasn't been selected yet.",
-				"SCHEDULE_ON_OFF": "Schedule Power ON/OFF",
+				"SCHEDULE_ON_OFF": "Schedule ON/OFF",
 				"SCHEDULE_TURN_ON_DESC": "Turn on to collect data automatically.",
 				"SELECT": "Select",
 				"SELECT_SERVICE_ACCOUNT": "Select Service Account(s) to attactch.",
@@ -3283,7 +3283,7 @@
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
-			"INVITE_ONLY": "Invite-only",
+			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",
 				"ADD_FROM": "Add from {user_type}",
