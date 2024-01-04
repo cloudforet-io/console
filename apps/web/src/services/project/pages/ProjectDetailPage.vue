@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
@@ -30,7 +30,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -187,7 +186,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <general-page-layout overflow="scroll">
+    <div>
         <p-data-loader class="page-inner"
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -301,7 +300,7 @@ onUnmounted(() => {
                                                :target-id="projectDetailPageState.projectId"
                                                @confirm="handleConfirmProjectGroupMoveModal"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -311,6 +310,7 @@ onUnmounted(() => {
     margin: 0 auto;
 }
 .p-heading {
+    margin-top: 0.25rem;
     margin-bottom: 0;
 }
 .top-wrapper {

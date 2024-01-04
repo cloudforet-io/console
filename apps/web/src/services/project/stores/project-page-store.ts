@@ -16,6 +16,8 @@ import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/proje
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
+import getRandomId from '@/lib/random-id-generator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
@@ -30,6 +32,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
     });
     const state = reactive({
+        projectTreeKey: getRandomId(),
         isInitiated: false as boolean,
         searchText: undefined as string|undefined,
         rootNode: null as ProjectTreeRoot|null,
@@ -272,6 +275,10 @@ export const useProjectPageStore = defineStore('project-page', () => {
         return res;
     };
 
+    const refreshProjectTreeKey = () => {
+        state.projectTreeKey = getRandomId();
+    };
+
     const mutations = {
         setShouldUpdateProjectList,
         setProjectFormModalVisible,
@@ -295,6 +302,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         updateProject,
         updateProjectType,
         openProjectFormModal,
+        refreshProjectTreeKey,
     };
 
     return {

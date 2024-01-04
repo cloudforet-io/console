@@ -5,6 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -23,7 +24,11 @@ const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin
 const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: makeAdminRouteName(COST_EXPLORER_ROUTE._NAME),
-    meta: { menuId: MENU_ID.COST_EXPLORER },
+    meta: {
+        menuId: MENU_ID.COST_EXPLORER,
+        translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
+    },
+    redirect: () => ({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME) }),
     component: CostExplorerContainer,
     children: [
         {
@@ -34,7 +39,10 @@ const adminCostExplorerRoutes: RouteConfig = {
         },
         {
             path: 'cost-analysis',
-            meta: { menuId: MENU_ID.COST_ANALYSIS },
+            meta: {
+                menuId: MENU_ID.COST_ANALYSIS,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId,
+            },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -78,7 +86,10 @@ const adminCostExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { menuId: makeAdminRouteName(MENU_ID.BUDGET) },
+            meta: {
+                menuId: makeAdminRouteName(MENU_ID.BUDGET),
+                translationId: MENU_INFO_MAP[MENU_ID.BUDGET].translationId,
+            },
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {

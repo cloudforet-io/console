@@ -4,6 +4,7 @@ import { i18n } from '@/translations';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -18,7 +19,11 @@ const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardD
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
-    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.DASHBOARDS,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId,
+    },
     redirect: () => ({
         name: DASHBOARDS_ROUTE.ALL._NAME,
     }),
