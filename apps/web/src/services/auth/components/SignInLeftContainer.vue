@@ -1,7 +1,6 @@
 <template>
     <div
         class="sign-in-left-container"
-        :class="{ admin: props.isDomainAdmin }"
     >
         <div class="lottie-wrapper">
             <img v-if="state.showNewYearImage"
@@ -16,7 +15,7 @@
                 <lottie-vue-player v-else
                                    autoplay
                                    loop
-                                   :src="props.isDomainAdmin ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
+                                   src="/lottiefiles/lottie_floating-astronaut_signin.json"
                                    :style="{ height: '100%', backgroundColor: 'transparent' }"
                 />
             </div>
@@ -49,14 +48,6 @@ import { store } from '@/store';
 
 import config from '@/lib/config';
 
-interface Props {
-    isDomainAdmin: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    isDomainAdmin: false,
-});
-
 const state = reactive({
     // eslint-disable-next-line no-undef
     version: VITE_APP_VER,
@@ -79,10 +70,6 @@ const state = reactive({
     justify-content: space-between;
     width: 33%;
     height: 100%;
-
-    &.admin {
-        background-color: rgba(theme('colors.primary3'), 0.3);
-    }
 
     .lottie-wrapper {
         @apply flex justify-center items-center;

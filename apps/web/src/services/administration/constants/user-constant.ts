@@ -64,7 +64,6 @@ export const USER_SEARCH_HANDLERS = {
                     label: 'Last Activity',
                     dataType: 'datetime',
                 },
-                { name: 'timezone', label: 'Timezone' },
             ],
         },
         {

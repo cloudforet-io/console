@@ -1,6 +1,5 @@
 export const AUTH_ROUTE = Object.freeze({
     _NAME: 'auth',
-    ADMIN_SIGN_IN: { _NAME: 'domainAdminSignIn' },
     SIGN_IN: {
         _NAME: 'signIn',
         KEYCLOAK: { _NAME: 'keycloak' },

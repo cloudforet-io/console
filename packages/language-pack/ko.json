@@ -2117,7 +2117,7 @@
 				"TITLE": "{provider} 어카운트"
 			}
 		},
-		"TAGS_PLACEHOLDER": "키:값 키:값2...",
+		"TAGS_PLACEHOLDER": "키1:값1 키2:값2",
 		"USER": {
 			"API_KEY": {
 				"ALERT_MSG": "JSON이나 Config 파일을 다운받으십시오. 이 창을 닫으면 파일을 다시 다운로드 받을 수 없습니다. ",
