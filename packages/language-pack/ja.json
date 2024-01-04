@@ -1933,6 +1933,7 @@
 					"ENABLE_TITLE": "ユーザー有効化",
 					"INVITE_TITLE": "ユーザーを{workspace_name}に招待",
 					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
+					"REMOVE_WORKSPACE_TITLE": "",
 					"UPDATE_TITLE": "ユーザーを編集"
 				},
 				"NAME": "名前",

@@ -5,6 +5,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -28,6 +29,7 @@ export const useUserPageStore = defineStore('user-page', {
         loading: true,
         users: [] as UserListItemType[],
         selectedUser: {} as UserListItemType,
+        selectedRemoveUser: {} as RoleBindingModel,
         roles: [] as RoleModel[],
         totalCount: 0,
         selectedIndices: [],
@@ -45,6 +47,7 @@ export const useUserPageStore = defineStore('user-page', {
                 add: false,
                 form: false,
                 status: false,
+                confirm: false,
             },
         },
     }),

@@ -8,20 +8,20 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { cloneDeep } from 'lodash';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
@@ -37,19 +37,12 @@ interface Props {
     tableHeight: number;
 }
 
-const ROLE_TYPE_LABEL_MAP = {
-    WORKSPACE_OWNER: 'Workspace Owner',
-    WORKSPACE_MEMBER: 'Workspace Member',
-};
-
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
-
-const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -179,6 +172,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     }
 };
 const handleChange = async (options: any = {}) => {
+    userPageStore.$patch({ loading: true });
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         userPageStore.$patch((_state) => {
@@ -187,26 +181,22 @@ const handleChange = async (options: any = {}) => {
     }
     if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
-    if (userPageState.isAdminMode) {
-        await userPageStore.listUsers({ query: userListApiQuery });
-    } else {
-        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+    try {
+        if (userPageState.isAdminMode) {
+            await userPageStore.listUsers({ query: userListApiQuery });
+        } else {
+            await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+        }
+    } finally {
+        userPageStore.$patch({ loading: false });
     }
 };
 const handleClickButton = async (value: RoleBindingModel) => {
-    tableState.removeLoading = true;
-    try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
-            role_binding_id: value.role_binding_id,
-        });
-        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
-        emit('confirm');
-    } catch (e) {
-        showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
-        ErrorHandler.handleError(e);
-    } finally {
-        tableState.removeLoading = false;
-    }
+    userPageStore.$patch((_state) => {
+        _state.selectedRemoveUser = value;
+        _state.modal.visible.confirm = true;
+        _state.modal = cloneDeep(_state.modal);
+    });
 };
 </script>
 
@@ -284,10 +274,13 @@ const handleClickButton = async (value: RoleBindingModel) => {
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
-                                <div class="role-info-wrapper">
+                                <p-tooltip position="bottom"
+                                           :contents="item.label"
+                                           class="role-label"
+                                >
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ ROLE_TYPE_LABEL_MAP[item.role_type] }})</span>
-                                </div>
+                                </p-tooltip>
+                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>
@@ -368,12 +361,12 @@ const handleClickButton = async (value: RoleBindingModel) => {
                     width: 1rem;
                     height: 1rem;
                 }
-                .role-info-wrapper {
-                    @apply flex flex-col;
-                    gap: 0.25rem;
-                    .role-type {
-                        @apply text-gray-500;
-                    }
+                .role-label {
+                    @apply truncate;
+                    width: 14.375rem;
+                }
+                .role-type {
+                    @apply text-label-sm text-gray-400;
                 }
             }
         }

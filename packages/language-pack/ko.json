@@ -1933,6 +1933,7 @@
 					"ENABLE_TITLE": "사용자 활성화",
 					"INVITE_TITLE": "{workspace_name}에 사용자 추가",
 					"REMOVE_TITLE": "다음의 사용자들을 워크스페이스로 부터 제거하시겠습니까? ",
+					"REMOVE_WORKSPACE_TITLE": "",
 					"UPDATE_TITLE": "사용자 수정"
 				},
 				"NAME": "이름",
