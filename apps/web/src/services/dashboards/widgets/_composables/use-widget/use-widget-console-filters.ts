@@ -27,7 +27,7 @@ export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapR
             // set filters from cloud service query set
             const cloudServiceQuerySetId = widgetState.options.cloud_service_query_set;
             if (cloudServiceQuerySetId) {
-                const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
+                const cloudServiceQuerySet = props.allReferenceTypeInfo.cloud_service_query_set.referenceMap[cloudServiceQuerySetId];
                 if (cloudServiceQuerySet) {
                     queryHelper.setFilters([
                         { k: 'provider', v: cloudServiceQuerySet.data?.provider, o: '=' },
