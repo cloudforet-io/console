@@ -86,7 +86,7 @@ const handleClickConfirmButton = async () => {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
             const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
+            const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
             await router.push(defaultRoute);
         }
         validationState.verificationCode = '';
