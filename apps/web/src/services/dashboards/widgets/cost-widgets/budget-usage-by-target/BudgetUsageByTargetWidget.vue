@@ -72,7 +72,7 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 /* Util */
 const targetTextFormatter = (value: string): string => {
     const isProjectGroup = value.startsWith('pg-');
-    if (isProjectGroup) return props.allReferenceTypeInfo.projectGroup.referenceMap[value].label ?? value;
+    if (isProjectGroup) return props.allReferenceTypeInfo.project_group.referenceMap[value].label ?? value;
     return props.allReferenceTypeInfo.project.referenceMap[value]?.label ?? value;
 };
 
