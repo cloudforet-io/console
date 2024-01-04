@@ -2,7 +2,6 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PButton,
@@ -62,8 +61,6 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const router = useRouter();
-
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
@@ -97,9 +94,6 @@ const handleChangeSort = (sortBy, sortDesc) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
     getWorkspaceList();
-};
-const handleClickLink = (id: string) => {
-    router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: id } });
 };
 const handleMenuVisible = (idx: number) => {
     if (!dropdownState.visibleMenu) return;
@@ -231,15 +225,14 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-workspace-format="{value}">
                 <span class="workspace-id-wrapper">
-                    <span>{{ value.name }}</span>
                     <router-link :to="{ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: value.id } }"
                                  target="_blank"
                     >
+                        <span>{{ value.name }}</span>
                         <p-i name="ic_arrow-right-up"
                              width="0.75rem"
                              height="0.75rem"
                              class="icon-link"
-                             @click="handleClickLink(value.id)"
                         />
                     </router-link>
                 </span>
@@ -330,10 +323,10 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
     }
     .workspace-id-wrapper {
         @apply flex items-center;
-        gap: 0.125rem;
     }
     .icon-link {
         @apply cursor-pointer;
+        margin-left: 0.125rem;
     }
 }
 
