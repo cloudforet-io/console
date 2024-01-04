@@ -66,9 +66,9 @@ const handleSelect = (id: string, selected: string) => {
                 <slot name="title-right"
                       v-bind="$props"
                 />
-                <new-mark v-if="item.hightlightTag === 'new'" />
-                <update-mark v-else-if="item.hightlightTag === 'update'" />
-                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+                <new-mark v-if="item.highlightTag === 'new'" />
+                <update-mark v-else-if="item.highlightTag === 'update'" />
+                <beta-mark v-else-if="item.highlightTag === 'beta'" />
                 <span v-if="item.foldable"
                       class="toggle-button"
                       @click="handleFoldableToggle"

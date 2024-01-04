@@ -199,7 +199,7 @@ const relocateNotificationState = reactive({
                 },
             }),
             // TODO: may be isUpdated?
-            hightlightTag: 'update',
+            highlightTag: 'update',
             hideFavorite: true,
         });
     }),

@@ -33,7 +33,7 @@ export interface LNBItem {
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: Location;
-    hightlightTag?: hightlightTagType;
+    highlightTag?: hightlightTagType;
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
     icon?: LNBIcon;
