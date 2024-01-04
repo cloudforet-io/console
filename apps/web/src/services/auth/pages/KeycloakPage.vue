@@ -3,21 +3,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentInstance, onMounted } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { defineComponent, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 
 export default defineComponent({
     name: 'KeycloakPage',
     beforeRouteEnter(to, from, next) {
-        if (from?.meta.isSignInPage) {
+        if (from?.meta?.isSignInPage) {
             next((vm) => {
                 vm.$router.replace({
                     query: { ...to.query, nextPath: from.query.nextPath },
@@ -36,20 +40,35 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
+        const appContextStore = useAppContextStore();
+        const userWorkspaceStore = useUserWorkspaceStore();
 
-        const onSignIn = async () => {
-            if (!props.nextPath) {
-                await vm.$router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
-                return;
-            }
+        const state = reactive({
+            beforeUser: store.state.user.userId,
+        });
+        const onSignIn = async (userId:string) => {
+            try {
+                const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
+                const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
 
-            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
-            if (isAccessible) {
-                await vm.$router.push(props.nextPath);
-            } else {
-                await vm.$router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
+                if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
+                    await router.push(defaultRoute);
+                    return;
+                }
+
+                const resolvedRoute = router.resolve(props.nextPath);
+                const isAdminRoute = resolvedRoute.route.matched.some((route) => route.path === '/admin');
+                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
+                if (isAccessible) {
+                    if (isAdminRoute) appContextStore.enterAdminMode();
+                    await router.push(resolvedRoute.location);
+                } else {
+                    await router.push(defaultRoute);
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         };
 
