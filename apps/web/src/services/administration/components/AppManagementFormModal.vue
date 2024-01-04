@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { cloneDeep } from 'lodash';
 
@@ -23,8 +23,13 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
+
+interface AppDropdownMenuItem extends SelectDropdownMenuItem {
+    role_type?: string;
+}
 
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
@@ -39,20 +44,20 @@ const storeState = reactive({
 });
 const formState = reactive({
     name: '',
-    role: {} as SelectDropdownMenuItem,
+    role: {} as AppDropdownMenuItem,
     tags: {} as Tags,
-    selectedTags: [] as SelectDropdownMenuItem[],
+    selectedTags: [] as AppDropdownMenuItem[],
 });
 const dropdownState = reactive({
     visible: false,
     loading: false,
     searchText: '',
-    menuItems: [] as SelectDropdownMenuItem[],
-    selectedMenuItems: [] as SelectDropdownMenuItem[],
+    menuItems: [] as AppDropdownMenuItem[],
+    selectedMenuItems: [] as AppDropdownMenuItem[],
 });
 
 /* Component */
-const menuHandler: AutocompleteHandler = async (inputText: string) => {
+const menuHandler = async (inputText: string) => {
     await fetchListRoles(inputText);
     return {
         results: dropdownState.menuItems,
@@ -77,7 +82,7 @@ const handleChangeTags = (items: InputItem[]) => {
 
     formState.tags = Object.assign({}, ...refinedTags);
 };
-const handleSelectItem = (item: SelectDropdownMenuItem) => {
+const handleSelectItem = (item: AppDropdownMenuItem) => {
     formState.role = item;
 };
 const setFormState = () => {
@@ -90,7 +95,7 @@ const setFormState = () => {
 };
 const initState = () => {
     formState.name = '';
-    formState.role = {} as SelectDropdownMenuItem;
+    formState.role = {} as AppDropdownMenuItem;
     formState.tags = {} as Tags;
     dropdownState.searchText = '';
     dropdownState.selectedMenuItems = [];
@@ -122,6 +127,7 @@ const fetchListRoles = async (inputText: string) => {
         dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
+            role_type: role.role_type,
         }));
     } finally {
         dropdownState.loading = false;
@@ -206,7 +212,17 @@ watch(() => storeState.isEdit, (isEdit) => {
                                            :multi-selectable="false"
                                            class="role-select-dropdown"
                                            @select="handleSelectItem"
-                        />
+                        >
+                            <template #menu-item--format="{item}">
+                                <div class="role-menu-item">
+                                    <img :src="useRoleFormatter(item.role_type).image"
+                                         alt="role-type-icon"
+                                         class="role-type-icon"
+                                    >
+                                    <span>{{ item.label }}</span>
+                                </div>
+                            </template>
+                        </p-select-dropdown>
                     </p-field-group>
                     <p-field-group :label="$t('IAM.APP.MODAL.COL_TAG')"
                                    class="input-form"
@@ -234,6 +250,18 @@ watch(() => storeState.isEdit, (isEdit) => {
         gap: 1rem;
         .input-form {
             margin-bottom: 0;
+            .role-menu-item {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .role-type-icon {
+                    @apply rounded-full;
+                    width: 1rem;
+                    height: 1rem;
+                }
+                .role-type {
+                    @apply text-gray-500;
+                }
+            }
         }
     }
 }
