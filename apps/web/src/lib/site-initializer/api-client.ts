@@ -34,17 +34,17 @@ const getAfterCallApiMap = (store) => ({
     '/identity/project-group/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('projectGroup', data);
+        allReferenceStore.sync('project_group', data);
     },
     '/identity/project-group/update': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('projectGroup', data);
+        allReferenceStore.sync('project_group', data);
     },
     '/identity/project-group/delete': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('projectGroup');
+        allReferenceStore.load('project_group');
     },
     '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },

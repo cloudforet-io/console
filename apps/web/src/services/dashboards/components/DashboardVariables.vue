@@ -5,8 +5,6 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardManageVariableOverlay
@@ -15,9 +13,9 @@ import DashboardVariableDropdown from '@/services/dashboards/components/Dashboar
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
-
 
 interface Props {
     isManageable?: boolean;
@@ -33,7 +31,7 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
-const allReferenceStore = useAllReferenceStore();
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
@@ -41,7 +39,7 @@ const state = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
-    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
+    allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];

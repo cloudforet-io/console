@@ -10,11 +10,14 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
-import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type {
+    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/modules/reference/type';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -113,11 +116,14 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
 
     const getters = reactive({
         projectGroupItems: asyncComputed<ProjectGroupReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectGroupTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.project_group,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
             referenceMap: getters.projectGroupItems,
         })),
     });

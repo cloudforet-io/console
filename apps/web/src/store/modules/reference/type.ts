@@ -1,3 +1,5 @@
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+
 export interface ReferenceItem<Data = Record<string, any>> {
     key?: string;
     label?: string;
@@ -51,4 +53,11 @@ export interface ReferenceRootState {
 export interface ReferenceLoadOptions {
     lazyLoad?: boolean;
     force?: boolean;
+}
+
+export interface ReferenceTypeInfo {
+    type: ManagedVariableModelKey;
+    key: string; // project_id
+    name: string; // Project
+    referenceMap: ReferenceMap;
 }
