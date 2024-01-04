@@ -3467,6 +3467,7 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
+			"INVITE_ONLY": "Invite only",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",

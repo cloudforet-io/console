@@ -78,7 +78,9 @@ const drawChart = () => {
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return numberFormatter(Number(convertedText));
+            const num = Number(convertedText);
+            if (Number.isNaN(num)) return text;
+            return numberFormatter(num);
         }
         return text;
     });

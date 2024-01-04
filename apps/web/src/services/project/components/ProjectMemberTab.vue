@@ -62,12 +62,17 @@ const storeState = reactive({
 const state = reactive({
     searchText: props.filters.map((d) => d.v).join(' ') || '',
     selectIndex: [] as number[],
-    fields: [
-        { label: 'User ID', name: 'user_id' },
-        { label: 'User Name', name: 'user_name' },
-        { label: 'Role', name: 'role_type' },
-        { label: ' ', name: 'delete', sortable: false },
-    ] as DataTableFieldType[],
+    fields: computed<DataTableFieldType[]>(() => {
+        const fields: DataTableFieldType[] = [
+            { label: 'User ID', name: 'user_id' },
+            { label: 'User Name', name: 'user_name' },
+            { label: 'Role', name: 'role_type' },
+        ];
+        if (projectDetailPageGetters.projectType === 'PRIVATE') {
+            fields.push({ label: ' ', name: 'delete', sortable: false });
+        }
+        return fields;
+    }),
     workspaceUserIdList: [] as string[],
     projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
@@ -156,10 +161,6 @@ const handleChangeTable = async (options: ToolboxOptions = {}) => {
     }
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-};
-const handleClickRemoveMember = async (item: UserItem) => {
-    await deleteProjectUsers([item]);
-    fetchUserList();
 };
 const handleClickRemoveMembers = () => {
     state.memberDeleteModalVisible = true;
@@ -256,12 +257,12 @@ watch(() => projectDetailPageGetters.projectType, () => {
                     </span>
                 </div>
             </template>
-            <template #col-delete-format="{ item }">
+            <template #col-delete-format>
                 <div class="remove-button-wrapper">
                     <p-button style-type="tertiary"
                               size="sm"
                               class="mr-4"
-                              @click="handleClickRemoveMember(item)"
+                              @click="handleClickRemoveMembers"
                     >
                         {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
                     </p-button>

@@ -3467,6 +3467,7 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "프로젝트 담당자 또는 도메인 어드민에게 요청하세요. ",
 			"EVERYONE_AT_THIS_WORKSPACE": "워크스페이스 내 전체 사용자가",
 			"FAVORITES": "즐겨찾기",
+			"INVITE_ONLY": "",
 			"MANAGE_PROJECT_GROUP_MEMBER": "프로젝트 그룹 멤버 관리",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "프로젝트 그룹 이름 ",
