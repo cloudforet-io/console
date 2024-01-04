@@ -133,7 +133,7 @@ const listEscalationPolicies = async () => {
         const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
             query: escalationPolicyApiQueryHelper.data,
         });
-        state.escalationPolicies = res.results;
+        state.escalationPolicies = res.results ?? [];
         state.items = res.results?.map((d) => ({
             ...d,
             name: {
