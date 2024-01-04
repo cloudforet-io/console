@@ -45,12 +45,6 @@ interface EnrichedBudgetUsageData {
     link?: Location | string;
 }
 
-
-interface BudgetTarget {
-    projectId?: string;
-    projectGroupId?: string;
-}
-
 type Providers = BudgetModel['provider_filter']['providers'];
 type BudgetTimeUnit = BudgetModel['time_unit'];
 
@@ -60,10 +54,11 @@ const budgetPageState = budgetPageStore.$state;
 
 const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageModel[], period: Period) => getStackedChartData(budgetUsageData, GRANULARITY.MONTHLY, period);
 
-const getBudgetRatio = (budgetTimeUnit: BudgetTimeUnit, usdCost: number, totalBudgetLimit: number, monthlyLimit: number) => {
-    if (totalBudgetLimit === 0 || monthlyLimit === 0) return '-';
-    return (budgetTimeUnit === 'TOTAL') ? `${Math.round((usdCost / totalBudgetLimit) * 100)}%`
-        : `${Math.round((usdCost / monthlyLimit) * 100)}%`;
+const getBudgetRatio = (budgetTimeUnit: BudgetTimeUnit, cost: number, totalBudgetLimit: number, monthlyLimit: number) => {
+    if (!totalBudgetLimit || !monthlyLimit) return '--';
+    const _cost = cost || 0;
+    return (budgetTimeUnit === 'TOTAL') ? `${Math.round((_cost / totalBudgetLimit) * 100)}%`
+        : `${Math.round((_cost / monthlyLimit) * 100)}%`;
 };
 const getConvertedConsoleFilters = (budgetFilter: Record<string, string[]>): ConsoleFilter[] => {
     const consoleFilters: ConsoleFilter[] = [];
@@ -75,13 +70,16 @@ const getConvertedConsoleFilters = (budgetFilter: Record<string, string[]>): Con
     return consoleFilters;
 };
 
-const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, providers: Providers, budgetTarget: BudgetTarget) => {
+const getBudgetUsageDataWithRatioAndLink = (accumulatedBudgetData, budgetTimeUnit: BudgetTimeUnit, totalBudgetLimit: number, providers: Providers) => {
     const costTypeFilters = {
         provider: providers,
     };
     let targetFilters = {};
-    if (budgetTarget.projectGroupId) targetFilters = { project_group_id: [budgetTarget.projectGroupId] };
-    else if (budgetTarget.projectId) targetFilters = { project_id: [budgetTarget.projectId] };
+    if (budgetPageState.budgetData?.resource_group === 'WORKSPACE') {
+        targetFilters = { workspace_id: [budgetPageState.budgetData?.workspace_id] };
+    } else {
+        targetFilters = { project_id: [budgetPageState.budgetData?.project_id] };
+    }
     return accumulatedBudgetData.map((d) => {
         const period = {
             start: dayjs.utc(d.date).format('YYYY-MM'),
@@ -115,7 +113,6 @@ const getEnrichedBudgetUsageData = (
     budgetTimeUnit: BudgetTimeUnit,
     totalBudgetLimit: number,
     providers: Providers,
-    budgetTarget: BudgetTarget,
 ): EnrichedBudgetUsageData[] => {
     const _budgetUsageData = cloneDeep(budgetUsageData);
     const accumulatedBudgetData = getAccumulatedBudgetUsageData(_budgetUsageData, period);
@@ -124,7 +121,6 @@ const getEnrichedBudgetUsageData = (
         budgetTimeUnit,
         totalBudgetLimit,
         providers,
-        budgetTarget,
     );
     return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
 };
@@ -138,10 +134,6 @@ const state = reactive({
         end: state.budgetData?.end,
     })),
     providers: computed<Providers>(() => state.budgetData?.provider_filter?.providers ?? []),
-    budgetTarget: computed<BudgetTarget>(() => ({
-        projectId: state.budgetData?.project_id,
-        projectGroupId: state.budgetData?.project_group_id,
-    })),
     totalBudgetLimit: computed<number>(() => state.budgetData?.limit ?? 0),
     enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(
         () => getEnrichedBudgetUsageData(
@@ -150,7 +142,6 @@ const state = reactive({
             state.budgetTimeUnit,
             state.totalBudgetLimit,
             state.providers,
-            state.budgetTarget,
         ),
     ),
     data: [],
