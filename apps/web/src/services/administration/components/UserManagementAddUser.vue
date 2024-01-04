@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    onMounted,
-    reactive, ref, watch,
+    onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -46,13 +45,16 @@ const state = reactive({
     selectedItems: [] as AddModalMenuItem[],
     independentUsersList: [] as SummaryWorkspaceUserModel[],
 });
+
 const authTypeState = reactive({
     selectedUserAuthType: '' as AuthType,
     selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
 });
+
 const formState = reactive({
     searchText: '',
 });
+
 const validationState = reactive({
     userIdInvalid: undefined as undefined | boolean,
     userIdInvalidText: '' as TranslateResult,
@@ -65,8 +67,7 @@ const hideMenu = () => {
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
 };
 const handleChangeTextInput = debounce((value: string) => {
     formState.searchText = value;
@@ -77,16 +78,7 @@ const handleChangeTextInput = debounce((value: string) => {
 }, 200);
 const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
-    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
-    const isExistUser = state.selectedItems.some((item) => item.user_id === formState.searchText);
-    if (!isValid) {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = invalidText;
-        hideMenu();
-    } else if (isExistUser) {
-        formState.searchText = '';
-        hideMenu();
-    } else {
+    if (validateUserId()) {
         await getUserList();
     }
 };
@@ -112,16 +104,7 @@ const getUserList = async () => {
             await fetchGetWorkspaceUsers(formState.searchText);
         }
     } catch (e) {
-        state.selectedItems.push({
-            user_id: formState.searchText,
-            label: formState.searchText,
-            name: formState.searchText,
-            isNew,
-            auth_type: authTypeState.selectedMenuItem,
-        });
-        formState.searchText = '';
-        validationState.userIdInvalid = false;
-        validationState.userIdInvalidText = '';
+        addSelectedItem(isNew);
     } finally {
         await hideMenu();
     }
@@ -132,11 +115,33 @@ const checkValidation = () => {
         validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
         return;
     }
-    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
-    if (!isValid) {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = invalidText;
+    if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
+        const { isValid, invalidText } = checkEmailFormat(formState.searchText);
+        if (!isValid) {
+            validationState.userIdInvalid = true;
+            validationState.userIdInvalidText = invalidText;
+        }
     }
+};
+const resetValidationState = () => {
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
+};
+const validateUserId = () => {
+    if (formState.searchText === '') {
+        validationState.userIdInvalid = true;
+        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
+        return false;
+    }
+    if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
+        const { isValid, invalidText } = checkEmailFormat(formState.searchText);
+        if (!isValid) {
+            validationState.userIdInvalid = true;
+            validationState.userIdInvalidText = invalidText;
+            return false;
+        }
+    }
+    return true;
 };
 const clickOutside = () => {
     if (state.menuVisible) {
@@ -144,12 +149,10 @@ const clickOutside = () => {
         hideMenu();
     }
 };
-// workspace owner only
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     state.selectedItems.push(menuItem);
     await hideMenu();
 };
-
 const initAuthTypeList = async () => {
     if (store.state.domain.extendedAuthType !== undefined) {
         authTypeMenuItem.value = [
@@ -157,6 +160,17 @@ const initAuthTypeList = async () => {
             ...authTypeMenuItem.value,
         ];
     }
+};
+const addSelectedItem = (isNew: boolean) => {
+    state.selectedItems.push({
+        user_id: formState.searchText,
+        label: formState.searchText,
+        name: formState.searchText,
+        isNew,
+        auth_type: authTypeState.selectedMenuItem,
+    });
+    formState.searchText = '';
+    resetValidationState();
 };
 
 /* API */
@@ -190,16 +204,7 @@ const fetchGetUsers = async (userId: string) => {
         user_id: userId,
     });
     if (userPageState.afterWorkspaceCreated) {
-        state.selectedItems.push({
-            user_id: formState.searchText,
-            label: formState.searchText,
-            name: formState.searchText,
-            isNew: false,
-            auth_type: authTypeState.selectedMenuItem,
-        });
-        formState.searchText = '';
-        validationState.userIdInvalid = false;
-        validationState.userIdInvalidText = '';
+        addSelectedItem(false);
     } else {
         validationState.userIdInvalid = true;
         validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
@@ -211,8 +216,7 @@ onClickOutside(containerRef, clickOutside);
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
-        validationState.userIdInvalid = false;
-        validationState.userIdInvalidText = '';
+        resetValidationState();
         if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
             await fetchListUsers();
             state.independentUsersList = await userPageStore.findWorkspaceUser();
