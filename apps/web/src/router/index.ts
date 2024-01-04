@@ -25,11 +25,11 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
-const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo> => {
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
-    if (isDuplicateScope || isDuplicateWorkspace) return undefined;
+    if (isDuplicateScope || isDuplicateWorkspace) return existingGrantInfo;
 
     const grantRequest = {
         scope,
