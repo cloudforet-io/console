@@ -1,5 +1,6 @@
 <template>
     <p-i
+        v-if="!isAdminMode"
         v-show="(visibleActiveCaseOnly || readOnly) ? active : true"
         :name="active ? 'ic_favorite-filled': 'ic_favorite'"
         width="1rem"
