@@ -236,7 +236,7 @@ export default defineComponent<Props>({
                     end: state.selectedPeriod?.end.toISOString(),
                 });
                 if (status === 'succeed') {
-                    state.data = response;
+                    state.data = response.results ?? [];
                     state.loading = false;
                 }
             } catch (e: any) {
