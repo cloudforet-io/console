@@ -97,7 +97,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.BUDGET },
                     component: AdminBudgetMainPage as any,
                 },
                 {
