@@ -48,6 +48,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -69,13 +70,20 @@ const emit = defineEmits<{(e: 'close'): void;
 }>();
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
-    tabs: computed(() => ([
-        { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
-        { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
-    ] as TabItem[])),
+    tabs: computed<TabItem[]>(() => {
+        if (storeState.isAdminMode) return [];
+        return [
+            { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
+            { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
+        ];
+    }),
     activeTab: 'favorite',
     subMenuList: computed(() => [
         {
