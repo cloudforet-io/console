@@ -110,14 +110,16 @@ export class SpaceRouter {
             const refreshToken = SpaceConnector.getRefreshToken();
 
             if (refreshToken && isTokenAlive && isNotErrorRoute) {
+                let workspaceId: string|undefined;
                 let scope: GrantScope;
                 if (to.name?.startsWith('admin.') || isAdminMode) {
                     scope = 'DOMAIN';
-                } else if (to.params.workspaceId) {
+                } else if (to.path?.startsWith('/workspace-') && to.params.workspaceId) {
                     scope = 'WORKSPACE';
+                    workspaceId = to.params.workspaceId;
                 } else scope = 'USER';
 
-                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, workspaceId);
                 await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
             }
 

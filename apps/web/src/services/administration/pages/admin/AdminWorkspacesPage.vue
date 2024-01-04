@@ -10,10 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
@@ -28,7 +25,6 @@ import { useWorkspacePageStore } from '@/services/administration/store/workspace
 
 
 const workspacePageStore = useWorkspacePageStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const userPageStore = useUserPageStore();
 
 const route = useRoute();
@@ -51,7 +47,6 @@ const refreshWorkspaceList = async () => {
         .setFilters(workspacePageStore.searchFilters);
     try {
         await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
-        await userWorkspaceStore.load(store.state.user.userId);
     } finally {
         workspacePageStore.$patch({ loading: false });
     }
