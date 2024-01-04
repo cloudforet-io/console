@@ -129,8 +129,6 @@ export const initApiClient = async (store, config) => {
         workspace_id: workspaceId,
     };
     await store.dispatch('user/grantRole', grantRequest);
-    const currentRoleInfo = store.getters['user/getCurrentRoleInfo'];
-    if (currentRoleInfo) await store.dispatch('reference/initializeAllReference');
     // to be deprecated
     // const isTokenAlive = SpaceConnector.isTokenAlive;
     // store.dispatch('user/setIsSessionExpired', !isTokenAlive);
