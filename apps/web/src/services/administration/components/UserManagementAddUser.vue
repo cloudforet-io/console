@@ -74,8 +74,8 @@ const handleChangeTextInput = debounce((value: string) => {
         fetchListUsers();
         state.menuVisible = true;
     }
-}, 500);
-const handleEnterTextInput = () => {
+}, 200);
+const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
     const { isValid, invalidText } = checkEmailFormat(formState.searchText);
     const isExistUser = state.selectedItems.some((item) => item.user_id === formState.searchText);
@@ -87,7 +87,7 @@ const handleEnterTextInput = () => {
         formState.searchText = '';
         hideMenu();
     } else {
-        getUserList();
+        await getUserList();
     }
 };
 const handleClickDeleteButton = (idx: number) => {
@@ -96,7 +96,6 @@ const handleClickDeleteButton = (idx: number) => {
 };
 const handleSelectAuthTypeItem = (selected: string, idx: number) => {
     state.selectedItems[idx].auth_type = selected as AuthType;
-    handleSelectDropdownItem(selected);
     emit('change-input', { userList: state.selectedItems });
 };
 const handleSelectDropdownItem = (selected: string) => {
@@ -266,7 +265,7 @@ onMounted(() => {
                                class="user-id-input"
                                :class="{'invalid': invalid}"
                                @click="handleClickTextInput"
-                               @keydown.enter="handleEnterTextInput"
+                               @keyup.enter="handleEnterTextInput"
                                @input="handleChangeTextInput($event.target.value)"
                         >
                         <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
