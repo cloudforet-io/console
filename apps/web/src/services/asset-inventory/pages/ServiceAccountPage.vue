@@ -363,6 +363,16 @@ watch(() => tableState.selectedAccountType, () => {
     }
 }
 
+/* custom design-system component -  p-dynamic-layout */
+:deep(.service-account-table) {
+    overflow: unset;
+    .p-data-table {
+        .row-height-fixed {
+            cursor: pointer;
+        }
+    }
+}
+
 @screen tablet {
     .account-type-filter {
         @apply flex gap-4 items-center border-b border-gray-200;
