@@ -3467,6 +3467,7 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "プロジェクト担当者もしくはドメインアドミンに問い合わせください。",
 			"EVERYONE_AT_THIS_WORKSPACE": "このワークスペースの全員",
 			"FAVORITES": "お気に入り",
+			"INVITE_ONLY": "",
 			"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "プロジェクトグループ名",
