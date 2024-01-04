@@ -36,26 +36,20 @@ const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
-        const workspaceList = state.workspaceList.map((_workspace) => {
-            if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
-                return {
-                    name: _workspace.workspace_id,
-                    label: _workspace.name,
-                    icon: 'ic_check',
-                    iconColor: violet[500],
-                };
-            }
+    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
+        if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
             return {
                 name: _workspace.workspace_id,
                 label: _workspace.name,
+                icon: 'ic_check',
+                iconColor: violet[500],
             };
-        });
-        console.debug('workspaceMenuList', workspaceList);
-        return [
-            ...workspaceList,
-        ];
-    }),
+        }
+        return {
+            name: _workspace.workspace_id,
+            label: _workspace.name,
+        };
+    })),
     searchText: '',
 });
 
