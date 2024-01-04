@@ -23,6 +23,8 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { store } from '@/store';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { getLastAccessedWorkspaceId } from '@/store/modules/user/actions';
@@ -34,6 +36,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 
@@ -71,7 +74,6 @@ const onSignIn = async (userId:string) => {
     try {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
         const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-        // const hasBoundRole = store.getters['user/hasPermission'] && hasBoundWorkspace;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         const defaultRouteWithWorkspace = {
@@ -92,6 +94,14 @@ const onSignIn = async (userId:string) => {
         const isAdminRoute = resolvedRoute.route.matched.some((route) => route.path === '/admin');
         const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
         if (isAccessible) {
+            if (resolvedRoute.resolved.name === HOME_DASHBOARD_ROUTE._NAME) {
+                await router.push({
+                    name: ROOT_ROUTE.WORKSPACE._NAME,
+                    params: {
+                        workspaceId: resolvedRoute.resolved.params.workspaceId,
+                    },
+                });
+            }
             if (isAdminRoute) appContextStore.enterAdminMode();
             await router.push(resolvedRoute.location);
         } else {
