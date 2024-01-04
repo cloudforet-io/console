@@ -3480,6 +3480,7 @@
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" を移動する",
 				"NO_PROJECT_GROUP": "プロジェクトグループなし",
+				"ROOT": "ルート",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "移動先（プロジェクトグループ）を選択してください"
 			},
 			"MODAL_PROJECT_CREATE": {
