@@ -14,6 +14,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -66,6 +67,10 @@ const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
@@ -81,7 +86,7 @@ const state = reactive({
         ], store.getters['user/pageAccessPermissionList']),
     ]),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
-        { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
+        (storeState.isAdminMode ? {} : { type: MENU_ITEM_TYPE.FAVORITE_ONLY }),
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId),
