@@ -20,11 +20,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -62,11 +64,20 @@ type CostAnalyzeRawData = {
     _total_value_sum?: number;
 };
 
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+});
 const state = reactive({
     component: computed(() => PToolboxTable),
     timeUnit: computed(() => getTimeUnitByGranularity(costAnalysisPageState.granularity)),
@@ -76,17 +87,6 @@ const state = reactive({
         return 'YYYY-MM-DD';
     }),
     //
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-    //
-    groupByStoreMap: computed(() => ({
-        [GROUP_BY.PROJECT]: state.projects,
-        [GROUP_BY.PROVIDER]: state.providers,
-        [GROUP_BY.REGION]: state.regions,
-        [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
-    })),
     visibleExcelNotiModal: false,
     isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE)),
     analyzeQuery: computed(() => {
@@ -109,10 +109,6 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
-    headerMenuItems: [
-        { type: 'item', name: 'cost', label: 'Cost' },
-        { type: 'item', name: 'usage', label: 'Usage' },
-    ],
     selectedDisplayDataType: 'cost' as DisplayDataType,
 });
 const tableState = reactive({
@@ -446,17 +442,20 @@ watch(
                 <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                     Unknown
                 </span>
+                <span v-else-if="field.name === GROUP_BY.WORKSPACE">
+                    {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT">
-                    {{ state.projects[value] ? state.projects[value].label : value }}
+                    {{ storeState.projects[value] ? storeState.projects[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                    {{ state.providers[value] ? state.providers[value].name : value }}
+                    {{ storeState.providers[value] ? storeState.providers[value].name : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.REGION">
-                    {{ state.regions[value] ? state.regions[value].name : value }}
+                    {{ storeState.regions[value] ? storeState.regions[value].name : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
-                    {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
+                    {{ storeState.serviceAccounts[value] ? storeState.serviceAccounts[value].name : value }}
                 </span>
                 <span v-else-if="field.name === 'Instance Type'">
                     {{ value ?? 'Unknown' }}
@@ -473,8 +472,9 @@ watch(
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
-                    <p-link :to="value ? getLink(item, field.name) : undefined"
+                    <p-link :to="(!storeState.isAdminMode && value !== undefined) ? getLink(item, field.name) : undefined"
                             class="!align-middle"
+                            :class="{ 'no-link': storeState.isAdminMode || value === undefined }"
                     >
                         <span class="usage-wrapper">
                             <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
@@ -532,6 +532,12 @@ watch(
     .usage-wrapper {
         display: inline-flex;
         align-items: center;
+    }
+    .no-link {
+        /* custom design-system component - p-link */
+        :deep(.p-link) {
+            @apply cursor-auto;
+        }
     }
 }
 </style>
