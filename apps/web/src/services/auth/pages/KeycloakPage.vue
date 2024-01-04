@@ -54,7 +54,7 @@ export default defineComponent({
         };
 
         onMounted(async () => {
-            await loadAuth('KEYCLOAK').signIn(onSignIn);
+            await loadAuth('KEYCLOAK_OIDC').signIn(onSignIn);
         });
     },
 });
