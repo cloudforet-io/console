@@ -23,7 +23,8 @@ const handleToggleAdminMode = async () => {
     if (state.isAdminMode) {
         await userWorkspaceStore.load(store.state.user.userId);
         appContextStore.exitAdminMode();
-        await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        const lastAccessedWorkspaceId = await store.dispatch('user/getLastAccessedWorkspaceId');
+        await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: lastAccessedWorkspaceId } });
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
