@@ -48,6 +48,7 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
                         >{{ route.name }}</span>
                         <span v-else
                               class="current-page"
+                              @click.prevent.stop
                         >
                             <span>{{ route.name }}</span>
                             <p-copy-button v-if="props.copiable"

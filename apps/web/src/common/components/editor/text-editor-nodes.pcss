@@ -2,7 +2,7 @@
     /* normal text */
     p {
         padding-bottom: 0.75rem;
-        line-height: 1.5;
+        line-height: 1.7;
         font-size: 0.875rem;
         font-weight: normal;
         &:focus {
@@ -49,8 +49,12 @@
     /* bullet list */
     ul {
         padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
         padding-left: 1rem;
         list-style-type: disc;
+        p {
+            padding-bottom: 0;
+        }
         > li {
             display: list-item;
             > ul {
@@ -60,6 +64,9 @@
                     list-style-type: square;
                 }
             }
+        }
+        &:not(:last-child) {
+            padding-bottom: 0.25rem;
         }
     }
 
@@ -131,6 +138,7 @@
 
     /* horizontal rule */
     hr {
+        @apply border-gray-200;
         padding-top: 0.75rem;
     }
 }
