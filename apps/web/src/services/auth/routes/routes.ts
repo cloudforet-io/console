@@ -7,7 +7,6 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 const SignInContainer = () => import('@/services/auth/components/SignInContainer.vue');
 const SignOutPage = () => import('@/services/auth/pages/SignOutPage.vue');
 const SignInPage = () => import('@/services/auth/pages/SignInPage.vue');
-const DomainAdminSignInPage = () => import('@/services/auth/pages/DomainAdminSignInPage.vue');
 const KeycloakPage = () => import('@/services/auth/pages/KeycloakPage.vue');
 const KB_SSO = () => import('@/services/auth/pages/KB_SSOPage.vue');
 const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
@@ -41,18 +40,6 @@ export default [
                     nextPath: route.query.nextPath,
                 }),
                 component: SignInPage,
-            },
-            {
-                path: 'admin',
-                name: AUTH_ROUTE.ADMIN_SIGN_IN._NAME,
-                meta: {
-                    isSignInPage: true,
-                },
-                component: DomainAdminSignInPage,
-                props: (route) => ({
-                    isDomainOwner: true,
-                    nextPath: route.query.nextPath,
-                }),
             },
             {
                 path: 'keycloak',

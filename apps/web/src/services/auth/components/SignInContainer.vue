@@ -1,23 +1,14 @@
 <script lang="ts" setup>
-import { reactive, computed, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { reactive, computed } from 'vue';
 
 import { store } from '@/store';
 
 import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
 
-
-const route = useRoute();
-
 const state = reactive({
-    isDomainAdmin: false,
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
 });
-
-watch(() => route.name, (name) => {
-    state.isDomainAdmin = name === 'domainAdminSignIn';
-}, { immediate: true });
 </script>
 
 <template>
@@ -43,7 +34,7 @@ watch(() => route.name, (name) => {
             >
         </div>
         <div class="contents-wrapper">
-            <sign-in-left-container :is-domain-admin="state.isDomainAdmin" />
+            <sign-in-left-container />
             <router-view />
         </div>
     </div>
