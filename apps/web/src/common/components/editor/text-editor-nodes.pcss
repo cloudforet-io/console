@@ -48,7 +48,6 @@
 
     /* bullet list */
     ul {
-        padding-top: 0.75rem;
         padding-left: 1rem;
         list-style-type: disc;
         p {
@@ -57,7 +56,6 @@
         > li {
             display: list-item;
             > ul {
-                padding-top: 0;
                 list-style-type: circle;
                 > li > ul {
                     list-style-type: square;
@@ -68,12 +66,31 @@
 
     /* padding of bullet list */
     > ul {
+        padding-top: 0.75rem;
         > li {
-            &:has(> ul) {
-                padding-bottom: 0.75rem;
+            > ul {
+                padding-bottom: 0.25rem;
+                > li {
+                    > ul {
+                        padding-bottom: 0.25rem;
+                        > li {
+                            ul {
+                                padding-bottom: 0;
+                            }
+                        }
+                    }
+                    &:last-of-type {
+                        > ul {
+                            padding-bottom: 0;
+                        }
+                    }
+                }
             }
             &:last-of-type {
-                padding-bottom: 0.25rem;
+                padding-bottom: 0.75rem;
+                > ul {
+                    padding-bottom: 0;
+                }
             }
         }
     }
