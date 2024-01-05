@@ -36,20 +36,31 @@ const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
-        if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
-            return {
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                icon: 'ic_check',
-                iconColor: violet[500],
-            };
-        }
-        return {
-            name: _workspace.workspace_id,
-            label: _workspace.name,
-        };
-    })),
+    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
+        const menuList: SelectDropdownMenuItem[] = [
+            { type: 'header', name: 'current_workspace_header', label: 'Current Workspace' } as SelectDropdownMenuItem,
+            { type: 'header', name: 'switch_to_header', label: 'Switch To' } as SelectDropdownMenuItem,
+        ];
+        state.workspaceList.forEach((_workspace) => {
+            if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    icon: 'ic_check',
+                    iconColor: violet[500],
+                    headerName: 'current_workspace_header',
+                } as SelectDropdownMenuItem);
+            } else {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    headerName: 'switch_to_header',
+                } as SelectDropdownMenuItem);
+            }
+            return menuList;
+        });
+        return menuList;
+    }),
     searchText: '',
 });
 
@@ -102,6 +113,7 @@ const selectWorkspace = (workspaceId: string): void => {
                            is-filterable
                            :search-text.sync="state.searchText"
                            :menu="state.workspaceMenuList"
+                           hide-header-without-items
                            :selected="state.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
