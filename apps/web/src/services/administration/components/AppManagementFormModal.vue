@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
@@ -18,14 +19,17 @@ import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import { getInputItemsFromTagKeys } from '@/services/administration/composables/tag-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
+
 
 interface AppDropdownMenuItem extends SelectDropdownMenuItem {
     role_type?: string;
@@ -47,6 +51,7 @@ const formState = reactive({
     role: {} as AppDropdownMenuItem,
     tags: {} as Tags,
     selectedTags: [] as AppDropdownMenuItem[],
+    searchText: '',
 });
 const dropdownState = reactive({
     visible: false,
@@ -54,6 +59,10 @@ const dropdownState = reactive({
     searchText: '',
     menuItems: [] as AppDropdownMenuItem[],
     selectedMenuItems: [] as AppDropdownMenuItem[],
+});
+const validationState = reactive({
+    isValid: true as undefined | boolean,
+    invalidText: '' as TranslateResult | string,
 });
 
 /* Component */
@@ -71,13 +80,36 @@ const handleClose = () => {
     });
     initState();
 };
-const handleChangeTags = (items: InputItem[]) => {
-    const refinedTags = items.map((item) => {
-        if (item.name.includes(':')) {
-            const tags = item.name.split(':').map((tag) => tag.trim());
-            return { [tags[0]]: tags[1] };
-        }
-        return { [item.name]: item.name };
+const handleChangeInput = (event) => {
+    formState.searchText = event.target.value;
+    if (formState.searchText !== '') {
+        validationState.isValid = true;
+        validationState.invalidText = '';
+    }
+};
+const handleEnterKey = () => {
+    if (!formState.searchText.includes(':') || formState.searchText.split(':').length > 2) {
+        validationState.isValid = false;
+        validationState.invalidText = i18n.t('IAM.ALT_E_TAG_FORMAT');
+        return;
+    }
+    const isExistItem = formState.selectedTags.findIndex((item) => item.name === formState.searchText);
+    if (isExistItem !== -1) {
+        validationState.isValid = false;
+        validationState.invalidText = i18n.t('IAM.ALT_E_TAG_DUPLICATION');
+        return;
+    }
+    formState.selectedTags.push({ label: formState.searchText, name: formState.searchText });
+    handleUpdateSelected();
+    validationState.isValid = true;
+    validationState.invalidText = '';
+    formState.searchText = '';
+};
+const handleUpdateSelected = (items?: InputItem[]) => {
+    if (items) formState.selectedTags = items;
+    const refinedTags = formState.selectedTags.map((item) => {
+        const tags = item.name.split(':').map((tag) => tag.trim());
+        return { [tags[0]]: tags[1] };
     });
 
     formState.tags = Object.assign({}, ...refinedTags);
@@ -88,10 +120,7 @@ const handleSelectItem = (item: AppDropdownMenuItem) => {
 const setFormState = () => {
     formState.name = appPageStore.selectedApp.name;
     formState.tags = appPageStore.selectedApp.tags as Tags;
-    formState.selectedTags = Object.keys(formState.tags).map((key) => ({
-        label: `${key}: ${formState.tags[key]}`,
-        name: `${key}: ${formState.tags[key]}`,
-    }));
+    formState.selectedTags = getInputItemsFromTagKeys(formState.tags);
 };
 const initState = () => {
     formState.name = '';
@@ -225,16 +254,24 @@ watch(() => storeState.isEdit, (isEdit) => {
                         </p-select-dropdown>
                     </p-field-group>
                     <p-field-group :label="$t('IAM.APP.MODAL.COL_TAG')"
+                                   :invalid-text="validationState.invalidText"
+                                   :invalid="!validationState.isValid"
                                    class="input-form"
                     >
                         <p-text-input class="text-input"
                                       multi-input
-                                      :placeholder="$t('IDENTITY.TAGS_PLACEHOLDER')"
+                                      :invalid="!validationState.isValid"
+                                      :selected="formState.selectedTags"
                                       appearance-type="stack"
                                       block
-                                      :selected="storeState.isEdit ? formState.selectedTags : []"
-                                      @update:selected="handleChangeTags"
-                        />
+                                      @update:selected="handleUpdateSelected"
+                        >
+                            <input :placeholder="$t('IDENTITY.TAGS_PLACEHOLDER')"
+                                   :value="formState.searchText"
+                                   @input="handleChangeInput"
+                                   @keyup.enter="handleEnterKey"
+                            >
+                        </p-text-input>
                     </p-field-group>
                 </div>
             </template>
