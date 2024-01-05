@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -15,6 +15,7 @@ import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { UserListItemType } from '@/services/administration/types/user-type';
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 
@@ -38,6 +39,7 @@ const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const state = reactive({
     loading: false,
+    data: {} as UserListItemType,
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
@@ -80,6 +82,9 @@ const handleChangeInput = (value: string) => {
 const handleClickCancel = async () => {
     modalState.proxyVisible = false;
     await resetFormData();
+    if (state.userId === state.data.user_id) {
+        await store.dispatch('user/setUser', state.data);
+    }
 };
 const handleConfirmButton = () => {
     if (modalState.proxyType === 'change') {
@@ -95,11 +100,14 @@ const handleConfirmButton = () => {
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
-        await postValidationMfaCode({
+        state.data = await postValidationMfaCode({
             verify_code: validationState.verificationCode,
-        });
+        }) as UserListItemType;
         if (modalState.proxyType !== 'change') {
             modalState.proxyVisible = false;
+            if (state.userId === state.data.user_id) {
+                await store.dispatch('user/setUser', state.data);
+            }
         } else {
             state.isNextStep = true;
         }
@@ -111,6 +119,13 @@ const handleClickVerifyButton = async () => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => state.userId, (userId) => {
+    if (userId) {
+        state.data = store.state.user;
+    }
+}, { immediate: true });
 </script>
 
 <template>
