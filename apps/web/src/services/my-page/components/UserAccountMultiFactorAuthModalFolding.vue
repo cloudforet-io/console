@@ -42,7 +42,7 @@ const handleClickSendEmailButton = async () => {
             options: {
                 email: props.email,
             },
-        });
+        }, true);
     }
     state.proxyIsSentCode = true;
 };

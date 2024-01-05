@@ -14,6 +14,8 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { UserListItemType } from '@/services/administration/types/user-type';
+
 interface Props {
     email?: string
     type?: string
@@ -32,6 +34,7 @@ const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
 const state = reactive({
     loading: false,
+    data: {} as UserListItemType,
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
@@ -55,11 +58,14 @@ const handleClickSendCodeButton = async () => {
     state.loading = true;
     try {
         if (props.type === 'new') {
-            await postEnableMfa({
+            state.data = await postEnableMfa({
                 mfa_type: props.mfaType,
                 options: {
                     email: email.value,
                 },
+            }, false) as UserListItemType;
+            await store.dispatch('user/setUser', {
+                email: state.data.email,
             });
         } else {
             const response = await postUserProfileDisableMfa();

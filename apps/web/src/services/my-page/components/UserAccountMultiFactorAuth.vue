@@ -67,7 +67,7 @@ const handleClickVerifyButton = async () => {
                 options: {
                     email: email.value,
                 },
-            });
+            }, true);
             modalState.modalType = 'verify';
         } finally {
             state.loading = false;
