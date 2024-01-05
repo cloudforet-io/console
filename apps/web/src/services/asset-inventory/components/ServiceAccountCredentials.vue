@@ -83,6 +83,7 @@ const deleteGeneralSecret = async (): Promise<void> => {
             service_account_id: props.serviceAccountId ?? '',
         });
         state.credentialData = undefined;
+        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
     }
@@ -148,7 +149,6 @@ const handleClickSaveButton = async () => {
         } else {
             await setGeneralSecret();
         }
-        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
     } else {
         await updateTrustedSecretData();
     }
