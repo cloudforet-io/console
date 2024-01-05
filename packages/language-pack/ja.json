@@ -1094,7 +1094,8 @@
 			"CREAT_PROJECT": "",
 			"CURRENT": "現在",
 			"PLACEHOLDER": "プロジェクト選択",
-			"RELOAD": ""
+			"RELOAD": "",
+			"RELOAD_PROJECT": ""
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
@@ -2482,7 +2483,7 @@
 				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
-				"DETAIL_JOB_LINK": "",
+				"DETAIL_JOB_LINK": "작업 상세 보기 ",
 				"EDIT": "編集",
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",

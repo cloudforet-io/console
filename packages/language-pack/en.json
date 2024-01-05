@@ -1094,7 +1094,8 @@
 			"CREAT_PROJECT": "Create",
 			"CURRENT": "Current",
 			"PLACEHOLDER": "Select Project",
-			"RELOAD": "Reload "
+			"RELOAD": "Reload ",
+			"RELOAD_PROJECT": "Reload Project"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
