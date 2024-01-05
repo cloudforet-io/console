@@ -1094,7 +1094,8 @@
 			"CREAT_PROJECT": "생성",
 			"CURRENT": "현재 위치",
 			"PLACEHOLDER": "프로젝트 선택",
-			"RELOAD": "새로고침"
+			"RELOAD": "새로고침",
+			"RELOAD_PROJECT": ""
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
@@ -2482,7 +2483,7 @@
 				"COLLECT_DATA": "데이터 수집",
 				"CREATED": "생성 날짜",
 				"DELETE_COLLECTOR": "컬렉터 삭제",
-				"DETAIL_JOB_LINK": "",
+				"DETAIL_JOB_LINK": "作業詳細を見る",
 				"EDIT": "수정",
 				"EDIT_COLLECTOR_NAME": "컬렉터 이름 수정",
 				"LAST_COLLECTED": "최근 수집 시간",
