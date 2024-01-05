@@ -102,7 +102,7 @@ const collectorSearchHandler = reactive({
 });
 const excelFields: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
-    { key: 'schedule.state', name: 'Schedule state' },
+    { key: 'schedule.state', name: 'Schedule' },
     { key: 'plugin_info.plugin_id', name: 'Plugin' },
     { key: 'plugin_info.version', name: 'Version' },
     { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
