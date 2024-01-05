@@ -31,6 +31,11 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.load('project', { force: true });
     },
+    '/identity/project/change-project-group': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
     '/identity/project-group/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -45,6 +50,11 @@ const getAfterCallApiMap = (store) => ({
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.load('project_group');
+    },
+    '/identity/project-group/change-parent-group': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project_group', data);
     },
     '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },

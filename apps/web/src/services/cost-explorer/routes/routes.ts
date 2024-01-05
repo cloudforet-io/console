@@ -54,7 +54,11 @@ const costExplorerRoutes: RouteConfig = {
                     beforeEnter: async (to, from, next) => {
                         try {
                             const workspaceId = to.params.workspaceId;
-                            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                                query: {
+                                    sort: [{ key: 'workspace_id', desc: false }],
+                                },
+                            });
                             const results = response?.results || [];
                             if (results.length === 0) { // none-data-source case
                                 next({
