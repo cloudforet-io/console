@@ -3,6 +3,8 @@ import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 
+import { throttle } from 'lodash';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -19,9 +21,15 @@ const router = useRouter();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isGrantProgressing: computed(() => store.getters['display/isGrantInProgress']),
+    loading: false,
 });
-const handleToggleAdminMode = async () => {
-    if (store.getters['display/isGrantInProgress']) return;
+const handleToggleAdminMode = throttle(async () => {
+    state.loading = true;
+    if (state.isGrantProgressing) {
+        state.loading = false;
+        return;
+    }
     if (state.isAdminMode) {
         await userWorkspaceStore.load(store.state.user.userId);
         appContextStore.exitAdminMode();
@@ -39,6 +47,7 @@ const handleToggleAdminMode = async () => {
             duration: 2000,
             speed: 1,
         });
+        state.loading = false;
         return;
     }
     appContextStore.enterAdminMode();
@@ -46,17 +55,19 @@ const handleToggleAdminMode = async () => {
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN'),
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
         duration: 2000,
         speed: 1,
     });
-};
+    state.loading = false;
+}, 300);
 </script>
 
 <template>
     <label class="g-n-b-admin-toggle-button">
         <input type="checkbox"
                class="switch-input"
+               :disabled="state.loading"
                :checked="state.isAdminMode"
                @change="handleToggleAdminMode"
         >
