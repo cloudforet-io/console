@@ -1929,7 +1929,7 @@
 					"ALT_S_UPDATE_USER": "사용자 업데이트 완료",
 					"CREATE_TITLE": "사용자 추가",
 					"DELETE_DESC": "선택한 사용자를 삭제하시겠습니까?",
-					"DELETE_PROJECT_MEMBER_TITLE": "",
+					"DELETE_PROJECT_MEMBER_TITLE": "이 사용자를 프로젝트에서 제거 하시겠습니까?",
 					"DELETE_TITLE": "사용자 삭제",
 					"DISABLE_DESC": "선택한 사용자를 비활성화 하시겠습니까?",
 					"DISABLE_TITLE": "사용자 비활성화",
@@ -1937,7 +1937,7 @@
 					"ENABLE_TITLE": "사용자 활성화",
 					"INVITE_TITLE": "{workspace_name}에 사용자 추가",
 					"REMOVE_TITLE": "다음의 사용자들을 워크스페이스로 부터 제거하시겠습니까? ",
-					"REMOVE_WORKSPACE_TITLE": "",
+					"REMOVE_WORKSPACE_TITLE": "이 사용자를 워크스페이스에서 제거 하시겠습니까?",
 					"UPDATE_TITLE": "사용자 수정"
 				},
 				"NAME": "이름",

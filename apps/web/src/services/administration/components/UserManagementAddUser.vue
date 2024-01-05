@@ -15,6 +15,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
@@ -109,19 +110,16 @@ const getUserList = async () => {
         await hideMenu();
     }
 };
-const checkValidation = () => {
-    if (formState.searchText === '') {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
-        return;
-    }
+const checkEmailValidation = () => {
     if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
         const { isValid, invalidText } = checkEmailFormat(formState.searchText);
         if (!isValid) {
             validationState.userIdInvalid = true;
             validationState.userIdInvalidText = invalidText;
+            return false;
         }
     }
+    return true;
 };
 const resetValidationState = () => {
     validationState.userIdInvalid = false;
@@ -133,19 +131,11 @@ const validateUserId = () => {
         validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
         return false;
     }
-    if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
-        const { isValid, invalidText } = checkEmailFormat(formState.searchText);
-        if (!isValid) {
-            validationState.userIdInvalid = true;
-            validationState.userIdInvalidText = invalidText;
-            return false;
-        }
-    }
-    return true;
+    return checkEmailValidation();
 };
 const clickOutside = () => {
     if (state.menuVisible) {
-        checkValidation();
+        checkEmailValidation();
         hideMenu();
     }
 };
@@ -177,14 +167,22 @@ const addSelectedItem = (isNew: boolean) => {
 const fetchListUsers = async () => {
     state.loading = true;
     try {
-        const results = await userPageStore.findWorkspaceUser({
-            keyword: formState.searchText || '@',
-        });
+        let params: FindWorkspaceUserParameters = { keyword: formState.searchText || '@' };
+        if (!userPageState.isAdminMode) {
+            params = {
+                ...params,
+                workspace_id: userPageState.createdWorkspaceId,
+            };
+        }
+        const results = await userPageStore.findWorkspaceUser(params);
         state.menuItems = results.map((user) => ({
             user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
         }));
+        if (!userPageState.isAdminMode) {
+            state.independentUsersList = results;
+        }
     } catch (e) {
         state.menuItems = [];
     } finally {
@@ -217,9 +215,8 @@ watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
         resetValidationState();
-        if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
+        if (!userPageState.isAdminMode) {
             await fetchListUsers();
-            state.independentUsersList = await userPageStore.findWorkspaceUser();
         }
     } else {
         state.menuItems = [];

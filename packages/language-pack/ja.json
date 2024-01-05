@@ -1929,7 +1929,7 @@
 					"ALT_S_UPDATE_USER": "ユーザー更新完了",
 					"CREATE_TITLE": "ユーザー追加",
 					"DELETE_DESC": "選択したユーザーを削除しますか？ |選択したユーザーを全部削除しますか？",
-					"DELETE_PROJECT_MEMBER_TITLE": "",
+					"DELETE_PROJECT_MEMBER_TITLE": "このユーザーをプロジェクトから削除してもよろしいですか？",
 					"DELETE_TITLE": "ユーザー削除",
 					"DISABLE_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 					"DISABLE_TITLE": "ユーザ無効化",
@@ -1937,7 +1937,7 @@
 					"ENABLE_TITLE": "ユーザー有効化",
 					"INVITE_TITLE": "ユーザーを{workspace_name}に招待",
 					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
-					"REMOVE_WORKSPACE_TITLE": "",
+					"REMOVE_WORKSPACE_TITLE": "このユーザーをワークスペースから削除してもよろしいですか？",
 					"UPDATE_TITLE": "ユーザーを編集"
 				},
 				"NAME": "名前",

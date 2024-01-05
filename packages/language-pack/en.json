@@ -1929,7 +1929,7 @@
 					"ALT_S_UPDATE_USER": "User successfully updated",
 					"CREATE_TITLE": "Add New Users",
 					"DELETE_DESC": "Are you sure you want to delete selected user?",
-					"DELETE_PROJECT_MEMBER_TITLE": "Are you sure you want to remove the user from this project?",
+					"DELETE_PROJECT_MEMBER_TITLE": "Are you sure you want to remove this user from the project?",
 					"DELETE_TITLE": "Delete User",
 					"DISABLE_DESC": "Are you sure you want to disable selected user? ",
 					"DISABLE_TITLE": "Disable User",
@@ -1937,7 +1937,7 @@
 					"ENABLE_TITLE": "Enable User",
 					"INVITE_TITLE": "Invite Users to {workspace_name}",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
-					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove the user from this workspace?",
+					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
 					"UPDATE_TITLE": "Edit User"
 				},
 				"NAME": "Name",

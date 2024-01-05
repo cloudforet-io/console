@@ -258,11 +258,11 @@ const handleRemoveButton = async () => {
                           class="capitalize"
                 />
             </template>
-            <template #col-role_id-format="{value, item}">
+            <template #col-role_id-format="{value}">
                 <div v-if="userPageStore.roleMap[value]?.name"
                      class="role-type-wrapper"
                 >
-                    <img :src="useRoleFormatter(item.role_type).image"
+                    <img :src="useRoleFormatter(userPageStore.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
