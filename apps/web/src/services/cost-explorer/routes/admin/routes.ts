@@ -93,7 +93,11 @@ const adminCostExplorerRoutes: RouteConfig = {
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {
-                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                        query: {
+                            sort: [{ key: 'workspace_id', desc: true }],
+                        },
+                    });
                     const results = response?.results || [];
                     if (results.length === 0) { // none-data-source case
                         next({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME) });

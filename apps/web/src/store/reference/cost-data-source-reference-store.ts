@@ -13,6 +13,7 @@ import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/mod
 // eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceItem,
     ReferenceMap,
@@ -33,6 +34,10 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
+    const appContextStore = useAppContextStore();
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         items: null as CostDataSourceReferenceMap|null,
     });
@@ -66,6 +71,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                 const res = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>({
                     query: {
                         only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys', 'workspace_id'],
+                        sort: [{ key: 'workspace_id', desc: _state.isAdminMode }],
                     },
                 });
                 const items: CostDataSourceReferenceMap = {};
