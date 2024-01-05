@@ -39,11 +39,11 @@
                      :class="[item.type === 'info' ? 'ml-2' : '']"
                 >
                     <a class="title">{{ item.title }}</a>
-                    <div v-if="item.text"
-                         class="contents"
+                    <span v-if="item.text"
+                          class="contents"
                     >
                         {{ item.text }}
-                    </div>
+                    </span>
                 </div>
                 <div class="button-wrapper">
                     <p-i name="ic_close"
@@ -131,6 +131,7 @@ const state = reactive({
 
     .content-wrapper {
         flex-grow: 1;
+        flex-wrap: wrap;
         .title {
             @apply text-white;
             display: block;
