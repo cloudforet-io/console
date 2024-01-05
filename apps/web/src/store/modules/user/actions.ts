@@ -21,7 +21,6 @@ import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
@@ -116,9 +115,16 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
             }
         }
     } catch (e) {
-        commit('setCurrentRoleInfo', undefined);
+        /*
+        * Unlike other cases where the ErrorHandler is used for error handling,
+        * in the grant logic scenario, there can be instances where the Router
+        * has not been initialized yet. Using the ErrorHandler in such situations
+        * can lead to issues since it internally relies on the router.
+        * Therefore, in this specific case, errors are simply logged to the console
+        * and not further processed, to avoid complications with uninitialized Router instances.
+        * */
         console.error(`Role Grant Error: ${e}`);
-        ErrorHandler.handleError(e);
+        commit('setCurrentRoleInfo', undefined);
         SpaceConnector.flushToken();
     } finally {
         /*
