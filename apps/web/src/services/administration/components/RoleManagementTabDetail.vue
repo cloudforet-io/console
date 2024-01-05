@@ -189,7 +189,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                              color="inherit"
                         />
                         <span class="text">
-                            {{ $t('IAM.ROLE.DETAIL.ALL_PERMISSIONS') }}
+                            {{ $t('IAM.ROLE.FORM.DEFAULT_API_POLICY_HELP_TEXT') }}
                         </span>
                     </div>
                     <div v-else>
