@@ -42,6 +42,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     fields: [
         { label: 'Service Account Name', name: 'name' },
+        { label: 'Service Account ID', name: 'service_account_id' },
     ],
     isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
 });
