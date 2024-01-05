@@ -2482,6 +2482,7 @@
 				"COLLECT_DATA": "Collect Data",
 				"CREATED": "Created",
 				"DELETE_COLLECTOR": "Delete Collector",
+				"DETAIL_JOB_LINK": "View job details",
 				"EDIT": "Edit",
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",

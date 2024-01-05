@@ -2482,6 +2482,7 @@
 				"COLLECT_DATA": "데이터 수집",
 				"CREATED": "생성 날짜",
 				"DELETE_COLLECTOR": "컬렉터 삭제",
+				"DETAIL_JOB_LINK": "",
 				"EDIT": "수정",
 				"EDIT_COLLECTOR_NAME": "컬렉터 이름 수정",
 				"LAST_COLLECTED": "최근 수집 시간",

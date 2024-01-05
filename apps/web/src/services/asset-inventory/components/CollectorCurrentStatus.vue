@@ -46,8 +46,8 @@
                         size="sm"
                         class="status-progress-bar"
         />
-        <div v-if="state.status === JOB_STATE.IN_PROGRESS"
-             class="mt-3"
+        <div v-if="state.status === JOB_STATE.IN_PROGRESS && props.isPopoverMode"
+             class="mt-8"
         >
             <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
                     size="sm"
@@ -80,6 +80,7 @@ interface Props {
     hours?: number[];
     recentJob?: JobAnalyzeStatus|null;
     isScheduleActivated?: boolean;
+    isPopoverMode?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -155,7 +156,7 @@ const state = reactive({
         }
     }
     .status-progress-bar {
-        @apply relative;
+        @apply absolute;
         width: calc(100% - 3rem);
         margin-top: 1.125rem;
     }
