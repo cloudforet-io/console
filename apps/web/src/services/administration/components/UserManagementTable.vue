@@ -129,8 +129,7 @@ const handleClickButton = async (value: RoleBindingModel) => {
     modalState.visible = true;
     modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
 };
-const handleChange = async (options: any = {}) => {
-    userPageStore.$patch({ loading: true });
+const handleChange = (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         userPageStore.$patch((_state) => {
@@ -139,7 +138,7 @@ const handleChange = async (options: any = {}) => {
     }
     if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
-    await fetchUserList();
+    fetchUserList();
 };
 const closeRemoveModal = () => {
     modalState.visible = false;
@@ -198,6 +197,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     }
 };
 const fetchUserList = async () => {
+    userPageStore.$patch({ loading: true });
     try {
         if (userPageState.isAdminMode) {
             await userPageStore.listUsers({ query: userListApiQuery });
