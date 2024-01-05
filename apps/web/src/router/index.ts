@@ -147,11 +147,11 @@ export class SpaceRouter {
                     const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
                     if (isAccessibleWorkspace) {
                         nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: to.params.workspaceId } };
-                    } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
+                    } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
                 } else if (routeAccessLevel === ACCESS_LEVEL.WORKSPACE_PERMISSION && userAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
                     // When admin user access disable or deleted workspace
                     const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
-                    if (!isAccessibleWorkspace) nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
+                    if (!isAccessibleWorkspace) nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
                 }
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
