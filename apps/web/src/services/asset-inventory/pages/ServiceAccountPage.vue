@@ -272,10 +272,7 @@ watch(() => tableState.selectedAccountType, () => {
 
 <template>
     <section class="service-account-page">
-        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})"
-                   use-total-count
-                   :total-count="typeOptionState.totalCount"
-        />
+        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})" />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
                        class="service-account-provider-list"
