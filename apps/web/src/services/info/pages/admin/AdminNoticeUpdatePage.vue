@@ -33,7 +33,6 @@ export default {
         const noticeDetailState = noticeDetailStore.state;
 
         onBeforeMount(async () => {
-            if (props.postId === noticeDetailState.post?.post_id) return;
             noticeDetailStore.reset();
             await noticeDetailStore.getNoticePost(props.postId);
         });
