@@ -98,7 +98,7 @@ const tableState = reactive({
         { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
         { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
     ]),
-    selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
+    selectedAccountType: computed<AccountType>(() => serviceAccountSchemaStore.state.selectedAccountType),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
 });
@@ -206,7 +206,7 @@ const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
 
-const handleSelectServiceAccountType = (accountType) => { tableState.selectedAccountType = accountType; };
+const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaStore.state.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
     SpaceRouter.router.push({
