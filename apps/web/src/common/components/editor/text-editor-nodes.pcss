@@ -49,7 +49,6 @@
     /* bullet list */
     ul {
         padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
         padding-left: 1rem;
         list-style-type: disc;
         p {
@@ -65,8 +64,17 @@
                 }
             }
         }
-        &:not(:last-child) {
-            padding-bottom: 0.25rem;
+    }
+
+    /* padding of bullet list */
+    > ul {
+        > li {
+            &:has(> ul) {
+                padding-bottom: 0.75rem;
+            }
+            &:last-of-type {
+                padding-bottom: 0.25rem;
+            }
         }
     }
 
