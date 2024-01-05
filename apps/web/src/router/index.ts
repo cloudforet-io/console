@@ -27,7 +27,6 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
-    if (existingGrantInfo?.isFailed) throw new Error('Grant Role Failed');
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
     if (isDuplicateScope || isDuplicateWorkspace) return undefined;
