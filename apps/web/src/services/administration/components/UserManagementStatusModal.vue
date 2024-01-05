@@ -12,7 +12,6 @@ import { cloneDeep, map } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
@@ -21,7 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
+import { useRoleFormatter, userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import { USER_MODAL_TYPE, USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -142,9 +141,7 @@ const disableUser = async (userId: string): Promise<boolean> => {
             />
         </template>
         <template #col-role_type-format="{ value }">
-            <span>
-                {{ value === ROLE_TYPE.WORKSPACE_OWNER ? $t('IAM.USER.FORM.OWNER') : $t('IAM.USER.FORM.MEMBER') }}
-            </span>
+            <span>{{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
         </template>
     </p-table-check-modal>
 </template>

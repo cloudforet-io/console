@@ -80,7 +80,7 @@ export const USER_STATUS_TABLE_FIELDS = [
     { name: 'user_id', label: 'User ID' },
     { name: 'name', label: 'Name' },
     { name: 'state', label: 'State' },
-    { name: 'role_type', label: 'Workspace Role Type' },
+    { name: 'role_type', label: 'Admin Role' },
 ] as const;
 
 // Tab

@@ -9,6 +9,7 @@ import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-memb
 import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
+import { i18n } from '@/translations';
 
 import { APP_STATE_COLOR } from '@/services/administration/constants/app-constant';
 import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/administration/constants/user-constant';
@@ -44,11 +45,11 @@ export const useRoleFormatter = (type: RoleType, isWorkspace?: boolean) => {
     };
     case ROLE_TYPE.WORKSPACE_OWNER: return {
         image: WorkspaceOwnerImage,
-        name: !isWorkspace ? name : 'Owner',
+        name: !isWorkspace ? name : i18n.t('IAM.USER.FORM.OWNER'),
     };
     case ROLE_TYPE.WORKSPACE_MEMBER: return {
         image: WorkspaceMemberImage,
-        name: !isWorkspace ? name : 'Member',
+        name: !isWorkspace ? name : i18n.t('IAM.USER.FORM.MEMBER'),
     };
     case ROLE_TYPE.USER: return {
         image: UserImage,
