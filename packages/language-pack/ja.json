@@ -1638,6 +1638,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
+		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",
 		"APP": {
 			"ACTION": "作業",
 			"CREATE": "作成",

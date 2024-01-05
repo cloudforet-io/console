@@ -1638,6 +1638,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",
+		"ALT_E_TAG_FORMAT": "Invalid key:value format",
 		"APP": {
 			"ACTION": "Action",
 			"CREATE": "Create",
