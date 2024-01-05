@@ -1,10 +1,26 @@
+<script setup lang="ts">
+import { PI } from '@spaceone/design-system';
+
+import { SIDEBAR_STYLE } from '@/common/components/titles/sidebar-title/type';
+
+const props = withDefaults(defineProps<{
+    title?: string;
+    selected?: boolean;
+    styleType?: string;
+}>(), {
+    title: '',
+    selected: false,
+    styleType: SIDEBAR_STYLE.DEFAULT,
+});
+</script>
+
 <template>
-    <header :class="{'link': styleType === SIDEBAR_STYLE.LINK}">
+    <header :class="{'link': props.styleType === SIDEBAR_STYLE.LINK}">
         <span class="title"
-              :class="{'selected': selected}"
+              :class="{'selected': props.selected}"
         >
-            <slot name="default">{{ title }}</slot>
-            <p-i v-if="styleType === SIDEBAR_STYLE.LINK"
+            <slot name="default">{{ props.title }}</slot>
+            <p-i v-if="props.styleType === SIDEBAR_STYLE.LINK"
                  name="ic_chevron-right"
                  width="1rem"
                  height="1rem"
@@ -14,38 +30,6 @@
         <slot name="extra" />
     </header>
 </template>
-
-<script lang="ts">
-import { PI } from '@spaceone/design-system';
-
-import { SIDEBAR_STYLE } from '@/common/components/titles/sidebar-title/type';
-
-export default {
-    name: 'SidebarTitle',
-    components: {
-        PI,
-    },
-    props: {
-        title: {
-            type: String,
-            default: '',
-        },
-        selected: {
-            type: Boolean,
-            default: false,
-        },
-        styleType: {
-            type: String,
-            default: SIDEBAR_STYLE.DEFAULT,
-        },
-    },
-    setup() {
-        return {
-            SIDEBAR_STYLE,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 header {
