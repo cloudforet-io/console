@@ -103,20 +103,10 @@ const adminAdministrationRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.PREFERENCE].translationId,
             },
             redirect: () => ({
-                name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME),
+                name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
             }),
             component: { template: '<router-view />' },
             children: [
-                {
-                    path: 'domain-settings',
-                    name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME),
-                    meta: {
-                        lnbVisible: true,
-                        menuId: MENU_ID.DOMAIN_SETTINGS,
-                        translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
-                    },
-                    component: DomainSettingsPage,
-                },
                 {
                     path: 'workspaces',
                     name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
@@ -126,6 +116,16 @@ const adminAdministrationRoutes: RouteConfig = {
                         translationId: MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId,
                     },
                     component: WorkspacesPage,
+                },
+                {
+                    path: 'domain-settings',
+                    name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME),
+                    meta: {
+                        lnbVisible: true,
+                        menuId: MENU_ID.DOMAIN_SETTINGS,
+                        translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
+                    },
+                    component: DomainSettingsPage,
                 },
             ],
         },
