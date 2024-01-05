@@ -28,7 +28,7 @@ const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    isAssignedToMe: true,
+    isAssignedToMe: false,
 });
 
 /* api */
@@ -73,7 +73,7 @@ const onClickConfirm = async () => {
 
 /* initiators */
 const reset = async () => {
-    state.isAssignedToMe = true;
+    state.isAssignedToMe = false;
 };
 
 watch(() => props.visible, async (visible) => {

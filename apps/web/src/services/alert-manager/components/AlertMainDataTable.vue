@@ -153,14 +153,11 @@ const state = reactive({
             { name: 'title', label: 'Title', width: '437px' },
             { name: 'state', label: 'State' },
             { name: 'urgency', label: 'Urgency' },
-            { name: 'resource', label: 'Resource' },
-            { name: 'project_id', label: 'Project', sortable: false },
-            { name: 'created_at', label: 'Duration', sortable: false },
             { name: 'assignee', label: 'Assigned to' },
+            { name: 'project_id', label: 'Project', sortable: false },
             { name: 'triggered_by', label: 'Triggered by' },
-            { name: 'created_at', label: 'Created Time' },
-            { name: 'acknowledged_at', label: 'Acknowledged Time' },
-            { name: 'resolved_at', label: 'Resolved Time' },
+            { name: 'created_at', label: 'Duration', sortable: false },
+            { name: 'created_at', label: 'Created' },
         ];
 
         if (state.totalCount === 0) { fields[1].width = 'auto'; }
@@ -359,8 +356,7 @@ if (!props.keepAlive) {
                     </div>
                 </template>
                 <template #toolbox-left>
-                    <p-button class="mr-4"
-                              style-type="primary"
+                    <p-button style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="props.manageDisabled"
                               @click="state.visibleAlertFormModal = true"
@@ -410,7 +406,7 @@ if (!props.keepAlive) {
                          width="1em"
                          height="1em"
                          class="mr-1"
-                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[300]"
+                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[200]"
                     />
                     <span>{{ state.urgencyLabels[value] }}</span>
                 </template>

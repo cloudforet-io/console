@@ -30,5 +30,6 @@ export interface AddModalMenuItem extends MenuItem {
     role_type?: RoleType;
     auth_type?: AuthType;
     isNew?: boolean;
+    workspace_id?: string;
 }
 

@@ -1,17 +1,19 @@
 <template>
     <div
         class="sign-in-left-container"
-        :class="{ admin: props.isDomainAdmin }"
     >
         <div class="lottie-wrapper">
-            <img
-                v-if="state.signInImage"
-                :src="state.signInImage"
+            <img v-if="state.signInImage"
+                 :src="state.signInImage"
+            >
+            <img v-else-if="state.showNewYearImage"
+                 class="happy-new-year-2024"
+                 src="/images/logos/happy-new-year-2024.png"
             >
             <lottie-vue-player v-else
                                autoplay
                                loop
-                               :src="props.isDomainAdmin ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
+                               src="/lottiefiles/lottie_floating-astronaut_signin.json"
                                :style="{ height: '100%', backgroundColor: 'transparent' }"
             />
         </div>
@@ -37,30 +39,23 @@
 import { computed, reactive } from 'vue';
 
 import { PBadge } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
 import config from '@/lib/config';
 
-interface Props {
-    isDomainAdmin: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    isDomainAdmin: false,
-});
-
 const state = reactive({
     // eslint-disable-next-line no-undef
     version: VITE_APP_VER,
-    signInImage: computed(() => {
-        const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.login_page_image_url) {
-            return domainSettings.login_page_image_url;
-        }
-        return config.get('DOMAIN_IMAGE.SIGN_IN');
-    }),
+    signInImage: computed<string|undefined>(() => store.getters['domain/domainSignInImage']),
     contactLink: computed(() => config.get('CONTACT_LINK')),
+    showNewYearImage: computed(() => {
+        const currentDate = dayjs();
+        const expiredDate = dayjs('2024-02-13');
+
+        return currentDate.isBefore(expiredDate);
+    }),
 });
 </script>
 
@@ -72,10 +67,6 @@ const state = reactive({
     justify-content: space-between;
     width: 33%;
     height: 100%;
-
-    &.admin {
-        background-color: rgba(theme('colors.primary3'), 0.3);
-    }
 
     .lottie-wrapper {
         @apply flex justify-center items-center;

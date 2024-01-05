@@ -1,24 +1,42 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+import type { Location } from 'vue-router';
+
+import { store } from '@/store';
+
+const props = withDefaults(defineProps<{
+    to?: Location|null;
+}>(), {
+    to: null,
+});
+
+const state = reactive({
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
+});
+</script>
+
 <template>
     <span class="gnb-logo"
           data-gtm="gtm-gnb-logo"
     >
-        <component :is="to ? 'router-link' : 'div'"
+        <component :is="props.to ? 'router-link' : 'div'"
                    class="inline-block"
-                   :to="to"
+                   :to="props.to"
         >
             <div class="logo-wrapper">
-                <img v-if="ciLogoImage"
+                <img v-if="state.symbolImage"
                      class="logo-character"
-                     :src="ciLogoImage"
+                     :src="state.symbolImage"
                 >
                 <img v-else
                      class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
                 >
 
-                <img v-if="ciTextImage"
+                <img v-if="state.wordTypeLogoImage"
                      class="logo-text"
-                     :src="ciTextImage"
+                     :src="state.wordTypeLogoImage"
                 >
                 <img v-else
                      class="logo-text"
@@ -28,35 +46,6 @@
         </component>
     </span>
 </template>
-
-<script lang="ts">
-import {
-    computed, defineComponent,
-    reactive, toRefs,
-} from 'vue';
-
-import config from '@/lib/config';
-
-export default defineComponent({
-    name: 'GNBLogo',
-    props: {
-        to: {
-            type: Object,
-            default: null,
-        },
-    },
-    setup() {
-        const state = reactive({
-            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-            ciTextImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT')),
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .gnb-logo {

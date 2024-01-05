@@ -104,6 +104,7 @@ export default defineComponent<Props>({
                     if (isFavoriteDashboard) {
                         favoriteList.push({
                             itemId: dashboard.dashboardId,
+                            workspaceId: dashboard.workspaceId,
                             label: dashboard.name,
                             itemType: FAVORITE_TYPE.DASHBOARD,
                         });

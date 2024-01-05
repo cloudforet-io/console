@@ -1,6 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    EventRuleCondition, EventRuleActions, EventRuleConditionsPolicy, EventRuleOptions, EventRuleResourceGroup,
+    EventRuleCondition, EventRuleActions, EventRuleConditionsPolicy, EventRuleOptions,
 } from '@/schema/monitoring/event-rule/type';
 
 export interface EventRuleModel {
@@ -12,7 +13,7 @@ export interface EventRuleModel {
     actions: EventRuleActions;
     options: EventRuleOptions;
     tags: Tags;
-    resource_group: EventRuleResourceGroup;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
     project_id: string;
     workspace_id: string;
     domain_id: string;

@@ -12,7 +12,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -46,13 +46,13 @@ const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
-    resourceGroupLabels: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
+    resourceGroupLabels: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
-    resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => {
+    resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyModel['resource_group']}[]>(() => {
         const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
-        const resGroup: {label: TranslateResult; value: EscalationPolicyResourceGroup}[] = [
+        const resGroup: {label: TranslateResult; value: EscalationPolicyModel['resource_group']}[] = [
             { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
         ];
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {

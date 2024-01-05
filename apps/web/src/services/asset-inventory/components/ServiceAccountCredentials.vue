@@ -8,7 +8,6 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
     ServiceAccountDeleteSecretDataParameters,
 } from '@/schema/identity/service-account/api-verbs/detele-secret-data';
@@ -22,12 +21,10 @@ import type {
     TrustedAccountUpdateSecretDataParameters,
 } from '@/schema/identity/trusted-account/api-verbs/update-secret-data';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import type { SecretCreateParameters } from '@/schema/secret/secret/api-verbs/create';
 import type { SecretGetParameters } from '@/schema/secret/secret/api-verbs/get';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretGetParameters } from '@/schema/secret/trusted-secret/api-verbs/get';
-import type { TrustedSecretListParameters } from '@/schema/secret/trusted-secret/api-verbs/list';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { i18n } from '@/translations';
 
@@ -86,47 +83,13 @@ const deleteGeneralSecret = async (): Promise<void> => {
             service_account_id: props.serviceAccountId ?? '',
         });
         state.credentialData = undefined;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
-    }
-};
-
-const getTrustedSecretId = async (trustedAccountId: string): Promise<string|undefined> => {
-    try {
-        const { results } = await SpaceConnector.clientV2.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
-            trusted_account_id: trustedAccountId,
-        });
-        return results ? results[0].trusted_secret_id : undefined;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-        return undefined;
-    }
-};
-
-const createGeneralSecret = async () => {
-    try {
-        let data;
-        if (state.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(state.credentialForm.credentialJson);
-        } else if (state.credentialForm.activeDataType === 'input') {
-            data = state.credentialForm.customSchemaForm;
-        }
-
-        await SpaceConnector.clientV2.secret.secret.create<SecretCreateParameters, SecretModel>({
-            name: (props.serviceAccountData?.name ?? '') + props.serviceAccountId,
-            data,
-            schema_id: state.credentialForm.selectedSecretSchema.schema_id,
-            service_account_id: props.serviceAccountId,
-            trusted_secret_id: state.credentialForm.attachedTrustedAccountId ? await getTrustedSecretId(state.credentialForm.attachedTrustedAccountId) : undefined,
-            resource_group: 'PROJECT',
-            project_id: props.projectId,
-        });
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
     }
 };
-const updateGeneralSecret = async () => {
+
+const setGeneralSecret = async () => {
     try {
         let data;
         if (state.credentialForm.activeDataType === 'json') {
@@ -137,8 +100,8 @@ const updateGeneralSecret = async () => {
 
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
             secret_data: data,
-            service_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
+            service_account_id: props.serviceAccountId ?? '',
             trusted_account_id: state.credentialForm.attachedTrustedAccountId,
         });
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
@@ -146,20 +109,7 @@ const updateGeneralSecret = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
     }
 };
-const updateTrustedSecret = async (): Promise<boolean> => {
-    try {
-        await SpaceConnector.clientV2.secret.trustedSecret.update({
-            trusted_secret_id: state.credentialData?.trusted_secret_id,
-            schema: state.credentialForm.selectedSecretSchema.schema_id,
-        });
-        return true;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
-        return false;
-    }
-};
 const updateTrustedSecretData = async () => {
-    if (!state.credentialData?.trusted_secret_id) return;
     try {
         let data;
         if (state.credentialForm.activeDataType === 'json') {
@@ -196,18 +146,11 @@ const handleClickSaveButton = async () => {
     if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
         if (!state.credentialForm.hasCredentialKey) {
             if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
-        } else if (!state.credentialData) {
-            await createGeneralSecret();
         } else {
-            await updateGeneralSecret();
+            await setGeneralSecret();
         }
-        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
     } else {
-        let isValid = true;
-        if (state.credentialForm.selectedSecretSchema.schema_id !== state.credentialData?.schema_id) {
-            isValid = await updateTrustedSecret();
-        }
-        if (isValid) await updateTrustedSecretData();
+        await updateTrustedSecretData();
     }
     state.mode = 'READ';
     emit('refresh');

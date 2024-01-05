@@ -11,7 +11,7 @@ import { store } from '@/store';
 // CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.
 import { i18n as _i18n } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -24,10 +24,12 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const route = useRoute();
 const router = useRouter();
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 
-const { password, userId, authType } = route.params;
+const {
+    password, userId, mfaEmail, authType,
+} = route.params;
 
 const credentials = {
     user_id: userId,
@@ -67,7 +69,7 @@ const handleClickResend = async () => {
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {
-            await showSuccessMessage(_i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+            showSuccessMessage(_i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
         } else {
             showErrorMessage(e.message, e);
             ErrorHandler.handleError(e);
@@ -83,8 +85,8 @@ const handleClickConfirmButton = async () => {
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
-            const hasBoundWorkspace = workspaceStore.getters.workspaceList.length > 0;
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
+            const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
+            const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
             await router.push(defaultRoute);
         }
         validationState.verificationCode = '';
@@ -132,7 +134,7 @@ const handleClickConfirmButton = async () => {
                          class="icon-envelope"
                     />
                     <strong class="email-text">
-                        {{ userId }}
+                        {{ mfaEmail }}
                     </strong>
                 </div>
             </div>

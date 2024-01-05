@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
@@ -12,15 +12,16 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
 interface UserItem {
@@ -42,6 +43,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
+const alertPageStore = useAlertPageStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -74,13 +76,10 @@ const state = reactive({
 
 const reassignMember = async () => {
     try {
-        await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters>({
-            alert_id: props.alertId,
-            assignee: state.selectedUserID,
-        });
+        await alertPageStore.assignUserToAlert(props.alertId, state.selectedUserID);
         showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'));
+        showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'), e);
     } finally {
         state.proxyVisible = false;
     }
@@ -92,8 +91,7 @@ const handleClickReassign = async () => {
 
 const fetchWorkspaceUserList = async () => {
     try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-        });
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
         state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
         state.totalCount = res.total_count ?? 0;
     } catch (e) {

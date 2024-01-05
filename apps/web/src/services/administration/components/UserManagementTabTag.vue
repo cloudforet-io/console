@@ -33,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const state = reactive({
     items: [] as TableItem[],
@@ -102,7 +103,9 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                    :total-count="state.items.length"
                    :title="$t('IAM.USER.MAIN.TAG')"
         >
-            <template #extra>
+            <template v-if="userPageState.isAdminMode"
+                      #extra
+            >
                 <div class="edit-button-container">
                     <p-button style-type="secondary"
                               icon-left="ic_edit"

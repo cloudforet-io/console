@@ -6,44 +6,55 @@ import {
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
-import type { DataSourceModel } from '@/schema/cost-analysis/data-source/model';
-
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceItem,
     ReferenceMap,
     ReferenceLoadOptions,
+    ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;
-export type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
-export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
+type PickedCostDataSourceModel = Pick<CostDataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'|'workspace_id'>;
+export type CostDataSourceItems = Required<Pick<ReferenceItem<PickedCostDataSourceModel>, 'key'|'label'|'name'|'data'>>;
+export type CostDataSourceReferenceMap = ReferenceMap<CostDataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
+    const appContextStore = useAppContextStore();
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         items: null as CostDataSourceReferenceMap|null,
     });
 
     const getters = reactive({
         costDataSourceItems: asyncComputed<CostDataSourceReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.cost_data_source,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
             referenceMap: getters.costDataSourceItems,
         })),
+        hasLoaded: computed<boolean>(() => state.items !== null),
     });
 
     const actions = {
@@ -55,32 +66,34 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                     || (options?.lazyLoad && state.items)
                 ) && !options?.force
             ) return;
-            lastLoadedTime = currentTime;
 
-            const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
             try {
-                const { status, response } = await fetcher({
+                const res = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>({
                     query: {
-                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys'],
+                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys', 'workspace_id'],
+                        sort: [{ key: 'workspace_id', desc: _state.isAdminMode }],
                     },
                 });
-                if (status === 'succeed') {
-                    const items: CostDataSourceReferenceMap = {};
-                    response.results.forEach((item: DataSourceModel) => {
-                        items[item.data_source_id] = {
-                            key: item.data_source_id,
-                            label: item.name,
-                            name: item.name,
-                            data: item,
-                        };
-                    });
-                    state.items = items;
-                }
+                const items: CostDataSourceReferenceMap = {};
+                res.results?.forEach((item: CostDataSourceModel) => {
+                    items[item.data_source_id] = {
+                        key: item.data_source_id,
+                        label: item.name,
+                        name: item.name,
+                        data: item,
+                    };
+                });
+                state.items = items;
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                lastLoadedTime = currentTime;
             }
         },
-        flush() { state.items = null; },
+        flush() {
+            state.items = null;
+            lastLoadedTime = 0;
+        },
     };
 
     return {

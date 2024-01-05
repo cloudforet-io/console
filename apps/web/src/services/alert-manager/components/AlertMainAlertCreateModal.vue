@@ -5,10 +5,8 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PLink, PButton,
-    PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
+    PButton, PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
 } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -25,7 +23,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 const props = defineProps<{
@@ -174,16 +171,6 @@ watch(() => state.proxyVisible, (visible) => {
                            :invalid="state.projectInvalid"
                            :invalid-text="state.projectInvalidText"
             >
-                <template #label-extra>
-                    <p-link class="go-project"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            highlight
-                            :to="{name: PROJECT_ROUTE._NAME }"
-                    >
-                        {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
-                    </p-link>
-                </template>
                 <project-select-dropdown :invalid="state.projectInvalid"
                                          project-selectable
                                          :project-group-selectable="false"

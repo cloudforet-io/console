@@ -22,9 +22,14 @@
 				"DO_NOT_SHOW_AGAIN": "Do not show again",
 				"EDGE": "Edge",
 				"HEADER": "Recommend using Chrome or Edge browser for this site."
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE_BUTTON": "Create Workspace",
+				"CREATE_WORKSPACE_DESC": "There is no workspace created in this domain yet."
 			}
 		},
 		"TOP_NOTI": {
+			"NO_WORKSPACE": "You are not associated with any workspace. Request access from your administrator.",
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
@@ -472,10 +477,12 @@
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
 						"DATA_SOURCE": "Data Source",
+						"DATA_SOURCE_PLACEHOLDER": "Please select the target first.",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
 						"LABEL_TARGET": "Target",
+						"NO_DATA_SOURCE": "No data source",
 						"PRODUCT": "Product",
 						"PROJECT": "Project",
 						"PROJECT_GROUP": "Project Group",
@@ -484,7 +491,8 @@
 						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
 						"REQUIRED_TARGET": "Please select target.",
-						"SPECIFIC_PROVIDER": "Specific Provider"
+						"SPECIFIC_PROVIDER": "Specific Provider",
+						"WORKSPACE": "Workspace"
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
@@ -493,9 +501,9 @@
 					"UPDATE_BUDGET": "Update Budget"
 				},
 				"MAIN": {
-					"AMOUNT_PAID": "{symbol} Amount used",
+					"AMOUNT_PAID": "Budget Usage Rate({symbol})",
 					"AMOUNT_SPENT": "Amount Spent",
-					"AMOUNT_USED": "{symbol} Amount used",
+					"AMOUNT_USED": "Budget Usage Amount{symbol})",
 					"ASC": "Asc",
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
@@ -514,7 +522,7 @@
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total",
 					"UPDATE_BUDGET": "Update Budget",
-					"USAGE": "{symbol} Amount used"
+					"USAGE": "Budget Usage Rate({symbol})"
 				},
 				"STAT": {
 					"AVAILABLE": "Available",
@@ -908,13 +916,14 @@
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
+				"LABEL_ROLE_TYPE": "Role Type",
 				"LABEL_SIGN_OUT": "Sign Out",
 				"LABEL_TIMEZONE": "Time zone",
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
 				"ROLE_ROOT_ADMIN": "Root Admin"
 			},
 			"ADMIN": {
-				"SWITCH_ADMIN": "Switched to admin mode.",
+				"SWITCH_ADMIN": "Switched to admin mode",
 				"SWITCH_WORKSPACE": "Exited admin mode."
 			},
 			"DASHBOARDS": {
@@ -927,7 +936,7 @@
 				"ALL_COST_ANALYSIS": "All Cost Analysis",
 				"ALL_DASHBOARD": "All Dashboards",
 				"ALL_MENU": "All Menu",
-				"ALL_PROJECTS": "All Projects",
+				"ALL_PROJECTS": "Project",
 				"FAVORITES": "Favorites",
 				"FAVORITES_HELP_TEXT": "Add frequently visited pages to your favorites.",
 				"GO_TO_CLOUD_SERVICE": "Go to Cloud Service",
@@ -936,8 +945,9 @@
 				"SHOW_ALL": "Show all"
 			},
 			"MY_PAGE": {
-				"BACK_LINK": "Back to Workspace",
-				"BACK_LINK_SHORT": "Back"
+				"BACK_LINK_ADMIN": "Back to Admin Center",
+				"BACK_LINK_SHORT": "Back",
+				"BACK_LINK_WORKSPACE": "Back to Workspace"
 			},
 			"NOTICE": {
 				"DETAIL_LINK": "Detail Link: ",
@@ -978,7 +988,7 @@
 				"LABEL_USER_GUIDE": "User Guide"
 			},
 			"TOOLTIP": {
-				"ENABLE_ADMIN_MODE": "Enable Admin Mode",
+				"ENABLE_ADMIN_MODE": "Switch to Admin Mode",
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
 				"NOTIFICATIONS": "Notifications",
 				"PROFILE": "My Page",
@@ -1081,10 +1091,11 @@
 			"TITLE": "Profile"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "Create Project",
+			"CREAT_PROJECT": "Create",
 			"CURRENT": "Current",
 			"PLACEHOLDER": "Select Project",
-			"RELOAD_PROJECT": "Reload Projects"
+			"RELOAD": "Reload ",
+			"RELOAD_PROJECT": "Reload Project"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
@@ -1298,7 +1309,7 @@
 		"ALL_DASHBOARDS": {
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
-			"DASHBOARDS_TITLE": "Dashboards",
+			"DASHBOARDS_TITLE": "Dashboard",
 			"FILTER_ALL": "All",
 			"FILTER_PRIVATE": "Private",
 			"FILTER_PUBLIC": "Pubilc",
@@ -1337,7 +1348,7 @@
 			"PUBLIC_DESC": "Anyone who has 'View' access to selected dashboard scope",
 			"SINGLE_PROJECT": "Single Project",
 			"STEP": "Step",
-			"STEP1_DESC": "Choose dashboard scope and viewer.",
+			"STEP1_DESC": "Choose dashboard scope and access.",
 			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
@@ -1402,7 +1413,7 @@
 				"DESCRIPTION_PROVIDER": "The cloud service providers such as AWS, Azure, Google",
 				"DESCRIPTION_REGION": "The geographic locations where each cloud provider has built data centers",
 				"DESCRIPTION_SERVICE_ACCOUNT": "The accounts created from each cloud provider and added in the ‘service account’ page",
-				"DESCRIPTION_WORKSPACE": "",
+				"DESCRIPTION_WORKSPACE": "List of workspaces created in this domain",
 				"EDIT": "Edit",
 				"FILTER_ALL": "All",
 				"FILTER_CUSTOM": "Custom",
@@ -1646,15 +1657,15 @@
 				"COL_ROLE_ID": "Role ID",
 				"COL_STATE": "State",
 				"COL_TAG": "Tags",
-				"COL_WORKSPACE_ROLE": "Workspace OwnerRole",
+				"COL_WORKSPACE_ROLE": "Workspace Owner Role",
 				"CREATE_TITLE": "Create App",
 				"DELETE_TITLE": "Are you sure you want to delete the App?",
 				"DISABLE_TITLE": "Are you sure you want to disable the App?",
 				"EDIT_TITLE": "Edit App Information",
 				"ENABLE_TITLE": "Are you sure you want to enable the App?",
-				"REGENERATE_TITLE": "Regenerate API key for selected App"
+				"REGENERATE_TITLE": "Regenerate Client Secret"
 			},
-			"REGENERATE": "Regenerate API Key",
+			"REGENERATE": "Regenerate Client Secret",
 			"TITLE": "App"
 		},
 		"DOMAIN_SETTINGS": {
@@ -1662,11 +1673,11 @@
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
 			"ALT_E_UPDATE_BRAND_ASSETS": "Failed to update brand assets",
 			"ALT_E_UPDATE_DISPLAY_NAME": "Failed to update display name",
-			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "Failed to update timezone and language",
+			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "Failed to update timezone/language",
 			"ALT_S_UPDATE_ADMIN_EMAIL": "Admin email successfully updated",
 			"ALT_S_UPDATE_BRAND_ASSETS": "Brand assets successfully updated",
 			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
-			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone and language successfully updated",
+			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone & language successfully updated",
 			"BASE_INFORMATION": "Base Information",
 			"BRAND_ASSETS": "Brand Assets",
 			"CHANGE": "Change",
@@ -1676,16 +1687,16 @@
 			"DOMAIN_NAME": "Domain Name",
 			"EMAIL_INVALID": "Invalid e-mail format.",
 			"LANGUAGE": "Language",
-			"LOGIN_PAGE_MAIN_IMAGE_DESCRIPTION": "Recommend using this image to strengthen your brand. It will shows up in sign-in screen.\n• Minimum 680 × 680 pixels\n• PNG, JPEG or GIF files",
 			"SAVE_CHANGE": "Save Change",
 			"SAVE_CHANGES": "Save Changes",
 			"SEND_CODE": "Send Code",
-			"SYMBOL_FAVICON_DESCRIPTION": "A symbol logo shows up in the sign-in, navigation bar and as a favicon in browser tabs.\n• Recommended 168 × 168 pixels\n• PNG, JPEG or GIF files",
+			"SIGN_IN_PAGE_MAIN_IMAGE_DESCRIPTION": "This image will appear on the sign-in screen, and it is recommended to use it to enhance your brand.\n• Minimum 680 × 680 pixels\n• PNG, JPEG, GIF or SVG files",
+			"SYMBOL_FAVICON_DESCRIPTION": "This will be displayed in the navigation bar, and as a favicon in browser tabs.\n• Recommended 168 × 168 pixels\n• PNG, JPEG, GIF or SVG files",
 			"TIMEZONE": "Timezone",
-			"TIMEZONE_AND_LANGUAGE": "Time zone and Language",
+			"TIMEZONE_AND_LANGUAGE": "Time zone & Language",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFICATION_CODE_INVALID": "Required field",
-			"WORDTYPE_LOGO_DESCRIPTION": "A wordtype logo shows up in your sign-in screen and represents your domain name.\n• Recommended 220 × 40 pixels\n• PNG, JPEG or GIF files"
+			"WORDTYPE_LOGO_DESCRIPTION": "This will be displayed on the sign-in screen and will represent your domain name\n• Recommended 220 × 40 pixels\n• PNG, JPEG, GIF or SVG files"
 		},
 		"POLICY": {
 			"FORM": {
@@ -1778,8 +1789,8 @@
 				"TOOLTIP_ALERT_DESC_EDIT": "Description Edit",
 				"TOOLTIP_ALERT_NOTE": "Note(Add/Delete)",
 				"TOOLTIP_ALERT_URGENCY": "Change Urgency",
-				"TOOLTIP_API_KEY_ACTION": "API Key (Action)",
-				"TOOLTIP_API_KEY_CREATE": "API Key (Create)",
+				"TOOLTIP_API_KEY_ACTION": "Client Secret (Action)",
+				"TOOLTIP_API_KEY_CREATE": "Client Secret (Create)",
 				"TOOLTIP_BUDGET_CREATE": "Create Budget",
 				"TOOLTIP_BUDGET_DELETE": "Budget Delete",
 				"TOOLTIP_CHANGE_PROJECT": "Change Project",
@@ -1811,25 +1822,24 @@
 				"VIEW": "View"
 			},
 			"HANDBOOK": {
-				"API_POLICY": "API Policy Attachment",
-				"API_POLICY_CREATE": "Create new or manage existing policy",
-				"API_POLICY_DESC": "A policy can reference the resource it wants to apply to. Access is granted with RBAC.",
-				"API_POLICY_LINK": "here",
-				"PAGE_ACCESS": "Page Access",
-				"PAGE_ACCESS_DESC": "Restrict access to each page with ‘View’ & ‘Manage’ permission.",
-				"PAGE_ACCESS_MANAGE": "‘Manage’:",
-				"PAGE_ACCESS_MANAGE_DESC": "Only users with this permission for specific service can access to its admin features such as Create, Edit, Add etc., (Each service has its own admin features)",
-				"PAGE_ACCESS_VIEW": "‘View’:",
-				"PAGE_ACCESS_VIEW_DESC": "Only users with this permission for specific service can view its page.",
+				"PERMISSION": "Permission",
+				"PERMISSION_API_POLICY": "‘API Policy Attachment’:",
+				"PERMISSION_API_POLICY_DESC": "A policy can specify the resource to which it applies. Access is then granted based on Role-Based Access Control (RBAC).",
+				"PERMISSION_DESC": "Access restrictions for each specific service menu can be set to each role.",
+				"PERMISSION_PAGE_ACCESS": "‘Page Access’:",
+				"PERMISSION_PAGE_ACCESS_DESC": "If access to a specific service menu is set to OFF, users with that role will not be able to access the menu.",
 				"ROLE_TYPE": "Role Type",
 				"ROLE_TYPE_ADMIN": "‘Admin’:",
-				"ROLE_TYPE_ADMIN_DESC": "Full access to all projects/project groups.",
-				"ROLE_TYPE_DESC": "Restrict access to project management with different role type.",
-				"ROLE_TYPE_USER": "‘User’:",
-				"ROLE_TYPE_USER_DESC": "Only invited(or self-made) projects/project groups and their child projects can be managed."
+				"ROLE_TYPE_ADMIN_DESC": "“Super administrator” - has access to all workspaces within the domain and can configure overall settings through accessing Admin mode.",
+				"ROLE_TYPE_DESC": "Restrict access to domain, workspace, and project management based on different role types.",
+				"ROLE_TYPE_WORKSPACE_MEMBER": "‘Workspace Member’:",
+				"ROLE_TYPE_WORKSPACE_MEMBER_DESC": "“Member of a workspace” - a general user who can access only the projects they have been invited to within a specific workspace.",
+				"ROLE_TYPE_WORKSPACE_OWNER": "‘Workspace Owner’:",
+				"ROLE_TYPE_WORKSPACE_OWNER_DESC": "“Owner or administrator of a workspace” - capable of adding/managing projects in a specific workspace, as well as managing users and apps."
 			},
+			"MANAGED": "Managed",
 			"MODAL": {
-				"DELETE_HELP_TEXT": "The role below assigned to some users. To delete this role, first you should remove it from assigned users.",
+				"DELETE_HELP_TEXT": "The role below is assigned to some users. To delete this role, you must first remove it from the assigned users.",
 				"DELETE_TITLE": "Are you sure you want to delete selected item?",
 				"DELETE_TITLE_CANNOT": "Cannot delete this role"
 			},
@@ -1841,7 +1851,7 @@
 				"ADD_TAG": "Add Tags",
 				"ADD_WORKSPACE": "New users will have access to",
 				"ADMIN_ROLE_HELP_TEXT": "New users will have comprehensive access to the entire domain, including admin mode and all workspaces with a role",
-				"ALT_E_INVALID_FULL_NAME": "Keep typing a full email",
+				"ALT_E_INVALID_FULL_NAME": "Keep typing a full email.",
 				"ALT_ING_SEND_INVITATION_EMAIL": "Invitation email will be sent and it could take couple of minutes...",
 				"ALT_S_SEND_INVITATION_EMAIL": "Users have been successfully invited",
 				"ASSIGN_DOMAIN_ROLE": "Admin Role",
@@ -1860,7 +1870,7 @@
 				"NO_DATA": "No Data",
 				"NO_ROLE": "No Role",
 				"NO_USER": "No User",
-				"NO_USER_DESC": "Add an user or more",
+				"NO_USER_DESC": "Add a user or more",
 				"NO_WORKSPACE": "No Workspace",
 				"OWNER": "Owner",
 				"PASSWORD": "Password",
@@ -1868,15 +1878,15 @@
 				"REQUIRED_FIELD": "Required field",
 				"ROLE_PLACEHOLDER": "Select a workspace role",
 				"ROLE_TITLE": "Invite with a role:",
-				"SELECT_ROLE": "Select Role",
+				"SELECT_ROLE": "Select a Role",
 				"SELECT_WORKSPACE": "Select one workspace or more",
 				"TAGS": "Tags",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "Already being used.",
 				"USER_ID_INVALID": "Same ID exists.",
-				"USER_ID_INVALID_DOMAIN": "{userId} is already in this domain",
-				"USER_ID_INVALID_WORKSPACE": "{userId} is already in this workspace",
+				"USER_ID_INVALID_DOMAIN": "{userId} is already in this domain.",
+				"USER_ID_INVALID_WORKSPACE": "{userId} is already in this workspace.",
 				"WITH_ROLE": "with a role"
 			},
 			"INVITE": "Invite",
@@ -1904,12 +1914,14 @@
 				"MFA_DESC": "Set up a multi-factor authentication option \nto enhance your account security.",
 				"MODAL": {
 					"ALT_E_ADD_USER": "Failed to Add User",
+					"ALT_E_DELETE_PROJECT_MEMBER": "Failed to Delete Member",
 					"ALT_E_DELETE_USER": "Failed to Delete User",
 					"ALT_E_DISABLE_USER": "Failed to Disable User",
 					"ALT_E_ENABLE_USER": "Failed to Enable User",
 					"ALT_E_REMOVE_USER": "Failed to Remove User",
 					"ALT_E_UPDATE_USER": "Failed to Update User",
 					"ALT_S_ADD_USER": "User successfully added",
+					"ALT_S_DELETE_PROJECT_MEMBER": "Member successfully deleted ",
 					"ALT_S_DELETE_USER": "User successfully deleted",
 					"ALT_S_DISABLE_USER": "User successfully disabled",
 					"ALT_S_ENABLE_USER": "User successfully enabled",
@@ -1917,13 +1929,15 @@
 					"ALT_S_UPDATE_USER": "User successfully updated",
 					"CREATE_TITLE": "Add New Users",
 					"DELETE_DESC": "Are you sure you want to delete selected user?",
+					"DELETE_PROJECT_MEMBER_TITLE": "Are you sure you want to remove this user from the project?",
 					"DELETE_TITLE": "Delete User",
 					"DISABLE_DESC": "Are you sure you want to disable selected user? ",
 					"DISABLE_TITLE": "Disable User",
 					"ENABLE_DESC": "Are you sure you want to enable selected user below?",
 					"ENABLE_TITLE": "Enable User",
-					"INVITE_TITLE": "Invite Users to Workspace-Name",
+					"INVITE_TITLE": "Invite Users to {workspace_name}",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
+					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
 					"UPDATE_TITLE": "Edit User"
 				},
 				"NAME": "Name",
@@ -1933,7 +1947,9 @@
 				"NO_SELECTED": "Select a user for more details.",
 				"PROJECT": "Project",
 				"PROJECTS": "Projects",
+				"PROJECT_ID": "Project ID",
 				"ROLE": "Role",
+				"ROLE_NAME": "Role Name",
 				"ROLE_TYPE": "Role Type",
 				"STATE": "State",
 				"TAB_SELECTED_DATA": "Selected Data",
@@ -2022,16 +2038,24 @@
 			"DELETE": "Delete",
 			"DELETE_WORKSPACE": "Delete",
 			"DELETE_WORKSPACE_DESC": "You cannot undo this action.",
+			"DETAIL": {
+				"USERS": "Users"
+			},
 			"DISABLE": "Disable",
+			"DISABLE_WORKSPACE": "Are you sure you want to disable the selected workspace?",
 			"EDIT": "Edit",
+			"EDIT_WORKSPACE": "Edit Workspace",
 			"ENABLE": "Enable",
+			"ENABLE_WORKSPACE": "Are you sure you want to enable the selected workspace?",
 			"FORM": {
+				"DUPLICATED_NAME": "Workspace name is duplicated.",
 				"LABEL_DESC": "Description",
 				"LABEL_NAME": "Name",
 				"PLACEHOLDER_DESC": "Workspace description",
 				"PLACEHOLDER_NAME": "Workspace name",
 				"REQUIRED_NAME": "Please enter name"
 			},
+			"REQUIRED_ENABLE_WORKSPACE": "At least one workspace must be enabled.",
 			"WORKSPACES": "Workspaces"
 		}
 	},
@@ -2099,9 +2123,10 @@
 				"TITLE": "{provider} Accounts"
 			}
 		},
+		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
 		"USER": {
 			"API_KEY": {
-				"ALERT_MSG": "You have to download the JSON or Config file before you continue. You will not be able to download the file again after close this.",
+				"ALERT_MSG": "Please download the JSON or Config file before continuing. You will not be able to download the file again once this is closed.",
 				"ALT_E_CREATE_SCHEDULER": "Failed to Create Scheduler",
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "Able to create API key up to 2.",
@@ -2119,8 +2144,8 @@
 				"ENABLE_MODAL_TITLE": "Enable API Key",
 				"ENDPOINTS": "Endpoints",
 				"HIDE": "hide",
-				"ID": "API Key ID",
-				"MODAL_TITLE": "API Key successfully created",
+				"ID": "Client ID",
+				"MODAL_TITLE": "Client Secret successfully created",
 				"SHOW": "show ",
 				"SPACECTL": "Spacectl (CLI)",
 				"SPACECTL_CONFIG": "spacectl configuration",
@@ -2458,12 +2483,13 @@
 				"COLLECT_DATA": "Collect Data",
 				"CREATED": "Created",
 				"DELETE_COLLECTOR": "Delete Collector",
+				"DETAIL_JOB_LINK": "View job details",
 				"EDIT": "Edit",
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",
 				"NAME": "Name",
 				"NO_TAG": "No Tags",
-				"PAGE_NOTIFICATION": "This collector’s settings can be changed in admin mode.",
+				"PAGE_NOTIFICATION": "This collector's settings can only be changed by admins.",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
 				"REGION": "Region",
@@ -2472,7 +2498,7 @@
 				"SCHEDULE_COLLECT_DESC": "Collect data at {times} every day.",
 				"SCHEDULE_HOURLY": "Hourly Schedule",
 				"SCHEDULE_NOT_SELECTED_YET": "Schedule frequency hasn't been selected yet.",
-				"SCHEDULE_ON_OFF": "Schedule Power ON/OFF",
+				"SCHEDULE_ON_OFF": "Schedule ON/OFF",
 				"SCHEDULE_TURN_ON_DESC": "Turn on to collect data automatically.",
 				"SELECT": "Select",
 				"SELECT_SERVICE_ACCOUNT": "Select Service Account(s) to attactch.",
@@ -2654,7 +2680,7 @@
 		"ADMINISTRATION_DOMAIN_SETTINGS": "Domain Settings",
 		"ADMINISTRATION_IAM": "IAM",
 		"ADMINISTRATION_POLICY": "Policy",
-		"ADMINISTRATION_PREFERENCE": "Preference",
+		"ADMINISTRATION_PREFERENCE": "Preferences",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
@@ -2671,7 +2697,7 @@
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",
-		"DASHBOARDS": "Dashboards",
+		"DASHBOARDS": "Dashboard",
 		"DASHBOARDS_PROJECT": "Project Dashboard",
 		"DASHBOARDS_WORKSPACE": "Workspace Dashboard",
 		"HOME_DASHBOARD": "Home",
@@ -2882,6 +2908,7 @@
 					"CURRENT": "Current",
 					"HIDE": "hide",
 					"LEVEL": "Level",
+					"NO_RESPONDER": "No Responder",
 					"RESPONDER": "Responder",
 					"SHOW_RESPONDERS": "show responders"
 				},
@@ -2966,6 +2993,7 @@
 			"SAVE_CHANGES": "Save Changes",
 			"TIMEZONE_INVALID": "The time zone is set incorrectly."
 		},
+		"ADMIN": "Admin",
 		"MFA": {
 			"BTN_CHANGE": "Change",
 			"BTN_SEND_MAIL": "Send Verification Code",
@@ -3000,7 +3028,6 @@
 		"NOTIFICATION_EMAIL": {
 			"EMAIL_INVALID": "Invalid e-mail format."
 		},
-		"ROOT_ACCOUNT": "Root Account",
 		"SPACEONE_USER": "SpaceONE User "
 	},
 	"PAGE_SCHEMA": {
@@ -3246,7 +3273,7 @@
 			"ALT_E_UPDATE_GROUP_MEMBER": "Failed to Update Project Group Member",
 			"ALT_E_UPDATE_MEMBER": "Failed to Update Member",
 			"ALT_E_UPDATE_PROJECT": "Failed to Update Project",
-			"ALT_E_UPDATE_PROJECT_TYPE": "Failed to Update Project Type",
+			"ALT_E_UPDATE_PROJECT_TYPE": "Failed to Update Project Access",
 			"ALT_E_UPDATE_WEBHOOK": "Failed to Update Webhook",
 			"ALT_S_ACTIVATE_ALERT": "Alert successfully activated",
 			"ALT_S_ADD_MEMBER": "Successfully Added Member ",
@@ -3259,7 +3286,7 @@
 			"ALT_S_UPDATE_GROUP_MEMBER": "Project Group Member successfully updated",
 			"ALT_S_UPDATE_MEMBER": "Member successfully updated ",
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
-			"ALT_S_UPDATE_PROJECT_TYPE": "Project Type successfully updated ",
+			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
@@ -3288,9 +3315,9 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
-				"PRIVATE_MEMBER_DESC": "Only people invited can be access to this project based on {settings}",
+				"PRIVATE_MEMBER_DESC": "Only people invited can access this project, based on the {settings}",
 				"PROJECT_SETTINGS": "project settings",
-				"PUBLIC_MEMBER_DESC": "Everyone in this workspace is considered a member of this project based on {settings}",
+				"PUBLIC_MEMBER_DESC": "Everyone in this workspace can access this project, based on the {settings}",
 				"REMOVE": "Remove",
 				"ROLE": "Role",
 				"ROLE_HELP_TEXT": "Set a role for selected member",
@@ -3310,8 +3337,7 @@
 			"MODAL_CREATE_WEBHOOK_NAME_REQUIRED": "Please enter name.",
 			"MODAL_CREATE_WEBHOOK_PLACEHOLDER": "Webhook Name",
 			"MODAL_CREATE_WEBHOOK_TITLE": "Add Webhook",
-			"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following member from project? ",
-			"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
+			"MODAL_DELETE_MEMBER_TITLE": "Are you sure you want to remove following user from this workspace?",
 			"MODAL_DELETE_PROJECT_CONTENT": "Are you sure you want to delete the project?",
 			"MODAL_DELETE_PROJECT_TITLE": "Delete Project",
 			"MODAL_DELETE_WEBHOOK": "Delete this webhook",
@@ -3421,7 +3447,7 @@
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
 			"ADD_SERVICE_ACCOUNT": "Add service account",
-			"ALL_PROJECTS": "All Projects",
+			"ALL_PROJECTS": "Project",
 			"ALT_E_CREATE_PROJECT": "Failed to Create Project",
 			"ALT_E_CREATE_PROJECT_GROUP": "Failed to Create Project Group",
 			"ALT_E_DELETE_PROJECT_GROUP": "Failed to Delete Project Group",
@@ -3432,6 +3458,7 @@
 			"ALT_S_DELETE_PROJECT_GROUP": "Project Group successfully deleted ",
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_GROUP": "Project Group successfully updated  ",
+			"CAN_ACCESS_TO_THIS_PROJECT": "can access to this project",
 			"CLOUD_SERVICES": "Cloud Services",
 			"COMPUTE": "Compute",
 			"CREATE": "Create",
@@ -3447,6 +3474,7 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
+			"INVITE_ONLY": "Invite only",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",
@@ -3459,7 +3487,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "Move \"{name}\"",
-				"NO_PROJECT_GROUP": "No Project Group",
+				"NO_PARENT_GROUP": "No parent group",
+				"NO_PROJECT_GROUP": "No project group",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "Select a project group to move to"
 			},
 			"MODAL_PROJECT_CREATE": {
@@ -3468,7 +3497,7 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
-			"NO_PROJECT_GROUP_MSG": "Getting started with grouping your scattered resource and accounts with your own project.",
+			"NO_PROJECT_GROUP_MSG": "There's no project or project group created in this workspace yet.",
 			"ONLY_PEOPLE_INVITED": "Only people invited",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",

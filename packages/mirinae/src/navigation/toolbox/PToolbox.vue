@@ -20,7 +20,9 @@
                                 @search="onSearch"
                 />
             </div>
-            <div class="tools-wrapper">
+            <div v-if="isToolsWrapperVisible"
+                 class="tools-wrapper"
+            >
                 <div v-if="paginationVisible"
                      class="tool"
                 >
@@ -265,6 +267,7 @@ export default defineComponent<ToolboxProps>({
                     return defaultConverter(queryTag, props.timezone);
                 };
             }),
+            isToolsWrapperVisible: computed(() => props.paginationVisible || props.pageSizeChangeable || props.sortable || props.exportable || props.refreshable || props.settingsVisible),
         });
 
 

@@ -4,13 +4,13 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface UpdatePublicDashboardParameters {
+export interface PublicDashboardUpdateParameters {
     public_dashboard_id: string;
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    variables_schema?: DashboardVariablesSchema;
     settings?: DashboardSettings;
+    variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
 }

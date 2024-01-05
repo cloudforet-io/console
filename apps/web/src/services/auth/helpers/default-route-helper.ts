@@ -11,15 +11,15 @@ const GENERAL_DEFAULT_ROUTE = Object.freeze({
 });
 
 const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+    name: MY_PAGE_ROUTE._NAME,
 });
 
 // const SYTEM_DEFAULT_ROUTE = Object.freeze({
 //     name: ADMINISTRATION_ROUTE.IAM._NAME,
 // });
 
-export const getDefaultRouteAfterSignIn = (hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
+export const getDefaultRouteAfterSignIn = (hasBoundRole: boolean): Location => {
     // TODO: need to decide SYSTEM ROLE
-    if (hasAnyPermissions) return GENERAL_DEFAULT_ROUTE;
+    if (hasBoundRole) return GENERAL_DEFAULT_ROUTE;
     return NO_ROLE_USER_DEFAULT_ROUTE;
 };

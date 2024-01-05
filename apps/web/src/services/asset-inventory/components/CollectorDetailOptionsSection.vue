@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
+                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty || !collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
@@ -79,6 +79,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
@@ -86,6 +87,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const state = reactive({
     loading: computed<boolean>(() => !collectorFormState.originCollector),

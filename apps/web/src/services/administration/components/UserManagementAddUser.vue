@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    reactive, ref, watch,
+    onMounted, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
@@ -15,8 +15,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
@@ -44,13 +46,16 @@ const state = reactive({
     selectedItems: [] as AddModalMenuItem[],
     independentUsersList: [] as SummaryWorkspaceUserModel[],
 });
+
 const authTypeState = reactive({
     selectedUserAuthType: '' as AuthType,
     selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
 });
+
 const formState = reactive({
     searchText: '',
 });
+
 const validationState = reactive({
     userIdInvalid: undefined as undefined | boolean,
     userIdInvalidText: '' as TranslateResult,
@@ -63,30 +68,19 @@ const hideMenu = () => {
 };
 const handleClickTextInput = async () => {
     state.menuVisible = true;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+    resetValidationState();
 };
-const handleChangeTextInput = debounce(async (searchText: string) => {
-    formState.searchText = searchText;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
-    if (!userPageState.isAdminMode) {
-        await fetchListUsers();
+const handleChangeTextInput = debounce((value: string) => {
+    formState.searchText = value;
+    if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
+        fetchListUsers();
+        state.menuVisible = true;
     }
 }, 200);
-const handleEnterTextInput = () => {
+const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
-    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
-    const isExistUser = state.selectedItems.some((item) => item.user_id === formState.searchText);
-    if (!isValid) {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = invalidText;
-        hideMenu();
-    } else if (isExistUser) {
-        formState.searchText = '';
-        hideMenu();
-    } else {
-        getUserList();
+    if (validateUserId()) {
+        await getUserList();
     }
 };
 const handleClickDeleteButton = (idx: number) => {
@@ -95,16 +89,15 @@ const handleClickDeleteButton = (idx: number) => {
 };
 const handleSelectAuthTypeItem = (selected: string, idx: number) => {
     state.selectedItems[idx].auth_type = selected as AuthType;
-    handleSelectDropdownItem(selected);
     emit('change-input', { userList: state.selectedItems });
 };
 const handleSelectDropdownItem = (selected: string) => {
     authTypeState.selectedMenuItem = selected as AuthType;
 };
 const getUserList = async () => {
-    let isNew = userPageState.isAdminMode;
+    let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
-        if (userPageState.isAdminMode) {
+        if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
             await fetchGetUsers(formState.searchText);
         } else {
             const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
@@ -112,66 +105,84 @@ const getUserList = async () => {
             await fetchGetWorkspaceUsers(formState.searchText);
         }
     } catch (e) {
-        state.selectedItems.push({
-            user_id: formState.searchText,
-            label: formState.searchText,
-            name: formState.searchText,
-            isNew,
-            auth_type: authTypeState.selectedMenuItem,
-        });
-        formState.searchText = '';
-        validationState.userIdInvalid = false;
-        validationState.userIdInvalidText = '';
+        addSelectedItem(isNew);
     } finally {
         await hideMenu();
     }
 };
-const checkValidation = () => {
+const checkEmailValidation = () => {
+    if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
+        const { isValid, invalidText } = checkEmailFormat(formState.searchText);
+        if (!isValid) {
+            validationState.userIdInvalid = true;
+            validationState.userIdInvalidText = invalidText;
+            return false;
+        }
+    }
+    return true;
+};
+const resetValidationState = () => {
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
+};
+const validateUserId = () => {
     if (formState.searchText === '') {
         validationState.userIdInvalid = true;
         validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.ALT_E_INVALID_FULL_NAME');
-        return;
+        return false;
     }
-    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
-    if (!isValid) {
-        validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = invalidText;
-    }
+    return checkEmailValidation();
 };
 const clickOutside = () => {
     if (state.menuVisible) {
-        checkValidation();
+        checkEmailValidation();
         hideMenu();
     }
 };
-// workspace owner only
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     state.selectedItems.push(menuItem);
     await hideMenu();
 };
-// TODO: Will be Improved in the next step.
-// const initAuthTypeList = async () => {
-//     if (store.state.domain.extendedAuthType !== undefined) {
-//         authTypeMenuItem.value = [
-//             { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
-//             ...authTypeMenuItem.value,
-//         ];
-//     }
-// };
+const initAuthTypeList = async () => {
+    if (store.state.domain.extendedAuthType !== undefined) {
+        authTypeMenuItem.value = [
+            { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
+            ...authTypeMenuItem.value,
+        ];
+    }
+};
+const addSelectedItem = (isNew: boolean) => {
+    state.selectedItems.push({
+        user_id: formState.searchText,
+        label: formState.searchText,
+        name: formState.searchText,
+        isNew,
+        auth_type: authTypeState.selectedMenuItem,
+    });
+    formState.searchText = '';
+    resetValidationState();
+};
 
 /* API */
 const fetchListUsers = async () => {
     state.loading = true;
-
     try {
-        const results = await userPageStore.findWorkspaceUser({
-            keyword: formState.searchText || '@',
-        });
+        let params: FindWorkspaceUserParameters = { keyword: formState.searchText || '@' };
+        if (!userPageState.isAdminMode) {
+            params = {
+                ...params,
+                workspace_id: userPageState.createdWorkspaceId,
+            };
+        }
+        const results = await userPageStore.findWorkspaceUser(params);
         state.menuItems = results.map((user) => ({
             user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
         }));
+        if (!userPageState.isAdminMode) {
+            state.independentUsersList = results;
+        }
     } catch (e) {
         state.menuItems = [];
     } finally {
@@ -190,29 +201,31 @@ const fetchGetUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
     });
-    validationState.userIdInvalid = true;
-    validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+    if (userPageState.afterWorkspaceCreated) {
+        addSelectedItem(false);
+    } else {
+        validationState.userIdInvalid = true;
+        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+    }
 };
 
 onClickOutside(containerRef, clickOutside);
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
-        formState.searchText = '';
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
+        resetValidationState();
         if (!userPageState.isAdminMode) {
             await fetchListUsers();
-            state.independentUsersList = await userPageStore.findWorkspaceUser();
         }
     } else {
         state.menuItems = [];
     }
 });
 
-// TODO: Will be Improved in the next step.
-// onMounted(() => {
-//     initAuthTypeList();
-// });
+onMounted(() => {
+    initAuthTypeList();
+});
 </script>
 
 <template>
@@ -220,6 +233,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
         <p-field-group required
                        :invalid="validationState.userIdInvalid"
                        :invalid-text="validationState.userIdInvalidText"
+                       class="user-info-field-group"
                        :class="{'is-admin-mode': userPageState.isAdminMode}"
         >
             <template #label>
@@ -227,8 +241,10 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     {{ $t('IAM.USER.FORM.USER_ID') }}
                 </strong>
                 <span v-else>
-                    <span>{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
-                    <span class="and-mark">&</span>
+                    <span v-if="!userPageStore.afterWorkspaceCreated">{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
+                    <span v-if="!userPageStore.afterWorkspaceCreated"
+                          class="and-mark"
+                    >&</span>
                     <span>{{ $t('IAM.USER.FORM.USER_ID') }}</span>
                 </span>
             </template>
@@ -239,19 +255,20 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     <div v-if="userPageState.isAdminMode">
                         <p-select-dropdown :menu="authTypeMenuItem"
                                            :selected="authTypeState.selectedMenuItem"
+                                           is-fixed-width
                                            class="type-dropdown"
                                            @update:selected="handleSelectDropdownItem"
                         />
                     </div>
                     <div class="input-form-wrapper">
-                        <p-text-input ref="targetRef"
-                                      :invalid="invalid"
-                                      :value="formState.searchText"
-                                      class="user-id-input"
-                                      @click="handleClickTextInput"
-                                      @keyup.enter="handleEnterTextInput"
-                                      @update:value="handleChangeTextInput"
-                        />
+                        <input ref="targetRef"
+                               :value="formState.searchText"
+                               class="user-id-input"
+                               :class="{'invalid': invalid}"
+                               @click="handleClickTextInput"
+                               @keyup.enter="handleEnterTextInput"
+                               @input="handleChangeTextInput($event.target.value)"
+                        >
                         <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
                                         ref="contextMenuRef"
                                         :loading="state.loading"
@@ -289,14 +306,14 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     <p-select-dropdown v-if="item.isNew"
                                        :selected="item.auth_type"
                                        :menu="authTypeMenuItem"
+                                       menu-position="right"
                                        class="auth-type-dropdown"
                                        style-type="transparent"
                                        @update:selected="handleSelectAuthTypeItem($event, idx)"
                     />
                     <p-icon-button name="ic_delete"
                                    class="delete-btn"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="sm"
                                    @click="handleClickDeleteButton(idx)"
                     />
                 </div>
@@ -310,6 +327,9 @@ watch(() => state.menuVisible, async (menuVisible) => {
     @apply flex flex-col bg-white border border-primary-3 rounded-md;
     height: 18rem;
     padding: 0.75rem;
+    .user-info-field-group {
+        margin-bottom: 0;
+    }
     .and-mark {
         @apply font-normal;
         margin-right: 0.25rem;
@@ -323,7 +343,13 @@ watch(() => state.menuVisible, async (menuVisible) => {
             @apply relative;
             width: 100%;
             .user-id-input {
+                @apply text-label-md border border-gray-300 rounded;
                 width: 100%;
+                height: 2rem;
+                padding: 0.375rem 0.5rem;
+                &.invalid {
+                    @apply border-alert;
+                }
             }
             .user-context-menu {
                 @apply absolute;
@@ -338,7 +364,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
         margin: auto;
     }
     .selected-user-list {
-        @apply overflow-y-scroll;
+        @apply overflow-y-auto;
         height: 12.5rem;
         margin-top: 1rem;
         .selected-user-list-item {

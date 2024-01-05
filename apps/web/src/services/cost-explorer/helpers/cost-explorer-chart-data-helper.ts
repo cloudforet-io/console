@@ -1,6 +1,7 @@
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import { store } from '@/store';
 
 import { pinia } from '@/store/pinia';
@@ -10,7 +11,7 @@ import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-e
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import type { ChartData, Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
-    Period, Granularity, GroupBy, CostAnalyzeResponse,
+    Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -51,7 +52,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
+export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
@@ -61,9 +62,10 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
         const _serviceAccounts = store.getters['reference/serviceAccountItems'];
         const _projects = allReferenceStore.getters.project;
         const _regions = store.getters['reference/regionItems'];
+        const _workspaces = allReferenceStore.getters.workspace;
 
         const legends: Legend[] = [];
-        rawData.results.forEach((d) => {
+        rawData.results?.forEach((d) => {
             if (d.value_sum) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
@@ -77,6 +79,8 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
                 } else if (_groupBy === GROUP_BY.PROVIDER) {
                     _label = _providers[_name]?.name || _name;
                     _color = _providers[_name]?.color;
+                } else if (_groupBy === GROUP_BY.WORKSPACE) {
+                    _label = _workspaces[_name]?.label || _name;
                 }
                 if (!_name) {
                     _name = `no_${_groupBy}`;
@@ -92,7 +96,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
         });
         return legends;
     }
-    if (rawData.results.length) {
+    if (rawData.results?.length) {
         return [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
     }
     return [];
@@ -104,8 +108,8 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
-    if (!rawData.results.length) return [];
+export const getXYChartData = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
+    if (!rawData.results?.length) return [];
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByGranularity(granularity);
     const _period = getPeriodByGranularity(granularity, period);

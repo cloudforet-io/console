@@ -97,7 +97,7 @@
     </p-button-modal>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -124,7 +124,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 interface Props {
-    domainId?: string
     userId?: string
     visible: boolean
     email?: string
@@ -132,7 +131,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    domainId: '',
     userId: '',
     visible: false,
     email: '',

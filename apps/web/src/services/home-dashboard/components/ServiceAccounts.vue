@@ -16,6 +16,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
@@ -48,8 +49,12 @@ const VALUE_KEY = 'service_account_count';
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const state = reactive({
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
+const state = reactive({
     loading: true,
     data: [] as Data[],
     totalServiceAccountCount: computed<number>(() => sum(state.data.map((d) => d.service_account_count))),
@@ -107,15 +112,18 @@ const getData = debounce(async () => {
     state.loading = true;
     const data: Data[] = [];
     try {
-        const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
+        const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider({
+            ...props.extraParams,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         forEach(results, (d) => {
             data.push({
                 ...d,
                 provider: d.provider,
-                providerLabel: state.providers[d.provider]?.label,
+                providerLabel: storeState.providers[d.provider]?.label,
                 href: getLink(d),
                 pieSettings: {
-                    fill: state.providers[d.provider].color || '',
+                    fill: storeState.providers[d.provider].color || '',
                 },
             });
         });
@@ -134,7 +142,7 @@ const getData = debounce(async () => {
 })();
 
 /* Watcher */
-watch(() => state.providers, (providers) => {
+watch(() => storeState.providers, (providers) => {
     if (!isEmpty(providers)) getData();
 }, { immediate: true });
 watch([() => state.loading, () => chartContext.value], ([loading, _chartContext]) => {
@@ -200,7 +208,7 @@ onBeforeUnmount(() => {
                             <router-link :to="getLink(item)">
                                 <span :style="{color: item.color}"
                                       class="provider-label"
-                                >{{ state.providers[item.provider].label }}</span>
+                                >{{ storeState.providers[item.provider].label }}</span>
                             </router-link>
                         </template>
                     </p-data-table>

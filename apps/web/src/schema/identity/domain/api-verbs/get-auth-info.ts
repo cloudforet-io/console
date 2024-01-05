@@ -12,7 +12,13 @@ export interface DomainGetAuthInfoResponse {
     config: Record<string, any>;
 }
 
-interface Metadata {
-    plugin_info: object;
+export interface Metadata {
+    token_endpoint?: string;
+    authorization_endpoint?: string;
     auth_type: string;
+    protocol: 'oidc' | 'saml' | 'oauth2';
+    identity_provider?: string;
+    end_session_endpoint?: string;
+    userinfo_endpoint?: string;
+    realm?: string; // only keycloack
 }

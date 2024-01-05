@@ -8,13 +8,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-
 // eslint-disable-next-line import/no-cycle
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import { store } from '@/store';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type {
+    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/modules/reference/type';
+
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 
 type PickedWorkspaceModel = Pick<WorkspaceModel, 'state'>;
@@ -35,11 +37,14 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
 
     const getters = reactive({
         workspaceItems: asyncComputed<WorkspaceReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         workspaceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.workspace,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
             referenceMap: getters.workspaceItems,
         })),
     });

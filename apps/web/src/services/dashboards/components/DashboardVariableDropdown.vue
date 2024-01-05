@@ -19,6 +19,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { VariableSelectionType } from '@/schema/dashboard/_types/dashboard-type';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { VariableModel } from '@/lib/variable-models';
@@ -93,9 +95,24 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // event
-const handleSelectOption = (_selected: MenuItem[]) => {
+const handleSelectOption = (selectionType: VariableSelectionType, item: MenuItem, index: number, isSelected: boolean) => {
+    if (selectionType === 'SINGLE') {
+        state.selected = [item];
+        changeVariables([item]);
+        return;
+    }
+    let _selected = cloneDeep(state.selected);
+    if (isSelected) {
+        _selected = [..._selected, item];
+    } else {
+        _selected = _selected.splice(index, 1);
+    }
     state.selected = _selected;
     changeVariables(_selected);
+};
+const handleClearSelection = () => {
+    state.selected = [];
+    changeVariables([]);
 };
 
 // helper
@@ -219,7 +236,7 @@ const {
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
-                        @click.stop="handleSelectOption([])"
+                        @click.stop="handleClearSelection"
                 >
                     <p-i name="ic_close"
                          width="1rem"
@@ -248,7 +265,7 @@ const {
                         :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
                         @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
-                        @update:selected="handleSelectOption"
+                        @select="handleSelectOption(variableProperty?.selection_type, ...arguments)"
                         @update:search-text="handleUpdateSearchText"
         />
     </div>

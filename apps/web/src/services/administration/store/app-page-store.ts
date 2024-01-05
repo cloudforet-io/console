@@ -114,7 +114,7 @@ export const useAppPageStore = defineStore('app-page', {
         async regenerateApp(params: AppGenerateApiKeyParameters) {
             this.modal.loading = true;
             try {
-                return await SpaceConnector.clientV2.identity.app.generateApiKey<AppGenerateApiKeyParameters, AppModel>(params);
+                return await SpaceConnector.clientV2.identity.app.generateClientSecret<AppGenerateApiKeyParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

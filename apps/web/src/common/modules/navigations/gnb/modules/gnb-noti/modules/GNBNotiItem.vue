@@ -16,8 +16,8 @@ import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/module
 import { green, red, yellow } from '@/styles/colors';
 
 interface Props {
-    isRead: boolean;
-    title: string;
+    isRead?: boolean;
+    title?: string;
     createdAt?: string;
     dateHeader?: TranslateResult | string;
     icon?: string;
@@ -25,7 +25,15 @@ interface Props {
     deletable?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    isRead: false,
+    title: '',
+    createdAt: '',
+    dateHeader: '',
+    icon: '',
+    writer: '',
+    deletable: false,
+});
 const emit = defineEmits<{(event: 'select'): void;
     (event: 'delete'): void;
 }>();

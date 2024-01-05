@@ -9,7 +9,7 @@
             />
             <div v-if="collectorDataModalState.collectDataType === COLLECT_DATA_TYPE.ENTIRE">
                 <span>{{ props.name }} {{ $t('INVENTORY.COLLECTOR.ACCOUNT') }}</span>
-                <span v-if="props.secretsCount > 0">
+                <span v-if="props.secretsCount >= 0">
                     ({{ props.secretsCount }})
                 </span>
             </div>

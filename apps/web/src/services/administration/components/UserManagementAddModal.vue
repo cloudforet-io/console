@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -14,6 +16,7 @@ import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/crea
 import type { UserModel } from '@/schema/identity/user/model';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -28,6 +31,7 @@ import UserManagementAddUser from '@/services/administration/components/UserMana
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/administration/types/user-type';
+
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
@@ -103,27 +107,34 @@ const handleClose = () => {
     userPageStore.$patch((_state) => {
         _state.modal.visible.add = false;
         _state.modal = cloneDeep(_state.modal);
+        _state.createdWorkspaceId = undefined;
+        _state.afterWorkspaceCreated = false;
     });
 };
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
-    const userInfoParams = {
+    const domainSettings = store.state.domain.config?.settings;
+    const userInfoParams: UserCreateParameters|WorkspaceUserCreateParameters = {
         user_id: item.user_id || '',
         email: item.user_id || '',
         auth_type: item.auth_type || 'LOCAL',
         password: state.password || '',
         reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
+        language: domainSettings?.language || 'en',
+        timezone: domainSettings?.timezone || 'UTC',
     };
 
     const createRoleBinding = async () => {
         if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
             await fetchCreateRoleBinding(item);
+        } else if (userPageState.afterWorkspaceCreated) {
+            await fetchCreateRoleBinding({ ...item, workspace_id: userPageState.createdWorkspaceId });
         } else {
             await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
         }
     };
 
-    if (userPageState.isAdminMode) {
+    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
         await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
             ...userInfoParams,
             tags: state.tags,
@@ -139,17 +150,29 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     }
 };
 const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    let roleParams: RoleCreateParameters;
     const baseRoleParams = {
         user_id: userItem.user_id || '',
         role_id: state.role.name || '',
         resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
-    const roleParams = (userPageStore.isWorkspaceOwner || state.isSetAdminRole) ? baseRoleParams : {
-        ...baseRoleParams,
-        workspace_id: item?.name || '',
-    };
+    if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
+        roleParams = baseRoleParams;
+    } else if (userPageState.afterWorkspaceCreated) {
+        roleParams = {
+            ...baseRoleParams,
+            workspace_id: userPageState.createdWorkspaceId || '',
+        };
+    } else {
+        roleParams = {
+            ...baseRoleParams,
+            workspace_id: item?.name || '',
+        };
+    }
+
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
 };
+
 </script>
 
 <template>
@@ -182,6 +205,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
                                           @change-input="handleChangeInput"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
+                                         is-bordered
                                          :tags.sync="state.tags"
                 />
             </div>

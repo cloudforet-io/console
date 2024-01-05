@@ -24,7 +24,6 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
         'filters.provider',
         'filters.project',
         'filters.service_account',
-        'filters.project_group',
         'filters.cost_product',
         'filters.region',
         'filters.cost_usage_type',

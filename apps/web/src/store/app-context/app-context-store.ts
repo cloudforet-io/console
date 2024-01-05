@@ -2,30 +2,31 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 interface AppContextStoreState {
     isAdminMode: boolean;
 }
 
 export const useAppContextStore = defineStore('app-context-store', () => {
-    const workspaceStore = useWorkspaceStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
 
     const state = reactive<AppContextStoreState>({
         isAdminMode: false,
     });
 
     const getters = reactive({
-        isAdminMode: computed(() => state.isAdminMode),
+        isAdminMode: computed<boolean>(() => state.isAdminMode),
+        workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 
     const actions = {
-        switchToAdminMode() {
-            workspaceStore.setCurrentWorkspace();
+        enterAdminMode() {
+            userWorkspaceStore.setCurrentWorkspace();
             state.isAdminMode = true;
         },
-        switchToWorkspaceMode() {
-            workspaceStore.setCurrentWorkspace();
+        exitAdminMode() {
+            userWorkspaceStore.setCurrentWorkspace();
             state.isAdminMode = false;
         },
     };

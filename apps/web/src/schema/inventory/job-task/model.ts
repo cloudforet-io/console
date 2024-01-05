@@ -1,8 +1,12 @@
+import type { JobStatus } from '@/schema/inventory/job/type';
+
 import type { JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
+
 
 export interface JobTaskModel {
     job_task_id: string;
-    status: string;
+    status: JobStatus;
+    provider: string;
     create_count: number;
     updated_count: number;
     failure_count: number;
@@ -11,7 +15,6 @@ export interface JobTaskModel {
     errors: JobTaskError[];
     job_id: string;
     secret_id: string;
-    provider: string;
     service_account_id: string;
     project_id: string;
     workspace_id: string;

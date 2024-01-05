@@ -1,7 +1,5 @@
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import type {
     DashboardSettings,
@@ -10,7 +8,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
     getRefinedWidgetOptions,
@@ -93,8 +91,6 @@ export function mergeBaseWidgetState(
 
     return state;
 }
-
-
 
 
 

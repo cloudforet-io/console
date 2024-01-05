@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onMounted, reactive,
 } from 'vue';
@@ -14,6 +14,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -30,6 +31,7 @@ import {
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
 import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
@@ -63,6 +65,12 @@ const allReferenceStore = useAllReferenceStore();
 
 const router = useRouter();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
@@ -73,12 +81,12 @@ const state = reactive({
                 type: 'item',
                 id: MENU_ID.BUDGET,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
-                to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
             },
         ], store.getters['user/pageAccessPermissionList']),
     ]),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
-        { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
+        (storeState.isAdminMode ? {} : { type: MENU_ITEM_TYPE.FAVORITE_ONLY }),
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId),
@@ -103,13 +111,13 @@ const state = reactive({
                         name: 'ic_main-filled',
                         color: gray[500],
                     },
-                    to: {
+                    to: getProperRouteLocation({
                         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                         params: {
                             dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                             costQuerySetId: d.cost_query_set_id,
                         },
-                    },
+                    }),
                     favoriteOptions: {
                         type: FAVORITE_TYPE.COST_ANALYSIS,
                         id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(d.data_source_id, d.cost_query_set_id),
@@ -120,13 +128,13 @@ const state = reactive({
                 type: 'item',
                 id: d.cost_query_set_id,
                 label: d.name,
-                to: {
+                to: getProperRouteLocation({
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
                         dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                         costQuerySetId: d.cost_query_set_id,
                     },
-                },
+                }),
                 favoriteOptions: {
                     type: FAVORITE_TYPE.COST_ANALYSIS,
                 },
@@ -184,14 +192,14 @@ const relocateNotificationState = reactive({
             type: 'item',
             id: MENU_ID.DASHBOARDS,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
-            to: {
+            to: getProperRouteLocation({
                 name: DASHBOARDS_ROUTE.ALL._NAME,
                 query: {
                     filters: dashboardQuery,
                 },
-            },
+            }),
             // TODO: may be isUpdated?
-            hightlightTag: 'update',
+            highlightTag: 'update',
             hideFavorite: true,
         });
     }),
@@ -224,13 +232,13 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
     costQuerySetStore.setSelectedDataSourceId(selected);
-    router.push({
+    router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
             costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
         },
-    }).catch(() => {});
+    })).catch(() => {});
 };
 
 const handleLearnMoreRelocateNotification = () => {

@@ -5,14 +5,15 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface CreatePublicDashboardParameters {
+export interface PublicDashboardCreateParameters {
     name: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    variables_schema?: DashboardVariablesSchema;
     settings?: DashboardSettings;
+    variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    workspace_id?: string;
     project_id?: string;
 }

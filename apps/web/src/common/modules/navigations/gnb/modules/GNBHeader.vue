@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
@@ -8,16 +7,18 @@ import {
     PDivider, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import { clone } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { store } from '@/store';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import config from '@/lib/config';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { violet } from '@/styles/colors';
-
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 interface Props {
     isAdminMode: boolean;
@@ -27,36 +28,50 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isAdminMode: false,
 });
-const workspaceStore = useWorkspaceStore();
-const workspaceStoreState = workspaceStore.$state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
 
 const state = reactive({
-    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
-        if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
-            return {
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                icon: 'ic_check',
-                iconColor: violet[500],
-            };
-        }
-        return {
-            name: _workspace.workspace_id,
-            label: _workspace.name,
-        };
-    })),
+    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
+        const menuList: SelectDropdownMenuItem[] = [
+            { type: 'header', name: 'current_workspace_header', label: 'Current Workspace' } as SelectDropdownMenuItem,
+            { type: 'header', name: 'switch_to_header', label: 'Switch To' } as SelectDropdownMenuItem,
+        ];
+        state.workspaceList.forEach((_workspace) => {
+            if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    icon: 'ic_check',
+                    iconColor: violet[500],
+                    headerName: 'current_workspace_header',
+                } as SelectDropdownMenuItem);
+            } else {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    headerName: 'switch_to_header',
+                } as SelectDropdownMenuItem);
+            }
+            return menuList;
+        });
+        return menuList;
+    }),
     searchText: '',
 });
 
 const selectWorkspace = (workspaceId: string): void => {
+    const reversedMatched = clone(router.currentRoute.matched).reverse();
+    const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+    const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
     if (workspaceId) {
         if (workspaceId === state.selectedWorkspace?.workspace_id) return;
-        workspaceStore.setCurrentWorkspace(workspaceId);
-        router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId } });
+        userWorkspaceStore.setCurrentWorkspace(workspaceId);
+        router.push({ name: MENU_INFO_MAP[closestMenuId].routeName, params: { workspaceId } });
     }
 };
 
@@ -73,14 +88,14 @@ const selectWorkspace = (workspaceId: string): void => {
             <span v-if="props.isAdminMode"
                   class="admin-title"
             >
-                Admin
+                Admin Center
             </span>
             <div v-else
                  class="logo-wrapper"
             >
-                <img v-if="state.ciLogoImage"
+                <img v-if="state.symbolImage"
                      class="logo-character"
-                     :src="state.ciLogoImage"
+                     :src="state.symbolImage"
                 >
                 <img v-else
                      class="logo-character"
@@ -93,11 +108,12 @@ const selectWorkspace = (workspaceId: string): void => {
                    vertical
         />
         <p-select-dropdown v-if="!props.isAdminMode"
-                           class="worksapce-dropdown"
+                           class="workspace-dropdown"
                            style-type="transparent"
                            is-filterable
                            :search-text.sync="state.searchText"
                            :menu="state.workspaceMenuList"
+                           hide-header-without-items
                            :selected="state.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
@@ -138,7 +154,7 @@ const selectWorkspace = (workspaceId: string): void => {
 
 <style scoped lang="postcss">
 .gnb-header {
-    @apply inline-flex items-center w-full;
+    @apply inline-flex items-center w-full h-full;
     max-width: 16.25rem;
     width: 16.25rem;
     padding: 0.625rem 1rem 0.625rem 1.25rem;
@@ -178,7 +194,7 @@ const selectWorkspace = (workspaceId: string): void => {
         margin: 0 0.75rem;
         height: 2rem;
     }
-    .worksapce-dropdown {
+    .workspace-dropdown {
         @apply inline-flex;
 
         @screen tablet {
@@ -191,11 +207,12 @@ const selectWorkspace = (workspaceId: string): void => {
         }
 
         .selected-workspace {
-            @apply text-label-lg text-gray-800 inline-block;
+            @apply text-label-lg text-gray-800 inline-block font-bold;
             max-width: 8.4375rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            vertical-align: bottom;
 
             @screen tablet {
                 @apply hidden;

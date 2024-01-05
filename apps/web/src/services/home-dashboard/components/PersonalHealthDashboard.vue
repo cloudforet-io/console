@@ -2,7 +2,7 @@
     <widget-layout>
         <template #title>
             <p class="title">
-                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+                <span :style="{ 'color': storeState.providers.aws ? storeState.providers.aws.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
             </p>
         </template>
@@ -22,7 +22,7 @@
                             <router-link :to="value.to"
                                          class="link-text"
                             >
-                                <span>{{ value.name }}</span>
+                                <span>{{ value?.name }}</span>
                             </router-link>
                         </span>
                         <span class="event-time"
@@ -46,7 +46,7 @@
                              :class="{ 'show-all': data[index].showAll }"
                         >
                             <div v-for="(project, pIndex) in value"
-                                 :key="`project-link-${project.name}-${pIndex}`"
+                                 :key="`project-link-${project?.name}-${pIndex}`"
                             >
                                 <p-i v-if="project.isFavorite"
                                      name="ic_favorite"
@@ -54,10 +54,10 @@
                                      width="0.625rem"
                                      height="0.625rem"
                                 />
-                                <router-link :to="project.to"
+                                <router-link :to="project?.to"
                                              class="project-link"
                                 >
-                                    {{ project.name }}
+                                    {{ project?.name }}
                                 </router-link>
                             </div>
                         </div>
@@ -111,6 +111,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -121,6 +122,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 const EVENT_PERIOD = 7;
 
@@ -141,11 +143,14 @@ export default {
     },
     setup(props) {
         const allReferenceStore = useAllReferenceStore();
-        const state = reactive({
-            loading: false,
-            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        });
+        const state = reactive({
+            loading: false,
             timezone: computed(() => store.state.user.timezone),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
             data: [] as any[],
@@ -166,9 +171,9 @@ export default {
                     lastUpdate: lastUpdateTime,
                     to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                 },
-                region: state.regions[d.region_code]?.name || d.region_code,
+                region: storeState.regions[d.region_code]?.name || d.region_code,
                 affected_projects: d.affected_projects.map((projectId) => ({
-                    name: projects[projectId].name,
+                    name: projects[projectId]?.name,
                     to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
                     isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                 })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
@@ -183,6 +188,7 @@ export default {
                 const { results } = await SpaceConnector.client.statistics.topic.phdSummary({
                     ...props.extraParams,
                     period: EVENT_PERIOD,
+                    workspace_id: storeState.currentWorkspaceId,
                 });
                 return results;
             } catch (e) {
@@ -216,6 +222,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             handleClickToggle,
         };
     },

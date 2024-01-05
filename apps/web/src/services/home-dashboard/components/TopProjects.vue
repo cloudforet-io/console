@@ -15,6 +15,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -72,9 +73,13 @@ const CATEGORY_KEY = 'rank';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    projects: computed(() => allReferenceStore.getters.project),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    projectItems: computed(() => allReferenceStore.getters.project),
     loading: true,
     data: [] as Data[],
     tableData: computed(() => getRefinedTableData(state.data)),
@@ -222,7 +227,10 @@ const getRefinedChartData = (tableData: TableData[]): ChartData[] => {
 const getData = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.client.statistics.topic.topProject(props.extraParams);
+        const { results } = await SpaceConnector.client.statistics.topic.topProject({
+            ...props.extraParams,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         state.data = results;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -278,7 +286,7 @@ onBeforeUnmount(() => {
                      class="chart"
                 />
             </p-data-loader>
-            <p-empty v-if="!state.loading && state.tableData.length === 0 && state.projectItems.length === 0"
+            <p-empty v-if="!state.loading && state.tableData.length === 0 && storeState.projects.length === 0"
                      :title="$t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT')"
                      show-button
             >
@@ -293,7 +301,7 @@ onBeforeUnmount(() => {
                     </router-link>
                 </template>
             </p-empty>
-            <p-empty v-else-if="!state.loading && state.tableData.length === 0 && state.projectItems.length !== 0"
+            <p-empty v-else-if="!state.loading && state.tableData.length === 0 && storeState.projects.length !== 0"
                      show-image
             >
                 {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}

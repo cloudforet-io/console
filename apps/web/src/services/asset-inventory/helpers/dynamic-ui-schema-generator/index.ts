@@ -6,8 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
-import type { GetUserConfigParameters } from '@/schema/config/user-config/api-verbs/get';
-import type { UpdateUserConfigParameters } from '@/schema/config/user-config/api-verbs/update';
+import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
@@ -25,11 +25,11 @@ const getCustomTableSchemaKey = (userData:{userType:string, userId: string}, res
 export const getCustomTableSchema = async (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string):Promise<DynamicLayout | undefined> => {
     let userConfig:UserConfigModel<DynamicLayout>|undefined;
     try {
-        userConfig = await SpaceConnector.clientV2.config.userConfig.get<GetUserConfigParameters, UserConfigModel<DynamicLayout>>({
+        userConfig = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel<DynamicLayout>>({
             name: getCustomTableSchemaKey(userData, resourceType, provider),
         });
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    } catch (e:any) {
+        if (e?.status !== 404) ErrorHandler.handleError(e);
         return undefined;
     }
     return Object.keys(userConfig?.data ?? {}).length ? userConfig?.data : undefined;
@@ -40,7 +40,7 @@ export const updateCustomTableSchema = async (userData:{userType:string, userId:
     const customSchemaData = await getCustomTableSchema(userData, resourceType, provider);
     try {
         if (customSchemaData) {
-            await client.userConfig.update<UpdateUserConfigParameters, UserConfigModel>({
+            await client.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
                 name: getCustomTableSchemaKey(userData, resourceType, provider),
                 data,
             });
@@ -90,7 +90,7 @@ export const getServiceAccountTableSchema = async ({
     let schemaData = getDefaultTableSchema(fields, isTrustedAccount);
 
     const customSchemaData = accountSchema?.provider ? await getCustomTableSchema(userData, resourceType, accountSchema?.provider) : undefined;
-    if (customSchemaData) schemaData = customSchemaData;
+    if (customSchemaData && !options?.include_optional_fields) schemaData = customSchemaData;
 
     const searchSchemaData = getDefaultSearchSchema(fields, isTrustedAccount);
     if (schemaData.options) schemaData.options.search = searchSchemaData.search;

@@ -2,11 +2,16 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ServiceAccountReferenceMap, ServiceAccountReferenceState } from '@/store/modules/reference/service-account/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 let lastLoadedTime = 0;
 
@@ -20,14 +25,14 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
     ) return;
 
     try {
-        const response = await SpaceConnector.clientV2.identity.serviceAccount.list({
+        const response = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
             query: {
                 only: ['service_account_id', 'name'],
             },
         }, { timeout: 3000 });
         const serviceAccounts: ServiceAccountReferenceMap = {};
 
-        response.results.forEach((serviceAccountInfo: any): void => {
+        response.results?.forEach((serviceAccountInfo: any): void => {
             serviceAccounts[serviceAccountInfo.service_account_id] = {
                 key: serviceAccountInfo.service_account_id,
                 label: serviceAccountInfo.name,

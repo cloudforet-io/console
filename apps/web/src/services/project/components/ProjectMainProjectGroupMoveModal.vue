@@ -82,6 +82,7 @@ const getIsValid = (isProject: boolean, selectProjectGroup: boolean, selectedPro
 /* Api */
 const changeProjectGroup = async () => {
     try {
+        if (!props.targetId) throw new Error('No target id');
         const _projectGroupId = state.selectProjectGroup ? state.selectedProjectGroupIdList[0] : null;
         if (props.isProject) {
             await SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters>({
@@ -97,7 +98,7 @@ const changeProjectGroup = async () => {
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
         state.proxyVisible = false;
         projectPageStore.setIsInitiated(false);
-        projectPageStore.setRootNode(cloneDeep(projectPageState.rootNode));
+        if (projectPageState.rootNode) projectPageStore.setRootNode(cloneDeep(projectPageState.rootNode));
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -154,7 +155,8 @@ watch(() => state.originParentGroupId, (_id?: string) => {
                          class="mt-2"
                          @change="state.selectProjectGroup = $event"
                 >
-                    {{ $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.NO_PROJECT_GROUP') }}
+                    {{ props.isProject ? $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.NO_PROJECT_GROUP')
+                        : $t('PROJECT.LANDING.MODAL_MOVE_PROJECT_GROUP.NO_PARENT_GROUP') }}
                 </p-radio>
             </p-radio-group>
         </template>

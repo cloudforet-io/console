@@ -65,7 +65,6 @@
                                           :extra-params="extraParams"
                         />
                         <daily-updates class="col-span-12 daily-updates"
-                                       :providers="providers"
                                        :extra-params="extraParams"
                         />
                     </div>
@@ -102,8 +101,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
 import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -151,7 +148,6 @@ export default {
                 if (state.selectedDomainId) params.domain_id = state.selectedDomainId;
                 return params;
             }),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 

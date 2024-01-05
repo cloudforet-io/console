@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
@@ -24,6 +24,7 @@ interface Props {
     topTitle?: TopTitle;
     menuSet: LNBMenu[];
     showFavoriteOnly?: boolean;
+    hideHeader?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,12 +54,14 @@ const handleSelect = (id: string, selected: string) => {
 
 <template>
     <nav class="lnb">
-        <div class="header">
-            <slot name="header">
-                {{ header }}
-            </slot>
-        </div>
-        <p-divider class="divider" />
+        <template v-if="!props.hideHeader">
+            <div class="header">
+                <slot name="header">
+                    {{ header }}
+                </slot>
+            </div>
+            <p-divider class="divider" />
+        </template>
         <div class="menu-wrapper">
             <router-link v-if="backLink.label"
                          class="back-link"

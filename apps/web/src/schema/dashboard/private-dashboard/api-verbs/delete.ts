@@ -1,3 +1,3 @@
-export interface DeletePrivateDashboardParameters {
+export interface PrivateDashboardDeleteParameters {
     private_dashboard_id: string;
 }

@@ -1,67 +1,40 @@
 <script lang="ts" setup>
-import { reactive, computed, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { isEmpty } from 'lodash';
+import { reactive, computed } from 'vue';
 
 import { store } from '@/store';
 
-import config from '@/lib/config';
-
 import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
 
-
-const route = useRoute();
-
 const state = reactive({
-    isDomainAdmin: false,
-    images: computed(() => {
-        const domainImage = config.get('DOMAIN_IMAGE');
-        if (!isEmpty(domainImage)) {
-            return {
-                ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
-                signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-            };
-        }
-        return undefined;
-    }),
-    wordTypeLogoUrl: computed(() => {
-        const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.wordtype_logo_url) {
-            return domainSettings.wordtype_logo_url;
-        }
-        return '@/assets/images/brand/spaceone-logotype-with-Service-Type.svg';
-    }),
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
 });
-
-watch(() => route.name, (name) => {
-    state.isDomainAdmin = name === 'domainAdminSignIn';
-}, { immediate: true });
 </script>
 
 <template>
     <div class="sign-in-container">
         <div class="ci-wrapper">
-            <template v-if="state.images">
-                <img class="logo-character"
-                     :src="state.images.ciLogo"
-                >
-                <img class="logo-text"
-                     :src="state.images.ciTextWithType"
-                >
-            </template>
-            <template v-else>
-                <img class="logo-character"
-                     src="@/assets/images/brand/brand_logo.png"
-                >
-                <img class="logo-text"
-                     :src="state.wordTypeLogoUrl"
-                >
-            </template>
+            <!--logo image-->
+            <img v-if="state.symbolImage"
+                 class="logo-image"
+                 :src="state.symbolImage"
+            >
+            <img v-else
+                 class="logo-image"
+                 src="@/assets/images/brand/brand_logo.png"
+            >
+            <!--logo text image-->
+            <img v-if="state.wordTypeLogoImage"
+                 class="text-image"
+                 :src="state.wordTypeLogoImage"
+            >
+            <img v-else
+                 class="text-image"
+                 src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+            >
         </div>
         <div class="contents-wrapper">
-            <sign-in-left-container :is-domain-admin="state.isDomainAdmin" />
+            <sign-in-left-container />
             <router-view />
         </div>
     </div>
@@ -73,13 +46,13 @@ watch(() => route.name, (name) => {
         @apply flex fixed;
         flex-flow: row;
         z-index: 1000;
-        .logo-character {
+        .logo-image {
             width: 56px;
             height: 56px;
             margin-top: 2rem;
             margin-left: 2rem;
         }
-        .logo-text {
+        .text-image {
             width: auto;
             height: 40px;
             margin-top: 2.5rem;

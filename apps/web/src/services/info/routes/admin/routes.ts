@@ -18,18 +18,19 @@ const infoRoute: RouteConfig = {
     path: 'info',
     name: makeAdminRouteName(INFO_ROUTE._NAME),
     meta: { menuId: MENU_ID.INFO, accessLevel: ACCESS_LEVEL.ADMIN_PERMISSION },
-    redirect: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME),
+    redirect: () => ({ name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME) }),
     component: InfoContainer,
     children: [
         {
             path: 'notice',
             meta: { lnbVisible: true, menuId: MENU_ID.NOTICE },
+            redirect: () => ({ name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME) }),
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME),
-                    meta: { lnbVisible: true, menuId: MENU_ID.NOTICE },
+                    meta: { lnbVisible: true },
                     component: AdminNoticeMainPage as any,
                 },
                 {

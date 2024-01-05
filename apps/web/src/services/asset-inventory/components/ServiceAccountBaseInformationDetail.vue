@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PDynamicLayout } from '@spaceone/design-system';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -23,6 +23,13 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const state = reactive({
     detailSchema: {} as Partial<DynamicLayout>,
     fieldHandler: [],
+    baseInformationData: computed(() => {
+        const accountType = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED ? 'Trusted Account' : 'General Account';
+        return ({
+            ...props.serviceAccountData,
+            account_type: accountType,
+        } ?? {});
+    }),
 });
 
 /* Util */
@@ -50,7 +57,7 @@ watch(() => props.provider, async (provider) => {
     <div class="service-account-base-information-detail">
         <p-dynamic-layout :type="state.detailSchema?.type"
                           :options="state.detailSchema?.options"
-                          :data="props.serviceAccountData"
+                          :data="state.baseInformationData"
                           :type-options="{
                               loading: !state.detailSchema?.type || props.loading
                           }"

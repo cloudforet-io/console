@@ -102,6 +102,7 @@ export default defineComponent<Props>({
                         if (recent.itemId === dashboard.dashboardId) {
                             recentItemList.push({
                                 itemId: dashboard.dashboardId,
+                                workspaceId: dashboard.workspaceId,
                                 label: dashboard.name,
                                 name: dashboard.dashboardId,
                                 itemType: RECENT_TYPE.DASHBOARD,

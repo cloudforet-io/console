@@ -57,7 +57,7 @@
             <div class="empty-tab">
                 <div class="container">
                     <img class="image"
-                         src="../../../assets/images/illust_microscope.svg"
+                         src="@/assets/images/illust_microscope.svg"
                     >
                     <p class="desc">
                         {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.NO_LOG_HELP_TEXT') }}
@@ -87,6 +87,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DataSourceListParameters } from '@/schema/monitoring/data-source/api-verbs/list';
+import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
+import type { MonitoringLogListParameters } from '@/schema/monitoring/log/api-verbs/list';
+import type { LogDataModel } from '@/schema/monitoring/log/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -111,28 +116,6 @@ interface PeriodItem {
 
 const HISTORY_LOG_PERIOD_LIST: PeriodType[] = ['last1day', 'last3days', 'last1week'];
 const CLOUD_SERVICE_LOG_PERIOD_LIST: PeriodType[] = ['last1week', 'last2weeks', 'last1month', 'last3months', 'last1year'];
-
-interface DataSourceInfo {
-    data_source_id: string;
-    monitoring_type: string;
-    name: string;
-    provider: string;
-    state: string;
-    tags: { [key: string]: string };
-    plugin_info?: {
-        plugin_id: string;
-        provider: string;
-        metadata: {
-            required_keys: string[];
-            supported_providers: string[];
-            view: {
-                table: {
-                    layout: DynamicLayout;
-                }
-            }
-        }
-    }
-}
 
 export default defineComponent<Props>({
     name: 'CloudServiceLogTab',
@@ -222,7 +205,7 @@ export default defineComponent<Props>({
             data: [] as any[],
             totalCount: computed(() => state.data.length),
             // dataSources and computed data by dataSources(schema, tabs)
-            dataSourceList: [] as DataSourceInfo[],
+            dataSourceList: [] as DataSourceModel[],
             layouts: computed<DynamicLayout[]>(() => state.dataSourceList.map((dataSource) => {
                 const layout = dataSource.plugin_info?.metadata?.view?.table?.layout ?? {};
                 return {
@@ -241,7 +224,7 @@ export default defineComponent<Props>({
         const handleChangeTab = (tab: string) => {
             state.activeTab = tab;
         };
-        const fetcher = getCancellableFetcher(SpaceConnector.client.monitoring.log.list);
+        const fetcher = getCancellableFetcher<MonitoringLogListParameters, LogDataModel>(SpaceConnector.clientV2.monitoring.log.list);
         const getLogData = debounce(async (dataSourceId: string, resourceId: string) => {
             try {
                 state.loading = true;
@@ -253,7 +236,7 @@ export default defineComponent<Props>({
                     end: state.selectedPeriod?.end.toISOString(),
                 });
                 if (status === 'succeed') {
-                    state.data = response.results;
+                    state.data = response.results ?? [];
                     state.loading = false;
                 }
             } catch (e: any) {
@@ -263,9 +246,9 @@ export default defineComponent<Props>({
             }
         }, 300);
         const schemaApiQueryHelper = new ApiQueryHelper();
-        const fetchDataSources = async (provider: string): Promise<DataSourceInfo[]> => {
+        const fetchDataSources = async (provider: string): Promise<DataSourceModel[]> => {
             try {
-                const { results } = await SpaceConnector.client.monitoring.dataSource.list({
+                const { results } = await SpaceConnector.clientV2.monitoring.dataSource.list<DataSourceListParameters, ListResponse<DataSourceModel>>({
                     monitoring_type: 'LOG',
                     query: schemaApiQueryHelper.setFilters([
                         { k: 'plugin_info.metadata.supported_providers', v: [provider, 'all'], o: '=' }, // filtering by provider labels.
@@ -277,7 +260,7 @@ export default defineComponent<Props>({
                 return [];
             }
         };
-        const dataSourcesCacheMap = new Map<string, DataSourceInfo[]>(); // provider: DataSourceInfo[]
+        const dataSourcesCacheMap = new Map<string, DataSourceModel[]>(); // provider: DataSourceModel[]
         const getSchema = async (provider: string) => {
             try {
                 state.schemaLoading = true;

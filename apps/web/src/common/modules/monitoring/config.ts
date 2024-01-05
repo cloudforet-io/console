@@ -2,12 +2,6 @@ import {
     blue, coral, green, indigo, peacock, violet, yellow,
 } from '@/styles/colors';
 
-export const MONITORING_TYPE = {
-    METRIC: 'METRIC',
-    LOG: 'LOG',
-} as const;
-export type MonitoringType = typeof MONITORING_TYPE[keyof typeof MONITORING_TYPE];
-
 export const STATISTICS_TYPE = {
     AVERAGE: 'AVERAGE',
     MAXIMUM: 'MAXIMUM',

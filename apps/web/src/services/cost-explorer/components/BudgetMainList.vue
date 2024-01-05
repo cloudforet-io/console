@@ -11,11 +11,13 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { Sort, Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { SpaceRouter } from '@/router';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type {
+    BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
@@ -69,11 +71,11 @@ const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeRe
         if (storeState.isAdminMode) {
             budgetUsageApiQueryHelper.addFilter({
                 k: 'resource_group',
-                v: 'WORKSPACE',
+                v: RESOURCE_GROUP.WORKSPACE,
             });
         }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze<BudgetUsageAnalyzeParameters, AnalyzeResponse<BudgetUsageAnalyzeResult>>({
             query: {
                 ...budgetUsageApiQueryHelper.data,
                 ..._query,
@@ -120,44 +122,32 @@ const handleRefresh = () => {
     listBudgets();
 };
 
-const budgetUsageExportQueryHelper = new QueryHelper();
 const handleExport = async () => {
     const targetFields: ExcelDataField[] = [];
     if (storeState.isAdminMode) {
         targetFields.push({ key: 'workspace_id', name: 'Workspace ID' });
     } else {
         targetFields.push({ key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } });
-        targetFields.push({ key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } });
     }
     const excelFields: ExcelDataField[] = [
+        ...targetFields,
         { key: 'budget_id', name: 'Budget ID' },
         { key: 'name', name: 'Budget Name' },
-        ...targetFields,
         { key: 'data_source_id', name: 'Data Source ID' },
         { key: 'provider_filter.providers', name: 'Providers' },
         { key: 'total_spent', name: 'Total Spent' },
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
-    budgetUsageExportQueryHelper.setFilters(state.queryFilters);
-    const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await downloadExcel({
-        url: '/cost-analysis/budget-usage/analyze',
-        param: {
-            query: {
-                ..._query,
-                filter: budgetUsageExportQueryHelper.apiQuery.filter,
-            },
-        },
+        data: state.budgetUsages,
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
-        version: 'v2',
-        timezone: state.timezone,
     });
 };
 
-const handleUpdateSort = (sort) => {
-    state.sort = sort;
+const handleUpdateSort = (sort: Sort) => {
+    state.sort = [sort];
     listBudgets();
 };
 

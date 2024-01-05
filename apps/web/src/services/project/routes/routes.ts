@@ -5,7 +5,9 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
+const ProjectContainer = () => import('@/services/project/ProjectContainer.vue');
+
+const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
 const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
@@ -22,15 +24,21 @@ const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectA
 
 export default {
     path: 'project',
-    meta: { menuId: MENU_ID.PROJECT },
-    component: { template: '<router-view />' },
+    meta: {
+        menuId: MENU_ID.PROJECT,
+    },
+    component: ProjectContainer,
     children: [
         {
             path: '/',
             name: PROJECT_ROUTE._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+            meta: {
+                accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+                menuId: MENU_ID.PROJECT,
+                lnbVisible: true,
+            },
             props: true,
-            component: ProjectPage,
+            component: ProjectMainPage,
         },
         {
             path: ':id',
@@ -111,7 +119,7 @@ export default {
                     component: ProjectAlertEventRulePage,
                 },
                 {
-                    path: 'notification/:protocol/:protocolId/:userId',
+                    path: 'notification/:protocolId',
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
                     component: ProjectNotificationAddPage,
                     props: true,

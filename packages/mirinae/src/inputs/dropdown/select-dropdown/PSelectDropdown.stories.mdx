@@ -9,13 +9,14 @@ import { useProxyValue } from "@/hooks/proxy-state";
 import {
     getSelectDropdownArgTypes
 } from "@/inputs/dropdown/select-dropdown/story-helper";
+import PTextEditor from "@/inputs/text-editor/PTextEditor.vue";
 import {
     APPEARANCE_TYPE,
     SELECT_DROPDOWN_STYLE_TYPE
 } from "@/inputs/dropdown/select-dropdown/type";
 import {
     getSelectDropdownMenu,
-    getSelectDropdownMenuWithMultiTypes, getHandler,
+    getSelectDropdownMenuWithMultiTypes, getHandler, getSelectDropdownMenuWithHeaderNames
 } from "@/inputs/dropdown/select-dropdown/mock";
 
 <Meta title='Inputs/Dropdown/Select Dropdown' parameters={{
@@ -43,6 +44,7 @@ export const Template = (args, { argTypes }) => ({
             :use-fixed-menu-style="useFixedMenuStyle"
             :button-icon="buttonIcon"
             :is-fixed-width="isFixedWidth"
+            :reset-selection-on-menu-close="resetSelectionOnMenuClose"
             :is-filterable="isFilterable"
             :visible-menu="proxyVisibleMenu"
             :menu="menu"
@@ -60,6 +62,7 @@ export const Template = (args, { argTypes }) => ({
             :page-size="pageSize"
             :reset-selected-on-unmounted="resetSelectedOnUnmounted"
             :init-selected-with-handler="initSelectedWithHandler"
+            :hide-header-without-items="hideHeaderWithoutItems"
             @update:visible-menu="onUpdateVisibleMenu"
             @update:search-text="onUpdateSearchText"
             @update:selected="onUpdateSelected"
@@ -556,8 +559,11 @@ export const Template = (args, { argTypes }) => ({
                 <p class="text-label-lg font-bold my-3">Default</p>
                 <p-select-dropdown :menu="menuItems"  />
                 <br/>
-                <p class="text-label-lg font-bold my-3">Filterable</p>
+                <p class="text-label-lg font-bold my-3">Filterable (single selection)</p>
                 <p-select-dropdown :menu="menu" is-filterable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Filterable (multi selection)</p>
+                <p-select-dropdown :menu="menu" is-filterable multi-selectable />
                 <br/>
             </div>
 `,
@@ -566,6 +572,35 @@ export const Template = (args, { argTypes }) => ({
                     menuItems
                 }
             }
+        }}
+    </Story>
+</Canvas>
+
+## Show Related Header to the Selected Zone
+
+Give ```headerName``` to the menu item to show the related header to the selected zone. <br/>
+If you give the ```hideHeaderWithoutItems``` prop, the header will be hidden in the non-selected zone when there is no related items. <br/>
+
+<Canvas>
+    <Story name="Show Related Header to the Selected Zone" args={{menu: getSelectDropdownMenuWithHeaderNames()}} height={'600px'}>
+        {{
+            props: Object.keys(getSelectDropdownArgTypes()),
+            components: { PSelectDropdown, PButton, PTextEditor },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">show headers</p>
+                <p-select-dropdown :menu="menu"  multi-selectable is-filterable />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi select with select header</p>
+                <p-select-dropdown :menu="menu" multi-selectable is-filterable hide-header-without-items />
+                <br/>
+                <br/>
+                <p-text-editor :code="JSON.stringify(menu, null, 2)"
+                               mode="readOnly"
+                               style="height: 200px; max-height: 400px;"
+                />
+            </div>
+`,
         }}
     </Story>
 </Canvas>
@@ -632,7 +667,6 @@ interface AutocompleteHandler {
                 (async () => {
                     const res = await simpleHandler('', 0, 2);
                     state.selected = res[0].results.map(d => ({ name: d.name }));
-                    console.debug('res', res)
                     state.isReady = true;
                 })();
                 return {

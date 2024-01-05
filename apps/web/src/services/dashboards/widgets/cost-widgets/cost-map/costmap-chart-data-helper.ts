@@ -1,7 +1,8 @@
 import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 /**
  * @name getRefinedTreemapChartData

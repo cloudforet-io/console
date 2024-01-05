@@ -27,10 +27,12 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -86,7 +88,7 @@ const createDashboard = async () => {
     try {
         state.loading = true;
 
-        const apiParam: CreatePublicDashboardParameters = {
+        const apiParam: PublicDashboardCreateParameters = {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
@@ -99,7 +101,7 @@ const createDashboard = async () => {
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam) as PublicDashboardModel;
         await SpaceRouter.router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
             params: {
                 dashboardId: createdDashboard.public_dashboard_id as string,
             },
@@ -116,7 +118,7 @@ const handleClickClose = () => {
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
-    name: DASHBOARDS_ROUTE.ALL._NAME,
+    name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
 });
 
 defineExpose({ setPathFrom });

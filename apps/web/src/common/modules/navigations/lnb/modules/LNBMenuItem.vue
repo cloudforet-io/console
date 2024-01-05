@@ -1,11 +1,11 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
 
 import { PI, PSelectDropdown } from '@spaceone/design-system';
 
-import { store } from '@/store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -27,9 +27,9 @@ const props = withDefaults(defineProps<Props>(), {
     depth: 1,
 });
 const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
-
+const appContextStore = useAppContextStore();
 const state = reactive({
-    isAdminMode: computed(() => store.getters['display/isAdminMode']),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
     isFolded: false,
     isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
@@ -66,9 +66,9 @@ const handleSelect = (id: string, selected: string) => {
                 <slot name="title-right"
                       v-bind="$props"
                 />
-                <new-mark v-if="item.hightlightTag === 'new'" />
-                <update-mark v-else-if="item.hightlightTag === 'update'" />
-                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+                <new-mark v-if="item.highlightTag === 'new'" />
+                <update-mark v-else-if="item.highlightTag === 'update'" />
+                <beta-mark v-else-if="item.highlightTag === 'beta'" />
                 <span v-if="item.foldable"
                       class="toggle-button"
                       @click="handleFoldableToggle"
@@ -83,7 +83,16 @@ const handleSelect = (id: string, selected: string) => {
             <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
                class="top-title-wrapper"
             >
-                <span class="top-title">{{ item.label }}</span>
+                <span class="top-title">
+                    {{ item.label }}
+                </span>
+                <p-i v-if="item.icon"
+                     :name="item.icon.name"
+                     class="top-title-icon"
+                     width="0.75rem"
+                     height="0.75rem"
+                     :color="item.icon.color"
+                />
             </p>
             <div v-else-if="item.type === MENU_ITEM_TYPE.DROPDOWN"
                  class="select-options-wrapper"
@@ -98,7 +107,7 @@ const handleSelect = (id: string, selected: string) => {
             <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
                                     :depth="depth"
-                                    :is-domain-owner="state.isDomainOwner"
+                                    :is-admin-mode="state.isAdminMode"
                                     :idx="idx"
                                     :current-path="currentPath"
             >
@@ -143,6 +152,9 @@ const handleSelect = (id: string, selected: string) => {
         padding-top: 1.25rem;
         padding-left: 0.5rem;
         padding-bottom: 0.75rem;
+        .top-title-icon {
+            margin-left: 0.25rem;
+        }
     }
     .select-options-wrapper {
         padding: 0 0.5rem;

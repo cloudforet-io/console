@@ -4,11 +4,15 @@ import {
 } from 'vue';
 
 import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type {
+    KeyItemSet,
+    QueryItem,
+    ValueHandler,
+    ValueHandlerMap,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { QueryItem, ValueHandlerMap, ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -33,7 +37,6 @@ import CollectorScheduleModal
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
-import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/types/collector-main-page-type';
 
 /** * @function
  *   @name makePluginReferenceValueHandler
@@ -77,13 +80,13 @@ const storeState = reactive({
 const keyItemSets: KeyItemSet[] = [{
     title: 'Properties',
     items: [
-        { name: 'collector_id', label: 'Collector Id' },
+        { name: 'collector_id', label: 'Collector ID' },
         { name: 'name', label: 'Name' },
         { name: 'schedule.state', label: 'Schedule' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
         { name: 'plugin_info.version', label: 'Version' },
-        { name: 'created_at', label: 'Created' },
-        { name: 'last_collected_at', label: 'Last Collected' },
+        { name: 'created_at', label: 'Created', dataType: 'datetime' },
+        { name: 'last_collected_at', label: 'Last Collected', dataType: 'datetime' },
     ],
 }];
 const collectorSearchHandler = reactive({
@@ -99,7 +102,7 @@ const collectorSearchHandler = reactive({
 });
 const excelFields: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
-    { key: 'schedule.state', name: 'Schedule state' },
+    { key: 'schedule.state', name: 'Schedule' },
     { key: 'plugin_info.plugin_id', name: 'Plugin' },
     { key: 'plugin_info.version', name: 'Version' },
     { key: 'last_collected_at', name: 'Last Collected', type: 'datetime' },
@@ -124,7 +127,7 @@ const state = reactive({
         return collectorPageState.collectors?.map((d) => {
             historyLinkQueryHelper.setFilters([
                 {
-                    k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+                    k: 'collector_id',
                     v: d.collector_id,
                     o: '=',
                 },
@@ -156,6 +159,7 @@ const state = reactive({
                 },
                 schedule: d.schedule,
                 recentJobAnalyze,
+                resourceGroup: d.resource_group,
                 hasJobList: !!matchedJob,
             };
         });
@@ -165,13 +169,15 @@ const state = reactive({
 const searchQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
 const collectorApiQueryHelper = new ApiQueryHelper()
     .setOnly(
-        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-        COLLECTOR_QUERY_HELPER_SET.NAME,
-        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
-        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
-        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
-        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
-        COLLECTOR_QUERY_HELPER_SET.SECRET_FILTER,
+        'collector_id',
+        'name',
+        'last_collected_at',
+        'provider',
+        'tags',
+        'plugin_info',
+        'schedule',
+        'secret_filter',
+        'workspace_id',
     )
     .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
     .setSort(collectorPageState.sortBy, true);

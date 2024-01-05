@@ -247,7 +247,7 @@ watch(() => state.selectedProvider, (provier) => {
 watch(() => state.selectedProvider, async (after, before) => {
     if (after && after !== before) {
         await replaceUrlQuery('provider', after);
-        await listServiceAccountData();
+        await reloadTable();
     }
 }, { immediate: true });
 watch(() => tableState.searchFilters, (searchFilters) => {
@@ -272,10 +272,7 @@ watch(() => tableState.selectedAccountType, () => {
 
 <template>
     <section class="service-account-page">
-        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})"
-                   use-total-count
-                   :total-count="typeOptionState.totalCount"
-        />
+        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})" />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
                        class="service-account-provider-list"
@@ -360,6 +357,16 @@ watch(() => tableState.selectedAccountType, () => {
         @apply text-gray-900;
         font-weight: bold;
         font-size: 0.875rem;
+    }
+}
+
+/* custom design-system component -  p-dynamic-layout */
+:deep(.service-account-table) {
+    overflow: unset;
+    .p-data-table {
+        .row-height-fixed {
+            cursor: pointer;
+        }
     }
 }
 

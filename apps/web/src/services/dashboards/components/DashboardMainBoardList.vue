@@ -13,11 +13,12 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
@@ -28,7 +29,6 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 
 const PAGE_SIZE = 10;
-const WORKSPACE_SCOPE_NAME = 'Workspace';
 
 interface Props {
     scopeType?: DashboardScope;
@@ -44,12 +44,13 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
-const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
 });
 const state = reactive({
     thisPage: 1,
@@ -89,12 +90,12 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         iconName: 'ic_edit',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
         eventAction: () => {
-            router.push({
+            router.push(getProperRouteLocation({
                 name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                 params: {
                     dashboardId: dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '',
                 },
-            });
+            }));
         },
     },
     {
@@ -114,12 +115,12 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push({
+    router.push(getProperRouteLocation(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
-    });
+    })));
 };
 const handleUpdateCloneModal = (visible: boolean) => {
     if (visible) return;
@@ -163,31 +164,37 @@ watch(() => props.dashboardList, () => {
         >
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
-                    <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.666"
-                        />
-                    </div>
+                    <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
+                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                     scale="0.666"
+                                     class="favorite-button"
+                    />
                     <p class="board-item-title">
                         {{ board.name }}
+                        <p-i v-if="scopeType === 'PRIVATE'"
+                             name="ic_lock-filled"
+                             width="0.75rem"
+                             height="0.75rem"
+                             color="gray900"
+                             class="private-icon"
+                        />
                     </p>
                 </div>
                 <div class="board-item-description">
                     <template v-if="board.tags.created_by">
                         <span>{{ board.tags.created_by }}</span>
                     </template>
-                    <template v-if="!storeState.isAdminMode">
+                    <template v-if="!isAdminMode">
                         <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
                         />
-                        <span v-if="props.scopeType === 'WORKSPACE'">{{ WORKSPACE_SCOPE_NAME }}</span>
+                        <span v-if="props.scopeType !== 'PROJECT'">{{ storeState.currentWorkspace?.name }}</span>
                         <span v-else>{{ board.label }}</span>
                     </template>
                 </div>
                 <div class="label-wrapper">
-                    <p-label v-if="!storeState.isAdminMode"
+                    <p-label v-if="!isAdminMode"
                              :class="{'item-label': true, 'viewers-label': true, 'private-label': !!board.private_dashboard_id}"
                              :text="!!board.private_dashboard_id ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC')"
                              :left-icon="!!board.private_dashboard_id ? 'ic_lock-filled' : 'ic_globe-filled'"
@@ -237,11 +244,10 @@ watch(() => props.dashboardList, () => {
     .board {
         .board-item-title-wrapper {
             @apply flex w-full;
+            align-items: center;
             min-height: 1.25rem;
-            .favorite-button-wrapper {
-                @apply flex items-center justify-center;
-                width: 1.25rem;
-                height: 1.25rem;
+            .favorite-button {
+                margin-right: 0.25rem;
             }
             .board-item-title {
                 @apply flex-grow w-full;

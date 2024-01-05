@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSkeleton, PI, PToolbox, PDataLoader, PEmpty,
+    PSkeleton, PI, PToolbox, PDataLoader, PEmpty, PBadge,
 } from '@spaceone/design-system';
 import { uniq } from 'lodash';
 
@@ -145,8 +145,8 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
     analyzeCloudServiceApiQueryHelper.setFilters([
         { k: 'ref_cloud_service_type.labels', v: summaryType, o: '=' },
         { k: 'ref_cloud_service_type.is_major', v: true, o: '=' },
-        { k: 'project_id', v: projectIdList, o: '' },
     ]);
+    if (projectIdList.length > 0) analyzeCloudServiceApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: {
@@ -174,8 +174,9 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
 const listServiceAccountApiQueryHelper = new ApiQueryHelper();
 const fetchServiceAccountList = async (projectIdList: string[]) => {
     listServiceAccountApiQueryHelper
-        .setFilters([{ k: 'project_id', v: projectIdList, o: '' }])
+        .setFilters([])
         .setOnly('provider', 'project_id', 'service_account_id');
+    if (projectIdList.length > 0) listServiceAccountApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
             query: {
@@ -262,59 +263,72 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                  :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id }}"
                     >
                         <div class="card-top-wrapper">
-                            <div class="group-name-wrapper">
+                            <div class="project-name-wrapper">
+                                <p class="project-name">
+                                    {{ item.name }}
+                                </p>
                                 <div class="group-name">
                                     {{ getProjectGroupName(item, props.parentGroups) }}
                                 </div>
-                                <div class="favorite-wrapper">
-                                    <favorite-button :item-id="item.project_id"
-                                                     :favorite-type="FAVORITE_TYPE.PROJECT"
-                                                     scale="0.7"
-                                                     class="favorite-button"
-                                    />
-                                </div>
                             </div>
-                            <p class="project-name">
-                                {{ item.name }}
-                            </p>
-                            <div class="accounts">
-                                <div class="provider-icon-wrapper">
-                                    <div class="provider">
-                                        <router-link v-for="(provider, index) in getDistinctProviders(item.project_id)"
-                                                     :key="index"
-                                                     :to="{
-                                                         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                                                         query: { provider: getProvider(provider) ? provider : null },
-                                                     }"
-                                                     class="icon-link"
-                                                     :style="{
-                                                         backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`
-                                                     }"
-                                        />
+                            <div class="favorite-wrapper">
+                                <favorite-button :item-id="item.project_id"
+                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
+                                                 scale="0.7"
+                                                 class="favorite-button"
+                                />
+                            </div>
+                            <div class="accounts-wrapper">
+                                <div>
+                                    <div class="provider-icon-wrapper">
+                                        <div class="provider">
+                                            <router-link v-for="(provider, index) in getDistinctProviders(item.project_id)"
+                                                         :key="index"
+                                                         :to="{
+                                                             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                                                             query: { provider: getProvider(provider) ? provider : null },
+                                                         }"
+                                                         class="icon-link"
+                                                         :style="{
+                                                             backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`
+                                                         }"
+                                            />
+                                        </div>
+                                        <router-link v-if="getDistinctProviders(item.project_id).length !== 0"
+                                                     class="icon-wrapper"
+                                                     :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                                        >
+                                            <p-i name="ic_plus_thin"
+                                                 scale="0.8"
+                                                 color="inherit"
+                                            />
+                                        </router-link>
                                     </div>
-                                    <router-link v-if="getDistinctProviders(item.project_id).length !== 0"
-                                                 class="icon-wrapper"
-                                                 :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                                    <div v-if="getDistinctProviders(item.project_id).length === 0"
+                                         class="account-add"
                                     >
-                                        <p-i name="ic_plus_thin"
-                                             scale="0.8"
-                                             color="inherit"
-                                        />
-                                    </router-link>
+                                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                            <p-i name="ic_plus_thin"
+                                                 scale="0.8"
+                                                 color="inherit"
+                                            />
+                                        </router-link>
+                                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                            <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                                        </router-link>
+                                    </div>
                                 </div>
-                                <div v-if="getDistinctProviders(item.project_id).length === 0"
-                                     class="account-add"
+                                <p-badge v-if="item.project_type === 'PRIVATE'"
+                                         badge-type="subtle"
+                                         style-type="gray100"
                                 >
-                                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
-                                        <p-i name="ic_plus_thin"
-                                             scale="0.8"
-                                             color="inherit"
-                                        />
-                                    </router-link>
-                                    <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
-                                        <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
-                                    </router-link>
-                                </div>
+                                    <p-i name="ic_lock-filled"
+                                         scale="0.8"
+                                         color="inherit"
+                                         class="badge-icon"
+                                    />
+                                    {{ $t('PROJECT.LANDING.INVITE_ONLY') }}
+                                </p-badge>
                             </div>
                         </div>
                         <div class="card-bottom-wrapper">
@@ -408,17 +422,34 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
 
 .card-top-wrapper {
     @apply flex-grow flex flex-col;
+    justify-content: space-between;
     margin: 1rem 1rem 0.5rem 1rem;
-    .group-name-wrapper {
-        @apply flex justify-between items-center;
+    .project-name-wrapper {
+        .project-name {
+            @apply flex-grow flex-shrink-0 overflow-hidden;
+            display: -webkit-box;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.2;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            max-width: 90%;
+            max-height: 2.6875rem;
+            margin-bottom: 0.125rem;
+        }
         .group-name {
             @apply flex-shrink-0 text-gray-500 text-xs truncate;
             line-height: 1.5;
             width: calc(100% - 1rem);
         }
     }
-    .accounts {
-        @apply flex-grow-0 overflow-x-hidden flex;
+    .accounts-wrapper {
+        @apply flex-grow-0 flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden;
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
             .provider {
@@ -462,19 +493,9 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                 }
             }
         }
-    }
-    .project-name {
-        @apply flex-grow flex-shrink-0 font-bold overflow-hidden;
-        display: -webkit-box;
-        text-overflow: ellipsis;
-        word-wrap: break-word;
-        font-size: 1.125rem;
-        line-height: 1.2;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        max-width: 90%;
-        max-height: 2.6875rem;
-        margin-bottom: 0.25rem;
+        .badge-icon {
+            margin-right: 0.125rem;
+        }
     }
 }
 .card-bottom-wrapper {

@@ -9,6 +9,8 @@ import {
 
 import { SpaceRouter } from '@/router';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
@@ -36,7 +38,7 @@ const getDashboardData = async (dashboardId: string) => {
         await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await SpaceRouter.router.push({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) });
     }
 };
 
@@ -87,6 +89,7 @@ onUnmounted(() => {
         <div class="dashboard-selectors">
             <dashboard-variables class="variable-selector-wrapper"
                                  :dashboard-id="props.dashboardId"
+                                 is-manageable
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"

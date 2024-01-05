@@ -28,7 +28,7 @@ const infoRoute: RouteConfig = {
                 {
                     path: '/',
                     name: INFO_ROUTE.NOTICE._NAME,
-                    meta: { lnbVisible: true, menuId: MENU_ID.NOTICE },
+                    meta: { lnbVisible: true },
                     component: NoticeMainPage as any,
                 },
                 {

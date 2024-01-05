@@ -15,6 +15,8 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -35,6 +37,7 @@ const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
@@ -90,12 +93,12 @@ const existingTemplateState = reactive({
 
 });
 
-const getDashboardLocation = (board: DashboardModel): Location => ({
+const getDashboardLocation = (board: DashboardModel): Location => (getProperRouteLocation({
     name: DASHBOARDS_ROUTE.DETAIL._NAME,
     params: {
-        dashboardId: board.public_dashboard_id || board.private_dashboard_id,
+        dashboardId: board.public_dashboard_id || board.private_dashboard_id || '',
     },
-});
+}));
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
     state.selectedTemplateName = selectedTemplate.value;

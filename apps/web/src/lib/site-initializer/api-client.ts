@@ -2,6 +2,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
+import type { GrantScope } from '@/schema/identity/token/type';
+
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -28,20 +31,30 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.load('project', { force: true });
     },
+    '/identity/project/change-project-group': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
     '/identity/project-group/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('projectGroup', data);
+        allReferenceStore.sync('project_group', data);
     },
     '/identity/project-group/update': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.sync('projectGroup', data);
+        allReferenceStore.sync('project_group', data);
     },
     '/identity/project-group/delete': () => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
-        allReferenceStore.load('projectGroup');
+        allReferenceStore.load('project_group');
+    },
+    '/identity/project-group/change-parent-group': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project_group', data);
     },
     '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
@@ -109,6 +122,28 @@ export const initApiClient = async (store, config) => {
         devConfig,
         getAfterCallApiMap(store),
     );
+    const existingRefreshToken = SpaceConnector.getRefreshToken();
+
+    if (!existingRefreshToken) return;
+    const scopePath = window.location.pathname.split('/')[1];
+    let workspaceId: string|undefined;
+    let scope: GrantScope = 'USER';
+    if (scopePath === 'admin') scope = 'DOMAIN';
+    if (scopePath.startsWith('workspace-')) {
+        scope = 'WORKSPACE';
+        workspaceId = scopePath;
+    }
+    const grantRequest: Omit<TokenGrantParameters, 'grant_type'> = {
+        token: existingRefreshToken,
+        scope,
+        workspace_id: workspaceId,
+    };
+    await store.dispatch('user/grantRole', grantRequest);
+    const currentRoleInfo = store.getters['user/getCurrentRoleInfo'];
+    if (currentRoleInfo) {
+        useAllReferenceStore(pinia);
+        await store.dispatch('reference/initializeAllReference');
+    }
     // to be deprecated
     // const isTokenAlive = SpaceConnector.isTokenAlive;
     // store.dispatch('user/setIsSessionExpired', !isTokenAlive);

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
@@ -10,7 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { find } from 'lodash';
+import { find, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -25,15 +25,16 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
@@ -57,21 +58,25 @@ const storeState = reactive({
 });
 const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
-    projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
+    projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
-        if (state.projectGroupId?.length) {
-            results.push({ name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` });
+        if (!isEmpty(state.projectGroupInfo)) {
+            results.push({
+                name: state.projectGroupInfo.name,
+                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
+            });
         }
-        results.push({ name: state.item?.name || '' });
+        results.push({ name: state.item?.name });
         return results;
     }),
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
+    projectGroupMoveModalVisible: false,
 });
 
 /** Tabs */
@@ -118,6 +123,9 @@ const openProjectDeleteForm = () => {
     formState.themeColor = 'alert';
     formState.modalContent = i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT');
 };
+const handleOpenProjectGroupMoveModal = () => {
+    state.projectGroupMoveModalVisible = true;
+};
 
 const projectDeleteFormConfirm = async () => {
     if (formState.modalLoading) return;
@@ -140,6 +148,10 @@ const projectDeleteFormConfirm = async () => {
 
 const handleConfirmProjectForm = (data: ProjectModel) => {
     projectDetailPageStore.setProject(data);
+};
+
+const handleConfirmProjectGroupMoveModal = () => {
+    projectDetailPageStore.getProject();
 };
 
 const onChangeTab = (activeTab) => {
@@ -174,7 +186,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <general-page-layout overflow="scroll">
+    <div>
         <p-data-loader class="page-inner"
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -199,6 +211,10 @@ onUnmounted(() => {
                                                class="edit-btn"
                                                size="md"
                                                @click="projectPageStore.openProjectFormModal()"
+                                />
+                                <p-icon-button name="ic_move"
+                                               style-type="transparent"
+                                               @click="handleOpenProjectGroupMoveModal"
                                 />
                                 <p-icon-button name="ic_delete"
                                                class="delete-btn"
@@ -278,7 +294,13 @@ onUnmounted(() => {
             @confirm="handleConfirmProjectForm"
             @update:visible="projectPageStore.setProjectFormModalVisible"
         />
-    </general-page-layout>
+        <project-main-project-group-move-modal v-if="state.projectGroupMoveModalVisible"
+                                               :visible.sync="state.projectGroupMoveModalVisible"
+                                               is-project
+                                               :target-id="projectDetailPageState.projectId"
+                                               @confirm="handleConfirmProjectGroupMoveModal"
+        />
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -288,6 +310,7 @@ onUnmounted(() => {
     margin: 0 auto;
 }
 .p-heading {
+    margin-top: 0.25rem;
     margin-bottom: 0;
 }
 .top-wrapper {

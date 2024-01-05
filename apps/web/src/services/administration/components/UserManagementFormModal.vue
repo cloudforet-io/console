@@ -10,9 +10,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -60,7 +61,8 @@ const state = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed(() => store.state.user.mfa),
     loginUserId: computed(() => store.state.user.userId),
-    isChangedToggle: false,
+    isChangedMfaToggle: false,
+    isChangedRoleToggle: false,
     roleBindingList: [] as RoleBindingModel[],
 });
 const formState = reactive({
@@ -111,11 +113,15 @@ const handleConfirm = async () => {
     state.loading = true;
 
     try {
-        if (state.isChangedToggle) {
+        if (state.isChangedMfaToggle) {
             await fetchPostDisableMfa();
         }
 
-        await fetchRoleBinding();
+        if (state.roleBindingList.length > 0 && !state.isChangedRoleToggle) {
+            await fetchDeleteRoleBinding();
+        } else {
+            await fetchRoleBinding();
+        }
 
         const userInfoParams = buildUserInfoParams();
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
@@ -136,10 +142,10 @@ const fetchRoleBinding = async (item?: AddModalMenuItem) => {
         role_id: formState.role.name || '',
     };
 
-    const roleBindingItem = state.roleBindingList.find((r) => r.role_id === formState.role.name);
+    const roleBindingItem = state.roleBindingList[0];
 
     try {
-        if (isEmpty(roleBindingItem)) {
+        if (state.roleBindingList.length === 0) {
             await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
                 ...roleParams,
                 workspace_id: item?.name || '',
@@ -147,11 +153,22 @@ const fetchRoleBinding = async (item?: AddModalMenuItem) => {
                 resource_group: RESOURCE_GROUP.DOMAIN,
             });
         } else {
-            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
                 ...roleParams,
                 role_binding_id: roleBindingItem?.role_binding_id || '',
             });
         }
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
+};
+const fetchDeleteRoleBinding = async () => {
+    const roleBindingItem = state.roleBindingList[0];
+
+    try {
+        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
+            role_binding_id: roleBindingItem?.role_binding_id || '',
+        });
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
@@ -177,7 +194,7 @@ const fetchPostDisableMfa = async () => {
     }
 };
 const fetchListRoleBindingInfo = async () => {
-    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
+    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
         user_id: state.data.user_id || '',
         query: {
             filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' }],
@@ -234,9 +251,10 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                     v-if="state.data.auth_type === 'LOCAL'"
                     @change-input="handleChangeInputs"
                 />
-                <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedToggle" />
+                <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedMfaToggle" />
                 <user-management-form-admin-role v-if="userPageState.isAdminMode"
                                                  :role.sync="formState.role"
+                                                 :is-changed-toggle.sync="state.isChangedRoleToggle"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"
@@ -248,7 +266,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
     </p-button-modal>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .user-management-modal {
     .input-form-wrapper {
         @apply flex flex-col bg-gray-100 rounded-lg;

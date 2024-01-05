@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PButton,
-    PDataTable, PHeading, PI, PSelectDropdown,
+    PDataTable, PHeading, PI, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -17,9 +18,9 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { TimeStamp } from '@/schema/_common/model';
+import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
-import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
@@ -31,6 +32,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import UserManagementRemoveModal from '@/services/administration/components/UserManagementRemoveModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
@@ -39,11 +41,15 @@ interface WorkspaceItem {
     name: string;
     id: string;
 }
+interface RoleBindingItem {
+    type: string;
+    name: string;
+    role_binding_id: string;
+}
 interface TableItem {
     workspace: WorkspaceItem;
-    role_type: string;
-    created_at: TimeStamp;
-    role_binding_id: string;
+    role_binding: RoleBindingItem;
+    created_at: string;
 }
 interface Props {
     activeTab: string;
@@ -54,8 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
-
-const router = useRouter();
+const userPageState = userPageStore.$state;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -67,11 +72,12 @@ const state = reactive({
     sortBy: 'workspace_id',
     sortDesc: true,
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedRemoveItem: '',
 });
 const tableState = reactive({
     fields: computed(() => [
         { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
-        { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') as string, sortable: false },
+        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
         { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
         { name: 'remove_button', label: ' ', sortable: false },
     ]),
@@ -84,26 +90,36 @@ const dropdownState = reactive({
     selectedItems: [] as SelectDropdownMenuItem[],
     menuItems: [] as SelectDropdownMenuItem[],
 });
+const modalState = reactive({
+    visible: false,
+    title: '',
+    loading: false,
+});
 
 /* Component */
 const handleChangeSort = (sortBy, sortDesc) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
-    getWorkspaceList();
-};
-const handleClickLink = (id: string) => {
-    router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: id } });
+    fetchWorkspaceList();
 };
 const handleMenuVisible = (idx: number) => {
     if (!dropdownState.visibleMenu) return;
     dropdownState.selectedMenuIndex = idx;
+};
+const handleClickButton = async (value: string) => {
+    state.selectedRemoveItem = value;
+    modalState.visible = true;
+    modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
+};
+const closeRemoveModal = () => {
+    modalState.visible = false;
 };
 
 /* API */
 const roleListApiQueryHelper = new ApiQueryHelper();
 const workspaceApiHelper = new ApiQueryHelper()
     .setPage(1, 15);
-const getWorkspaceList = async () => {
+const fetchWorkspaceList = async () => {
     state.loading = true;
     workspaceApiHelper.setSort(state.sortBy, state.sortDesc);
     workspaceApiHelper.setFilters([
@@ -124,9 +140,12 @@ const getWorkspaceList = async () => {
                 name: workspaceResults?.find((w) => w.workspace_id === k.workspace_id)?.name || '',
                 id: k.workspace_id,
             },
-            role_type: k.role_type,
+            role_binding: {
+                type: k.role_type,
+                name: userPageState.roles.find((r) => r.role_id === k.role_id)?.name || '',
+                role_binding_id: k.role_binding_id,
+            },
             created_at: k.created_at,
-            role_binding_id: k.role_binding_id,
         }));
     } catch (e) {
         state.items = [];
@@ -170,32 +189,41 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
-            role_binding_id: state.items[rowIndex].role_binding_id,
-            role_id: value.name || '',
+        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
+            role_binding_id: state.items[rowIndex].role_binding.role_binding_id,
+            role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        await getWorkspaceList();
+        const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
+        state.items[rowIndex].role_binding = {
+            name: roleName,
+            type: response.role_type,
+            role_binding_id: response.role_binding_id,
+        };
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-const handleClickButton = async (value: RoleBindingModel) => {
+const handleRemoveButton = async () => {
+    modalState.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete({
-            role_binding_id: value,
+        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
+            role_binding_id: state.selectedRemoveItem,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
-        await getWorkspaceList();
+        closeRemoveModal();
+        await fetchWorkspaceList();
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
+    } finally {
+        modalState.loading = false;
     }
 };
 
 /* Watcher */
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
-    await getWorkspaceList();
+    await fetchWorkspaceList();
 }, { immediate: true });
 </script>
 
@@ -216,49 +244,51 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-workspace-format="{value}">
                 <span class="workspace-id-wrapper">
-                    <span>{{ value.name }}</span>
                     <router-link :to="{ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: value.id } }"
                                  target="_blank"
                     >
+                        <span>{{ value.name }}</span>
                         <p-i name="ic_arrow-right-up"
                              width="0.75rem"
                              height="0.75rem"
                              class="icon-link"
-                             @click="handleClickLink(value.id)"
                         />
                     </router-link>
                 </span>
             </template>
-            <template #col-role_type-format="{value, rowIndex}">
+            <template #col-role_binding-format="{value, rowIndex}">
                 <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(value.type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
                     <p-select-dropdown is-filterable
                                        use-fixed-menu-style
-                                       menu-position="right"
-                                       style-type="icon-button"
+                                       style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.selectedItems"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @update:visible-menu="handleMenuVisible(rowIndex)"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
+                        <template #dropdown-button>
+                            <span>{{ value.name }}</span>
+                        </template>
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
-                                <div class="role-info-wrapper">
+                                <p-tooltip position="bottom"
+                                           :contents="item.label"
+                                           class="role-label"
+                                >
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ item.role_type }})</span>
-                                </div>
+                                </p-tooltip>
+                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>
@@ -271,12 +301,18 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"
-                          @click="handleClickButton(item.role_binding_id)"
+                          @click="handleClickButton(item.role_binding.role_binding_id)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
             </template>
         </p-data-table>
+        <user-management-remove-modal v-if="modalState.visible"
+                                      :visible.sync="modalState.visible"
+                                      :title="modalState.title"
+                                      :loading="modalState.loading"
+                                      @confirm="handleRemoveButton"
+        />
     </div>
 </template>
 
@@ -300,22 +336,28 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     width: 1rem;
                     height: 1rem;
                 }
-                .role-info-wrapper {
-                    @apply flex flex-col;
-                    gap: 0.25rem;
-                    .role-type {
-                        @apply text-gray-500;
-                    }
+                .role-label {
+                    @apply truncate;
+                    width: 14.375rem;
+                }
+                .role-type {
+                    @apply text-label-sm text-gray-400;
                 }
             }
         }
     }
     .workspace-id-wrapper {
         @apply flex items-center;
-        gap: 0.125rem;
     }
     .icon-link {
-        @apply cursor-pointer;
+        margin-left: 0.125rem;
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .no-data {
+        position: initial;
     }
 }
 </style>

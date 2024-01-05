@@ -8,7 +8,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PDivider, PButton,
+    PI, PDivider, PButton, PCopyButton,
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 
@@ -23,6 +23,7 @@ import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const route = useRoute();
 const router = useRouter();
@@ -46,15 +48,21 @@ const state = reactive({
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
         if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
-        const currentRoleType = store.getters['user/getCurrentRoleInfo']?.roleType;
+        const currentRoleType = state.currentRoleType;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
         return 'img_avatar_no-role';
     }),
+    baseRoleType: computed(() => store.state.user.roleType),
+    currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+    visibleRoleType: computed(() => {
+        if (state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN) return 'Admin';
+        if (state.currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'Workspace Owner';
+        if (state.currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'Workspace Member';
+        return 'User';
+    }),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
-    // TODO: to be refactored by new planning
-    role: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType || 'USER'),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
@@ -72,7 +80,6 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
@@ -108,6 +115,20 @@ const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
 };
 
+const handleClickGoToMyPage = () => {
+    if (isAdminMode.value) appContextStore.exitAdminMode();
+    const currentWorkspace = route.params?.workspaceId ?? 'admin';
+    router.push({
+        name: MY_PAGE_ROUTE._NAME,
+        ...(currentWorkspace && {
+            query: {
+                beforeWorkspace: currentWorkspace,
+            },
+        }),
+    }).catch(() => {});
+    hideProfileMenu();
+};
+
 const handleLanguageClick = async (language) => {
     try {
         if (store.state.user.language === language) return;
@@ -125,12 +146,12 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
+    if (isAdminMode.value) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },
     };
     await router.push(res);
-    if (state.isAdminMode) appContextStore.switchToWorkspaceMode();
 };
 </script>
 
@@ -162,11 +183,19 @@ const handleClickSignOut = async () => {
             <div class="info-wrapper">
                 <div class="info-menu">
                     <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
-                    <span class="value">{{ state.domainId }}</span>
+                    <span class="value">
+                        <p-copy-button size="sm"
+                                       style="vertical-align: unset; display: inline-flex; align-items: center;"
+                        >
+                            {{ state.domainId }}
+                        </p-copy-button>
+                    </span>
                 </div>
-                <div class="info-menu">
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.role }}</span>
+                <div v-if="state.currentRoleType || state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
+                     class="info-menu"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
+                    <span class="value">{{ state.visibleRoleType }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
@@ -227,24 +256,23 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
                 </div>
-                <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
-                                 @click.native="hideProfileMenu"
+                <div v-if="!route.path.includes('my-page')"
+                     class="info-menu"
+                >
+                    <p-button style-type="secondary"
+                              size="sm"
+                              class="my-page-button"
+                              @click="handleClickGoToMyPage"
                     >
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  class="my-page-button"
-                        >
-                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
-                        </p-button>
-                    </router-link>
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                    </p-button>
                 </div>
             </div>
             <template v-if="!state.isMyPage">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"
-                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 :to="getProperRouteLocation({name: INFO_ROUTE.NOTICE._NAME})"
                                  @click.native="hideProfileMenu"
                     >
                         {{ $t('MENU.INFO_NOTICE') }}

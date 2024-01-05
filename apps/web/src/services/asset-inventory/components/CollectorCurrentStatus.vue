@@ -46,13 +46,23 @@
                         size="sm"
                         class="status-progress-bar"
         />
+        <div v-if="state.status === JOB_STATE.IN_PROGRESS && props.isPopoverMode"
+             class="mt-8"
+        >
+            <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
+                    size="sm"
+                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id} }"
+                    highlight
+                    action-icon="internal-link"
+            />
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI, PProgressBar } from '@spaceone/design-system';
+import { PI, PProgressBar, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { numberFormatter } from '@cloudforet/utils';
@@ -60,6 +70,7 @@ import { numberFormatter } from '@cloudforet/utils';
 import { peacock } from '@/styles/colors';
 
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
 
 
@@ -69,6 +80,7 @@ interface Props {
     hours?: number[];
     recentJob?: JobAnalyzeStatus|null;
     isScheduleActivated?: boolean;
+    isPopoverMode?: boolean;
 }
 
 const props = defineProps<Props>();

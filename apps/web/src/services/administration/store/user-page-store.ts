@@ -34,6 +34,9 @@ export const useUserPageStore = defineStore('user-page', {
         pageStart: 1,
         pageLimit: 15,
         searchFilters: [] as ConsoleFilter[],
+        // This is for workspace created case in admin mode
+        afterWorkspaceCreated: false,
+        createdWorkspaceId: undefined as string | undefined,
         modal: {
             type: '',
             title: '',
@@ -47,7 +50,7 @@ export const useUserPageStore = defineStore('user-page', {
     }),
     getters: {
         timezone: () => store.state.user.timezone,
-        isWorkspaceOwner: () => store.state.user.currentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER,
+        isWorkspaceOwner: () => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
         selectedUsers: (state) => {
             if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
             const users: UserListItemType[] = [];
@@ -55,6 +58,13 @@ export const useUserPageStore = defineStore('user-page', {
                 users.push(state.users[d]);
             });
             return users ?? [];
+        },
+        roleMap: (state) => {
+            const map: Record<string, RoleModel> = {};
+            state.roles.forEach((role) => {
+                map[role.role_id] = role;
+            });
+            return map;
         },
     },
     actions: {

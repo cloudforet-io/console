@@ -90,6 +90,7 @@ watch(() => props.initialRoleData, (initialRoleData) => {
                                            @update-form="handleUpdateForm"
         />
         <role-update-form-role-type :initial-data="state.roleTypeData"
+                                    :form-type="props.formType"
                                     @update-form="handleUpdateForm"
         />
         <role-update-form-permission-form :initial-page-access="state.pageAccessFormData"

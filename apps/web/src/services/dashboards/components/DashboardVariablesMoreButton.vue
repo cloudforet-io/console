@@ -15,11 +15,13 @@ import {
 import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+
 
 interface Props {
     isManageable?: boolean;
@@ -33,6 +35,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const route = useRoute();
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -168,16 +171,16 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 const handleOpenOverlay = () => {
     hideContextMenu();
     if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
-        router.push({
+        router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.CREATE._NAME,
             hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-        });
+        }));
     } else {
-        router.push({
+        router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
             params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
             hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-        });
+        }));
     }
 };
 const handleClickButton = () => {

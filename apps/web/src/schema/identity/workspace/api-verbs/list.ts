@@ -4,4 +4,5 @@ export interface WorkspaceListParameters {
     query?: Query;
     workspace_id?: string;
     name?: string;
+    created_by?: string;
 }

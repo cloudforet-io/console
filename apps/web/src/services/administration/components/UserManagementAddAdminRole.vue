@@ -20,6 +20,8 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -179,6 +181,8 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                    :search-text.sync="workspaceState.searchText"
                                    :selected.sync="workspaceState.selectedItems"
                                    :handler="workspaceMenuHandler"
+                                   show-select-marker
+                                   show-select-header
                                    is-filterable
                                    multi-selectable
                                    appearance-type="badge"
@@ -201,7 +205,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                             <template #button>
                                 <p-button style-type="substitutive"
                                           icon-left="ic_plus_bold"
-                                          @click="router.push({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME })"
+                                          @click="router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) })"
                                 >
                                     {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
                                 </p-button>
@@ -239,7 +243,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                  class="role-type-icon"
                             >
                             <span>{{ item.label }}</span>
-                            <span class="role-type">({{ item.role_type }})</span>
+                            <span class="role-type">({{ useRoleFormatter(item.role_type).name }})</span>
                         </div>
                     </template>
                     <template #no-data-area>
@@ -255,7 +259,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                 >
                             </template>
                             <template #button>
-                                <router-link :to="{ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }">
+                                <router-link :to="{ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME) }">
                                     <p-button style-type="substitutive"
                                               icon-right="ic_arrow-right-up"
                                     >

@@ -14,49 +14,45 @@ import { PDivider } from '@spaceone/design-system';
                 {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER') }}
-            </h4>
-            <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_USER_DESC') }}
-            </p>
-            <h4 class="header4">
                 {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN') }}
             </h4>
             <p class="desc4">
                 {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_ADMIN_DESC') }}
             </p>
+            <h4 class="header4">
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_WORKSPACE_OWNER') }}
+            </h4>
+            <p class="desc4">
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_WORKSPACE_OWNER_DESC') }}
+            </p>
+            <h4 class="header4">
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_WORKSPACE_MEMBER') }}
+            </h4>
+            <p class="desc4">
+                {{ $t('IAM.ROLE.HANDBOOK.ROLE_TYPE_WORKSPACE_MEMBER_DESC') }}
+            </p>
         </article>
         <p-divider class="divider" />
         <article class="desc-wrapper">
             <h2 class="header2">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION') }}
             </h2>
             <p class="desc2">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_DESC') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION_PAGE_ACCESS') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_VIEW_DESC') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION_PAGE_ACCESS_DESC') }}
             </p>
             <h4 class="header4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION_API_POLICY') }}
             </h4>
             <p class="desc4">
-                {{ $t('IAM.ROLE.HANDBOOK.PAGE_ACCESS_MANAGE_DESC') }}
+                {{ $t('IAM.ROLE.HANDBOOK.PERMISSION_API_POLICY_DESC') }}
             </p>
         </article>
-        <p-divider class="divider" />
-        <h2 class="header2">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY') }}
-        </h2>
-        <p class="desc2">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_DESC') }}
-        </p>
-        <p class="desc4">
-            {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
-        </p>
     </section>
 </template>
 

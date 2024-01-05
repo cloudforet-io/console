@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags } from '@/schema/_common/model';
 
 
 export interface ProjectGroupModel {
@@ -8,5 +8,5 @@ export interface ProjectGroupModel {
     parent_group_id: string;
     workspace_id: string;
     domain_id: string;
-    created_at: TimeStamp;
+    created_at: string;
 }

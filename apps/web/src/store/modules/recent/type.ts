@@ -12,6 +12,7 @@ export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 
 export interface RecentConfig {
     itemType: RecentType;
+    workspaceId: string;
     itemId: string;
     updatedAt?: string;
 }

@@ -15,7 +15,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import { FORM_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import type { RoleFormData } from '@/services/administration/types/role-type';
 
 interface RoleTypeForm {
@@ -25,10 +25,12 @@ interface RoleTypeForm {
 }
 interface Props {
     initialData?: string;
+    formType?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     initialData: undefined,
+    formType: FORM_TYPE.CREATE,
 });
 
 const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void}>();
@@ -55,6 +57,12 @@ const state = reactive({
     savedRoleType: computed<RoleTypeForm|undefined>(() => state.roleTypes.find((type) => type.key === props.initialData)),
 });
 
+/* Component */
+const handleChangeCard = (value: string) => {
+    if (props.formType === FORM_TYPE.UPDATE) return;
+    state.selectedRoleType = value;
+};
+
 /* Watcher */
 watch(() => state.selectedRoleType, (value) => {
     emit('update-form', { role_type: value });
@@ -73,11 +81,13 @@ watch(() => props.initialData, (initialData) => {
         <div class="select-card-wrapper">
             <p-select-card v-for="(roleType, index) in state.roleTypes"
                            :key="roleType.key"
-                           v-model="state.selectedRoleType"
+                           :selected="state.selectedRoleType"
                            :tab-index="index"
+                           :disabled="props.formType === FORM_TYPE.UPDATE && state.selectedRoleType !== roleType.key"
                            class="card"
                            :value="roleType.key"
                            :label="roleType.label"
+                           @change="handleChangeCard"
             >
                 <div class="card-content">
                     <img :src="useRoleFormatter(roleType.key).image"
@@ -126,6 +136,14 @@ watch(() => props.initialData, (initialData) => {
             &.selected {
                 .role-type-name {
                     @apply text-blue-600;
+                }
+            }
+            &.disabled {
+                .card-content {
+                    opacity: 0.2;
+                }
+                .marker {
+                    @apply hidden;
                 }
             }
         }

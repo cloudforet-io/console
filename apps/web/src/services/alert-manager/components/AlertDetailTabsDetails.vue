@@ -1,10 +1,42 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import {
+    PDefinitionTable, PHeading,
+} from '@spaceone/design-system';
+import { map } from 'lodash';
+
+import { i18n } from '@/translations';
+
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
+
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.$state;
+
+const state = reactive({
+    fields: computed(() => [
+        { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
+        { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
+        { name: 'resource.resource_id', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_ID') },
+        { name: 'resource.resource_type', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_TYPE') },
+    ]),
+    data: computed(() => alertPageState.alertData ?? {}),
+});
+
+const additionalState = reactive({
+    fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
+    data: computed(() => alertPageState.alertData?.additional_info) || {},
+});
+
+</script>
+
 <template>
     <section>
         <p-heading heading-type="sub"
                    :title="$t('PAGE_SCHEMA.BASE_INFO')"
         />
-        <p-definition-table :fields="fields"
-                            :data="data"
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
                             :skeleton-rows="7"
                             block
         >
@@ -24,64 +56,3 @@
         />
     </section>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PDefinitionTable, PHeading,
-} from '@spaceone/design-system';
-import { map } from 'lodash';
-
-import { iso8601Formatter } from '@cloudforet/utils';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
-
-export default {
-    name: 'AlertDetailTabsDetails',
-    components: {
-        PDefinitionTable,
-        PHeading,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup() {
-        const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.$state;
-
-        const state = reactive({
-            fields: computed(() => [
-                { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
-                { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
-                { name: 'resource.resource_id', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_ID') },
-                { name: 'resource.resource_type', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_TYPE') },
-            ]),
-            data: computed(() => alertPageState.alertData ?? {}),
-            escalationPolicyName: '',
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
-        });
-
-        const checkEmptyValue = (data: Record<string, any>) => Object.values(data).every((el) => el.length === 0);
-        const additionalState = reactive({
-            fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
-            data: computed(() => alertPageState.alertData?.additional_info) || {},
-            loading: true,
-            isEmptyValue: computed(() => checkEmptyValue(additionalState.data)),
-        });
-
-        return {
-            ...toRefs(state),
-            additionalState,
-            iso8601Formatter,
-        };
-    },
-};
-</script>

@@ -4,21 +4,22 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
+import type { ListResponse, ListResponse as ApiListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
-import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type {
+    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/modules/reference/type';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 
 interface ProjectResourceItemData {
@@ -34,34 +35,49 @@ export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
+
+const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectGroupModel[]> => {
+    try {
+        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ApiListResponse<ProjectGroupModel>>({
+            query: {
+                only: ['project_group_id', 'name'],
+                filter: [
+                    {
+                        k: 'project_group_id',
+                        v: projectGroupIdList,
+                        o: 'in',
+                    },
+                ],
+            },
+        });
+        return res?.results ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
 export const useProjectReferenceStore = defineStore('project-reference', () => {
-    const fetcher = getCancellableFetcher<ProjectListParameters, ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
+    const _state = reactive({
+        projectGroupList: [] as ProjectGroupModel[],
+    });
     const state = reactive({
         items: null as ProjectReferenceMap | null,
     });
 
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.project,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.project.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
             referenceMap: getters.projectItems,
         })),
     });
 
-    const _getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
-        if (!projectGroupId) return undefined;
-        try {
-            return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-                project_group_id: projectGroupId,
-            });
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            return undefined;
-        }
-    };
     const load = async (options?: ReferenceLoadOptions) => {
         const currentTime = new Date().getTime();
 
@@ -76,14 +92,15 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
                 only: ['project_id', 'name', 'project_group_id', 'users'],
             },
         };
-        const { status, response } = await fetcher(params);
-        if (status === 'cancelled') return;
+        const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
 
+        const projectGroupIdList = res.results?.map((d) => d.project_group_id) ?? [];
+        _state.projectGroupList = await _listProjectGroup(projectGroupIdList);
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
-        for await (const projectInfo of response?.results || []) {
-            const projectGroup = await _getProjectGroup(projectInfo.project_group_id);
+        for await (const projectInfo of res?.results || []) {
+            const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === projectInfo.project_group_id);
             projectReferenceMap[projectInfo.project_id] = {
                 key: projectInfo.project_id,
                 label: (projectGroup)
@@ -104,7 +121,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
     };
 
     const sync = async (project: ProjectModel) => {
-        const projectGroup = await _getProjectGroup(project.project_group_id);
+        const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === project.project_group_id);
         state.items = {
             ...state.items,
             [project.project_id]: {

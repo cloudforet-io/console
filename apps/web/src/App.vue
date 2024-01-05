@@ -7,13 +7,16 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
 } from '@spaceone/design-system';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -22,6 +25,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
+import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -30,6 +34,7 @@ import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
@@ -44,11 +49,13 @@ const state = reactive({
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
     email: computed<string>(() => store.state.user.email),
-    domainId: computed<string>(() => store.state.domain.domainId),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    hasNoWorkspace: false,
+    isGrantInProgress: computed(() => store.getters['display/isGrantInProgress']),
 });
 
+const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -70,9 +77,20 @@ const goToSignIn = async () => {
 };
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
-watch(() => route, (value) => {
-    state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
-});
+watch(() => route.path, () => {
+    state.notificationEmailModalVisible = route.path !== '/'
+        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED
+        && !state.isEmailVerified
+        && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
+}, { immediate: true });
+
+
+watch(() => route.name, (routeName) => {
+    const routerAccessLevel = getRouteAccessLevel(route);
+    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && routerAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
+        state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
+    }
+}, { immediate: true });
 
 watch(() => state.userId, (userId) => {
     if (userId) {
@@ -99,7 +117,8 @@ watch(() => state.userId, (userId) => {
                 <g-n-b v-else
                        class="gnb"
                 />
-                <div class="app-body"
+                <div v-if="!state.isGrantInProgress"
+                     class="app-body"
                      :style="{ height: globalUIGetters.appBodyHeight }"
                 >
                     <p-sidebar :visible="store.state.display.visibleSidebar"
@@ -146,6 +165,11 @@ watch(() => state.userId, (userId) => {
                 </div>
             </template>
             <router-view v-else />
+            <p-data-loader v-if="state.isGrantInProgress"
+                           :loading="state.isGrantInProgress"
+                           :data="true"
+                           class="console-loading-wrapper"
+            />
             <p-icon-modal :visible="state.isExpired"
                           emoji="👋"
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -153,10 +177,11 @@ watch(() => state.userId, (userId) => {
                           button-type="primary"
                           @clickButton="goToSignIn"
             />
+            <has-no-workspace-modal :visible.sync="state.hasNoWorkspace" />
             <notification-email-modal
                 v-if="state.smtpEnabled"
-                :domain-id="state.domainId"
                 :user-id="state.userId"
+                :email="state.email"
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
@@ -177,6 +202,15 @@ watch(() => state.userId, (userId) => {
     width: 100vw;
     height: 100vh;
     background-color: $bg-color;
+
+    .console-loading-wrapper {
+        position: absolute;
+        height: 100%;
+        z-index: 101;
+        & > .data-loader-container > .loader-wrapper > .loader.spinner {
+            max-height: unset;
+        }
+    }
 
     .gnb {
         position: fixed;

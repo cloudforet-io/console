@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PHeading,
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PEmpty,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -18,7 +18,6 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -50,12 +49,13 @@ const state = reactive({
     escalationRuleItems: [] as RuleItem[],
     loading: true,
     projectChannels: [] as ProjectChannelModel[],
+    unfoldedIndices: typeof props.alertData?.escalation_step === 'number' ? [props.alertData.escalation_step - 1] : [],
 });
 
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
     apiQuery
-        .setFilters([{ k: 'project_id', v: props.alertData.project_id ?? '', o: '=' }]);
+        .setFilters([{ k: 'project_id', v: props.alertData?.project_id ?? '', o: '=' }]);
     return apiQuery.data;
 };
 const listProjectChannel = async () => {
@@ -71,7 +71,7 @@ const listProjectChannel = async () => {
 
 
 const listEscalationPolicy = async () => {
-    if (!props.alertData.escalation_policy_id) throw new Error('escalation_policy_id is required');
+    if (!props.alertData?.escalation_policy_id) throw new Error('escalation_policy_id is required');
     const { rules } = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
         escalation_policy_id: props.alertData.escalation_policy_id,
     });
@@ -83,9 +83,6 @@ const listEscalationPolicy = async () => {
 
 // LOAD REFERENCE STORE
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/protocol/load'),
-    ]);
     await Promise.allSettled([
         listProjectChannel(), listEscalationPolicy(),
     ]);
@@ -114,7 +111,7 @@ const listEscalationPolicy = async () => {
                                 :items="state.escalationRuleItems"
                                 theme="card"
                                 multi-unfoldable
-                                :unfolded-indices="[alertData.escalation_step - 1]"
+                                :unfolded-indices="state.unfoldedIndices"
             >
                 <template #title="{data, index}">
                     <p class="responder-info"
@@ -132,9 +129,13 @@ const listEscalationPolicy = async () => {
                 </template>
                 <template #default="{ data }">
                     <p class="data-wrapper">
-                        <project-channel-list :project-channels="state.projectChannels"
+                        <project-channel-list v-if="state.projectChannels.length > 0"
+                                              :project-channels="state.projectChannels"
                                               :notification-level="data.notification_level"
                         />
+                        <p-empty v-else>
+                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.NO_RESPONDER') }}
+                        </p-empty>
                     </p>
                 </template>
             </p-collapsible-list>
@@ -162,9 +163,12 @@ const listEscalationPolicy = async () => {
     }
 }
 
-/* custom project-channel-list */
-:deep(.project-channel-list) {
-    @apply bg-gray-100;
+.data-wrapper {
+    @apply bg-gray-100 rounded;
+    padding: 0.5rem;
+    .project-channel-list {
+        @apply bg-transparent;
+    }
 }
 
 .tag-box {

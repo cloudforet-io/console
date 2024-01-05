@@ -121,6 +121,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -129,7 +130,7 @@ import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
-    COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
+    COLORS, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
 import type {
     AvailableResource,

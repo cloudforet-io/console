@@ -81,7 +81,8 @@ watch(() => props.initialData, (initialData) => {
     @apply mx-0;
     max-width: 100%;
     .input-wrapper {
-        @apply mx-4 mb-8 flex flex-wrap gap-1 flex-col;
+        @apply mx-4 flex flex-wrap gap-1 flex-col;
+        margin-bottom: 1.5rem;
         .input {
             max-width: 43.5rem;
             width: 100%;

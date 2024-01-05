@@ -34,9 +34,7 @@ const state = reactive({
 
 const handleClickSendEmailButton = async () => {
     if (props.type === 'disabled' || props.type === 'change') {
-        const response = await postUserProfileDisableMfa({
-            user_id: state.userId,
-        });
+        const response = await postUserProfileDisableMfa();
         await store.dispatch('user/setUser', response);
     } else {
         await postEnableMfa({
@@ -44,7 +42,7 @@ const handleClickSendEmailButton = async () => {
             options: {
                 email: props.email,
             },
-        });
+        }, true);
     }
     state.proxyIsSentCode = true;
 };

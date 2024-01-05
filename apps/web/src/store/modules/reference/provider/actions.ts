@@ -16,6 +16,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo } from '@/styles/colors';
 
+
 let lastLoadedTime = 0;
 
 export const load: Action<ProviderReferenceState, any> = async ({ commit, state }, options: ReferenceLoadOptions): Promise<void|Error> => {
@@ -28,11 +29,10 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
     ) return;
 
     try {
-        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters>({
+        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters, ListResponse<ProviderModel>>({
             query: {
                 only: ['provider', 'name', 'icon', 'alias', 'color'],
             },
-            workspace_id: undefined,
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
 

@@ -20,7 +20,6 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 import type {
@@ -73,7 +72,7 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 /* Util */
 const targetTextFormatter = (value: string): string => {
     const isProjectGroup = value.startsWith('pg-');
-    if (isProjectGroup) return props.allReferenceTypeInfo.projectGroup.referenceMap[value].label ?? value;
+    if (isProjectGroup) return props.allReferenceTypeInfo.project_group.referenceMap[value].label ?? value;
     return props.allReferenceTypeInfo.project.referenceMap[value]?.label ?? value;
 };
 

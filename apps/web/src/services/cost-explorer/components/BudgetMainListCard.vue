@@ -11,16 +11,15 @@ import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -35,25 +34,23 @@ const props = withDefaults(defineProps<Props>(), {
     budgetUsage: () => ({} as BudgetUsageAnalyzeResult),
 });
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
-    linkLocation: computed<Location>(() => ({
+    linkLocation: computed<Location>(() => (getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
         params: {
             budgetId: props.budgetUsage.budget_id,
         },
-    })),
+    }))),
     isProjectTarget: computed(() => props.budgetUsage.resource_group === 'PROJECT'),
     targetLabelList: computed<string[]>(() => {
         const targetId = state.isProjectTarget ? props.budgetUsage.project_id : props.budgetUsage.workspace_id;
@@ -112,8 +109,6 @@ const state = reactive({
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/region/load'),
         store.dispatch('reference/provider/load'),
     ]);
 })();

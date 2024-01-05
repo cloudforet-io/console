@@ -53,13 +53,8 @@ export const MENU_LIST: Menu[] = [
         hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
-            {
-                id: MENU_ID.ACCOUNT,
-                subMenuList: [
-                    { id: MENU_ID.ACCOUNT_PROFILE },
-                    { id: MENU_ID.NOTIFICATIONS },
-                ],
-            },
+            { id: MENU_ID.ACCOUNT_PROFILE },
+            { id: MENU_ID.NOTIFICATIONS },
         ],
     },
     {
@@ -73,21 +68,23 @@ export const MENU_LIST: Menu[] = [
 ];
 
 export const ADMIN_MENU_LIST: Menu[] = [
-    {
-        id: MENU_ID.HOME_DASHBOARD,
-        hideOnGNB: true,
-    },
-    {
-        id: MENU_ID.DASHBOARDS,
-    },
-    {
-        id: MENU_ID.ASSET_INVENTORY,
-        subMenuList: [
-            { id: MENU_ID.CLOUD_SERVICE },
-            { id: MENU_ID.SERVER, needPermissionByRole: true },
-            { id: MENU_ID.COLLECTOR },
-        ],
-    },
+    // HACK: hide for now
+    // {
+    //     id: MENU_ID.HOME_DASHBOARD,
+    //     hideOnGNB: true,
+    // },
+    // {
+    //     id: MENU_ID.DASHBOARDS,
+    // },
+    // TODO: low priority features, so hide it for now
+    // {
+    //     id: MENU_ID.ASSET_INVENTORY,
+    //     subMenuList: [
+    //         { id: MENU_ID.CLOUD_SERVICE },
+    //         { id: MENU_ID.SERVER, needPermissionByRole: true },
+    //         { id: MENU_ID.COLLECTOR },
+    //     ],
+    // },
     {
         id: MENU_ID.COST_EXPLORER,
         subMenuList: [
@@ -109,8 +106,8 @@ export const ADMIN_MENU_LIST: Menu[] = [
             {
                 id: MENU_ID.PREFERENCE,
                 subMenuList: [
-                    { id: MENU_ID.DOMAIN_SETTINGS },
                     { id: MENU_ID.WORKSPACES },
+                    { id: MENU_ID.DOMAIN_SETTINGS },
                 ],
             },
         ],

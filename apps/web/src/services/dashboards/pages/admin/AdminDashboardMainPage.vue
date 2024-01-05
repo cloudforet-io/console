@@ -16,6 +16,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -49,7 +51,7 @@ const queryState = reactive({
     queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
 
-const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
+const handleCreateDashboard = () => { SpaceRouter.router.push({ name: makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) }); };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
@@ -117,11 +119,13 @@ onUnmounted(() => {
                    :total-count="dashboardState.totalCount"
         >
             <template #extra>
-                <p-button icon-left="ic_plus_bold"
-                          @click="handleCreateDashboard"
-                >
-                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
-                </p-button>
+                <div class="extra-button">
+                    <p-button icon-left="ic_plus_bold"
+                              @click="handleCreateDashboard"
+                    >
+                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
+                    </p-button>
+                </div>
             </template>
         </p-heading>
         <p-toolbox filters-visible
@@ -170,6 +174,10 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .dashboards-main-page {
     @apply w-full;
+
+    .extra-button {
+        @apply flex justify-end;
+    }
 
     .dashboard-list-wrapper {
         @apply flex w-full;

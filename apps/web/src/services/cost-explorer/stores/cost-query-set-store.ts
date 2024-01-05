@@ -4,7 +4,9 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -12,7 +14,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 export const useCostQuerySetStore = defineStore('cost-query-set', () => {
@@ -20,6 +21,7 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        workspaceId: computed(() => appContextStore.getters.workspaceId),
     });
     const state = reactive({
         costQuerySetList: [] as CostQuerySetModel[],
@@ -58,12 +60,18 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
             state.costQuerySetList = [...getters.managedCostQuerySets];
             return;
         }
+
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters([{ k: 'user_id', v: store.state.user.userId, o: '=' }]);
+        if (_state.isAdminMode) {
+            apiQueryHelper.addFilter({ k: 'workspace_id', v: null, o: '=' });
+        } else {
+            apiQueryHelper.addFilter({ k: 'workspace_id', v: _state.workspaceId as string, o: '=' });
+        }
         try {
             const { status, response } = await fetcher({
                 data_source_id: state.selectedDataSourceId,
-                query: {
-                    filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                },
+                query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response?.results) {
                 state.costQuerySetList = [...getters.managedCostQuerySets, ...response.results];

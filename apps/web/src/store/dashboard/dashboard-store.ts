@@ -14,7 +14,7 @@ import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -47,11 +47,11 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
-    const workspaceStore = useWorkspaceStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        currentWorkspace: computed(() => workspaceStore.getters.currentWorkspace),
+        currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
     });
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
@@ -65,7 +65,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     const getters = reactive({
-        allItems: computed<Array<PublicDashboardModel|PrivateDashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems]),
+        allItems: computed<Array<DashboardModel>>(() => [...state.privateDashboardItems, ...state.publicDashboardItems] as DashboardModel[]),
         domainItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'DOMAIN')),
         workspaceItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'WORKSPACE')),
         projectItems: computed<PublicDashboardModel[]>(() => state.publicDashboardItems.filter((item) => item.resource_group === 'PROJECT')),
@@ -73,7 +73,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     /* Mutations */
-    const setScope = (scope?: ResourceGroupType) => {
+    const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
         state.scope = scope;
     };
     const setSearchFilters = (filters: ConsoleFilter[]) => {
@@ -124,7 +124,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (params?: ListDashboardParameters) => {
+    const load = async () => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -145,9 +145,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
 
         const _publicDashboardParams = {
-            ...params,
             query: {
-                ...(params?.query || {}),
                 ...publicDashboardApiQueryHelper.data,
             },
         };
@@ -156,7 +154,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([
-                fetchDashboard('PRIVATE', params),
+                fetchDashboard('PRIVATE'),
                 fetchDashboard('PUBLIC', _publicDashboardParams),
             ]);
         }

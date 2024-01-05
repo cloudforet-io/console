@@ -97,15 +97,15 @@ const alertTitleEditConfirm = async () => {
             <template #title-right-extra>
                 <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
                 <span class="title-btn">
-                    <p-icon-button name="ic_delete"
-                                   class="w-full delete-btn"
-                                   :disabled="!state.hasManagePermission"
-                                   @click="openAlertDeleteForm"
-                    />
                     <p-icon-button name="ic_edit-text"
                                    class="edit-btn"
                                    :disabled="!state.hasManagePermission"
                                    @click="openAlertEditForm"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   class="w-full delete-btn"
+                                   :disabled="!state.hasManagePermission"
+                                   @click="openAlertDeleteForm"
                     />
                 </span>
             </template>

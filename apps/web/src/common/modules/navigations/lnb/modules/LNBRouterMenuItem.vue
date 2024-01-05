@@ -17,7 +17,7 @@ import type { LNBMenu, LNBIcon } from '@/common/modules/navigations/lnb/type';
 interface Props {
     item: LNBMenu;
     depth?: number;
-    isDomainOwner?: boolean;
+    isAdminMode?: boolean;
     idx?: number | string;
     currentPath?: string;
     openNewTab?: boolean;
@@ -76,16 +76,16 @@ const getIconName = (icon: LNBIcon): string => {
                   v-bind="{...props, item, index: idx}"
             />
             <span class="mark-wrapper">
-                <new-mark v-if="item.hightlightTag === 'new'" />
-                <update-mark v-else-if="item.hightlightTag === 'update'" />
-                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+                <new-mark v-if="item.highlightTag === 'new'" />
+                <update-mark v-else-if="item.highlightTag === 'update'" />
+                <beta-mark v-else-if="item.highlightTag === 'beta'" />
             </span>
         </div>
         <slot name="right-extra"
               v-bind="{...props, item, index: idx}"
         />
         <favorite-button
-            v-if="!item.hideFavorite && !isDomainOwner"
+            v-if="!item.hideFavorite && !isAdminMode"
             :item-id="item.favoriteOptions?.id ? item.favoriteOptions.id : item.id"
             :favorite-type="item.favoriteOptions?.type ? item.favoriteOptions.type : FAVORITE_TYPE.MENU"
             :visible-active-case-only="!getIsHovered(item.id)"

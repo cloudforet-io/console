@@ -7,9 +7,6 @@ import {
 import { PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import DashboardWidgetEditModal from '@/services/dashboards/components/DashboardWidgetEditModal.vue';
@@ -21,6 +18,8 @@ import type { ReformedWidgetInfo } from '@/services/dashboards/composables/use-r
 import {
     useReformedWidgetInfoList,
 } from '@/services/dashboards/composables/use-reformed-widget-info-list';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
     UpdatableWidgetInfo,
@@ -40,13 +39,13 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 
-const allReferenceStore = useAllReferenceStore();
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const state = reactive({
     mountedWidgetMap: {} as Record<string, boolean>,
     intersectedWidgetMap: {} as Record<string, boolean>,
     isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
 });
 
 /* container width */
@@ -262,7 +261,8 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                 </template>
             </div>
         </p-data-loader>
-        <widget-view-mode-modal :visible="widgetViewState.visibleModal"
+        <widget-view-mode-modal v-if="widgetViewState.visibleModal"
+                                :visible="widgetViewState.visibleModal"
                                 :widget-key="widgetViewState.targetWidget?.widget_key"
                                 :size="widgetViewState.targetWidget?.size"
                                 :theme="widgetViewState.targetWidget?.theme"

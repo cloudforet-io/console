@@ -1,8 +1,8 @@
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     BudgetNotification, BudgetPlannedLimit, BudgetTimeUnit, ProviderFilter,
 } from '@/schema/cost-analysis/budget/type';
-import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -20,10 +20,10 @@ export interface BudgetModel {
     notifications: BudgetNotification[];
     tags: Tags;
     data_source_id: string;
-    resource_group: Extract<ResourceGroup, 'WORKSPACE' | 'PROJECT'>
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>
     project_id: string;
     workspace_id: string;
-    domain_id?: string;
+    domain_id: string;
     created_at: string;
     updated_at: string;
 }

@@ -20,7 +20,7 @@ import { red } from '@/styles/colors';
 
 import DashboardWidgetAddModal from '@/services/dashboards/components/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 interface Props {
     loading?: boolean;

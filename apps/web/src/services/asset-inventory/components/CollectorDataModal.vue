@@ -4,6 +4,7 @@
                         :header-title="state.headerTitle"
                         :theme-color="state.isDuplicateJobs ? 'alert' : 'primary'"
                         :loading="state.loading"
+                        :disabled="!state.secretsCount"
                         size="sm"
                         @confirm="handleClickConfirm"
                         @cancel="handleClickCancel"
@@ -86,6 +87,7 @@ const state = reactive({
         }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
+    serviceAccountReferenceMap: computed(() => store.state.reference.serviceAccount.items),
     provider: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
         return selectedCollector?.provider ? storeState.providers[selectedCollector.provider] : undefined;
@@ -99,8 +101,7 @@ const state = reactive({
         const selectedSecret = collectorDataModalState.selectedSecret;
         if (!selectedSecret) return '';
         const id = selectedSecret.service_account_id;
-        const fullName = selectedSecret.name;
-        return fullName.split(id)[0] ?? '';
+        return state.serviceAccountReferenceMap[id].name ?? id;
     }),
     secretFilter: computed(() => collectorDataModalState.selectedCollector?.secret_filter),
     isExcludeFilter: computed(() => !!(state.secretFilter.exclude_service_accounts ?? []).length),

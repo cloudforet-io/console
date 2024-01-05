@@ -15,12 +15,14 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
 import CostAnalysisGranularityPeriodDropdown
@@ -31,6 +33,7 @@ import {
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
@@ -43,6 +46,7 @@ const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
@@ -88,8 +92,8 @@ onClickOutside(rightPartRef, hideContextMenu);
 /* event */
 const handleSaveQuerySet = async () => {
     try {
-        await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageGetters.selectedQueryId,
+        await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters>({
+            cost_query_set_id: costAnalysisPageGetters.selectedQueryId as string,
             options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
@@ -114,13 +118,13 @@ const handleClickSaveAsButton = () => {
 const handleUpdateQuery = async (updatedQueryId: string) => {
     await costAnalysisPageStore.getCostQueryList();
     await costAnalysisPageStore.selectQueryId(updatedQueryId);
-    await SpaceRouter.router.push({
+    await SpaceRouter.router.push(getProperRouteLocation({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
-    });
+    }));
 };
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
@@ -136,7 +140,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 <template>
     <div class="cost-analysis-query-section">
         <div class="filter-wrapper"
-             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
+             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
             <div class="left-part">
                 <cost-analysis-granularity-period-dropdown />

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,8 +13,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -51,25 +53,33 @@ const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
     searchText: props.filters.map((d) => d.v).join(' ') || '',
     selectIndex: [] as number[],
-    fields: [
-        { label: 'User ID', name: 'user_id' },
-        { label: 'User Name', name: 'user_name' },
-    ] as DataTableField[],
+    fields: computed<DataTableFieldType[]>(() => {
+        const fields: DataTableFieldType[] = [
+            { label: 'User ID', name: 'user_id' },
+            { label: 'User Name', name: 'user_name' },
+            { label: 'Role', name: 'role_type' },
+        ];
+        if (projectDetailPageGetters.projectType === 'PRIVATE') {
+            fields.push({ label: ' ', name: 'delete', sortable: false });
+        }
+        return fields;
+    }),
     workspaceUserIdList: [] as string[],
     projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
-            user_name: storeState.users[d]?.name ?? d,
+            user_name: storeState.users[d]?.name ?? '',
+            role_type: storeState.users[d]?.data.roleInfo?.name ?? '',
         }));
         const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
@@ -118,8 +128,7 @@ const fetchProjectUsers = async () => {
 const fetchWorkspaceUserList = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-        });
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
         state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
         state.totalCount = res.total_count ?? 0;
     } catch (e) {
@@ -130,7 +139,7 @@ const fetchWorkspaceUserList = async () => {
         state.loading = false;
     }
 };
-const deleteProjectUser = async (items) => {
+const deleteProjectUsers = async (items: UserItem[]) => {
     try {
         await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters>({
             project_id: props.projectId,
@@ -153,15 +162,15 @@ const handleChangeTable = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
-const handleClickRemoveMember = () => {
+const handleClickRemoveMembers = () => {
     state.memberDeleteModalVisible = true;
 };
 const handleClickInviteMember = () => {
     state.memberInviteFormVisible = true;
 };
 
-const handleConfirmDeleteMember = async (items) => {
-    await deleteProjectUser(items);
+const handleConfirmDeleteMember = async (items: UserItem[]) => {
+    await deleteProjectUsers(items);
 
     state.memberDeleteModalVisible = false;
     fetchUserList();
@@ -170,10 +179,15 @@ const handleConfirmInvite = () => {
     fetchUserList();
 };
 
-/* Watcher */
+/* Init */
 (async () => {
     fetchUserList();
 })();
+
+/* Watcher */
+watch(() => projectDetailPageGetters.projectType, () => {
+    fetchUserList();
+}, { immediate: false });
 </script>
 
 <template>
@@ -200,10 +214,10 @@ const handleConfirmInvite = () => {
                               #title-right-extra
                     >
                         <div class="action-button-wrapper">
-                            <p-button style-type="primary"
+                            <p-button style-type="tertiary"
                                       class="mr-4 add-btn"
                                       :disabled="!state.selectedItems.length"
-                                      @click="handleClickRemoveMember"
+                                      @click="handleClickRemoveMembers"
                             >
                                 {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
                             </p-button>
@@ -229,7 +243,7 @@ const handleConfirmInvite = () => {
                     <span class="text">
                         <i18n :path="projectDetailPageGetters.projectType === 'PRIVATE' ? 'PROJECT.DETAIL.MEMBER.PRIVATE_MEMBER_DESC' : 'PROJECT.DETAIL.MEMBER.PUBLIC_MEMBER_DESC'">
                             <template #settings>
-                                <span v-if="projectPageState.isWorkspaceOwner"
+                                <span v-if="storeState.isWorkspaceOwner"
                                       class="link-text"
                                       @click="projectPageStore.openProjectFormModal()"
                                 >
@@ -241,6 +255,17 @@ const handleConfirmInvite = () => {
                             </template>
                         </i18n>
                     </span>
+                </div>
+            </template>
+            <template #col-delete-format>
+                <div class="remove-button-wrapper">
+                    <p-button style-type="tertiary"
+                              size="sm"
+                              class="mr-4"
+                              @click="handleClickRemoveMembers"
+                    >
+                        {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
+                    </p-button>
                 </div>
             </template>
         </p-toolbox-table>
@@ -257,7 +282,6 @@ const handleConfirmInvite = () => {
                              :fields="state.fields"
                              :items="state.selectedItems"
                              :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
-                             :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
                              @confirm="handleConfirmDeleteMember"
         />
     </div>
@@ -310,6 +334,9 @@ const handleConfirmInvite = () => {
     }
     .action-button-wrapper {
         display: inline-flex;
+        float: right;
+    }
+    .remove-button-wrapper {
         float: right;
     }
 }

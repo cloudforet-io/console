@@ -8,8 +8,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
@@ -29,7 +27,7 @@ export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapR
             // set filters from cloud service query set
             const cloudServiceQuerySetId = widgetState.options.cloud_service_query_set;
             if (cloudServiceQuerySetId) {
-                const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
+                const cloudServiceQuerySet = props.allReferenceTypeInfo.cloud_service_query_set.referenceMap[cloudServiceQuerySetId];
                 if (cloudServiceQuerySet) {
                     queryHelper.setFilters([
                         { k: 'provider', v: cloudServiceQuerySet.data?.provider, o: '=' },
@@ -67,7 +65,7 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
     const results: ConsoleFilter[] = [];
     Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
         if (!filterItems?.length) return;
-        if ((filterKey === REFERENCE_TYPE_INFO.project.type || filterKey === REFERENCE_TYPE_INFO.project_group.type)) {
+        if ((filterKey === 'project')) {
             filterItems.forEach((d) => {
                 results.push(d);
             });

@@ -28,18 +28,39 @@ export const WORKSPACE_SEARCH_HANDLERS = {
     keyItemSets: [{
         title: 'Properties',
         items: [
+            { name: 'workspace_id', label: 'Workspace ID' },
             { name: 'name', label: 'Name' },
             { name: 'tags.description', label: 'Description' },
             { name: 'state', label: 'State' },
-            { name: 'users', label: 'Users' },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }] as KeyItemSet[],
     valueHandlerMap: {
+        workspace_id: makeDistinctValueHandler('identity.Workspace', 'workspace_id'),
         name: makeDistinctValueHandler('identity.Workspace', 'name'),
         'tags.description': makeDistinctValueHandler('identity.Workspace', 'tags.description'),
         state: makeEnumValueHandler(WORKSPACE_STATE),
-        // users: makeDistinctValueHandler('identity.Workspace', 'users'),
         created_at: makeDistinctValueHandler('identity.Workspace', 'created_at', 'datetime'),
     },
 } as const;
+
+
+export const WORKSPACES_USER_SEARCH_HANDLERS = {
+    keyItemSets: [
+        {
+            title: 'Properties',
+            items: [
+                { name: 'user_id', label: 'User ID' },
+                { name: 'name', label: 'Name' },
+                { name: 'state', label: 'State' },
+                { name: 'email', label: 'E-mail' },
+                { name: 'auth_type', label: 'Auth Type' },
+                {
+                    name: 'last_accessed_at',
+                    label: 'Last Activity',
+                    dataType: 'datetime',
+                },
+                { name: 'timezone', label: 'Timezone' },
+            ],
+        }] as KeyItemSet[],
+};

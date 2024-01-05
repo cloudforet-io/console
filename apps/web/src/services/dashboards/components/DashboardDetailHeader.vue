@@ -57,12 +57,11 @@ const handleNameUpdate = (name: string) => {
                       #title-right-extra
             >
                 <div class="title-right-extra">
-                    <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="props.dashboardId"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.8"
-                        />
-                    </div>
+                    <favorite-button :item-id="props.dashboardId"
+                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                     scale="0.8"
+                                     class="favorite-button"
+                    />
                     <p-icon-button name="ic_edit-text"
                                    size="md"
                                    @click="handleVisibleNameEditModal"
@@ -103,10 +102,8 @@ const handleNameUpdate = (name: string) => {
     @apply flex-shrink-0 inline-flex items-center;
     margin-bottom: -0.25rem;
     gap: 0.5rem;
-    .favorite-button-wrapper {
-        @apply flex items-center justify-center;
-        width: 1.25rem;
-        height: 1.25rem;
+    .favorite-button {
+        margin: 0 0.25rem;
     }
 }
 </style>

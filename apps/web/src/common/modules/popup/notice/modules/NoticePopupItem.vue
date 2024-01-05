@@ -1,11 +1,69 @@
+<script setup lang="ts">
+import { computedAsync } from '@vueuse/core';
+import { reactive } from 'vue';
+
+import {
+    PButtonModal, PDivider, PButton,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
+import type { PostModel } from '@/schema/board/post/model';
+import type { FileModel } from '@/schema/file-manager/model';
+
+import { useNoticeStore } from '@/store/notice';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileAttachments } from '@/common/composables/file-attachments';
+
+const props = withDefaults(defineProps<{
+    popupIndex: number|string;
+    item?: PostModel;
+}>(), {
+    item: undefined,
+});
+const noticeStore = useNoticeStore();
+
+const state = reactive({
+    popupVisible: true,
+});
+const files = computedAsync<FileModel[]>(async () => {
+    const notice = props.item;
+    if (!notice) return [];
+    try {
+        const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
+            post_id: notice.post_id,
+        });
+        return result.files;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+});
+const { attachments } = useFileAttachments(files);
+
+const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
+    state.popupVisible = false;
+    if (!props.item) return;
+    if (neverShowPopup) {
+        await noticeStore.updateNoticeReadState(props.item.post_id, false);
+    }
+};
+</script>
+
 <template>
-    <p-button-modal :visible="popupVisible"
+    <p-button-modal :visible="state.popupVisible"
                     :backdrop="false"
                     hide-header
                     hide-header-close-button
                     hide-footer-close-button
-                    size="sm"
-                    :absolute="popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
+                    size="md"
+                    :absolute="props.popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
                     class="notice-popup"
                     @confirm="handleClose"
     >
@@ -35,86 +93,6 @@
     </p-button-modal>
 </template>
 
-<script lang="ts">
-import { computedAsync } from '@vueuse/core';
-import { reactive, toRefs } from 'vue';
-import type { PropType } from 'vue';
-
-import {
-    PButtonModal, PDivider, PButton,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { iso8601Formatter } from '@cloudforet/utils';
-
-import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
-import type { PostModel } from '@/schema/board/post/model';
-
-import { useNoticeStore } from '@/store/notice';
-
-import type { FileInfo } from '@/lib/file-manager/type';
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
-import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFileAttachments } from '@/common/composables/file-attachments';
-
-export default {
-    name: 'NoticePopupItem',
-    components: {
-        PButtonModal,
-        PDivider,
-        TextEditorViewer,
-        PButton,
-    },
-    props: {
-        popupIndex: {
-            type: Number,
-            default: undefined,
-        },
-        item: {
-            type: Object as PropType<PostModel>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const noticeStore = useNoticeStore();
-
-        const state = reactive({
-            popupVisible: true,
-        });
-        const files = computedAsync<FileInfo[]>(async () => {
-            const notice = props.item;
-            if (!notice) return [];
-            try {
-                const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
-                    post_id: notice.post_id,
-                });
-                return result.files;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        });
-        const { attachments } = useFileAttachments(files);
-
-        const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
-            state.popupVisible = false;
-            if (neverShowPopup) {
-                await noticeStore.updateNoticeReadState(props.item.post_id, false);
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            attachments,
-            handleClose,
-            isMobile,
-            iso8601Formatter,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .notice-popup {
     .notice-popup-title {

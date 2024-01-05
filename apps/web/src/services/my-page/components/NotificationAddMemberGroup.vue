@@ -1,25 +1,21 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import {
-    PSelectDropdown,
-} from '@spaceone/design-system';
+import { PSelectDropdown } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface Props {
     projectId?: string;
@@ -35,12 +31,20 @@ const emit = defineEmits<{(e: 'change', value: any): void; }>();
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    userId: computed<string>(() => store.state.user.userId),
 });
 const state = reactive({
     loading: true,
-    projectUserIdList: [] as string[],
-    allMemberItems: computed<SelectDropdownMenuItem[]>(() => state.projectUserIdList.map((d) => ({
+    targetProject: null as ProjectModel|null,
+    projectMemberIdList: computed<string[]>(() => {
+        if (!state.targetProject) return [];
+        if (state.targetProject.project_type === 'PUBLIC') return Object.keys(storeState.users);
+        const _users = new Set([storeState.userId, ...(state.targetProject.users ?? [])]);
+        return [..._users];
+    }),
+    allMemberItems: computed<SelectDropdownMenuItem[]>(() => state.projectMemberIdList.map((d) => ({
         name: d,
         label: storeState.users[d]?.label ?? d,
         type: 'item',
@@ -54,38 +58,22 @@ const emitChange = () => {
     });
 };
 
-const fetchWorkspaceUserList = async () => {
-    try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-        });
-        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.projectUserIdList = [];
-    }
-};
-const listProjectMember = async () => {
+/* Api */
+const getProject = async (): Promise<ProjectModel|null> => {
     try {
         state.loading = true;
-        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+        return await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
         });
-        if (res.project_type === 'PUBLIC') {
-            await fetchWorkspaceUserList();
-            return;
-        }
-        state.projectUserIdList = res.users ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.projectUserIdList = [];
+        return null;
     } finally {
         state.loading = false;
     }
 };
 (async () => {
-    await Promise.allSettled([
-        listProjectMember(),
-    ]);
+    state.targetProject = await getProject();
 })();
 
 watch(() => state.selectedMemberItems, () => {

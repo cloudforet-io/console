@@ -28,7 +28,8 @@ const state: UserState = {
     email: storedUserState.email,
     language: (storedUserState.language && languages[storedUserState.language]) ? storedUserState.language : 'en',
     timezone: storedUserState.timezone,
-    // TODO: to be deprecated
+    // "currentGrantInfo" is for optimization of grant API call
+    currentGrantInfo: undefined,
     currentRoleInfo: storedUserState.currentRoleInfo,
     requiredActions: storedUserState.requiredActions,
     emailVerified: storedUserState.emailVerified,

@@ -109,7 +109,7 @@ const state = reactive({
     }),
     isValid: computed(() => state.loading || state.selectedColumns.length > 0),
     isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
-    isServiceAccountTable: computed(() => ['identity.ServiceAccount', 'identity.TrustedAccount'].includes(props.resourceType)),
+    isServiceAccountTable: computed(() => ['identity.ServiceAccount', 'identity.TrustedAccount'].includes(props.resourceType ?? '')),
 });
 
 const sortByRecommendation = () => {
@@ -153,14 +153,14 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
         let res;
-        if (state.isServiceAccountTable) {
+        if (state.isServiceAccountTable && props.resourceType) {
             res = await getServiceAccountTableSchema({
                 userData: {
                     userType: _userConfigMap.value.userType ?? 'USER',
                     userId: _userConfigMap.value.userId ?? '',
                 },
                 resourceType: props.resourceType,
-                options: props.options,
+                options,
             });
         } else {
             res = await SpaceConnector.client.addOns.pageSchema.get({
@@ -169,8 +169,6 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
                 options,
             });
         }
-
-
         schema = res;
         delete schema.options?.search;
         return res.options?.fields || [];
@@ -201,7 +199,7 @@ const updatePageSchema = async () => {
     if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
     try {
-        if (state.isServiceAccountTable) {
+        if (state.isServiceAccountTable && props.resourceType) {
             await updateCustomTableSchema(
                 {
                     userType: _userConfigMap.value.userType ?? 'USER',

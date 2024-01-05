@@ -1,16 +1,5 @@
-<template>
-    <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents"
-         v-html="refinedContents"
-    />
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed,
-    defineComponent,
-} from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 
 import { setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
@@ -18,36 +7,30 @@ import type { Attachment } from '@/common/components/editor/extensions/image/typ
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
-    contents: string,
-    attachments: Attachment[]
+    contents?: string,
+    attachments?: Attachment[]
 }
-
-export default defineComponent<Props>({
-    name: 'TextEditorViewer',
-    components: {},
-    props: {
-        contents: {
-            type: String,
-            default: '',
-        },
-        attachments: {
-            type: Array as PropType<Attachment[]>,
-            default: () => [],
-        },
-    },
-    setup(props) {
-        loadMonospaceFonts();
-        const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
-        return {
-            refinedContents,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    contents: '',
+    attachments: () => [],
 });
+
+loadMonospaceFonts();
+const refinedContents = computed(() => setAttachmentsToContents(props.contents, props.attachments));
 </script>
+
+<template>
+    <!--        eslint-disable-next-line vue/no-v-html-->
+    <div class="text-editor-contents"
+         v-html="refinedContents"
+    />
+</template>
 
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
 .text-editor-contents {
+    margin-left: 0.1rem;
+
     @mixin all-nodes-style;
 
     img:active {

@@ -88,14 +88,23 @@ interface ProvidersReferenceItems {
  * @param dataType
  * @param filters
  * @param limit
+ * @param extraParams
  */
-export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: KeyDataType, filters?: ApiFilter[], limit?: number): ValueHandler|undefined {
+export function makeDistinctValueHandler(
+    resourceType: string,
+    distinct: string,
+    dataType?: KeyDataType,
+    filters?: ApiFilter[],
+    limit?: number,
+    extraParams?: Record<string, any>,
+): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
     const staticParam: any = {
         resource_type: resourceType,
         options: { limit: limit || 10 },
         distinct_key: distinct,
+        extra_params: extraParams,
     };
 
     return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {

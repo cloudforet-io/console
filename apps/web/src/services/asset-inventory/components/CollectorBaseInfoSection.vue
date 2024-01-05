@@ -2,14 +2,15 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
+                                         :hide-edit-button="!collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
         <div v-if="!state.isEditMode"
              class="contents-wrapper"
         >
-            <collector-plugin-info :plugin="state.repositoryPlugin"
-                                   :collector="collectorFormState.originCollector"
+            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
+                                          :collector="collectorFormState.originCollector"
             />
             <plugin-summary-cards :collector="collectorFormState.originCollector"
                                   :recent-jobs="state.recentJobs"
@@ -65,12 +66,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import type {
-    CollectorModel,
-    CollectorPluginModel,
-
-
-} from '@/schema/inventory/collector/model';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
 import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
@@ -81,12 +77,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import CollectorPluginInfo from '@/services/asset-inventory/components/CollectorDetailPluginInfo.vue';
+import CollectorDetailPluginInfo from '@/services/asset-inventory/components/CollectorDetailPluginInfo.vue';
 import PluginSummaryCards from '@/services/asset-inventory/components/CollectorDetailPluginSummaryCards.vue';
 import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
@@ -101,8 +98,10 @@ const collectorFormState = collectorFormStore.$state;
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 
+const collectorDetailPageStore = useCollectorDetailPageStore();
+
 const state = reactive({
-    collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
+    collectorPluginInfo: computed<CollectorModel['plugin_info']|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
     repositoryPlugin: null as null|PluginModel,
     isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {

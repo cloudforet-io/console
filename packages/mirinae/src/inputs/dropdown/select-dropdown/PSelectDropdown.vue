@@ -38,6 +38,7 @@ interface SelectDropdownProps {
     useFixedMenuStyle?: boolean;
     buttonIcon?: string;
     isFixedWidth?: boolean;
+    resetSelectionOnMenuClose?: boolean;
 
     /* context menu props */
     isFilterable?: boolean;
@@ -59,6 +60,7 @@ interface SelectDropdownProps {
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
     initSelectedWithHandler?: boolean;
+    hideHeaderWithoutItems?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectDropdownProps>(), {
@@ -70,6 +72,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     selectionLabel: undefined,
     showDeleteAllButton: false,
     buttonIcon: undefined,
+    resetSelectionOnMenuClose: false,
     /* context menu props */
     visibleMenu: undefined,
     menu: () => [],
@@ -166,6 +169,7 @@ const {
     handler: toRef(props, 'handler'),
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
+    hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
 });
 
 /* focusing */
@@ -220,6 +224,7 @@ const handleEnterKey = () => {
     focusOnContextMenu(undefined);
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
+    if (props.resetSelectionOnMenuClose) return;
     if (props.multiSelectable) {
         state.proxySelectedItem = selected;
     } else if (Array.isArray(state.proxySelectedItem)) {

@@ -25,7 +25,7 @@ import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -103,10 +103,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
-        isAllVariablesInitialized: computed(() => {
-            if (!state.dashboardInfo) return false;
-            return Object.values(state.variablesInitMap).every((d) => d === true);
-        }),
+        isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
     });
 
     /* Mutations */

@@ -21,6 +21,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
@@ -127,10 +129,10 @@ const handleConfirm = async () => {
     const clonedDashboardId = await createDashboard();
     state.proxyVisible = false;
     if (clonedDashboardId) {
-        await SpaceRouter.router.push({
+        await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: clonedDashboardId },
-        });
+        }));
     }
 };
 

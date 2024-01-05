@@ -24,7 +24,7 @@ import NotificationAddTopic from '@/services/my-page/components/NotificationAddT
 import type { NotificationAddFormDataPayload, NotificationAddFormTopicPayload, NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 
 const props = withDefaults(defineProps<{
-    projectId: string;
+    projectId?: string;
     protocolType: string;
     protocolId: string;
 }>(), {

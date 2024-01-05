@@ -7,6 +7,11 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { CostQuerySetCreateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/create';
+import type { CostQuerySetUpdateParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/update';
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import { store } from '@/store';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -17,8 +22,7 @@ import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explor
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {
-    RelativePeriod,
-    CostQuerySetModel, Granularity, GroupBy, Period,
+    RelativePeriod, Granularity, GroupBy, Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -49,8 +53,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             if (_state.isAdminMode) {
                 return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.PROJECT);
             }
-            return Object.values(GROUP_BY_ITEM_MAP);
-            // return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
         }),
     });
     const state = reactive({
@@ -105,7 +108,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         dataSourceImageUrl: computed<string>(() => {
             if (costQuerySetState.selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
-                return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
+                return store.getters['reference/pluginItems'][targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }
             return '';
         }),
@@ -182,8 +185,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             if (_state.isAdminMode) {
                 state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.PROJECT);
             } else {
-                // state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
             state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
@@ -200,9 +202,9 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         };
         let createdData;
         try {
-            createdData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
+            createdData = await SpaceConnector.clientV2.costAnalysis.costQuerySet.create<CostQuerySetCreateParameters, CostQuerySetModel>({
                 name,
-                data_source_id: costQuerySetState.selectedDataSourceId,
+                data_source_id: costQuerySetState.selectedDataSourceId as string,
                 options,
             });
             selectQueryId(createdData.cost_query_set_id);
@@ -218,7 +220,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         let updatedQueryData;
         if (costQuerySetGetters.selectedQuerySet?.name !== name) {
             try {
-                updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
+                updatedQueryData = await SpaceConnector.clientV2.costAnalysis.costQuerySet.update<CostQuerySetUpdateParameters, CostQuerySetModel>({
                     cost_query_set_id: querySetId,
                     name,
                 });
@@ -249,6 +251,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         setPeriod,
         setRelativePeriod,
     };
+
+    (async () => {
+        await store.dispatch('reference/plugin/load');
+    })();
 
     return {
         state,

@@ -1,5 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
 
 import { adminRoutes } from '@/router/admin-routes';
@@ -9,10 +11,11 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
@@ -27,7 +30,10 @@ export const integralRoutes: RouteConfig[] = [
         // TODO: need to implement with SYSTEM_ADMIN
         redirect: () => {
             const appContextStore = useAppContextStore();
-            if (appContextStore.getters.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
+            const isAdminMode = appContextStore.getters.isAdminMode;
+            const isTokenAlive = SpaceConnector.isTokenAlive;
+            if (!isTokenAlive) return ({ name: AUTH_ROUTE.SIGN_OUT._NAME });
+            if (isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
             return { name: ROOT_ROUTE.WORKSPACE._NAME };
         },
         component: { template: '<router-view />' },
@@ -49,11 +55,16 @@ export const integralRoutes: RouteConfig[] = [
                 path: '/:workspaceId',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 redirect: (to) => {
-                    const workspaceStore = useWorkspaceStore();
-                    const workspaceList = workspaceStore.getters.workspaceList;
-                    const currentWorkspaceId = workspaceStore.getters.currentWorkspaceId;
+                    const userWorkspaceStore = useUserWorkspaceStore();
+                    const workspaceList = userWorkspaceStore.getters.workspaceList;
+                    if (!workspaceList) return ({ name: MY_PAGE_ROUTE._NAME });
+
+                    const currentWorkspaceIdFromUrl = to.params.workspaceId;
+                    const currentWorkspaceId = currentWorkspaceIdFromUrl || userWorkspaceStore.getters.currentWorkspaceId;
                     const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === currentWorkspaceId);
+
                     if (currentWorkspaceId && isValidWorkspace) {
+                        userWorkspaceStore.setCurrentWorkspace(currentWorkspaceId);
                         return ({
                             name: HOME_DASHBOARD_ROUTE._NAME,
                             params: {
@@ -62,9 +73,10 @@ export const integralRoutes: RouteConfig[] = [
                             },
                         });
                     }
-                    if (workspaceList.length) {
+
+                    if (!currentWorkspaceId) {
                         const defaultWorkspaceId = workspaceList[0].workspace_id;
-                        workspaceStore.setCurrentWorkspace(defaultWorkspaceId);
+                        userWorkspaceStore.setCurrentWorkspace(defaultWorkspaceId);
                         return ({
                             name: HOME_DASHBOARD_ROUTE._NAME,
                             params: {
@@ -73,7 +85,7 @@ export const integralRoutes: RouteConfig[] = [
                             },
                         });
                     }
-                    // TODO: handle no workspace case -> such as caution or error
+
                     return ({ name: MY_PAGE_ROUTE._NAME });
                 },
                 component: { template: '<router-view />' },

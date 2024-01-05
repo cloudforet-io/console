@@ -55,7 +55,7 @@ const handleClickBack = () => {
 };
 const handleClickHome = () => {
     const isTokenAlive = SpaceConnector.isTokenAlive;
-    if (props.statusCode === '403') appContextStore.switchToWorkspaceMode();
+    if (props.statusCode === '403') appContextStore.exitAdminMode();
     if (isTokenAlive) router.push({ name: ROOT_ROUTE._NAME });
     else router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
 };

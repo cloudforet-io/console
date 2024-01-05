@@ -17,17 +17,17 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
+import type { FileModel } from '@/schema/file-manager/model';
 import { store } from '@/store';
 
 import { useNoticeStore } from '@/store/notice';
 
-import type { FileInfo } from '@/lib/file-manager/type';
-
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import ListItem from '@/services/info/components/NoticeListItem.vue';
+import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
@@ -37,6 +37,7 @@ const props = defineProps<{
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -61,7 +62,7 @@ const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
 });
 
-const files = computed<FileInfo[]>(() => state.noticePostData?.files ?? []);
+const files = computed<FileModel[]>(() => state.noticePostData?.files ?? []);
 const { attachments } = useFileAttachments(files);
 
 /* Api */
@@ -104,7 +105,7 @@ const noticeStore = useNoticeStore();
 
 /* Event */
 const handleBackToListButtonClick = () => {
-    SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
+    SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME }));
 };
 
 
@@ -113,10 +114,10 @@ const handleBackToListButtonClick = () => {
 const handlePostClick = (direction: 'next'|'prev') => {
     if (direction === 'next') {
         if (!state.nextPostRoute) return;
-        SpaceRouter.router.push(state.nextPostRoute);
+        SpaceRouter.router.push(getProperRouteLocation(state.nextPostRoute));
     } else {
         if (!state.prevPostRoute) return;
-        SpaceRouter.router.push(state.prevPostRoute);
+        SpaceRouter.router.push(getProperRouteLocation(state.prevPostRoute));
     }
 };
 
@@ -177,16 +178,18 @@ watch(() => props.postId, (postId) => {
         </p-pane-layout>
         <p-pane-layout class="post-router">
             <div class="post-router-item">
-                <list-item :post-direction="state.nextNoticePost ? 'next' : undefined"
-                           :post="state.nextNoticePost"
-                           @click.native="handlePostClick('next')"
+                <notice-list-item post-direction="next"
+                                  :post="state.nextNoticePost"
+                                  :loading="state.loading"
+                                  @click.native="handlePostClick('next')"
                 />
             </div>
             <p-divider />
             <div class="post-router-item">
-                <list-item :post-direction="state.prevNoticePost ? 'prev' : undefined"
-                           :post="state.prevNoticePost"
-                           @click.native="handlePostClick('prev')"
+                <notice-list-item post-direction="prev"
+                                  :post="state.prevNoticePost"
+                                  :loading="state.loading"
+                                  @click.native="handlePostClick('prev')"
                 />
             </div>
         </p-pane-layout>
@@ -204,6 +207,10 @@ watch(() => props.postId, (postId) => {
 <style scoped lang="postcss">
 .notice-detail-layout {
     padding: 1.25rem 1.5rem;
+    min-height: calc(100vh - 35rem);
+    >.p-data-loader {
+        min-height: inherit;
+    }
 
     .post-title {
         @apply flex flex-wrap gap-2 items-center text-gray-600;

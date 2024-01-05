@@ -1,7 +1,6 @@
 import { describe } from 'vitest';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
 
 const mockAllReferenceTypeInfo: AllReferenceTypeInfo = {

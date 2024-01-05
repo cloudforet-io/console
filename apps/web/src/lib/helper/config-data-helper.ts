@@ -1,5 +1,7 @@
 import { find } from 'lodash';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -11,7 +13,6 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/referenc
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
-import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
@@ -36,6 +37,7 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
         const menu = find(allMenuList, { id: d.itemId });
         if (menu) {
             results.push({
+                ...d,
                 itemType: FAVORITE_TYPE.MENU,
                 itemId: menu.id,
                 name: menu.id,

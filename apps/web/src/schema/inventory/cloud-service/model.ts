@@ -1,3 +1,4 @@
+import type { Tags } from '@/schema/_common/model';
 import type { CloudServiceState } from '@/schema/inventory/cloud-service/type';
 
 export interface CloudServiceModel {
@@ -11,10 +12,10 @@ export interface CloudServiceModel {
     cloud_service_type: string;
     cloud_service_group: string;
     provider: string;
-    data: {[key:string]: any};
-    metadata: {[key:string]: any};
-    reference: {[key:string]: any};
-    tags: {[key:string]: any};
+    data: Record<string, any>;
+    metadata: Record<string, any>;
+    reference: Record<string, any>;
+    tags: Tags;
     tag_keys: string[];
     collection_info: string[];
     region_code: string;

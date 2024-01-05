@@ -17,6 +17,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { EscalationPolicyDeleteParameters } from '@/schema/monitoring/escalation-policy/api-verbs/delete';
 import type {
     EscalationPolicyListParameters,
@@ -113,7 +114,7 @@ const state = reactive({
             type: 'item',
             name: 'default',
             label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
-            disabled: state.selectedItem?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.PROJECT,
+            disabled: state.selectedItem?.resource_group === RESOURCE_GROUP.PROJECT,
         },
     ])),
     escalationPolicies: [] as EscalationPolicyModel[],
@@ -126,14 +127,13 @@ const state = reactive({
 });
 
 /* api */
-const escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
         const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
-            query: escalationPolicyApiQuery,
+            query: escalationPolicyApiQueryHelper.data,
         });
-        state.escalationPolicies = res.results;
+        state.escalationPolicies = res.results ?? [];
         state.items = res.results?.map((d) => ({
             ...d,
             name: {
@@ -238,6 +238,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
                     </p-button>
                     <p-select-dropdown
                         class="left-toolbox-dropdown-item"
+                        reset-selection-on-menu-close
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :menu="state.actionItems"
                         :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"

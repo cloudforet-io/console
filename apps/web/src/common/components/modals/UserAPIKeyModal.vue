@@ -33,7 +33,7 @@ interface State {
     proxyVisible: Ref<boolean>;
     isAPICollapsed: boolean;
     isSpacectlCollapsed: boolean;
-    apiKeyItemCode: string;
+    clientSecretCode: string;
     yamlItem: string;
     githubLink: string;
 }
@@ -41,19 +41,19 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     isAPICollapsed: true,
     isSpacectlCollapsed: true,
-    apiKeyItemCode: '',
+    clientSecretCode: '',
     yamlItem: '',
     githubLink: 'https://github.com/cloudforet-io/spacectl',
 }) as UnwrapRef<State>;
 
 const onClickDownloadFile = (fileType: FileType) => {
     let blob;
-    if (fileType === FileType.JSON) blob = new Blob([state.apiKeyItemCode], { type: 'application/json' });
+    if (fileType === FileType.JSON) blob = new Blob([state.clientSecretCode], { type: 'application/json' });
     if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    if (fileType === FileType.JSON) a.download = 'api_key';
+    if (fileType === FileType.JSON) a.download = 'client_secret';
     if (fileType === FileType.YAML) a.download = 'spacectl_config';
     a.click();
     a.remove();
@@ -64,13 +64,13 @@ const onClickConfirm = () => {
 };
 
 const makeJsonItem = () => {
-    state.apiKeyItemCode = JSON.stringify(props.apiKeyItem, null, 4);
+    state.clientSecretCode = JSON.stringify(props.apiKeyItem, null, 4);
 };
 
 const makeYamlItem = () => {
     const endpoints = endpointGetters.endpointLinks;
     const yamlItem = {
-        api_key: props.apiKeyItem?.api_key,
+        token: props.apiKeyItem?.client_secret,
         endpoints,
     };
 
@@ -114,7 +114,7 @@ watch(() => props.visible, async (visible) => {
                     {{ $t('IDENTITY.USER.API_KEY.ID') }}
                 </span>
                 <p class="box-contents">
-                    {{ props.apiKeyItem?.api_key_id }}
+                    {{ props.apiKeyItem?.client_id }}
                     <p-collapsible-toggle :is-collapsed.sync="state.isAPICollapsed"
                                           class="collapsible-toggle"
                     >
@@ -122,7 +122,7 @@ watch(() => props.visible, async (visible) => {
                     </p-collapsible-toggle>
                     <p-text-editor v-if="!state.isAPICollapsed"
                                    class="m-4"
-                                   :code="state.apiKeyItemCode"
+                                   :code="state.clientSecretCode"
                                    folded
                                    read-only
                     />

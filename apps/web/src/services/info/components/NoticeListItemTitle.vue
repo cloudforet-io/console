@@ -1,53 +1,38 @@
+<script setup lang="ts">
+import { PI, PTextHighlighting } from '@spaceone/design-system';
+
+import NewMark from '@/common/components/marks/NewMark.vue';
+
+const props = withDefaults(defineProps<{
+    isPinned?: boolean;
+    isNew?: boolean;
+    title?: string;
+    searchInputText?: string;
+}>(), {
+    isPinned: false,
+    isNew: false,
+    title: '',
+    searchInputText: '',
+});
+
+</script>
+
 <template>
     <div class="list-title">
-        <p-i v-if="isPinned"
+        <p-i v-if="props.isPinned"
              class="pin"
              name="ic_pin-filled"
              width="1.125rem"
         />
-        <text-highlighting class="title"
-                           :term="searchInputText"
-                           :text="title"
+        <p-text-highlighting class="title"
+                             :term="props.searchInputText"
+                             :text="props.title"
         />
-        <new-mark v-if="isNew"
+        <new-mark v-if="props.isNew"
                   class="new-mark"
         />
     </div>
 </template>
-
-<script lang="ts">
-import { PI } from '@spaceone/design-system';
-
-import NewMark from '@/common/components/marks/NewMark.vue';
-import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
-
-export default {
-    name: 'ListItemTitle',
-    components: {
-        NewMark,
-        TextHighlighting,
-        PI,
-    },
-    props: {
-        isPinned: {
-            type: Boolean,
-            default: false,
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        searchInputText: {
-            type: String,
-            default: '',
-        },
-    },
-};
-</script>
 
 <style scoped lang="postcss">
 .list-title {

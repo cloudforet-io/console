@@ -10,6 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { AppModel } from '@/schema/identity/app/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,7 +26,7 @@ const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const emit = defineEmits<{(e: 'confirm', app_key_id?: string): void;
+const emit = defineEmits<{(e: 'confirm', app?: AppModel): void;
 }>();
 
 const storeState = reactive({
@@ -83,7 +84,7 @@ const checkModalConfirm = async () => {
             await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
-            emit('confirm', res.api_key_id);
+            emit('confirm', res);
             appPageStore.$patch((_state) => {
                 _state.modal.visible.apiKey = true;
                 _state.modal = cloneDeep(_state.modal);
@@ -106,6 +107,7 @@ const checkModalConfirm = async () => {
                     modal-size="md"
                     @confirm="checkModalConfirm"
                     @cancel="handleClose"
+                    @close="handleClose"
     >
         <template #body>
             <p-definition-table :fields="definitionFields"

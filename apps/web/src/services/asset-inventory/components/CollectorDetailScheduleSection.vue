@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorFormState.schedulePower"
+                                         :hide-edit-button="!collectorFormState.schedulePower || !state.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
@@ -117,7 +117,7 @@ watch(() => collectorFormState.schedulePower, (schedulePower) => {
 
 <style lang="postcss" scoped>
 .schedule-wrapper {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     .button-group {
         margin-bottom: 1.5rem;
         .save-changes-button {

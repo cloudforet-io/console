@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'trendOfPassAndFailFindings',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/TrendOfPassAndFailFindingsWidget.vue'),
-    }),
     title: 'Trend of Pass and Fail Findings',
     labels: ['Asset'],
     description: {

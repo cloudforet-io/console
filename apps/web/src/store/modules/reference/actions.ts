@@ -23,6 +23,6 @@ export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commi
 
 export const initializeAllReference: Action<ReferenceRootState, any> = async ({ dispatch }): Promise<void> => {
     const allReferenceStore = useAllReferenceStore();
-    await dispatch('reference/loadAll', { force: true });
+    await dispatch('loadAll', { force: true });
     allReferenceStore.flush();
 };

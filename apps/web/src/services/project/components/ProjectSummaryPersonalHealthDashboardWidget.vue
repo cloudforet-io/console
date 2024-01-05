@@ -18,6 +18,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -48,7 +49,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
-
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: false,
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -140,6 +144,7 @@ const getCount = async () => {
         state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({
             project_id: props.projectId,
             period: EVENT_PERIOD,
+            workspace_id: storeState.currentWorkspaceId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -152,14 +157,13 @@ const getEvents = async () => {
             .setSort(state.sortBy, state.sortDesc)
             .setPage(state.pageStart, state.pageLimit)
             .setFilters([{ v: state.search }]);
-        const res = await SpaceConnector.client.statistics.topic.phdEvents(
-            {
-                project_id: props.projectId,
-                event_type_category: tabState.activeTab,
-                query: getEventsApiQuery.data,
-                period: EVENT_PERIOD,
-            },
-        );
+        const res = await SpaceConnector.client.statistics.topic.phdEvents({
+            project_id: props.projectId,
+            event_type_category: tabState.activeTab,
+            query: getEventsApiQuery.data,
+            period: EVENT_PERIOD,
+            workspace_id: storeState.currentWorkspaceId,
+        });
 
         state.totalCount = res.total_count;
         state.data = res.results.map((d) => {

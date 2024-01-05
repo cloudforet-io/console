@@ -56,6 +56,11 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
             );
+            if (state.selectedUser?.role_id) {
+                additionalRoleFields.push(
+                    { name: 'role_id', label: i18n.t('IAM.USER.MAIN.ROLE_NAME') },
+                );
+            }
         } else {
             additionalRoleFields.push({
                 name: 'role_binding',
@@ -118,13 +123,24 @@ const handleClickVerifyButton = async () => {
             <template #data-mfa="{data}">
                 {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
             </template>
-            <template #data-role_type="{value}">
+            <template #data-role_type>
                 <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(userPageStore.isAdminMode ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
+                    <span>
+                        {{
+                            useRoleFormatter(userPageStore.isAdminMode
+                                ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
+                                : tableState.refinedUserItems?.role_type).name
+                        }}
+                    </span>
+                </span>
+            </template>
+            <template #data-role_id="{value}">
+                <span class="role-type">
+                    <span class="pr-4">{{ userPageStore.roleMap[value]?.name ?? '' }}</span>
                 </span>
             </template>
             <template #data-role_binding="{value}">
@@ -213,7 +229,6 @@ const handleClickVerifyButton = async () => {
         @apply relative;
         .not-verified {
             @apply absolute bg-yellow-200 text-label-sm;
-            width: 5.375rem;
             height: 1.25rem;
             padding: 0.15rem 0.5rem;
             border-radius: 6.25rem;

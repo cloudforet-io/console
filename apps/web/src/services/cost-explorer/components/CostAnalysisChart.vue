@@ -11,6 +11,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,7 +29,6 @@ import {
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {
-    CostAnalyzeResponse,
     Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
@@ -53,9 +54,9 @@ const state = reactive({
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, AnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
+const listCostAnalysisData = async (period:Period): Promise<AnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         let dateFormat = 'YYYY-MM';

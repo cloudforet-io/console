@@ -18,6 +18,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -29,6 +30,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { coral, gray } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 interface CloudService {
     cloud_service_group: string;
@@ -61,13 +63,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const chartContext = ref<HTMLElement|null>(null);
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     chartRegistry: {},
     chart: null as MapChart|null,
     data: [] as Resource[],
     loading: true,
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     resourceDataByRegion: [] as CloudService[],
     selectedRegionLabel: '',
     selectedRegionCode: '',
@@ -78,10 +84,10 @@ const state = reactive({
 const chartState = reactive({
     marker: null,
     initialRegion: computed(() => ({
-        title: state.regions[state.data[0]?.region_code]?.name || state.data[0]?.region_code,
+        title: storeState.regions[state.data[0]?.region_code]?.name || state.data[0]?.region_code,
         longitude: state.data[0]?.longitude,
         latitude: state.data[0]?.latitude,
-        color: state.providers[state.data[0]?.provider]?.color,
+        color: storeState.providers[state.data[0]?.provider]?.color,
     })),
     providerLegends: [] as ProviderLegend[],
     providerFilter: undefined as string[]|undefined,
@@ -105,13 +111,14 @@ const getResourceByRegionData = async () => {
         const { results } = await SpaceConnector.client.statistics.topic.resourceByRegion({
             ...props.extraParams,
             providers: chartState.providerFilter,
+            workspace_id: storeState.currentWorkspaceId,
         });
         state.data = results.map((d) => ({
             ...d,
-            title: state.regions[d.region_code]?.name || d.region_code,
-            longitude: parseFloat(state.regions[d.region_code]?.longitude ?? 0),
-            latitude: parseFloat(state.regions[d.region_code]?.latitude ?? 0),
-            color: state.providers[d.provider]?.color ?? '',
+            title: storeState.regions[d.region_code]?.name || d.region_code,
+            longitude: parseFloat(storeState.regions[d.region_code]?.longitude ?? 0),
+            latitude: parseFloat(storeState.regions[d.region_code]?.latitude ?? 0),
+            color: storeState.providers[d.provider]?.color ?? '',
         })) as Resource[];
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -243,8 +250,8 @@ const initLegends = () => {
     chartState.legendsLoading = true;
     chartState.providerLegends = state.data
         .map((d) => ({
-            name: state.providers[d.provider]?.label,
-            color: state.providers[d.provider]?.color as string,
+            name: storeState.providers[d.provider]?.label,
+            color: storeState.providers[d.provider]?.color as string,
             provider: d.provider,
         }))
         .filter((data, index, arr) => arr.findIndex((item) => item.name === data.name) === index);
@@ -319,7 +326,7 @@ onUnmounted(() => {
                              @click="handleClickLegends(item.provider)"
                         >
                             <p class="circle"
-                               :style="{background: chartState.providerFilter.includes(item.provider) ? item.color : 'gray'}"
+                               :style="{background: chartState.providerFilter?.includes(item.provider) ? item.color : 'gray'}"
                             />
                             <span>{{ item.name }}</span>
                         </div>
@@ -334,9 +341,9 @@ onUnmounted(() => {
                 <div class="resource-info-wrapper">
                     <div class="resource-info-title">
                         <span class="resource-info-provider"
-                              :style="{color: state.providers[state.selectedProvider] ? state.providers[state.selectedProvider].color : 'gray' }"
+                              :style="{color: storeState.providers[state.selectedProvider] ? storeState.providers[state.selectedProvider].color : 'gray' }"
                         >
-                            {{ state.providers[state.selectedProvider] ? state.providers[state.selectedProvider].label : '' }}</span>
+                            {{ storeState.providers[state.selectedProvider] ? storeState.providers[state.selectedProvider].label : '' }}</span>
                         <span class="resource-info-region">{{ state.selectedRegionLabel }}</span>
                     </div>
                     <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 progress-bar-wrapper">
@@ -352,7 +359,7 @@ onUnmounted(() => {
                             <p-progress-bar :percentage="(item.count / state.maxValue) * 100"
                                             class="progress-bar"
                                             :class="state.selectedProvider||'aws'"
-                                            :color="state.providers[state.selectedProvider] ? state.providers[state.selectedProvider].color : 'gray'"
+                                            :color="storeState.providers[state.selectedProvider] ? storeState.providers[state.selectedProvider].color : 'gray'"
                             />
                         </router-link>
                     </div>

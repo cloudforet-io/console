@@ -115,12 +115,15 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 interface Value {
     provider: string;
@@ -159,6 +162,10 @@ export default {
     setup(props) {
         const queryHelper = new QueryHelper();
 
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const storeState = reactive({
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        });
         const state = reactive({
             loading: true,
             skeletons: range(8),
@@ -218,6 +225,7 @@ export default {
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: projectApiQuery.data,
                 is_primary: true,
+                workspace_id: storeState.currentWorkspaceId,
             });
 
             state.data = [
@@ -245,6 +253,7 @@ export default {
                     const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                         query: apiQuery.data,
                         is_primary: true,
+                        workspace_id: storeState.currentWorkspaceId,
                     });
                     state.data = [
                         ...res.results.splice(0, DATA_LENGTH).map((d) => ({

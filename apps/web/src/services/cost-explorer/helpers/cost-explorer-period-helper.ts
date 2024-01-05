@@ -2,9 +2,15 @@ import dayjs from 'dayjs';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type {
-    RelativePeriod, Granularity, Period, CostQuerySetOptionForPeriod,
+    RelativePeriod, Granularity, Period,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
+interface CostQuerySetOptionForPeriod {
+    granularity: Granularity;
+    period?: Period;
+    relativePeriod: RelativePeriod;
+}
 
 export const convertRelativePeriodToPeriod = (costQueryOption: CostQuerySetOptionForPeriod): { start: string; end: string; } => {
     const today = dayjs.utc();

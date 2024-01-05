@@ -3,22 +3,43 @@ import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 
+import { throttle } from 'lodash';
+
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isGrantProgressing: computed(() => store.getters['display/isGrantInProgress']),
+    loading: false,
 });
-const handleToggleAdminMode = () => {
+const handleToggleAdminMode = throttle(async () => {
+    state.loading = true;
+    if (state.isGrantProgressing) {
+        state.loading = false;
+        return;
+    }
     if (state.isAdminMode) {
-        appContextStore.switchToWorkspaceMode();
-        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        await userWorkspaceStore.load(store.state.user.userId);
+        appContextStore.exitAdminMode();
+        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
+        if (lastAccessedWorkspaceId) {
+            await router.push({
+                name: ROOT_ROUTE.WORKSPACE._NAME,
+                params: { workspaceId: lastAccessedWorkspaceId },
+            });
+        } else await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
@@ -26,24 +47,27 @@ const handleToggleAdminMode = () => {
             duration: 2000,
             speed: 1,
         });
+        state.loading = false;
         return;
     }
-    appContextStore.switchToAdminMode();
-    router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+    appContextStore.enterAdminMode();
+    await router.push({ name: ROOT_ROUTE.ADMIN._NAME });
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN'),
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
         duration: 2000,
         speed: 1,
     });
-};
+    state.loading = false;
+}, 300);
 </script>
 
 <template>
     <label class="g-n-b-admin-toggle-button">
         <input type="checkbox"
                class="switch-input"
+               :disabled="state.loading"
                :checked="state.isAdminMode"
                @change="handleToggleAdminMode"
         >
@@ -57,9 +81,9 @@ const handleToggleAdminMode = () => {
 <style lang="postcss" scoped>
 .g-n-b-admin-toggle-button {
     @apply relative inline-block cursor-pointer;
-    width: 5.625rem;
+    width: 6.875rem;
     height: 1.75rem;
-    padding-left: 0.75rem;
+    padding: 0 1rem;
 
     .switch-input {
         opacity: 0;
@@ -88,6 +112,7 @@ const handleToggleAdminMode = () => {
         @apply relative inline-block w-full h-full rounded-full cursor-pointer border border-gray-200;
         background: rgba(221, 221, 223, 0.6);
         box-shadow: 0 0.25rem 0.25rem 0 rgba(194, 194, 198, 0.5) inset;
+        margin-top: 2px;
 
         .slider {
             @apply absolute top-0 left-0 right-0 bottom-0;

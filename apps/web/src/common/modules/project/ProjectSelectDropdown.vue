@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
 import {
@@ -267,6 +267,17 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
             <template #menu-no-data-format>
                 <div />
             </template>
+            <template v-if="props.projectGroupSelectOptions && state.selectedItems.length"
+                      #dropdown-button
+            >
+                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
+                         badge-type="subtle"
+                         style-type="gray200"
+                >
+                    {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
+                </p-badge>
+                {{ state.selectedItems[0]?.label }}
+            </template>
             <template #menu-menu>
                 <div class="button-wrapper top">
                     <p-button icon-left="ic_refresh"
@@ -332,20 +343,32 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 .project-select-dropdown {
     .button-wrapper {
         padding: 0.5rem;
+
         &.top {
             padding-bottom: 0.25rem;
         }
+
         .create-button {
             width: 100%;
         }
     }
 
     /* custom design-system component - p-tree */
+
     :deep(.p-tree) {
         padding: 0.25rem;
         min-height: 12rem;
+
         .toggle-right {
             @apply flex-shrink-0;
+        }
+    }
+
+    /* custom design-system component - p-context-menu */
+
+    :deep(.p-context-menu) {
+        .no-data {
+            padding: 0;
         }
     }
 }

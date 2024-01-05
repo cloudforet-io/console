@@ -19,14 +19,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
-interface Props {
-    isDomainOwner?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    isDomainOwner: false,
-});
-
 const router = useRouter();
 
 
@@ -90,10 +82,13 @@ const signIn = async () => {
         }
     } catch (e: any) {
         if (e.message.includes('MFA')) {
+            const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+            const userEmail = e.message.match(emailRegex);
             await router.push({
                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
                 params: {
                     password: credentials.password,
+                    mfaEmail: userEmail[0],
                     userId: state.userId?.trim() as string,
                     authType: 'LOCAL',
                 },
@@ -105,8 +100,6 @@ const signIn = async () => {
         state.password = '';
     }
 };
-
-const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'substitutive'));
 </script>
 
 <template>
@@ -114,7 +107,7 @@ const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'subst
         <form class="form"
               onsubmit="return false"
         >
-            <p-field-group :label="props.isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
+            <p-field-group :label="$t('COMMON.SIGN_IN.USER_ID')"
                            :invalid="validationState.isIdValid === false"
                            required
             >
@@ -153,7 +146,7 @@ const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'subst
                     {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
                 </router-link>
             </p>
-            <p-button :style-type="buttonStyleType"
+            <p-button style-type="substitutive"
                       type="submit"
                       size="lg"
                       class="sign-in-btn"

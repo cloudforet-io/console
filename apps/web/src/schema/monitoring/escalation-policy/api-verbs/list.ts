@@ -5,13 +5,13 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
 
 export interface EscalationPolicyListParameters {
+    query?: Query;
     escalation_policy_id?: string;
     name?: string;
     is_default?: boolean;
     finish_condition?: EscalationPolicyFinishCondition;
     resource_group?: EscalationPolicyModel['resource_group'];
     project_id?: string;
-    query?: Query;
 }
 
 export type EscalationPolicyListResponse = ListResponse<EscalationPolicyModel>;

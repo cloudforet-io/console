@@ -3,7 +3,6 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm,
@@ -17,7 +16,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -26,11 +28,7 @@ import NotificationAddMemberGroup from '@/services/my-page/components/Notificati
 import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
 
 
-const CHANNEL_TYPE = {
-    AWS_SNS: 'AWSSNS',
-    SLACK: 'Slack',
-    SPACEONE_USER: 'SpaceONEUser',
-} as const;
+const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
 
 const PROTOCOL_TYPE = {
     INTERNAL: 'INTERNAL',
@@ -49,9 +47,11 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayload): void;
 }>();
 
-const route = useRoute();
-
+const storeState = reactive({
+    protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
+});
 const state = reactive({
+    protocol: computed(() => storeState.protocols[props.protocolId] ?? null),
     channelName: undefined as string|undefined,
     notificationLevel: 'LV1' as NotificationLevel,
     schemaForm: {} as Record<string, any>,
@@ -165,7 +165,7 @@ watch([() => props.protocolId, () => props.protocolType], async ([protocolId, pr
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
-        <div v-if="props.projectId && route.params.protocol === CHANNEL_TYPE.SPACEONE_USER && props.protocolType === PROTOCOL_TYPE.INTERNAL">
+        <div v-if="props.projectId && state.protocol?.name === SPACEONE_USER_CHANNEL_TYPE && props.protocolType === PROTOCOL_TYPE.INTERNAL">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
                            required
             >

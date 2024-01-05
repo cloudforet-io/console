@@ -1,15 +1,37 @@
+<script setup lang="ts">
+import { reactive, computed } from 'vue';
+
+import { PButtonModal, PCheckbox } from '@spaceone/design-system';
+
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+
+import { i18n } from '@/translations';
+
+const state = reactive({
+    isVisible: true,
+    isSelected: false,
+    browserList: computed(() => [
+        { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.CHROME'), img: 'images/support-browsers/ic_chrome_2x.png', link: 'https://www.google.com/chrome' },
+        { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.EDGE'), img: 'images/support-browsers/ic_edge_2x.png', link: 'https://www.microsoft.com/edge' },
+    ]),
+});
+const handleCloseModal = () => {
+    if (state.isSelected) LocalStorageAccessor.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
+    state.isVisible = false;
+};
+</script>
 <template>
     <p-button-modal class="recommended-browser-modal"
                     :hide-header-close-button="true"
                     :hide-footer-close-button="true"
-                    :visible="isVisible"
+                    :visible="state.isVisible"
                     :header-title="$t('APP.MODAL.RECOMMEND_BROWSER.HEADER')"
                     size="sm"
                     @confirm="handleCloseModal"
     >
         <template #body>
             <div class="browser-icon-wrapper">
-                <a v-for="(browser, idx) in browserList"
+                <a v-for="(browser, idx) in state.browserList"
                    :key="idx"
                    class="browser-icon-container"
                    :href="browser.link"
@@ -27,7 +49,7 @@
         </template>
         <template #footer-extra>
             <div>
-                <p-checkbox v-model="isSelected">
+                <p-checkbox v-model="state.isSelected">
                     {{ $t('APP.MODAL.RECOMMEND_BROWSER.DO_NOT_SHOW_AGAIN') }}
                 </p-checkbox>
             </div>
@@ -37,42 +59,6 @@
         </template>
     </p-button-modal>
 </template>
-<script lang="ts">
-import { reactive, toRefs, computed } from 'vue';
-
-import { PButtonModal, PCheckbox } from '@spaceone/design-system';
-
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-
-import { i18n } from '@/translations';
-
-
-export default {
-    name: 'RecommendedBrowserModal',
-    components: {
-        PButtonModal,
-        PCheckbox,
-    },
-    setup() {
-        const state = reactive({
-            isVisible: true,
-            isSelected: false,
-            browserList: computed(() => [
-                { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.CHROME'), img: 'images/support-browsers/ic_chrome_2x.png', link: 'https://www.google.com/chrome' },
-                { label: i18n.t('APP.MODAL.RECOMMEND_BROWSER.EDGE'), img: 'images/support-browsers/ic_edge_2x.png', link: 'https://www.microsoft.com/edge' },
-            ]),
-        });
-        const handleCloseModal = () => {
-            if (state.isSelected) LocalStorageAccessor.setItem('showBrowserRecommendation', 'showBrowserRecommendation');
-            state.isVisible = false;
-        };
-        return {
-            ...toRefs(state),
-            handleCloseModal,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .recommended-browser-modal {
     .browser-icon-wrapper {

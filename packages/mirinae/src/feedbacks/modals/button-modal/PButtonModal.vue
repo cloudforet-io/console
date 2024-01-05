@@ -22,8 +22,8 @@
                             <slot v-if="!hideHeader"
                                   name="header"
                             >
-                                <div class="modal-header"
-                                     :class="[`${themeColor}-header`]"
+                                <span class="modal-header"
+                                      :class="[`${themeColor}-header`]"
                                 >
                                     <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
@@ -31,7 +31,7 @@
                                          color="inherit transparent"
                                     />
                                     {{ headerTitle }}
-                                </div>
+                                </span>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_close"
@@ -264,7 +264,6 @@ export default defineComponent<ButtonModalProps>({
 </script>
 <style lang="postcss">
 .p-button-modal {
-    display: inline-block;
     .modal-content {
         @apply bg-white border border-gray-200 rounded-lg;
         display: flex;

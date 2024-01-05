@@ -2,11 +2,9 @@ export const WIDGET_OPTION_FILTER_KEY_MAP = {
     // common
     provider: 'filters.provider',
     project: 'filters.project',
+    workspace: 'filters.workspace',
     service_account: 'filters.service_account',
-    project_group: 'filters.project_group',
     region: 'filters.region',
-    // 'filters.cloud_service_type': 'filters.cloud_service_type',
-    // 'filters.user': 'filters.user',
     // cost
     cost_product: 'filters.cost_product',
     cost_usage_type: 'filters.cost_usage_type',

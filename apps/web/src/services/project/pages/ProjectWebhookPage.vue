@@ -324,6 +324,7 @@ onActivated(() => {
                 <p-select-dropdown
                     :menu="state.dropdown"
                     :disabled="!state.isSelectedItem"
+                    reset-selection-on-menu-close
                     :placeholder="$t('PROJECT.DETAIL.WEBHOOK_ACTION')"
                     @select="onSelectDropdown"
                 />

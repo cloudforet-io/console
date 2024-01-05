@@ -85,4 +85,11 @@ onUnmounted(() => {
     @apply mx-0;
     max-width: 100%;
 }
+
+/* custom design-system component - p-horizontal-layout */
+:deep(.user-toolbox-layout) {
+    .horizontal-contents {
+        overflow: unset;
+    }
+}
 </style>

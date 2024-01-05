@@ -10,6 +10,7 @@ export interface ProviderModel {
     options: Record<string, any>;
     tags: Tags;
     is_managed: boolean;
+    domain_id: string;
     created_at: string;
     updated_at: string;
 }

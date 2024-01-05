@@ -9,6 +9,9 @@ import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { CurrencySymbol } from '@/store/modules/settings/type';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -17,9 +20,13 @@ import type { AutofillOptions } from '@/services/cost-explorer/types/budget-form
 
 interface Props {
     visible?: boolean;
+    currencyText?: CurrencySymbol;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    currencyText: CURRENCY_SYMBOL.USD,
+});
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; (e: 'confirm', options: AutofillOptions): void; }>();
 
@@ -93,7 +100,7 @@ watch(() => props.visible, (visible) => {
                                   :invalid="invalidState.start"
                     >
                         <template #right-extra>
-                            ($)
+                            ({{ props.currencyText }})
                         </template>
                     </p-text-input>
                 </p-field-group>

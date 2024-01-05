@@ -95,7 +95,7 @@ const fetchCollectors = async () => {
                 },
             },
         });
-        state.collectors = res.results;
+        state.collectors = res.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.collectors = [];

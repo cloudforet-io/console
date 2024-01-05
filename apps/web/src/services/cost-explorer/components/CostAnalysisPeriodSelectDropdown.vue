@@ -10,9 +10,10 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 import dayjs from 'dayjs';
 import { isEqual, range } from 'lodash';
 
+import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { i18n } from '@/translations';
 
-import { queryStringToString } from '@/lib/router-query-string';
+import { queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
@@ -32,7 +33,6 @@ import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-a
 import type { PeriodDropdownMenu } from '@/services/cost-explorer/types/cost-analysis-period-type';
 import type {
     Granularity, Period, RelativePeriod,
-    CostQuerySetModel,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -132,7 +132,13 @@ const state = reactive({
 
 /* Util */
 const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod): PeriodDropdownMenu => state.allPeriodItems.find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
-const setSelectedItemByGranularity = (granularity: Granularity) => {
+const setSelectedItemByGranularity = (granularity: Granularity, period?: Period) => {
+    if (period) {
+        costAnalysisPageStore.setPeriod(period);
+        costAnalysisPageStore.setRelativePeriod(undefined);
+        state.selectedPeriod = 'custom';
+        return;
+    }
     const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
     costAnalysisPageStore.setPeriod(defaultPeriod);
     costAnalysisPageStore.setRelativePeriod(defaultRelativePeriod);
@@ -152,7 +158,9 @@ const init = (querySet?: CostQuerySetModel) => {
     } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
         // set selected item by url query
         const currentQuery = router.currentRoute.query;
-        setSelectedItemByGranularity(queryStringToString(currentQuery.granularity) as Granularity);
+        const _granularity = queryStringToString(currentQuery.granularity);
+        const _period = queryStringToObject(currentQuery.period);
+        setSelectedItemByGranularity(_granularity as Granularity, _period as Period|undefined);
     }
 };
 
@@ -188,7 +196,7 @@ watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) =
 }, { immediate: true });
 watch(() => costAnalysisPageState.granularity, (granularity) => {
     if (granularity) {
-        setSelectedItemByGranularity(granularity);
+        setSelectedItemByGranularity(granularity, undefined);
     }
 }, { immediate: false });
 </script>

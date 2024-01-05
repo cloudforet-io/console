@@ -12,7 +12,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 // eslint-disable-next-line import/no-cycle
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 // eslint-disable-next-line import/no-cycle
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
@@ -22,6 +22,7 @@ import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+export const isGrantInProgress: Getter<DisplayState, any> = (state): boolean => state.isGrantInProgress;
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
 export const isHandbookVisible: Getter<DisplayState, any> = (state): boolean => state.visibleSidebar && state.sidebarType === SIDEBAR_TYPE.handbook;
@@ -56,8 +57,8 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 };
 
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
-    const workspaceStore = useWorkspaceStore();
-    const tagetWorkspaceId = workspaceStore.getters.currentWorkspaceId;
+    const userWorkspaceStore = useUserWorkspaceStore();
+    const tagetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);

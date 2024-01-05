@@ -104,7 +104,7 @@ const setSelectIndex = () => {
 /* Api */
 const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
-    .setFilters([{ k: 'project_id', v: [props.projectId ?? '', null], o: '=' }]);
+    .setFilters([{ k: 'project_id', v: props.projectId ? [props.projectId, '*'] : ['*'], o: '=' }]);
 let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {

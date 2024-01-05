@@ -1,6 +1,7 @@
 <template>
     <l-n-b :header="header"
            :menu-set="menuSet"
+           hide-header
     >
         <template #default>
             <div class="member-profile">
@@ -30,6 +31,8 @@ import { PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import {
     filterLNBMenuByAccessPermission,
 } from '@/lib/access-control/page-access-helper';
@@ -48,44 +51,51 @@ export default defineComponent({
         LNB,
     },
     setup() {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
-            userType: computed(() => store.state.user.backend) as unknown as string,
+            hasRole: computed<boolean>(() => userWorkspaceStore.getters.workspaceList.length > 0),
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
-            icon: computed(() => {
-                if (state.isDomainOwner) return 'img_avatar_root-account';
-                return 'img_avatar_user';
+            icon: computed<string>(() => {
+                if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
+                if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
+                return 'img_avatar_no-role';
             }),
             memberType: computed(() => {
-                if (state.isDomainOwner) return i18n.t('MY_PAGE.ROOT_ACCOUNT');
-                return i18n.t('MY_PAGE.SPACEONE_USER');
+                if (state.isDomainOwner) return i18n.t('MY_PAGE.ADMIN');
+                return '';
             }),
             header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId) as string),
             menuSet: computed<LNBMenu[]>(() => {
                 const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'title',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT].translationId),
-                        id: MENU_ID.ACCOUNT,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId),
+                        id: MENU_ID.MY_PAGE,
                         foldable: false,
+                        hideFavorite: true,
                     },
                     {
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
                         id: MENU_ID.ACCOUNT_PROFILE,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME },
+                        to: { name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME },
+                        hideFavorite: true,
                     },
-                    {
+                ];
+                if (state.hasRole) {
+                    allLnbMenu.push({
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId),
                         id: MENU_ID.NOTIFICATIONS,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
-                        hightlightTag: 'beta',
-                    },
-                ];
+                        to: { name: MY_PAGE_ROUTE.NOTIFICATION._NAME },
+                        highlightTag: 'beta',
+                        hideFavorite: true,
+                    });
+                }
                 return filterLNBMenuByAccessPermission(allLnbMenu, store.getters['user/pageAccessPermissionList']);
             }),
         });
@@ -105,7 +115,6 @@ export default defineComponent({
     padding: 1rem 2.125rem;
     margin-top: 1.5rem;
     margin-bottom: 2.125rem;
-    width: 14.75rem;
     height: 7.875rem;
     .member-icon {
         @apply mx-auto rounded-full;

@@ -1,20 +1,15 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive, watch,
 } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSelectDropdown, PCheckbox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton, PDataLoader,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
-import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
-import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -26,6 +21,7 @@ import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
@@ -33,11 +29,6 @@ import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store
 interface Props {
     type?: NoticeFormType;
 }
-interface DomainItem {
-    name: string;
-    label: string;
-}
-
 type NoticeFormType = 'CREATE' | 'EDIT';
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,18 +39,10 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
-    hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasDomainRole: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
-    isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
-    domainList: [] as Array<DomainItem>,
-    selectedDomain: store.getters['user/hasSystemRole']
-        ? []
-        : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
-    domainName: '',
 });
 
 const {
@@ -95,11 +78,12 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     },
 }));
 
-const { fileUploader } = useFileUploader(computed(() => (state.isAllDomainSelected ? null : state.selectedDomain[0].name)));
+const { fileUploader } = useFileUploader();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
-    if (props.type === 'EDIT') handleEditNotice();
+    else if (props.type === 'EDIT') handleEditNotice();
 };
 
 const handleCreateNotice = async () => {
@@ -117,22 +101,16 @@ const handleCreateNotice = async () => {
             resource_group: 'DOMAIN',
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
-        await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: INFO_ROUTE.NOTICE._NAME, query: {} }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
     }
 };
 const handleEditNotice = async () => {
     try {
-        const params = state.isAllDomainSelected
-            ? {
-                ...formData.value,
-            }
-            : {
-                ...formData.value,
-                domain_id: state.selectedDomain[0].name,
-            };
-        await noticeDetailStore.updateNoticePost(params);
+        await noticeDetailStore.updateNoticePost({
+            ...formData.value,
+        });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
     } catch (e) {
@@ -140,145 +118,82 @@ const handleEditNotice = async () => {
     }
 };
 
-const handleClickAllDomainRadio = () => { state.isAllDomainSelected = true; };
-const handleClickSelectDomainRadio = () => { state.isAllDomainSelected = false; };
 
-const handleSelectDomain = (domain: Array<DomainItem>) => {
-    if (!state.isAllDomainSelected) {
-        state.selectedDomain = domain;
-    }
-};
-
-const getDomainList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
-        state.domainList = results.map((d) => ({
-            name: d.domain_id,
-            label: d.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.domainList = [];
-    }
-};
-
-
-watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
-    if (isAllDomain) state.selectedDomain = [];
-});
-
-watch(() => noticeDetailState.post, async (notice) => {
-    if (!notice || !Object.keys(notice).length) return;
-    if (notice?.domain_id) {
-        const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: notice.domain_id });
-        state.domainName = name;
-    }
+watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([notice, loading]) => {
+    if (loading) return;
 
     // INIT STATES
-    state.isPinned = notice.options?.is_pinned ?? false;
-    state.isPopup = notice.options?.is_popup ?? false;
-    state.attachments = notice.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    state.isAllDomainSelected = !notice?.domain_id;
-    state.selectedDomain = notice?.domain_id
-        ? [{ name: notice.domain_id, label: state.domainName || notice.domain_id }]
-        : [];
-    setForm('writerName', notice.writer);
-    setForm('noticeTitle', notice.title);
-    setForm('contents', notice.contents);
+    state.isPinned = notice?.options?.is_pinned ?? false;
+    state.isPopup = notice?.options?.is_popup ?? false;
+    state.attachments = notice?.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+    setForm('writerName', notice?.writer ?? store.state.user.name);
+    setForm('noticeTitle', notice?.title ?? '');
+    setForm('contents', notice?.contents ?? '');
 });
 
-(async () => {
-    if (state.hasSystemRole) await getDomainList();
-})();
 </script>
 
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <p-field-group class="notice-label-wrapper writer-name-input"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
-                           required
+            <p-data-loader :loading="noticeDetailState.loading"
+                           :data="noticeDetailState.post"
             >
-                <template #default="{invalid}">
-                    <p-text-input :value="writerName"
-                                  :invalid="invalid"
-                                  :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
-                                  @update:value="setForm('writerName', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group v-if="state.hasSystemRole"
-                           class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
-                           required
-            >
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="state.isAllDomainSelected"
-                         class="mr-4"
-                         @change="handleClickAllDomainRadio"
+                <p-field-group class="notice-label-wrapper writer-name-input"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
+                               required
                 >
-                    <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
-                </p-radio>
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="!state.isAllDomainSelected"
-                         @change="handleClickSelectDomainRadio"
+                    <template #default="{invalid}">
+                        <p-text-input :value="writerName"
+                                      :invalid="invalid"
+                                      :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
+                                      @update:value="setForm('writerName', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
+                               required
+                               :invalid="invalidState.noticeTitle"
+                               :invalid-text="invalidTexts.noticeTitle"
                 >
-                    <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
-                </p-radio>
-                <br>
-                <p-select-dropdown class="mt-2 w-1/2"
-                                   :menu="state.domainList"
-                                   :selected="state.selectedDomain"
-                                   :disabled="state.isAllDomainSelected || props.type === 'EDIT'"
-                                   :placeholder="state.isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
-                                   is-filterable
-                                   show-delete-all-button
-                                   @update:selected="handleSelectDomain"
-                />
-            </p-field-group>
-            <p-field-group class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
-                           required
-                           :invalid="invalidState.noticeTitle"
-                           :invalid-text="invalidTexts.noticeTitle"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="noticeTitle"
-                                  :invalid="invalid"
-                                  class="!w-full"
-                                  @update:value="setForm('noticeTitle', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')"
-                           required
-                           :invalid="invalidState.contents"
-                           :invalid-text="invalidTexts.contents"
-            >
-                <template #default="{invalid}">
-                    <text-editor :value="contents"
-                                 :attachments.sync="state.attachments"
-                                 :image-uploader="fileUploader"
-                                 :invalid="invalid"
-                                 @update:value="(d) => setForm('contents', d)"
-                    />
-                </template>
-            </p-field-group>
-            <div v-if="state.hasSystemRole || state.hasDomainRole"
-                 class="notice-create-options-wrapper"
-            >
-                <p-checkbox v-model="state.isPinned">
-                    <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
-                </p-checkbox>
-                <p-checkbox v-model="state.isPopup">
-                    <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
-                </p-checkbox>
-            </div>
+                    <template #default="{invalid}">
+                        <p-text-input :value="noticeTitle"
+                                      :invalid="invalid"
+                                      class="!w-full"
+                                      @update:value="setForm('noticeTitle', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')"
+                               required
+                               :invalid="invalidState.contents"
+                               :invalid-text="invalidTexts.contents"
+                >
+                    <template #default="{invalid}">
+                        <text-editor :value="contents"
+                                     :attachments.sync="state.attachments"
+                                     :image-uploader="fileUploader"
+                                     :invalid="invalid"
+                                     @update:value="(d) => setForm('contents', d)"
+                        />
+                    </template>
+                </p-field-group>
+                <div class="notice-create-options-wrapper">
+                    <p-checkbox v-model="state.isPinned">
+                        <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
+                    </p-checkbox>
+                    <p-checkbox v-model="state.isPopup">
+                        <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
+                    </p-checkbox>
+                </div>
+            </p-data-loader>
         </p-pane-layout>
         <div class="notice-create-buttons-wrapper">
             <p-button style-type="tertiary"
                       size="lg"
+                      :disabled="noticeDetailState.loadingForCUD"
                       @click="$router.go(-1)"
             >
                 {{ $t('INFO.NOTICE.FORM.CANCEL') }}
@@ -286,6 +201,7 @@ watch(() => noticeDetailState.post, async (notice) => {
             <p-button style-type="primary"
                       size="lg"
                       :disabled="!isAllValid"
+                      :loading="noticeDetailState.loadingForCUD"
                       @click="handleConfirm"
             >
                 {{ $t('INFO.NOTICE.FORM.CONFIRM') }}

@@ -1,4 +1,3 @@
-export interface RoleDeleteParameters {
+export interface RoleBindingDeleteParameters {
     role_binding_id: string;
-    workspace_id?: string;
 }
