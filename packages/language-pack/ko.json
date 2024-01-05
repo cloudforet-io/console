@@ -1638,6 +1638,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "중복된 ‘key:value’ 입니다.",
+		"ALT_E_TAG_FORMAT": "유효하지 않은 ‘키:값’ 형식 입니다.",
 		"APP": {
 			"ACTION": "작업",
 			"CREATE": "생성",

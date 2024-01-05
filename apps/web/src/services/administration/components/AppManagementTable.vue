@@ -28,7 +28,7 @@ import AppManagementFormModal from '@/services/administration/components/AppMana
 import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import {
     appStateFormatter,
-    calculateTime,
+    calculateTime, useRoleFormatter,
 } from '@/services/administration/composables/refined-table-data';
 import {
     APP_DROPDOWN_MODAL_TYPE,
@@ -61,7 +61,10 @@ const state = reactive({
     loading: false,
     refinedUserItems: computed(() => appPageState.apps.map((app) => ({
         ...app,
-        role_type: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.name || '',
+        role_type: {
+            type: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.role_type || '',
+            name: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.name || '',
+        },
         last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
     }))),
     fields: computed(() => {
@@ -69,7 +72,7 @@ const state = reactive({
         if (storeState.isAdminMode) {
             additionalFields.push({ name: 'role_type', label: 'Admin Role' });
         } else {
-            additionalFields.push({ name: 'role_type', label: 'Workspace Owner Role' });
+            additionalFields.push({ name: 'role_type', label: 'Workspace Role', sortable: false });
         }
         return [
             { name: 'name', label: 'App Name' },
@@ -273,6 +276,15 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                     <p-copy-button :value="value" />
                 </span>
             </template>
+            <template #col-role_type-format="{value}">
+                <span class="role-type">
+                    <img :src="useRoleFormatter(value.type).image"
+                         alt="role-type-icon"
+                         class="role-type-icon"
+                    >
+                    <span>{{ value.name }}</span>
+                </span>
+            </template>
             <template #col-tags-format="{value}">
                 <template v-if="!!Object.keys(value).length">
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
@@ -338,6 +350,13 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
             width: 1.5rem;
             height: 1.5rem;
         }
+    }
+}
+
+/* custom design-system component - p-data-table */
+:deep(.p-data-table) {
+    .row-height-fixed td:not(.has-width) {
+        overflow-x: initial;
     }
 }
 </style>
