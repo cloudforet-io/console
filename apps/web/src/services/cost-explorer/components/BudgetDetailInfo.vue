@@ -224,7 +224,8 @@ watch(() => costTypeRef.value, (costType) => {
             display: inline-block;
             gap: 0.125rem;
             .target-project-group {
-                @apply flex items-center;
+                @apply items-center;
+                display: inline-block;
                 gap: 0.125rem;
             }
         }
