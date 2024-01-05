@@ -179,10 +179,10 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
 .alert-detail-summary {
     display: flex;
     gap: 1rem;
-    padding-left: 1rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-    justify-content: space-between;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
     .state-dropdown {
         width: 9rem;
         .text-alert, .selected-urgency {
@@ -198,12 +198,15 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
     @screen tablet {
         flex-wrap: wrap;
         gap: 1.5rem;
+        max-width: 100%;
     }
 }
 .content-wrapper {
     display: flex;
     flex-direction: column;
-
+    min-width: 150px;
+    width: 100%;
+    max-width: calc(20% - 1rem);
     .title {
         @apply text-gray-500 font-bold;
         font-size: 0.75rem;
