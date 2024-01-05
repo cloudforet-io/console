@@ -1,21 +1,42 @@
+<script setup lang="ts">
+import type { TranslateResult } from 'vue-i18n';
+
+import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
+
+interface Props {
+    iconOnly?: boolean;
+    title?: string|TranslateResult;
+}
+const props = withDefaults(defineProps<Props>(), {
+    iconOnly: false,
+    title: 'PDF',
+});
+const emit = defineEmits<{(e: 'click', event: MouseEvent): void}>();
+const isBrowserSupported = supportsBrowser();
+</script>
+
 <template>
     <span class="pdf-download-button">
         <p-popover v-if="!isBrowserSupported"
                    class="popover"
                    position="bottom-end"
         >
-            <p-icon-button v-if="iconOnly"
+            <p-icon-button v-if="props.iconOnly"
                            name="ic_download"
                            style-type="tertiary"
                            size="sm"
-                           @click="$emit('click', $event)"
+                           @click="emit('click', $event)"
             />
             <p-button v-else
                       icon-left="ic_download"
                       style-type="tertiary"
-                      @click="$emit('click', $event)"
+                      @click="emit('click', $event)"
             >
-                {{ title }}
+                {{ props.title }}
             </p-button>
             <template #content>
                 <i18n class="popover-content"
@@ -34,62 +55,22 @@
             </template>
         </p-popover>
         <template v-if="isBrowserSupported">
-            <p-icon-button v-if="iconOnly"
+            <p-icon-button v-if="props.iconOnly"
                            name="ic_download"
                            style-type="tertiary"
                            size="sm"
-                           @click="$emit('click', $event)"
+                           @click="emit('click', $event)"
             />
             <p-button v-else
                       icon-left="ic_download"
                       style-type="tertiary"
-                      @click="$emit('click', $event)"
+                      @click="emit('click', $event)"
             >
-                {{ title }}
+                {{ props.title }}
             </p-button>
         </template>
     </span>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
-
-interface Props {
-    iconOnly?: boolean;
-}
-export default defineComponent<Props>({
-    name: 'PdfDownloadButton',
-    components: {
-        PPopover: PPopover as any,
-        PIconButton,
-        PButton,
-    },
-    props: {
-        iconOnly: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String as PropType<string|TranslateResult>,
-            default: 'PDF',
-        },
-    },
-    setup() {
-        return {
-            i18n,
-            isBrowserSupported: supportsBrowser(),
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .pdf-download-button {

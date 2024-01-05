@@ -1,51 +1,5 @@
-<template>
-    <p-tooltip v-if="show"
-               :contents="isEllipsisActive() ? label : undefined"
-               position="bottom"
-    >
-        <router-link class="gnb-sub-menu"
-                     :to="href ? {} : to"
-                     custom
-        >
-            <template #default="{href: toHref, navigate}">
-                <span>
-                    <a class="gnb-sub-contents"
-                       :href="href ? href : toHref"
-                       :target="href ? '_blank' : undefined"
-                       @click.stop="handleClickAnchor(navigate, $event)"
-                    >
-                        <div class="contents-left"
-                             :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
-                        >
-                            <p-i v-if="isDraggable"
-                                 name="ic_drag-handle"
-                                 width="1rem"
-                                 height="1rem"
-                                 class="drag-icon"
-                            />
-                            <div ref="labelRef"
-                                 class="label"
-                            >
-                                {{ label }}
-                            </div>
-                            <beta-mark v-if="higlightTag === 'beta'" />
-                            <new-mark v-else-if="higlightTag === 'new'" />
-                        </div>
-                        <div class="contents-right">
-                            <slot name="extra-mark" />
-                        </div>
-                    </a>
-                </span>
-            </template>
-        </router-link>
-    </p-tooltip>
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
@@ -62,63 +16,73 @@ interface Props {
     to?: Route;
     href?: string;
     isDraggable?: boolean;
-    higlightTag?: HighlightTagType;
+    highlightTag?: HighlightTagType;
 }
-
-export default defineComponent<Props>({
-    name: 'GNBSubMenu',
-    components: {
-        NewMark, BetaMark, PI, PTooltip,
-    },
-    props: {
-        show: {
-            type: Boolean,
-            default: true,
-        },
-        to: {
-            type: Object,
-            default: () => ({}),
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-        label: {
-            type: String as PropType<string|undefined|TranslateResult>,
-            default: '',
-        },
-        higlightTag: {
-            type: String as PropType<HighlightTagType>,
-            default: undefined,
-        },
-        isDraggable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            labelRef: null as HTMLElement|null,
-        });
-        const isEllipsisActive = () => {
-            if (state.labelRef) {
-                return (state.labelRef?.offsetWidth < state.labelRef?.scrollWidth);
-            } return false;
-        };
-
-        const handleClickAnchor = (navigateFn, event: Event) => {
-            if (!props.href) navigateFn(event);
-            emit('navigate');
-        };
-
-        return {
-            ...toRefs(state),
-            isEllipsisActive,
-            handleClickAnchor,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    show: true,
+    label: '',
+    to: () => ({} as Route),
+    href: undefined,
+    isDraggable: false,
+    highlightTag: undefined,
 });
+const emit = defineEmits<{(e: 'navigate'): void;
+}>();
+const labelRef = ref<HTMLElement|null>(null);
+const isEllipsisActive = () => {
+    if (labelRef.value) {
+        return (labelRef.value?.offsetWidth < labelRef.value?.scrollWidth);
+    } return false;
+};
+
+const handleClickAnchor = (navigateFn, event: Event) => {
+    if (!props.href) navigateFn(event);
+    emit('navigate');
+};
 </script>
+
+<template>
+    <p-tooltip v-if="props.show"
+               :contents="isEllipsisActive() ? props.label : undefined"
+               position="bottom"
+    >
+        <router-link class="gnb-sub-menu"
+                     :to="props.href ? {} : props.to"
+                     custom
+        >
+            <template #default="{href: toHref, navigate}">
+                <span>
+                    <a class="gnb-sub-contents"
+                       :href="props.href ? props.href : toHref"
+                       :target="props.href ? '_blank' : undefined"
+                       @click.stop="handleClickAnchor(navigate, $event)"
+                    >
+                        <div class="contents-left"
+                             :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
+                        >
+                            <p-i v-if="props.isDraggable"
+                                 name="ic_drag-handle"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="drag-icon"
+                            />
+                            <div ref="labelRef"
+                                 class="label"
+                            >
+                                {{ label }}
+                            </div>
+                            <beta-mark v-if="props.highlightTag === 'beta'" />
+                            <new-mark v-else-if="props.highlightTag === 'new'" />
+                        </div>
+                        <div class="contents-right">
+                            <slot name="extra-mark" />
+                        </div>
+                    </a>
+                </span>
+            </template>
+        </router-link>
+    </p-tooltip>
+</template>
 
 <style lang="postcss" scoped>
 .gnb-sub-menu {

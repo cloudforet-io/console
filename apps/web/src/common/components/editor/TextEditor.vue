@@ -1,21 +1,7 @@
-<template>
-    <div v-if="editor"
-         class="text-editor"
-         :class="{invalid: invalid}"
-    >
-        <menu-bar :editor="editor" />
-        <editor-content class="editor-content"
-                        :editor="editor"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-
+<script setup lang="ts">
 import {
-    defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
+    onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
-import type { PropType, SetupContext } from 'vue';
 
 import { Color } from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
@@ -33,95 +19,87 @@ import MenuBar from '@/common/components/editor/MenuBar.vue';
 import { loadMonospaceFonts } from '@/styles/fonts';
 
 interface Props {
-    value: string;
-    imageUploader: ImageUploader;
-    attachments: Attachment[];
+    value?: string;
+    imageUploader?: ImageUploader;
+    attachments?: Attachment[];
+    invalid?: boolean;
 }
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    imageUploader: () => Promise.resolve<Attachment>({
+        downloadUrl: '',
+        fileId: '',
+    }),
+    attachments: () => [],
+    invalid: false,
+});
+const emit = defineEmits<{(e: 'update:value', value: string): void;
+    (e: 'update:attachments', attachments: Attachment[]): void;
+}>();
 
-export default defineComponent<Props>({
-    name: 'TextEditor',
-    components: {
-        MenuBar,
-        EditorContent,
-    },
-    model: {
-        prop: 'value',
-        event: 'update:value',
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        imageUploader: {
-            type: Function as PropType<ImageUploader>,
-            default: () => Promise.resolve(''),
-        },
-        attachments: {
-            type: Array as PropType<Attachment[]>,
-            default: () => [],
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        loadMonospaceFonts();
+loadMonospaceFonts();
 
-        const state = reactive({
-            editor: null as null|Editor,
-        });
+const state = reactive({
+    editor: null as null|Editor,
+});
 
-        onMounted(() => {
-            state.editor = new Editor({
-                content: setAttachmentsToContents(props.value, props.attachments),
-                extensions: [
-                    StarterKit.configure({
-                        heading: {
-                            levels: [1, 2, 3],
-                        },
-                        code: {
-                            HTMLAttributes: {
-                                class: 'inline-code',
-                            },
-                        },
-                    }),
-                    Underline,
-                    Link,
-                    TextStyle,
-                    Color,
-                    TextAlign.configure({
-                        types: ['heading', 'paragraph'],
-                    }),
-                    createImageExtension(props.imageUploader),
-                ],
-                onUpdate: () => {
-                    emit('update:value', state.editor?.getHTML() ?? '');
-                    emit('update:attachments', state.editor ? getAttachments(state.editor as Editor) : []);
+onMounted(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    state.editor = new Editor({
+        content: setAttachmentsToContents(props.value, props.attachments),
+        extensions: [
+            StarterKit.configure({
+                heading: {
+                    levels: [1, 2, 3],
                 },
-            });
-        });
+                code: {
+                    HTMLAttributes: {
+                        class: 'inline-code',
+                    },
+                },
+            }),
+            Underline,
+            Link,
+            TextStyle,
+            Color,
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
+            }),
+            createImageExtension(props.imageUploader),
+        ],
+        onUpdate: () => {
+            emit('update:value', state.editor?.getHTML() ?? '');
+            emit('update:attachments', state.editor ? getAttachments(state.editor as Editor) : []);
+        },
+    });
+});
 
-        onBeforeUnmount(() => {
-            if (state.editor) state.editor.destroy();
-        });
+onBeforeUnmount(() => {
+    if (state.editor) state.editor.destroy();
+});
 
-        watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
-            if (!state.editor) return;
-            const isSame = state.editor.getHTML() === value;
-            if (isSame) return;
-            let newContents = value;
-            if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
-            state.editor.commands.setContent(newContents, false);
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+watch([() => props.value, () => props.attachments], ([value, attachments], prev) => {
+    if (!state.editor) return;
+    const isSame = state.editor.getHTML() === value;
+    if (isSame) return;
+    let newContents = value;
+    if (attachments !== prev[1]) newContents = setAttachmentsToContents(value, attachments);
+    state.editor.commands.setContent(newContents, false);
 });
 </script>
+
+<template>
+    <div v-if="editor"
+         class="text-editor"
+         :class="{invalid: props.invalid}"
+    >
+        <menu-bar :editor="state.editor" />
+        <editor-content class="editor-content"
+                        :editor="state.editor"
+        />
+    </div>
+</template>
 
 <style lang="postcss">
 @import './text-editor-nodes.pcss';
