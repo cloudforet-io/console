@@ -1091,10 +1091,10 @@
 			"TITLE": "개인 정보"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "프로젝트 / 그룹 생성",
+			"CREAT_PROJECT": "생성",
 			"CURRENT": "현재 위치",
 			"PLACEHOLDER": "프로젝트 선택",
-			"RELOAD_PROJECT": "프로젝트 불러오기"
+			"RELOAD": "새로고침"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
