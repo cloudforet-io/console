@@ -11,9 +11,9 @@ const AdministrationContainer = () => import('@/services/administration/Administ
 
 const UserMainPage = () => import('@/services/administration/pages/UserMainPage.vue');
 const AppMainPage = () => import('@/services/administration/pages/AppMainPage.vue');
-const RolePage = () => import('@/services/administration/pages/admin/RolePage.vue');
-const RoleCreatePage = () => import('@/services/administration/pages/admin/RoleCreatePage.vue');
-const RoleUpdatePage = () => import('@/services/administration/pages/admin/RoleUpdatePage.vue');
+const RolePage = () => import('@/services/administration/pages/admin/AdminRolePage.vue');
+const RoleCreatePage = () => import('@/services/administration/pages/admin/AdminRoleCreatePage.vue');
+const RoleUpdatePage = () => import('@/services/administration/pages/admin/AdminRoleUpdatePage.vue');
 
 const DomainSettingsPage = () => import('@/services/administration/pages/admin/AdminDomainSettingsPage.vue');
 
