@@ -29,6 +29,19 @@ export const getSelectDropdownMenuWithMultiTypes = (): SelectDropdownMenuItem[] 
 
     return result;
 });
+export const getSelectDropdownMenuWithHeaderNames = (): SelectDropdownMenuItem[] => {
+    const menu = getSelectDropdownMenu(10, 30);
+    const headerNames = range(3).map(() => faker.random.word());
+    menu.forEach((item, i) => {
+        if (i % 10 === 0) {
+            item.type = 'header';
+            item.name = headerNames[i / 10];
+        } else {
+            item.headerName = headerNames[Math.floor(i / 10)];
+        }
+    });
+    return menu;
+};
 
 export const getHandler = (dataSetCount = 3, timeout = 500) => {
     const menuList = range(dataSetCount).map(() => getSelectDropdownMenu());

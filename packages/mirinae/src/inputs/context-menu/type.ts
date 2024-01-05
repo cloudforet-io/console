@@ -22,4 +22,5 @@ export interface MenuItem {
     error?: boolean;
     imageUrl?: string;
     _resultIndex?: number; // A value indicating which item corresponds to or belongs to the nth result among the handler outputs. It is used internally.
+    headerName?: string; // the name of the header to which the item belongs.
 }
