@@ -80,7 +80,7 @@ const storeState = reactive({
 const keyItemSets: KeyItemSet[] = [{
     title: 'Properties',
     items: [
-        { name: 'collector_id', label: 'Collector Id' },
+        { name: 'collector_id', label: 'Collector ID' },
         { name: 'name', label: 'Name' },
         { name: 'schedule.state', label: 'Schedule' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
