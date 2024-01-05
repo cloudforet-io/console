@@ -27,6 +27,7 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
+    if (existingGrantInfo?.isFailed) throw new Error('Grant Role Failed');
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
     if (isDuplicateScope || isDuplicateWorkspace) return undefined;
@@ -84,7 +85,6 @@ export class SpaceRouter {
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             const isAdminMode = appContextStore.getters.isAdminMode;
-            const accessibleWorkspaceList = userWorkspaceStore.getters.workspaceList;
 
 
             /* Browser Back Button Case
@@ -123,7 +123,7 @@ export class SpaceRouter {
                 await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
             }
 
-
+            const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
@@ -144,10 +144,14 @@ export class SpaceRouter {
                 } else if (userAccessLevel < routeAccessLevel) {
                     // When a user tries to another available workspace without target page's access permission.
                     // e.g. In A workspace Dashboard, try to toggle B workspace without dashboard access permission.
-                    const isAccessibleWorkspace = accessibleWorkspaceList?.some((workspace) => workspace.workspace_id === to.params.workspaceId);
+                    const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
                     if (isAccessibleWorkspace) {
                         nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: to.params.workspaceId } };
                     } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
+                } else if (routeAccessLevel === ACCESS_LEVEL.WORKSPACE_PERMISSION && userAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
+                    // When admin user access disable or deleted workspace
+                    const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
+                    if (!isAccessibleWorkspace) nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
                 }
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {

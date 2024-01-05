@@ -22,14 +22,11 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
         workspaceList: computed<WorkspaceModel[]>(() => state.items || []),
         currentWorkspace: computed<WorkspaceModel|undefined>(() => state.currentItem),
         currentWorkspaceId: computed<string|undefined>(() => state.currentItem?.workspace_id),
+
     });
 
     const actions = {
-        async load(userId?: string) {
-            if (!userId) {
-                state.items = [];
-                return;
-            }
+        async load() {
             const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
             state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
         },
@@ -43,6 +40,11 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             }
 
             state.currentItem = currentItem;
+        },
+        async getIsAccessibleWorkspace(workspaceId: string, reload = false) {
+            if (!workspaceId) return false;
+            if (reload) await actions.load();
+            return state.items.some((workspace) => workspace.workspace_id === workspaceId);
         },
     };
 

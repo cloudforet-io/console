@@ -23,7 +23,7 @@ const state = reactive({
 const handleToggleAdminMode = async () => {
     if (store.getters['display/isGrantInProgress']) return;
     if (state.isAdminMode) {
-        await userWorkspaceStore.load(store.state.user.userId);
+        await userWorkspaceStore.load();
         appContextStore.exitAdminMode();
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         if (lastAccessedWorkspaceId) {
