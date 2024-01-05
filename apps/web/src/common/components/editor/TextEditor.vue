@@ -90,7 +90,7 @@ watch([() => props.value, () => props.attachments], ([value, attachments], prev)
 </script>
 
 <template>
-    <div v-if="editor"
+    <div v-if="state.editor"
          class="text-editor"
          :class="{invalid: props.invalid}"
     >

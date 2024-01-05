@@ -13,7 +13,7 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 const props = withDefaults(defineProps<{
-    title?: TranslateResult|string;
+    title?: Omit<TranslateResult, 'null'>|string;
     tags?: Tag;
     loading?: boolean;
 }>(), {

@@ -28,8 +28,8 @@ const props = withDefaults(defineProps<{
     resourceId: string;
     resourceType: string;
     disabled?: boolean;
-    tagEditButtonText?: TranslateResult|string;
-    overlayTitle?: TranslateResult|string;
+    tagEditButtonText?: Omit<TranslateResult, 'null'>|string;
+    overlayTitle?: Omit<TranslateResult, 'null'>|string;
     customFields?: any[];
     customItems?: CloudServiceTagTableItem[];
     customTags?: Tag;

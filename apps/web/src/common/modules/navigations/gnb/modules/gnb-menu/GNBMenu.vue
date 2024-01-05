@@ -40,6 +40,7 @@ interface Props {
     isSelected?: boolean;
     subMenuList?: SubMenu[];
     highlightTag?: HighlightTagType;
+    isAdminMode?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     show: true,
@@ -51,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
     isSelected: false,
     subMenuList: () => [],
     highlightTag: undefined,
+    isAdminMode: false,
 });
 const emit = defineEmits<{(e: 'open-menu', menuId: MenuId): void;
     (e: 'hide-menu'): void;
@@ -85,7 +87,7 @@ const handleMenu = () => {
              :class="[{
                  opened: state.isMenuWithAdditionalMenu && props.isOpened,
                  selected: props.isSelected,
-                 'admin-button': isAdminMode,
+                 'admin-button': props.isAdminMode,
              }]"
         >
             <span class="button-label"
@@ -136,7 +138,7 @@ const handleMenu = () => {
                 />
             </div>
             <div v-if="props.isSelected"
-                 :class="{'menu-underline': true, 'is-admin': isAdminMode}"
+                 :class="{'menu-underline': true, 'is-admin': props.isAdminMode}"
             />
         </div>
     </div>

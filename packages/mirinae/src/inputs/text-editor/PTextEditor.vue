@@ -9,7 +9,7 @@
  * CodeMirror can get String ONLY
  */
 import {
-    computed, nextTick, onBeforeUnmount, reactive, watch,
+    computed, nextTick, onBeforeUnmount, reactive, watch, toRef,
 } from 'vue';
 
 import type { EditorConfiguration } from 'codemirror';
@@ -178,6 +178,8 @@ watch([() => state.textareaRef, () => props.code, () => props.disableAutoReforma
 onBeforeUnmount(() => {
     destroy(state.cmInstance);
 });
+
+const textareaRef = toRef(state, 'textareaRef');
 </script>
 
 <template>
