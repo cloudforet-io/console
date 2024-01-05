@@ -140,7 +140,7 @@ watch(() => costTypeRef.value, (costType) => {
                          :color="gray[400]"
                     />
                 </span>
-                <p-link v-else-if="state.targetLocation"
+                <p-link v-if="state.targetLocation"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
@@ -221,7 +221,7 @@ watch(() => costTypeRef.value, (costType) => {
         font-size: 0.875rem;
         line-height: 120%;
         &.target {
-            @apply flex;
+            display: inline-block;
             gap: 0.125rem;
             .target-project-group {
                 @apply flex items-center;
