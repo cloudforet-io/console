@@ -2,7 +2,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    CollectorPluginModel,
+    CollectorPluginInfo,
 
 } from '@/schema/inventory/collector/model';
 import type { Schedule } from '@/schema/inventory/collector/type';
@@ -13,7 +13,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 interface CollectorPlugin {
     name?: string;
     icon?: string;
-    info: CollectorPluginModel;
+    info: CollectorPluginInfo;
 }
 
 export interface CollectorLink {

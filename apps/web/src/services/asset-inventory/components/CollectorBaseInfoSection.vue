@@ -66,9 +66,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
+import { CollectorPluginInfo } from '@/schema/inventory/collector/model';
 import type {
     CollectorModel,
-    CollectorPluginModel,
 
 
 } from '@/schema/inventory/collector/model';
@@ -106,7 +106,7 @@ const collectorJobState = collectorJobStore.$state;
 const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const state = reactive({
-    collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
+    collectorPluginInfo: computed<CollectorPluginInfo|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
     repositoryPlugin: null as null|PluginModel,
     isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {

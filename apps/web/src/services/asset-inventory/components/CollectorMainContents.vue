@@ -4,11 +4,15 @@ import {
 } from 'vue';
 
 import { PToolbox, PButton, PDataLoader } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type {
+    KeyItemSet,
+    QueryItem,
+    ValueHandler,
+    ValueHandlerMap,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { QueryItem, ValueHandlerMap, ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -81,8 +85,8 @@ const keyItemSets: KeyItemSet[] = [{
         { name: 'schedule.state', label: 'Schedule' },
         { name: 'plugin_info.plugin_id', label: 'Plugin' },
         { name: 'plugin_info.version', label: 'Version' },
-        { name: 'created_at', label: 'Created' },
-        { name: 'last_collected_at', label: 'Last Collected' },
+        { name: 'created_at', label: 'Created', dataType: 'datetime' },
+        { name: 'last_collected_at', label: 'Last Collected', dataType: 'datetime' },
     ],
 }];
 const collectorSearchHandler = reactive({
@@ -155,6 +159,7 @@ const state = reactive({
                 },
                 schedule: d.schedule,
                 recentJobAnalyze,
+                resourceGroup: d.resource_group,
                 hasJobList: !!matchedJob,
             };
         });
