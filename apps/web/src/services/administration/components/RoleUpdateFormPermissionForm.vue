@@ -52,10 +52,13 @@ const updateMenuItems = (item: PageAccessMenuItem, val: boolean, parentItem?: Pa
     }
 };
 const handleUpdateForm = (value: UpdateFormDataType) => {
-    const { id: menuId, val } = value;
+    const { id: menuId, val, isHideMenu } = value;
     const item = find(menuItems.value, { id: menuId });
     const allItem = find(menuItems.value, { id: 'all' }) as PageAccessMenuItem;
     if (item) {
+        if (isHideMenu !== undefined) {
+            item.hideMenu = isHideMenu;
+        }
         if (item.id === 'all') {
             menuItems.value.forEach((menu) => {
                 updateMenuItems(menu, val);
