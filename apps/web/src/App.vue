@@ -78,9 +78,10 @@ const goToSignIn = async () => {
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
 watch(() => route.path, () => {
-    state.notificationEmailModalVisible = !state.isEmailVerified
-        && !LocalStorageAccessor.getItem('hideNotificationEmailModal')
-        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED;
+    state.notificationEmailModalVisible = route.path !== '/'
+        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED
+        && !state.isEmailVerified
+        && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
 }, { immediate: true });
 
 
