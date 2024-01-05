@@ -410,6 +410,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    hideHeaderWithoutItems: {
+        name: 'hideHeaderWithoutItems',
+        type: { name: 'boolean' },
+        description: 'Whether to hide the header when there are no items that indicate the name of the header.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
 
     /* events */
     onHideMenu: {
