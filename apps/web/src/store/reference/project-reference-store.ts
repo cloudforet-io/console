@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse, ListResponse as ApiListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
@@ -38,7 +38,7 @@ let lastLoadedTime = 0;
 
 const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectGroupModel[]> => {
     try {
-        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ApiListResponse<ProjectGroupModel>>({
+        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
             query: {
                 only: ['project_group_id', 'name'],
                 filter: [
@@ -99,7 +99,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
-        for await (const projectInfo of res?.results || []) {
+        res?.results?.forEach((projectInfo) => {
             const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === projectInfo.project_group_id);
             projectReferenceMap[projectInfo.project_id] = {
                 key: projectInfo.project_id,
@@ -114,7 +114,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
                     users: projectInfo.users || [],
                 },
             };
-        }
+        });
 
         state.items = projectReferenceMap;
         lastLoadedTime = currentTime;
