@@ -41,9 +41,8 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
 
             state.currentItem = currentItem;
         },
-        async getIsAccessibleWorkspace(workspaceId: string, reload = false) {
+        getIsAccessibleWorkspace(workspaceId: string) {
             if (!workspaceId) return false;
-            if (reload) await actions.load();
             return state.items.some((workspace) => workspace.workspace_id === workspaceId);
         },
         reset() {

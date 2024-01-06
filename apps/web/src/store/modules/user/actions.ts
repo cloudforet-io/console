@@ -123,6 +123,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         * Therefore, in this specific case, errors are simply logged to the console
         * and not further processed, to avoid complications with uninitialized Router instances.
         * */
+        commit('setCurrentGrantInfo', undefined);
         commit('setCurrentRoleInfo', undefined);
         if (isInstanceOfAPIError(error)) {
             if (error.code === 'ERROR_WORKSPACE_STATE') {
