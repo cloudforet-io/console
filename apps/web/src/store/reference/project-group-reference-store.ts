@@ -4,10 +4,8 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 // eslint-disable-next-line import/no-cycle
@@ -35,19 +33,8 @@ export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
-    if (!projectGroupId) return undefined;
-    try {
-        return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-            project_group_id: projectGroupId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
+
 export const useProjectGroupReferenceStore = defineStore('project-group-reference', () => {
-    const fetcher = getCancellableFetcher<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>(SpaceConnector.clientV2.identity.projectGroup.list);
     const state = reactive({
         items: null as ProjectGroupReferenceMap | null,
     });
@@ -67,13 +54,12 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
             },
         };
         try {
-            const { status, response } = await fetcher(params);
-            if (status === 'cancelled') return;
+            const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>(params);
+
             const projectGroupReferenceMap: ProjectGroupReferenceMap = {};
 
-            // eslint-disable-next-line no-restricted-syntax
-            for await (const projectGroupInfo of response?.results || []) {
-                const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
+            res?.results?.forEach((projectGroupInfo) => {
+                const parentGroup = res.results?.find((d) => d.project_group_id === projectGroupInfo.parent_group_id);
                 projectGroupReferenceMap[projectGroupInfo.project_group_id] = {
                     key: projectGroupInfo.project_group_id,
                     label: (parentGroup)
@@ -86,7 +72,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
                         } : undefined,
                     },
                 };
-            }
+            });
 
             state.items = projectGroupReferenceMap;
             lastLoadedTime = currentTime;
@@ -96,7 +82,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
     };
 
     const sync = async (projectGroupInfo: ProjectGroupModel) => {
-        const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
+        const parentGroup = state.items?.[projectGroupInfo.parent_group_id];
         state.items = {
             ...state.items,
             [projectGroupInfo.project_group_id]: {
@@ -106,7 +92,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
                 name: projectGroupInfo.name,
                 data: {
                     parentGroupInfo: parentGroup ? {
-                        id: parentGroup.project_group_id,
+                        id: parentGroup.key,
                         name: parentGroup.name,
                     } : undefined,
                 },
