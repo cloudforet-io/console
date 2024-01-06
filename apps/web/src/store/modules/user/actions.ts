@@ -136,6 +136,8 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
             } else {
                 SpaceConnector.flushToken();
             }
+        } else {
+            SpaceConnector.flushToken();
         }
     } finally {
         /*
