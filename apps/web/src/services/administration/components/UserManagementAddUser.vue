@@ -72,7 +72,7 @@ const handleClickTextInput = async () => {
 };
 const handleChangeTextInput = debounce((value: string) => {
     formState.searchText = value;
-    if (!userPageState.isAdminMode && userPageState.afterWorkspaceCreated) {
+    if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }

@@ -13,7 +13,6 @@ import { cloneDeep, map } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
@@ -35,12 +34,20 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
-    fields: computed(() => [
-        { name: 'user_id', label: 'User ID' },
-        { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'role_type', label: userPageState.isAdminMode ? 'Admin Role' : 'Workspace Role Type' },
-    ]),
+    fields: computed(() => {
+        const baseField = [
+            { name: 'user_id', label: 'User ID' },
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
+        ];
+        return userPageState.isAdminMode ? [
+            ...baseField,
+            { name: 'role_id', label: 'Admin Role' },
+        ] : [
+            ...baseField,
+            { name: 'role_type', label: 'Workspace Role Type' },
+        ];
+    }),
 });
 
 /* Component */
@@ -148,14 +155,12 @@ const disableUser = async (userId: string): Promise<boolean> => {
                       class="capitalize"
             />
         </template>
-        <template #col-role_type-format="{ value }">
-            <span
-                v-if="userPageState.isAdminMode
-                    && value !== ROLE_TYPE.USER"
-            >
-                {{ $t('IAM.USER.FORM.ASSIGN_DOMAIN_ROLE') }} -
-            </span>
-            <span> {{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
+        <template #col-role_id-format="{value}">
+            <span v-if="!value">--</span>
+            <span v-else> {{ userPageStore.roleMap[value]?.name }}</span>
+        </template>
+        <template #col-role_type-format="{value}">
+            <span> {{ useRoleFormatter(value, true).name }}</span>
         </template>
     </p-table-check-modal>
 </template>
