@@ -131,8 +131,13 @@ export class SpaceRouter {
             let nextLocation;
 
 
+            if (grantAcessFailStatus) {
+                await userWorkspaceStore.load();
+                nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
+                SpaceRouter.router.app?.$store.commit('error/setGrantAccessFailStatus', false);
+
             // When a user is authenticated
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
+            } else if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 // When a user need to reset password and tries to go to other pages, redirect to reset password page
                 if (userNeedPwdReset && to.name !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     nextLocation = { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
@@ -143,15 +148,12 @@ export class SpaceRouter {
                 } else if (userAccessLevel < routeAccessLevel) {
                     // When a user tries to another available workspace without target page's access permission.
                     // e.g. In A workspace Dashboard, try to toggle B workspace without dashboard access permission.
-                    const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
+                    const isAccessibleWorkspace = userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId);
                     if (isAccessibleWorkspace) {
                         nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: to.params.workspaceId } };
                     } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
-                } else if (routeAccessLevel === ACCESS_LEVEL.WORKSPACE_PERMISSION && userAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
-                    // When admin user access disable or deleted workspace
-                    const isAccessibleWorkspace = await userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId, grantAcessFailStatus);
-                    if (!isAccessibleWorkspace) nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
                 }
+
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 if (!isTokenAlive) {
