@@ -76,13 +76,6 @@ export const USER_SEARCH_HANDLERS = {
         }] as KeyItemSet[],
 };
 
-export const USER_STATUS_TABLE_FIELDS = [
-    { name: 'user_id', label: 'User ID' },
-    { name: 'name', label: 'Name' },
-    { name: 'state', label: 'State' },
-    { name: 'role_type', label: 'Admin Role' },
-] as const;
-
 // Tab
 export const USER_TAB_TABLE_FIELDS = [
     { name: 'user_id', label: 'User ID', sortable: false },

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+    computed,
     getCurrentInstance, reactive,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
@@ -21,7 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useRoleFormatter, userStateFormatter } from '@/services/administration/composables/refined-table-data';
-import { USER_MODAL_TYPE, USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
+import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const vm = getCurrentInstance()?.proxy as Vue;
@@ -33,6 +34,12 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
+    fields: computed(() => [
+        { name: 'user_id', label: 'User ID' },
+        { name: 'name', label: 'Name' },
+        { name: 'state', label: 'State' },
+        { name: 'role_type', label: userPageState.isAdminMode ? 'Admin Role' : 'Workspace Role Type' },
+    ]),
 });
 
 /* Component */
@@ -128,7 +135,7 @@ const disableUser = async (userId: string): Promise<boolean> => {
     <p-table-check-modal :visible="userPageState.modal.visible.status"
                          :header-title="userPageState.modal.title"
                          :theme-color="userPageState.modal.themeColor"
-                         :fields="USER_STATUS_TABLE_FIELDS"
+                         :fields="state.fields"
                          :loading="state.loading"
                          :items="userPageStore.selectedUsers"
                          modal-size="md"
