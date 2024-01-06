@@ -63,7 +63,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItems.length > 0) {
+    if (!props.disabled && props.selectedItems.length > 0) {
         emit('click-delete');
     }
 };
