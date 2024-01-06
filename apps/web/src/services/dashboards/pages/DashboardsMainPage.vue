@@ -67,7 +67,7 @@ const state = reactive({
         if (dashboardState.scope === 'PRIVATE') {
             return !!(state.privateDashboardList.length);
         }
-        return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
+        return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length || state.privateDashboardList.length));
     }),
 });
 
