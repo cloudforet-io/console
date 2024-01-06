@@ -99,7 +99,9 @@ export const useUserReferenceStore = defineStore('user-reference', () => {
             },
         };
 
-        const fetcher = _state.isAdminMode
+        const grantScope = store.getters['user/getCurrentGrantInfo'].scope;
+
+        const fetcher = _state.isAdminMode && grantScope === 'ADMIN'
             ? SpaceConnector.clientV2.identity.user.list
             : SpaceConnector.clientV2.identity.workspaceUser.list;
         const res = await fetcher<UserListParameters|WorkspaceUserListParameters, ListResponse<_UserModel>>(params);
