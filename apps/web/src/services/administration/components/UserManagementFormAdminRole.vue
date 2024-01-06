@@ -223,14 +223,8 @@ watch(() => roleState.proxySelectedItems, (role) => {
     }
 }
 
-/* TODO: will be deleted after p-select-dropdown update */
-
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
-    .selection-display-container {
-        @apply flex items-center;
-        gap: 0.25rem;
-    }
     &.no-data {
         .clear-all-wrapper {
             @apply hidden;

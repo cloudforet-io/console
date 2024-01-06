@@ -4,15 +4,16 @@ import { pinia } from '@/store/pinia';
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 
-export const initWorkspace = async (userId?: string): Promise<string|undefined> => {
+export const initWorkspace = async (userId?: string): Promise<void> => {
+    if (!userId) return;
     // NOTE: this is to use pinia store outside vue component
     useUserWorkspaceStore(pinia);
 
-    const workspaceStore = useUserWorkspaceStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
 
     /* Workspace Load */
-    await workspaceStore.load(userId);
-    const lastAccessedWorkspaceId = userId ? await getLastAccessedWorkspaceId() : undefined;
+    await userWorkspaceStore.load();
+    const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
 
     /* Set Default Workspace */
     const { pathname } = window.location;
@@ -23,7 +24,5 @@ export const initWorkspace = async (userId?: string): Promise<string|undefined> 
     } else if (workspacePath) {
         workspaceId = workspacePath;
     } else workspaceId = lastAccessedWorkspaceId;
-    workspaceStore.setCurrentWorkspace(workspaceId);
-
-    return workspaceStore.getters.currentWorkspaceId;
+    userWorkspaceStore.setCurrentWorkspace(workspaceId);
 };

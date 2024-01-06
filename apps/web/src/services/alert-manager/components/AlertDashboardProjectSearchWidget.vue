@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, getCurrentInstance, reactive, watch,
 } from 'vue';
@@ -15,6 +14,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -31,6 +31,10 @@ const props = defineProps<{
 }>();
 const vm = getCurrentInstance()?.proxy as Vue;
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     totalCount: 0,
@@ -73,7 +77,7 @@ const listAlertByProject = async () => {
     state.loading = true;
     try {
         const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.alertByProject({
-            // eslint-disable-next-line camelcase
+            workspace_id: storeState.currentWorkspaceId,
             activated_projects: props.activatedProjects,
             query: AlertByProjectApiQuery,
         });

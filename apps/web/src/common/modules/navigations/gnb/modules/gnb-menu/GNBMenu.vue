@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { RawLocation } from 'vue-router';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PDivider } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
@@ -25,10 +25,6 @@ import GNBDashboardMenu
 import IntegrationSubMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/Integration-menu/IntegrationSubMenu.vue';
 
-interface SubMenu extends DisplayMenu {
-    href?: string;
-}
-
 interface Props {
     menuId: MenuId;
     show?: boolean;
@@ -38,7 +34,7 @@ interface Props {
     hasPermission?: boolean;
     isOpened?: boolean;
     isSelected?: boolean;
-    subMenuList?: SubMenu[];
+    subMenuList?: DisplayMenu[];
     highlightTag?: HighlightTagType;
     isAdminMode?: boolean;
 }
@@ -111,7 +107,6 @@ const handleMenu = () => {
                      color="inherit transparent"
                 />
             </span>
-
             <div v-if="state.hasCustomMenu"
                  v-show="props.isOpened"
                  class="custom-menu-wrapper"
@@ -127,15 +122,38 @@ const handleMenu = () => {
                  v-show="props.isOpened"
                  class="sub-menu-wrapper"
             >
-                <g-n-b-sub-menu v-for="(subMenu, index) in props.subMenuList"
-                                :key="index"
-                                :show="!subMenu.hideOnGNB"
-                                :label="subMenu.label"
-                                :to="subMenu.to"
-                                :href="subMenu.href"
-                                :highlight-tag="subMenu.highlightTag"
-                                @navigate="hideMenu"
-                />
+                <template v-for="(subMenu, index) in props.subMenuList">
+                    <div v-if="subMenu.subMenuList?.length"
+                         :key="`sub-menu-group-${index}`"
+                         class="sub-menu-group"
+                    >
+                        <p class="sub-menu-title">
+                            {{ subMenu.label }}
+                        </p>
+                        <g-n-b-sub-menu v-for="(child, i) in subMenu.subMenuList"
+                                        :key="`sub-menu-child-${i}`"
+                                        :show="!child.hideOnGNB"
+                                        :label="child.label"
+                                        :to="child.to"
+                                        :href="child.href"
+                                        :highlight-tag="child.highlightTag"
+                                        @navigate="hideMenu"
+                        />
+                        <p-divider v-if="subMenu.subMenuList.length - 1 > index"
+                                   :key="`sub-menu-divider-${index}`"
+                                   class="sub-menu-divider"
+                        />
+                    </div>
+                    <g-n-b-sub-menu v-else
+                                    :key="`sub-menu-${index}`"
+                                    :show="!subMenu.hideOnGNB"
+                                    :label="subMenu.label"
+                                    :to="subMenu.to"
+                                    :href="subMenu.href"
+                                    :highlight-tag="subMenu.highlightTag"
+                                    @navigate="hideMenu"
+                    />
+                </template>
             </div>
             <div v-if="props.isSelected"
                  :class="{'menu-underline': true, 'is-admin': props.isAdminMode}"
@@ -209,7 +227,7 @@ const handleMenu = () => {
     }
 
     .sub-menu-wrapper {
-        @apply bg-white border border-gray-200 rounded-xs;
+        @apply bg-white border border-gray-200 rounded-xs text-gray-900;
         position: absolute;
         top: $gnb-height;
         margin-top: -1.125rem;
@@ -218,6 +236,21 @@ const handleMenu = () => {
         z-index: 1000;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
+        .sub-menu-title {
+            @apply text-gray-500 rounded;
+            height: 2rem;
+            padding: 0.5rem;
+            font-weight: bold;
+            font-size: 0.75rem;
+            line-height: 1.25;
+            letter-spacing: 0.015rem;
+            text-transform: capitalize;
+            cursor: default;
+        }
+        .sub-menu-divider {
+            margin: 0.5rem;
+            width: calc(100% - 1rem);
+        }
     }
     .custom-menu-wrapper {
         @apply rounded-xs;

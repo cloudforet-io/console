@@ -16,7 +16,7 @@ abstract class Authenticator {
             authType,
             verify_code: verifyCode,
         });
-        await userWorkspaceStore.load(store.state.user.userId);
+        await userWorkspaceStore.load();
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');
     }

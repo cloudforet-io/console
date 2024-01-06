@@ -268,7 +268,9 @@ onMounted(() => {
                :menu-set="state.menuSet"
                :show-favorite-only.sync="state.showFavoriteOnly"
         >
-            <template #default>
+            <template v-if="!storeState.isAdminMode"
+                      #default
+            >
                 <l-n-b-router-menu-item :item="relocateNotificationState.data"
                                         open-new-tab
                 >
@@ -322,7 +324,10 @@ onMounted(() => {
                 </p-select-dropdown>
             </template>
         </l-n-b>
-        <cost-explorer-l-n-b-relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
+        <cost-explorer-l-n-b-relocate-dashboard-modal
+            v-if="!storeState.isAdminMode"
+            :visible.sync="relocateNotificationState.isModalVisible"
+        />
     </aside>
 </template>
 

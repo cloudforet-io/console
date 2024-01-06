@@ -158,20 +158,16 @@ export default {
             keyItemSets: computed<KeyItemSet[]>(() => [{
                 title: 'Properties',
                 items: [
-                    { name: 'cloud_service_type', label: 'Cloud Service Type' },
                     { name: 'cloud_service_group', label: 'Cloud Service Group' },
-                    { name: 'service_code', label: 'Product' },
-                    { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
+                    { name: 'ref_cloud_service_type.service_code', label: 'Product' },
                     { name: 'project_id', label: 'Project', valueSet: storeState.projects },
                     { name: 'collection_info.service_account_id', label: 'Service Account', valueSet: storeState.serviceAccounts },
                     { name: 'account', label: 'Account ID' },
                 ],
             }]),
             valueHandlerMap: {
-                cloud_service_type: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_type'),
                 cloud_service_group: makeDistinctValueHandler('inventory.CloudService', 'cloud_service_group'),
-                service_code: makeDistinctValueHandler('inventory.CloudServiceType', 'service_code'),
-                project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
+                'ref_cloud_service_type.service_code': makeDistinctValueHandler('inventory.CloudServiceType', 'service_code'),
                 project_id: makeReferenceValueHandler('identity.Project'),
                 'collection_info.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
                 account: makeDistinctValueHandler('inventory.CloudService', 'account'),

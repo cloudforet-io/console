@@ -99,8 +99,8 @@ export const ADMIN_MENU_LIST: Menu[] = [
                 id: MENU_ID.IAM,
                 subMenuList: [
                     { id: MENU_ID.USER },
-                    { id: MENU_ID.ROLE },
                     { id: MENU_ID.APP },
+                    { id: MENU_ID.ROLE },
                 ],
             },
             {

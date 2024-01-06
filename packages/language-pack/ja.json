@@ -994,6 +994,10 @@
 				"PROFILE": "マイページ",
 				"RECENT_FAVORITE": "最近のアクセス / お気に入り",
 				"SEARCH": "検索"
+			},
+			"WORKSPACE": {
+				"CURRENT_WORKSPACE": "",
+				"SWITCH_TO": ""
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1094,7 +1098,6 @@
 			"CREAT_PROJECT": "",
 			"CURRENT": "現在",
 			"PLACEHOLDER": "プロジェクト選択",
-			"RELOAD": "",
 			"RELOAD_PROJECT": ""
 		},
 		"SESSION_MODAL": {
@@ -1638,6 +1641,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
+		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",
 		"APP": {
 			"ACTION": "作業",
 			"CREATE": "作成",

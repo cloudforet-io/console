@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    computed,
     reactive, watch, watchEffect,
 } from 'vue';
 
@@ -11,6 +12,8 @@ import { find } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,6 +35,10 @@ const props = defineProps<{
     activatedProjects: string[];
 }>();
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     currentDate: dayjs.utc(),
     createdSummaryData: {
@@ -92,6 +99,7 @@ const getAlertHistorySummary = async () => {
             start: current.subtract(1, 'month').format('YYYY-MM-01'),
             end: current.add(1, 'month').format('YYYY-MM-01'),
             activated_projects: props.activatedProjects,
+            workspace_id: storeState.currentWorkspaceId,
         });
         setSummaryData(current, results);
     } catch (e) {

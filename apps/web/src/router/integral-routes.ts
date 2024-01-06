@@ -57,7 +57,7 @@ export const integralRoutes: RouteConfig[] = [
                 redirect: (to) => {
                     const userWorkspaceStore = useUserWorkspaceStore();
                     const workspaceList = userWorkspaceStore.getters.workspaceList;
-                    if (!workspaceList) return ({ name: MY_PAGE_ROUTE._NAME });
+                    if (!workspaceList || workspaceList.length < 1) return ({ name: MY_PAGE_ROUTE._NAME });
 
                     const currentWorkspaceIdFromUrl = to.params.workspaceId;
                     const currentWorkspaceId = currentWorkspaceIdFromUrl || userWorkspaceStore.getters.currentWorkspaceId;

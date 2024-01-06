@@ -11,6 +11,8 @@ import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -18,6 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     green, red, white, gray,
 } from '@/styles/colors';
+
 
 enum PROJECT_STATUS {
     issue = 'issue',
@@ -29,6 +32,10 @@ interface ChartData {
     color: string;
 }
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     loading: true,
@@ -102,7 +109,9 @@ const drawChart = (ctx) => {
 const getCurrentProjectStatus = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.currentProjectStatus();
+        const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.currentProjectStatus({
+            workspace_id: storeState.currentWorkspaceId,
+        });
         state.count.total = total_count;
         state.count.issue = results.filter((d) => d.is_issued).length;
         state.count.healthy = total_count - state.count.issue;

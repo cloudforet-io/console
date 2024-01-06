@@ -14,6 +14,7 @@ export interface DisplayMenu extends Menu {
     highlightTag?: HighlightTagType;
     to: Location;
     subMenuList?: DisplayMenu[];
+    href?: string;
 }
 
 export interface DisplayState {

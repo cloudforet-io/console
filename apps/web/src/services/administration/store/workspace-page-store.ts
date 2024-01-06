@@ -37,7 +37,7 @@ interface WorkspacePageState {
 }
 
 export interface WorkspaceTableModel extends WorkspaceModel {
-    users?: number;
+    users?: string;
 }
 
 export const useWorkspacePageStore = defineStore('workspace-page', {
@@ -94,7 +94,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                     const roleBindingsFilteredByWorkspaceId = this.roleBindings.filter((roleBinding) => roleBinding.workspace_id === workspace.workspace_id);
                     return {
                         ...workspace,
-                        users: roleBindingsFilteredByWorkspaceId.length,
+                        users: roleBindingsFilteredByWorkspaceId.length.toString(),
                     };
                 });
             } catch (e) {

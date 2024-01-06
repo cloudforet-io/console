@@ -31,7 +31,7 @@ const handleToggleAdminMode = throttle(async () => {
         return;
     }
     if (state.isAdminMode) {
-        await userWorkspaceStore.load(store.state.user.userId);
+        await userWorkspaceStore.load();
         appContextStore.exitAdminMode();
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         if (lastAccessedWorkspaceId) {
