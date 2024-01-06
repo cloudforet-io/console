@@ -28,7 +28,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 
 const {
-    password, userId, mfaEmail, authType, accessToken,
+    password, userId, mfaEmail, accessToken,
 } = route.params;
 
 const state = reactive({
@@ -71,7 +71,7 @@ const handleClickGoBackButton = () => {
 const handleClickResend = async () => {
     state.loading = true;
     try {
-        await loadAuth().signIn(state.credentials, authType);
+        await loadAuth().signIn(state.credentials, 'MFA');
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {

@@ -107,7 +107,6 @@ export default defineComponent({
                         accessToken: state.token,
                         mfaEmail: userEmail[0],
                         userId: state.beforeUser,
-                        authType: 'EXTERNAL',
                     },
                 });
             } else {
