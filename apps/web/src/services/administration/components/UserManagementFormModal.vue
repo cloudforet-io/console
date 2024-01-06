@@ -136,6 +136,7 @@ const handleConfirm = async () => {
     }
 };
 const fetchRoleBinding = async (item?: AddModalMenuItem) => {
+    if (state.data.user_id === store.state.user.userId) return;
     if (isEmpty(formState.role)) return;
 
     const roleParams = {

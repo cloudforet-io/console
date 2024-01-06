@@ -186,7 +186,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div>
+    <div class="project-detail-page">
         <p-data-loader class="page-inner"
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -304,6 +304,9 @@ onUnmounted(() => {
 </template>
 
 <style lang="postcss" scoped>
+.project-detail-page {
+    height: 100%;
+}
 .page-inner {
     height: 100%;
     max-width: 1368px;

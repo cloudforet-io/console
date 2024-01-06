@@ -63,7 +63,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItems.length > 0) {
+    if (!props.disabled && props.selectedItems.length > 0) {
         emit('click-delete');
     }
 };
@@ -156,7 +156,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             </div>
             <div class="extra-button-wrapper">
                 <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
-                      class="delete-all-button"
+                      :class="{'delete-all-button': true, 'disabled': props.disabled}"
                       @click.stop="handleClickDeleteAll"
                 >
                     <p-i name="ic_close"
@@ -224,6 +224,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             .delete-all-button {
                 @apply inline-flex items-center text-gray-400 cursor-pointer;
                 width: 1rem;
+                &.disabled {
+                    @apply cursor-not-allowed;
+                }
             }
             .arrow-button {
                 @apply inline-flex items-center text-gray-600 cursor-pointer;
