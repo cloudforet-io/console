@@ -28,19 +28,25 @@ const userWorkspaceStore = useUserWorkspaceStore();
 
 
 const {
-    password, userId, mfaEmail, authType,
+    password, userId, mfaEmail, authType, accessToken,
 } = route.params;
-
-const credentials = {
-    user_id: userId,
-    password,
-};
 
 const state = reactive({
     loading: false,
     confirmLoading: false,
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
+    credentials: computed(() => {
+        if (!accessToken) {
+            return {
+                user_id: userId,
+                password,
+            };
+        }
+        return {
+            access_token: accessToken,
+        };
+    }),
 });
 
 const validationState = reactive({
@@ -65,7 +71,7 @@ const handleClickGoBackButton = () => {
 const handleClickResend = async () => {
     state.loading = true;
     try {
-        await loadAuth().signIn(credentials, authType);
+        await loadAuth().signIn(state.credentials, authType);
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {
@@ -81,7 +87,7 @@ const handleClickResend = async () => {
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
     try {
-        await loadAuth().signIn(credentials, authType, validationState.verificationCode);
+        await loadAuth().signIn(state.credentials, 'MFA', validationState.verificationCode);
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
