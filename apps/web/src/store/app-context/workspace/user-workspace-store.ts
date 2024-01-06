@@ -46,6 +46,10 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             if (reload) await actions.load();
             return state.items.some((workspace) => workspace.workspace_id === workspaceId);
         },
+        reset() {
+            state.items = [];
+            state.currentItem = undefined;
+        },
     };
 
     return {
