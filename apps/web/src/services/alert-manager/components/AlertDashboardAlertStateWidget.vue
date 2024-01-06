@@ -21,6 +21,7 @@ import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -74,6 +75,10 @@ const tabState = reactive({
     },
 });
 const allReferenceStore = useAllReferenceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: true,
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
@@ -140,7 +145,10 @@ const getQuery = () => {
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({ query: getQuery() });
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+            query: getQuery(),
+            workspace_id: storeState.currentWorkspaceId,
+        });
         state.allPage = getAllPage(total_count, 10);
         state.items = results ?? [];
     } catch (e) {
@@ -154,6 +162,7 @@ const statAlerts = async () => {
     try {
         const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
             activated_projects: props.activatedProjects,
+            workspace_id: storeState.currentWorkspaceId,
         });
         const resolvedCount = find(results, { state: ALERT_STATE.RESOLVED })?.total || 0;
         const acknowledgedCount = find(results, { state: ALERT_STATE.ACKNOWLEDGED })?.total || 0;
