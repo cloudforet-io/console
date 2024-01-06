@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import Vue, { onMounted, onUnmounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -23,8 +22,8 @@ import { WORKSPACE_STATE } from '@/services/administration/constants/workspace-c
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
-
 const workspacePageStore = useWorkspacePageStore();
+const workspacePageState = workspacePageStore.$state;
 const userPageStore = useUserPageStore();
 
 const route = useRoute();
@@ -116,7 +115,10 @@ onUnmounted(() => {
 
 <template>
     <section class="workspaces-page">
-        <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')">
+        <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
+                   :total-count="workspacePageState.totalCount"
+                   use-total-count
+        >
             <template #extra>
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"

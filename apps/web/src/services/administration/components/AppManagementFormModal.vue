@@ -82,12 +82,11 @@ const handleClose = () => {
 };
 const handleChangeInput = (event) => {
     formState.searchText = event.target.value;
-    if (formState.searchText !== '') {
-        validationState.isValid = true;
-        validationState.invalidText = '';
-    }
+    validationState.isValid = true;
+    validationState.invalidText = '';
 };
 const handleEnterKey = () => {
+    if (formState.searchText === '') return;
     if (!formState.searchText.includes(':') || formState.searchText.split(':').length > 2) {
         validationState.isValid = false;
         validationState.invalidText = i18n.t('IAM.ALT_E_TAG_FORMAT');
@@ -126,6 +125,8 @@ const initState = () => {
     formState.name = '';
     formState.role = {} as AppDropdownMenuItem;
     formState.tags = {} as Tags;
+    formState.selectedTags = [];
+    formState.searchText = '';
     dropdownState.searchText = '';
     dropdownState.selectedMenuItems = [];
 };
