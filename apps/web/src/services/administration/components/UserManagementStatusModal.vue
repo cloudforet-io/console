@@ -13,6 +13,7 @@ import { cloneDeep, map } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
 import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
 import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
@@ -148,7 +149,13 @@ const disableUser = async (userId: string): Promise<boolean> => {
             />
         </template>
         <template #col-role_type-format="{ value }">
-            <span>{{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
+            <span
+                v-if="userPageState.isAdminMode
+                    && value !== ROLE_TYPE.USER"
+            >
+                {{ $t('IAM.USER.FORM.ASSIGN_DOMAIN_ROLE') }} -
+            </span>
+            <span> {{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
         </template>
     </p-table-check-modal>
 </template>
