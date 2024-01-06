@@ -48,12 +48,11 @@ const handleClickButton = () => {
 };
 const handleChangeInput = (event) => {
     state.searchText = event.target.value;
-    if (state.searchText !== '') {
-        validationState.isValid = true;
-        validationState.invalidText = '';
-    }
+    validationState.isValid = true;
+    validationState.invalidText = '';
 };
 const handleEnterKey = () => {
+    if (state.searchText === '') return;
     if (!state.searchText.includes(':') || state.searchText.split(':').length > 2) {
         validationState.isValid = false;
         validationState.invalidText = i18n.t('IAM.ALT_E_TAG_FORMAT');
