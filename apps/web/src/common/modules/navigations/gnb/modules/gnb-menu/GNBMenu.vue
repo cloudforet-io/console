@@ -107,8 +107,7 @@ const handleMenu = () => {
                      color="inherit transparent"
                 />
             </span>
-            <div v-if="state.hasCustomMenu"
-                 v-show="props.isOpened"
+            <div v-if="state.hasCustomMenu && props.isOpened"
                  class="custom-menu-wrapper"
             >
                 <g-n-b-dashboard-menu v-show="props.menuId === MENU_ID.DASHBOARDS"
