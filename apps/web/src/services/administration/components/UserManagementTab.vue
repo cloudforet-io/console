@@ -19,12 +19,24 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/administration/composables/refined-table-data';
-import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-constant';
+import { USER_TABS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const state = reactive({
+    field: computed(() => ([
+        { name: 'user_id', label: 'User ID', sortable: false },
+        { name: 'name', label: 'Name', sortable: false },
+        { name: 'state', label: 'State', sortable: false },
+        { name: 'role_type', label: userPageState.isAdminMode ? 'Admin Role' : 'Workspace Role', sortable: false },
+        { name: 'tags', label: 'Tags' },
+        { name: 'auth_type', label: 'Auth Type', sortable: false },
+        { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
+        { name: 'timezone', label: 'Timezone', sortable: false },
+    ])),
+});
 const singleItemTabState = reactive({
     userTabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
@@ -96,7 +108,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="USER_TAB_TABLE_FIELDS"
+                <p-data-table :fields="state.field"
                               :sortable="false"
                               :selectable="false"
                               :items="multiItemTabState.refinedUserItems"
