@@ -11,6 +11,7 @@ import { clone } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -38,8 +39,8 @@ const state = reactive({
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
         const menuList: SelectDropdownMenuItem[] = [
-            { type: 'header', name: 'current_workspace_header', label: 'Current Workspace' } as SelectDropdownMenuItem,
-            { type: 'header', name: 'switch_to_header', label: 'Switch To' } as SelectDropdownMenuItem,
+            { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
         ];
         state.workspaceList.forEach((_workspace) => {
             if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {

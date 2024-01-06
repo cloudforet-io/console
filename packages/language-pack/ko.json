@@ -994,6 +994,10 @@
 				"PROFILE": "마이페이지",
 				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
+			},
+			"WORKSPACE": {
+				"CURRENT_WORKSPACE": "현재 워크스페이스",
+				"SWITCH_TO": "다른 워크스페이스로 변경"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1094,8 +1098,7 @@
 			"CREAT_PROJECT": "생성",
 			"CURRENT": "현재 위치",
 			"PLACEHOLDER": "프로젝트 선택",
-			"RELOAD": "새로고침",
-			"RELOAD_PROJECT": ""
+			"RELOAD_PROJECT": "새로고침"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
