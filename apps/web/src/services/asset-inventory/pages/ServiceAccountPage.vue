@@ -60,6 +60,7 @@ const { query } = SpaceRouter.router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -91,14 +92,14 @@ const tableState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: computed<DynamicLayout|undefined>(() => (tableState.isTrustedAccount
-        ? serviceAccountSchemaStore.state.trustedAccountTableSchema : serviceAccountSchemaStore.state.generalAccountTableSchema)),
+        ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => [
         { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
         { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
     ]),
-    selectedAccountType: computed<AccountType>(() => serviceAccountSchemaStore.state.selectedAccountType),
+    selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
 });
@@ -206,7 +207,7 @@ const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
 
-const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaStore.state.selectedAccountType = accountType; };
+const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
     SpaceRouter.router.push({
