@@ -35,7 +35,7 @@ class GoogleAuth extends Authenticator {
         }
     }
 
-    static async onSuccess(accessToken) {
+    static async onSuccess(accessToken, onErrorCallback) {
         try {
             store.dispatch('user/startSignIn');
             GoogleAuth.accessToken = accessToken;
@@ -44,15 +44,16 @@ class GoogleAuth extends Authenticator {
             };
             await super.signIn(credentials, 'EXTERNAL');
         } catch (e: any) {
+            if (onErrorCallback) onErrorCallback(e, accessToken);
             await GoogleAuth.signOut();
             await store.dispatch('display/showSignInErrorMessage');
-            throw new Error(e);
+            throw e;
         } finally {
             store.dispatch('user/finishSignIn');
         }
     }
 
-    static signIn = async (onSignInCallback?) => {
+    static signIn = async (onSignInCallback?, onErrorCallback?) => {
         await GoogleAuth.loadGapi();
         const tokenClient = await google.accounts.oauth2.initTokenClient({
             client_id: store.state.domain.authOptions.client_id,
@@ -60,7 +61,7 @@ class GoogleAuth extends Authenticator {
             include_granted_scopes: false,
             callback: async (res) => {
                 if (google.accounts.oauth2.hasGrantedAllScopes(res, 'https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email')) {
-                    await GoogleAuth.onSuccess(res.access_token);
+                    await GoogleAuth.onSuccess(res.access_token, onErrorCallback);
                     if (onSignInCallback) onSignInCallback();
                 } else {
                     ErrorHandler.handleError(new Error('GoogleAuth.signIn: has not granted all scopes'), {
