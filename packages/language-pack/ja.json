@@ -994,6 +994,10 @@
 				"PROFILE": "マイページ",
 				"RECENT_FAVORITE": "最近のアクセス / お気に入り",
 				"SEARCH": "検索"
+			},
+			"WORKSPACE": {
+				"CURRENT_WORKSPACE": "",
+				"SWITCH_TO": ""
 			}
 		},
 		"HANDBOOK_BUTTON": {

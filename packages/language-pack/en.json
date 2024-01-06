@@ -994,6 +994,10 @@
 				"PROFILE": "My Page",
 				"RECENT_FAVORITE": "Recent Visits / Favorites",
 				"SEARCH": "Search"
+			},
+			"WORKSPACE": {
+				"CURRENT_WORKSPACE": "Current Workspace",
+				"SWITCH_TO": "Switch To"
 			}
 		},
 		"HANDBOOK_BUTTON": {

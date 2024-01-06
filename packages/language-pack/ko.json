@@ -994,6 +994,10 @@
 				"PROFILE": "마이페이지",
 				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
+			},
+			"WORKSPACE": {
+				"CURRENT_WORKSPACE": "현재 워크스페이스",
+				"SWITCH_TO": "다른 워크스페이스로 변경"
 			}
 		},
 		"HANDBOOK_BUTTON": {
