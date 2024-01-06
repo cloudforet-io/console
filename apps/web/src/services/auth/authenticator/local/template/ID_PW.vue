@@ -90,7 +90,6 @@ const signIn = async () => {
                     password: credentials.password,
                     mfaEmail: userEmail[0],
                     userId: state.userId?.trim() as string,
-                    authType: 'LOCAL',
                 },
             });
         } else {

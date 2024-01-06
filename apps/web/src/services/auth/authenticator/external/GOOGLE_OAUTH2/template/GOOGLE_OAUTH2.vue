@@ -52,7 +52,6 @@ const onErrorSignIn = (e, token) => {
                 accessToken: state.token,
                 mfaEmail: userEmail[0],
                 userId: state.userId?.trim() as string,
-                authType: 'EXTERNAL',
             },
         });
     } else {
