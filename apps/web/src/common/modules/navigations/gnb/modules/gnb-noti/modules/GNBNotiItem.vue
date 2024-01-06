@@ -15,17 +15,15 @@ import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/module
 
 import { green, red, yellow } from '@/styles/colors';
 
-interface Props {
+const props = withDefaults(defineProps<{
     isRead?: boolean;
     title?: string;
     createdAt?: string;
-    dateHeader?: TranslateResult | string;
+    dateHeader?: Omit<TranslateResult, 'null'>|string;
     icon?: string;
     writer?: string;
     deletable?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
     isRead: false,
     title: '',
     createdAt: '',

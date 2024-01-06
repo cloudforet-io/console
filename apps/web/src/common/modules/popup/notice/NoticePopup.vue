@@ -23,6 +23,7 @@ const state = reactive({
     isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
     isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
     popupList: [] as PostModel[],
+    hasLoaded: false,
 });
 
 // helper
@@ -65,9 +66,26 @@ const getPostList = async (): Promise<void> => {
     }
 };
 
-watch(() => state.isSessionExpired, async (isSessionExpired) => {
-    if (!isSessionExpired && !state.isNoRoleUser) await getPostList();
+watch([
+    () => state.hasLoaded,
+    () => state.isSessionExpired,
+    () => state.isNoRoleUser,
+    () => store.getters['display/isGrantInProgress'],
+], async ([hasLoaded, isSessionExpired, isNoRoleUser, isGrantInProgress]) => {
+    if (hasLoaded) return;
+    if (isNoRoleUser || isSessionExpired) {
+        state.popupList = [];
+    } else if (!isGrantInProgress) {
+        await getPostList();
+        state.hasLoaded = true;
+    }
 }, { immediate: true });
+
+watch(() => store.state.user.userId, async (userId, prevUserId) => {
+    if (userId !== prevUserId) {
+        state.hasLoaded = false;
+    }
+});
 </script>
 
 <template>

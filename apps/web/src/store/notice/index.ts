@@ -105,6 +105,11 @@ export const useNoticeStore = defineStore('notice', () => {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
             }
         },
+        reset() {
+            state.noticeConfigMap = {};
+            state.totalNoticeIdList = [];
+            state.totalNoticeCount = 0;
+        },
     };
 
 
