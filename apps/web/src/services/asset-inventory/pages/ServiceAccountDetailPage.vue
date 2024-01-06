@@ -66,7 +66,12 @@ const state = reactive({
     providerKey: computed(() => state.provider?.key),
     providerIcon: computed(() => state.provider?.icon),
     consoleLink: computed(() => {
-        if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
+        try {
+            if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
+        } catch (e) {
+            console.warn('Failed to render external link. Please check the accountID value.');
+            return '';
+        }
         return '';
     }),
     projectId: computed(() => state.item.project_info?.project_id),
