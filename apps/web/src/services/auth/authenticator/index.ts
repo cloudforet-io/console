@@ -25,6 +25,8 @@ abstract class Authenticator {
         try {
             if (SpaceRouter.router) {
                 await store.dispatch('user/signOut');
+                const userWorkspaceStore = useUserWorkspaceStore();
+                userWorkspaceStore.reset();
                 await store.dispatch('display/hideSignInErrorMessage');
                 LocalStorageAccessor.removeItem('hideNotificationEmailModal');
                 await store.dispatch('error/resetErrorState');

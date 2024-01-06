@@ -72,7 +72,7 @@ const handleClickTextInput = async () => {
 };
 const handleChangeTextInput = debounce((value: string) => {
     formState.searchText = value;
-    if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
+    if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
@@ -274,6 +274,7 @@ onMounted(() => {
                                         :loading="state.loading"
                                         :menu="state.menuItems"
                                         :selected="state.selectedItems"
+                                        :highlight-term="formState.searchText"
                                         multi-selectable
                                         class="user-context-menu"
                                         @select="handleSelectMenuItem"
