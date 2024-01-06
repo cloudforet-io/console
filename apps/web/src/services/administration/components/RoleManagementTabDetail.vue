@@ -12,7 +12,6 @@ import { find } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -22,10 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red } from '@/styles/colors';
 
-import {
-    DOMAIN_ADMIN_MANAGED_PAGE_ACCESS, WORKSPACE_MEMBER_MANAGED_PAGE_ACCESS,
-    WORKSPACE_OWNER_MANAGED_PAGE_ACCESS,
-} from '@/services/administration/constants/role-constant';
+import { MANAGED_PAGE_ACCESS } from '@/services/administration/constants/role-constant';
 import { getPageAccessMenuListByRoleType } from '@/services/administration/helpers/role-page-access-menu-list';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/role-type';
@@ -60,9 +56,7 @@ const state = reactive({
     permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
     pageAccess: computed<string[]>(() => {
         if (state.data.is_managed) {
-            if (state.data.role_type === ROLE_TYPE.DOMAIN_ADMIN) return DOMAIN_ADMIN_MANAGED_PAGE_ACCESS;
-            if (state.data.role_type === ROLE_TYPE.WORKSPACE_OWNER) return WORKSPACE_OWNER_MANAGED_PAGE_ACCESS;
-            if (state.data.role_type === ROLE_TYPE.WORKSPACE_MEMBER) return WORKSPACE_MEMBER_MANAGED_PAGE_ACCESS;
+            return MANAGED_PAGE_ACCESS;
         }
         return state.data.page_access ?? [];
     }),
