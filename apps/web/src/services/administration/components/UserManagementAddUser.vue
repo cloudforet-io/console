@@ -274,6 +274,7 @@ onMounted(() => {
                                         :loading="state.loading"
                                         :menu="state.menuItems"
                                         :selected="state.selectedItems"
+                                        :highlight-term="formState.searchText"
                                         multi-selectable
                                         class="user-context-menu"
                                         @select="handleSelectMenuItem"
