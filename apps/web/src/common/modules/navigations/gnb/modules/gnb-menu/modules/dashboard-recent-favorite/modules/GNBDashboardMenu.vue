@@ -1,46 +1,6 @@
-<template>
-    <div class="g-n-b-dashboard-menu">
-        <p-tab :tabs="state.tabs"
-               :active-tab.sync="state.activeTab"
-               :class="{ 'admin-mode': storeState.isAdminMode }"
-        >
-            <template #favorite>
-                <g-n-b-dashboard-favorite :dashboard-list="state.dashboardList"
-                                          @close="hideMenu"
-                                          @update:is-overflown="handleOverflown"
-                />
-            </template>
-            <template #recent>
-                <g-n-b-dashboard-recent :visible="state.activeTab === 'recent'"
-                                        :dashboard-list="state.dashboardList"
-                                        @close="hideMenu"
-                />
-            </template>
-            <template #footer>
-                <div class="footer-wrapper">
-                    <template v-for="(subMenu, index) in state.subMenuList">
-                        <div :key="`footer-${subMenu.label}-${index}`"
-                             class="sub-menu"
-                        >
-                            <g-n-b-sub-menu :label="subMenu.label"
-                                            :to="subMenu.to"
-                                            :higlight-tag="subMenu.highlightTag"
-                                            @navigate="hideMenu"
-                            />
-                        </div>
-                    </template>
-                    <div v-if="state.isOverflown"
-                         class="gradient-box"
-                    />
-                </div>
-            </template>
-        </p-tab>
-    </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PTab } from '@spaceone/design-system';
@@ -110,14 +70,58 @@ const handleOverflown = (isOverflown: boolean) => {
     state.isOverflown = isOverflown;
 };
 
-(async () => {
-    // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-        dashboardStore.load(),
-    ]);
-})();
+// NOTE: dashboardStore.load() is tightly related to the grant scope. So, we need to wait for the grant scope to be loaded.
+const stopWatch = watch(() => store.state.user.isGrantInProgress, async (isGrantInProgress) => {
+    if (!isGrantInProgress) {
+        // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
+        await Promise.allSettled([
+            store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+            dashboardStore.load(),
+        ]);
+        stopWatch();
+    }
+});
 </script>
+
+<template>
+    <div class="g-n-b-dashboard-menu">
+        <p-tab :tabs="state.tabs"
+               :active-tab.sync="state.activeTab"
+               :class="{ 'admin-mode': storeState.isAdminMode }"
+        >
+            <template #favorite>
+                <g-n-b-dashboard-favorite :dashboard-list="state.dashboardList"
+                                          @close="hideMenu"
+                                          @update:is-overflown="handleOverflown"
+                />
+            </template>
+            <template #recent>
+                <g-n-b-dashboard-recent :visible="state.activeTab === 'recent'"
+                                        :dashboard-list="state.dashboardList"
+                                        @close="hideMenu"
+                />
+            </template>
+            <template #footer>
+                <div class="footer-wrapper">
+                    <template v-for="(subMenu, index) in state.subMenuList">
+                        <div :key="`footer-${subMenu.label}-${index}`"
+                             class="sub-menu"
+                        >
+                            <g-n-b-sub-menu :label="subMenu.label"
+                                            :to="subMenu.to"
+                                            :higlight-tag="subMenu.highlightTag"
+                                            @navigate="hideMenu"
+                            />
+                        </div>
+                    </template>
+                    <div v-if="state.isOverflown"
+                         class="gradient-box"
+                    />
+                </div>
+            </template>
+        </p-tab>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .g-n-b-dashboard-menu {
