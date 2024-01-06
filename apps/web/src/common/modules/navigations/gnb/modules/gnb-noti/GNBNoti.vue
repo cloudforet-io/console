@@ -95,7 +95,10 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
-    if (isSessionExpired) store.dispatch('display/stopCheckNotification');
+    if (isSessionExpired) {
+        store.dispatch('display/stopCheckNotification');
+        noticeStore.reset();
+    }
 });
 
 </script>

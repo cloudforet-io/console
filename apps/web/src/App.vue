@@ -185,7 +185,7 @@ watch(() => state.userId, (userId) => {
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
-            <notice-popup v-if="!store.getters['user/hasSystemRole']" />
+            <notice-popup />
             <!--            <survey-modal />-->
         </template>
         <!-- Modal for Cross Browsing -->
