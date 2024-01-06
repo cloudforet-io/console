@@ -170,6 +170,7 @@ watch(() => userPageState.selectedIndices[0], (index) => {
     .role-type-wrapper {
         @apply flex items-center;
         gap: 0.25rem;
+        margin-right: 0.5rem;
         .role-type-icon {
             @apply rounded-full;
             width: 1.5rem;
