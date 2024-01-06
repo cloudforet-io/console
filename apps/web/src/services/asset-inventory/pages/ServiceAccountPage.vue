@@ -280,7 +280,8 @@ watch(() => tableState.selectedAccountType, () => {
         />
         <component :is="width > screens.tablet.max ? PTab : PPaneLayout"
                    :tabs="tableState.accountTypeList"
-                   :active-tab.sync="tableState.selectedAccountType"
+                   :active-tab="tableState.selectedAccountType"
+                   @update:activeTab="handleSelectServiceAccountType"
         >
             <div class="account-type-filter">
                 <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
