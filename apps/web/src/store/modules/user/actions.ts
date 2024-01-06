@@ -4,6 +4,7 @@ import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { isInstanceOfAPIError } from '@cloudforet/core-lib/space-connector/error';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -20,7 +21,6 @@ import { setI18nLocale } from '@/translations';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
-
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
@@ -114,7 +114,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
                 await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
             }
         }
-    } catch (e) {
+    } catch (error) {
         /*
         * Unlike other cases where the ErrorHandler is used for error handling,
         * in the grant logic scenario, there can be instances where the Router
@@ -123,9 +123,20 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         * Therefore, in this specific case, errors are simply logged to the console
         * and not further processed, to avoid complications with uninitialized Router instances.
         * */
-        console.error(`Role Grant Error: ${e}`);
         commit('setCurrentRoleInfo', undefined);
-        SpaceConnector.flushToken();
+        if (isInstanceOfAPIError(error)) {
+            if (error.code === 'ERROR_WORKSPACE_STATE') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_NOT_FOUND') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_PERMISSION_DENIED') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_AUTHENTICATE_FAILURE') {
+                SpaceConnector.flushToken();
+            } else {
+                SpaceConnector.flushToken();
+            }
+        }
     } finally {
         /*
         * Implemented a global loading with a minimum duration of 500 milliseconds
