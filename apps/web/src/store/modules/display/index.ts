@@ -13,7 +13,6 @@ const state: DisplayState = {
     uncheckedNotificationCount: 0,
     isSignInFailed: false,
     visibleMobileGuideModal: false,
-    isGrantInProgress: false,
 };
 
 export default {
