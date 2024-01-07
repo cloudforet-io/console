@@ -18,6 +18,7 @@ import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
@@ -86,11 +87,13 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
     return decodedToken.rol;
 };
-export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    const appContextStore = useAppContextStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
     try {
-        await dispatch('display/startGrantRole', undefined, { root: true });
+        // This is for not-triggered CASE, such as when user use browser back button.
+        appContextStore.setGlobalGrantLoading(true);
         const { status, response } = await fetcher({
             grant_type: 'REFRESH_TOKEN',
             scope: grantRequest.scope,
@@ -146,7 +149,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         * during the grant process to prevent rendering of services until the process is complete.
         * */
         setTimeout(() => {
-            dispatch('display/finishGrantRole', undefined, { root: true });
+            appContextStore.setGlobalGrantLoading(false);
         }, 500);
     }
 };

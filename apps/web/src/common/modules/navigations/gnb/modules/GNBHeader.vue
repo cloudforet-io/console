@@ -13,6 +13,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { MenuId } from '@/lib/menu/config';
@@ -29,6 +30,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isAdminMode: false,
 });
+const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
@@ -66,6 +68,7 @@ const state = reactive({
 });
 
 const selectWorkspace = (workspaceId: string): void => {
+    appContextStore.setGlobalGrantLoading(true);
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;

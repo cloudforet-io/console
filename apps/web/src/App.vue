@@ -16,6 +16,7 @@ import { store } from '@/store';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
@@ -52,9 +53,10 @@ const state = reactive({
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     hasNoWorkspace: false,
-    isGrantInProgress: computed(() => store.getters['display/isGrantInProgress']),
+    globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
+const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
@@ -117,7 +119,7 @@ watch(() => state.userId, (userId) => {
                 <g-n-b v-else
                        class="gnb"
                 />
-                <div v-if="!state.isGrantInProgress"
+                <div v-if="!state.globalGrantLoading"
                      class="app-body"
                      :style="{ height: globalUIGetters.appBodyHeight }"
                 >
@@ -165,8 +167,8 @@ watch(() => state.userId, (userId) => {
                 </div>
             </template>
             <router-view v-else />
-            <p-data-loader v-if="state.isGrantInProgress"
-                           :loading="state.isGrantInProgress"
+            <p-data-loader v-if="state.globalGrantLoading"
+                           :loading="state.globalGrantLoading"
                            :data="true"
                            class="console-loading-wrapper"
             />

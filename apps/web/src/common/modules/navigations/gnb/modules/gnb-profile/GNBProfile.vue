@@ -39,12 +39,13 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
         if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
@@ -116,7 +117,8 @@ const handleLanguageDropdownClick = () => {
 };
 
 const handleClickGoToMyPage = () => {
-    if (isAdminMode.value) appContextStore.exitAdminMode();
+    appContextStore.setGlobalGrantLoading(true);
+    if (state.isAdminMode) appContextStore.exitAdminMode();
     const currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,
@@ -146,7 +148,7 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
-    if (isAdminMode.value) appContextStore.exitAdminMode();
+    if (state.isAdminMode) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },

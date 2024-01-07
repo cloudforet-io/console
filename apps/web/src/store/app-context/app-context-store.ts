@@ -6,6 +6,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 interface AppContextStoreState {
     isAdminMode: boolean;
+    globalGrantLoading: boolean;
 }
 
 export const useAppContextStore = defineStore('app-context-store', () => {
@@ -13,10 +14,12 @@ export const useAppContextStore = defineStore('app-context-store', () => {
 
     const state = reactive<AppContextStoreState>({
         isAdminMode: false,
+        globalGrantLoading: false,
     });
 
     const getters = reactive({
         isAdminMode: computed<boolean>(() => state.isAdminMode),
+        globalGrantLoading: computed<boolean>(() => state.globalGrantLoading),
         workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 
@@ -28,6 +31,9 @@ export const useAppContextStore = defineStore('app-context-store', () => {
         exitAdminMode() {
             userWorkspaceStore.setCurrentWorkspace();
             state.isAdminMode = false;
+        },
+        setGlobalGrantLoading(loading: boolean) {
+            state.globalGrantLoading = loading;
         },
     };
 

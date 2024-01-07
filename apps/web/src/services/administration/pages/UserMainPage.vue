@@ -7,8 +7,6 @@ import { PHorizontalLayout } from '@spaceone/design-system';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
@@ -25,7 +23,7 @@ const userPageState = userPageStore.$state;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isGrantInProgress: computed(() => store.getters['display/isGrantInProgress']),
+    globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -49,8 +47,8 @@ const refreshUserList = () => {
 };
 
 /* Watcher */
-watch(() => storeState.isGrantInProgress, (isGrantInProgress) => {
-    if (isGrantInProgress) return;
+watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
+    if (globalGrantLoading) return;
     userPageStore.$patch({ isAdminMode: storeState.isAdminMode });
 }, { immediate: true });
 

@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router/composables';
 
 import { throttle } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -21,15 +20,16 @@ const router = useRouter();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isGrantProgressing: computed(() => store.getters['display/isGrantInProgress']),
+    globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     loading: false,
 });
 const handleToggleAdminMode = throttle(async () => {
     state.loading = true;
-    if (state.isGrantProgressing) {
+    if (state.globalGrantLoading) {
         state.loading = false;
         return;
     }
+    appContextStore.setGlobalGrantLoading(true);
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         appContextStore.exitAdminMode();
