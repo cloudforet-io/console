@@ -272,10 +272,10 @@ const handleRemoveButton = async () => {
             <template #col-role_binding-format="{value, rowIndex}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value.type).name"
+                               :contents="useRoleFormatter(value?.type).name"
                                class="tooltip"
                     >
-                        <img :src="useRoleFormatter(value.type).image"
+                        <img :src="useRoleFormatter(value?.type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >
