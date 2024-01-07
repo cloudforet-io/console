@@ -6,15 +6,23 @@ import { PDivider } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 interface Props {
     to: Location;
 }
 
 const props = defineProps<Props>();
+const appContextStore = useAppContextStore();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
 });
+
+const handleClickLogo = () => {
+    if (!props.to) return;
+    appContextStore.setGlobalGrantLoading(true);
+};
 
 
 </script>
@@ -24,6 +32,7 @@ const state = reactive({
         <component :is="props.to ? 'router-link' : 'div'"
                    class="title-wrapper"
                    :to="props.to"
+                   @click.native="handleClickLogo"
         >
             <div class="logo-wrapper">
                 <img v-if="state.symbolImage"
