@@ -71,8 +71,8 @@ const handleOverflown = (isOverflown: boolean) => {
 };
 
 // NOTE: dashboardStore.load() is tightly related to the grant scope. So, we need to wait for the grant scope to be loaded.
-const stopWatch = watch(() => store.getters['display/isGrantInProgress'], async (isGrantInProgress) => {
-    if (!isGrantInProgress) {
+const stopWatch = watch(() => appContextStore.getters.globalGrantLoading, async (globalGrantLoading) => {
+    if (!globalGrantLoading) {
         // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
         await Promise.allSettled([
             store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
