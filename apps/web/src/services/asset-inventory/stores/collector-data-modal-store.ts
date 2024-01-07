@@ -3,9 +3,11 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
     CollectorModel,
 } from '@/schema/inventory/collector/model';
+import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
 import type { SecretModel } from '@/schema/secret/secret/model';
 
@@ -44,13 +46,13 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
         async getJobs(collectorId: string) {
             this.initLoading = true;
             try {
-                const res = await SpaceConnector.clientV2.inventory.job.list({ collector_id: collectorId });
-                if (res.results.length > 0) {
+                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ collector_id: collectorId });
+                if ((results ?? []).length > 0 && results) {
                     if (this.selectedSecret) {
-                        const filteredJobs = res.results.filter((job) => job.secret_id);
+                        const filteredJobs = results.filter((job) => job.secret_id);
                         this.recentJob = filteredJobs[0];
                     } else {
-                        const filteredJobs = res.results.filter((job) => !job.secret_id);
+                        const filteredJobs = results.filter((job) => !job.secret_id);
                         this.recentJob = filteredJobs[0];
                     }
                 }
