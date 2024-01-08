@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import Vue, { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
@@ -12,6 +12,8 @@ import { clone } from 'lodash';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -44,6 +46,12 @@ const state = reactive({
             { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
             { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
         ];
+        const allWorkspacesMenu: SelectDropdownMenuItem[] = [
+            { type: 'divider', name: '' } as SelectDropdownMenuItem,
+            {
+                type: 'item', name: 'all_workspaces', label: i18n.t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES'), icon: 'ic_list-card',
+            } as SelectDropdownMenuItem,
+        ];
         state.workspaceList.forEach((_workspace) => {
             if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
                 menuList.push({
@@ -62,13 +70,26 @@ const state = reactive({
             }
             return menuList;
         });
-        return menuList;
+        return [...menuList, ...allWorkspacesMenu];
     }),
     searchText: '',
 });
 
-const selectWorkspace = (workspaceId: string): void => {
+const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
+    if (name === 'all_workspaces') {
+        appContextStore.enterAdminMode();
+        router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        Vue.notify({
+            group: 'toastTopCenter',
+            type: 'info',
+            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+            duration: 2000,
+            speed: 1,
+        });
+        return;
+    }
+    const workspaceId = name;
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;

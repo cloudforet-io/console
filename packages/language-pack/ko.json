@@ -996,6 +996,7 @@
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
+				"ALL_WORKSPACES": "",
 				"CURRENT_WORKSPACE": "현재 워크스페이스",
 				"SWITCH_TO": "다른 워크스페이스로 변경"
 			}

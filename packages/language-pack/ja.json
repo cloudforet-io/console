@@ -996,6 +996,7 @@
 				"SEARCH": "検索"
 			},
 			"WORKSPACE": {
+				"ALL_WORKSPACES": "",
 				"CURRENT_WORKSPACE": "",
 				"SWITCH_TO": ""
 			}
