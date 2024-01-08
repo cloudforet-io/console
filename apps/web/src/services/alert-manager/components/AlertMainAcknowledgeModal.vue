@@ -6,6 +6,7 @@ import {
 import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
 import type { AlertModel } from '@/schema/monitoring/alert/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -31,7 +32,7 @@ const state = reactive({
 
 /* api */
 const updateToAcknowledge = async () => {
-    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id));
+    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id, store.state.user.userId));
     const results = await Promise.allSettled(promises);
     const rejected = results.filter((d) => d.status === 'rejected');
     if (rejected.length > 0) {
