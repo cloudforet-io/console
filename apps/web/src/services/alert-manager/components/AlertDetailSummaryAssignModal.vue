@@ -5,22 +5,15 @@ import {
 
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useAlertAssignUserStore } from '@/services/alert-manager/stores/alert-assign-user-store';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
@@ -44,20 +37,20 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 
 const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
+const alertAssignUserStore = useAlertAssignUserStore();
+const alertAssignUserState = alertAssignUserStore.state;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     //
-    loading: true,
     selectIndex: [] as number[],
     selectedUserID: computed(() => state.refinedItems[state.selectIndex]?.user_id),
     fields: [
         { label: 'User ID', name: 'user_id', type: 'item' },
         { label: 'Name', name: 'user_name', type: 'item' },
     ],
-    projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
-        const users: UserItem[] = state.projectUserIdList.map((d) => ({
+        const users: UserItem[] = alertAssignUserState.userIds.map((d) => ({
             user_id: d,
             user_name: allReferenceStore.getters.user[d]?.label ?? d,
         }));
@@ -68,7 +61,6 @@ const state = reactive({
         });
         return filteredUsers.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
     }),
-    totalCount: 0,
     searchText: '',
     pageLimit: 15,
     pageStart: 1,
@@ -76,7 +68,8 @@ const state = reactive({
 
 const reassignMember = async () => {
     try {
-        await alertPageStore.assignUserToAlert(props.alertId, state.selectedUserID);
+        const alertData = await alertAssignUserStore.assignUserToAlert(props.alertId, state.selectedUserID);
+        await alertPageStore.setAlertData(alertData);
         showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
     } catch (e) {
         showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'), e);
@@ -89,48 +82,14 @@ const handleClickReassign = async () => {
     await reassignMember();
 };
 
-const fetchWorkspaceUserList = async () => {
-    try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
-        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
-        state.totalCount = res.total_count ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.projectUserIdList = [];
-    }
-};
-const getProjectUserData = async () => {
-    try {
-        state.loading = true;
-        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-            project_id: props.projectId,
-        });
-        if (res.project_type === 'PUBLIC') {
-            await fetchWorkspaceUserList();
-            return;
-        }
-        state.projectUserIdList = res.users ?? [];
-        state.totalCount = res.users?.length ?? 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.projectUserIdList = [];
-    } finally {
-        state.loading = false;
-    }
-};
-
 const handleChangeTable = async (options: any = {}) => {
-    // TODO: check it's working
     if (options.searchText !== undefined) state.searchText = options.searchText;
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
 
-// LOAD REFERENCE STORE
 (async () => {
-    await Promise.allSettled([
-        getProjectUserData(),
-    ]);
+    await alertAssignUserStore.getUserList();
 })();
 </script>
 
@@ -150,8 +109,8 @@ const handleChangeTable = async (options: any = {}) => {
                              :fields="state.fields"
                              :items="state.refinedItems"
                              :select-index.sync="state.selectIndex"
-                             :loading="state.loading"
-                             :total-count="state.totalCount"
+                             :loading="alertAssignUserState.loading"
+                             :total-count="alertAssignUserState.totalUserCount"
                              @change="handleChangeTable"
                              @refresh="handleChangeTable()"
             />
