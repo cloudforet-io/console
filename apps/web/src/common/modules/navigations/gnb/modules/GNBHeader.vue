@@ -76,6 +76,9 @@ const state = reactive({
 });
 
 const selectWorkspace = (name: string): void => {
+    const workspaceId = name;
+    if (workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
         appContextStore.enterAdminMode();
@@ -89,7 +92,6 @@ const selectWorkspace = (name: string): void => {
         });
         return;
     }
-    const workspaceId = name;
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
