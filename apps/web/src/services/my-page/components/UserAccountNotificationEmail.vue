@@ -37,7 +37,12 @@ const {
 } = useFormValidator({
     notificationEmail: '',
 }, {
-    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID'); },
+    notificationEmail(value: string) {
+        if (!value) {
+            return '';
+        }
+        return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID');
+    },
 });
 
 const handleClickVerifyButton = async (type: string) => {
