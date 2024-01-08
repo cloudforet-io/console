@@ -122,6 +122,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 
 const EVENT_PERIOD = 7;
@@ -144,6 +145,7 @@ export default {
     setup(props) {
         const allReferenceStore = useAllReferenceStore();
         const userWorkspaceStore = useUserWorkspaceStore();
+        const { getProperRouteLocation } = useProperRouteLocation();
         const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -169,12 +171,12 @@ export default {
                 event: {
                     name: d.event_title,
                     lastUpdate: lastUpdateTime,
-                    to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+                    to: getProperRouteLocation(referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' })),
                 },
                 region: storeState.regions[d.region_code]?.name || d.region_code,
                 affected_projects: d.affected_projects.map((projectId) => ({
                     name: projects[projectId]?.name,
-                    to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
+                    to: getProperRouteLocation(referenceRouter(projectId, { resource_type: 'identity.Project' })),
                     isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                 })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
                 showAll: false,
