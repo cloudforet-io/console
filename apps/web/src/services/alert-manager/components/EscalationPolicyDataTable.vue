@@ -60,7 +60,7 @@ const fields: DataTableField[] = [
     { name: 'rules', label: 'Escalation Rules', sortable: false },
     { name: 'repeat_count', label: 'Repeat Time' },
     { name: 'finish_condition', label: 'Finish Condition' },
-    { name: 'resource_group', label: 'Resource Group' },
+    { name: 'resource_group', label: 'Scope' },
     { name: 'project_id', label: 'Project', sortable: false },
     { name: 'created_at', label: 'Created' },
 ];
