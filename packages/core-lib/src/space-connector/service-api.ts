@@ -27,15 +27,17 @@ export default class ServiceAPI {
         this.setAxiosInterceptors();
     }
 
-    private handleResponseError = async (error: AxiosError): Promise<void> => {
+    // eslint-disable-next-line class-methods-use-this
+    private handleResponseError = (error: AxiosError): void => {
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);
         }
         case 401: {
-            const res = await this.tokenApi.refreshAccessToken();
-            if (!res) throw new AuthenticationError(error);
-            else break;
+            // const res = await this.tokenApi.refreshAccessToken();
+            // if (!res)
+            throw new AuthenticationError(error);
+            // else break;
         }
         case 403: {
             throw new AuthorizationError(error);
