@@ -26,10 +26,14 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+    const appContextStore = useAppContextStore(pinia);
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
-    if (isDuplicateScope || isDuplicateWorkspace) return undefined;
+    if (isDuplicateScope || isDuplicateWorkspace) {
+        appContextStore.setGlobalGrantLoading(false);
+        return undefined;
+    }
 
     const grantRequest = {
         scope,
