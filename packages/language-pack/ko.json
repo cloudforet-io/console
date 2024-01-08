@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "월별 예산 계획",
 					"NOTIFICATIONS_CHANNEL": "알림 채널",
 					"ORIGINAL_DATA": "원본데이터",
+					"PAGE_NOTIFICATION": "",
 					"PERIOD": "기간",
 					"PROVIDER": "프로바이더",
 					"SET": "설정",
@@ -451,7 +452,8 @@
 					"TARGET": "타겟",
 					"TOTAL_AMOUNT": "총 예산 계획",
 					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)",
-					"VIEW_ALL": "전체보기"
+					"VIEW_ALL": "전체보기",
+					"VIEW_IN_ADMIN_MODE": ""
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
