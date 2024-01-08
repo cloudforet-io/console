@@ -22,6 +22,8 @@ export default defineComponent({
 import { defineComponent, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { PSpinner } from '@spaceone/design-system';
+
 import { store } from '@/store';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -123,5 +125,16 @@ onMounted(async () => {
 </script>
 
 <template>
-    <fragment />
+    <div class="keycloak-page">
+        <p-spinner size="xl" />
+    </div>
 </template>
+
+<style lang="postcss" scoped>
+.keycloak-page {
+    @apply flex flex-col items-center justify-center bg-white;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 2.5rem;
+}
+</style>
