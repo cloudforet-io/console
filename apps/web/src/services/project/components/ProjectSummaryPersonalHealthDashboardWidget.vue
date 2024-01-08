@@ -27,6 +27,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -46,7 +47,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
-
+const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -172,7 +173,7 @@ const getEvents = async () => {
             return {
                 event: {
                     name: d.event_title,
-                    to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+                    to: getProperRouteLocation(referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' })),
                 },
                 region_code: d.region_code,
                 start_time: startTime,

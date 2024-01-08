@@ -7,6 +7,8 @@ import { isEmpty } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { locationQueryToString } from '@/lib/router-query-string';
 
 import { NoSearchResourceError } from '@/common/composables/error/error';
@@ -18,6 +20,7 @@ const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 export default {
     name: 'CloudServiceSearch',
     beforeRouteEnter(to, from, next) {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const queryHelper = new QueryHelper();
         (async () => {
             let link = DEFAULT_URL;
@@ -31,7 +34,7 @@ export default {
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
                     queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '' }]);
-                    link = `${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
+                    link = `${userWorkspaceStore.getters.currentWorkspaceId}${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);
                         link += `&${queryString}`;
