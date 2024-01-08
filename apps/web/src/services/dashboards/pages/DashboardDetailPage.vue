@@ -14,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
-import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
+import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -77,7 +77,9 @@ onUnmounted(() => {
             <dashboard-labels editable
                               @update-labels="handleUpdateLabels"
             />
-            <dashboard-toolset />
+            <dashboard-toolset-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
+                                             :date-range="dashboardDetailState.settings.date_range"
+            />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">

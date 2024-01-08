@@ -22,7 +22,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { gray } from '@/styles/colors';
 
-import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
+import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -176,7 +176,9 @@ onBeforeUnmount(() => {
                         />
                     </div>
                     <div class="right-part">
-                        <dashboard-toolset />
+                        <dashboard-toolset-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
+                                                         :date-range="dashboardDetailState.settings.date_range"
+                        />
                     </div>
                 </div>
                 <div v-if="state.originWidgetInfo && state.component"
