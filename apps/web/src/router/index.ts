@@ -111,7 +111,7 @@ export class SpaceRouter {
             if (refreshToken && isTokenAlive && isNotErrorRoute) {
                 let workspaceId: string|undefined;
                 let scope: GrantScope;
-                if (to.name?.startsWith('admin.') || isAdminMode) {
+                if (to.name?.startsWith('admin.') || appContextStore.getters.isAdminMode) {
                     scope = 'DOMAIN';
                 } else if (to.path?.startsWith('/workspace-') && to.params.workspaceId) {
                     scope = 'WORKSPACE';
