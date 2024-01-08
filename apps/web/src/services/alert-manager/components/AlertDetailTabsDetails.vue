@@ -11,7 +11,7 @@ import { i18n } from '@/translations';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.$state;
+const alertPageState = alertPageStore.state;
 
 const state = reactive({
     fields: computed(() => [

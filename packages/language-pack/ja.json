@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "月別予算計画",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
 					"ORIGINAL_DATA": "原本データー",
+					"PAGE_NOTIFICATION": "",
 					"PERIOD": "期間",
 					"PROVIDER": "プロバイダー",
 					"SET": "設定",
@@ -451,7 +452,8 @@
 					"TARGET": "ターゲット",
 					"TOTAL_AMOUNT": "総予算計画",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
-					"VIEW_ALL": "すべて表示"
+					"VIEW_ALL": "すべて表示",
+					"VIEW_IN_ADMIN_MODE": ""
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -2974,6 +2976,7 @@
 					"RESOLVED": "完了",
 					"RESOURCE_GROUP": "リソースグループ",
 					"RULE": "ルール",
+					"SCOPE": "スコープ",
 					"STEP": "ステップ",
 					"TIME": "時間",
 					"WORKSPACE": "ワークスペース"

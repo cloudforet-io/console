@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "Monthly Planning",
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
 					"ORIGINAL_DATA": "Original Data",
+					"PAGE_NOTIFICATION": "This budget’s settings can be changed in admin mode.",
 					"PERIOD": "Period",
 					"PROVIDER": "Provider",
 					"SET": "Set",
@@ -451,7 +452,8 @@
 					"TARGET": "Target",
 					"TOTAL_AMOUNT": "Total Amount",
 					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)",
-					"VIEW_ALL": "View All"
+					"VIEW_ALL": "View All",
+					"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -2974,6 +2976,7 @@
 					"RESOLVED": "Resolved",
 					"RESOURCE_GROUP": "Resource Group",
 					"RULE": "Rule",
+					"SCOPE": "Scope",
 					"STEP": "Step",
 					"TIME": "time(s)",
 					"WORKSPACE": "Workspace"

@@ -139,7 +139,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
             </template>
         </p-field-group>
         <p-field-group v-if="props.showResourceGroup"
-                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOURCE_GROUP')"
+                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE')"
                        required
         >
             <template #default>

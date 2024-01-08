@@ -401,7 +401,6 @@ watch(() => state.selectedDateType, async () => {
                                           :count="state.count[state.activeTab]"
                                           :selected-date-type="state.selectedDateType"
                                           :storage-suffix="state.storageBoxSuffix"
-                                          :data-source-id="state.dataSourceId"
                 />
             </div>
         </p-balloon-tab>

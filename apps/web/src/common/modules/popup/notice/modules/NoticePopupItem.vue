@@ -102,7 +102,7 @@ const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
         @apply flex items-center;
     }
     .notice-popup-author {
-        @apply text-sm ml-1 text-gray-600;
+        @apply text-sm text-gray-600;
     }
 }
 </style>

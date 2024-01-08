@@ -39,7 +39,7 @@ const calculateTime = (time) => {
     return `${days}d ${hours}h ${minutes}m`;
 };
 const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.$state;
+const alertPageState = alertPageStore.state;
 
 const state = reactive({
     alertState: computed(() => alertPageState.alertData?.state),
