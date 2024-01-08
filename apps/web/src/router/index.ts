@@ -106,13 +106,12 @@ export class SpaceRouter {
 
 
             nextPath = to.fullPath;
-            const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
 
-            if (refreshToken && isTokenAlive && isNotErrorRoute && !to.meta?.isSignInPage) {
+            if (refreshToken && SpaceConnector.isTokenAlive && isNotErrorRoute && !to.meta?.isSignInPage) {
                 let workspaceId: string|undefined;
                 let scope: GrantScope;
                 if (to.name?.startsWith('admin.') || appContextStore.getters.isAdminMode) {
@@ -129,7 +128,7 @@ export class SpaceRouter {
             const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, SpaceConnector.isTokenAlive);
 
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
@@ -160,7 +159,7 @@ export class SpaceRouter {
 
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                if (!isTokenAlive) {
+                if (!SpaceConnector.isTokenAlive) {
                     // When refreshing token is failed, redirect to sign in page
                     const res = await SpaceConnector.refreshAccessToken(false);
                     if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
