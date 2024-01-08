@@ -2976,6 +2976,7 @@
 					"RESOLVED": "Resolved",
 					"RESOURCE_GROUP": "Resource Group",
 					"RULE": "Rule",
+					"SCOPE": "Scope",
 					"STEP": "Step",
 					"TIME": "time(s)",
 					"WORKSPACE": "Workspace"

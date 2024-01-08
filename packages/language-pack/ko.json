@@ -2976,6 +2976,7 @@
 					"RESOLVED": "완료",
 					"RESOURCE_GROUP": "리소스 그룹",
 					"RULE": "규칙",
+					"SCOPE": "범위",
 					"STEP": "단계",
 					"TIME": "번",
 					"WORKSPACE": "워크스페이스"

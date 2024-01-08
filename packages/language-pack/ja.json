@@ -2976,6 +2976,7 @@
 					"RESOLVED": "完了",
 					"RESOURCE_GROUP": "リソースグループ",
 					"RULE": "ルール",
+					"SCOPE": "スコープ",
 					"STEP": "ステップ",
 					"TIME": "時間",
 					"WORKSPACE": "ワークスペース"

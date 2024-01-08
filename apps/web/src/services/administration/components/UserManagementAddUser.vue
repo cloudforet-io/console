@@ -8,7 +8,6 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
-import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -70,13 +69,13 @@ const handleClickTextInput = async () => {
     state.menuVisible = true;
     resetValidationState();
 };
-const handleChangeTextInput = debounce((value: string) => {
+const handleChangeTextInput = (value: string) => {
     formState.searchText = value;
     if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
         state.menuVisible = true;
     }
-}, 200);
+};
 const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
     if (validateUserId()) {
