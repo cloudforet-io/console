@@ -112,7 +112,7 @@ export class SpaceRouter {
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
 
-            if (refreshToken && isTokenAlive && isNotErrorRoute) {
+            if (refreshToken && isTokenAlive && isNotErrorRoute && !to.meta?.isSignInPage) {
                 let workspaceId: string|undefined;
                 let scope: GrantScope;
                 if (to.name?.startsWith('admin.') || appContextStore.getters.isAdminMode) {
