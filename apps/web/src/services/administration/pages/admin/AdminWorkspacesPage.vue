@@ -149,7 +149,7 @@ onUnmounted(() => {
                                      :enable-modal-type="modalState.enableState"
                                      @refresh="refreshWorkspaceList"
         />
-        <user-management-add-modal />
+        <user-management-add-modal @confirm="refreshWorkspaceList" />
     </section>
 </template>
 
