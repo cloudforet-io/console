@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PLink, PToolboxTable,
+    PLink, PToolboxTable, PTooltip,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
@@ -277,13 +277,16 @@ watch(() => tabState.activeTab, () => {
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                                            new-tab
-                                            :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                            highlight
-                                    >
-                                        {{ resource.entity_value }}
-                                    </p-link>
+                                    <p-tooltip :contents="resource.entity_value">
+                                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                                new-tab
+                                                :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                                class="affected-resource-link"
+                                                highlight
+                                        >
+                                            {{ resource.entity_value }}
+                                        </p-link>
+                                    </p-tooltip>
                                 </template>
                             </div>
                         </div>
@@ -361,6 +364,17 @@ watch(() => tabState.activeTab, () => {
         }
         .label {
             @apply text-gray-600;
+        }
+    }
+}
+
+/* custom design-system component - p-link */
+.affected-resource-link {
+    :deep(.p-link) {
+        .text {
+            @apply truncate;
+            width: 10rem;
+            display: inline-block;
         }
     }
 }
