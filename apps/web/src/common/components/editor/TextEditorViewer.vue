@@ -36,5 +36,9 @@ const refinedContents = computed(() => setAttachmentsToContents(props.contents, 
     img:active {
         outline: none;
     }
+
+    li {
+        @apply ml-1;
+    }
 }
 </style>

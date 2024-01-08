@@ -39,6 +39,7 @@ const router = useRouter();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
@@ -70,7 +71,7 @@ const state = reactive({
             }
             return menuList;
         });
-        return [...menuList, ...allWorkspacesMenu];
+        return [...menuList, ...(state.isDomainAdmin ? allWorkspacesMenu : [])];
     }),
     searchText: '',
 });

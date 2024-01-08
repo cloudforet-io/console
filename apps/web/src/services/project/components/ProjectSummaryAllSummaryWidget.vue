@@ -229,7 +229,7 @@ const getCloudServiceSummary = async () => {
 const getTrend = async (type) => {
     const dateRange = state.selectedDateType === 'MONTHLY' ? MONTH_COUNT : DAY_COUNT;
     const dateUnit = state.selectedDateType === 'MONTHLY' ? 'month' : 'day';
-    const dateFormat = state.selectedDateType === 'MONTHLY' ? 'YYYY-DD' : 'YYYY-MM-DD';
+    const dateFormat = state.selectedDateType === 'MONTHLY' ? 'YYYY-MM' : 'YYYY-MM-DD';
 
     try {
         const param: any = {
