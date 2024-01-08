@@ -341,15 +341,11 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                         {{ title }}
                                     </div>
                                     <p-skeleton v-if="state.cardSummaryLoading[summaryType]" />
-                                    <router-link v-else-if="getCloudServiceCount(summaryType, item.project_id) !== 0"
-                                                 class="summary-item-num"
+                                    <router-link class="summary-item-num"
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                     >
                                         {{ getCloudServiceCount(summaryType, item.project_id) }}
                                     </router-link>
-                                    <span v-else
-                                          class="summary-item-num none"
-                                    >N/A</span>
                                 </div>
                             </div>
                         </div>
@@ -513,13 +509,10 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
             .summary-item-num {
                 @apply text-xs text-gray-900;
                 line-height: 1.125rem;
-                &:hover:not(.none) {
+                &:hover {
                     @apply text-secondary;
                     text-decoration: underline;
                     cursor: pointer;
-                }
-                &.none {
-                    @apply text-gray-300;
                 }
             }
             &:last-child {
