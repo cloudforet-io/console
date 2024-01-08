@@ -5,19 +5,14 @@ import {
 
 import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
-import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
-import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useAlertAssignUserStore } from '@/services/alert-manager/stores/alert-assign-user-store';
 
 const props = defineProps<{
     visible: boolean;
@@ -26,31 +21,17 @@ const props = defineProps<{
 const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
     (event: 'confirm'): void;
 }>();
+
+const alertAssignUserStore = useAlertAssignUserStore();
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     isAssignedToMe: false,
 });
 
 /* api */
-const updateToAcknowledgeAndAssignToMe = async (alertId: string) => {
-    try {
-        await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters>({
-            alert_id: alertId,
-            state: ALERT_STATE.ACKNOWLEDGED,
-        });
-        if (state.isAssignedToMe) {
-            await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters>({
-                alert_id: alertId,
-                assignee: store.state.user.userId,
-            });
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        throw new Error(alertId);
-    }
-};
 const updateToAcknowledge = async () => {
-    const promises = props.alerts?.map((d) => updateToAcknowledgeAndAssignToMe(d.alert_id));
+    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id));
     const results = await Promise.allSettled(promises);
     const rejected = results.filter((d) => d.status === 'rejected');
     if (rejected.length > 0) {
