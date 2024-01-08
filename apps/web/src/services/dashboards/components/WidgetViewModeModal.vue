@@ -17,7 +17,6 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { gray } from '@/styles/colors';
@@ -72,6 +71,7 @@ const state = reactive({
         if (!props.widgetKey) return undefined;
         return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
+    hideDateDropdown: computed<boolean>(() => widgetFormGetters.widgetConfig?.options?.data_criteria === 'realtime'),
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -176,7 +176,8 @@ onBeforeUnmount(() => {
                         />
                     </div>
                     <div class="right-part">
-                        <dashboard-toolset-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
+                        <dashboard-toolset-date-dropdown v-if="!state.hideDateDropdown"
+                                                         v-show="dashboardDetailState.settings.date_range.enabled"
                                                          :date-range="dashboardDetailState.settings.date_range"
                         />
                     </div>
