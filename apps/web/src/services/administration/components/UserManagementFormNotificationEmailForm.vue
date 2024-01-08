@@ -47,8 +47,9 @@ const { email } = forms;
 
 /* Components */
 const handleChangeInput = (value: string) => {
+    state.isValidEmail = false;
     setForm('email', value);
-    emit('change-input', { email: email.value });
+    emit('change-input', { email: email.value, isValidEmail: state.isValidEmail });
 };
 const handleClickChange = () => {
     if (!state.isEdit) {

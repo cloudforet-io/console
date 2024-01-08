@@ -68,6 +68,7 @@ const state = reactive({
 const formState = reactive({
     name: '',
     email: '',
+    isValidEmail: true,
     // password
     password: '',
     passwordType: '',
@@ -92,6 +93,7 @@ const setForm = () => {
 };
 const handleChangeInputs = (value) => {
     if (value.email) formState.email = value.email;
+    if (value.isValidEmail !== undefined) formState.isValidEmail = value.isValidEmail;
     if (value.password) formState.password = value.password || '';
     if (value.passwordType) formState.passwordType = value.passwordType;
     if (value.role) formState.role = value.role;
@@ -102,7 +104,7 @@ const handleChangeVerify = (status) => {
 const buildUserInfoParams = (): UserManagementData => ({
     user_id: state.data.user_id || '',
     name: formState.name,
-    email: formState.email || '',
+    email: formState.isValidEmail ? formState.email : state.data.email || '',
     tags: formState.tags || {},
     password: formState.password || '',
     reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
