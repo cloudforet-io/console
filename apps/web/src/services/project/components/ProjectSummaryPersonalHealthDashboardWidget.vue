@@ -228,7 +228,7 @@ watch(() => tabState.activeTab, () => {
                      :class="{active: tabState.activeTab === data.name}"
                      @click="tabState.activeTab = data.name"
                 >
-                    <p-link :href="summaryLinkFormatter(data.name).href"
+                    <p-link :to="summaryLinkFormatter(data.name)"
                             class="count"
                             highlight
                     >
