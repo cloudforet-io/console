@@ -71,14 +71,19 @@ const listProjectChannel = async () => {
 
 
 const listEscalationPolicy = async () => {
-    if (!props.alertData?.escalation_policy_id) throw new Error('escalation_policy_id is required');
-    const { rules } = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
-        escalation_policy_id: props.alertData.escalation_policy_id,
-    });
-    state.escalationRuleItems = rules.map((d) => ({
-        title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL') as string,
-        data: d,
-    }));
+    try {
+        if (!props.alertData?.escalation_policy_id) throw new Error('escalation_policy_id is required');
+        const { rules } = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
+            escalation_policy_id: props.alertData.escalation_policy_id,
+        });
+        state.escalationRuleItems = rules.map((d) => ({
+            title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL') as string,
+            data: d,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.escalationRuleItems = [];
+    }
 };
 
 // LOAD REFERENCE STORE

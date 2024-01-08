@@ -32,7 +32,7 @@ const props = defineProps({
     },
 });
 const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.$state;
+const alertPageState = alertPageStore.state;
 
 const router = useRouter();
 
