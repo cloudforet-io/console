@@ -996,6 +996,7 @@
 				"SEARCH": "Search"
 			},
 			"WORKSPACE": {
+				"ALL_WORKSPACES": "All workspaces",
 				"CURRENT_WORKSPACE": "Current Workspace",
 				"SWITCH_TO": "Switch To"
 			}
