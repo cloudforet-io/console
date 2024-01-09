@@ -234,7 +234,7 @@ const {
         @apply relative bg-white border border-gray-200 rounded-md ;
 
         .add-button-wrapper {
-            @apply flex justify-end;
+            @apply flex;
         }
         .list-wrapper {
             .variable-select-filter {

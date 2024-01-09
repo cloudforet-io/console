@@ -208,12 +208,6 @@ watch(() => props.provider, async (provider) => {
 
 <style lang="postcss" scoped>
 .service-account-base-information {
-    /* custom design-system component - p-heading */
-    :deep(.p-heading) {
-        .extra {
-            text-align: right;
-        }
-    }
     .content-wrapper {
         padding-top: 0.5rem;
         padding-bottom: 2.5rem;

@@ -106,14 +106,12 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
             <template v-if="userPageState.isAdminMode"
                       #extra
             >
-                <div class="edit-button-container">
-                    <p-button style-type="secondary"
-                              icon-left="ic_edit"
-                              @click="handleEditTag"
-                    >
-                        {{ $t('COMMON.TAGS.EDIT') }}
-                    </p-button>
-                </div>
+                <p-button style-type="secondary"
+                          icon-left="ic_edit"
+                          @click="handleEditTag"
+                >
+                    {{ $t('COMMON.TAGS.EDIT') }}
+                </p-button>
             </template>
         </p-heading>
         <p-data-table :fields="tableState.fields"
