@@ -13,6 +13,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
+interface DateOption {
+    minDate?: string;
+    maxDate?: string;
+}
+
 const emit = defineEmits<{(e: 'update', period: Period, isValid: boolean): void; }>();
 const {
     forms: { startDates, endDates },
@@ -31,9 +36,21 @@ const state = reactive({
         start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM'),
         end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM'),
     })),
-    endMinDate: computed(() => {
-        const start = startDates.value[0];
-        return start ? dayjs.utc(start).format('YYYY-MM') : undefined;
+    startDateSetting: computed<DateOption>(() => {
+        const today = dayjs.utc();
+        const minDate = today.subtract(35, 'month').format('YYYY-MM');
+        const maxDate = today.format('YYYY-MM');
+        return { minDate, maxDate };
+    }),
+    endDateSetting: computed<DateOption>(() => {
+        let minDate;
+        let maxDate;
+        if (!startDates.value.length) return { minDate, maxDate };
+
+        const startDate = dayjs.utc(startDates.value[0]);
+        minDate = startDate.format('YYYY-MM');
+        maxDate = startDate.add(11, 'month').format('YYYY-MM');
+        return { minDate, maxDate };
     }),
 });
 
@@ -65,7 +82,7 @@ watch(() => state.period, (period) => {
         >
             <p-datetime-picker :selected-dates="startDates"
                                data-type="yearToMonth"
-                               :invalid="invalidState.startDates"
+                               :invalid="!!startDates.length && !!endDates.length && invalidState.startDates"
                                @update:selectedDates="handleUpdateSelectedDates('startDates', $event)"
             />
         </p-field-group>
@@ -77,8 +94,9 @@ watch(() => state.period, (period) => {
         >
             <p-datetime-picker :selected-dates="endDates"
                                data-type="yearToMonth"
-                               :invalid="invalidState.endDates"
-                               :min-date="state.endMinDate"
+                               :invalid="!!startDates.length && !!endDates.length && invalidState.endDates"
+                               :min-date="state.endDateSetting.minDate"
+                               :max-date="state.endDateSetting.maxDate"
                                @update:selectedDates="handleUpdateSelectedDates('endDates', $event)"
             />
         </p-field-group>
