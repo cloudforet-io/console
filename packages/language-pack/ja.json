@@ -998,9 +998,9 @@
 				"SEARCH": "検索"
 			},
 			"WORKSPACE": {
-				"ALL_WORKSPACES": "",
-				"CURRENT_WORKSPACE": "",
-				"SWITCH_TO": ""
+				"ALL_WORKSPACES": "すべてのワークスペース",
+				"CURRENT_WORKSPACE": "現在のワークスペース",
+				"SWITCH_TO": "切り替える"
 			}
 		},
 		"HANDBOOK_BUTTON": {
