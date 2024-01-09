@@ -2059,6 +2059,7 @@
 				"DUPLICATED_NAME": "이름이 중복되었습니다. ",
 				"LABEL_DESC": "설명",
 				"LABEL_NAME": "이름",
+				"LABEL_THEME": "",
 				"PLACEHOLDER_DESC": "워크스페이스 설명",
 				"PLACEHOLDER_NAME": "워크스페이스명",
 				"REQUIRED_NAME": "이름을 입력하세요."

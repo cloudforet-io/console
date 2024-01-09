@@ -15,7 +15,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
-import MyPageGNBHeader from '@/common/modules/navigations/gnb/modules/MyPageGNBHeader.vue';
+import MyPageGNBHeader from '@/common/modules/navigations/gnb/modules/gnb-header/MyPageGNBHeader.vue';
 import MyPageGNBToolset from '@/common/modules/navigations/gnb/modules/MyPageGNBToolset.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
