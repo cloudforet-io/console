@@ -17,6 +17,8 @@ import type { CollectorListParameters } from '@/schema/inventory/collector/api-v
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
@@ -116,7 +118,7 @@ onMounted(async () => {
         >
             <template #extra>
                 <router-link
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }"
+                    :to="{ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME) }"
                 >
                     <p-button style-type="tertiary"
                               class="history-button"
