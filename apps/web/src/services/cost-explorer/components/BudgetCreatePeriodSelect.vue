@@ -36,12 +36,6 @@ const state = reactive({
         start: dayjs.utc(startDates.value[0]).locale('en').format('YYYY-MM'),
         end: dayjs.utc(endDates.value[0]).locale('en').format('YYYY-MM'),
     })),
-    startDateSetting: computed<DateOption>(() => {
-        const today = dayjs.utc();
-        const minDate = today.subtract(35, 'month').format('YYYY-MM');
-        const maxDate = today.format('YYYY-MM');
-        return { minDate, maxDate };
-    }),
     endDateSetting: computed<DateOption>(() => {
         let minDate;
         let maxDate;
