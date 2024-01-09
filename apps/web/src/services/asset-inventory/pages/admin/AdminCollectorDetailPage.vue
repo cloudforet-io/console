@@ -1,13 +1,5 @@
 <template>
     <div class="collector-detail-page">
-        <portal to="page-top-notification">
-            <scoped-notification v-if="state.isNotiVisible"
-                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
-                                 title-icon="ic_info-circle"
-                                 type="info"
-                                 hide-header-close-button
-            />
-        </portal>
         <p-heading :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
@@ -59,9 +51,6 @@
         <collector-schedule-section class="section" />
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
-        />
-        <collector-service-accounts-section class="section"
-                                            :manage-disabled="!state.hasManagePermission"
         />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
@@ -119,9 +108,10 @@ import type { CollectorGetParameters } from '@/schema/inventory/collector/api-ve
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -136,8 +126,6 @@ import CollectorNameEditModal
 import CollectorOptionsSection
     from '@/services/asset-inventory/components/CollectorDetailOptionsSection.vue';
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
-import CollectorServiceAccountsSection
-    from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
@@ -178,7 +166,7 @@ const state = reactive({
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorHistoryLink: computed<Location>(() => ({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME),
         query: {
             filters: queryHelper.setFilters([
                 {

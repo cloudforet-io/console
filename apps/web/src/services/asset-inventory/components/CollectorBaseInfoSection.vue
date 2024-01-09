@@ -22,9 +22,9 @@
         <div v-if="state.isEditMode"
              class="collector-base-info-edit"
         >
-            <collector-plugin-info :plugin="state.repositoryPlugin"
-                                   :collector="collectorFormState.originCollector"
-                                   show-minimal
+            <collector-detail-plugin-info :plugin="state.repositoryPlugin"
+                                          :collector="collectorFormState.originCollector"
+                                          show-minimal
             />
             <collector-version-form @update-valid="handleUpdateIsVersionValid" />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
