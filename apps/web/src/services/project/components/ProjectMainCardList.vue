@@ -91,7 +91,7 @@ const state = reactive({
 const getProvider = (name: string): ProviderReferenceItem => storeState.providers[name] || {};
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
 const getCloudServiceCount = (summaryType: SummaryType, projectId: string) => {
-    const cloudServiceData = state.cloudServiceDataMap[summaryType].find((d) => d.project_id === projectId);
+    const cloudServiceData = state.cloudServiceDataMap[summaryType]?.find((d) => d.project_id === projectId);
     return cloudServiceData?.total_count || 0;
 };
 const getProjectGroupName = (projectItem: ProjectModel, parentGroups?: ProjectGroupTreeNodeData[]) => {
