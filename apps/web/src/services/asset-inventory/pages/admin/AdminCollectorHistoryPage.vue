@@ -2,9 +2,10 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { RawLocation } from 'vue-router';
 
 import {
-    PHeading, PPagination, PLazyImg,
+    PHeading, PPagination, PLazyImg, PLink,
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
@@ -26,6 +27,9 @@ import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { ROOT_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -49,9 +53,13 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
 
 
+const COLLECTOR_DETAIL_ROUTE = ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
+const WORKSPACE_HOME_ROUTE = ROOT_ROUTE.WORKSPACE._NAME;
+
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
-    { label: 'Collector', name: 'collector_info.label', sortable: false },
+    { label: 'Workspace', name: 'workspace_id' },
+    { label: 'Collector', name: 'collector_info', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
     { label: 'Job Progress', name: 'progress', sortable: false },
@@ -136,7 +144,7 @@ const getQuery = () => {
 /* Components */
 const handleSelect = (item) => {
     SpaceRouter.router.push({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
+        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME),
         params: { jobId: item.job_id },
     }).catch(() => {});
 };
@@ -202,6 +210,18 @@ const getJobs = async () => {
     }
 };
 
+const getLocation = ({ workspaceId, collectorId, target }: {workspaceId:string, collectorId?: string, target: string}):RawLocation => {
+    console.log('collectorId', collectorId);
+    const isAdminCenter = workspaceId === '*';
+    const routeParams: {collectorId?: string, workspaceId?: string} = {};
+    if (collectorId) routeParams.collectorId = collectorId;
+    if (!isAdminCenter) routeParams.workspaceId = workspaceId;
+    return ({
+        name: isAdminCenter ? makeAdminRouteName(target) : target,
+        params: routeParams,
+    });
+};
+
 /* Watcher */
 watch(() => state.selectedStatus, (selectedStatus) => {
     state.selectedStatus = selectedStatus;
@@ -264,6 +284,29 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              @refresh="handleChange()"
                              @rowLeftClick="handleSelect"
             >
+                <template #col-workspace_id-format="{ value }">
+                    <span v-if="value === '*'">Global</span>
+                    <p-link v-else
+                            :to="getLocation({
+                                workspaceId: value,
+                                target: WORKSPACE_HOME_ROUTE,
+                            })"
+                            action-icon="internal-link"
+                            new-tab
+                            :text="value === '*' ? 'Global' : value"
+                    />
+                </template>
+                <template #col-collector_info-format="{ value, item }">
+                    <p-link :to="getLocation({
+                                workspaceId: item.workspace_id,
+                                collectorId: item.collector_id,
+                                target: COLLECTOR_DETAIL_ROUTE,
+                            })"
+                            action-icon="internal-link"
+                            new-tab
+                            :text="value.label || ''"
+                    />
+                </template>
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
                         <div class="col-plugin-info">
