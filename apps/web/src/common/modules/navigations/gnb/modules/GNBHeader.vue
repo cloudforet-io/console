@@ -22,6 +22,8 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { violet } from '@/styles/colors';
 
 interface Props {
@@ -36,6 +38,7 @@ const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
@@ -83,7 +86,7 @@ const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
         appContextStore.enterAdminMode();
-        router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        router.push(getProperRouteLocation({ name: ROOT_ROUTE.ADMIN._NAME }));
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
