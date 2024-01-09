@@ -112,14 +112,6 @@ export default defineComponent({
             adminModeMenuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
-                    id: MENU_ID.SERVER,
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
-                    to: getProperRouteLocation({
-                        name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-                    }),
-                },
-                {
-                    type: 'item',
                     id: MENU_ID.COLLECTOR,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
                     to: getProperRouteLocation({
@@ -129,6 +121,7 @@ export default defineComponent({
 
             ]),
             menuSet: computed<LNBMenu[]>(() => {
+                if (isAdminMode.value) return state.adminModeMenuSet;
                 const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
                     id: MENU_ID.CLOUD_SERVICE,
@@ -139,9 +132,7 @@ export default defineComponent({
                 }]);
                 const result = [
                     (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
-                    ...filterLNBMenuByAccessPermission(menu.concat(
-                        isAdminMode.value ? state.adminModeMenuSet : state.userModeMenuSet,
-                    ), store.getters['user/pageAccessPermissionList']),
+                    ...filterLNBMenuByAccessPermission(menu.concat(state.userModeMenuSet), store.getters['user/pageAccessPermissionList']),
                 ];
                 return result;
             }),
