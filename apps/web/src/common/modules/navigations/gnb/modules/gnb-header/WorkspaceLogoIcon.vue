@@ -2,42 +2,50 @@
 
 import { computed, reactive } from 'vue';
 
-import { getRandomWorkspaceIconTheme } from '@/common/modules/navigations/gnb/helpers/gnb-logo-helper';
 import type { GNBLogoIconTheme } from '@/common/modules/navigations/gnb/types/type';
 
 interface Props {
     theme?: GNBLogoIconTheme;
-    workspaceName: string;
+    text: string;
+    size?: 'sm'|'md';
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    theme: undefined,
-    workspaceName: '',
+    theme: 'blue',
+    text: '',
+    size: 'sm',
 });
 
 const state = reactive({
-    theme: computed(() => props.theme ?? getRandomWorkspaceIconTheme()),
-    logoText: computed(() => props.workspaceName.slice(0, 1).toUpperCase()),
+    theme: computed(() => props.theme),
+    logoText: computed(() => props.text.slice(0, 1).toUpperCase()),
     isLogoStartsWithEnglish: computed(() => /^[A-Za-z]/.test(state.logoText)),
 });
 
 </script>
 
 <template>
-    <div :class="{'logo-wrapper': true, [state.theme]: true, 'english-logo': state.isLogoStartsWithEnglish}">
+    <div :class="{'workspace-logo-icon': true, [state.theme]: true, 'english-logo': state.isLogoStartsWithEnglish, [props.size]: true}">
         {{ state.logoText }}
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.logo-wrapper {
-    @apply flex items-center justify-center text-white text-label-xl font-bold;
-    width: 2rem;
-    height: 2rem;
+.workspace-logo-icon {
+    @apply flex items-center justify-center text-white  font-bold;
     border-radius: 0.375rem;
-
+    &.sm {
+        @apply text-label-xl;
+        width: 2rem;
+        height: 2rem;
+    }
     &.english-logo {
         @apply text-display-md;
+    }
+    &.md {
+        @apply text-display-lg;
+        width: 3rem;
+        height: 3rem;
     }
 }
 .blue {
