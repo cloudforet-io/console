@@ -2059,6 +2059,7 @@
 				"DUPLICATED_NAME": "Workspace name is duplicated.",
 				"LABEL_DESC": "Description",
 				"LABEL_NAME": "Name",
+				"LABEL_THEME": "Workspace Color",
 				"PLACEHOLDER_DESC": "Workspace description",
 				"PLACEHOLDER_NAME": "Workspace name",
 				"REQUIRED_NAME": "Please enter name"

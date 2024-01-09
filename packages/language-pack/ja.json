@@ -2059,6 +2059,7 @@
 				"DUPLICATED_NAME": "ワークスペース名が重複しています。",
 				"LABEL_DESC": "説明",
 				"LABEL_NAME": "名前",
+				"LABEL_THEME": "",
 				"PLACEHOLDER_DESC": "ワークスペースの説明\"",
 				"PLACEHOLDER_NAME": "ワークスペース名",
 				"REQUIRED_NAME": "名前を入力してください"
