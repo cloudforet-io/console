@@ -1,11 +1,5 @@
 <template>
     <div class="my-page-gnb-toolset">
-        <!--        <g-n-b-menu v-if="state.hasRole"-->
-        <!--                    :menu-id="noticeState.noticeMenuItem.id"-->
-        <!--                    :label="noticeState.noticeMenuItem.label"-->
-        <!--                    :to="noticeState.noticeMenuItem.to"-->
-        <!--                    :is-selected="noticeState.isSelected"-->
-        <!--        />-->
         <g-n-b-profile :visible="state.profileMenuVisible"
                        @update:visible="updateOpenedMenu"
         />
@@ -19,32 +13,13 @@ import {
 
 import { store } from '@/store';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 
-const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
-    hasRole: computed(() => userWorkspaceStore.getters.workspaceList.length > 0),
     timezone: computed(() => store.state.user.timezone),
     profileMenuVisible: false,
 });
 
-// const noticeState = reactive({
-//     noticeMenuItem: computed<DisplayMenu>(() => {
-//         const menuInfo: MenuInfo = MENU_INFO_MAP[MENU_ID.NOTICE];
-//
-//         return {
-//             id: MENU_ID.NOTICE,
-//             label: i18n.t(menuInfo.translationId),
-//             to: { name: makeAdminRouteName(menuInfo.routeName) },
-//         };
-//     }),
-//     isSelected: computed(() => {
-//         const matched = route.matched;
-//         return matched.some((item) => item.meta.menuId === MENU_ID.NOTICE);
-//     }),
-// });
 const hideMenu = () => {
     state.profileMenuVisible = false;
 };
