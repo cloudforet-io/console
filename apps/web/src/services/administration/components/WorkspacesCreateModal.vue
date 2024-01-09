@@ -23,6 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { getRandomWorkspaceIconTheme } from '@/common/modules/navigations/gnb/helpers/gnb-logo-helper';
 
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
@@ -98,6 +99,7 @@ const handleConfirm = async () => {
                 name: state.name ?? '',
                 tags: {
                     description: state.description ?? '',
+                    theme: getRandomWorkspaceIconTheme(),
                 },
             });
             await userWorkspaceStore.load();
