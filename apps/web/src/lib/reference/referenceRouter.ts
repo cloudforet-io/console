@@ -145,7 +145,6 @@ export const referenceRouter = (data: string, reference: Reference, query?: Loca
                 workspaceId: reference.workspace_id,
             };
         }
-        console.log('>>>>>>>>', location);
         return location;
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);

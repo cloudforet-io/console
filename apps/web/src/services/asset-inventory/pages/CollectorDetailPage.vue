@@ -8,7 +8,8 @@
                                  hide-header-close-button
             >
                 <template #right>
-                    <p-link :text="i18n.t('View in Admin Mode')"
+                    <p-link v-if="state.isDomainAdmin"
+                            :text="i18n.t('View in Admin Mode')"
                             :to="{name: makeAdminRouteName($route.name)}"
                             size="sm"
                             highlight
@@ -127,6 +128,7 @@ import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
@@ -184,6 +186,7 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),

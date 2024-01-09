@@ -49,8 +49,9 @@ import {
     PButton, PTextButton,
 } from '@spaceone/design-system';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AttachedServiceAccountForm
     from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
@@ -64,14 +65,16 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
-const { isAdminMode } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
+const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
 
 const state = reactive({
     loading: true,
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     deleteModalVisible: false,
-    isAttachedServiceAccountValid: !!isAdminMode,
+    isAttachedServiceAccountValid: isAdminMode.value,
     isSchemaFormValid: false,
     isAllFormValid: computed<boolean>(() => state.isAttachedServiceAccountValid && state.isSchemaFormValid),
 });
