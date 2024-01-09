@@ -69,16 +69,14 @@ export class SpaceRouter {
         const userWorkspaceStore = useUserWorkspaceStore(pinia);
 
         SpaceRouter.router.onError((error) => {
-            console.error('[Router Error]', error);
+            console.error(error);
 
-            if (error.name === 'ChunkLoadError' || error.message.includes('Failed to fetch dynamically imported module')) {
+            if (error.name === 'ChunkLoadError') {
                 const lastCheckedTime = LocalStorageAccessor.getItem(CHUNK_LOAD_REFRESH_STORAGE_KEY);
                 if (!lastCheckedTime) {
                     LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, getCurrentTime().toString());
-                    console.log('ChunkLoadError: Refreshing to: ', nextPath ?? '/');
                     window.location.href = nextPath ?? '/';
                 } else if (getCurrentTime() - parseInt(lastCheckedTime) < 10) {
-                    console.log('ChunkLoadError: Refreshing to: ', nextPath ?? '/');
                     window.location.href = nextPath ?? '/';
                 }
             }
@@ -92,16 +90,17 @@ export class SpaceRouter {
             const isAdminMode = appContextStore.getters.isAdminMode;
 
 
-            /* NOTE: Browser Back Button Case
+            /* Browser Back Button Case
             *  isAdminMode state is not changed when browser back button is clicked. (route: admin <-> workspace)
             *  So, when the user clicks the browser back button, the isAdminMode state is changed to the correct state.
-            *  This is allowed only in the cases below.
+            *  This is allowed ONLY THIS CASE
             * */
-            // CASE 1: Admin Mode -> Workspace Mode -> (back button) Admin Mode
+            // [CASE] Admin Mode -> Workspace Mode -> (back button) Admin Mode
             if (to.name?.startsWith('admin.') && !isAdminMode) {
                 appContextStore.enterAdminMode();
-            // CASE 2: Workspace Mode -> Admin Mode -> (back button) Workspace Mode
-            } else if (!to.name?.startsWith('admin.') && isAdminMode) {
+            }
+            // [CASE] Workspace Mode -> Admin Mode -> (back button) Workspace Mode
+            if (!to.name?.startsWith('admin.') && isAdminMode) {
                 appContextStore.exitAdminMode();
             }
 
