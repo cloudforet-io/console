@@ -9,8 +9,6 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { store } from '@/store';
 
@@ -25,14 +23,14 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/components/BudgetDetailInfoAmountPlanningTypePopover.vue';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 
 const budgetPageStore = useBudgetDetailPageStore();
@@ -41,7 +39,6 @@ const budgetPageState = budgetPageStore.$state;
 const costTypeWrapperRef = ref<HTMLElement|null>(null);
 const costTypeRef = ref<HTMLElement|null>(null);
 
-const queryHelper = new QueryHelper();
 const storeState = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -77,11 +74,10 @@ const state = reactive({
             );
         }
         if (isAdminMode.value) {
-            queryHelper.setFilters([{ k: 'workspace_id', v: state.budgetData?.workspace_id, o: '=' }]);
-            return getProperRouteLocation({
-                name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME,
-                query: {
-                    filters: queryHelper.rawQueryStrings,
+            return ({
+                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                params: {
+                    workspaceId: state.budgetData?.workspace_id,
                 },
             });
         }
@@ -144,7 +140,7 @@ watch(() => costTypeRef.value, (costType) => {
                          :color="gray[400]"
                     />
                 </span>
-                <p-link v-else-if="state.targetLocation"
+                <p-link v-if="state.targetLocation"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
@@ -225,10 +221,11 @@ watch(() => costTypeRef.value, (costType) => {
         font-size: 0.875rem;
         line-height: 120%;
         &.target {
-            @apply flex;
+            display: inline-block;
             gap: 0.125rem;
             .target-project-group {
-                @apply flex items-center;
+                @apply items-center;
+                display: inline-block;
                 gap: 0.125rem;
             }
         }

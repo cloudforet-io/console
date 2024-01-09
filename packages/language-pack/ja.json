@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "月別予算計画",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
 					"ORIGINAL_DATA": "原本データー",
+					"PAGE_NOTIFICATION": "",
 					"PERIOD": "期間",
 					"PROVIDER": "プロバイダー",
 					"SET": "設定",
@@ -451,7 +452,8 @@
 					"TARGET": "ターゲット",
 					"TOTAL_AMOUNT": "総予算計画",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
-					"VIEW_ALL": "すべて表示"
+					"VIEW_ALL": "すべて表示",
+					"VIEW_IN_ADMIN_MODE": ""
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -994,6 +996,11 @@
 				"PROFILE": "マイページ",
 				"RECENT_FAVORITE": "最近のアクセス / お気に入り",
 				"SEARCH": "検索"
+			},
+			"WORKSPACE": {
+				"ALL_WORKSPACES": "",
+				"CURRENT_WORKSPACE": "",
+				"SWITCH_TO": ""
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1091,10 +1098,10 @@
 			"TITLE": "個人情報"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "プロジェクト作成",
+			"CREAT_PROJECT": "",
 			"CURRENT": "現在",
 			"PLACEHOLDER": "プロジェクト選択",
-			"RELOAD_PROJECT": "プロジェクト読み込む"
+			"RELOAD_PROJECT": ""
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
@@ -1637,6 +1644,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
+		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",
 		"APP": {
 			"ACTION": "作業",
 			"CREATE": "作成",
@@ -1913,12 +1922,14 @@
 				"MFA_DESC": "アカウントのセキュリティを向上させるために、マルチファクタ認証オプションを設定してください。",
 				"MODAL": {
 					"ALT_E_ADD_USER": "ユーザー追加に失敗",
+					"ALT_E_DELETE_PROJECT_MEMBER": "メンバー削除に失敗",
 					"ALT_E_DELETE_USER": "ユーザー削除に失敗",
 					"ALT_E_DISABLE_USER": "ユーザー無効化に失敗",
 					"ALT_E_ENABLE_USER": "ユーザー有効化に失敗",
 					"ALT_E_REMOVE_USER": "ユーザーの削除に失敗しました",
 					"ALT_E_UPDATE_USER": "ユーザー編集に失敗",
 					"ALT_S_ADD_USER": "ユーザー追加完了",
+					"ALT_S_DELETE_PROJECT_MEMBER": "メンバー削除完了",
 					"ALT_S_DELETE_USER": "ユーザー削除完了",
 					"ALT_S_DISABLE_USER": "ユーザー無効化完了",
 					"ALT_S_ENABLE_USER": "ユーザー有効化完了",
@@ -1926,6 +1937,7 @@
 					"ALT_S_UPDATE_USER": "ユーザー更新完了",
 					"CREATE_TITLE": "ユーザー追加",
 					"DELETE_DESC": "選択したユーザーを削除しますか？ |選択したユーザーを全部削除しますか？",
+					"DELETE_PROJECT_MEMBER_TITLE": "このユーザーをプロジェクトから削除してもよろしいですか？",
 					"DELETE_TITLE": "ユーザー削除",
 					"DISABLE_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 					"DISABLE_TITLE": "ユーザ無効化",
@@ -1933,6 +1945,7 @@
 					"ENABLE_TITLE": "ユーザー有効化",
 					"INVITE_TITLE": "ユーザーを{workspace_name}に招待",
 					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
+					"REMOVE_WORKSPACE_TITLE": "このユーザーをワークスペースから削除してもよろしいですか？",
 					"UPDATE_TITLE": "ユーザーを編集"
 				},
 				"NAME": "名前",
@@ -1942,6 +1955,7 @@
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 				"PROJECT": "プロジェクト ",
 				"PROJECTS": "プロジェクト",
+				"PROJECT_ID": "プロジェクトID",
 				"ROLE": "ロール",
 				"ROLE_NAME": "ロール名",
 				"ROLE_TYPE": "ロールタイプ",
@@ -2477,6 +2491,7 @@
 				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
+				"DETAIL_JOB_LINK": "作業詳細を見る",
 				"EDIT": "編集",
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",
@@ -2961,6 +2976,7 @@
 					"RESOLVED": "完了",
 					"RESOURCE_GROUP": "リソースグループ",
 					"RULE": "ルール",
+					"SCOPE": "スコープ",
 					"STEP": "ステップ",
 					"TIME": "時間",
 					"WORKSPACE": "ワークスペース"
@@ -3480,8 +3496,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" を移動する",
-				"NO_PROJECT_GROUP": "プロジェクトグループなし",
-				"ROOT": "ルート",
+				"NO_PARENT_GROUP": "",
+				"NO_PROJECT_GROUP": "",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "移動先（プロジェクトグループ）を選択してください"
 			},
 			"MODAL_PROJECT_CREATE": {

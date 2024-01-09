@@ -5,6 +5,7 @@ import { i18n } from '@/translations';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -19,7 +20,10 @@ const AdminDashboardDetailPage = () => import('@/services/dashboards/pages/admin
 const adminDashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
-    meta: { menuId: MENU_ID.DASHBOARDS },
+    meta: {
+        menuId: MENU_ID.DASHBOARDS,
+        translationId: MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId,
+    },
     redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
     component: DashboardsContainer,
     children: [

@@ -67,12 +67,16 @@ class KeycloakAuth extends Authenticator {
         }
     }
 
-    static async signIn(onSignInCallback) {
+    static async signIn(onSignInCallback, onErrorCallback?) {
         KeycloakAuth.init();
         KeycloakAuth.keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
             .then(async (auth) => {
-                await KeycloakAuth.keycloakSignIn(auth);
-                await onSignInCallback();
+                try {
+                    await KeycloakAuth.keycloakSignIn(auth);
+                    await onSignInCallback();
+                } catch (e) {
+                    if (onErrorCallback) onErrorCallback(e, KeycloakAuth.keycloak.token);
+                }
             })
             .catch(async (e) => {
                 ErrorHandler.handleError(e);

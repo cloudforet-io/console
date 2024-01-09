@@ -4,6 +4,7 @@ import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { isInstanceOfAPIError } from '@cloudforet/core-lib/space-connector/error';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -17,7 +18,10 @@ import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
+
+import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
@@ -26,6 +30,7 @@ import type {
 interface JWTPayload {
     rol: RoleType;
 }
+
 
 const getUserInfo = async (): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.clientV2.identity.userProfile.get<UserGetParameters, UserModel>();
@@ -82,11 +87,13 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
     return decodedToken.rol;
 };
-export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    const appContextStore = useAppContextStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
     try {
-        await dispatch('display/startGrantRole', undefined, { root: true });
+        // This is for not-triggered CASE, such as when user use browser back button.
+        appContextStore.setGlobalGrantLoading(true);
         const { status, response } = await fetcher({
             grant_type: 'REFRESH_TOKEN',
             scope: grantRequest.scope,
@@ -105,18 +112,45 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
 
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
+
+            if (grantRequest.scope === 'WORKSPACE' && grantRequest.workspace_id) {
+                await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
+            }
         }
+    } catch (error) {
+        /*
+        * Unlike other cases where the ErrorHandler is used for error handling,
+        * in the grant logic scenario, there can be instances where the Router
+        * has not been initialized yet. Using the ErrorHandler in such situations
+        * can lead to issues since it internally relies on the router.
+        * Therefore, in this specific case, errors are simply logged to the console
+        * and not further processed, to avoid complications with uninitialized Router instances.
+        * */
+        commit('setCurrentGrantInfo', undefined);
+        commit('setCurrentRoleInfo', undefined);
+        if (isInstanceOfAPIError(error)) {
+            if (error.code === 'ERROR_WORKSPACE_STATE') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_NOT_FOUND') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_PERMISSION_DENIED') {
+                commit('error/setGrantAccessFailStatus', true, { root: true });
+            } else if (error.code === 'ERROR_AUTHENTICATE_FAILURE') {
+                SpaceConnector.flushToken();
+            } else {
+                SpaceConnector.flushToken();
+            }
+        } else {
+            SpaceConnector.flushToken();
+        }
+    } finally {
         /*
         * Implemented a global loading with a minimum duration of 500 milliseconds
         * during the grant process to prevent rendering of services until the process is complete.
         * */
         setTimeout(() => {
-            dispatch('display/finishGrantRole', undefined, { root: true });
+            appContextStore.setGlobalGrantLoading(false);
         }, 500);
-    } catch (e) {
-        commit('setCurrentRoleInfo', undefined);
-        console.error(`Role Grant Error: ${e}`);
-        SpaceConnector.flushToken();
     }
 };
 

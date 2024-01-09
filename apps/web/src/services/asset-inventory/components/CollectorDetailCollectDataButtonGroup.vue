@@ -71,6 +71,7 @@ watch(() => state.recentJob, (recentJob, prevJob) => {
                         :hours="collectorJobStore.schedule?.hours"
                         :recent-job="state.recentJob"
                         :is-schedule-activated="collectorJobStore.schedule?.state === 'ENABLED'"
+                        :is-popover-mode="true"
                     />
                 </div>
             </template>

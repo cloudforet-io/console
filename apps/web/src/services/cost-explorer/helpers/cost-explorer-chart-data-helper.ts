@@ -62,6 +62,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnal
         const _serviceAccounts = store.getters['reference/serviceAccountItems'];
         const _projects = allReferenceStore.getters.project;
         const _regions = store.getters['reference/regionItems'];
+        const _workspaces = allReferenceStore.getters.workspace;
 
         const legends: Legend[] = [];
         rawData.results?.forEach((d) => {
@@ -78,6 +79,8 @@ export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnal
                 } else if (_groupBy === GROUP_BY.PROVIDER) {
                     _label = _providers[_name]?.name || _name;
                     _color = _providers[_name]?.color;
+                } else if (_groupBy === GROUP_BY.WORKSPACE) {
+                    _label = _workspaces[_name]?.label || _name;
                 }
                 if (!_name) {
                     _name = `no_${_groupBy}`;

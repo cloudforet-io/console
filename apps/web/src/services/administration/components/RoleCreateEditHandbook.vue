@@ -4,7 +4,6 @@ import { PDivider } from '@spaceone/design-system';
 </script>
 
 <template>
-    <!--    TODO: will be updated stationery-->
     <section>
         <article class="desc-wrapper">
             <h2 class="header2">

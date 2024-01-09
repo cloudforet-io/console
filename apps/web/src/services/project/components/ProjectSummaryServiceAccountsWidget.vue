@@ -14,6 +14,7 @@ import { byteFormatter } from '@cloudforet/utils';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -52,6 +53,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const queryHelper = new QueryHelper();
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: true,
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -121,6 +126,7 @@ const getData = async () => {
     try {
         const { results } = await SpaceConnector.client.statistics.topic.serviceAccountSummary({
             project_id: props.projectId,
+            workspace_id: storeState.currentWorkspaceId,
         });
         state.items = getConvertedData(results);
     } catch (e) {

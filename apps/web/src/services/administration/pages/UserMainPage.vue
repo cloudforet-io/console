@@ -23,6 +23,7 @@ const userPageState = userPageStore.$state;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -46,8 +47,9 @@ const refreshUserList = () => {
 };
 
 /* Watcher */
-watch(() => storeState.isAdminMode, (isAdminMode) => {
-    userPageStore.$patch({ isAdminMode });
+watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
+    if (globalGrantLoading) return;
+    userPageStore.$patch({ isAdminMode: storeState.isAdminMode });
 }, { immediate: true });
 
 /* Init */
@@ -84,5 +86,12 @@ onUnmounted(() => {
 .user-page {
     @apply mx-0;
     max-width: 100%;
+}
+
+/* custom design-system component - p-horizontal-layout */
+:deep(.user-toolbox-layout) {
+    .horizontal-contents {
+        overflow: unset;
+    }
 }
 </style>

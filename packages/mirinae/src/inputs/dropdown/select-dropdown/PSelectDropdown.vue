@@ -60,6 +60,7 @@ interface SelectDropdownProps {
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
     initSelectedWithHandler?: boolean;
+    hideHeaderWithoutItems?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectDropdownProps>(), {
@@ -168,6 +169,7 @@ const {
     handler: toRef(props, 'handler'),
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
+    hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
 });
 
 /* focusing */

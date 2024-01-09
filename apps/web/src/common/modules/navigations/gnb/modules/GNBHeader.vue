@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import Vue, { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
@@ -11,7 +11,11 @@ import { clone } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { MenuId } from '@/lib/menu/config';
@@ -28,32 +32,67 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isAdminMode: false,
 });
+const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
-        if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
-            return {
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                icon: 'ic_check',
-                iconColor: violet[500],
-            };
-        }
-        return {
-            name: _workspace.workspace_id,
-            label: _workspace.name,
-        };
-    })),
+    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
+        const menuList: SelectDropdownMenuItem[] = [
+            { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
+        ];
+        const allWorkspacesMenu: SelectDropdownMenuItem[] = [
+            { type: 'divider', name: '' } as SelectDropdownMenuItem,
+            {
+                type: 'item', name: 'all_workspaces', label: i18n.t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES'), icon: 'ic_list-card',
+            } as SelectDropdownMenuItem,
+        ];
+        state.workspaceList.forEach((_workspace) => {
+            if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    icon: 'ic_check',
+                    iconColor: violet[500],
+                    headerName: 'current_workspace_header',
+                } as SelectDropdownMenuItem);
+            } else {
+                menuList.push({
+                    name: _workspace.workspace_id,
+                    label: _workspace.name,
+                    headerName: 'switch_to_header',
+                } as SelectDropdownMenuItem);
+            }
+            return menuList;
+        });
+        return [...menuList, ...(state.isDomainAdmin ? allWorkspacesMenu : [])];
+    }),
     searchText: '',
 });
 
-const selectWorkspace = (workspaceId: string): void => {
+const selectWorkspace = (name: string): void => {
+    const workspaceId = name;
+    if (workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+
+    appContextStore.setGlobalGrantLoading(true);
+    if (name === 'all_workspaces') {
+        appContextStore.enterAdminMode();
+        router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        Vue.notify({
+            group: 'toastTopCenter',
+            type: 'info',
+            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+            duration: 2000,
+            speed: 1,
+        });
+        return;
+    }
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
@@ -77,7 +116,7 @@ const selectWorkspace = (workspaceId: string): void => {
             <span v-if="props.isAdminMode"
                   class="admin-title"
             >
-                Admin
+                Admin Center
             </span>
             <div v-else
                  class="logo-wrapper"
@@ -102,6 +141,7 @@ const selectWorkspace = (workspaceId: string): void => {
                            is-filterable
                            :search-text.sync="state.searchText"
                            :menu="state.workspaceMenuList"
+                           hide-header-without-items
                            :selected="state.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >

@@ -1,4 +1,4 @@
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 interface ValueLabelHelperOptions {
     allReferenceTypeInfo?: AllReferenceTypeInfo;

@@ -8,4 +8,5 @@ export interface FindWorkspaceUserParameters {
     keyword: string;
     state?: UserState;
     page?: Page;
+    workspace_id?: string;
 }

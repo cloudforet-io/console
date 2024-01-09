@@ -1,7 +1,6 @@
 import { computed, reactive } from 'vue';
 
 import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
-import { reverse } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -15,6 +14,8 @@ import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verb
 import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -30,6 +31,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
     });
     const state = reactive({
+        projectTreeKey: getRandomId(),
         isInitiated: false as boolean,
         searchText: undefined as string|undefined,
         rootNode: null as ProjectTreeRoot|null,
@@ -71,7 +73,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
 
                     return parents;
                 }, []);
-                return reverse(parentItems);
+                return parentItems;
             }
             return [];
         }),
@@ -272,6 +274,10 @@ export const useProjectPageStore = defineStore('project-page', () => {
         return res;
     };
 
+    const refreshProjectTreeKey = () => {
+        state.projectTreeKey = getRandomId();
+    };
+
     const mutations = {
         setShouldUpdateProjectList,
         setProjectFormModalVisible,
@@ -295,6 +301,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         updateProject,
         updateProjectType,
         openProjectFormModal,
+        refreshProjectTreeKey,
     };
 
     return {

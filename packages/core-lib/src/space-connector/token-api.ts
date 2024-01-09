@@ -92,20 +92,24 @@ export default class TokenAPI {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
-        if (!this.refreshToken || !this.accessToken) {
+        if (!this.refreshToken) {
             return false;
         }
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
                 let scope = 'USER';
-                if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
-                if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
-                if (rol === 'WORKSPACE_OWNER' || rol === 'WORKSPACE_MEMBER') scope = 'WORKSPACE';
+                let workspaceId: string|undefined;
+                if (this.accessToken) {
+                    const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
+                    if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
+                    if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
+                    if (rol === 'WORKSPACE_OWNER' || rol === 'WORKSPACE_MEMBER') scope = 'WORKSPACE';
+                    workspaceId = wid;
+                }
 
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
-                    grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId: wid,
+                    grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId,
                 });
                 this.setToken(response.data.access_token);
                 if (VERBOSE) {

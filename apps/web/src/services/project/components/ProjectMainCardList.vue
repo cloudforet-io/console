@@ -145,8 +145,8 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
     analyzeCloudServiceApiQueryHelper.setFilters([
         { k: 'ref_cloud_service_type.labels', v: summaryType, o: '=' },
         { k: 'ref_cloud_service_type.is_major', v: true, o: '=' },
-        { k: 'project_id', v: projectIdList, o: '' },
     ]);
+    if (projectIdList.length > 0) analyzeCloudServiceApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: {
@@ -174,8 +174,9 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
 const listServiceAccountApiQueryHelper = new ApiQueryHelper();
 const fetchServiceAccountList = async (projectIdList: string[]) => {
     listServiceAccountApiQueryHelper
-        .setFilters([{ k: 'project_id', v: projectIdList, o: '' }])
+        .setFilters([])
         .setOnly('provider', 'project_id', 'service_account_id');
+    if (projectIdList.length > 0) listServiceAccountApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
         const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
             query: {
@@ -340,15 +341,11 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                         {{ title }}
                                     </div>
                                     <p-skeleton v-if="state.cardSummaryLoading[summaryType]" />
-                                    <router-link v-else-if="getCloudServiceCount(summaryType, item.project_id) !== 0"
-                                                 class="summary-item-num"
+                                    <router-link class="summary-item-num"
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                     >
                                         {{ getCloudServiceCount(summaryType, item.project_id) }}
                                     </router-link>
-                                    <span v-else
-                                          class="summary-item-num none"
-                                    >N/A</span>
                                 </div>
                             </div>
                         </div>
@@ -425,11 +422,12 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
     margin: 1rem 1rem 0.5rem 1rem;
     .project-name-wrapper {
         .project-name {
-            @apply flex-grow flex-shrink-0 font-bold overflow-hidden;
+            @apply flex-grow flex-shrink-0 overflow-hidden;
             display: -webkit-box;
             text-overflow: ellipsis;
             word-wrap: break-word;
-            font-size: 1.125rem;
+            font-size: 1rem;
+            font-weight: 500;
             line-height: 1.2;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
@@ -444,9 +442,10 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
         }
     }
     .accounts-wrapper {
-        @apply flex-grow-0 overflow-x-hidden flex;
+        @apply flex-grow-0 flex;
         justify-content: space-between;
         align-items: center;
+        overflow: hidden;
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
             .provider {
@@ -510,13 +509,10 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
             .summary-item-num {
                 @apply text-xs text-gray-900;
                 line-height: 1.125rem;
-                &:hover:not(.none) {
+                &:hover {
                     @apply text-secondary;
                     text-decoration: underline;
                     cursor: pointer;
-                }
-                &.none {
-                    @apply text-gray-300;
                 }
             }
             &:last-child {

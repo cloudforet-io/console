@@ -96,6 +96,7 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
                    :total-count="workspacePageState.usersTotalCount"
         />
         <p-toolbox-table
+            class="workspace-user-management-table"
             search-type="query"
             searchable
             sortable
@@ -150,6 +151,9 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
 
 <style lang="postcss" scoped>
 .workspace-user-management-tab-contents {
+    .workspace-user-management-table {
+        @apply border-0;
+    }
     .role-type-wrapper {
         @apply flex items-center;
         gap: 0.25rem;

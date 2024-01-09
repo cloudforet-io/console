@@ -49,7 +49,7 @@ export const useCollectorJobStore = defineStore('collector-job', {
                 const { total_count } = await SpaceConnector.clientV2.inventory.job.list({
                     query: allJobsCountQueryHelper.data,
                 });
-                this.allJobsCount = total_count;
+                this.allJobsCount = total_count ?? 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.allJobsCount = 0;

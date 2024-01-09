@@ -26,6 +26,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import UserManagementRemoveModal from '@/services/administration/components/UserManagementRemoveModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
@@ -37,19 +38,12 @@ interface Props {
     tableHeight: number;
 }
 
-const ROLE_TYPE_LABEL_MAP = {
-    WORKSPACE_OWNER: 'Workspace Owner',
-    WORKSPACE_MEMBER: 'Workspace Member',
-};
-
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
-
-const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -63,6 +57,7 @@ const storeState = reactive({
     loginUserId: computed(() => store.state.user.userId),
 });
 const state = reactive({
+    selectedRemoveItem: '',
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
         mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
@@ -70,7 +65,6 @@ const state = reactive({
     }))),
 });
 const tableState = reactive({
-    removeLoading: false,
     userTableFields: computed(() => {
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
@@ -120,10 +114,34 @@ const dropdownState = reactive({
     searchText: '',
     menuItems: [] as SelectDropdownMenuItem[],
 });
+const modalState = reactive({
+    visible: false,
+    title: '',
+    loading: false,
+});
 
 /* Component */
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
+};
+const handleClickButton = async (value: RoleBindingModel) => {
+    state.selectedRemoveItem = value.role_binding_id;
+    modalState.visible = true;
+    modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
+};
+const handleChange = (options: any = {}) => {
+    userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
+    if (options.queryTags !== undefined) {
+        userPageStore.$patch((_state) => {
+            _state.searchFilters = userListApiQueryHelper.filters;
+        });
+    }
+    if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
+    if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
+    fetchUserList();
+};
+const closeRemoveModal = () => {
+    modalState.visible = false;
 };
 /* API */
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
@@ -178,34 +196,32 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-const handleChange = async (options: any = {}) => {
-    userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
-    if (options.queryTags !== undefined) {
-        userPageStore.$patch((_state) => {
-            _state.searchFilters = userListApiQueryHelper.filters;
-        });
-    }
-    if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
-    if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
-    if (userPageState.isAdminMode) {
-        await userPageStore.listUsers({ query: userListApiQuery });
-    } else {
-        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+const fetchUserList = async () => {
+    userPageStore.$patch({ loading: true });
+    try {
+        if (userPageState.isAdminMode) {
+            await userPageStore.listUsers({ query: userListApiQuery });
+        } else {
+            await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+        }
+    } finally {
+        userPageStore.$patch({ loading: false });
     }
 };
-const handleClickButton = async (value: RoleBindingModel) => {
-    tableState.removeLoading = true;
+const handleRemoveButton = async () => {
+    modalState.loading = true;
     try {
         await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
-            role_binding_id: value.role_binding_id,
+            role_binding_id: state.selectedRemoveItem,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
-        emit('confirm');
+        closeRemoveModal();
+        await fetchUserList();
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
     } finally {
-        tableState.removeLoading = false;
+        modalState.loading = false;
     }
 };
 </script>
@@ -242,11 +258,11 @@ const handleClickButton = async (value: RoleBindingModel) => {
                           class="capitalize"
                 />
             </template>
-            <template #col-role_id-format="{value, item}">
+            <template #col-role_id-format="{value}">
                 <div v-if="userPageStore.roleMap[value]?.name"
                      class="role-type-wrapper"
                 >
-                    <img :src="useRoleFormatter(item.role_type).image"
+                    <img :src="useRoleFormatter(userPageStore.roleMap[value]?.role_type || ROLE_TYPE.USER).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
@@ -256,10 +272,10 @@ const handleClickButton = async (value: RoleBindingModel) => {
             <template #col-role_binding-format="{value, rowIndex}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value.type).name"
+                               :contents="useRoleFormatter(value?.type).name"
                                class="tooltip"
                     >
-                        <img :src="useRoleFormatter(value.type).image"
+                        <img :src="useRoleFormatter(value?.type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >
@@ -284,10 +300,13 @@ const handleClickButton = async (value: RoleBindingModel) => {
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
-                                <div class="role-info-wrapper">
+                                <p-tooltip position="bottom"
+                                           :contents="item.label"
+                                           class="role-label"
+                                >
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ ROLE_TYPE_LABEL_MAP[item.role_type] }})</span>
-                                </div>
+                                </p-tooltip>
+                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>
@@ -332,7 +351,6 @@ const handleClickButton = async (value: RoleBindingModel) => {
             <template #col-remove_button-format="value">
                 <p-button style-type="tertiary"
                           size="sm"
-                          :loading="tableState.removeLoading"
                           class="remove-button"
                           @click.stop="handleClickButton(value.item.role_binding_info)"
                 >
@@ -340,6 +358,12 @@ const handleClickButton = async (value: RoleBindingModel) => {
                 </p-button>
             </template>
         </p-toolbox-table>
+        <user-management-remove-modal v-if="modalState.visible"
+                                      :visible.sync="modalState.visible"
+                                      :title="modalState.title"
+                                      :loading="modalState.loading"
+                                      @confirm="handleRemoveButton"
+        />
     </section>
 </template>
 
@@ -368,12 +392,12 @@ const handleClickButton = async (value: RoleBindingModel) => {
                     width: 1rem;
                     height: 1rem;
                 }
-                .role-info-wrapper {
-                    @apply flex flex-col;
-                    gap: 0.25rem;
-                    .role-type {
-                        @apply text-gray-500;
-                    }
+                .role-label {
+                    @apply truncate;
+                    width: 14.375rem;
+                }
+                .role-type {
+                    @apply text-label-sm text-gray-400;
                 }
             }
         }

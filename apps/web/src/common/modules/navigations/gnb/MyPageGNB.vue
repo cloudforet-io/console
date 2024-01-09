@@ -11,6 +11,7 @@ import { i18n } from '@/translations';
 import { ROOT_ROUTE } from '@/router/constant';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
@@ -18,6 +19,7 @@ import MyPageGNBHeader from '@/common/modules/navigations/gnb/modules/MyPageGNBH
 import MyPageGNBToolset from '@/common/modules/navigations/gnb/modules/MyPageGNBToolset.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -34,6 +36,7 @@ const state = reactive({
 });
 
 const handleBackToWorkspace = () => {
+    appContextStore.setGlobalGrantLoading(true);
     if (state.beforeWorkspace === 'admin') {
         router.push({ name: ROOT_ROUTE.ADMIN._NAME });
         return;

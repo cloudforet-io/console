@@ -66,15 +66,15 @@ export default defineComponent({
                 },
                 {
                     type: 'item',
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId),
-                    id: MENU_ID.DOMAIN_SETTINGS,
-                    to: getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME }),
-                },
-                {
-                    type: 'item',
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId),
                     id: MENU_ID.WORKSPACES,
                     to: getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME }),
+                },
+                {
+                    type: 'item',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId),
+                    id: MENU_ID.DOMAIN_SETTINGS,
+                    to: getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME }),
                 },
             ]),
             menuSet: computed<LNBMenu[]>(() => {

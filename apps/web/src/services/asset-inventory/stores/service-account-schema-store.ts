@@ -13,6 +13,8 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -40,6 +42,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
     const _userConfigMap = computed<UserState>(() => store.state.user);
 
     const state = reactive({
+        selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
         currentProvider: undefined as string|undefined,
         generalAccountTableSchema: undefined as DynamicLayout|undefined,
         trustedAccountTableSchema: undefined as DynamicLayout|undefined,

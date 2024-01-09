@@ -5,16 +5,19 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse, ListResponse as ApiListResponse } from '@/schema/_common/api-verbs/list';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
-import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type {
+    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/modules/reference/type';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -35,7 +38,7 @@ let lastLoadedTime = 0;
 
 const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectGroupModel[]> => {
     try {
-        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ApiListResponse<ProjectGroupModel>>({
+        const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
             query: {
                 only: ['project_group_id', 'name'],
                 filter: [
@@ -63,11 +66,14 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
 
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.project,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.project.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
             referenceMap: getters.projectItems,
         })),
     });
@@ -93,7 +99,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
         const projectReferenceMap: ProjectReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
-        for await (const projectInfo of res?.results || []) {
+        res?.results?.forEach((projectInfo) => {
             const projectGroup = _state.projectGroupList.find((d) => d.project_group_id === projectInfo.project_group_id);
             projectReferenceMap[projectInfo.project_id] = {
                 key: projectInfo.project_id,
@@ -108,7 +114,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
                     users: projectInfo.users || [],
                 },
             };
-        }
+        });
 
         state.items = projectReferenceMap;
         lastLoadedTime = currentTime;

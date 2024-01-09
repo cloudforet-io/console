@@ -17,6 +17,8 @@ import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -36,12 +38,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'confirm', workspaceId: string): void;
+    (e: 'confirm', workspaceInfo: { id: string, name: string }): void;
     (e: 'refresh'): void;
 }>();
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -97,8 +100,12 @@ const handleConfirm = async () => {
                     description: state.description ?? '',
                 },
             });
+            await userWorkspaceStore.load();
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
-            emit('confirm', response.workspace_id);
+            emit('confirm', {
+                id: response.workspace_id,
+                name: response.name,
+            });
         }
     } catch (e) {
         ErrorHandler.handleError(e);

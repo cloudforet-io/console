@@ -26,10 +26,14 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+    const appContextStore = useAppContextStore(pinia);
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
-    if (isDuplicateScope || isDuplicateWorkspace) return undefined;
+    if (isDuplicateScope || isDuplicateWorkspace) {
+        appContextStore.setGlobalGrantLoading(false);
+        return undefined;
+    }
 
     const grantRequest = {
         scope,
@@ -84,7 +88,6 @@ export class SpaceRouter {
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             const isAdminMode = appContextStore.getters.isAdminMode;
-            const accessibleWorkspaceList = userWorkspaceStore.getters.workspaceList;
 
 
             /* Browser Back Button Case
@@ -103,35 +106,41 @@ export class SpaceRouter {
 
 
             nextPath = to.fullPath;
-            const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
 
-            if (refreshToken && isTokenAlive && isNotErrorRoute) {
+            if (refreshToken && SpaceConnector.isTokenAlive && isNotErrorRoute && !to.meta?.isSignInPage) {
+                let workspaceId: string|undefined;
                 let scope: GrantScope;
-                if (to.name?.startsWith('admin.') || isAdminMode) {
+                if (to.name?.startsWith('admin.') || appContextStore.getters.isAdminMode) {
                     scope = 'DOMAIN';
-                } else if (to.params.workspaceId) {
+                } else if (to.path?.startsWith('/workspace-') && to.params.workspaceId) {
                     scope = 'WORKSPACE';
+                    workspaceId = to.params.workspaceId;
                 } else scope = 'USER';
 
-                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, workspaceId);
                 await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
             }
 
-
+            const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, SpaceConnector.isTokenAlive);
 
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
 
+            if (grantAcessFailStatus) {
+                await userWorkspaceStore.load();
+                nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
+                SpaceRouter.router.app?.$store.commit('error/setGrantAccessFailStatus', false);
+
             // When a user is authenticated
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
+            } else if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
                 // When a user need to reset password and tries to go to other pages, redirect to reset password page
                 if (userNeedPwdReset && to.name !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     nextLocation = { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
@@ -142,14 +151,15 @@ export class SpaceRouter {
                 } else if (userAccessLevel < routeAccessLevel) {
                     // When a user tries to another available workspace without target page's access permission.
                     // e.g. In A workspace Dashboard, try to toggle B workspace without dashboard access permission.
-                    const isAccessibleWorkspace = accessibleWorkspaceList?.some((workspace) => workspace.workspace_id === to.params.workspaceId);
+                    const isAccessibleWorkspace = userWorkspaceStore.getIsAccessibleWorkspace(to.params.workspaceId);
                     if (isAccessibleWorkspace) {
                         nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: to.params.workspaceId } };
-                    } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
+                    } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
                 }
+
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                if (!isTokenAlive) {
+                if (!SpaceConnector.isTokenAlive) {
                     // When refreshing token is failed, redirect to sign in page
                     const res = await SpaceConnector.refreshAccessToken(false);
                     if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };

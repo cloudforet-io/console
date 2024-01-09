@@ -2,7 +2,7 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 interface RawData {
     [key: string]: any;

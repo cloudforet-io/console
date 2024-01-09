@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PLink, PToolboxTable,
+    PLink, PToolboxTable, PTooltip,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
@@ -18,6 +18,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -26,6 +27,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -45,10 +47,13 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
-
+const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
-
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: false,
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -140,6 +145,7 @@ const getCount = async () => {
         state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({
             project_id: props.projectId,
             period: EVENT_PERIOD,
+            workspace_id: storeState.currentWorkspaceId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -152,14 +158,13 @@ const getEvents = async () => {
             .setSort(state.sortBy, state.sortDesc)
             .setPage(state.pageStart, state.pageLimit)
             .setFilters([{ v: state.search }]);
-        const res = await SpaceConnector.client.statistics.topic.phdEvents(
-            {
-                project_id: props.projectId,
-                event_type_category: tabState.activeTab,
-                query: getEventsApiQuery.data,
-                period: EVENT_PERIOD,
-            },
-        );
+        const res = await SpaceConnector.client.statistics.topic.phdEvents({
+            project_id: props.projectId,
+            event_type_category: tabState.activeTab,
+            query: getEventsApiQuery.data,
+            period: EVENT_PERIOD,
+            workspace_id: storeState.currentWorkspaceId,
+        });
 
         state.totalCount = res.total_count;
         state.data = res.results.map((d) => {
@@ -168,7 +173,7 @@ const getEvents = async () => {
             return {
                 event: {
                     name: d.event_title,
-                    to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+                    to: getProperRouteLocation(referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' })),
                 },
                 region_code: d.region_code,
                 start_time: startTime,
@@ -223,7 +228,7 @@ watch(() => tabState.activeTab, () => {
                      :class="{active: tabState.activeTab === data.name}"
                      @click="tabState.activeTab = data.name"
                 >
-                    <p-link :href="summaryLinkFormatter(data.name).href"
+                    <p-link :to="summaryLinkFormatter(data.name)"
                             class="count"
                             highlight
                     >
@@ -272,13 +277,16 @@ watch(() => tabState.activeTab, () => {
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                                            new-tab
-                                            :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                            highlight
-                                    >
-                                        {{ resource.entity_value }}
-                                    </p-link>
+                                    <p-tooltip :contents="resource.entity_value">
+                                        <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                                                new-tab
+                                                :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                                class="affected-resource-link"
+                                                highlight
+                                        >
+                                            {{ resource.entity_value }}
+                                        </p-link>
+                                    </p-tooltip>
                                 </template>
                             </div>
                         </div>
@@ -356,6 +364,17 @@ watch(() => tabState.activeTab, () => {
         }
         .label {
             @apply text-gray-600;
+        }
+    }
+}
+
+/* custom design-system component - p-link */
+.affected-resource-link {
+    :deep(.p-link) {
+        .text {
+            @apply truncate;
+            width: 10rem;
+            display: inline-block;
         }
     }
 }

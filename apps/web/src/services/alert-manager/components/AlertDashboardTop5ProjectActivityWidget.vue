@@ -15,6 +15,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -55,6 +56,11 @@ interface Activity {
 }
 
 const vm = getCurrentInstance()?.proxy as Vue;
+
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
@@ -113,6 +119,7 @@ const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) 
 const getTop5ProjectList = async () => {
     try {
         const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityList({
+            workspace_id: storeState.currentWorkspaceId,
             period: state.selectedPeriod,
         });
         state.top5Projects = results.map((d) => d.project_id);
@@ -128,6 +135,7 @@ const getActivities = async (projectId) => {
         const start = end.subtract(periodNumberFormatter(state.selectedPeriod), unit);
 
         const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityAlertDetails({
+            workspace_id: storeState.currentWorkspaceId,
             project_id: projectId,
             granularity: state.selectedPeriod.includes('d') ? DATE_TYPE.DAILY : DATE_TYPE.HOURLY,
             start: start.toISOString(),

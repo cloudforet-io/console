@@ -7,6 +7,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,7 +25,11 @@ const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDeta
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.COST_EXPLORER,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: CostExplorerContainer,
     children: [
@@ -36,7 +41,10 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'cost-analysis',
-            meta: { menuId: MENU_ID.COST_ANALYSIS },
+            meta: {
+                menuId: MENU_ID.COST_ANALYSIS,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId,
+            },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -45,10 +53,18 @@ const costExplorerRoutes: RouteConfig = {
                     meta: { lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
-                            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                            const workspaceId = to.params.workspaceId;
+                            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                                query: {
+                                    sort: [{ key: 'workspace_id', desc: false }],
+                                },
+                            });
                             const results = response?.results || [];
                             if (results.length === 0) { // none-data-source case
-                                next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                                next({
+                                    name: COST_EXPLORER_ROUTE.LANDING._NAME,
+                                    params: { workspaceId },
+                                });
                             } else if (to.params.dataSourceId && to.params.costQuerySetId) {
                                 next();
                             } else {
@@ -57,6 +73,7 @@ const costExplorerRoutes: RouteConfig = {
                                     params: {
                                         dataSourceId: results[0].data_source_id,
                                         costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+                                        workspaceId,
                                     },
                                 });
                             }
@@ -80,7 +97,10 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { menuId: MENU_ID.BUDGET },
+            meta: {
+                menuId: MENU_ID.BUDGET,
+                translationId: MENU_INFO_MAP[MENU_ID.BUDGET].translationId,
+            },
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {

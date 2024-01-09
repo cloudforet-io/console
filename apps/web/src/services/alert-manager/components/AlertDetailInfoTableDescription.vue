@@ -71,6 +71,7 @@ const {
 .p-collapsible-panel {
     padding: 0;
     margin-right: 0.5rem;
+    line-height: 1.5;
 }
 .description {
     white-space: pre-line;

@@ -158,11 +158,3 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
 export const showMobileGuideModal: Action<DisplayState, any> = ({ commit }) => {
     commit('setVisibleMobileGuideModal', true);
 };
-
-export const startGrantRole: Action<DisplayState, any> = ({ commit }) => {
-    commit('setIsGrantInProgress', true);
-};
-
-export const finishGrantRole: Action<DisplayState, any> = ({ commit }) => {
-    commit('setIsGrantInProgress', false);
-};

@@ -14,6 +14,7 @@ export interface DisplayMenu extends Menu {
     highlightTag?: HighlightTagType;
     to: Location;
     subMenuList?: DisplayMenu[];
+    href?: string;
 }
 
 export interface DisplayState {
@@ -23,7 +24,6 @@ export interface DisplayState {
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
     visibleMobileGuideModal: boolean;
-    isGrantInProgress: boolean;
 }
 
 export interface SidebarProps {

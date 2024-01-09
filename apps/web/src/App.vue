@@ -7,7 +7,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar, PDataLoader,
 } from '@spaceone/design-system';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
@@ -16,6 +16,7 @@ import { store } from '@/store';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
@@ -52,9 +53,10 @@ const state = reactive({
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     hasNoWorkspace: false,
-    isGrantInProgress: computed(() => store.getters['display/isGrantInProgress']),
+    globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
+const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
@@ -78,9 +80,10 @@ const goToSignIn = async () => {
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
 watch(() => route.path, () => {
-    state.notificationEmailModalVisible = !state.isEmailVerified
-        && !LocalStorageAccessor.getItem('hideNotificationEmailModal')
-        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED;
+    state.notificationEmailModalVisible = route.path !== '/'
+        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED
+        && !state.isEmailVerified
+        && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
 }, { immediate: true });
 
 
@@ -116,7 +119,7 @@ watch(() => state.userId, (userId) => {
                 <g-n-b v-else
                        class="gnb"
                 />
-                <div v-if="!state.isGrantInProgress"
+                <div v-if="!state.globalGrantLoading"
                      class="app-body"
                      :style="{ height: globalUIGetters.appBodyHeight }"
                 >
@@ -164,6 +167,11 @@ watch(() => state.userId, (userId) => {
                 </div>
             </template>
             <router-view v-else />
+            <p-data-loader v-if="state.globalGrantLoading"
+                           :loading="state.globalGrantLoading"
+                           :data="true"
+                           class="console-loading-wrapper"
+            />
             <p-icon-modal :visible="state.isExpired"
                           emoji="👋"
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -179,7 +187,7 @@ watch(() => state.userId, (userId) => {
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
-            <notice-popup v-if="!store.getters['user/hasSystemRole']" />
+            <notice-popup />
             <!--            <survey-modal />-->
         </template>
         <!-- Modal for Cross Browsing -->
@@ -196,6 +204,15 @@ watch(() => state.userId, (userId) => {
     width: 100vw;
     height: 100vh;
     background-color: $bg-color;
+
+    .console-loading-wrapper {
+        position: absolute;
+        height: 100%;
+        z-index: 101;
+        & > .data-loader-container > .loader-wrapper > .loader.spinner {
+            max-height: unset;
+        }
+    }
 
     .gnb {
         position: fixed;

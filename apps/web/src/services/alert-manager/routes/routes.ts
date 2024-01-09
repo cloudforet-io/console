@@ -5,6 +5,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
@@ -18,19 +19,30 @@ const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetail
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.ALERT_MANAGER,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AlertManagerContainer,
     children: [
         {
             path: 'dashboard',
             name: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ALERT_MANAGER_DASHBOARD },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
+                translationId: MENU_INFO_MAP[MENU_ID.ALERT_MANAGER_DASHBOARD].translationId,
+            },
             component: AlertDashboardPage as any,
         },
         {
             path: 'alert',
-            meta: { menuId: MENU_ID.ALERT },
+            meta: {
+                menuId: MENU_ID.ALERT,
+                translationId: MENU_INFO_MAP[MENU_ID.ALERT].translationId,
+            },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -51,7 +63,11 @@ const alertManagerRoutes: RouteConfig = {
         {
             path: 'escalation-policy',
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ESCALATION_POLICY },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.ESCALATION_POLICY,
+                translationId: MENU_INFO_MAP[MENU_ID.ESCALATION_POLICY].translationId,
+            },
             component: EscalationPolicyPage as any,
         },
     ],

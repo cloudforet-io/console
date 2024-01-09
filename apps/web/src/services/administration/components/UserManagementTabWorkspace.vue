@@ -2,11 +2,10 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PButton,
-    PDataTable, PHeading, PI, PSelectDropdown,
+    PDataTable, PHeading, PI, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -33,6 +32,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import UserManagementRemoveModal from '@/services/administration/components/UserManagementRemoveModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
@@ -62,8 +62,6 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const router = useRouter();
-
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
@@ -74,6 +72,7 @@ const state = reactive({
     sortBy: 'workspace_id',
     sortDesc: true,
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    selectedRemoveItem: '',
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -91,26 +90,36 @@ const dropdownState = reactive({
     selectedItems: [] as SelectDropdownMenuItem[],
     menuItems: [] as SelectDropdownMenuItem[],
 });
+const modalState = reactive({
+    visible: false,
+    title: '',
+    loading: false,
+});
 
 /* Component */
 const handleChangeSort = (sortBy, sortDesc) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
-    getWorkspaceList();
-};
-const handleClickLink = (id: string) => {
-    router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: id } });
+    fetchWorkspaceList();
 };
 const handleMenuVisible = (idx: number) => {
     if (!dropdownState.visibleMenu) return;
     dropdownState.selectedMenuIndex = idx;
+};
+const handleClickButton = async (value: string) => {
+    state.selectedRemoveItem = value;
+    modalState.visible = true;
+    modalState.title = i18n.t('IAM.USER.MAIN.MODAL.REMOVE_WORKSPACE_TITLE') as string;
+};
+const closeRemoveModal = () => {
+    modalState.visible = false;
 };
 
 /* API */
 const roleListApiQueryHelper = new ApiQueryHelper();
 const workspaceApiHelper = new ApiQueryHelper()
     .setPage(1, 15);
-const getWorkspaceList = async () => {
+const fetchWorkspaceList = async () => {
     state.loading = true;
     workspaceApiHelper.setSort(state.sortBy, state.sortDesc);
     workspaceApiHelper.setFilters([
@@ -195,22 +204,26 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-const handleClickButton = async (value: string) => {
+const handleRemoveButton = async () => {
+    modalState.loading = true;
     try {
         await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
-            role_binding_id: value,
+            role_binding_id: state.selectedRemoveItem,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
-        await getWorkspaceList();
+        closeRemoveModal();
+        await fetchWorkspaceList();
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
+    } finally {
+        modalState.loading = false;
     }
 };
 
 /* Watcher */
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
-    await getWorkspaceList();
+    await fetchWorkspaceList();
 }, { immediate: true });
 </script>
 
@@ -231,15 +244,14 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-workspace-format="{value}">
                 <span class="workspace-id-wrapper">
-                    <span>{{ value.name }}</span>
                     <router-link :to="{ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: value.id } }"
                                  target="_blank"
                     >
+                        <span>{{ value.name }}</span>
                         <p-i name="ic_arrow-right-up"
                              width="0.75rem"
                              height="0.75rem"
                              class="icon-link"
-                             @click="handleClickLink(value.id)"
                         />
                     </router-link>
                 </span>
@@ -270,10 +282,13 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                                      alt="role-type-icon"
                                      class="role-type-icon"
                                 >
-                                <div class="role-info-wrapper">
+                                <p-tooltip position="bottom"
+                                           :contents="item.label"
+                                           class="role-label"
+                                >
                                     <span>{{ item.label }}</span>
-                                    <span class="role-type">({{ item.role_type }})</span>
-                                </div>
+                                </p-tooltip>
+                                <span class="role-type">{{ useRoleFormatter(item.role_type, true).name }}</span>
                             </div>
                         </template>
                     </p-select-dropdown>
@@ -292,6 +307,12 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                 </p-button>
             </template>
         </p-data-table>
+        <user-management-remove-modal v-if="modalState.visible"
+                                      :visible.sync="modalState.visible"
+                                      :title="modalState.title"
+                                      :loading="modalState.loading"
+                                      @confirm="handleRemoveButton"
+        />
     </div>
 </template>
 
@@ -315,22 +336,21 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     width: 1rem;
                     height: 1rem;
                 }
-                .role-info-wrapper {
-                    @apply flex flex-col;
-                    gap: 0.25rem;
-                    .role-type {
-                        @apply text-gray-500;
-                    }
+                .role-label {
+                    @apply truncate;
+                    width: 14.375rem;
+                }
+                .role-type {
+                    @apply text-label-sm text-gray-400;
                 }
             }
         }
     }
     .workspace-id-wrapper {
         @apply flex items-center;
-        gap: 0.125rem;
     }
     .icon-link {
-        @apply cursor-pointer;
+        margin-left: 0.125rem;
     }
 }
 

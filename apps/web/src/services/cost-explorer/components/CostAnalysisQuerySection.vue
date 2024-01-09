@@ -140,7 +140,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
 <template>
     <div class="cost-analysis-query-section">
         <div class="filter-wrapper"
-             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
+             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
             <div class="left-part">
                 <cost-analysis-granularity-period-dropdown />

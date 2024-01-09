@@ -7,7 +7,7 @@ import type { UpgradeMode } from '@/schema/plugin/plugin/type';
 import type { Capability } from '@/schema/repository/plugin/type';
 
 
-export interface CollectorPluginModel {
+export interface CollectorPluginInfo {
     plugin_id: string;
     version: string;
     options: CollectorOptions;
@@ -22,7 +22,7 @@ export interface CollectorModel {
     provider: string;
     capability: Capability;
     secret_filter: SecretFilter;
-    plugin_info: CollectorPluginModel;
+    plugin_info: CollectorPluginInfo;
     schedule?: Schedule;
     tags: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;

@@ -4,6 +4,8 @@ import {
     computed, isRef, reactive, ref, toRef,
 } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import type { MenuAttachHandler } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuAttach } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
@@ -40,6 +42,7 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
 
     /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
     position?: 'left' | 'right';
+    hideHeaderWithoutItems?: Ref<boolean|undefined>|boolean;
 }
 
 
@@ -47,7 +50,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize, position,
+    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems,
 }: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -76,6 +79,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         pageSize,
         searchText: searchText ?? '',
         position: position ?? 'left',
+        hideHeaderWithoutItems,
     });
 
     /* fixed style */
@@ -128,7 +132,35 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
 
     /* menu refining */
     const SELECTION_DIVIDER_KEY = 'selection-divider';
-    const topItems = computed<Item[]>(() => filterItemsBySearchText(state.searchText, selectedSnapshot.value as Item[]));
+    const topItems = computed<Item[]>(() => {
+        const filtered = filterItemsBySearchText(state.searchText, selectedSnapshot.value as Item[]);
+
+        // group by headerName
+        const headerNameItemsMap = getHeaderNameItemsMap<Item>(filtered, attachedMenu.value);
+        if (isEmpty(headerNameItemsMap)) return filtered;
+
+        // reorder items by headerName and add divider
+        let reordered: Item[] = [];
+        const entries = Object.entries<HeaderIndicesTuple<Item>>(headerNameItemsMap);
+        const allIndices: number[] = [];
+        entries.forEach(([, [header, indices]], i) => {
+            reordered.push(header);
+            indices.forEach((idx) => {
+                reordered.push(filtered[idx]);
+                allIndices.push(idx);
+            });
+            if (i < entries.length - 1) {
+                reordered.push({ type: 'divider', name: `selection-${header.name}-divider` } as Item);
+            }
+        });
+        const restItems = filtered.filter((_, idx) => !allIndices.includes(idx));
+        if (restItems.length) {
+            reordered.push({ type: 'divider', name: 'selection-rest-divider' } as Item);
+            reordered = reordered.concat(restItems);
+        }
+        reordered = reordered.concat();
+        return reordered;
+    });
     const refinedMenu = computed(() => {
         if (!useReorderBySelection) return attachedMenu.value;
 
@@ -136,7 +168,22 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         if (topItems.value.length) {
             newItems = newItems.concat(topItems.value);
             newItems.push({ type: 'divider', name: SELECTION_DIVIDER_KEY } as Item);
-            newItems = newItems.concat(attachedMenu.value);
+
+            let restItems: Item[];
+            if (state.hideHeaderWithoutItems) {
+                restItems = [];
+                const headerNameItemsMap = getHeaderNameItemsMap<Item>(attachedMenu.value, attachedMenu.value);
+                restItems = attachedMenu.value.filter((d) => {
+                    if (d.type === 'header') {
+                        return !!headerNameItemsMap[d.name as string]?.[1]?.length;
+                    }
+                    return true;
+                });
+            } else {
+                restItems = attachedMenu.value;
+            }
+
+            newItems = newItems.concat(restItems);
         } else {
             newItems = attachedMenu.value;
         }
@@ -185,4 +232,20 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         reloadMenu,
         showMoreMenu: attachMenuItems,
     };
+};
+
+type HeaderIndicesTuple<Item> = [header: Item, itemIndices: number[]];
+const getHeaderNameItemsMap = <Item extends MenuItem>(targetItems: Item[], allItems: Item[]): Record<string, HeaderIndicesTuple<Item>> => {
+    const headerNameItemsMap: Record<string, HeaderIndicesTuple<Item>> = {};
+    targetItems.forEach((item, index) => {
+        if (!item.headerName) return;
+        if (headerNameItemsMap[item.headerName]) {
+            headerNameItemsMap[item.headerName][1].push(index);
+        } else {
+            const header = allItems.find((d) => d.type === 'header' && d.name === item.headerName);
+            if (!header) return;
+            headerNameItemsMap[item.headerName] = [header, [index]];
+        }
+    });
+    return headerNameItemsMap;
 };

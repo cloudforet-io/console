@@ -27,10 +27,9 @@ const state = reactive({
 
 /* Components */
 const handleToggleMenuVisible = () => {
-    const val = !props.menu.hideMenu;
-    emit('update', { id: props.menu.id, val, isHideMenu: true });
+    const isHideMenu = !props.menu.hideMenu;
+    emit('update', { id: props.menu.id, val: props.menu.isAccessible, isHideMenu });
 };
-// TODO: will be check after api is ready
 const handleChangeToggle = () => {
     const val = !props.menu.isAccessible;
     emit('update', { id: props.menu.id, val });
@@ -46,8 +45,10 @@ watch(() => props.menu.isAccessible, (isAccessible) => {
     <div class="role-create-page-access-menu-item"
          :class="[menu.isParent ? 'parent' : '', menu.id]"
     >
-        <div class="left-part">
-            <p-icon-button v-if="!isSubMenu"
+        <div class="left-part"
+             :class="{ 'is-only-main-menu': props.menu.id !== 'all' && props.menu.subMenuList?.length === 0}"
+        >
+            <p-icon-button v-if="props.menu.id === 'all' || props.menu.subMenuList?.length > 0"
                            :name="menu.hideMenu ? 'ic_caret-right' : 'ic_caret-down-filled-alt'"
                            size="sm"
                            :disabled="state.isDisabled"
@@ -64,7 +65,7 @@ watch(() => props.menu.isAccessible, (isAccessible) => {
             </template>
         </div>
         <div class="right-part"
-             :class="isSubMenu ? 'sub-menu' : 'menu'"
+             :class="props.isSubMenu ? 'sub-menu' : 'menu'"
         >
             <p-toggle-button :value="state.toggleState"
                              @change-toggle="handleChangeToggle"
@@ -92,6 +93,9 @@ watch(() => props.menu.isAccessible, (isAccessible) => {
     }
     .left-part {
         flex-grow: 1;
+        &.is-only-main-menu {
+            margin-left: 1.5rem;
+        }
     }
     .right-part {
         display: flex;

@@ -2,7 +2,7 @@
     <widget-layout>
         <template #title>
             <p class="title">
-                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+                <span :style="{ 'color': storeState.providers.aws ? storeState.providers.aws.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
             </p>
         </template>
@@ -111,6 +111,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -121,6 +122,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 const EVENT_PERIOD = 7;
 
@@ -141,11 +144,15 @@ export default {
     },
     setup(props) {
         const allReferenceStore = useAllReferenceStore();
-        const state = reactive({
-            loading: false,
-            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const { getProperRouteLocation } = useProperRouteLocation();
+        const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+        });
+        const state = reactive({
+            loading: false,
             timezone: computed(() => store.state.user.timezone),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
             data: [] as any[],
@@ -164,12 +171,12 @@ export default {
                 event: {
                     name: d.event_title,
                     lastUpdate: lastUpdateTime,
-                    to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+                    to: getProperRouteLocation(referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' })),
                 },
-                region: state.regions[d.region_code]?.name || d.region_code,
+                region: storeState.regions[d.region_code]?.name || d.region_code,
                 affected_projects: d.affected_projects.map((projectId) => ({
                     name: projects[projectId]?.name,
-                    to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
+                    to: getProperRouteLocation(referenceRouter(projectId, { resource_type: 'identity.Project' })),
                     isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                 })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
                 showAll: false,
@@ -183,6 +190,7 @@ export default {
                 const { results } = await SpaceConnector.client.statistics.topic.phdSummary({
                     ...props.extraParams,
                     period: EVENT_PERIOD,
+                    workspace_id: storeState.currentWorkspaceId,
                 });
                 return results;
             } catch (e) {
@@ -216,6 +224,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             handleClickToggle,
         };
     },

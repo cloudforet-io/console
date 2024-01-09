@@ -86,7 +86,8 @@ const handleCloseClick = () => {
     }
 
     .content-wrapper {
-        @apply flex-grow;
+        @apply flex flex-grow;
+        justify-content: space-between;
         .left-part {
             .title-wrapper {
                 height: 1.5rem;

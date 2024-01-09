@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onUnmounted, reactive, watch,
 } from 'vue';
@@ -25,11 +25,11 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -62,10 +62,13 @@ const state = reactive({
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
+            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
-            results.push({ name: state.projectGroupInfo.name, path: `/project?select_pg=${state.projectGroupId}` });
+            results.push({
+                name: state.projectGroupInfo.name,
+                to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
+            });
         }
         results.push({ name: state.item?.name });
         return results;
@@ -183,7 +186,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <general-page-layout overflow="scroll">
+    <div class="project-detail-page">
         <p-data-loader class="page-inner"
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -297,16 +300,20 @@ onUnmounted(() => {
                                                :target-id="projectDetailPageState.projectId"
                                                @confirm="handleConfirmProjectGroupMoveModal"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
+.project-detail-page {
+    height: 100%;
+}
 .page-inner {
     height: 100%;
     max-width: 1368px;
     margin: 0 auto;
 }
 .p-heading {
+    margin-top: 0.25rem;
     margin-bottom: 0;
 }
 .top-wrapper {

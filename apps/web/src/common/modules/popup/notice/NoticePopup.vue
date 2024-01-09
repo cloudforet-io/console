@@ -16,13 +16,17 @@ import type { UserConfigListParameters } from '@/schema/config/user-config/api-v
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
 
+const appContextStore = useAppContextStore();
 const state = reactive({
     isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
     isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
     popupList: [] as PostModel[],
+    hasLoaded: false,
 });
 
 // helper
@@ -65,9 +69,26 @@ const getPostList = async (): Promise<void> => {
     }
 };
 
-watch(() => state.isSessionExpired, async (isSessionExpired) => {
-    if (!isSessionExpired && !state.isNoRoleUser) await getPostList();
+watch([
+    () => state.hasLoaded,
+    () => state.isSessionExpired,
+    () => state.isNoRoleUser,
+    () => appContextStore.getters.globalGrantLoading,
+], async ([hasLoaded, isSessionExpired, isNoRoleUser, globalGrantLoading]) => {
+    if (hasLoaded) return;
+    if (isNoRoleUser || isSessionExpired) {
+        state.popupList = [];
+    } else if (!globalGrantLoading) {
+        await getPostList();
+        state.hasLoaded = true;
+    }
 }, { immediate: true });
+
+watch(() => store.state.user.userId, async (userId, prevUserId) => {
+    if (userId !== prevUserId) {
+        state.hasLoaded = false;
+    }
+});
 </script>
 
 <template>

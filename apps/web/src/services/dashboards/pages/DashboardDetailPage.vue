@@ -74,7 +74,9 @@ onUnmounted(() => {
     <div class="dashboard-detail-page">
         <dashboard-detail-header :dashboard-id="props.dashboardId" />
         <div class="filter-box">
-            <dashboard-labels @update-labels="handleUpdateLabels" />
+            <dashboard-labels editable
+                              @update-labels="handleUpdateLabels"
+            />
             <dashboard-toolset />
         </div>
         <p-divider class="divider" />

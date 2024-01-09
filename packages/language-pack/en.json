@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "Monthly Planning",
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
 					"ORIGINAL_DATA": "Original Data",
+					"PAGE_NOTIFICATION": "This budget’s settings can be changed in admin mode.",
 					"PERIOD": "Period",
 					"PROVIDER": "Provider",
 					"SET": "Set",
@@ -451,7 +452,8 @@
 					"TARGET": "Target",
 					"TOTAL_AMOUNT": "Total Amount",
 					"TOTAL_BUDGETED_AMOUNT": "Total Budgeted Amount (Period)",
-					"VIEW_ALL": "View All"
+					"VIEW_ALL": "View All",
+					"VIEW_IN_ADMIN_MODE": "View in Admin Mode"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -994,6 +996,11 @@
 				"PROFILE": "My Page",
 				"RECENT_FAVORITE": "Recent Visits / Favorites",
 				"SEARCH": "Search"
+			},
+			"WORKSPACE": {
+				"ALL_WORKSPACES": "All workspaces",
+				"CURRENT_WORKSPACE": "Current Workspace",
+				"SWITCH_TO": "Switch To"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1091,10 +1098,10 @@
 			"TITLE": "Profile"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "Create Project / Group",
+			"CREAT_PROJECT": "Create",
 			"CURRENT": "Current",
 			"PLACEHOLDER": "Select Project",
-			"RELOAD_PROJECT": "Reload Projects"
+			"RELOAD_PROJECT": "Reload"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
@@ -1637,6 +1644,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",
+		"ALT_E_TAG_FORMAT": "Invalid key:value format",
 		"APP": {
 			"ACTION": "Action",
 			"CREATE": "Create",
@@ -1913,12 +1922,14 @@
 				"MFA_DESC": "Set up a multi-factor authentication option \nto enhance your account security.",
 				"MODAL": {
 					"ALT_E_ADD_USER": "Failed to Add User",
+					"ALT_E_DELETE_PROJECT_MEMBER": "Failed to Delete Member",
 					"ALT_E_DELETE_USER": "Failed to Delete User",
 					"ALT_E_DISABLE_USER": "Failed to Disable User",
 					"ALT_E_ENABLE_USER": "Failed to Enable User",
 					"ALT_E_REMOVE_USER": "Failed to Remove User",
 					"ALT_E_UPDATE_USER": "Failed to Update User",
 					"ALT_S_ADD_USER": "User successfully added",
+					"ALT_S_DELETE_PROJECT_MEMBER": "Member successfully deleted ",
 					"ALT_S_DELETE_USER": "User successfully deleted",
 					"ALT_S_DISABLE_USER": "User successfully disabled",
 					"ALT_S_ENABLE_USER": "User successfully enabled",
@@ -1926,6 +1937,7 @@
 					"ALT_S_UPDATE_USER": "User successfully updated",
 					"CREATE_TITLE": "Add New Users",
 					"DELETE_DESC": "Are you sure you want to delete selected user?",
+					"DELETE_PROJECT_MEMBER_TITLE": "Are you sure you want to remove this user from the project?",
 					"DELETE_TITLE": "Delete User",
 					"DISABLE_DESC": "Are you sure you want to disable selected user? ",
 					"DISABLE_TITLE": "Disable User",
@@ -1933,6 +1945,7 @@
 					"ENABLE_TITLE": "Enable User",
 					"INVITE_TITLE": "Invite Users to {workspace_name}",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
+					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
 					"UPDATE_TITLE": "Edit User"
 				},
 				"NAME": "Name",
@@ -1942,6 +1955,7 @@
 				"NO_SELECTED": "Select a user for more details.",
 				"PROJECT": "Project",
 				"PROJECTS": "Projects",
+				"PROJECT_ID": "Project ID",
 				"ROLE": "Role",
 				"ROLE_NAME": "Role Name",
 				"ROLE_TYPE": "Role Type",
@@ -2477,6 +2491,7 @@
 				"COLLECT_DATA": "Collect Data",
 				"CREATED": "Created",
 				"DELETE_COLLECTOR": "Delete Collector",
+				"DETAIL_JOB_LINK": "View job details",
 				"EDIT": "Edit",
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",
@@ -2961,6 +2976,7 @@
 					"RESOLVED": "Resolved",
 					"RESOURCE_GROUP": "Resource Group",
 					"RULE": "Rule",
+					"SCOPE": "Scope",
 					"STEP": "Step",
 					"TIME": "time(s)",
 					"WORKSPACE": "Workspace"
@@ -3480,8 +3496,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "Move \"{name}\"",
-				"NO_PROJECT_GROUP": "No Project Group",
-				"ROOT": "Root",
+				"NO_PARENT_GROUP": "No parent group",
+				"NO_PROJECT_GROUP": "No project group",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "Select a project group to move to"
 			},
 			"MODAL_PROJECT_CREATE": {

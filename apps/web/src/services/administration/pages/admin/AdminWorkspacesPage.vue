@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import Vue, { onMounted, onUnmounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -10,10 +9,7 @@ import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
@@ -26,9 +22,8 @@ import { WORKSPACE_STATE } from '@/services/administration/constants/workspace-c
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
-
 const workspacePageStore = useWorkspacePageStore();
-const userWorkspaceStore = useUserWorkspaceStore();
+const workspacePageState = workspacePageStore.$state;
 const userPageStore = useUserPageStore();
 
 const route = useRoute();
@@ -51,7 +46,6 @@ const refreshWorkspaceList = async () => {
         .setFilters(workspacePageStore.searchFilters);
     try {
         await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
-        await userWorkspaceStore.load(store.state.user.userId);
     } finally {
         workspacePageStore.$patch({ loading: false });
     }
@@ -62,13 +56,13 @@ const handleCreateWorkspace = () => {
     modalState.createModalVisible = true;
 };
 
-const handleConfirm = async (workspaceId: string) => {
+const handleConfirm = async ({ id, name }: {id: string, name: string}) => {
     userPageStore.$patch((_state) => {
         _state.modal.type = USER_MODAL_TYPE.ADD;
-        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE') as string;
+        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: name }) as string;
         _state.modal.themeColor = 'primary';
         _state.afterWorkspaceCreated = true;
-        _state.createdWorkspaceId = workspaceId;
+        _state.createdWorkspaceId = id;
         _state.modal.visible.add = true;
         _state.modal = cloneDeep(_state.modal);
     });
@@ -121,7 +115,10 @@ onUnmounted(() => {
 
 <template>
     <section class="workspaces-page">
-        <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')">
+        <p-heading :title="$t('IAM.WORKSPACES.WORKSPACES')"
+                   :total-count="workspacePageState.totalCount"
+                   use-total-count
+        >
             <template #extra>
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
@@ -152,7 +149,7 @@ onUnmounted(() => {
                                      :enable-modal-type="modalState.enableState"
                                      @refresh="refreshWorkspaceList"
         />
-        <user-management-add-modal />
+        <user-management-add-modal @confirm="refreshWorkspaceList" />
     </section>
 </template>
 

@@ -1,33 +1,32 @@
 <script setup lang="ts">
+import { asyncComputed } from '@vueuse/core';
 import {
-    computed, onActivated, reactive,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { PHeading } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
 import NotificationAddForm from '@/services/my-page/components/NotificationAddForm.vue';
 
-
 const route = useRoute();
 
 const state = reactive({
-    protocolLabel: '' as string,
     pageTitle: computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: state.protocolLabel })),
     protocolId: computed(() => route.params.protocolId),
     protocolType: computed(() => route.query.protocolType),
-});
-
-(async () => {
-    state.protocolLabel = queryStringToString(route.query?.protocolLabel);
-})();
-
-onActivated(() => {
-    state.protocolLabel = queryStringToString(route.query?.protocolLabel);
+    protocolLabel: asyncComputed<string>(async () => {
+        const labelFromQuery = queryStringToString(route.query?.protocolLabel);
+        if (labelFromQuery) return labelFromQuery;
+        await store.dispatch('reference/protocol/load');
+        const protocols = store.getters['reference/protocolItems'];
+        return protocols[state.protocolId]?.label;
+    }, '', { lazy: true, onError: (e) => console.error(e) }),
 });
 </script>
 

@@ -123,13 +123,19 @@ const handleClickVerifyButton = async () => {
             <template #data-mfa="{data}">
                 {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
             </template>
-            <template #data-role_type="{value}">
+            <template #data-role_type>
                 <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(userPageStore.isAdminMode ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type) : tableState.refinedUserItems.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
+                    <span>
+                        {{
+                            useRoleFormatter(userPageStore.isAdminMode
+                                ? (userPageStore.roleMap[tableState.refinedUserItems?.role_id]?.role_type)
+                                : tableState.refinedUserItems?.role_type).name
+                        }}
+                    </span>
                 </span>
             </template>
             <template #data-role_id="{value}">

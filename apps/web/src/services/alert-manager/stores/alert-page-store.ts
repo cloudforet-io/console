@@ -1,3 +1,5 @@
+import { reactive } from 'vue';
+
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -14,14 +16,14 @@ interface UpdateAlertPayload {
     updateParams: Omit<AlertUpdateParameters, 'alert_id'>;
 }
 
-export const useAlertPageStore = defineStore('alert-page', {
-    state: () => ({
+export const useAlertPageStore = defineStore('alert-page', () => {
+    const state = reactive({
         alertData: null as Partial<AlertModel>|null,
-    }),
-    actions: {
+    });
+    const actions = {
         async getAlertData(alertId: string): Promise<void|Error> {
             try {
-                this.alertData = await SpaceConnector.clientV2.monitoring.alert.get<AlertGetParameters, AlertModel>({
+                state.alertData = await SpaceConnector.clientV2.monitoring.alert.get<AlertGetParameters, AlertModel>({
                     alert_id: alertId,
                 });
             } catch (e: any) {
@@ -31,7 +33,7 @@ export const useAlertPageStore = defineStore('alert-page', {
         },
         async updateAlertData({ alertId, updateParams }: UpdateAlertPayload): Promise<void|Error> {
             try {
-                this.alertData = await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModel>({
+                state.alertData = await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModel>({
                     ...updateParams,
                     alert_id: alertId,
                 });
@@ -40,5 +42,14 @@ export const useAlertPageStore = defineStore('alert-page', {
                 throw e;
             }
         },
-    },
+        async setAlertData(alertData: AlertModel): Promise<void|Error> {
+            state.alertData = alertData;
+        },
+
+    };
+
+    return {
+        state,
+        ...actions,
+    };
 });

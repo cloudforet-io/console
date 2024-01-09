@@ -57,30 +57,39 @@ export const integralRoutes: RouteConfig[] = [
                 redirect: (to) => {
                     const userWorkspaceStore = useUserWorkspaceStore();
                     const workspaceList = userWorkspaceStore.getters.workspaceList;
-                    const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
+
+                    // If there is no workspace, redirect to my page
+                    if (!workspaceList || workspaceList.length < 1) return ({ name: MY_PAGE_ROUTE._NAME });
+
+                    const currentWorkspaceIdFromUrl = to.params.workspaceId;
+                    const currentWorkspaceId = currentWorkspaceIdFromUrl || userWorkspaceStore.getters.currentWorkspaceId;
                     const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === currentWorkspaceId);
-                    if (currentWorkspaceId && isValidWorkspace) {
-                        return ({
-                            name: HOME_DASHBOARD_ROUTE._NAME,
-                            params: {
-                                ...to.params,
-                                workspaceId: currentWorkspaceId,
-                            },
-                        });
+
+                    // If the workspace id exist in the list
+                    if (currentWorkspaceId) {
+                        // If the workspace id is valid, redirect to that workspace's home dashboard
+                        if (isValidWorkspace) {
+                            userWorkspaceStore.setCurrentWorkspace(currentWorkspaceId);
+                            return ({
+                                name: HOME_DASHBOARD_ROUTE._NAME,
+                                params: {
+                                    ...to.params,
+                                    workspaceId: currentWorkspaceId,
+                                },
+                            });
+                        }
                     }
-                    if (workspaceList.length) {
-                        const defaultWorkspaceId = workspaceList[0].workspace_id;
-                        userWorkspaceStore.setCurrentWorkspace(defaultWorkspaceId);
-                        return ({
-                            name: HOME_DASHBOARD_ROUTE._NAME,
-                            params: {
-                                ...to.params,
-                                workspaceId: defaultWorkspaceId,
-                            },
-                        });
-                    }
-                    // TODO: handle no workspace case -> such as caution or error
-                    return ({ name: MY_PAGE_ROUTE._NAME });
+
+                    // Otherwise, redirect to the first workspace's home dashboard
+                    const defaultWorkspaceId = workspaceList[0].workspace_id;
+                    userWorkspaceStore.setCurrentWorkspace(defaultWorkspaceId);
+                    return ({
+                        name: HOME_DASHBOARD_ROUTE._NAME,
+                        params: {
+                            ...to.params,
+                            workspaceId: defaultWorkspaceId,
+                        },
+                    });
                 },
                 component: { template: '<router-view />' },
                 children: [

@@ -16,7 +16,7 @@ abstract class Authenticator {
             authType,
             verify_code: verifyCode,
         });
-        await userWorkspaceStore.load(store.state.user.userId);
+        await userWorkspaceStore.load();
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');
     }
@@ -25,6 +25,8 @@ abstract class Authenticator {
         try {
             if (SpaceRouter.router) {
                 await store.dispatch('user/signOut');
+                const userWorkspaceStore = useUserWorkspaceStore();
+                userWorkspaceStore.reset();
                 await store.dispatch('display/hideSignInErrorMessage');
                 LocalStorageAccessor.removeItem('hideNotificationEmailModal');
                 await store.dispatch('error/resetErrorState');

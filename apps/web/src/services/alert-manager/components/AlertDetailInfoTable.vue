@@ -59,7 +59,7 @@ const props = defineProps<{
 
 const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
-const alertPageState = alertPageStore.$state;
+const alertPageState = alertPageStore.state;
 
 const state = reactive({
     fields: computed(() => [
@@ -92,6 +92,7 @@ const state = reactive({
 
 const getEscalationPolicy = async () => {
     try {
+        if (!state.data.escalation_policy_id) throw new Error('escalation_policy_id is required');
         const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
             escalation_policy_id: state.data.escalation_policy_id,
         });

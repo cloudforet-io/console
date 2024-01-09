@@ -19,6 +19,8 @@ import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -62,6 +64,10 @@ const MONTH_COUNT = 12;
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     chart: null as any,
     //
@@ -248,6 +254,7 @@ const getCount = async () => {
         const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
             ...props.extraParams,
             labels: Object.values(HOME_DASHBOARD_DATA_TYPE),
+            workspace_id: storeState.currentWorkspaceId,
         });
 
         results.forEach((result) => {
@@ -273,6 +280,7 @@ const getTrend = async (type) => {
             ...props.extraParams,
             label: type,
             granularity: state.selectedDateType,
+            workspace_id: storeState.currentWorkspaceId,
         });
         const data = res.results;
         chartState.data = getChartData(data);
@@ -393,7 +401,6 @@ watch(() => state.selectedDateType, async () => {
                                           :count="state.count[state.activeTab]"
                                           :selected-date-type="state.selectedDateType"
                                           :storage-suffix="state.storageBoxSuffix"
-                                          :data-source-id="state.dataSourceId"
                 />
             </div>
         </p-balloon-tab>

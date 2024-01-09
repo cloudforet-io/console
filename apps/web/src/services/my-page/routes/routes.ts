@@ -5,6 +5,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
@@ -20,19 +21,31 @@ const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotif
 const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.AUTHENTICATED },
+    meta: {
+        menuId: MENU_ID.MY_PAGE,
+        accessLevel: ACCESS_LEVEL.AUTHENTICATED,
+        translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: MyPageContainer,
     children: [
         {
             path: 'profile',
             name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ACCOUNT_PROFILE },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.ACCOUNT_PROFILE,
+                translationId: MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId,
+            },
             component: UserAccountPage as any,
         },
         {
             path: 'notification',
-            meta: { lnbVisible: true, menuId: MENU_ID.NOTIFICATIONS },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.NOTIFICATIONS,
+                translationId: MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId,
+            },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -44,7 +57,9 @@ const myPageRoutes: RouteConfig = {
                 {
                     path: ':protocolId',
                     name: MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
-                    meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
+                    meta: {
+                        translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL',
+                    },
                     props: true,
                     component: UserNotificationAddPage as any,
                 },

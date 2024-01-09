@@ -19,6 +19,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -51,6 +52,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const chartContext = ref<HTMLElement|null>(null);
 const queryHelper = new QueryHelper();
+const userWorkspaceStore = useUserWorkspaceStore();
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
     loading: true,
     skeletons: range(3),
@@ -148,7 +153,10 @@ const getData = async () => {
             aggregation: 'inventory.Region',
             labels: [props.label],
         };
-        const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
+        const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+            ...param,
+            workspace_id: storeState.currentWorkspaceId,
+        });
         const colors = [coral[500], yellow[400], secondary1];
         let data = orderBy(res.results, ['total'], ['desc']);
         data = data.map((d, idx) => ({

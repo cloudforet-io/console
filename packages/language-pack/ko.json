@@ -444,6 +444,7 @@
 					"MONTHLY_PLANNING": "월별 예산 계획",
 					"NOTIFICATIONS_CHANNEL": "알림 채널",
 					"ORIGINAL_DATA": "원본데이터",
+					"PAGE_NOTIFICATION": "",
 					"PERIOD": "기간",
 					"PROVIDER": "프로바이더",
 					"SET": "설정",
@@ -451,7 +452,8 @@
 					"TARGET": "타겟",
 					"TOTAL_AMOUNT": "총 예산 계획",
 					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)",
-					"VIEW_ALL": "전체보기"
+					"VIEW_ALL": "전체보기",
+					"VIEW_IN_ADMIN_MODE": ""
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -994,6 +996,11 @@
 				"PROFILE": "마이페이지",
 				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
+			},
+			"WORKSPACE": {
+				"ALL_WORKSPACES": "",
+				"CURRENT_WORKSPACE": "현재 워크스페이스",
+				"SWITCH_TO": "다른 워크스페이스로 변경"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1091,10 +1098,10 @@
 			"TITLE": "개인 정보"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "프로젝트 / 그룹 생성",
+			"CREAT_PROJECT": "생성",
 			"CURRENT": "현재 위치",
 			"PLACEHOLDER": "프로젝트 선택",
-			"RELOAD_PROJECT": "프로젝트 불러오기"
+			"RELOAD_PROJECT": "새로고침"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
@@ -1637,6 +1644,8 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "중복된 ‘key:value’ 입니다.",
+		"ALT_E_TAG_FORMAT": "유효하지 않은 ‘키:값’ 형식 입니다.",
 		"APP": {
 			"ACTION": "작업",
 			"CREATE": "생성",
@@ -1913,12 +1922,14 @@
 				"MFA_DESC": "계정 보안을 위해 멀티 팩터 인증을 설정하세요.",
 				"MODAL": {
 					"ALT_E_ADD_USER": "사용자 추가 실패",
+					"ALT_E_DELETE_PROJECT_MEMBER": "멤버 삭제 실패",
 					"ALT_E_DELETE_USER": "사용자 삭제 실패",
 					"ALT_E_DISABLE_USER": "사용자 비활성화 실패",
 					"ALT_E_ENABLE_USER": "사용자 활성화 실패",
 					"ALT_E_REMOVE_USER": "사용자 제거 실패",
 					"ALT_E_UPDATE_USER": "사용자 업데이트 실패",
 					"ALT_S_ADD_USER": "사용자 추가 완료",
+					"ALT_S_DELETE_PROJECT_MEMBER": "멤버 삭제 완료",
 					"ALT_S_DELETE_USER": "사용자 삭제 완료",
 					"ALT_S_DISABLE_USER": "사용자 비활성화 완료",
 					"ALT_S_ENABLE_USER": "사용자 활성화 완료",
@@ -1926,6 +1937,7 @@
 					"ALT_S_UPDATE_USER": "사용자 업데이트 완료",
 					"CREATE_TITLE": "사용자 추가",
 					"DELETE_DESC": "선택한 사용자를 삭제하시겠습니까?",
+					"DELETE_PROJECT_MEMBER_TITLE": "이 사용자를 프로젝트에서 제거 하시겠습니까?",
 					"DELETE_TITLE": "사용자 삭제",
 					"DISABLE_DESC": "선택한 사용자를 비활성화 하시겠습니까?",
 					"DISABLE_TITLE": "사용자 비활성화",
@@ -1933,6 +1945,7 @@
 					"ENABLE_TITLE": "사용자 활성화",
 					"INVITE_TITLE": "{workspace_name}에 사용자 추가",
 					"REMOVE_TITLE": "다음의 사용자들을 워크스페이스로 부터 제거하시겠습니까? ",
+					"REMOVE_WORKSPACE_TITLE": "이 사용자를 워크스페이스에서 제거 하시겠습니까?",
 					"UPDATE_TITLE": "사용자 수정"
 				},
 				"NAME": "이름",
@@ -1942,6 +1955,7 @@
 				"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"PROJECT": "프로젝트 ",
 				"PROJECTS": "프로젝트",
+				"PROJECT_ID": "프로젝트 아이디",
 				"ROLE": "역할(Role)",
 				"ROLE_NAME": "역할(Role)명",
 				"ROLE_TYPE": "역할(Role) 타입",
@@ -2477,6 +2491,7 @@
 				"COLLECT_DATA": "데이터 수집",
 				"CREATED": "생성 날짜",
 				"DELETE_COLLECTOR": "컬렉터 삭제",
+				"DETAIL_JOB_LINK": "작업 상세 보기 ",
 				"EDIT": "수정",
 				"EDIT_COLLECTOR_NAME": "컬렉터 이름 수정",
 				"LAST_COLLECTED": "최근 수집 시간",
@@ -2961,6 +2976,7 @@
 					"RESOLVED": "완료",
 					"RESOURCE_GROUP": "리소스 그룹",
 					"RULE": "규칙",
+					"SCOPE": "범위",
 					"STEP": "단계",
 					"TIME": "번",
 					"WORKSPACE": "워크스페이스"
@@ -3480,8 +3496,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" 이동하기",
-				"NO_PROJECT_GROUP": "프로젝트 그룹 없음",
-				"ROOT": "Root",
+				"NO_PARENT_GROUP": "상위 프로젝트 그룹 선택하지 않음",
+				"NO_PROJECT_GROUP": "프로젝트 그룹 선택하지 않음",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "이동 할 위치(프로젝트 그룹)를 선택하세요"
 			},
 			"MODAL_PROJECT_CREATE": {

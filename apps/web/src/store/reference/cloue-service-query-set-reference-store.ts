@@ -10,18 +10,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceQuerySetListParameters } from '@/schema/inventory/cloud-service-query-set/api-verbs/list';
 import type { CloudServiceQuerySetModel } from '@/schema/inventory/cloud-service-query-set/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
 import type {
     ReferenceItem,
     ReferenceMap,
-    ReferenceLoadOptions,
+    ReferenceLoadOptions, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
-import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 type PickedQuerySetModel = Pick<CloudServiceQuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
 export type QuerySetItems = Required<Pick<ReferenceItem<PickedQuerySetModel>, 'key'|'label'|'name'|'data'>>;
@@ -37,11 +37,14 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
 
     const getters = reactive({
         cloudServiceQuerySetItems: asyncComputed<CloudServiceQuerySetReferenceMap>(async () => {
+            if (store.getters['user/getCurrentGrantInfo'].scope === 'USER') return {};
             if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         cloudServiceQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.cloud_service_query_set,
+            type: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+            key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.idKey as string,
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.name,
             referenceMap: getters.cloudServiceQuerySetItems,
         })),
     });

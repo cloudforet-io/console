@@ -79,10 +79,13 @@ const getProjectUserData = async () => {
 };
 
 const handleChangeTable = async (options: any = {}) => {
-    // TODO: check it's working
     if (options.searchText !== undefined) state.searchText = options.searchText;
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+};
+
+const handleRefreshUserData = async () => {
+    await getProjectUserData();
 };
 
 const handleExport = async () => {
@@ -111,16 +114,17 @@ watch(() => props.cloudServiceProjectId, (after, before) => {
                          :items="state.refinedItems.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1)"
                          :loading="state.loading"
                          :total-count="state.totalCount"
+                         class="member-table"
                          @export="handleExport"
                          @change="handleChangeTable"
-                         @refresh="handleChangeTable()"
+                         @refresh="handleRefreshUserData"
         />
     </div>
 </template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-search-table */
-:deep(.p-search-table) {
+:deep(.p-toolbox-table) {
     border-width: 0;
 }
 </style>

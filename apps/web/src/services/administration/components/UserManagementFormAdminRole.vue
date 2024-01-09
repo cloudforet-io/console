@@ -17,13 +17,15 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import type { AddModalMenuItem } from '@/services/administration/types/user-type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { AddModalMenuItem, UserListItemType } from '@/services/administration/types/user-type';
 
 interface Props {
     role?: AddModalMenuItem
@@ -38,11 +40,13 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:role', formState): void,
     (e: 'update:is-changed-toggle', type: string): void,
 }>();
+const userPageStore = useUserPageStore();
 
 const roleState = reactive({
     loading: true,
     visible: false,
     searchText: '',
+    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
     selectedItems: computed(() => {
@@ -134,6 +138,7 @@ watch(() => roleState.proxySelectedItems, (role) => {
                                    :search-text="roleState.searchText"
                                    :selected="roleState.selectedItems"
                                    :handler="roleMenuHandler"
+                                   :disabled="roleState.data.user_id === store.state.user.userId"
                                    is-filterable
                                    show-delete-all-button
                                    class="role-select-dropdown"
@@ -223,14 +228,8 @@ watch(() => roleState.proxySelectedItems, (role) => {
     }
 }
 
-/* TODO: will be deleted after p-select-dropdown update */
-
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
-    .selection-display-container {
-        @apply flex items-center;
-        gap: 0.25rem;
-    }
     &.no-data {
         .clear-all-wrapper {
             @apply hidden;

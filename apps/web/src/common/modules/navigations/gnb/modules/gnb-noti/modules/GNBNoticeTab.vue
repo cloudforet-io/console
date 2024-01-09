@@ -47,7 +47,6 @@ const state = reactive({
     pinnedItems: computed<NoticeItem[]>(() => {
         const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
         const res = convertNoticeItem(filteredData);
-        console.debug('pinnedItems', res);
         return res;
     }),
 });

@@ -17,8 +17,6 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -27,6 +25,8 @@ import { gray } from '@/styles/colors';
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
+import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
@@ -56,12 +56,12 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
-const allReferenceStore = useAllReferenceStore();
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     loadingWidget: true,
     hasManagePermission: useManagePermissionState(),
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     component: null as AsyncComponent|null,
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,

@@ -32,7 +32,6 @@ export const WORKSPACE_SEARCH_HANDLERS = {
             { name: 'name', label: 'Name' },
             { name: 'tags.description', label: 'Description' },
             { name: 'state', label: 'State' },
-            { name: 'users', label: 'Users' },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }] as KeyItemSet[],
@@ -41,7 +40,6 @@ export const WORKSPACE_SEARCH_HANDLERS = {
         name: makeDistinctValueHandler('identity.Workspace', 'name'),
         'tags.description': makeDistinctValueHandler('identity.Workspace', 'tags.description'),
         state: makeEnumValueHandler(WORKSPACE_STATE),
-        // users: makeDistinctValueHandler('identity.Workspace', 'users'),
         created_at: makeDistinctValueHandler('identity.Workspace', 'created_at', 'datetime'),
     },
 } as const;

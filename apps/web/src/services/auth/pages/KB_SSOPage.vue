@@ -48,7 +48,7 @@ export default defineComponent({
 
         const onSignIn = async () => {
             const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
+            const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
 
             if (!props.nextPath) {
                 await vm.$router.push(defaultRoute);

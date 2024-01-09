@@ -155,6 +155,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -163,6 +164,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 interface CloudServiceData {
     cloud_service_group: string;
@@ -210,9 +212,11 @@ export default {
         },
     },
     setup(props) {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const queryHelper = new QueryHelper();
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             cloudServiceData: [] as CloudServiceData[],
             data: [] as Item[],
             commonData: computed(() => state.data.filter((d) => !d.isCreateWarning && !d.isDeleteWarning)),
@@ -231,6 +235,7 @@ export default {
                 if (props.projectId) params.project_id = props.projectId;
                 const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService({
                     ...props.extraParams,
+                    workspace_id: state.currentWorkspaceId,
                     params,
                 });
                 state.cloudServiceData = results;
