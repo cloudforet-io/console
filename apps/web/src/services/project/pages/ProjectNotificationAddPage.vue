@@ -20,14 +20,11 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/referenc
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { queryStringToString } from '@/lib/router-query-string';
 
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-
 import NotificationAddForm from '@/services/my-page/components/NotificationAddForm.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type {
     ProjectNotificationAddPageUrlQueryValue,
 } from '@/services/project/types/project-notification-add-page-url-query-type';
-
 
 const route = useRoute();
 
@@ -78,7 +75,7 @@ const routeState = reactive({
 </script>
 
 <template>
-    <general-page-layout>
+    <div>
         <p-breadcrumbs v-if="routeState.routes.length"
                        class="flex-grow"
                        :routes="routeState.routes"
@@ -92,7 +89,7 @@ const routeState = reactive({
                                :protocol-id="state.protocolId"
                                :protocol-type="state.protocolType"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
