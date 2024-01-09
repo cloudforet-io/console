@@ -1,9 +1,11 @@
 <template>
     <div class="collector-page-3">
         <div class="input-form">
-            <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
-            <collector-options-form class="collector-options-form"
-                                    show-title-on-empty-schema
+            <attached-service-account-form v-if="!isAdminMode"
+                                           class="attached-service-account-form"
+                                           @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
+            />
+            <collector-options-form show-title-on-empty-schema
                                     @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>
@@ -48,6 +50,7 @@ import {
 } from '@spaceone/design-system';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import AttachedServiceAccountForm
     from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
@@ -61,13 +64,14 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const { isAdminMode } = useProperRouteLocation();
 
 
 const state = reactive({
     loading: true,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     deleteModalVisible: false,
-    isAttachedServiceAccountValid: false,
+    isAttachedServiceAccountValid: !!isAdminMode,
     isSchemaFormValid: false,
     isAllFormValid: computed<boolean>(() => state.isAttachedServiceAccountValid && state.isSchemaFormValid),
 });
@@ -103,8 +107,8 @@ const handleClose = () => {
     min-width: 40rem;
 
     .input-form {
-        .collector-options-form {
-            margin-top: 2rem;
+        .attached-service-account-form {
+            margin-bottom: 2rem;
         }
     }
 

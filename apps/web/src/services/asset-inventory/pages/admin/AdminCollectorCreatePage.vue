@@ -61,6 +61,8 @@ import { PCenteredLayoutHeader } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import { useGoBack } from '@/common/composables/go-back';
 
@@ -84,7 +86,7 @@ const state = reactive({
         4: i18n.t('INVENTORY.COLLECTOR.CREATE.STEP_DESC4'),
     })),
 });
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME) });
 
 const handleClickClose = () => {
     state.deleteModalVisible = true;
