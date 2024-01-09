@@ -2,7 +2,8 @@
 
 import { computed, reactive } from 'vue';
 
-type GNBLogoIconTheme = 'blue'|'yellow'|'gray'|'green'|'coral'|'indigo'|'peacock';
+import type { GNBLogoIconTheme } from '@/common/modules/navigations/gnb/types/type';
+
 interface Props {
     theme: GNBLogoIconTheme;
     workspaceName: string;
