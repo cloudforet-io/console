@@ -23,9 +23,9 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useGnbContainerWidth } from '@/common/modules/navigations/gnb/composables/use-gnb-container-width';
+import GNBHeader from '@/common/modules/navigations/gnb/modules/gnb-header/GNBHeader.vue';
 import GNBInvisibleMenuDropdown from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBInvisibleMenuDropdown.vue';
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
-import GNBHeader from '@/common/modules/navigations/gnb/modules/GNBHeader.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
