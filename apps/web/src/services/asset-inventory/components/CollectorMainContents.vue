@@ -115,9 +115,11 @@ const state = reactive({
     searchTags: computed(() => {
         const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
         return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {
-            if (d.value) {
+            if (d.value && d?.key?.name === 'plugin_info.plugin_id') {
                 const plugin = storeState.plugins[d.value.name];
                 r.push({ ...d, value: { label: plugin?.label, name: plugin?.key } });
+            } else {
+                r.push(d);
             }
             return r;
         }, []);
