@@ -444,7 +444,7 @@
 					"MONTHLY_PLANNING": "월별 예산 계획",
 					"NOTIFICATIONS_CHANNEL": "알림 채널",
 					"ORIGINAL_DATA": "원본데이터",
-					"PAGE_NOTIFICATION": "",
+					"PAGE_NOTIFICATION": "Admin 모드에서만 설정을 변경할 수 있는 예산입니다.",
 					"PERIOD": "기간",
 					"PROVIDER": "프로바이더",
 					"SET": "설정",
@@ -453,7 +453,7 @@
 					"TOTAL_AMOUNT": "총 예산 계획",
 					"TOTAL_BUDGETED_AMOUNT": "전체 예산 금액(기간)",
 					"VIEW_ALL": "전체보기",
-					"VIEW_IN_ADMIN_MODE": ""
+					"VIEW_IN_ADMIN_MODE": "Admin 모드에서 확인"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -1955,7 +1955,7 @@
 				"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"PROJECT": "프로젝트 ",
 				"PROJECTS": "프로젝트",
-				"PROJECT_ID": "프로젝트 아이디",
+				"PROJECT_ID": "프로젝트 ID",
 				"ROLE": "역할(Role)",
 				"ROLE_NAME": "역할(Role)명",
 				"ROLE_TYPE": "역할(Role) 타입",
@@ -2497,7 +2497,7 @@
 				"LAST_COLLECTED": "최근 수집 시간",
 				"NAME": "이름",
 				"NO_TAG": "지정한 태그 없음",
-				"PAGE_NOTIFICATION": "Admin 역할(Role)을 가진 사용자에 의해서만 설정을 변경할 수 있는 컬렉터 입니다.",
+				"PAGE_NOTIFICATION": "Admin 모드에서만 설정을 변경할 수 있는 컬렉터입니다.",
 				"PLUGIN": "플러그인",
 				"PLUGIN_ID": "플러그인 ID",
 				"REGION": "Region",

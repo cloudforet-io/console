@@ -444,7 +444,7 @@
 					"MONTHLY_PLANNING": "月別予算計画",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
 					"ORIGINAL_DATA": "原本データー",
-					"PAGE_NOTIFICATION": "",
+					"PAGE_NOTIFICATION": "この予算の設定は管理者モードでのみ変更できます。",
 					"PERIOD": "期間",
 					"PROVIDER": "プロバイダー",
 					"SET": "設定",
@@ -453,7 +453,7 @@
 					"TOTAL_AMOUNT": "総予算計画",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
 					"VIEW_ALL": "すべて表示",
-					"VIEW_IN_ADMIN_MODE": ""
+					"VIEW_IN_ADMIN_MODE": "管理者モードで確認"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -1098,10 +1098,10 @@
 			"TITLE": "個人情報"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "",
+			"CREAT_PROJECT": "作成",
 			"CURRENT": "現在",
 			"PLACEHOLDER": "プロジェクト選択",
-			"RELOAD_PROJECT": ""
+			"RELOAD_PROJECT": "リロード"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
@@ -2497,7 +2497,7 @@
 				"LAST_COLLECTED": "最後に収集した時間",
 				"NAME": "名前",
 				"NO_TAG": "タグなし",
-				"PAGE_NOTIFICATION": "このコレクターの設定は管理者のみ変更できます。",
+				"PAGE_NOTIFICATION": "このコレクターの設定は管理者モードでのみ行うことができます。",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
 				"REGION": "Region",
@@ -3496,8 +3496,8 @@
 			},
 			"MODAL_MOVE_PROJECT_GROUP": {
 				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" を移動する",
-				"NO_PARENT_GROUP": "",
-				"NO_PROJECT_GROUP": "",
+				"NO_PARENT_GROUP": "上位プロジェクトグループを選択しない",
+				"NO_PROJECT_GROUP": "プロジェクトグループを選択しない",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "移動先（プロジェクトグループ）を選択してください"
 			},
 			"MODAL_PROJECT_CREATE": {
