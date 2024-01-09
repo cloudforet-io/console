@@ -5,8 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { adminRoutes } from '@/router/admin-routes';
-import { ROOT_ROUTE } from '@/router/constant';
-import { errorRoutes } from '@/router/error-routes';
+import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
@@ -14,6 +13,8 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+
+import ErrorPage from '@/common/pages/ErrorPage.vue';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import authRoutes from '@/services/auth/routes/routes';
@@ -51,8 +52,16 @@ export const integralRoutes: RouteConfig[] = [
                     ...adminRoutes,
                 ],
             },
+            myPageRoutes,
             {
-                path: '/:workspaceId',
+                path: '/error-page/:statusCode?',
+                name: ERROR_ROUTE._NAME,
+                meta: { accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH },
+                props: true,
+                component: ErrorPage,
+            },
+            {
+                path: '/:workspaceId?',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 redirect: (to) => {
                     const userWorkspaceStore = useUserWorkspaceStore();
@@ -94,10 +103,12 @@ export const integralRoutes: RouteConfig[] = [
                 component: { template: '<router-view />' },
                 children: [
                     ...workspaceRoutes,
+                    {
+                        path: '*',
+                        component: ErrorPage,
+                    },
                 ],
             },
         ],
     },
-    myPageRoutes,
-    ...errorRoutes,
 ];
