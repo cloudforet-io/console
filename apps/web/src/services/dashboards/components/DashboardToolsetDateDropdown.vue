@@ -6,14 +6,15 @@ import {
 import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
-import { range } from 'lodash';
+import { cloneDeep, range } from 'lodash';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange, DashboardSettings } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/DashboardToolsetDateCustomModal.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface Props {
@@ -22,10 +23,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     dateRange: undefined,
 });
-const emit = defineEmits<{(event: 'update:date-range', dateRange: DateRange): void;
-}>();
 
 const { i18nDayjs } = useI18nDayjs();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
@@ -63,27 +64,35 @@ const state = reactive({
     customRangeModalVisible: false,
 });
 
+/* Util */
 const setSelectedDateRange = (start, end) => {
     const _start = dayjs.utc(start).startOf('month').format('YYYY-MM');
     const _end = dayjs.utc(end).endOf('month').format('YYYY-MM');
     state.selectedDateRange = { start: _start, end: _end };
 };
+const updateDashboardDateRange = (dateRange: DashboardSettings['date_range']) => {
+    const _settings = cloneDeep(dashboardDetailState.settings);
+    _settings.date_range.start = dateRange.start;
+    _settings.date_range.end = dateRange.end;
+    dashboardDetailStore.setSettings(_settings);
+};
 
+/* Event */
 const handleSelectMonthMenuItem = (selected: string) => {
     state.selectedMonthMenu = state.monthMenuItems.find((d) => d.name === selected);
     if (state.selectedMonthMenu.name === 'current') {
         state.selectedDateRange = { start: undefined, end: undefined };
-        emit('update:date-range', state.selectedDateRange);
+        updateDashboardDateRange(state.selectedDateRange);
     } else if (state.selectedMonthMenu.name === 'custom') state.customRangeModalVisible = true;
     else {
         setSelectedDateRange(state.selectedMonthMenu.name, state.selectedMonthMenu.name);
-        emit('update:date-range', state.selectedDateRange);
+        updateDashboardDateRange(state.selectedDateRange);
     }
 };
 const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
     const { start, end } = dateRange;
     setSelectedDateRange(start, end);
-    emit('update:date-range', state.selectedDateRange);
+    updateDashboardDateRange(state.selectedDateRange);
     state.selectedMonthMenu = state.monthMenuItems[state.monthMenuItems.length - 1];
     state.customRangeModalVisible = false;
 };
