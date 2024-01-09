@@ -96,7 +96,7 @@ export default {
     },
     props: {
         selectedItem: {
-            type: Object as () => JobTaskModel,
+            type: Object as () => Partial<JobTaskModel>,
             default: () => ({}),
             required: true,
         },
