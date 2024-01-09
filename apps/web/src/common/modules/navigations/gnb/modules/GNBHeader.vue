@@ -23,6 +23,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import GNBLogoIcon from '@/common/modules/navigations/gnb/modules/GNBLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
 
@@ -121,18 +122,10 @@ const selectWorkspace = (name: string): void => {
             >
                 Admin <span class="omitable-text">Center</span>
             </span>
-            <div v-else
-                 class="logo-wrapper"
-            >
-                <img v-if="state.symbolImage"
-                     class="logo-character"
-                     :src="state.symbolImage"
-                >
-                <img v-else
-                     class="logo-character"
-                     src="/images/logos/spaceone-default-logo.svg"
-                >
-            </div>
+            <g-n-b-logo-icon v-else
+                             :workspace-name="state.selectedWorkspace?.name || ''"
+                             :theme="'coral'"
+            />
         </component>
         <p-select-dropdown v-if="!props.isAdminMode"
                            class="workspace-dropdown"
@@ -216,20 +209,6 @@ const selectWorkspace = (name: string): void => {
                 }
             }
         }
-        .logo-wrapper {
-            width: 2rem;
-            height: 2rem;
-            .logo-character {
-                display: inline-block;
-                width: 2rem;
-                height: 2rem;
-            }
-        }
-    }
-
-    .logo-divider {
-        margin: 0 0.75rem;
-        height: 2rem;
     }
     .workspace-dropdown {
         @apply inline-flex;
