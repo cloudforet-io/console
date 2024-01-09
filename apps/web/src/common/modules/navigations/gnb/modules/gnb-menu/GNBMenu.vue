@@ -18,7 +18,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
-import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
+import { customMenuNameList } from '@/common/modules/navigations/gnb/constants/constant';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';

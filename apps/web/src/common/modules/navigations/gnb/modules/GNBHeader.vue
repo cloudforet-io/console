@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDivider, PSelectDropdown, PTooltip,
+    PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { clone } from 'lodash';
@@ -23,6 +23,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import GNBLogoIcon from '@/common/modules/navigations/gnb/modules/GNBLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
 
@@ -119,25 +120,13 @@ const selectWorkspace = (name: string): void => {
             <span v-if="props.isAdminMode"
                   class="admin-title"
             >
-                Admin Center
+                Admin <span class="omitable-text">Center</span>
             </span>
-            <div v-else
-                 class="logo-wrapper"
-            >
-                <img v-if="state.symbolImage"
-                     class="logo-character"
-                     :src="state.symbolImage"
-                >
-                <img v-else
-                     class="logo-character"
-                     src="/images/logos/spaceone-default-logo.svg"
-                >
-            </div>
+            <g-n-b-logo-icon v-else
+                             :workspace-name="state.selectedWorkspace?.name || ''"
+                             :theme="state.selectedWorkspace?.tags?.theme"
+            />
         </component>
-        <p-divider v-if="!props.isAdminMode"
-                   class="logo-divider"
-                   vertical
-        />
         <p-select-dropdown v-if="!props.isAdminMode"
                            class="workspace-dropdown"
                            style-type="transparent"
@@ -209,27 +198,23 @@ const selectWorkspace = (name: string): void => {
 
         .admin-title {
             @apply text-label-xl text-violet-100 w-full;
-        }
-        .logo-wrapper {
-            width: 2rem;
-            height: 2rem;
-            .logo-character {
-                display: inline-block;
-                width: 2rem;
-                height: 2rem;
+
+            .omitable-text {
+                @screen tablet {
+                    @apply hidden;
+                }
+
+                @screen mobile {
+                    @apply inline-block;
+                }
             }
         }
-    }
-
-    .logo-divider {
-        margin: 0 0.75rem;
-        height: 2rem;
     }
     .workspace-dropdown {
         @apply inline-flex;
 
         @screen tablet {
-            width: 2.875rem;
+            width: 3.625rem;
         }
 
         /* custom design-system component - p-context-menu */
@@ -239,11 +224,12 @@ const selectWorkspace = (name: string): void => {
 
         .selected-workspace {
             @apply text-label-lg text-gray-800 inline-block font-bold;
-            max-width: 8.4375rem;
+            max-width: 9.1875rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             vertical-align: bottom;
+            padding-left: 0.75rem;
 
             @screen tablet {
                 @apply hidden;
@@ -255,6 +241,7 @@ const selectWorkspace = (name: string): void => {
         }
         .tablet-selected {
             @apply hidden text-label-lg text-gray-800;
+            padding-left: 0.75rem;
 
             @screen tablet {
                 @apply inline-block;
