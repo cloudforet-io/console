@@ -2,19 +2,21 @@
 
 import { computed, reactive } from 'vue';
 
+import { getRandomWorkspaceIconTheme } from '@/common/modules/navigations/gnb/helpers/gnb-logo-helper';
 import type { GNBLogoIconTheme } from '@/common/modules/navigations/gnb/types/type';
 
 interface Props {
-    theme: GNBLogoIconTheme;
+    theme?: GNBLogoIconTheme;
     workspaceName: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    theme: 'blue',
+    theme: undefined,
     workspaceName: '',
 });
 
 const state = reactive({
+    theme: computed(() => props.theme ?? getRandomWorkspaceIconTheme()),
     logoText: computed(() => props.workspaceName.slice(0, 1).toUpperCase()),
     isLogoStartsWithEnglish: computed(() => /^[A-Za-z]/.test(state.logoText)),
 });
@@ -22,7 +24,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div :class="{'logo-wrapper': true, [props.theme]: true, 'english-logo': state.isLogoStartsWithEnglish}">
+    <div :class="{'logo-wrapper': true, [state.theme]: true, 'english-logo': state.isLogoStartsWithEnglish}">
         {{ state.logoText }}
     </div>
 </template>

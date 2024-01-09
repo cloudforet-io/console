@@ -23,7 +23,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { getRandomWorkspaceIconTheme } from '@/common/modules/navigations/gnb/helpers/gnb-logo-helper';
 import GNBLogoIcon from '@/common/modules/navigations/gnb/modules/GNBLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
@@ -125,7 +124,7 @@ const selectWorkspace = (name: string): void => {
             </span>
             <g-n-b-logo-icon v-else
                              :workspace-name="state.selectedWorkspace?.name || ''"
-                             :theme="state.selectedWorkspace?.tags?.theme ?? getRandomWorkspaceIconTheme()"
+                             :theme="state.selectedWorkspace?.tags?.theme"
             />
         </component>
         <p-select-dropdown v-if="!props.isAdminMode"
