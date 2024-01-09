@@ -1,59 +1,45 @@
-<template>
-    <p-tab class="job-task-details"
-           :tabs="tabs"
-           :active-tab.sync="activeTab"
-    >
-        <template #error-list>
-            <job-task-error-list :selected-item="selectedItem" />
-        </template>
-    </p-tab>
-</template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
+<script setup lang="ts">
+import { computed, onActivated, reactive } from 'vue';
 
 import { PTab } from '@spaceone/design-system';
 
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+import { i18n } from '@/translations';
 
 import JobTaskErrorList from '@/services/asset-inventory/components/CollectorHistoryJobTaskErrorList.vue';
 
 
-export default {
-    name: 'JobTaskDetails',
-    components: {
-        PTab,
-        JobTaskErrorList,
-    },
-    props: {
-        selectedItem: {
-            type: Object as () => JobTaskModel,
-            default: () => ({}),
-            required: true,
-        },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            tabs: computed(() => [
-                { name: 'error-list', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },
-            ]),
-            activeTab: 'error-list',
-        });
+interface Props {
+    selectedItem: Partial<JobTaskModel>;
+}
 
-        onActivated(() => {
-            state.activeTab = 'error-list';
-        });
+const props = withDefaults(defineProps<Props>(), {
+    selectedItem: () => ({}),
+});
 
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+const state = reactive({
+    tabs: computed(() => [
+        { name: 'error-list', label: i18n.t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },
+    ]),
+    activeTab: 'error-list',
+});
+
+onActivated(() => {
+    state.activeTab = 'error-list';
+});
+
 </script>
+
+<template>
+    <p-tab class="job-task-details"
+           :tabs="state.tabs"
+           :active-tab.sync="state.activeTab"
+    >
+        <template #error-list>
+            <job-task-error-list :selected-item="props.selectedItem" />
+        </template>
+    </p-tab>
+</template>
 
 <style lang="postcss" scoped>
 .job-task-details {

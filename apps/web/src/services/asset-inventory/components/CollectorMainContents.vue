@@ -27,6 +27,7 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorDataModal
     from '@/services/asset-inventory/components/CollectorDataModal.vue';
@@ -71,6 +72,7 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -91,8 +93,8 @@ const keyItemSets: KeyItemSet[] = [{
 }];
 const collectorSearchHandler = reactive({
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
-        name: makeDistinctValueHandler('inventory.Collector', 'name'),
+        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
+        name: makeDistinctValueHandler('inventory.Collector', 'name', undefined, isAdminMode ? [{ k: 'workspace_id', v: '*', o: 'eq' }] : undefined),
         'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
         'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id', storeState.plugins),
         'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
@@ -187,7 +189,7 @@ const collectorApiQueryHelper = new ApiQueryHelper()
 
 /* Components */
 const routeToCreatePage = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     if (options.pageStart !== undefined) collectorApiQueryHelper.setPageStart(options.pageStart);
@@ -203,7 +205,7 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
     fetchCollectorList();
 };
 const handleClickListItem = (detailLink) => {
-    SpaceRouter.router.push(detailLink);
+    SpaceRouter.router.push(getProperRouteLocation(detailLink));
 };
 const handleClickCollectDataConfirm = () => {
     fetchCollectorList();

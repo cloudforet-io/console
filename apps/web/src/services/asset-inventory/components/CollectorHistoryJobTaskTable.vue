@@ -20,6 +20,8 @@ import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -27,6 +29,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import {
     statusIconColorFormatter,
@@ -41,12 +44,15 @@ interface Props {
     jobId: string;
 }
 
+const { isAdminMode } = useProperRouteLocation();
+
 const props = withDefaults(defineProps<Props>(), {
     jobId: '',
 });
 
-const fields = [
+const adminFields = [
     { label: 'Service Account', name: 'service_account_id', sortable: false },
+    { label: 'Workspace', name: 'workspace_id' },
     { label: 'Project', name: 'project_id', sortable: false },
     { label: 'Status', name: 'status' },
     { label: 'Errors', name: 'errors' },
@@ -58,6 +64,8 @@ const fields = [
     { label: 'Started', name: 'started_at' },
     { label: 'Duration', name: 'duration', sortable: false },
 ];
+
+const fields = adminFields.filter((f) => f.name !== 'workspace_id');
 
 const statusList = computed(() => [
     { name: JOB_SELECTED_STATUS.ALL, label: i18n.t('INVENTORY.COLLECTOR.HISTORY.ALL') },
@@ -73,6 +81,7 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 
 const state = reactive({
@@ -221,7 +230,7 @@ onDeactivated(() => {
                      sortable
                      search-type="query"
                      :loading="state.loading"
-                     :fields="fields"
+                     :fields="isAdminMode ? adminFields : fields"
                      :items="state.items"
                      :select-index.sync="state.selectIndex"
                      :sort-by="state.sortBy"
@@ -248,25 +257,39 @@ onDeactivated(() => {
                 />
             </div>
         </template>
-        <template #col-service_account_id-format="{ value }">
+        <template #col-service_account_id-format="{ value, item }">
             <p-link v-if="storeState.serviceAccounts[value]"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
                     :to="referenceRouter(
                         value,
-                        { resource_type: 'identity.ServiceAccount' })"
+                        { resource_type: 'identity.ServiceAccount', workspace_id: item.workspace_id })"
             >
                 {{ storeState.serviceAccounts[value].label }}
             </p-link>
             <span v-else>--</span>
         </template>
-        <template #col-project_id-format="{ value }">
+        <template v-if="isAdminMode"
+                  #col-workspace_id-format="{ value }"
+        >
+            <span v-if="value === '*'">Global</span>
+            <p-link v-else
+                    :to="{
+                        name: ROOT_ROUTE.WORKSPACE._NAME,
+                        params: { workspaceId: value },
+                    }"
+                    action-icon="internal-link"
+                    new-tab
+                    :text="storeState.workspaces[value]?.label"
+            />
+        </template>
+        <template #col-project_id-format="{ value, item }">
             <p-link v-if="storeState.projects[value]"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
                     :to="referenceRouter(
                         value,
-                        { resource_type: 'identity.Project' })"
+                        { resource_type: 'identity.Project', workspace_id: item.workspace_id })"
             >
                 {{ storeState.projects[value].label }}
             </p-link>

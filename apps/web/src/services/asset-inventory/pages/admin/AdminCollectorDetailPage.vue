@@ -1,24 +1,5 @@
 <template>
     <div class="collector-detail-page">
-        <portal to="page-top-notification">
-            <scoped-notification v-if="state.isNotiVisible"
-                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
-                                 title-icon="ic_info-circle"
-                                 type="info"
-                                 hide-header-close-button
-            >
-                <template #right>
-                    <p-link v-if="state.isDomainAdmin"
-                            :text="i18n.t('View in Admin Mode')"
-                            :to="{name: makeAdminRouteName($route.name)}"
-                            size="sm"
-                            highlight
-                            action-icon="internal-link"
-                            new-tab
-                    />
-                </template>
-            </scoped-notification>
-        </portal>
         <p-heading :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
@@ -71,9 +52,6 @@
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
         />
-        <collector-service-accounts-section class="section"
-                                            :manage-disabled="!state.hasManagePermission"
-        />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
@@ -118,7 +96,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -128,14 +106,12 @@ import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -150,8 +126,6 @@ import CollectorNameEditModal
 import CollectorOptionsSection
     from '@/services/asset-inventory/components/CollectorDetailOptionsSection.vue';
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
-import CollectorServiceAccountsSection
-    from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
@@ -160,6 +134,7 @@ import {
 import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
+
 
 const props = defineProps<{
     collectorId: string;
@@ -186,13 +161,12 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),
     collectorHistoryLink: computed<Location>(() => ({
-        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME),
         query: {
             filters: queryHelper.setFilters([
                 {
@@ -335,6 +309,7 @@ onUnmounted(() => {
 .collector-button-box {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
 }

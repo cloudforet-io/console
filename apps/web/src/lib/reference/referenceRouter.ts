@@ -138,7 +138,14 @@ const routerMap: RouterMap = {
 export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {
     if (routerMap[reference.resource_type]) {
         const { name, formatter } = routerMap[reference.resource_type];
-        return formatter(name, data, reference, query);
+        const location = formatter(name, data, reference, query);
+        if (reference.workspace_id) {
+            location.params = {
+                ...location.params,
+                workspaceId: reference.workspace_id,
+            };
+        }
+        return location;
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
     return {};

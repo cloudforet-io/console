@@ -14,6 +14,8 @@ import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,6 +24,9 @@ import type { JobAnalyzeInfo } from '@/services/asset-inventory/types/collector-
 
 
 export const useCollectorPageStore = defineStore('collector-page', () => {
+    const appContextStore = useAppContextStore();
+    const appContextGetters = appContextStore.getters;
+
     const state = reactive({
         loading: {
             collectorList: true,
@@ -50,6 +55,9 @@ export const useCollectorPageStore = defineStore('collector-page', () => {
             const filters: ConsoleFilter[] = [];
             if (state.selectedProvider !== 'all') {
                 filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
+            }
+            if (appContextGetters.isAdminMode) {
+                filters.push({ k: 'workspace_id', v: '*', o: '=' });
             }
             return filters.concat(state.searchFilters);
         }),
