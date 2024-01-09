@@ -33,6 +33,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -55,6 +56,7 @@ import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-
 
 const COLLECTOR_DETAIL_ROUTE = ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME;
 const WORKSPACE_HOME_ROUTE = ROOT_ROUTE.WORKSPACE._NAME;
+const allReferenceStore = useAllReferenceStore();
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
@@ -95,6 +97,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    workspaces: computed(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     loading: true,
@@ -211,7 +214,6 @@ const getJobs = async () => {
 };
 
 const getLocation = ({ workspaceId, collectorId, target }: {workspaceId:string, collectorId?: string, target: string}):RawLocation => {
-    console.log('collectorId', collectorId);
     const isAdminCenter = workspaceId === '*';
     const routeParams: {collectorId?: string, workspaceId?: string} = {};
     if (collectorId) routeParams.collectorId = collectorId;
@@ -293,7 +295,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                             })"
                             action-icon="internal-link"
                             new-tab
-                            :text="value === '*' ? 'Global' : value"
+                            :text="storeState.workspaces[value]?.label"
                     />
                 </template>
                 <template #col-collector_info-format="{ value, item }">
