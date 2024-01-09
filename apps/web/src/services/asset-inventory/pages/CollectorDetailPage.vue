@@ -321,7 +321,6 @@ onUnmounted(() => {
 .collector-button-box {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
 }

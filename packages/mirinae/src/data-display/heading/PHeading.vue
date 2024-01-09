@@ -158,6 +158,7 @@ export default defineComponent<Props>({
         }
     }
     > .extra {
+        @apply flex justify-end;
         flex-grow: 1;
     }
 

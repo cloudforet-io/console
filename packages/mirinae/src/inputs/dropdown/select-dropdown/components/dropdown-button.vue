@@ -133,7 +133,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                                 <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                                 <p-badge v-if="displayBadgeValueOnDropdownButton"
                                          class="selected-item-badge"
-                                         :style-type="props.disabled ? 'gray200' : 'blue300'"
+                                         :style-type="props.disabled ? 'gray200' : 'blue200'"
                                          :badge-type="props.disabled ? 'solid' : 'subtle'"
                                 >
                                     {{ displayBadgeValueOnDropdownButton }}
@@ -428,10 +428,11 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                         width: 100%;
                     }
                     .selected-item {
-                        @apply absolute;
-                        top: 25%;
-                        left: 0.5rem;
-                        width: calc(100% - 2.5rem);
+                        @apply flex;
+                        .selected-item-text {
+                            @apply truncate;
+                            flex: 1;
+                        }
                     }
                 }
             }
