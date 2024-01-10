@@ -204,31 +204,26 @@ const getQueryForGetDataAPI = (): any => {
 };
 const getData = async () => {
     state.data = dataMap[state.fetchOptionKey];
-    if (state.currentLayout.type === 'raw-table') {
-        const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
-        const keyPath = state.currentLayout.options?.root_path;
-        if (keyPath) params.key_path = keyPath;
-        const res = await SpaceConnector.clientV2.inventory.cloudService.getData(params);
-        if (res.total_count !== undefined) state.totalCount = res.total_count;
-        state.data = res.results;
-    } else if (state.isTableTypeInDynamicLayout) {
-        try {
+    try {
+        if (state.currentLayout.type === 'raw-table') {
+            const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
+            const keyPath = state.currentLayout.options?.root_path;
+            if (keyPath) params.key_path = keyPath;
+            const res = await SpaceConnector.client.inventory.cloudService.getData(params);
+            if (res.total_count !== undefined) state.totalCount = res.total_count;
+            state.data = res.results;
+        } else if (state.isTableTypeInDynamicLayout) {
             const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams(state.currentLayout.type));
             if (res.total_count !== undefined) state.totalCount = res.total_count;
             if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.data = undefined;
-            state.totalCount = 0;
-        }
-    } else {
-        try {
+        } else {
             const res = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({ cloud_service_id: props.cloudServiceId });
             if (res) state.data = res;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.data = undefined;
         }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.data = undefined;
+        state.totalCount = 0;
     }
 
     dataMap[state.fetchOptionKey] = state.data;
@@ -350,13 +345,24 @@ watch(() => props.cloudServiceId, async (after, before) => {
 </template>
 
 <style scoped lang="postcss">
-/* custom design-system component - p-toolbox-table */
+/* custom design-system component - p-dynamic-layout-query-search-table */
 .dynamic-layout-wrapper {
     :deep(.p-dynamic-layout-query-search-table) {
         .p-toolbox-table {
             border-width: 0;
             .table-container {
                 min-height: 200px;
+            }
+        }
+    }
+
+    /* custom design-system component - p-definition-table */
+    :deep(.p-definition-table) {
+        min-height: initial;
+        .p-definition {
+            td.key {
+                min-width: 22rem;
+                width: 22rem;
             }
         }
     }

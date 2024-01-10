@@ -138,15 +138,13 @@ watch(
                    :title="$t('COMMON.TAGS.TITLE')"
         >
             <template #extra>
-                <div class="edit-button-container">
-                    <p-button style-type="secondary"
-                              icon-left="ic_edit"
-                              :disabled="props.disabled"
-                              @click="editTag"
-                    >
-                        {{ props.tagEditButtonText ?? $t('COMMON.TAGS.EDIT') }}
-                    </p-button>
-                </div>
+                <p-button style-type="secondary"
+                          icon-left="ic_edit"
+                          :disabled="props.disabled"
+                          @click="editTag"
+                >
+                    {{ props.tagEditButtonText ?? $t('COMMON.TAGS.EDIT') }}
+                </p-button>
             </template>
         </p-heading>
         <slot name="table-top" />
@@ -179,11 +177,6 @@ watch(
     </div>
 </template>
 <style lang="postcss" scoped>
-.edit-button-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
 /* transition */
 .slide-up-enter-active {
     transition: all 0.3s ease;

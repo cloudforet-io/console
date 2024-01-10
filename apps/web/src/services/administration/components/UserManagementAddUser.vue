@@ -6,7 +6,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown,
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -20,7 +20,6 @@ import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/ide
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/administration/types/user-type';
@@ -45,16 +44,10 @@ const state = reactive({
     selectedItems: [] as AddModalMenuItem[],
     independentUsersList: [] as SummaryWorkspaceUserModel[],
 });
-
-const authTypeState = reactive({
-    selectedUserAuthType: '' as AuthType,
-    selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
-});
-
 const formState = reactive({
     searchText: '',
+    selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
 });
-
 const validationState = reactive({
     userIdInvalid: undefined as undefined | boolean,
     userIdInvalidText: '' as TranslateResult,
@@ -70,6 +63,8 @@ const handleClickTextInput = async () => {
     resetValidationState();
 };
 const handleChangeTextInput = (value: string) => {
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
     formState.searchText = value;
     if (!userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
         fetchListUsers();
@@ -86,12 +81,10 @@ const handleClickDeleteButton = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('change-input', { userList: state.selectedItems });
 };
-const handleSelectAuthTypeItem = (selected: string, idx: number) => {
-    state.selectedItems[idx].auth_type = selected as AuthType;
-    emit('change-input', { userList: state.selectedItems });
-};
 const handleSelectDropdownItem = (selected: string) => {
-    authTypeState.selectedMenuItem = selected as AuthType;
+    formState.selectedMenuItem = selected as AuthType;
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
 };
 const getUserList = async () => {
     let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
@@ -110,7 +103,7 @@ const getUserList = async () => {
     }
 };
 const checkEmailValidation = () => {
-    if (userPageState.isAdminMode && authTypeState.selectedMenuItem === 'LOCAL') {
+    if (formState.selectedMenuItem === 'LOCAL') {
         const { isValid, invalidText } = checkEmailFormat(formState.searchText);
         if (!isValid) {
             validationState.userIdInvalid = true;
@@ -139,7 +132,7 @@ const clickOutside = () => {
     }
 };
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
-    state.selectedItems.push(menuItem);
+    state.selectedItems.unshift(menuItem);
     await hideMenu();
 };
 const initAuthTypeList = async () => {
@@ -151,12 +144,12 @@ const initAuthTypeList = async () => {
     }
 };
 const addSelectedItem = (isNew: boolean) => {
-    state.selectedItems.push({
+    state.selectedItems.unshift({
         user_id: formState.searchText,
         label: formState.searchText,
         name: formState.searchText,
         isNew,
-        auth_type: authTypeState.selectedMenuItem,
+        auth_type: formState.selectedMenuItem,
     });
     formState.searchText = '';
     resetValidationState();
@@ -212,7 +205,6 @@ onClickOutside(containerRef, clickOutside);
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
-        authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
         resetValidationState();
         if (!userPageState.isAdminMode) {
             await fetchListUsers();
@@ -236,14 +228,9 @@ onMounted(() => {
                        :class="{'is-admin-mode': userPageState.isAdminMode}"
         >
             <template #label>
-                <strong v-if="userPageState.modal.type === USER_MODAL_TYPE.INVITE">
-                    {{ $t('IAM.USER.FORM.USER_ID') }}
-                </strong>
-                <span v-else>
-                    <span v-if="!userPageStore.afterWorkspaceCreated">{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
-                    <span v-if="!userPageStore.afterWorkspaceCreated"
-                          class="and-mark"
-                    >&</span>
+                <span>
+                    <span>{{ $t('IAM.USER.FORM.AUTH_TYPE') }}</span>
+                    <span class="and-mark">&</span>
                     <span>{{ $t('IAM.USER.FORM.USER_ID') }}</span>
                 </span>
             </template>
@@ -251,9 +238,9 @@ onMounted(() => {
                 <div ref="containerRef"
                      class="input-wrapper"
                 >
-                    <div v-if="userPageState.isAdminMode">
+                    <div>
                         <p-select-dropdown :menu="authTypeMenuItem"
-                                           :selected="authTypeState.selectedMenuItem"
+                                           :selected="formState.selectedMenuItem"
                                            is-fixed-width
                                            class="type-dropdown"
                                            @update:selected="handleSelectDropdownItem"
@@ -303,14 +290,12 @@ onMounted(() => {
                     >new</span>
                 </div>
                 <div class="selected-toolbox">
-                    <p-select-dropdown v-if="item.isNew"
-                                       :selected="item.auth_type"
-                                       :menu="authTypeMenuItem"
-                                       menu-position="right"
-                                       class="auth-type-dropdown"
-                                       style-type="transparent"
-                                       @update:selected="handleSelectAuthTypeItem($event, idx)"
-                    />
+                    <p-badge v-if="item.auth_type"
+                             badge-type="subtle"
+                             :style-type="item.auth_type === 'LOCAL' ? 'primary3' : 'blue200'"
+                    >
+                        {{ authTypeMenuItem.find((i) => i.name === item.auth_type).label || '' }}
+                    </p-badge>
                     <p-icon-button name="ic_delete"
                                    class="delete-btn"
                                    size="sm"
@@ -385,23 +370,19 @@ onMounted(() => {
             }
             .selected-toolbox {
                 @apply flex items-center;
+                gap: 0.25rem;
             }
         }
     }
 }
 
-/* custom design-system component - p-button */
+/* custom design-system component - p-field-group */
 :deep(.p-field-group) {
     @apply relative;
     .invalid-feedback {
         @apply absolute;
         bottom: -1.125rem;
-        left: 0;
-    }
-    &.is-admin-mode {
-        .invalid-feedback {
-            left: 6.75rem;
-        }
+        left: 6.75rem;
     }
 }
 </style>

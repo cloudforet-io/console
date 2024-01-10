@@ -2,8 +2,6 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import { PDivider } from '@spaceone/design-system';
-
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -45,9 +43,6 @@ const handleClickLogo = () => {
                 >
             </div>
         </component>
-        <p-divider class="logo-divider"
-                   vertical
-        />
         <p class="my-page-text-title">
             {{ $t('MENU.MY_PAGE') }}
         </p>
@@ -91,6 +86,7 @@ const handleClickLogo = () => {
     }
     .my-page-text-title {
         @apply text-label-lg font-bold text-gray-900;
+        padding-left: 0.75rem;
 
         @screen tablet {
             display: none;

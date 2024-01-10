@@ -30,7 +30,7 @@ const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 
 const state = reactive({
-    loading: true,
+    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     alertTitleInput: '',
     nameInvalidText: computed(() => {
@@ -66,7 +66,7 @@ const onClickConfirm = async () => {
 
 watch(() => alertPageState.alertData?.title, (alertTitle) => {
     if (alertTitle) state.alertTitleInput = alertTitle;
-});
+}, { immediate: true });
 </script>
 
 <template>

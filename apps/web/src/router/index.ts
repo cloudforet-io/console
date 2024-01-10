@@ -7,7 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { GrantScope } from '@/schema/identity/token/type';
 
-import { ERROR_ROUTE } from '@/router/constant';
+import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -119,6 +119,8 @@ export class SpaceRouter {
                 } else if (to.path?.startsWith('/workspace-') && to.params.workspaceId) {
                     scope = 'WORKSPACE';
                     workspaceId = to.params.workspaceId;
+                    // Browser Back Button Case
+                    userWorkspaceStore.setCurrentWorkspace(workspaceId);
                 } else scope = 'USER';
 
                 const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, workspaceId);
@@ -146,7 +148,7 @@ export class SpaceRouter {
                     nextLocation = { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
                 // When a user is already signed in and tries to go to sign in page, redirect to home-dashboard page
                 } else if (to.meta?.isSignInPage) {
-                    nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
+                    nextLocation = { name: ROOT_ROUTE._NAME };
                 // When a user tries to go to inaccessible page, redirect to error page (Exclude Admin Mode)
                 } else if (userAccessLevel < routeAccessLevel) {
                     // When a user tries to another available workspace without target page's access permission.

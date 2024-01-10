@@ -162,6 +162,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -307,7 +308,8 @@ export default {
             ]);
             state.data = getConvertedCloudServiceData(state.cloudServiceData);
         };
-        init();
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+        callApiWithGrantGuard();
 
         return {
             ...toRefs(state),

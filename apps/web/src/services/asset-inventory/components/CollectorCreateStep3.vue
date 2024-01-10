@@ -1,9 +1,11 @@
 <template>
     <div class="collector-page-3">
         <div class="input-form">
-            <attached-service-account-form @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid" />
-            <collector-options-form class="collector-options-form"
-                                    show-title-on-empty-schema
+            <attached-service-account-form v-if="!isAdminMode"
+                                           class="attached-service-account-form"
+                                           @update:isAttachedServiceAccountValid="handleChangeIsAttachedServiceAccountValid"
+            />
+            <collector-options-form show-title-on-empty-schema
                                     @update:isValid="handleChangeIsSchemaFormValid"
             />
         </div>
@@ -47,6 +49,8 @@ import {
     PButton, PTextButton,
 } from '@spaceone/design-system';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import AttachedServiceAccountForm
@@ -61,13 +65,16 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const appContextStore = useAppContextStore();
+const isAdminMode = computed(() => appContextStore.getters.isAdminMode);
 
 
 const state = reactive({
     loading: true,
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
     deleteModalVisible: false,
-    isAttachedServiceAccountValid: false,
+    isAttachedServiceAccountValid: isAdminMode.value,
     isSchemaFormValid: false,
     isAllFormValid: computed<boolean>(() => state.isAttachedServiceAccountValid && state.isSchemaFormValid),
 });
@@ -103,8 +110,8 @@ const handleClose = () => {
     min-width: 40rem;
 
     .input-form {
-        .collector-options-form {
-            margin-top: 2rem;
+        .attached-service-account-form {
+            margin-bottom: 2rem;
         }
     }
 

@@ -105,7 +105,7 @@ const handleSelectOption = (selectionType: VariableSelectionType, item: MenuItem
     if (isSelected) {
         _selected = [..._selected, item];
     } else {
-        _selected = _selected.splice(index, 1);
+        _selected.splice(index, 1);
     }
     state.selected = _selected;
     changeVariables(_selected);

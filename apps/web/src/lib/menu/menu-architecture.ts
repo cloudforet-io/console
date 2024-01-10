@@ -77,14 +77,14 @@ export const ADMIN_MENU_LIST: Menu[] = [
     //     id: MENU_ID.DASHBOARDS,
     // },
     // TODO: low priority features, so hide it for now
-    // {
-    //     id: MENU_ID.ASSET_INVENTORY,
-    //     subMenuList: [
-    //         { id: MENU_ID.CLOUD_SERVICE },
-    //         { id: MENU_ID.SERVER, needPermissionByRole: true },
-    //         { id: MENU_ID.COLLECTOR },
-    //     ],
-    // },
+    {
+        id: MENU_ID.ASSET_INVENTORY,
+        subMenuList: [
+            // { id: MENU_ID.CLOUD_SERVICE },
+            // { id: MENU_ID.SERVER, needPermissionByRole: true },
+            { id: MENU_ID.COLLECTOR },
+        ],
+    },
     {
         id: MENU_ID.COST_EXPLORER,
         subMenuList: [

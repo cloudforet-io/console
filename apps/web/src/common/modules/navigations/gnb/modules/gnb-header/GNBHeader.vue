@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDivider, PSelectDropdown, PTooltip,
+    PSelectDropdown, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { clone } from 'lodash';
@@ -13,7 +13,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ROOT_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -22,7 +22,12 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
+
 import { violet } from '@/styles/colors';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 interface Props {
     isAdminMode: boolean;
@@ -36,6 +41,7 @@ const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
@@ -46,12 +52,6 @@ const state = reactive({
         const menuList: SelectDropdownMenuItem[] = [
             { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
             { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
-        ];
-        const allWorkspacesMenu: SelectDropdownMenuItem[] = [
-            { type: 'divider', name: '' } as SelectDropdownMenuItem,
-            {
-                type: 'item', name: 'all_workspaces', label: i18n.t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES'), icon: 'ic_list-card',
-            } as SelectDropdownMenuItem,
         ];
         state.workspaceList.forEach((_workspace) => {
             if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
@@ -71,7 +71,7 @@ const state = reactive({
             }
             return menuList;
         });
-        return [...menuList, ...(state.isDomainAdmin ? allWorkspacesMenu : [])];
+        return [...menuList];
     }),
     searchText: '',
 });
@@ -83,7 +83,7 @@ const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
         appContextStore.enterAdminMode();
-        router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+        router.push(getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME }));
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
@@ -103,6 +103,9 @@ const selectWorkspace = (name: string): void => {
     }
 };
 
+const handleClickAllWorkspace = () => {
+    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) });
+};
 </script>
 
 <template>
@@ -116,25 +119,13 @@ const selectWorkspace = (name: string): void => {
             <span v-if="props.isAdminMode"
                   class="admin-title"
             >
-                Admin Center
+                Admin <span class="omitable-text">Center</span>
             </span>
-            <div v-else
-                 class="logo-wrapper"
-            >
-                <img v-if="state.symbolImage"
-                     class="logo-character"
-                     :src="state.symbolImage"
-                >
-                <img v-else
-                     class="logo-character"
-                     src="/images/logos/spaceone-default-logo.svg"
-                >
-            </div>
+            <workspace-logo-icon v-else
+                                 :text="state.selectedWorkspace?.name || ''"
+                                 :theme="state.selectedWorkspace?.tags?.theme"
+            />
         </component>
-        <p-divider v-if="!props.isAdminMode"
-                   class="logo-divider"
-                   vertical
-        />
         <p-select-dropdown v-if="!props.isAdminMode"
                            class="workspace-dropdown"
                            style-type="transparent"
@@ -156,6 +147,18 @@ const selectWorkspace = (name: string): void => {
                         ...
                     </span>
                 </p-tooltip>
+            </template>
+            <template #menu-bottom>
+                <div class="all-workspace"
+                     @click="handleClickAllWorkspace"
+                >
+                    <p-i name="ic_list-card"
+                         height="1rem"
+                         width="1rem"
+                         class="verified-icon"
+                    />
+                    <span>{{ $t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES') }}</span>
+                </div>
             </template>
             <!--            <template #menu-item&#45;&#45;format="{ item }">-->
             <!--                <span class="menu-wrapper">-->
@@ -206,41 +209,54 @@ const selectWorkspace = (name: string): void => {
 
         .admin-title {
             @apply text-label-xl text-violet-100 w-full;
-        }
-        .logo-wrapper {
-            width: 2rem;
-            height: 2rem;
-            .logo-character {
-                display: inline-block;
-                width: 2rem;
-                height: 2rem;
+
+            .omitable-text {
+                @screen tablet {
+                    @apply hidden;
+                }
+
+                @screen mobile {
+                    @apply inline-block;
+                }
             }
         }
-    }
-
-    .logo-divider {
-        margin: 0 0.75rem;
-        height: 2rem;
     }
     .workspace-dropdown {
         @apply inline-flex;
 
         @screen tablet {
-            width: 2.875rem;
+            width: 3.625rem;
         }
 
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
             min-width: 12rem !important;
+            .menu-container {
+                padding-bottom: 2.25rem;
+            }
+            .bottom-slot-area {
+                padding: 0;
+            }
+            .all-workspace {
+                @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t cursor-pointer;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+                padding-left: 0.5rem;
+                gap: 0.25rem;
+            }
         }
 
         .selected-workspace {
             @apply text-label-lg text-gray-800 inline-block font-bold;
-            max-width: 8.4375rem;
+            max-width: 9.1875rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             vertical-align: bottom;
+            padding-left: 0.75rem;
 
             @screen tablet {
                 @apply hidden;
@@ -252,6 +268,7 @@ const selectWorkspace = (name: string): void => {
         }
         .tablet-selected {
             @apply hidden text-label-lg text-gray-800;
+            padding-left: 0.75rem;
 
             @screen tablet {
                 @apply inline-block;

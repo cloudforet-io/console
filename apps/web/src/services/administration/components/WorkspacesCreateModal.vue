@@ -23,6 +23,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/gnb/constants/constant';
+import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
 
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
@@ -54,13 +56,20 @@ const state = reactive({
     }),
     name: undefined as undefined|string,
     description: '',
+    selectedTheme: 'blue',
+    themes: WORKSPACE_LOGO_ICON_THEMES,
 });
+
+const handleClickTheme = (theme: string) => {
+    state.selectedTheme = theme;
+};
 
 const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
             const isChanged = state.name !== workspacePageStore.selectedWorkspaces[0].name
-                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description;
+                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description
+                || state.selectedTheme !== workspacePageStore.selectedWorkspaces[0].tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
@@ -90,6 +99,7 @@ const handleConfirm = async () => {
                 name: state.name ?? '',
                 tags: {
                     description: state.description ?? '',
+                    theme: state.selectedTheme ?? 'blue',
                 },
             });
             showSuccessMessage(i18n.t('Workspace successfully updated'), '');
@@ -98,6 +108,7 @@ const handleConfirm = async () => {
                 name: state.name ?? '',
                 tags: {
                     description: state.description ?? '',
+                    theme: state.selectedTheme ?? 'blue',
                 },
             });
             await userWorkspaceStore.load();
@@ -120,9 +131,11 @@ watch(() => props.visible, (visible) => {
     if (props.createType === 'CREATE') {
         state.name = undefined;
         state.description = '';
+        state.selectedTheme = 'blue';
     } else {
         state.name = workspacePageStore.selectedWorkspaces[0].name;
         state.description = workspacePageStore.selectedWorkspaces[0].tags?.description ?? '';
+        state.selectedTheme = workspacePageStore.selectedWorkspaces[0].tags?.theme ?? 'blue';
     }
 }, { immediate: true });
 
@@ -130,7 +143,8 @@ watch(() => props.visible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :visible.sync="state.proxyVisible"
+    <p-button-modal class="workspaces-create-modal"
+                    :visible.sync="state.proxyVisible"
                     :header-title="state.headerTitle"
                     size="sm"
                     :disabled="!validationState.isAllValid"
@@ -153,6 +167,51 @@ watch(() => props.visible, (visible) => {
                             :placeholder="$t('IAM.WORKSPACES.FORM.PLACEHOLDER_DESC')"
                 />
             </p-field-group>
+            <p-field-group :label="$t('IAM.WORKSPACES.FORM.LABEL_THEME')">
+                <div class="theme-wrapper">
+                    <button v-for="(theme, idx) in state.themes"
+                            :key="`${theme}-${idx}`"
+                            :class="{'logo-button': true, 'selected': state.selectedTheme === theme}"
+                            @click="handleClickTheme(theme)"
+                    >
+                        <div v-show="state.selectedTheme === theme"
+                             class="background-area"
+                        />
+                        <workspace-logo-icon :theme="theme"
+                                             text="A"
+                                             size="md"
+                        />
+                    </button>
+                </div>
+            </p-field-group>
         </template>
     </p-button-modal>
 </template>
+
+<style lang="postcss" scoped>
+.workspaces-create-modal {
+    .theme-wrapper {
+        @apply flex;
+        padding-left: 0.125rem;
+        gap: 0.125rem;
+        .logo-button {
+            @apply relative flex items-center justify-center cursor-pointer;
+            width: 3.375rem;
+            height: 3.375rem;
+            border-radius: 0.5rem;
+            &.selected {
+                @apply border-2 border-blue-600;
+            }
+
+            .background-area {
+                @apply absolute border-2 border-blue-200;
+                width: 3.625rem;
+                height: 3.625rem;
+                top: -0.25rem;
+                left: -0.25rem;
+                border-radius: 0.625rem;
+            }
+        }
+    }
+}
+</style>

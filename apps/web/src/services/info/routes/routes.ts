@@ -5,6 +5,7 @@ import { store } from '@/store';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
@@ -16,13 +17,21 @@ const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vu
 const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
-    meta: { menuId: MENU_ID.INFO, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: {
+        menuId: MENU_ID.INFO,
+        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+        translationId: MENU_INFO_MAP[MENU_ID.INFO].translationId,
+    },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: InfoContainer,
     children: [
         {
             path: 'notice',
-            meta: { lnbVisible: true, menuId: MENU_ID.NOTICE },
+            meta: {
+                lnbVisible: true,
+                menuId: MENU_ID.NOTICE,
+                translationId: MENU_INFO_MAP[MENU_ID.NOTICE].translationId,
+            },
             component: { template: '<router-view />' },
             children: [
                 {

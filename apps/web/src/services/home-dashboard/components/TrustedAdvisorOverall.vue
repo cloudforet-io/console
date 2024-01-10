@@ -15,6 +15,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import {
     green, red, white, yellow,
@@ -160,10 +161,8 @@ const getData = async () => {
     }
 };
 
-/* Init */
-(async () => {
-    await getData();
-})();
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], getData);
+callApiWithGrantGuard();
 
 /* Watcher */
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {

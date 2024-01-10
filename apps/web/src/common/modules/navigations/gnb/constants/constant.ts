@@ -8,3 +8,4 @@ export const customMenuNameList: MenuId[] = [
     DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
 ];
 
+export const WORKSPACE_LOGO_ICON_THEMES = ['blue', 'yellow', 'gray', 'green', 'coral', 'indigo', 'peacock'] as const;

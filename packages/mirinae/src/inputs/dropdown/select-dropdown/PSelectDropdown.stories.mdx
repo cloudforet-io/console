@@ -536,11 +536,16 @@ export const Template = (args, { argTypes }) => ({
             template: `
                 <div class="h-full w-full overflow p-8">
                     <p-select-dropdown class="w-96" :menu="menuItems" is-fixed-width placeholder="long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long placeholder "></p-select-dropdown>
+                    <p-select-dropdown class="mt-5" :menu="menuItems" is-fixed-width :selected="multiSelected" multi-selectable appearance-type="badge" />
                 </div>
             `,
             setup() {
+                const state = reactive({
+                    multiSelected: menuItems.filter(d => !d.type || d.type === 'item').splice(0, 15),
+                })
                 return {
-                    menuItems
+                    menuItems,
+                    ...toRefs(state)
                 }
             }
         }}

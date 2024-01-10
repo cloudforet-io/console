@@ -17,12 +17,11 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { gray } from '@/styles/colors';
 
-import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
+import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -72,6 +71,7 @@ const state = reactive({
         if (!props.widgetKey) return undefined;
         return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
+    hideDateDropdown: computed<boolean>(() => widgetFormGetters.widgetConfig?.options?.data_criteria === 'realtime'),
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -176,7 +176,10 @@ onBeforeUnmount(() => {
                         />
                     </div>
                     <div class="right-part">
-                        <dashboard-toolset />
+                        <dashboard-toolset-date-dropdown v-if="!state.hideDateDropdown"
+                                                         v-show="dashboardDetailState.settings.date_range.enabled"
+                                                         :date-range="dashboardDetailState.settings.date_range"
+                        />
                     </div>
                 </div>
                 <div v-if="state.originWidgetInfo && state.component"

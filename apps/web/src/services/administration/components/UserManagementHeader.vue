@@ -68,24 +68,22 @@ const updateModalSettings = ({
                               icon-left="ic_plus_bold"
                               @click="handleClickButton(USER_MODAL_TYPE.ADD)"
                     >
-                        {{ $t('IAM.USER.ADD') }}
+                        <span class="button-label">{{ $t('IAM.USER.ADD') }}</span>
                     </p-button>
-                    <div v-else>
-                        <div v-if="userPageStore.isWorkspaceOwner"
-                             class="toolbox"
+                    <div v-else-if="userPageStore.isWorkspaceOwner"
+                         class="toolbox"
+                    >
+                        <p-button style-type="tertiary"
+                                  :disabled="userPageStore.selectedUsers.length === 0"
+                                  @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                         >
-                            <p-button style-type="tertiary"
-                                      :disabled="userPageStore.selectedUsers.length === 0"
-                                      @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
-                            >
-                                {{ $t('IAM.USER.REMOVE') }}
-                            </p-button>
-                            <p-button style-type="primary"
-                                      @click="handleClickButton(USER_MODAL_TYPE.INVITE)"
-                            >
-                                {{ $t('IAM.USER.INVITE') }}
-                            </p-button>
-                        </div>
+                            {{ $t('IAM.USER.REMOVE') }}
+                        </p-button>
+                        <p-button style-type="primary"
+                                  @click="handleClickButton(USER_MODAL_TYPE.INVITE)"
+                        >
+                            {{ $t('IAM.USER.INVITE') }}
+                        </p-button>
                     </div>
                 </div>
             </template>
@@ -97,8 +95,11 @@ const updateModalSettings = ({
 .user-management-header {
     .toolbox-wrapper {
         .toolbox {
-            @apply flex;
+            @apply flex ;
             gap: 1rem;
+        }
+        .button-label {
+            line-height: 1rem;
         }
     }
 }

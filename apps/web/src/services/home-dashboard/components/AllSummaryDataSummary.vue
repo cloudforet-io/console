@@ -73,6 +73,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';
@@ -197,13 +198,15 @@ export default {
             }
         };
 
-        /* Init */
-        (async () => {
+        const init = async () => {
             await Promise.allSettled([
                 getSummaryInfo(props.activeTab),
                 store.dispatch('reference/provider/load'), // LOAD REFERENCE STORE
             ]);
-        })();
+        };
+
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+        callApiWithGrantGuard();
 
         /* Watcher */
         watch(() => props.activeTab, (type) => {

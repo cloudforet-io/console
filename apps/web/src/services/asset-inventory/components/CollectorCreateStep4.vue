@@ -73,6 +73,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -84,6 +85,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 const appContextStore = useAppContextStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const emit = defineEmits([
     'update:currentStep',
@@ -182,12 +184,12 @@ const handleConfirmCreateCollector = async () => {
 const goToCollectorDetailPage = () => {
     state.visibleCreateCompleteModal = false;
     if (state.createdCollectorId) {
-        SpaceRouter.router.push({
+        SpaceRouter.router.push(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
             params: {
                 collectorId: state.createdCollectorId,
             },
-        });
+        }));
     }
 };
 

@@ -383,7 +383,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
 
 <style lang="postcss" scoped>
 .action-btn-wrapper {
-    @apply ml-auto justify-end mr-3 inline-flex items-center;
+    @apply ml-auto mr-3 inline-flex items-center;
 }
 .all-project-button {
     @apply mr-1;

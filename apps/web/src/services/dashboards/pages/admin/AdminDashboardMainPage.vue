@@ -119,13 +119,11 @@ onUnmounted(() => {
                    :total-count="dashboardState.totalCount"
         >
             <template #extra>
-                <div class="extra-button">
-                    <p-button icon-left="ic_plus_bold"
-                              @click="handleCreateDashboard"
-                    >
-                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
-                    </p-button>
-                </div>
+                <p-button icon-left="ic_plus_bold"
+                          @click="handleCreateDashboard"
+                >
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
+                </p-button>
             </template>
         </p-heading>
         <p-toolbox filters-visible
@@ -174,10 +172,6 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .dashboards-main-page {
     @apply w-full;
-
-    .extra-button {
-        @apply flex justify-end;
-    }
 
     .dashboard-list-wrapper {
         @apply flex w-full;

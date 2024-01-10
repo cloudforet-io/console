@@ -22,6 +22,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -163,7 +164,10 @@ const init = async () => {
         getData(),
     ]);
 };
-init();
+
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
+
 </script>
 
 <template>

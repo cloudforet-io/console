@@ -258,12 +258,6 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
 
 <style lang="postcss" scoped>
 .service-account-credentials {
-    /* custom design-system component - p-heading */
-    :deep(.p-heading) {
-        .extra {
-            text-align: right;
-        }
-    }
     .content-wrapper {
         min-height: 10rem;
         padding-top: 0.5rem;

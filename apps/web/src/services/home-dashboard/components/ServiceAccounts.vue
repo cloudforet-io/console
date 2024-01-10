@@ -8,7 +8,7 @@ import {
     PDataLoader, PDataTable, PI, PEmpty, PSkeleton,
 } from '@spaceone/design-system';
 import {
-    cloneDeep, debounce, forEach, isEmpty, sum,
+    cloneDeep, debounce, forEach, sum,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -22,6 +22,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { white } from '@/styles/colors';
 
@@ -136,15 +137,13 @@ const getData = debounce(async () => {
     }
 }, 300);
 
-/* Init */
-(async () => {
+const init = async () => {
     await store.dispatch('reference/provider/load', true);
-})();
+    await getData();
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
 
-/* Watcher */
-watch(() => storeState.providers, (providers) => {
-    if (!isEmpty(providers)) getData();
-}, { immediate: true });
 watch([() => state.loading, () => chartContext.value], ([loading, _chartContext]) => {
     if (!loading && _chartContext) {
         drawChart();

@@ -322,19 +322,18 @@ watch(() => isAllValid.value, (_isAllValid) => {
     padding: 0.5rem;
 
     .label-row {
-        @apply text-gray-400 grid grid-cols-12;
-        position: relative;
+        @apply relative flex text-gray-400;
         font-size: 0.75rem;
         font-weight: bold;
         line-height: 1.5;
         margin-bottom: 0.5rem;
 
         .col-step {
-            @apply col-span-1;
             text-align: center;
+            width: 3.625rem;
         }
         .col-notification {
-            @apply col-span-2;
+            width: 7.5rem;
         }
         .col-rule {
             @apply col-span-3;
@@ -347,30 +346,23 @@ watch(() => isAllValid.value, (_isAllValid) => {
     }
 
     .content-row {
-        @apply bg-white grid grid-cols-12 rounded-md;
-        position: relative;
+        @apply relative flex items-center align-middle bg-white rounded-md;
         height: 3rem;
-        align-items: center;
-        vertical-align: middle;
         margin-bottom: 0.25rem;
-        padding: 0.5rem 0;
+        padding: 0.5rem 0.75rem 0.5rem 1rem;
+        gap: 1rem;
 
         .col-step {
-            @apply col-span-1;
-            margin: auto;
+            margin-right: 0.25rem;
         }
         .col-notification {
-            @apply col-span-2;
             .p-select-dropdown {
-                min-width: 6rem;
+                min-width: 6.5rem;
             }
         }
         .col-rule {
-            @apply col-span-4 text-gray-900;
-            display: flex;
-            justify-content: flex-start;
+            @apply flex justify-start items-center text-gray-900;
             gap: 0.5rem;
-            align-items: center;
             font-size: 0.875rem;
             line-height: 1.4;
 
@@ -397,11 +389,10 @@ watch(() => isAllValid.value, (_isAllValid) => {
     }
 
     .add-row {
-        @apply grid grid-cols-12;
-        position: relative;
-        align-items: center;
+        @apply relative flex items-center;
         font-size: 0.875rem;
-        padding: 0.5rem 0;
+        padding: 0.5rem 0.75rem 0.5rem 1rem;
+        gap: 1.25rem;
 
         .col-icon {
             @apply col-span-1;
@@ -423,7 +414,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 }
             }
             .repeat-input {
-                width: 6rem;
+                width: 6.5rem;
             }
         }
         .col-label {

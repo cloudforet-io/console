@@ -97,7 +97,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import {
@@ -122,6 +122,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 
@@ -192,10 +193,10 @@ export default {
                     period: EVENT_PERIOD,
                     workspace_id: storeState.currentWorkspaceId,
                 });
-                return results;
+                const rawData = results ?? [];
+                state.data = getConvertedData(rawData, allReferenceStore.getters.project);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return [];
             } finally {
                 state.loading = false;
             }
@@ -207,20 +208,19 @@ export default {
             state.data[index].showAll = !showAll;
         };
 
-        (async () => {
+
+
+        const init = async () => {
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('reference/region/load'),
+                await getData(),
             ]);
-        })();
+        };
 
-        /* Watcher */
-        watch(() => allReferenceStore.getters.project, async (projects) => {
-            if (projects) {
-                const rawData = await getData();
-                state.data = getConvertedData(rawData, projects);
-            }
-        }, { immediate: true });
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+        callApiWithGrantGuard();
+
 
         return {
             ...toRefs(state),

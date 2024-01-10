@@ -99,7 +99,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import {
@@ -126,6 +126,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import TrustedAdvisorOverall from '@/services/home-dashboard/components/TrustedAdvisorOverall.vue';
@@ -296,13 +297,12 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/provider/load'),
+                getProjectSummary(allReferenceStore.getters.project),
             ]);
         };
-        asyncInit();
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], asyncInit);
+        callApiWithGrantGuard();
 
-        watch(() => allReferenceStore.getters.project, (projects) => {
-            if (projects) getProjectSummary(projects);
-        }, { immediate: true });
 
         return {
             ...toRefs(state),

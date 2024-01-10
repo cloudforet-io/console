@@ -6,7 +6,18 @@
                                  title-icon="ic_info-circle"
                                  type="info"
                                  hide-header-close-button
-            />
+            >
+                <template #right>
+                    <p-link v-if="state.isDomainAdmin"
+                            :text="i18n.t('View in Admin Mode')"
+                            :to="{name: makeAdminRouteName($route.name)}"
+                            size="sm"
+                            highlight
+                            action-icon="internal-link"
+                            new-tab
+                    />
+                </template>
+            </scoped-notification>
         </portal>
         <p-heading :title="state.collectorName"
                    show-back-button
@@ -107,7 +118,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal,
+    PHeading, PSkeleton, PButton, PIconButton, PDoubleCheckModal, PLink,
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -117,7 +128,10 @@ import { SpaceRouter } from '@/router';
 import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -147,7 +161,6 @@ import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/c
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
-
 const props = defineProps<{
     collectorId: string;
 }>();
@@ -173,6 +186,7 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
@@ -321,7 +335,6 @@ onUnmounted(() => {
 .collector-button-box {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
 }

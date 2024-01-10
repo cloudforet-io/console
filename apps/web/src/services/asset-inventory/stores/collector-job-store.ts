@@ -4,8 +4,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { Schedule } from '@/schema/inventory/collector/type';
+import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
 import type { JobModel } from '@/schema/inventory/job/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -63,10 +65,10 @@ export const useCollectorJobStore = defineStore('collector-job', {
                     { k: 'collector_id', v: this.collector.collector_id, o: '=' },
                     { k: 'created_at', v: fiveDaysAgo, o: '>' },
                 ]);
-                const { results } = await SpaceConnector.clientV2.inventory.job.list({
+                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({
                     query: jobQueryHelper.data,
                 });
-                this.recentJobs = results;
+                this.recentJobs = results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.recentJobs = [];
