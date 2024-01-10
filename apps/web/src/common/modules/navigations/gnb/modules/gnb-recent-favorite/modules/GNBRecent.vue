@@ -43,6 +43,7 @@ import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-que
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
@@ -100,6 +101,7 @@ export default defineComponent({
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
         const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
+        const appContextStore = useAppContextStore();
         const router = useRouter();
 
         const storeState = reactive({
@@ -245,8 +247,11 @@ export default defineComponent({
                 state.loading = false;
             }
         });
-        watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
-            if (hasLoaded) fetchCostQuerySet();
+        watch([
+            () => costDataSourceReferenceStore.getters.hasLoaded,
+            () => appContextStore.getters.globalGrantLoading,
+        ], ([hasLoaded, loading]) => {
+            if (hasLoaded && !loading) fetchCostQuerySet();
         }, { immediate: true });
 
         return {

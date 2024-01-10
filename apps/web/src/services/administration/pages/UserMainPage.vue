@@ -1,13 +1,17 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { PHorizontalLayout } from '@spaceone/design-system';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { store } from '@/store';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
@@ -24,22 +28,23 @@ const userPageState = userPageStore.$state;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
+    grantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
 /* API */
-const refreshUserList = () => {
+const refreshUserList = async () => {
     userPageStore.$patch({ loading: true });
     userListApiQueryHelper
         .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
         .setFilters(userPageState.searchFilters);
     try {
-        if (storeState.isAdminMode) {
-            userPageStore.listUsers({ query: userListApiQueryHelper.data });
-        } else {
-            userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+        if (storeState.isAdminMode && storeState.grantInfo.scope === 'DOMAIN') {
+            await userPageStore.listUsers({ query: userListApiQueryHelper.data });
+        } else if (storeState.grantInfo.scope === 'WORKSPACE') {
+            await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
         }
     } finally {
         userPageStore.$patch({ loading: false });
@@ -52,11 +57,12 @@ watch(() => storeState.globalGrantLoading, (globalGrantLoading) => {
     userPageStore.$patch({ isAdminMode: storeState.isAdminMode });
 }, { immediate: true });
 
-/* Init */
-onMounted(async () => {
+const init = async () => {
     await userPageStore.listRoles();
     await refreshUserList();
-});
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
+callApiWithGrantGuard();
 
 /* Unmount */
 onUnmounted(() => {

@@ -17,6 +17,7 @@ import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/mo
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
@@ -64,6 +65,7 @@ const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
+const appContextStore = useAppContextStore();
 const router = useRouter();
 
 const storeState = reactive({
@@ -317,8 +319,11 @@ const fetchCostQuerySet = async () => {
     state.loading = false;
 })();
 
-watch(() => costDataSourceReferenceStore.getters.hasLoaded, (hasLoaded) => {
-    if (hasLoaded) fetchCostQuerySet();
+watch([
+    () => costDataSourceReferenceStore.getters.hasLoaded,
+    () => appContextStore.getters.globalGrantLoading,
+], ([hasLoaded, loading]) => {
+    if (hasLoaded && !loading) fetchCostQuerySet();
 }, { immediate: true });
 </script>
 

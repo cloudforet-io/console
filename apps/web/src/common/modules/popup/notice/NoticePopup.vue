@@ -74,11 +74,12 @@ watch([
     () => state.isSessionExpired,
     () => state.isNoRoleUser,
     () => appContextStore.getters.globalGrantLoading,
-], async ([hasLoaded, isSessionExpired, isNoRoleUser, globalGrantLoading]) => {
+    () => store.getters['user/getCurrentGrantInfo'],
+], async ([hasLoaded, isSessionExpired, isNoRoleUser, globalGrantLoading, grantInfo]) => {
     if (hasLoaded) return;
     if (isNoRoleUser || isSessionExpired) {
         state.popupList = [];
-    } else if (!globalGrantLoading) {
+    } else if (!globalGrantLoading && grantInfo.scope !== 'USER') {
         await getPostList();
         state.hasLoaded = true;
     }

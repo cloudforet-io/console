@@ -24,6 +24,7 @@ import { arrayToQueryString } from '@/lib/router-query-string';
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import {
     gray, peacock, secondary, white,
@@ -243,7 +244,10 @@ const getData = async () => {
 const init = async () => {
     await getData();
 };
-init();
+
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
+
 
 watch([() => chartContext.value, () => state.chartData], ([_chartContext, chartData]) => {
     if (_chartContext && chartData) drawChart();

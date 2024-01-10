@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PTab } from '@spaceone/design-system';
@@ -14,6 +14,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardFavorite
@@ -70,17 +71,15 @@ const handleOverflown = (isOverflown: boolean) => {
     state.isOverflown = isOverflown;
 };
 
-// NOTE: dashboardStore.load() is tightly related to the grant scope. So, we need to wait for the grant scope to be loaded.
-const stopWatch = watch(() => appContextStore.getters.globalGrantLoading, async (globalGrantLoading) => {
-    if (!globalGrantLoading) {
-        // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
-        await Promise.allSettled([
-            store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-            dashboardStore.load(),
-        ]);
-        stopWatch();
-    }
-});
+const init = async () => {
+    await Promise.allSettled([
+        store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+        dashboardStore.load(),
+    ]);
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], init);
+callApiWithGrantGuard();
+
 </script>
 
 <template>
