@@ -62,6 +62,8 @@
 </template>
 
 <script setup lang="ts">
+import type { LocaleMessage } from 'vue-i18n';
+
 import { PTooltip, PI } from '@spaceone/design-system';
 
 
@@ -69,7 +71,7 @@ import { JOB_STATE } from '@/services/asset-inventory/constants/collector-consta
 
 interface Props {
     to: string | object,
-    contents?: string,
+    contents?: string|LocaleMessage,
     status?: string,
     isArrow?: boolean,
     tooltipPosition?: string,
