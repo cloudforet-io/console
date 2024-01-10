@@ -171,11 +171,11 @@ watch(() => props.visible, (visible) => {
                 <div class="theme-wrapper">
                     <button v-for="(theme, idx) in state.themes"
                             :key="`${theme}-${idx}`"
-                            :class="{'logo-button': true, 'selected': state.selectedTheme === theme, [`border-${theme}-600`]: state.selectedTheme === theme}"
+                            :class="{'logo-button': true, 'selected': state.selectedTheme === theme}"
                             @click="handleClickTheme(theme)"
                     >
                         <div v-show="state.selectedTheme === theme"
-                             :class="{'background-area': true, [`border-${theme}-200`]: state.selectedTheme === theme}"
+                             class="background-area"
                         />
                         <workspace-logo-icon :theme="theme"
                                              text="A"
@@ -200,11 +200,11 @@ watch(() => props.visible, (visible) => {
             height: 3.375rem;
             border-radius: 0.5rem;
             &.selected {
-                @apply border-2;
+                @apply border-2 border-blue-600;
             }
 
             .background-area {
-                @apply absolute border-2;
+                @apply absolute border-2 border-blue-200;
                 width: 3.625rem;
                 height: 3.625rem;
                 top: -0.25rem;
