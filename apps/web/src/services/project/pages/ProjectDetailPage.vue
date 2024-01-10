@@ -167,17 +167,15 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
             projectDetailPageStore.getAlertCounts(projectId),
         ]);
     }
-}, { immediate: true });
+});
 
 watch(() => route.name, () => {
     const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
     singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
 }, { immediate: true });
 
-watch(() => props.id, (after, before) => {
-    if (after !== before) {
-        projectDetailPageStore.setProjectId(after);
-    }
+watch(() => props.id, (id) => {
+    projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
 onUnmounted(() => {
