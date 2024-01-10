@@ -11,6 +11,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
 import WorkspacesCreateModal from '@/services/administration/components/WorkspacesCreateModal.vue';
@@ -99,11 +101,14 @@ const handleSelectAction = (name: string) => {
     }
 };
 
+
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN'], refreshWorkspaceList);
+callApiWithGrantGuard();
+
 onMounted(() => {
     if (route.query.hasNoWorkpspace === 'true') {
         handleCreateWorkspace();
     }
-    refreshWorkspaceList();
 });
 
 onUnmounted(() => {
