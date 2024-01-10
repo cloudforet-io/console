@@ -8,6 +8,7 @@ import {
     PDefinitionTable, PHeading, PI, PStatus,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
+import { cloneDeep } from 'lodash';
 
 import { iso8601Formatter } from '@cloudforet/utils';
 
@@ -24,9 +25,12 @@ import {
     useRoleFormatter,
     userStateFormatter,
 } from '@/services/administration/composables/refined-table-data';
+import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { ModalSettingState } from '@/services/administration/types/user-type';
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'refresh', id: string): void }>();
 
@@ -84,6 +88,56 @@ const tableState = reactive({
     }),
 });
 
+/* Component */
+const handleClickButton = (type: string) => {
+    switch (type) {
+    case USER_MODAL_TYPE.DISABLE: updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        themeColor: 'alert',
+        statusVisible: true,
+    }); break;
+    case USER_MODAL_TYPE.ENABLE: updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        themeColor: 'primary',
+        statusVisible: true,
+    }); break;
+    case USER_MODAL_TYPE.REMOVE: updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+        themeColor: 'alert',
+        statusVisible: true,
+    }); break;
+    case USER_MODAL_TYPE.DELETE: updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        themeColor: 'alert',
+        statusVisible: true,
+    }); break;
+    case USER_MODAL_TYPE.UPDATE: updateModalSettings({
+        type,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        themeColor: 'primary',
+        formVisible: true,
+    }); break;
+    default: break;
+    }
+};
+const updateModalSettings = ({
+    type, title, themeColor, statusVisible, addVisible, formVisible,
+}: ModalSettingState) => {
+    userPageStore.$patch((_state) => {
+        _state.modal.type = type;
+        _state.modal.title = title;
+        _state.modal.themeColor = themeColor;
+        _state.modal.visible.status = statusVisible ?? false;
+        _state.modal.visible.add = addVisible ?? false;
+        _state.modal.visible.form = formVisible ?? false;
+        _state.modal = cloneDeep(_state.modal);
+    });
+};
+
 /* API */
 const handleClickVerifyButton = async () => {
     state.verifyEmailLoading = true;
@@ -104,10 +158,50 @@ const handleClickVerifyButton = async () => {
 </script>
 
 <template>
-    <div>
+    <div class="user-management-tab-detail">
         <p-heading heading-type="sub"
                    :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
-        />
+        >
+            <template #extra>
+                <div class="toolbox-wrapper">
+                    <div v-if="userPageState.isAdminMode"
+                         class="toolbox"
+                    >
+                        <p-button v-if="tableState.refinedUserItems.state === 'ENABLED'"
+                                  style-type="tertiary"
+                                  @click="handleClickButton(USER_MODAL_TYPE.DISABLE)"
+                        >
+                            {{ $t('IAM.USER.MAIN.DISABLE') }}
+                        </p-button>
+                        <p-button v-else
+                                  style-type="tertiary"
+                                  @click="handleClickButton(USER_MODAL_TYPE.ENABLE)"
+                        >
+                            {{ $t('IAM.USER.MAIN.ENABLE') }}
+                        </p-button>
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_edit"
+                                  @click="handleClickButton(USER_MODAL_TYPE.UPDATE)"
+                        >
+                            <span class="button-label">{{ $t('IAM.USER.MAIN.EDIT') }}</span>
+                        </p-button>
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_delete"
+                                  @click="handleClickButton(USER_MODAL_TYPE.DELETE)"
+                        >
+                            <span class="button-label">{{ $t('IAM.USER.MAIN.DELETE') }}</span>
+                        </p-button>
+                    </div>
+                    <p-button v-else-if="userPageStore.isWorkspaceOwner"
+                              style-type="tertiary"
+                              :disabled="userPageStore.selectedUsers.length === 0"
+                              @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
+                    >
+                        {{ $t('IAM.USER.REMOVE') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading>
         <p-definition-table :fields="tableState.fields"
                             :data="tableState.refinedUserItems"
                             :loading="state.loading"
@@ -202,54 +296,66 @@ const handleClickVerifyButton = async () => {
 </template>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-definition */
-:deep(.p-definition) {
-    height: 2.25rem;
-    .value-wrapper {
-        @apply items-center;
-        padding: 0 1rem;
-        .extra {
-            @apply flex items-center;
-            max-height: 100%;
-            .verify-button-wrapper {
-                height: 1.5rem;
-            }
-        }
-        .p-copy-button {
-            @apply flex items-center;
-            gap: 0.25rem;
-            .copy-text {
-                margin: 0;
+.user-management-tab-detail {
+    .toolbox-wrapper {
+        .toolbox {
+            @apply flex ;
+            gap: 0.5rem;
+            .button-label {
+                line-height: 1rem;
             }
         }
     }
-}
-.user-definition-table {
-    .col-email {
-        @apply relative;
-        .not-verified {
-            @apply absolute bg-yellow-200 text-label-sm;
-            height: 1.25rem;
-            padding: 0.15rem 0.5rem;
-            border-radius: 6.25rem;
-            right: -7rem;
-        }
-        .verified-text {
-            margin-left: 1.5rem;
-        }
-        .verified-icon {
-            @apply absolute;
-            bottom: -0.025rem;
-            left: 0;
+
+    /* custom design-system component - p-definition */
+    :deep(.p-definition) {
+        height: 2.25rem;
+        .value-wrapper {
+            @apply items-center;
+            padding: 0 1rem;
+            .extra {
+                @apply flex items-center;
+                max-height: 100%;
+                .verify-button-wrapper {
+                    height: 1.5rem;
+                }
+            }
+            .p-copy-button {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .copy-text {
+                    margin: 0;
+                }
+            }
         }
     }
-    .role-type {
-        @apply flex items-center;
-        gap: 0.5rem;
-        .role-type-icon {
-            @apply rounded-full;
-            width: 1rem;
-            height: 1rem;
+    .user-definition-table {
+        .col-email {
+            @apply relative;
+            .not-verified {
+                @apply absolute bg-yellow-200 text-label-sm;
+                height: 1.25rem;
+                padding: 0.15rem 0.5rem;
+                border-radius: 6.25rem;
+                right: -7rem;
+            }
+            .verified-text {
+                margin-left: 1.5rem;
+            }
+            .verified-icon {
+                @apply absolute;
+                bottom: -0.025rem;
+                left: 0;
+            }
+        }
+        .role-type {
+            @apply flex items-center;
+            gap: 0.5rem;
+            .role-type-icon {
+                @apply rounded-full;
+                width: 1rem;
+                height: 1rem;
+            }
         }
     }
 }
