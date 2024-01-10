@@ -13,8 +13,6 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ROOT_ROUTE } from '@/router/constant';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -26,6 +24,8 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 interface Props {
     isAdminMode: boolean;
@@ -87,7 +87,7 @@ const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
         appContextStore.enterAdminMode();
-        router.push(getProperRouteLocation({ name: ROOT_ROUTE.ADMIN._NAME }));
+        router.push(getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME }));
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
