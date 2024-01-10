@@ -20,6 +20,7 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -47,6 +48,7 @@ const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
 
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
@@ -174,8 +176,11 @@ watch(() => route.name, () => {
     singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
 }, { immediate: true });
 
-watch(() => props.id, (id) => {
-    projectDetailPageStore.setProjectId(id);
+watch([
+    () => props.id,
+    () => appContextStore.getters.globalGrantLoading,
+], ([id, globalGrantLoading]) => {
+    if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
 onUnmounted(() => {
