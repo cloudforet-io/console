@@ -350,13 +350,24 @@ watch(() => props.cloudServiceId, async (after, before) => {
 </template>
 
 <style scoped lang="postcss">
-/* custom design-system component - p-toolbox-table */
+/* custom design-system component - p-dynamic-layout-query-search-table */
 .dynamic-layout-wrapper {
     :deep(.p-dynamic-layout-query-search-table) {
         .p-toolbox-table {
             border-width: 0;
             .table-container {
                 min-height: 200px;
+            }
+        }
+    }
+
+    /* custom design-system component - p-definition-table */
+    :deep(.p-definition-table) {
+        min-height: initial;
+        .p-definition {
+            td.key {
+                min-width: 22rem;
+                width: 22rem;
             }
         }
     }

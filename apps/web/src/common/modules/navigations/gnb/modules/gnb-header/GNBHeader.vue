@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PTooltip,
+    PSelectDropdown, PTooltip, PI,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { clone } from 'lodash';
@@ -51,12 +51,6 @@ const state = reactive({
             { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
             { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
         ];
-        const allWorkspacesMenu: SelectDropdownMenuItem[] = [
-            { type: 'divider', name: '' } as SelectDropdownMenuItem,
-            {
-                type: 'item', name: 'all_workspaces', label: i18n.t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES'), icon: 'ic_list-card',
-            } as SelectDropdownMenuItem,
-        ];
         state.workspaceList.forEach((_workspace) => {
             if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
                 menuList.push({
@@ -75,7 +69,7 @@ const state = reactive({
             }
             return menuList;
         });
-        return [...menuList, ...(state.isDomainAdmin ? allWorkspacesMenu : [])];
+        return [...menuList];
     }),
     searchText: '',
 });
@@ -149,6 +143,16 @@ const selectWorkspace = (name: string): void => {
                     </span>
                 </p-tooltip>
             </template>
+            <template #menu-bottom>
+                <div class="all-workspace">
+                    <p-i name="ic_list-card"
+                         height="1rem"
+                         width="1rem"
+                         class="verified-icon"
+                    />
+                    <span>{{ $t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES') }}</span>
+                </div>
+            </template>
             <!--            <template #menu-item&#45;&#45;format="{ item }">-->
             <!--                <span class="menu-wrapper">-->
             <!--                    <span v-if="item.name === state.selectedWorkspace?.workspace_id"-->
@@ -220,6 +224,22 @@ const selectWorkspace = (name: string): void => {
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
             min-width: 12rem !important;
+            .menu-container {
+                padding-bottom: 2.25rem;
+            }
+            .bottom-slot-area {
+                padding: 0;
+            }
+            .all-workspace {
+                @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+                padding-left: 0.5rem;
+                gap: 0.25rem;
+            }
         }
 
         .selected-workspace {

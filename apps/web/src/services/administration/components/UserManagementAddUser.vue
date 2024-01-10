@@ -132,7 +132,7 @@ const clickOutside = () => {
     }
 };
 const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
-    state.selectedItems.push(menuItem);
+    state.selectedItems.unshift(menuItem);
     await hideMenu();
 };
 const initAuthTypeList = async () => {
@@ -144,7 +144,7 @@ const initAuthTypeList = async () => {
     }
 };
 const addSelectedItem = (isNew: boolean) => {
-    state.selectedItems.push({
+    state.selectedItems.unshift({
         user_id: formState.searchText,
         label: formState.searchText,
         name: formState.searchText,

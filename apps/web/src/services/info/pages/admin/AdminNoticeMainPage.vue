@@ -3,7 +3,7 @@
         <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
                 <p-button v-if="hasDomainRoleUser"
-                          style-type="secondary"
+                          style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateNotice"
                 >
