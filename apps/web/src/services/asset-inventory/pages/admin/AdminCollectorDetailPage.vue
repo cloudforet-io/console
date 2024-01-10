@@ -182,7 +182,7 @@ const state = reactive({
     editModalVisible: false,
 });
 
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME) });
 
 defineExpose({ setPathFrom });
 
