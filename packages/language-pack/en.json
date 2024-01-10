@@ -1253,7 +1253,7 @@
 			"RESOURCE_BY_REGION_SERVER": "Server",
 			"RESOURCE_BY_REGION_TITLE": "Resources By Region",
 			"RESOURCE_MAP": {
-				"NO_REGION": "No Region."
+				"NO_REGION": "No Region"
 			},
 			"RUN_COLLECTOR": "Run Collectors",
 			"RUN_COLLECTOR_COLLECTOR": "Collector",
