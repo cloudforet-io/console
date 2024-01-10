@@ -13,6 +13,8 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -101,6 +103,9 @@ const selectWorkspace = (name: string): void => {
     }
 };
 
+const handleClickAllWorkspace = () => {
+    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) });
+};
 </script>
 
 <template>
@@ -144,7 +149,9 @@ const selectWorkspace = (name: string): void => {
                 </p-tooltip>
             </template>
             <template #menu-bottom>
-                <div class="all-workspace">
+                <div class="all-workspace"
+                     @click="handleClickAllWorkspace"
+                >
                     <p-i name="ic_list-card"
                          height="1rem"
                          width="1rem"
@@ -231,7 +238,7 @@ const selectWorkspace = (name: string): void => {
                 padding: 0;
             }
             .all-workspace {
-                @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t;
+                @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t cursor-pointer;
                 bottom: 0;
                 left: 0;
                 width: 100%;
