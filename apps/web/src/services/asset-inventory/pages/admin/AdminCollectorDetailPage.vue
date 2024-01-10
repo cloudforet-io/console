@@ -115,6 +115,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
@@ -158,6 +159,8 @@ watch(() => collectorFormState.originCollector, async (collector) => {
     }
 });
 
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
@@ -182,7 +185,7 @@ const state = reactive({
     editModalVisible: false,
 });
 
-const { setPathFrom, handleClickBackButton } = useGoBack({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
+const { setPathFrom, handleClickBackButton } = useGoBack({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME) });
 
 defineExpose({ setPathFrom });
 
@@ -205,9 +208,9 @@ const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? Space
 }) : undefined);
 
 const goBackToMainPage = () => {
-    SpaceRouter.router.push({
+    SpaceRouter.router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-    });
+    }));
 };
 
 const handleClickEditButton = () => {
