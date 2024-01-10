@@ -66,7 +66,7 @@ const onClickConfirm = async () => {
 
 watch(() => alertPageState.alertData?.title, (alertTitle) => {
     if (alertTitle) state.alertTitleInput = alertTitle;
-});
+}, { immediate: true });
 </script>
 
 <template>
