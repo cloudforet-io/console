@@ -68,7 +68,8 @@ const validationState = reactive({
     isAllValid: computed(() => {
         if (props.createType === 'EDIT') {
             const isChanged = state.name !== workspacePageStore.selectedWorkspaces[0].name
-                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description;
+                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description
+                || state.selectedTheme !== workspacePageStore.selectedWorkspaces[0].tags?.theme;
             return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
         }
         return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
