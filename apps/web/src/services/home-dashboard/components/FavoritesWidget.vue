@@ -78,6 +78,8 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>;
 
@@ -127,15 +129,16 @@ export default {
             state.isExpanded = !state.isExpanded;
         };
 
-        /* Init */
-        (async () => {
+        const init = async () => {
             await Promise.allSettled([
                 store.dispatch('reference/cloudServiceType/load'),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
                 store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
             ]);
-        })();
+        };
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+        callApiWithGrantGuard();
 
         return {
             ...toRefs(state),

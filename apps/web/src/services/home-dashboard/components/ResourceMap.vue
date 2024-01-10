@@ -26,6 +26,7 @@ import config from '@/lib/config';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { coral, gray } from '@/styles/colors';
 
@@ -287,7 +288,7 @@ onUnmounted(() => {
     if (state.chart) state.chart.dispose();
 });
 
-(async () => {
+const init = async () => {
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
         store.dispatch('reference/region/load'),
@@ -295,7 +296,11 @@ onUnmounted(() => {
     await getResourceByRegionData();
     initLegends();
     initResourceInfo();
-})();
+};
+
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
+
 </script>
 
 <template>
