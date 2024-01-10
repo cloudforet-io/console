@@ -155,7 +155,7 @@ const handleSelectGNBMenu = (menuId: string) => {
     const selectedRoute = state.invisibleGnbMenuList.find((menu) => menu.id === menuId)?.to;
     const isDuplicatePath = SpaceRouter.router.currentRoute.name === selectedRoute.name;
     if (isDuplicatePath) return;
-    router.push(selectedRoute);
+    router.push(selectedRoute).catch(() => {});
 };
 
 
