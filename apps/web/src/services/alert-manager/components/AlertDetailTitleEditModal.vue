@@ -30,7 +30,7 @@ const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
 
 const state = reactive({
-    loading: true,
+    loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
     alertTitleInput: '',
     nameInvalidText: computed(() => {
