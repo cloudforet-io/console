@@ -1,3 +1,5 @@
+import type { Dictionary, Location } from 'vue-router/types/router';
+
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { ResourceGroupType } from '@/schema/_common/type';
@@ -16,17 +18,17 @@ interface CollectorPlugin {
     info: CollectorPluginInfo;
 }
 
-export interface CollectorLink {
+export interface CollectorLink extends Location {
     name: string;
     params: CollectorDetailLinkParameter;
     query?: CollectorDetailLinkQuery;
 }
 
-interface CollectorDetailLinkParameter {
+interface CollectorDetailLinkParameter extends Dictionary<any> {
     id?: string;
     collectorId?: string;
 }
-interface CollectorDetailLinkQuery {
+interface CollectorDetailLinkQuery extends Dictionary<any> {
     filters: string[];
     collectorId?: string;
 }

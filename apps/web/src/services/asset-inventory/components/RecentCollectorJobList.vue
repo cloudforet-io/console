@@ -10,6 +10,8 @@ import dayjs from 'dayjs';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/components/CollectorJobStatusIcon.vue';
 import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
@@ -27,6 +29,8 @@ interface Props {
     historyLink?: CollectorLink;
     fullMode?: boolean;
 }
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const props = withDefaults(defineProps<Props>(), {
     recentJobs: undefined,
@@ -87,7 +91,7 @@ watch(() => props.recentJobs, () => {
                     size="sm"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     highlight
-                    :to="props.historyLink"
+                    :to="getProperRouteLocation(props.historyLink)"
                     class="view-all-link"
             >
                 View All
@@ -107,13 +111,13 @@ watch(() => props.recentJobs, () => {
                                                class="collector-job-status-icon-wrapper"
                                                :status="job.status"
                                                :contents="handleTooltipContent(job)"
-                                               :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} }"
+                                               :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: job.job_id} })"
                                                :style-type="props.fullMode ? 'white' : 'gray'"
                     />
                 </div>
                 <collector-job-status-icon v-if="state.completedJobs.length > 0 && !props.fullMode && props.historyLink"
                                            is-arrow
-                                           :to="props.historyLink"
+                                           :to="getProperRouteLocation(props.historyLink)"
                                            class="more-button"
                                            :contents="$t('INVENTORY.COLLECTOR.MAIN.VIEW_HISTORY_DETAIL')"
                 />
