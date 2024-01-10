@@ -3,6 +3,8 @@
 </template>
 
 <script lang="ts">
+import type { Vue } from 'vue/types/vue';
+
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -32,7 +34,18 @@ export default {
                         const queryString = locationQueryToString(to.query);
                         link += `?${queryString}`;
                     }
-                    next(link);
+                    next((vm: Vue) => {
+                        const targetLocation = vm.$router.match(link);
+                        if (!targetLocation.name) {
+                            ErrorHandler.handleError('Not found page. (CloudServiceTypeSearchPage.vue)');
+                            return;
+                        }
+                        vm.$router.replace({
+                            name: targetLocation.name,
+                            params: targetLocation.params,
+                            query: targetLocation.query,
+                        });
+                    });
                 }
             } catch (e) {
                 ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));

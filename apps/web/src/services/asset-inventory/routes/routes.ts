@@ -29,7 +29,6 @@ const CreateCollectorPage = () => import('@/services/asset-inventory/pages/Colle
 const ServiceAccountPage = () => import('@/services/asset-inventory/pages/ServiceAccountPage.vue');
 const ServiceAccountDetailPage = () => import('@/services/asset-inventory/pages/ServiceAccountDetailPage.vue');
 const ServiceAccountAddPage = () => import('@/services/asset-inventory/pages/ServiceAccountAddPage.vue');
-const ServiceAccountSearchPage = () => import('@/services/asset-inventory/pages/ServiceAccountSearchPage.vue');
 
 const CollectorHistoryPage = () => import('@/services/asset-inventory/pages/CollectorHistoryPage.vue');
 const CollectJobPage = () => import('@/services/asset-inventory/pages/CollectHistoryJobPage.vue');
@@ -162,12 +161,6 @@ const assetInventoryRoute: RouteConfig = {
                     meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, copiable: true },
                     props: true,
                     component: ServiceAccountDetailPage,
-                },
-                {
-                    path: 'search/:id',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
-                    props: true,
-                    component: ServiceAccountSearchPage,
                 },
                 {
                     path: 'add/:provider/:serviceAccountType',

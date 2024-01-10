@@ -19,11 +19,10 @@
                 <template #col-event-format="{ index, value }">
                     <div class="col-event">
                         <span class="event-name">
-                            <router-link :to="value.to"
-                                         class="link-text"
-                            >
-                                <span>{{ value?.name }}</span>
-                            </router-link>
+                            <p-link :to="value.to"
+                                    class="link-text"
+                                    :text="value?.name"
+                            />
                         </span>
                         <span class="event-time"
                               :class="{ 'show-all': data[index].showAll }"
@@ -101,7 +100,7 @@ import {
 } from 'vue';
 
 import {
-    PDataTable, PI, PEmpty, PDataLoader,
+    PDataTable, PI, PEmpty, PDataLoader, PLink,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
@@ -136,6 +135,7 @@ export default {
         WidgetLayout,
         PEmpty,
         PDataLoader,
+        PLink,
     },
     props: {
         extraParams: {
