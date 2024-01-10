@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
@@ -101,9 +102,8 @@ const init = async () => {
     await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     state.loading = false;
 };
-(async () => {
-    await init();
-})();
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
 
 </script>
 
