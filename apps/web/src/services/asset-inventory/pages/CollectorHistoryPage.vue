@@ -236,7 +236,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
         />
         <div class="collector-history-table">
             <div class="status-wrapper">
-                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}</span>
                 <p-select-button-group class="select-button-group"
                                        :buttons="statusList"
                                        :selected.sync="state.selectedStatus"
@@ -321,21 +321,25 @@ watch(() => state.selectedStatus, (selectedStatus) => {
         @apply bg-white border border-gray-200 rounded-lg;
         margin-top: 1rem;
         .status-wrapper {
-            display: flex;
-            align-items: center;
+            @apply flex items-center;
             margin-left: 1rem;
             margin-top: 1.5rem;
+            gap: 1rem;
             .label {
                 font-size: 0.875rem;
                 font-weight: bold;
                 line-height: 1.5;
-                padding-right: 1rem;
             }
 
             /* custom design-system component - p-select-button-group */
             :deep(.select-button-group) {
                 .button-group {
-                    display: flex;
+                    @apply flex;
+                    gap: 1rem;
+                    .select-button {
+                        padding: 0;
+                        margin-right: 0;
+                    }
                 }
             }
         }

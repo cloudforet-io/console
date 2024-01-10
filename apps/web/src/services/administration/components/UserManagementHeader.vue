@@ -68,7 +68,7 @@ const updateModalSettings = ({
                               icon-left="ic_plus_bold"
                               @click="handleClickButton(USER_MODAL_TYPE.ADD)"
                     >
-                        {{ $t('IAM.USER.ADD') }}
+                        <span class="button-label">{{ $t('IAM.USER.ADD') }}</span>
                     </p-button>
                     <div v-else-if="userPageStore.isWorkspaceOwner"
                          class="toolbox"
@@ -97,6 +97,9 @@ const updateModalSettings = ({
         .toolbox {
             @apply flex ;
             gap: 1rem;
+        }
+        .button-label {
+            line-height: 1rem;
         }
     }
 }
