@@ -45,6 +45,7 @@ interface Props {
     serviceAccountId?: string;
     serviceAccountType: AccountType;
     serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
+    serviceAccountLoading: boolean;
     projectId?: string;
     attachedTrustedAccountId?: string;
     editable: boolean;
@@ -56,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
     serviceAccountId: undefined,
     serviceAccountType: ACCOUNT_TYPE.GENERAL,
     serviceAccountData: undefined,
+    serviceAccountLoading: true,
     projectId: undefined,
     attachedTrustedAccountId: undefined,
     editable: false,
@@ -196,7 +198,7 @@ const getSecretData = async () => {
 };
 
 watch(() => props.serviceAccountData, async (serviceAccountData) => {
-    if (serviceAccountData) {
+    if (serviceAccountData && !props.serviceAccountLoading) {
         await getSecretData();
         if (state.credentialData) await getSecretSchema();
     }
@@ -240,7 +242,7 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
             <service-account-credentials-detail v-show="state.mode === 'READ'"
                                                 :credential-data="state.credentialData"
                                                 :attached-trusted-account-id="props.attachedTrustedAccountId"
-                                                :loading="state.loading"
+                                                :loading="props.serviceAccountLoading || state.loading"
                                                 :has-manage-permission="hasManagePermission"
                                                 @edit="handleClickEditButton"
             />
