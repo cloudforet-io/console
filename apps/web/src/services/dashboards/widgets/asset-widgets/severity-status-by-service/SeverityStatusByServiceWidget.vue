@@ -122,6 +122,7 @@ const refineData = (data?: Data[]): RefinedData[] => {
     if (!data?.length) return [];
     const refinedData: RefinedData[] = [];
     data.forEach((d) => {
+        if (!d.service) return;
         const status = _getStatus(d.status);
         const severity = _getSeverity(d.severity, status);
         const value: number = status === 'FAIL' ? d.fail_finding_count : d.pass_finding_count;
