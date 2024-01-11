@@ -9,6 +9,8 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { locationQueryToString } from '@/lib/router-query-string';
@@ -16,13 +18,20 @@ import { locationQueryToString } from '@/lib/router-query-string';
 import { NoSearchResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 const DEFAULT_URL = '/asset-inventory/cloud-service';
-const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 
 export default {
     name: 'CloudServiceTypeSearch',
     beforeRouteEnter(to, from, next) {
         const userWorkspaceStore = useUserWorkspaceStore();
+        const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
+        if (!currentWorkspaceId) {
+            ErrorHandler.handleError('Not found workspace id. (CloudServiceTypeSearchPage.vue)');
+            next({ name: ROOT_ROUTE._NAME });
+            return;
+        }
         (async () => {
             try {
                 const result = await SpaceConnector.client.addOns.pageDiscovery.get({
@@ -30,7 +39,12 @@ export default {
                     search: to.params.id,
                 });
                 if (result.url === DEFAULT_URL || userWorkspaceStore.getters.currentWorkspaceId === undefined) {
-                    ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
+                    ErrorHandler.handleError(new NoSearchResourceError({
+                        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
+                        params: {
+                            workspaceId: currentWorkspaceId,
+                        },
+                    }));
                 } else {
                     let link = `${userWorkspaceStore.getters.currentWorkspaceId}${result.url}`;
                     if (!isEmpty(to.query)) {
@@ -51,7 +65,12 @@ export default {
                     });
                 }
             } catch (e) {
-                ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
+                ErrorHandler.handleError(new NoSearchResourceError({
+                    name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
+                    params: {
+                        workspaceId: currentWorkspaceId,
+                    },
+                }));
             }
         })();
     },
