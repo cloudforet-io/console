@@ -2,6 +2,8 @@
     <div />
 </template>
 <script lang="ts">
+import type { Vue } from 'vue/types/vue';
+
 import { isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -30,7 +32,7 @@ export default {
                     search: to.params.id,
                     search_key: to.params.searchKey,
                 });
-                if (result.url === DEFAULT_URL) {
+                if (result.url === DEFAULT_URL || userWorkspaceStore.getters.currentWorkspaceId === undefined) {
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
                     queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '' }]);
@@ -39,7 +41,18 @@ export default {
                         const queryString = locationQueryToString(to.query);
                         link += `&${queryString}`;
                     }
-                    next(link);
+                    next((vm: Vue) => {
+                        const targetLocation = vm.$router.match(link);
+                        if (!targetLocation.name) {
+                            ErrorHandler.handleError('Not found page. (CloudServiceSearchPage.vue)');
+                            return;
+                        }
+                        vm.$router.replace({
+                            name: targetLocation.name,
+                            params: targetLocation.params,
+                            query: targetLocation.query,
+                        });
+                    });
                 }
             } catch (e) {
                 ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
