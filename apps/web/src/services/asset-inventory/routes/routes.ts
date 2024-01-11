@@ -156,6 +156,12 @@ const assetInventoryRoute: RouteConfig = {
                     component: ServiceAccountPage as any,
                 },
                 {
+                    path: 'no-resource',
+                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
+                    component: NoResourcePage as any,
+                },
+                {
                     path: ':serviceAccountId',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                     meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, copiable: true },
@@ -173,12 +179,6 @@ const assetInventoryRoute: RouteConfig = {
                     },
                     props: true,
                     component: ServiceAccountAddPage as any,
-                },
-                {
-                    path: 'no-resource',
-                    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
-                    component: NoResourcePage as any,
                 },
             ],
         },
