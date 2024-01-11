@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 import type { RouteConfig } from 'vue-router';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
@@ -12,8 +12,12 @@ import { i18n } from '@/translations';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 const route = useRoute();
+const router = useRouter();
 const state = reactive({
-    serviceRoute: computed(() => route.matched[route.matched.length - 2]),
+    serviceRoute: computed(() => {
+        const targetLocation = router.match(route.matched[route.matched.length - 2]);
+        return targetLocation;
+    }),
     mainLabel: computed(() => {
         const meta: RouteConfig['meta'] = state.serviceRoute.meta;
         if (!meta) return '';
@@ -41,7 +45,7 @@ const state = reactive({
                 <p class="error-message">
                     {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}
                 </p>
-                <router-link :to="state.serviceRoute.path">
+                <router-link :to="{name:state.serviceRoute.name}">
                     <p-button style-type="primary"
                               class="redirect-button"
                     >

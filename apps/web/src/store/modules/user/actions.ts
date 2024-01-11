@@ -87,7 +87,7 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
     return decodedToken.rol;
 };
-export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     const appContextStore = useAppContextStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
@@ -115,6 +115,10 @@ export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest
 
             if (grantRequest.scope === 'WORKSPACE' && grantRequest.workspace_id) {
                 await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
+            }
+
+            if (roleInfo) {
+                await dispatch('reference/initializeAllReference', {}, { root: true });
             }
         }
     } catch (error) {

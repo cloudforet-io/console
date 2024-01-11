@@ -10,6 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -69,7 +70,7 @@ const fetchData = async (): Promise<Data[]> => {
             .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                group_by: ['data.service'],
+                group_by: [ASSET_DATA_FIELD_MAP.SERVICE.name],
                 fields: {
                     pass_finding_count: {
                         key: 'data.stats.findings.pass',

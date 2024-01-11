@@ -38,7 +38,7 @@ const state = reactive({
     loading: true,
     hasManagePermission: useManagePermissionState(),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    showNotification: computed<boolean>(() => !!(state.budgetData?.resource_group === 'WORKSPACE' && store.getters['user/isDomainAdmin'])),
+    isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
         name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
         params: {
@@ -66,13 +66,15 @@ const state = reactive({
 <template>
     <div>
         <portal to="page-top-notification">
-            <scoped-notification v-if="state.showNotification"
+            <scoped-notification v-if="state.isWorkspaceTarget"
                                  :title="i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PAGE_NOTIFICATION')"
                                  title-icon="ic_info-circle"
                                  type="info"
                                  hide-header-close-button
             >
-                <template #right>
+                <template v-if="store.getters['user/isDomainAdmin']"
+                          #right
+                >
                     <p-link class="notification-link"
                             :action-icon="ACTION_ICON.INTERNAL_LINK"
                             highlight
@@ -91,7 +93,8 @@ const state = reactive({
                 :budget-loading="state.loading"
                 class="summary"
             />
-            <budget-detail-notifications class="alert"
+            <budget-detail-notifications v-if="!state.isWorkspaceTarget"
+                                         class="alert"
                                          :manage-disabled="!state.hasManagePermission"
                                          :currency="state.budgetData?.currency"
             />
