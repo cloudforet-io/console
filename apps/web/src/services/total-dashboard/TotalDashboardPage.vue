@@ -61,9 +61,6 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                     >
-                        <favorites-widget class="hidden lg:block col-span-12"
-                                          :extra-params="extraParams"
-                        />
                         <daily-updates class="col-span-12 daily-updates"
                                        :extra-params="extraParams"
                         />
@@ -109,7 +106,6 @@ import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
 import AllSummary from '@/services/home-dashboard/components/AllSummary.vue';
 import CollectorProgress from '@/services/home-dashboard/components/CollectingProgress.vue';
-import FavoritesWidget from '@/services/home-dashboard/components/FavoritesWidget.vue';
 import PersonalHealthDashboard from '@/services/home-dashboard/components/PersonalHealthDashboard.vue';
 import ResourceMap from '@/services/home-dashboard/components/ResourceMap.vue';
 import ServiceAccounts from '@/services/home-dashboard/components/ServiceAccounts.vue';
@@ -131,7 +127,6 @@ export default {
         PersonalHealthDashboard,
         TrustedAdvisor,
         TopProjects,
-        FavoritesWidget,
         DailyUpdates,
         ServiceAccounts,
         CollectorProgress,
