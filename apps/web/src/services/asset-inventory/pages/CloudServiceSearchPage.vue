@@ -32,7 +32,7 @@ export default {
                     search: to.params.id,
                     search_key: to.params.searchKey,
                 });
-                if (result.url === DEFAULT_URL) {
+                if (result.url === DEFAULT_URL || userWorkspaceStore.getters.currentWorkspaceId === undefined) {
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
                     queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '' }]);

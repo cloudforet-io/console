@@ -9,6 +9,8 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { locationQueryToString } from '@/lib/router-query-string';
 
 import { NoSearchResourceError } from '@/common/composables/error/error';
@@ -20,16 +22,17 @@ const ERROR_URL = '/asset-inventory/cloud-service/no-resource';
 export default {
     name: 'CloudServiceTypeSearch',
     beforeRouteEnter(to, from, next) {
+        const userWorkspaceStore = useUserWorkspaceStore();
         (async () => {
             try {
                 const result = await SpaceConnector.client.addOns.pageDiscovery.get({
                     resource_type: 'inventory.CloudServiceType',
                     search: to.params.id,
                 });
-                if (result.url === DEFAULT_URL) {
+                if (result.url === DEFAULT_URL || userWorkspaceStore.getters.currentWorkspaceId === undefined) {
                     ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
-                    let link = result.url;
+                    let link = `${userWorkspaceStore.getters.currentWorkspaceId}${result.url}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);
                         link += `?${queryString}`;
