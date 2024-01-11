@@ -11,7 +11,6 @@ import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { RoleInfo } from '@/store/modules/user/type';
 import { pinia } from '@/store/pinia';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
@@ -25,14 +24,14 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
-const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+const grantAndLoadByCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<void> => {
     const appContextStore = useAppContextStore(pinia);
     const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
     const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
     const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
     if (isDuplicateScope || isDuplicateWorkspace) {
         appContextStore.setGlobalGrantLoading(false);
-        return undefined;
+        return;
     }
 
     const grantRequest = {
@@ -41,13 +40,7 @@ const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?:
         workspace_id: workspaceId,
     };
 
-    await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
-    return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
-};
-const loadAllReferencesByGrantedRoleInfo = async (grantedRoleInfo?: RoleInfo) => {
-    if (grantedRoleInfo) {
-        await SpaceRouter.router.app?.$store.dispatch('reference/initializeAllReference');
-    }
+    await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
 };
 
 export class SpaceRouter {
@@ -123,8 +116,7 @@ export class SpaceRouter {
                     userWorkspaceStore.setCurrentWorkspace(workspaceId);
                 } else scope = 'USER';
 
-                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, workspaceId);
-                await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
+                await grantAndLoadByCurrentScope(scope, refreshToken, workspaceId);
             }
 
             const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
