@@ -51,7 +51,7 @@
         >
             <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
                     size="sm"
-                    :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id} }"
+                    :to="getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id ?? ''} })"
                     highlight
                     action-icon="internal-link"
             />
@@ -66,6 +66,8 @@ import { PI, PProgressBar, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { numberFormatter } from '@cloudforet/utils';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { peacock } from '@/styles/colors';
 
@@ -82,6 +84,8 @@ interface Props {
     isScheduleActivated?: boolean;
     isPopoverMode?: boolean;
 }
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const props = defineProps<Props>();
 
