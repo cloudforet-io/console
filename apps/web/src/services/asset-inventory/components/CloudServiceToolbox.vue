@@ -235,6 +235,9 @@ const handleExport = () => {
     };
     downloadExcelByExportFetcher(excelExportFetcher);
 };
+const handleDeletePeriodFilter = () => {
+    cloudServicePageStore.$patch({ period: undefined });
+};
 
 /* Init */
 (async () => {
@@ -251,7 +254,9 @@ const handleExport = () => {
             <div v-if="cloudServicePageState.period"
                  class="period-wrapper"
             >
-                <cloud-service-period-filter />
+                <cloud-service-period-filter :period="cloudServicePageState.period"
+                                             @delete-period="handleDeletePeriodFilter"
+                />
                 <p-divider vertical />
             </div>
             <div class="filter-wrapper">

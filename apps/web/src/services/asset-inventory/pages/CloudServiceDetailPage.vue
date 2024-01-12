@@ -15,7 +15,6 @@ import type {
     DynamicLayout,
     DynamicLayoutOptions,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
@@ -35,7 +34,7 @@ import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
-import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
+import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -216,7 +215,6 @@ const getQuery = (schema?) => {
     if (fields) {
         apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
     }
-
     return apiQuery.data;
 };
 
@@ -225,12 +223,6 @@ const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalC
     try {
         const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
             query: getQuery(schema),
-            ...(overviewState.period && {
-                date_range: {
-                    start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
-                    end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
-                },
-            }),
         });
 
         // filtering select index
@@ -335,9 +327,9 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
 /* Usage Overview */
-const handlePeriodUpdate = (period?: Period) => {
-    overviewState.period = period;
-    replaceUrlQuery('period', objectToQueryString(period));
+const handleDeletePeriodFilter = () => {
+    overviewState.period = undefined;
+    replaceUrlQuery('period', undefined);
 };
 const handleCustomFieldModalVisibleUpdate = (visible) => {
     tableState.visibleCustomFieldModal = visible;
@@ -390,7 +382,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
         >
             <span class="filter-title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
             <cloud-service-period-filter :period="overviewState.period"
-                                         @update:period="handlePeriodUpdate"
+                                         @delete-period="handleDeletePeriodFilter"
             />
         </div>
         <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT"
