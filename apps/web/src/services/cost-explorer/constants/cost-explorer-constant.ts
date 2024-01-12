@@ -7,6 +7,7 @@ export const GRANULARITY = {
 export const GROUP_BY = {
     WORKSPACE: 'workspace_id',
     PROJECT: 'project_id',
+    PROJECT_GROUP: 'project_group_id',
     PROVIDER: 'provider',
     SERVICE_ACCOUNT: 'service_account_id',
     PRODUCT: 'product',
