@@ -181,6 +181,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
             <service-account-credentials :provider="state.providerKey"
+                                         :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
                                          :service-account-type="state.serviceAccountType"
                                          :service-account-data="state.item"
