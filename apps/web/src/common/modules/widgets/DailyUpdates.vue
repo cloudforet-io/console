@@ -236,8 +236,8 @@ export default {
                 if (props.projectId) params.project_id = props.projectId;
                 const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService({
                     ...props.extraParams,
+                    ...params,
                     workspace_id: state.currentWorkspaceId,
-                    params,
                 });
                 state.cloudServiceData = results;
             } catch (e) {
