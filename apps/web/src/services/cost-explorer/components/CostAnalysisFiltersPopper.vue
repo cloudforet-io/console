@@ -7,7 +7,7 @@ import {
     PSelectDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
@@ -104,8 +104,6 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
 };
 
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
-    if (isEqual(state.selectedItemsMap[groupBy], selectedItems)) return;
-
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
