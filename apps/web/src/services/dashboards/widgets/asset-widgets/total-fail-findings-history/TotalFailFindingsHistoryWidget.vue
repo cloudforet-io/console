@@ -106,14 +106,14 @@ const state = reactive({
         let _dateFormat = 'MMM, YYYY';
         if (widgetState.options.granularity === GRANULARITY.YEARLY) _dateFormat = 'YYYY';
         if (widgetState.options.granularity === GRANULARITY.DAILY) _dateFormat = 'MMM D, YYYY';
-        return dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(_dateFormat);
+        return dayjs.utc(widgetState.dateRange.end).format(_dateFormat);
     }),
     currData: computed<Data>(() => {
-        const currDate = dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(state.dateFormat);
+        const currDate = dayjs.utc(widgetState.dateRange.end).format(state.dateFormat);
         return state.data?.find((d) => d.date === currDate);
     }),
     prevData: computed<Data>(() => {
-        const prevDate = dayjs.utc(widgetState.dateRange.end).subtract(2, state.timeUnit).format(state.dateFormat);
+        const prevDate = dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(state.dateFormat);
         return state.data?.find((d) => d.date === prevDate);
     }),
     currTotalCount: computed<number>(() => (state.currData?._total_pass_finding_count ?? 0) + (state.currData?._total_fail_finding_count ?? 0)),
