@@ -149,11 +149,11 @@ const fetchTrendData = async (): Promise<Data[]> => {
                 group_by: ['additional_info.severity'],
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.pass_finding_count',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.fail_finding_count',
                         operator: 'sum',
                     },
                 },

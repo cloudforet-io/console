@@ -140,11 +140,11 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
                 end: widgetState.dateRange.end,
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.pass_finding_count',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.fail_finding_count',
                         operator: 'sum',
                     },
                 },
@@ -180,7 +180,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                 group_by: [widgetState.dataField],
                 fields: {
                     value: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.fail_finding_count',
                         operator: 'sum',
                     },
                 },
