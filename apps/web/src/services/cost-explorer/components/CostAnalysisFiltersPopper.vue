@@ -7,7 +7,7 @@ import {
     PSelectDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
@@ -30,6 +30,7 @@ const costAnalysisPageState = costAnalysisPageStore.state;
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
     [GROUP_BY.WORKSPACE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key })],
     [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
+    [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
     [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
     [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
     [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
@@ -49,6 +50,9 @@ const state = reactive({
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
+            // NOTE: only for project group case (not in group by but in filters)
+            if (d === GROUP_BY.PROJECT_GROUP) return { name: d, label: 'Project Group' };
+            // other cases
             const targetItem = costAnalysisPageGetters.defaultGroupByItems.find((item) => item.name === d);
             if (targetItem) return targetItem;
             return { name: d, label: d };
@@ -100,8 +104,6 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
 };
 
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
-    if (isEqual(state.selectedItemsMap[groupBy], selectedItems)) return;
-
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
