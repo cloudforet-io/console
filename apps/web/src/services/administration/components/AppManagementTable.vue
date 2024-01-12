@@ -24,6 +24,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import AppManagementDoubleCheckModal from '@/services/administration/components/AppManagementDoubleCheckModal.vue';
 import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
 import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import {
@@ -130,12 +131,13 @@ const handleSelectDropdown = (name) => {
     case APP_DROPDOWN_MODAL_TYPE.EDIT: clickFormModal({
         name,
         title: i18n.t('IAM.APP.MODAL.EDIT_TITLE') as string,
+        isForm: true,
     });
         break;
-    case APP_DROPDOWN_MODAL_TYPE.DELETE: clickStatusModal({
+    case APP_DROPDOWN_MODAL_TYPE.DELETE: clickFormModal({
         name,
-        title: i18n.t('IAM.APP.MODAL.DELETE_TITLE') as string,
-        theme: 'alert',
+        title: i18n.t('IAM.APP.MODAL.DELETE_TITLE', { app: appPageStore.selectedApp.name }) as string,
+        isForm: false,
     });
         break;
     case APP_DROPDOWN_MODAL_TYPE.REGENERATE: clickStatusModal({
@@ -171,11 +173,12 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     }
     await getListApps();
 };
-const clickFormModal = ({ name, title }) => {
+const clickFormModal = ({ name, title, isForm }) => {
     appPageStore.$patch((_state) => {
         _state.modal.type = name;
         _state.modal.title = title;
-        _state.modal.visible.form = true;
+        _state.modal.visible.form = isForm;
+        _state.modal.visible.doubleCheck = !isForm;
         _state.modal = cloneDeep(_state.modal);
     });
 };
@@ -330,6 +333,7 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
         />
         <app-management-form-modal @confirm="handleConfirmButton" />
         <app-management-status-modal @confirm="handleConfirmButton" />
+        <app-management-double-check-modal @confirm="handleConfirmButton" />
     </section>
 </template>
 

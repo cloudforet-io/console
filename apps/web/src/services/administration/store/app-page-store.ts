@@ -33,6 +33,7 @@ export const useAppPageStore = defineStore('app-page', {
                 form: false,
                 status: false,
                 apiKey: false,
+                doubleCheck: false,
             },
         },
     }),
