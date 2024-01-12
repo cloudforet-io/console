@@ -58,6 +58,9 @@ const handleUpdateDelete = (visible) => {
 const handleConfirmDelete = () => {
     router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }));
 };
+const handleClickBackButton = () => {
+    router.push(getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }));
+};
 </script>
 
 <template>
@@ -65,7 +68,7 @@ const handleConfirmDelete = () => {
         <p-heading :show-back-button="!props.loading"
                    :title="state.budgetData?.name"
                    class="mb-2"
-                   @click-back-button="$router.go(-1)"
+                   @click-back-button="handleClickBackButton"
         >
             <template v-if="!props.loading"
                       #title-right-extra
