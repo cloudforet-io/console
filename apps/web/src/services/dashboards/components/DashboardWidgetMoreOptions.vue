@@ -27,6 +27,16 @@ const state = reactive({
         const properties = widgetFormGetters.widgetConfig?.options_schema?.properties ?? {};
         return Object.entries(properties);
     }),
+    widgetOptionMenuItems: computed<MenuItem[]>(() => {
+        const _refinedMenu = refinedMenu.value.map((d) => {
+            const schemaProperty = widgetFormGetters.widgetConfig?.options_schema?.properties?.[d.name];
+            if (schemaProperty?.fixed || schemaProperty?.readonly) {
+                return { ...d, disabled: true };
+            }
+            return d;
+        });
+        return _refinedMenu;
+    }),
 });
 
 /* refs */
@@ -103,7 +113,7 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
         </p-button>
         <p-context-menu v-show="visibleContextMenu"
                         ref="contextMenuRef"
-                        :menu="refinedMenu"
+                        :menu="state.widgetOptionMenuItems"
                         :selected="selectedOptions"
                         :style="contextMenuStyle"
                         use-fixed-menu-style
