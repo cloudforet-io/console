@@ -57,6 +57,7 @@ import {
 import type { Location } from 'vue-router';
 
 import { PLazyImg, PDivider, PTooltip } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -125,7 +126,12 @@ export default defineComponent<Props>({
                 console.error(new Error(`Invalid cloud service item to generate link: ${item}`));
                 return undefined;
             }
-            cloudServiceDetailQueryHelper.setFilters(cloudServicePageState.searchFilters.filter((f: any) => f.k && ![
+
+            // extract product filter
+            let _searchFilters = cloneDeep(cloudServicePageState.searchFilters);
+            _searchFilters = _searchFilters.filter((d) => d.k !== 'ref_cloud_service_type.service_code');
+
+            cloudServiceDetailQueryHelper.setFilters(_searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
                 'service_code',
