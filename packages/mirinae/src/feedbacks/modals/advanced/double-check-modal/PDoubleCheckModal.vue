@@ -66,7 +66,7 @@ const handleConfirm = () => {
                     <template #label>
                         <i18n path="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC">
                             <template #text>
-                                <strong>[{{ props.verificationText }}]</strong>
+                                <strong>{{ props.verificationText }}</strong>
                             </template>
                         </i18n>
                     </template>
@@ -85,3 +85,12 @@ const handleConfirm = () => {
         </template>
     </p-button-modal>
 </template>
+
+<style lang="postcss" scoped>
+/* custom design-system component - p-field-title */
+:deep(.p-field-title) {
+    .title {
+        @apply font-normal;
+    }
+}
+</style>
