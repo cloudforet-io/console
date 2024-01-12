@@ -15,6 +15,8 @@ import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
@@ -130,7 +132,9 @@ const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit 
             return result;
         }, []);
         return {
-            results: refinedResultsItems,
+            results: refinedResultsItems.length === 0 ? [{
+                label: i18n.t('COMPONENT.CONTEXT_MENU.NO_ITEM'), name: i18n.t('COMPONENT.CONTEXT_MENU.NO_ITEM'), type: 'item', disabled: true,
+            }] : refinedResultsItems,
             totalCount: total_count,
             more: pageLimit - 1 < refinedResultsItems.length,
         };
