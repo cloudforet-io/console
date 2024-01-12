@@ -18,7 +18,6 @@ import {
 import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 
@@ -37,17 +36,18 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    setup() {
-        const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.$state;
-
+    setup(props, { emit }) {
         const state = reactive({
             periodText: computed<string>(() => {
-                if (cloudServicePageState.period?.start) {
-                    const start = dayjs.utc(cloudServicePageState.period.start);
-                    const end = dayjs.utc(cloudServicePageState.period.end);
-                    if (start.isSame(end)) return dayjs.utc(cloudServicePageState.period.start).format('MMM D, YYYY');
+                if (props.period?.start) {
+                    const start = dayjs.utc(props.period.start);
+                    const end = dayjs.utc(props.period.end);
+                    if (start.isSame(end)) return dayjs.utc(props.period.start).format('MMM D, YYYY');
                     return `${start.format('MMM D, YYYY')} ~ ${end.format('MMM D, YYYY')}`;
                 }
                 return '';
@@ -55,7 +55,7 @@ export default defineComponent<Props>({
         });
 
         const handleDeletePeriod = () => {
-            cloudServicePageStore.$patch({ period: undefined });
+            emit('delete-period');
         };
 
         return {
