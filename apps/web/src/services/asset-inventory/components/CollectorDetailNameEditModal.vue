@@ -8,7 +8,9 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <collector-name-form @update-valid="handleUpdateIsValid" />
+            <collector-name-form :loading="state.loading"
+                                 @update-valid="handleUpdateIsValid"
+            />
         </template>
     </p-button-modal>
 </template>
@@ -65,9 +67,9 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         const collector = await fetchUpdateCollectorName();
-        collectorFormStore.setOriginCollector(collector);
         emits('update:visible', false);
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_CHANGE_COLLECTOR_NAME'), '');
+        collectorFormStore.setOriginCollector(collector);
     } catch (e) {
         collectorFormStore.resetName();
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_CHANGE_COLLECTOR_NAME'));

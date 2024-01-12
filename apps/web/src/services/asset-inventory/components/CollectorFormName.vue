@@ -32,6 +32,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
 
+interface Props {
+    loading: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+});
+
 const emits = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
@@ -58,7 +66,7 @@ const {
     name(value: string) {
         if (value.length < 2) {
             return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_MIN');
-        } if (state.collectorNames.includes(value)) {
+        } if (state.collectorNames.includes(value) && !props.loading) {
             return i18n.t('INVENTORY.COLLECTOR.CREATE.NAME_INVALID_DUPLICATED');
         }
         return '';
