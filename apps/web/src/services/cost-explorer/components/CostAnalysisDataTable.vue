@@ -217,9 +217,9 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     }
 
     if (typeof item.product === 'string') {
-        filters.push({ k: 'service_code', v: item.product, o: '=' });
+        filters.push({ k: 'ref_cloud_service_type.service_code', v: item.product, o: '=' });
     } else if (costAnalysisPageState.filters?.product?.length) {
-        filters.push({ k: 'service_code', v: costAnalysisPageState.filters.product, o: '=' });
+        filters.push({ k: 'ref_cloud_service_type.service_code', v: costAnalysisPageState.filters.product, o: '=' });
     }
 
     return {
