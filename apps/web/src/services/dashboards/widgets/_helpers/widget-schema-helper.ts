@@ -1,5 +1,5 @@
 import {
-    chain, get, union,
+    chain, get,
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
@@ -84,9 +84,12 @@ export const getInitialSchemaProperties = (
 
 export const getRefinedSchemaProperties = (
     storedProperties: string[],
-    initialProperties: string[],
     widgetOptions?: WidgetOptions,
+    inheritOptions?: InheritOptions,
 ): string[] => {
-    const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
-    return union(initialProperties, optionExistProperties);
+    const optionExistProperties = storedProperties.filter((property) => {
+        if (inheritOptions?.[property]?.enabled) return true;
+        return !!get(widgetOptions, property);
+    });
+    return optionExistProperties;
 };
