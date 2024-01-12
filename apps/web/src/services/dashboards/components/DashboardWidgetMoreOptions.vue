@@ -7,7 +7,7 @@ import {
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
-import { chain, isEqual } from 'lodash';
+import { chain, cloneDeep, isEqual } from 'lodash';
 
 import type { WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
 
@@ -65,6 +65,20 @@ const {
     menu: optionsMenuItems,
 });
 
+const handleSelectWidgetOption = (selected: MenuItem, index: number, isSelected: boolean) => {
+    // only manage delete case
+    if (!isSelected) {
+        const _widgetOptions = cloneDeep(widgetFormState.widgetOptions);
+        const propertyName = selected.name;
+        const dataName = propertyName.replace('filters.', '');
+        if (propertyName.startsWith('filters.')) {
+            delete _widgetOptions.filters?.[dataName];
+        } else {
+            delete _widgetOptions[propertyName];
+        }
+        widgetFormStore.updateOptions(_widgetOptions);
+    }
+};
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
     const order = widgetFormGetters.widgetConfig?.options_schema?.order ?? [];
     const schemaProperties = widgetFormGetters.widgetConfig?.options_schema?.properties ?? {};
@@ -121,6 +135,7 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
                         item-height-fixed
                         show-select-marker
                         :reset-selected-on-unmounted="false"
+                        @select="handleSelectWidgetOption"
                         @update:selected="handleUpdateSelectedOptions"
         />
     </div>
