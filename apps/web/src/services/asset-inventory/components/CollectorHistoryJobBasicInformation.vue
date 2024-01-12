@@ -59,6 +59,8 @@ import { store } from '@/store';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 
@@ -69,6 +71,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     job: undefined,
 });
+
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
@@ -81,12 +85,12 @@ const state = reactive({
         return {
             id,
             label: storeState.collectors[id]?.label || id,
-            linkLocation: {
+            linkLocation: getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                 params: {
                     collectorId: id,
                 },
-            },
+            }),
         };
     }),
     plugin: computed(() => {
