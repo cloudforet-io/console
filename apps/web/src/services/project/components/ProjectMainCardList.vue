@@ -341,8 +341,9 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                         {{ title }}
                                     </div>
                                     <p-skeleton v-if="state.cardSummaryLoading[summaryType]" />
-                                    <router-link class="summary-item-num"
+                                    <router-link v-else
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
+                                                 class="summary-item-num"
                                     >
                                         {{ getCloudServiceCount(summaryType, item.project_id) }}
                                     </router-link>
