@@ -34,7 +34,6 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    loading: false,
     confirmButton: computed(() => {
         if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
             return i18n.t('IAM.APP.DELETE');
@@ -73,8 +72,6 @@ const handleClose = () => {
 
 /* API */
 const checkModalConfirm = async () => {
-    state.loading = true;
-
     try {
         if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
             await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
@@ -93,7 +90,6 @@ const checkModalConfirm = async () => {
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     } finally {
-        state.loading = false;
         handleClose();
     }
 };
