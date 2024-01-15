@@ -120,7 +120,7 @@ const handleClickAllWorkspace = () => {
                  class="admin-header"
             >
                 <img class="admin-icon"
-                     src="public/images/icons/admin_icon.png"
+                     src="/images/icons/admin_icon.png"
                 >
                 <span class="admin-title">
                     Admin <span class="omitable-text">Center</span>
