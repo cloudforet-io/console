@@ -1,7 +1,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import { cloneDeep, flattenDeep, union } from 'lodash';
+import { flattenDeep, union } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
@@ -287,11 +287,11 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             state.inheritOptions = inheritOptions;
 
             // update widget options
-            const widgetOptions = cloneDeep(state.widgetOptions);
-            Object.keys(widgetOptions).forEach((name) => {
-                if (!properties.includes(name)) delete widgetOptions[name];
-            });
-            state.widgetOptions = widgetOptions;
+            // const widgetOptions = cloneDeep(state.widgetOptions);
+            // Object.keys(widgetOptions).forEach((name) => {
+            //     if (!properties.includes(name)) delete widgetOptions[name];
+            // });
+            // state.widgetOptions = widgetOptions;
 
             initOptionsValidMap();
             initOptionsInitMap();
