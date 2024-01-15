@@ -171,13 +171,17 @@ const getListApiParams = (type?: DynamicLayoutType) => {
     let params: any;
 
     if (type !== 'list') {
+        const unwindQueryData = unwindTagQuery.data;
+        const keyword = unwindQueryData.keyword;
+        delete unwindQueryData.keyword;
         params = {
             query: {
                 ...apiQuery.data,
                 unwind: {
                     path: state.currentLayout.options?.unwind?.path ?? '',
-                    ...(!isTagsEmpty && { ...unwindTagQuery.data }),
+                    ...(!isTagsEmpty && { ...unwindQueryData }),
                 },
+                ...(keyword && { keyword }),
             },
         };
     } else {
@@ -202,7 +206,7 @@ const getQueryForGetDataAPI = (): any => {
     }
     return apiQueryForGetData.data;
 };
-const getData = async () => {
+const fetchData = async () => {
     state.data = dataMap[state.fetchOptionKey];
     try {
         if (state.currentLayout.type === 'raw-table') {
@@ -265,7 +269,7 @@ const unwindTableExcelDownload = async (fields: DynamicField[]) => {
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
         fetchOptionsMap[state.fetchOptionKey] = options;
-        getData();
+        fetchData();
     },
     select(selectIndex) {
         state.selectIndex = selectIndex;
@@ -286,7 +290,7 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 const loadSchemaAndData = async () => {
     state.loading = true;
     await getSchema();
-    await getData();
+    await fetchData();
     state.loading = false;
 };
 
