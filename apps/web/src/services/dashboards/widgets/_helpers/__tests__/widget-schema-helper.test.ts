@@ -161,53 +161,29 @@ describe('[Widget Schema Helper] getInitialSchemaProperties', () => {
 
 
 describe('[Widget Schema Helper] getRefinedSchemaProperties', () => {
-    it('should be the same as enabled inherit options if stored properties are empty', () => {
+    it('should be the same as initial schema properties if stored properties are empty', () => {
+        const initialProperties = ['filters.provider', 'filters.project', 'filters.service_account'];
         const storedProperties = [];
         const widgetOptions = {};
-        const inheritOptions = {
-            'filters.provider': {
-                enabled: true,
-            },
-            'filters.project': {
-                enabled: true,
-            },
-            'filters.service_account': {
-                enabled: true,
-            },
-        };
-        const refined = getRefinedSchemaProperties(storedProperties, widgetOptions, inheritOptions);
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
         expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
     });
-    it('should be not exist if the value is not set in widget options and it is not enabled inherit option even if it is in stored properties', () => {
+    it('should be not exist if the value is not set in widget options and it is not in initial schema properties even if it is in stored properties', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
         const storedProperties = ['filters.provider'];
-        const inheritOptions = {
-            'filters.project': {
-                enabled: true,
-            },
-            'filters.service_account': {
-                enabled: true,
-            },
-        };
         const widgetOptions = {};
-        const refined = getRefinedSchemaProperties(storedProperties, widgetOptions, inheritOptions);
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
         expect(refined).toEqual(['filters.project', 'filters.service_account']);
     });
-    it('should be exist if the value is set in widget options, stored properties even if it is not enabled inherit option.', () => {
+    it('should be exist if the value is set in widget options, stored properties even if it is not in initial schema properties.', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
         const storedProperties = ['filters.provider'];
         const widgetOptions: WidgetOptions = {
             filters: {
                 provider: [{ k: 'provider', v: 'aws' }],
             },
         };
-        const inheritOptions = {
-            'filters.project': {
-                enabled: true,
-            },
-            'filters.service_account': {
-                enabled: true,
-            },
-        };
-        const refined = getRefinedSchemaProperties(storedProperties, widgetOptions, inheritOptions);
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
         expect(refined).toEqual(['filters.project', 'filters.service_account', 'filters.provider']);
     });
 });
