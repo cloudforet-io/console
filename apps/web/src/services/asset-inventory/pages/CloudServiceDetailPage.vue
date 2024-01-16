@@ -355,6 +355,12 @@ debouncedWatch([() => props.group, () => props.name], async () => {
     await fetchTableData();
 }, { immediate: true, debounce: 200 });
 
+(() => {
+    excelQuery.setFiltersAsRawQueryString(route.query.filters);
+    cloudServiceDetailPageStore.$patch((_state) => {
+        _state.searchFilters = excelQuery.filters;
+    });
+})();
 
 </script>
 
