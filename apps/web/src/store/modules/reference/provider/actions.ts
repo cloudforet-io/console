@@ -31,7 +31,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
     try {
         const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters, ListResponse<ProviderModel>>({
             query: {
-                only: ['provider', 'name', 'icon', 'alias', 'color'],
+                only: ['provider', 'name', 'icon', 'alias', 'color', 'options'],
             },
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};

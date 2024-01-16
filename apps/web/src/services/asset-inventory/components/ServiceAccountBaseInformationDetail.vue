@@ -43,8 +43,8 @@ const fieldHandler = (field) => {
 watch(() => props.provider, async (provider) => {
     if (provider) {
         await serviceAccountSchemaStore.setProviderSchema(provider);
-        await serviceAccountSchemaStore.setGeneralAccountDetailSchema(provider);
-        await serviceAccountSchemaStore.setTrustedAccountDetailSchema(provider);
+        await serviceAccountSchemaStore.setGeneralAccountDetailSchema();
+        await serviceAccountSchemaStore.setTrustedAccountDetailSchema();
 
         const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
         const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;

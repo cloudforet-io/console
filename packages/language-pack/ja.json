@@ -3055,7 +3055,7 @@
 		"CPU_CORE": "コア",
 		"CPU_MODEL": "CPUモデル",
 		"CPU_SOCKET": "CPUソケット",
-		"CREATED_AT": "作成日",
+		"CREATED_AT": "初回収集日",
 		"DELETED_AT": "削除日",
 		"FIELD_DESC": {
 			"TAGS": "(タグ)"

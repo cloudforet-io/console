@@ -116,11 +116,16 @@ const handleClickAllWorkspace = () => {
                    class="title-wrapper"
                    :to="props.to"
         >
-            <span v-if="props.isAdminMode"
-                  class="admin-title"
+            <div v-if="props.isAdminMode"
+                 class="admin-header"
             >
-                Admin <span class="omitable-text">Center</span>
-            </span>
+                <img class="admin-icon"
+                     src="/images/icons/admin_icon.png"
+                >
+                <span class="admin-title">
+                    Admin <span class="omitable-text">Center</span>
+                </span>
+            </div>
             <workspace-logo-icon v-else
                                  :text="state.selectedWorkspace?.name || ''"
                                  :theme="state.selectedWorkspace?.tags?.theme"
@@ -193,6 +198,10 @@ const handleClickAllWorkspace = () => {
 
     &.admin-mode {
         box-shadow: 0.1875rem 0 0.25rem 0 rgba(255, 255, 255, 0.3);
+
+        @screen mobile {
+            box-shadow: none;
+        }
     }
 
     @screen tablet {
@@ -207,17 +216,31 @@ const handleClickAllWorkspace = () => {
     .title-wrapper {
         @apply inline-block;
 
-        .admin-title {
-            @apply text-label-xl text-violet-100 w-full;
+        .admin-header {
+            @apply flex items-center;
+            gap: 0.75rem;
 
-            .omitable-text {
-                @screen tablet {
-                    @apply hidden;
-                }
+            .admin-icon {
+                width: 2rem;
+                height: 2rem;
+            }
 
-                @screen mobile {
-                    @apply inline-block;
+            .admin-title {
+                @apply text-label-xl text-violet-100 w-full;
+
+                .omitable-text {
+                    @screen tablet {
+                        @apply hidden;
+                    }
+
+                    @screen mobile {
+                        @apply inline-block;
+                    }
                 }
+            }
+
+            @screen tablet {
+                gap: 0.5rem;
             }
         }
     }

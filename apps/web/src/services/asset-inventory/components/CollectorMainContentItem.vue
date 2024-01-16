@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton, PCard, PLazyImg,
+    PButton, PCard, PLazyImg, PBadge,
 } from '@spaceone/design-system';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
@@ -103,11 +103,13 @@ watch(() => props.item.schedule, (schedule) => {
             <div class="collector-item-wrapper">
                 <div class="collector-title-wrapper">
                     <span class="collector-item-name">{{ props.item.name }}</span>
-                    <div v-if="props.item.workspaceId === '*' && !state.isAdminMode"
-                         class="managed-item-label"
+                    <p-badge v-if="props.item.workspaceId === '*' && !state.isAdminMode"
+                             badge-type="subtle"
+                             style-type="indigo100"
+                             class="managed-item-label"
                     >
                         {{ $t('INVENTORY.COLLECTOR.MAIN.MANAGED_ITEM_LABEL') }}
-                    </div>
+                    </p-badge>
                 </div>
                 <div class="collector-plugin">
                     <p-lazy-img :src="props.item.plugin.icon"
@@ -173,6 +175,9 @@ watch(() => props.item.schedule, (schedule) => {
                     opacity: 1;
                 }
             }
+            .managed-item-label {
+                display: none;
+            }
         }
         .collector-status-wrapper {
             @apply absolute;
@@ -198,18 +203,18 @@ watch(() => props.item.schedule, (schedule) => {
             @apply flex flex-col;
             padding: 0.5rem 0.625rem;
             .collector-title-wrapper {
+                @apply flex items-center justify-between;
                 height: 2.625rem;
                 margin-bottom: 0.75rem;
                 .collector-item-name {
-                    @apply text-label-xl font-bold;
+                    @apply text-label-xl font-bold truncate;
                     display: inline-block;
                     line-height: 1.40625rem;
                     height: 1.5rem;
+                    flex-shrink: 1;
                 }
                 .managed-item-label {
-                    @apply text-label-sm text-indigo-600;
-                    line-height: 1.125rem;
-                    height: 1.125rem;
+                    flex: 0 0 auto;
                 }
             }
 

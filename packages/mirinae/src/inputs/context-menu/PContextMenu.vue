@@ -376,6 +376,7 @@ defineExpose({
             padding: 0.5rem;
         }
         > .clear-all-wrapper {
+            width: max-content;
             padding: 0.375rem 0.5rem 0.25rem 0.5rem;
         }
         > .context-header {
