@@ -156,7 +156,7 @@ const state = reactive({
             { name: 'assignee', label: 'Assigned to' },
             { name: 'project_id', label: 'Project', sortable: false },
             { name: 'triggered_by', label: 'Triggered by' },
-            { name: 'created_at', label: 'Duration', sortable: false },
+            { name: 'duration', label: 'Duration', sortable: false },
             { name: 'created_at', label: 'Created' },
         ];
 
@@ -219,7 +219,7 @@ const updateBottomFilterQuery = (filters: AlertBottomFilters) => {
 };
 
 const alertApiQueryHelper = new ApiQueryHelper()
-    .setOnly(...state.fields.map((d) => d.name), 'alert_id')
+    .setOnly(...state.fields.map((d) => d.name).filter((name) => name !== 'duration'), 'alert_id')
     .setPageStart(1).setPageLimit(15)
     .setSort('created_at', true);
 let alertApiQuery = alertApiQueryHelper.data;
@@ -423,13 +423,11 @@ if (!props.keepAlive) {
                         </p-link>
                     </template>
                 </template>
-                <template #col-created_at-format="{value, field}">
-                    <template v-if="field.label === 'Created Time'">
-                        {{ iso8601Formatter(value, storeState.timezone) }}
-                    </template>
-                    <template v-else>
-                        {{ alertDurationFormatter(value) }}
-                    </template>
+                <template #col-duration-format="{item}">
+                    {{ alertDurationFormatter(item.created_at) }}
+                </template>
+                <template #col-created_at-format="{value}">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
                 </template>
                 <template #col-webhook_id-format="{ value }">
                     {{ value ? (storeState.webhooks[value] ? storeState.webhooks[value].label : value) : ' ' }}
