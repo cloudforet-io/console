@@ -75,14 +75,14 @@ const tableState = reactive({
         return [
             { name: 'user_id', label: i18n.t('IAM.USER.MAIN.USER_ID') },
             { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
-            { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') },
+            { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE'), disableCopy: true },
             ...additionalFields,
-            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY') },
+            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY'), disableCopy: true },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
             { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') },
             ...additionalRoleFields,
-            { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE') },
-            { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE') },
+            { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE'), disableCopy: true },
+            { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE'), disableCopy: true },
             { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
@@ -242,7 +242,7 @@ const handleClickVerifyButton = async () => {
             </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === -1">
-                    No Activity
+                    -
                 </span>
                 <span v-else-if="data === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
