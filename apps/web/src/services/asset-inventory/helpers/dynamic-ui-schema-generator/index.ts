@@ -14,7 +14,7 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
+import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type { GetSchemaParams, ResourceType } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 const getCustomTableSchemaKey = (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string) => {
@@ -57,7 +57,7 @@ export const updateCustomTableSchema = async (userData:{userType:string, userId:
 };
 
 
-const getAccountFields = (accountSchema) => Object.entries<JsonSchema>(accountSchema?.schema?.properties ?? {}).map(([key, value]) => ({
+export const getAccountFields = (accountSchema) => Object.entries<JsonSchema>(accountSchema?.schema?.properties ?? {}).map(([key, value]) => ({
     key: `data.${key}`,
     name: value?.title ?? key,
     type: 'text',
@@ -84,7 +84,6 @@ export const getServiceAccountTableSchema = async ({
     const isTrustedAccount = resourceType === 'identity.TrustedAccount';
     const accountSchema = await getAccountSchema({ options, resourceType });
     if (!accountSchema) {
-        ErrorHandler.handleError(new Error('Service Account schema not found'));
         return undefined;
     }
     const fields:DynamicField[] = getAccountFields(accountSchema);
@@ -97,11 +96,4 @@ export const getServiceAccountTableSchema = async ({
     if (schemaData.options) schemaData.options.search = searchSchemaData.search;
 
     return schemaData;
-};
-
-export const getDetailSchema = async ({ resourceType, options }: Pick<GetSchemaParams, 'resourceType'|'options' >): Promise<{ details: Partial<DynamicLayout>[] }> => {
-    const isTrustedAccount = resourceType === 'identity.TrustedAccount';
-    const accountSchema = await getAccountSchema({ options, resourceType });
-    const fields:DynamicField[] = getAccountFields(accountSchema);
-    return getDefaultDetailSchema(fields, isTrustedAccount);
 };
