@@ -3055,7 +3055,7 @@
 		"CPU_CORE": "Core",
 		"CPU_MODEL": "CPU Model",
 		"CPU_SOCKET": "CPU Socket",
-		"CREATED_AT": "Created",
+		"CREATED_AT": "First Collected",
 		"DELETED_AT": "Deleted",
 		"FIELD_DESC": {
 			"TAGS": "(Tags)"

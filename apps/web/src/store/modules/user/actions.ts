@@ -80,8 +80,9 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     commit('setIsSessionExpired', false);
 };
 
-export const signOut = (): void => {
+export const signOut = ({ commit }): void => {
     SpaceConnector.flushToken();
+    commit('setCurrentGrantInfo', undefined);
 };
 const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);

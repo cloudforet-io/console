@@ -3055,7 +3055,7 @@
 		"CPU_CORE": "코어",
 		"CPU_MODEL": "CPU 모델",
 		"CPU_SOCKET": "CPU 소켓",
-		"CREATED_AT": "생성 날짜",
+		"CREATED_AT": "최초 수집 날짜",
 		"DELETED_AT": "삭제 날짜",
 		"FIELD_DESC": {
 			"TAGS": "(태그)"

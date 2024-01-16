@@ -109,7 +109,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
     } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
 };
 
-watch(() => dashboardDetailState.variablesSchema.order, (_order) => {
+watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVariableType], ([_order]) => {
     convertAndUpdateVariablesForTable(_order);
 }, { immediate: true });
 

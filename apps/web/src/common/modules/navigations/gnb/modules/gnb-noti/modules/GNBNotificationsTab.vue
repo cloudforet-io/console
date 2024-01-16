@@ -295,7 +295,7 @@ onMounted(() => {
                          class="icon"
                          :color="state.selectedItem.iconColor"
                     />
-                    <span>{{ selectedItem.title }}</span>
+                    <span>{{ state.selectedItem.title }}</span>
                 </div>
             </template>
             <template #body>

@@ -226,9 +226,9 @@ const handleVisibleCustomFieldModal = (visible) => {
 
 const reloadTable = async () => {
     if (tableState.isTrustedAccount) {
-        await serviceAccountSchemaStore.setTrustedAccountTableSchema(state.selectedProvider);
+        await serviceAccountSchemaStore.setTrustedAccountTableSchema();
     } else {
-        await serviceAccountSchemaStore.setGeneralAccountTableSchema(state.selectedProvider);
+        await serviceAccountSchemaStore.setGeneralAccountTableSchema();
     }
     await listServiceAccountData();
 };
@@ -240,13 +240,9 @@ watch(() => store.state.reference.provider.items, (providers) => {
         state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
     }
 }, { immediate: true });
-watch(() => state.selectedProvider, (provier) => {
-    if (provier) {
-        serviceAccountSchemaStore.setProviderSchema(provier);
-    }
-});
 watch(() => state.selectedProvider, async (after, before) => {
     if (after && after !== before) {
+        await serviceAccountSchemaStore.setProviderSchema(after);
         await replaceUrlQuery('provider', after);
         await reloadTable();
     }

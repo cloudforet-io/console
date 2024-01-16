@@ -73,7 +73,9 @@ const goToSignIn = async () => {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },
     };
+    store.commit('user/setCurrentGrantInfo', undefined);
     store.commit('error/setVisibleSessionExpiredError', false);
+
     await router.push(res);
     state.isRoutingToSignIn = false;
 };
