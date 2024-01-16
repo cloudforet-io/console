@@ -27,6 +27,7 @@ const appContextStore = useAppContextStore();
 const state = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     tooltipTexts: computed<Record<string, string>>(() => ({
         search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
         recentFavorite: i18n.t('COMMON.GNB.TOOLTIP.RECENT_FAVORITE') as string,
@@ -54,7 +55,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
         <p-tooltip :contents="state.tooltipTexts.search"
                    position="bottom"
         >
-            <g-n-b-search v-if="!state.isAdminMode"
+            <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"
                           :visible="props.openedMenu === 'search'"
                           @update:visible="updateOpenedMenu('search', $event)"
             />
@@ -62,7 +63,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
         <p-tooltip :contents="state.tooltipTexts.recentFavorite"
                    position="bottom"
         >
-            <g-n-b-recent-favorite v-if="!state.isAdminMode"
+            <g-n-b-recent-favorite v-if="!state.isAdminMode && !state.isGrantLoading"
                                    :visible="props.openedMenu === 'recentFavorite'"
                                    @update:visible="updateOpenedMenu('recentFavorite', $event)"
             />
@@ -70,7 +71,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
         <p-tooltip :contents="state.tooltipTexts.notifications"
                    position="bottom"
         >
-            <g-n-b-noti v-if="!state.isAdminMode"
+            <g-n-b-noti v-if="!state.isAdminMode && !state.isGrantLoading"
                         :visible="props.openedMenu === 'notifications'"
                         @update:visible="updateOpenedMenu('notifications', $event)"
             />

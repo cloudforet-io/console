@@ -71,6 +71,7 @@ const state = reactive({
     showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
 });
 const onSignIn = async (userId:string) => {
+    appContextStore.setGlobalGrantLoading(true);
     try {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
         const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
@@ -108,6 +109,7 @@ const onSignIn = async (userId:string) => {
             await router.push(defaultRouteWithWorkspace);
         }
     } catch (e) {
+        appContextStore.setGlobalGrantLoading(false);
         ErrorHandler.handleError(e);
     }
 };
