@@ -133,7 +133,7 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
             </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
-                    No Activity
+                    -
                 </span>
                 <span v-else-if="value === 0">
                     {{ $t('IAM.USER.MAIN.TODAY') }}
