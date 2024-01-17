@@ -219,6 +219,7 @@ watch(() => collectorFormState.attachedServiceAccount, (value) => {
                                        :reset-selected-on-unmounted="false"
                                        is-filterable
                                        show-delete-all-button
+                                       use-fixed-menu-style
                                        @update:selected="handleSelectAttachedServiceAccount"
                     >
                         <template #dropdown-left-area>
