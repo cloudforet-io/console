@@ -8,6 +8,7 @@ import { PI, PDivider } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { DisplayMenu, HighlightTagType } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
@@ -53,6 +54,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'open-menu', menuId: MenuId): void;
     (e: 'hide-menu'): void;
 }>();
+const appContextStore = useAppContextStore();
+
+const storeState = reactive({
+    grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
+});
 const state = reactive({
     hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
     hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
@@ -154,7 +160,7 @@ const handleMenu = () => {
                     />
                 </template>
             </div>
-            <div v-if="props.isSelected"
+            <div v-if="props.isSelected && !storeState.grantLoading"
                  :class="{'menu-underline': true, 'is-admin': props.isAdminMode}"
             />
         </div>
