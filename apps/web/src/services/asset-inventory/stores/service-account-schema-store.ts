@@ -88,7 +88,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
                 return;
             }
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            let schemaData = getDefaultTableSchema(fields, true);
+            let schemaData = getDefaultTableSchema(fields, false);
             const userData = {
                 userType: _userConfigMap.value.userType ?? 'USER',
                 userId: _userConfigMap.value.userId ?? '',
@@ -97,7 +97,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
             const customSchemaData = accountSchema?.provider ? await getCustomTableSchema(userData, 'identity.ServiceAccount', accountSchema?.provider) : undefined;
             if (customSchemaData) schemaData = customSchemaData;
 
-            const searchSchemaData = getDefaultSearchSchema(fields, true);
+            const searchSchemaData = getDefaultSearchSchema(fields, false);
             if (schemaData.options) schemaData.options.search = searchSchemaData.search;
 
             state.generalAccountTableSchema = schemaData;
