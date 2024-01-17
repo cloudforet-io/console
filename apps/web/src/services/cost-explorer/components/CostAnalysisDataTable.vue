@@ -70,6 +70,17 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
+const getValueSumKey = (dataType:string) => {
+    switch (dataType) {
+    case 'cost':
+        return 'cost';
+    case 'usage':
+        return 'usage_quantity';
+    default:
+        return `data.${dataType}`;
+    }
+};
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -95,7 +106,7 @@ const state = reactive({
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const fields = {
             value_sum: {
-                key: state.selectedDisplayDataType === 'usage' ? 'usage_quantity' : 'cost',
+                key: getValueSumKey(state.selectedDisplayDataType),
                 operator: 'sum',
             },
         };
@@ -424,7 +435,10 @@ watch(
                 />
             </template>
             <template #toolbox-left>
-                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateSelectedDisplayDataType" />
+                <cost-analysis-data-table-data-type-dropdown
+                    :data-source-id="costAnalysisPageGetters.selectedDataSourceId"
+                    @update-display-data-type="handleUpdateSelectedDisplayDataType"
+                />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"

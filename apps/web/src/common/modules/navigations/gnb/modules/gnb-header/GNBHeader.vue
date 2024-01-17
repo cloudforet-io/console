@@ -119,9 +119,12 @@ const handleClickAllWorkspace = () => {
             <div v-if="props.isAdminMode"
                  class="admin-header"
             >
-                <img class="admin-icon"
-                     src="/images/icons/admin_icon.png"
-                >
+                <div class="admin-icon">
+                    <p-i name="ic_admin-icon"
+                         width="2rem"
+                         height="2rem"
+                    />
+                </div>
                 <span class="admin-title">
                     Admin <span class="omitable-text">Center</span>
                 </span>

@@ -70,7 +70,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             try {
                 const res = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>({
                     query: {
-                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys', 'workspace_id'],
+                        only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys', 'workspace_id', 'cost_data_keys'],
                         sort: [{ key: 'workspace_id', desc: _state.isAdminMode }],
                     },
                 });

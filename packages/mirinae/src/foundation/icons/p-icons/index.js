@@ -1,4 +1,5 @@
 /* eslint-disable */
+import './ic_admin-icon'
 import './ic_alarm-clock'
 import './ic_arrow-down-bold'
 import './ic_arrow-down'
@@ -171,6 +172,7 @@ import './ic_users'
 import './ic_verified'
 import './ic_warning-filled'
 import './ic_webhook'
+import './img_admin-center'
 import './img_avatar_admin'
 import './img_avatar_no-role'
 import './img_avatar_project-admin'
