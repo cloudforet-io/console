@@ -12,7 +12,7 @@ import type { Currency } from '@/store/modules/settings/type';
 // @ts-ignore
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getNonInheritedWidgetOptionNamesAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export interface WidgetFrameOptions {
@@ -32,7 +32,7 @@ export const useWidgetFrame = (
     });
     const nonInheritOptionsTooltipText = computed<string | undefined>(() => {
         if (!props.dashboardVariablesSchema) return undefined;
-        const nonInheritOptions = getNonInheritedWidgetOptionsAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.schemaProperties);
+        const nonInheritOptions = getNonInheritedWidgetOptionNamesAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.schemaProperties);
         if (!nonInheritOptions.length) return undefined;
 
         // TODO: widget option name must be changed to readable name.

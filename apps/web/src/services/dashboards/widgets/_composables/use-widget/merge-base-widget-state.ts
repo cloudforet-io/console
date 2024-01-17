@@ -85,7 +85,7 @@ export function mergeBaseWidgetState(
         schemaProperties: computed<string[]>(() => {
             const initialSchemaProperties = getInitialSchemaProperties(state.widgetConfig, optionState.dashboardVariablesSchema);
             if (!optionState.schemaProperties) return initialSchemaProperties;
-            return getRefinedSchemaProperties(optionState.schemaProperties, initialSchemaProperties, optionState.widgetOptions);
+            return getRefinedSchemaProperties(optionState.schemaProperties, initialSchemaProperties, optionState.widgetOptions, optionState.inheritOptions);
         }),
     }) as UnwrapRef<MergedBaseWidgetState>;
 
