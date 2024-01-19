@@ -24,23 +24,17 @@ import { useRouter } from 'vue-router/composables';
 
 import { PSpinner } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
-import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import { isUserAccessibleToRoute } from '@/lib/access-control';
-import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 interface Props {
     visible?: boolean;
@@ -60,43 +54,28 @@ const state = reactive({
     token: '',
 });
 const onSignIn = async (userId:string) => {
+    appContextStore.setGlobalGrantLoading(true);
     try {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
-        const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-        const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
-        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
-        const defaultRouteWithWorkspace = {
-            ...defaultRoute,
-            ...(defaultRoute.name === MY_PAGE_ROUTE._NAME || !lastAccessedWorkspaceId ? {} : {
-                params: {
-                    workspaceId: lastAccessedWorkspaceId,
-                },
-            }),
-        };
+        const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
+        const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
 
         if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
-            await router.push(defaultRouteWithWorkspace);
+            await router.push(defaultRoute);
             return;
         }
 
         const resolvedRoute = router.resolve(props.nextPath);
-        const isAdminRoute = resolvedRoute.route.matched.some((route) => route.path === '/admin');
-        const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
-        if (isAccessible) {
-            if (resolvedRoute.resolved.name === HOME_DASHBOARD_ROUTE._NAME) {
-                await router.push({
-                    name: ROOT_ROUTE.WORKSPACE._NAME,
-                    params: {
-                        workspaceId: resolvedRoute.resolved.params.workspaceId,
-                    },
-                });
-            }
-            if (isAdminRoute) appContextStore.enterAdminMode();
+        const allRoutes = SpaceRouter.router.getRoutes();
+
+        const isValidRoute = allRoutes.some((route) => route.name === resolvedRoute.route.name);
+        if (isValidRoute) {
             await router.push(resolvedRoute.location);
         } else {
-            await router.push(defaultRouteWithWorkspace);
+            await router.push(defaultRoute);
         }
     } catch (e) {
+        appContextStore.setGlobalGrantLoading(false);
         ErrorHandler.handleError(e);
     }
 };
