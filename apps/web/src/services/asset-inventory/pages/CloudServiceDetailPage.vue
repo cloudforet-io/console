@@ -38,7 +38,6 @@ import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string'
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -99,7 +98,6 @@ const typeOptionState = reactive({
 
 const tableHeight = assetInventorySettingsStore.getCloudServiceTableHeight;
 const tableState = reactive({
-    hasManagePermission: useManagePermissionState(),
     schema: null as null|DynamicLayout,
     items: [],
     selectedItems: computed(() => typeOptionState.selectIndex.map((d) => tableState.items[d])),

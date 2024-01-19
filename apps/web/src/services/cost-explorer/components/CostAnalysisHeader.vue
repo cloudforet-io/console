@@ -20,7 +20,6 @@ import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/c
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
@@ -41,7 +40,6 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageGetters.dataSourceImageUrl),
@@ -118,7 +116,7 @@ const handleDeleteQueryConfirm = async () => {
                                              scale="0.8"
                             />
                         </div>
-                        <template v-if="state.hasManagePermission && state.isEditableQuerySet && !state.isManagedCostQuerySet">
+                        <template v-if="state.isEditableQuerySet && !state.isManagedCostQuerySet">
                             <p-icon-button name="ic_edit-text"
                                            size="md"
                                            @click.stop="handleClickEditQuery(costAnalysisPageGetters.selectedQueryId)"

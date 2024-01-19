@@ -34,14 +34,12 @@
                     <p-icon-button name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
                                    class="delete-button"
                                    @click="handleClickDeleteButton"
                     />
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
                                    @click="handleClickEditButton"
                     />
                 </span>
@@ -71,9 +69,7 @@
         <collector-options-section class="section"
                                    data-test-id="collector-options-section"
         />
-        <collector-service-accounts-section class="section"
-                                            :manage-disabled="!state.hasManagePermission"
-        />
+        <collector-service-accounts-section class="section" />
 
         <p-double-check-modal :visible.sync="state.deleteModalVisible"
                               :header-title="$t('INVENTORY.COLLECTOR.DETAIL.DELETE_COLLECTOR')"
@@ -138,7 +134,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
 import CollectorDataModal
@@ -187,7 +182,6 @@ const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
-    hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),

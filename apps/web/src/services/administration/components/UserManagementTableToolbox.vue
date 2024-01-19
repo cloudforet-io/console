@@ -7,8 +7,6 @@ import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import { USER_MODAL_TYPE, USER_STATE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { ModalSettingState } from '@/services/administration/types/user-type';
@@ -17,7 +15,6 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
     dropdownMenu: computed<MenuItem[]>(() => ([
         {
@@ -96,7 +93,6 @@ const updateModalSettings = ({
                        :menu="state.dropdownMenu"
                        reset-selection-on-menu-close
                        :placeholder="$t('IAM.USER.MAIN.ACTION')"
-                       :disabled="!state.hasManagePermission"
                        @select="handleSelectDropdown"
     />
 </template>

@@ -14,7 +14,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
@@ -37,7 +36,6 @@ const alertPageState = alertPageStore.state;
 const router = useRouter();
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     loading: true,
     alertTitleEditFormVisible: false,
 });
@@ -99,12 +97,10 @@ const alertTitleEditConfirm = async () => {
                 <span class="title-btn">
                     <p-icon-button name="ic_edit-text"
                                    class="edit-btn"
-                                   :disabled="!state.hasManagePermission"
                                    @click="openAlertEditForm"
                     />
                     <p-icon-button name="ic_delete"
                                    class="w-full delete-btn"
-                                   :disabled="!state.hasManagePermission"
                                    @click="openAlertDeleteForm"
                     />
                 </span>
@@ -116,13 +112,11 @@ const alertTitleEditConfirm = async () => {
                     <alert-detail-summary
                         :id="props.id"
                         class="header"
-                        :manage-disabled="!state.hasManagePermission"
                     />
 
                     <alert-detail-info-table
                         :id="props.id"
                         class="info"
-                        :manage-disabled="!state.hasManagePermission"
                     />
                     <alert-detail-tabs
                         :id="props.id"
@@ -135,11 +129,9 @@ const alertTitleEditConfirm = async () => {
                     <alert-responder :id="props.id"
                                      class="responder"
                                      :alert-data="alertPageState.alertData"
-                                     :manage-disabled="!state.hasManagePermission"
                     />
                     <alert-detail-note
                         :id="props.id"
-                        :manage-disabled="!state.hasManagePermission"
                         class="note"
                     />
                 </div>

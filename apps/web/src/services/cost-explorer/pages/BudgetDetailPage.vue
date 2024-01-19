@@ -13,7 +13,6 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetDetailHeading from '@/services/cost-explorer/components/BudgetDetailHeading.vue';
 import BudgetDetailInfo from '@/services/cost-explorer/components/BudgetDetailInfo.vue';
@@ -36,7 +35,6 @@ const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
-    hasManagePermission: useManagePermissionState(),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     isWorkspaceTarget: computed<boolean>(() => (state.budgetData?.resource_group === 'WORKSPACE')),
     adminModeLink: computed<Location>(() => ({
@@ -95,7 +93,6 @@ const state = reactive({
             />
             <budget-detail-notifications v-if="!state.isWorkspaceTarget"
                                          class="alert"
-                                         :manage-disabled="!state.hasManagePermission"
                                          :currency="state.budgetData?.currency"
             />
         </section>
