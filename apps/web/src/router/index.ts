@@ -101,6 +101,7 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
+            console.debug('SpaceRouter.beforeEach', to, from);
             if (!to.name) {
                 next({ name: ROOT_ROUTE._NAME });
                 return;
