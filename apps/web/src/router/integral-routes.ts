@@ -40,7 +40,7 @@ export const integralRoutes: RouteConfig[] = [
                 ],
             },
             {
-                path: 'workspace/:workspaceId',
+                path: 'workspace/:workspaceId?',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 meta: { scope: ROUTE_SCOPE.WORKSPACE },
                 redirect: (to) => ({
