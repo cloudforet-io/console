@@ -312,7 +312,6 @@ watch(() => props.selected, (selected) => {
         .dropdown-button {
             @apply flex justify-between items-center bg-white text-label-md font-normal border rounded border-gray-300 cursor-pointer;
             width: 100%;
-            max-width: 15.25rem;
             min-height: 2rem;
             gap: 0.25rem;
             padding-left: 0.5rem;
