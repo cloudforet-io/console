@@ -114,7 +114,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CollectorBaseInfoSection from '@/services/asset-inventory/components/CollectorBaseInfoSection.vue';
@@ -164,7 +163,6 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const queryHelper = new QueryHelper();
 const state = reactive({
     isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
-    hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
     collectorName: computed<string>(() => state.collector?.name ?? ''),

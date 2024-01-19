@@ -21,7 +21,6 @@ import { store } from '@/store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/components/ServiceAccountAttachedGeneralAccounts.vue';
@@ -51,7 +50,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    hasManagePermission: useManagePermissionState(),
     item: {} as ServiceAccountModel,
     serviceAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
     attachedGeneralAccounts: [] as ServiceAccountModel[],
@@ -143,7 +141,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                             error-icon="ic_cloud-filled"
                 />
             </template>
-            <template v-if="state.hasManagePermission && !state.isManagedTrustedAccount"
+            <template v-if="!state.isManagedTrustedAccount"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
@@ -153,7 +151,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                     />
                 </div>
             </template>
-            <template v-if="state.hasManagePermission && !state.isManagedTrustedAccount"
+            <template v-if="!state.isManagedTrustedAccount"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -173,7 +171,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                               :service-account-id="props.serviceAccountId"
                                               :service-account-type="state.serviceAccountType"
                                               :service-account-data="state.item"
-                                              :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
+                                              :editable="!state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />
             <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && props.serviceAccountId"
@@ -187,8 +185,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                          :service-account-data="state.item"
                                          :project-id="state.projectId"
                                          :attached-trusted-account-id="state.attachedTrustedAccountId"
-                                         :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
-                                         :has-manage-permission="state.hasManagePermission"
+                                         :editable="!state.isManagedTrustedAccount"
                                          @refresh="handleRefresh"
             />
         </div>
