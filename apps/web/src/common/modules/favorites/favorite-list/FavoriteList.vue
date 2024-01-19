@@ -29,6 +29,7 @@
                 <router-link :to="referenceRouter(
                                  item.itemId, {
                                      resource_type: getResourceType(item.itemType),
+                                     workspace_id: currentWorkspaceId,
                                  })"
                              class="item-link"
                 >
@@ -67,6 +68,7 @@ import type { Vue } from 'vue/types/vue';
 
 import { PI, PIconButton } from '@spaceone/design-system';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -92,7 +94,9 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const userWorkspaceStore = useUserWorkspaceStore();
         const state = reactive({
+            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
             displayItems: computed<FavoriteItem[]>(() => {
                 if (state.isExpanded) return props.items;
                 return props.items.slice(0, LIMIT_COUNT);

@@ -68,6 +68,7 @@ const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const appContextStore = useAppContextStore();
+
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
