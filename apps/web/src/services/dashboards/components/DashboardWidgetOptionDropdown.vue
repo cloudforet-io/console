@@ -227,7 +227,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
         results = initSelectedInInheritCase(inheritOption);
     // 2) non-inherit case
     } else {
-        const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormGetters.updatedWidgetInfo?.widget_options, props.propertyName)
+        const selected: SelectDropdownMenuItem[]|string[]|string|undefined = get(widgetFormGetters.updatedWidgetInfo?.widget_options, props.propertyName)
             ?? get(widgetFormState.widgetOptions, props.propertyName);
         // 2-1) no stored option case
         if (!selected) {
@@ -238,13 +238,16 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
             results = await initSelectedInStoredOptionArrayTypeCase(selected);
         // 2-2-2) primitive type case (e.g. 'aws')
         } else if (typeof selected !== 'object') {
-            results = await initSelectedInStoredOptionPrimitiveTypeCase(selected);
+            if (selected.includes('.')) {
+                results = [{ name: selected.split('.')[1], label: selected.split('.')[1] }];
+            } else {
+                results = await initSelectedInStoredOptionPrimitiveTypeCase(selected);
+            }
         } else {
             console.warn(new Error(`Invalid selected value: ${selected}`));
             results = [];
         }
     }
-
     return results;
 };
 
