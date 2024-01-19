@@ -118,7 +118,6 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     appContextStore.setGlobalGrantLoading(true);
-    if (state.isAdminMode) appContextStore.exitAdminMode();
     const currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,

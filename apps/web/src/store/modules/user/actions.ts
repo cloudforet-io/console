@@ -19,6 +19,7 @@ import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
@@ -90,6 +91,7 @@ const getRoleTypeFromToken = (token: string): RoleType => {
 };
 export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     const appContextStore = useAppContextStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
     try {
@@ -114,9 +116,14 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
 
+            if (grantRequest.scope === 'DOMAIN') {
+                appContextStore.enterAdminMode();
+            } else appContextStore.exitAdminMode();
             if (grantRequest.scope === 'WORKSPACE' && grantRequest.workspace_id) {
+                userWorkspaceStore.setCurrentWorkspace(grantRequest.workspace_id);
                 await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
             }
+            if (grantRequest.scope === 'USER') userWorkspaceStore.setCurrentWorkspace();
 
             if (roleInfo) {
                 await dispatch('reference/initializeAllReference', {}, { root: true });
@@ -133,6 +140,9 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
         * */
         commit('setCurrentGrantInfo', undefined);
         commit('setCurrentRoleInfo', undefined);
+        userWorkspaceStore.setCurrentWorkspace();
+        appContextStore.exitAdminMode();
+
         if (isInstanceOfAPIError(error)) {
             if (error.code === 'ERROR_WORKSPACE_STATE') {
                 commit('error/setGrantAccessFailStatus', true, { root: true });

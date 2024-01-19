@@ -93,7 +93,7 @@ const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionLis
     return results;
 }, [] as DisplayMenu[]);
 
-const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMenu[] => menuList.map((d) => {
+const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWorkspaceId?: string): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
     const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
     return {
@@ -102,18 +102,20 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMen
         label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
-        to: { name: routeName },
-        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode) : [],
+        to: { name: routeName, params: { workspaceId: currentWorkspaceId } },
+        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode, currentWorkspaceId) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
     const appContextStore = useAppContextStore();
     const appContextState = appContextStore.$state;
+    const userWorkspaceStore = useUserWorkspaceStore();
     const isAdminMode = appContextState.getters.isAdminMode;
+    const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
     const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
     let _allGnbMenuList: DisplayMenu[];
 
-    _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
+    _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode, currentWorkspaceId);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     if (!isAdminMode) {
         _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, rootGetters['user/pageAccessPermissionList']);

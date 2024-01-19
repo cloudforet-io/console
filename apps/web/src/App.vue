@@ -43,7 +43,7 @@ const router = useRouter();
 const route = useRoute();
 
 const state = reactive({
-    showGNB: computed(() => route.matched[0]?.name === 'root' || state.isMyPage),
+    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
     isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
     isRoutingToSignIn: false,
@@ -189,7 +189,7 @@ watch(() => state.userId, (userId) => {
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
-            <notice-popup />
+            <notice-popup v-if="!state.globalGrantLoading" />
             <!--            <survey-modal />-->
         </template>
         <!-- Modal for Cross Browsing -->
