@@ -127,6 +127,7 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
         </p-button>
         <p-context-menu v-show="visibleContextMenu"
                         ref="contextMenuRef"
+                        class="more-context-menu"
                         :menu="state.widgetOptionMenuItems"
                         :selected="selectedOptions"
                         :style="contextMenuStyle"
@@ -140,4 +141,10 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
         />
     </div>
 </template>
+
+<style lang="postcss" scoped>
+.more-context-menu {
+    z-index: 1000;
+}
+</style>
 

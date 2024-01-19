@@ -307,6 +307,7 @@ defineExpose<WidgetExpose<Data[]>>({
 
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  :width="props.disableViewMode ? undefined : 542"
                   v-on="widgetFrameEventHandlers"
     >
         <div class="monthly-cost">
