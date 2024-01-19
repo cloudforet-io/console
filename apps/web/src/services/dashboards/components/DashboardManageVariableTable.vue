@@ -8,14 +8,14 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import type {
+    DashboardVariableSchemaProperty,
+    VariableType,
+} from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type {
-    DashboardVariableSchemaProperty,
-    VariableType,
-} from '@/services/dashboards/types/dashboard-model-type';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;

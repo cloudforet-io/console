@@ -11,6 +11,10 @@ import {
 import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
+import type {
+    DashboardVariableSchemaProperty,
+    DashboardVariablesSchema,
+} from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 
@@ -25,10 +29,6 @@ import DashboardManageVariableTable
     from '@/services/dashboards/components/DashboardManageVariableTable.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type {
-    DashboardVariableSchemaProperty,
-    DashboardVariablesSchema,
-} from '@/services/dashboards/types/dashboard-model-type';
 import type { ManageVariableOverlayStatus } from '@/services/dashboards/types/manage-variable-type';
 
 
