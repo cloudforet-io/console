@@ -19,13 +19,14 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/types/dashboard-model-type';
 
 
 interface Props {
