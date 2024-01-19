@@ -238,6 +238,10 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
             results = await initSelectedInStoredOptionArrayTypeCase(selected);
         // 2-2-2) primitive type case (e.g. 'aws')
         } else if (typeof selected !== 'object') {
+            /*
+                Here is the compatible code for removing the "." in cases where it is attached to data, such as "additional_info." or "tags."
+                This code is designed to set the select dropdown menu item type accordingly.
+            */
             if (selected.includes('.')) {
                 results = [{ name: selected.split('.')[1], label: selected.split('.')[1] }];
             } else {
