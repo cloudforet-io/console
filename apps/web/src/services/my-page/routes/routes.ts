@@ -2,6 +2,8 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
+import { ROUTE_SCOPE } from '@/router/constant';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
@@ -25,6 +27,7 @@ const myPageRoutes: RouteConfig = {
         menuId: MENU_ID.MY_PAGE,
         accessLevel: ACCESS_LEVEL.AUTHENTICATED,
         translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
+        scope: ROUTE_SCOPE.USER,
     },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: MyPageContainer,

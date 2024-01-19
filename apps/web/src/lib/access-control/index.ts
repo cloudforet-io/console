@@ -54,6 +54,13 @@ export const getUserAccessLevel = (
 
     return getAccessTypeFromPermission(isAccessible);
 };
+
+export const calculateIsAccessibleRoute = (route: Route, pagePermissions: MenuId[]): boolean => {
+    const closetMenuRoute = clone(route?.matched)?.reverse().find((match) => !!match.meta.menuId);
+    const menuId = closetMenuRoute?.meta.menuId;
+    return pagePermissions.some((id) => id === menuId);
+};
+
 const getMenuAccessLevel = (id: MenuId): AccessLevel => {
     const flattenedMenuList = flattenMenu(MENU_LIST);
     if (!flattenedMenuList.find((menu) => menu.id === id)) return ACCESS_LEVEL.WORKSPACE_PERMISSION;

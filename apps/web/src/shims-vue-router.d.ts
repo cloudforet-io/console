@@ -28,7 +28,9 @@ import {
   interface RouteCopiableFormatter {
         (route: Route): boolean;
   }
+  export type RouteScope = 'EXCLUDE_AUTH' | 'USER' | 'WORKSPACE' | 'DOMAIN';
   interface RouteMeta {
+    scope: RouteScope;
     lnbVisible?: boolean;
     centeredLayout?: boolean;
     menuId?: string;

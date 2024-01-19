@@ -11,3 +11,10 @@ export const ROOT_ROUTE = Object.freeze({
         _NAME: 'admin',
     },
 });
+
+export const ROUTE_SCOPE = {
+    EXCLUDE_AUTH: 'EXCLUDE_AUTH',
+    USER: 'USER',
+    WORKSPACE: 'WORKSPACE',
+    DOMAIN: 'DOMAIN',
+} as const;
