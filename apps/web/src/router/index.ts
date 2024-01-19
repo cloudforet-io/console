@@ -115,10 +115,25 @@ export class SpaceRouter {
             // 1. Common processes for all scope
             if (!isValidRoute) {
                 if (isTokenAlive) {
-                    const { rol } = getDecodedDataFromAccessToken();
+                    // AccessToken refers to data of existing scope.
+                    const { rol, wid } = getDecodedDataFromAccessToken();
 
+                    // Admin to Admin Case
                     if (rol === 'DOMAIN_ADMIN' && to.name && !to.name?.startsWith('admin.')) {
                         next({ name: makeAdminRouteName(to.name) });
+                        return;
+                    }
+
+                    // Workspace to Workspace Case
+                    if (rol.startsWith('WORKSPACE') && wid && !to.params.workspaceId) {
+                        next({
+                            ...to,
+                            name: to.name,
+                            params: {
+                                ...to.params,
+                                workspaceId: wid,
+                            },
+                        });
                         return;
                     }
                     next({
@@ -148,11 +163,11 @@ export class SpaceRouter {
             }
 
             if (isTokenAlive) {
+                // AccessToken refers to data of existing scope.
                 const { rol, wid } = getDecodedDataFromAccessToken();
                 const isScopeChanged = !rol.startsWith(routeScope);
-                const isWorkpspaceChanged = routeScope === 'WORKSPACE' && to.params.workspaceId && wid !== to.params.workspaceId;
-                const needToChangeScope = isScopeChanged || isWorkpspaceChanged;
-
+                const exceptionScopeChangedCase = rol.startsWith('WORKSPACE') && routeScope === 'WORKSPACE';
+                const needToChangeScope = isScopeChanged || exceptionScopeChangedCase;
 
                 if (needToChangeScope) {
                     if (routeScope === 'USER') {
@@ -167,8 +182,7 @@ export class SpaceRouter {
 
 
                         const targetWorkspaceId = to.params.workspaceId;
-
-                        if (targetWorkspaceId && wid === targetWorkspaceId) {
+                        if (targetWorkspaceId && wid && wid === targetWorkspaceId) {
                             next();
                             return;
                         }
