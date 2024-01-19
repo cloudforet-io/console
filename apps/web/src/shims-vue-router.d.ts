@@ -12,8 +12,6 @@ import {
     VueRouter,
 } from 'vue-router/types/router';
 
-    import type { AccessLevel } from '@/lib/access-control/config';
-
     import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
   interface RouteLabelFormatter {
@@ -39,7 +37,6 @@ import {
     breadcrumbs?: RouteBreadcrumbsFormatter;
     copiable?: boolean|RouteCopiableFormatter; // for breadcrumbs
     isSignInPage?: boolean;
-    accessLevel?: AccessLevel;
     accessInfo?: AccessInfo;
   }
   export interface RouteConfigSingleView extends OriginRouteConfigSingleView {

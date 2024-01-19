@@ -30,6 +30,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -47,6 +48,7 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
@@ -158,7 +160,7 @@ const handleConfirmProjectGroupMoveModal = () => {
 
 const onChangeTab = (activeTab) => {
     if (activeTab === route.name) return;
-    router.replace({ name: activeTab });
+    router.replace(getProperRouteLocation({ name: activeTab }));
 };
 
 /* Watchers */

@@ -4,7 +4,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -27,7 +26,6 @@ const costExplorerRoutes: RouteConfig = {
     name: COST_EXPLORER_ROUTE._NAME,
     meta: {
         menuId: MENU_ID.COST_EXPLORER,
-        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
         translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
     },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
@@ -125,7 +123,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
                     component: BudgetCreatePage as any,
                 },
                 {

@@ -2,7 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -20,7 +19,6 @@ const administrationRoutes: RouteConfig = {
     meta: {
         menuId: MENU_ID.IAM,
         lnbVisible: true,
-        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
         translationId: MENU_INFO_MAP[MENU_ID.IAM].translationId,
     },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),

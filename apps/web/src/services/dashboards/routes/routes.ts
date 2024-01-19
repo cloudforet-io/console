@@ -2,7 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { i18n } from '@/translations';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -21,7 +20,6 @@ const dashboardsRoute: RouteConfig = {
     name: DASHBOARDS_ROUTE._NAME,
     meta: {
         menuId: MENU_ID.DASHBOARDS,
-        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
         translationId: MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId,
     },
     redirect: () => ({
@@ -46,7 +44,6 @@ const dashboardsRoute: RouteConfig = {
                     meta: {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
-                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                     },
                     component: DashboardCreatePage,
                 },
@@ -61,7 +58,6 @@ const dashboardsRoute: RouteConfig = {
                     path: 'customize/:dashboardId?',
                     name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                     meta: {
-                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                         breadcrumbs: ({ params }) => {
                             const breadcrumbs: Breadcrumb[] = [
                                 {
