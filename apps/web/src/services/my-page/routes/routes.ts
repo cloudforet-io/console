@@ -4,7 +4,6 @@ import { store } from '@/store';
 
 import { ROUTE_SCOPE } from '@/router/constant';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -25,7 +24,6 @@ const myPageRoutes: RouteConfig = {
     name: MY_PAGE_ROUTE._NAME,
     meta: {
         menuId: MENU_ID.MY_PAGE,
-        accessLevel: ACCESS_LEVEL.AUTHENTICATED,
         translationId: MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId,
         scope: ROUTE_SCOPE.USER,
     },

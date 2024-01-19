@@ -4,7 +4,6 @@ import { upperCase } from 'lodash';
 
 import { store } from '@/store';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -39,7 +38,6 @@ const assetInventoryRoute: RouteConfig = {
     name: ASSET_INVENTORY_ROUTE._NAME,
     meta: {
         menuId: MENU_ID.ASSET_INVENTORY,
-        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
         translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId,
     },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
@@ -111,7 +109,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION, centeredLayout: true },
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true },
                     component: CreateCollectorPage as any,
                 },
                 {
@@ -175,7 +173,6 @@ const assetInventoryRoute: RouteConfig = {
                         translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
                             type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
                         }]),
-                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                     },
                     props: true,
                     component: ServiceAccountAddPage as any,

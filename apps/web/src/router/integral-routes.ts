@@ -8,8 +8,6 @@ import { errorRoutes } from '@/router/error-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import myPageRoutes from '@/services/my-page/routes/routes';
@@ -29,7 +27,7 @@ export const integralRoutes: RouteConfig[] = [
             {
                 path: '/admin',
                 name: ROOT_ROUTE.ADMIN._NAME,
-                meta: { accessLevel: ACCESS_LEVEL.ADMIN_PERMISSION, scope: ROUTE_SCOPE.DOMAIN },
+                meta: { scope: ROUTE_SCOPE.DOMAIN },
                 redirect: () => {
                     if (!store.getters['user/isDomainAdmin']) return { name: ROOT_ROUTE.WORKSPACE._NAME };
                     return ({ name: makeAdminRouteName(HOME_DASHBOARD_ROUTE._NAME) });

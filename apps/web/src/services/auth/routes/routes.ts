@@ -1,7 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const SignInContainer = () => import('@/services/auth/components/SignInContainer.vue');
@@ -19,14 +17,13 @@ export default [
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         component: SignOutPage,
         meta: {
-            isSignInPage: false, accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+            isSignInPage: false,
         },
     },
     {
         path: '/sign-in',
         meta: {
             isSignInPage: true,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         component: SignInContainer,
         children: [
@@ -70,7 +67,6 @@ export default [
         name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
         meta: {
             isSignInPage: false,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         props: (route) => ({
             status: route.query.status || AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
@@ -82,7 +78,6 @@ export default [
         name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         meta: {
             isSignInPage: false,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         props: (route) => ({
             status: route.query.status || AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
@@ -94,7 +89,6 @@ export default [
         name: AUTH_ROUTE.EMAIL._NAME,
         meta: {
             isSignInPage: false,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         component: ValidationEmailPage,
     },
@@ -103,7 +97,6 @@ export default [
         name: AUTH_ROUTE.SIGN_IN.KB._NAME,
         meta: {
             isSignInPage: true,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
         props: ({ query }) => ({
             secureToken: query.secureToken,

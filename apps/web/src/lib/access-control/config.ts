@@ -1,15 +1,6 @@
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-export const ACCESS_LEVEL = {
-    EXCLUDE_AUTH: 0,
-    AUTHENTICATED: 1,
-    WORKSPACE_PERMISSION: 2,
-    ADMIN_PERMISSION: 3,
-} as const;
-
-export type AccessLevel = typeof ACCESS_LEVEL[keyof typeof ACCESS_LEVEL];
-
 export interface AccessInfo {
     referenceMenuIds: MenuId[];
 }
