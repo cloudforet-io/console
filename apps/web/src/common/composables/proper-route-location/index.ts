@@ -5,6 +5,7 @@ import type { Location } from 'vue-router/types/router';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 interface UseProperRouteLocationReturnType {
     isAdminMode: Ref<boolean>;
@@ -13,6 +14,7 @@ interface UseProperRouteLocationReturnType {
 
 export const useProperRouteLocation = (): UseProperRouteLocationReturnType => {
     const appContextStore = useAppContextStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
     const state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
@@ -23,7 +25,13 @@ export const useProperRouteLocation = (): UseProperRouteLocationReturnType => {
         return (state.isAdminMode ? {
             ...location,
             name: makeAdminRouteName(location.name),
-        } : location);
+        } : {
+            ...location,
+            params: {
+                ...location.params,
+                workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
+            },
+        }) as Location;
     };
 
     return {
