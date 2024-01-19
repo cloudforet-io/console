@@ -316,6 +316,36 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        beforeSelect: {
+            name: 'beforeSelect',
+            type: { name: 'function' },
+            description: 'A function that is called before selecting an item. If it returns false, the selection is canceled.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'function',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+        },
+        beforeClearSelection: {
+            name: 'beforeClearSelection',
+            type: { name: 'function' },
+            description: 'A function that is called before clearing all selected items. If it returns false, the clearing is canceled.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'function',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+        },
         ...getArgTypes('slots', contextMenuSlots),
         ...getArgTypes('events', contextMenuEvents),
     };

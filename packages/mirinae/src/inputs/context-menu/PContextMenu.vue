@@ -32,6 +32,8 @@ interface ContextMenuProps {
     searchText?: string;
     readonly?: boolean;
     resetSelectedOnUnmounted?: boolean;
+    beforeSelect?: (item: MenuItem, index: number, isSelected: boolean) => boolean;
+    beforeClearSelection?: (clearableSelectedItems: MenuItem[], allSelectedItems: MenuItem[]) => boolean;
 }
 interface ContextMenuEmits {
     (e: 'update:selected', selected: MenuItem[]): void,
@@ -55,6 +57,8 @@ const props = withDefaults(defineProps<ContextMenuProps>(), {
     searchText: '',
     readonly: false,
     resetSelectedOnUnmounted: true,
+    beforeSelect: undefined,
+    beforeClearSelection: undefined,
 });
 const emit = defineEmits<ContextMenuEmits>();
 const slots = useSlots();
@@ -134,6 +138,11 @@ const onClickMenu = (item: MenuItem, index) => {
     let isSelected = true;
     if (state.proxySelected.find((d) => d.name === item.name)) isSelected = false;
 
+    if (props.beforeSelect) {
+        const isContinue = props.beforeSelect(item, index, isSelected);
+        if (!isContinue) return;
+    }
+
     if (props.multiSelectable) {
         if (state.selectedNameMap[item.name ?? ''] !== undefined) {
             const indexOfSelected = state.selectedNameMap[item.name ?? ''];
@@ -153,7 +162,12 @@ const onClickEsc = (e: MouseEvent) => {
     blur();
 };
 const handleClickClearSelection = () => {
-    state.proxySelected = state.proxySelected.filter((item) => item.disabled);
+    const clearableItems = state.proxySelected.filter((item) => item.disabled);
+    if (props.beforeClearSelection) {
+        const isContinue = props.beforeClearSelection(clearableItems, state.proxySelected);
+        if (!isContinue) return;
+    }
+    state.proxySelected = clearableItems;
     emit('clear-selection');
 };
 const handleUpdateSearchText = async (value: string) => {
