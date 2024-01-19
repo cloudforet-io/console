@@ -90,6 +90,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         visibleMenu: toRef(state, 'visibleMenu'),
         targetRef,
         position: state.position,
+        menuRef: contextMenuRef,
     });
 
     // menu filtering
