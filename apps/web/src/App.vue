@@ -41,7 +41,7 @@ const router = useRouter();
 const route = useRoute();
 
 const state = reactive({
-    routeScope: computed(() => getRouteScope(router.currentRoute)),
+    routeScope: computed(() => getRouteScope(route)),
     showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
     isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
@@ -89,7 +89,7 @@ watch(() => route.path, () => {
 
 
 watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH' && !state.globalGrantLoading) {
+    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
         state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });
