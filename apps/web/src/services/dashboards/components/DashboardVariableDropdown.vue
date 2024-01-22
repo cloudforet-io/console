@@ -254,6 +254,7 @@ const {
                         @keyup:down:end="focusOnContextMenu()"
                         @select="handleSelectOption"
                         @update:search-text="handleUpdateSearchText"
+                        @clear-selection="handleClearSelection"
         />
     </div>
 </template>
