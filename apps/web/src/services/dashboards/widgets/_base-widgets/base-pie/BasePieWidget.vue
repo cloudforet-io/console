@@ -15,13 +15,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 
-import type { ReferenceType } from '@/store/reference/all-reference-store';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import type { ReferenceType } from '@/services/dashboards/stores/all-reference-type-info-store';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
@@ -37,6 +36,7 @@ import type { Field } from '@/services/dashboards/widgets/_types/widget-data-tab
 import type {
     WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
 } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 interface SubData {
     [field_group: string]: any;
