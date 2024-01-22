@@ -1,7 +1,7 @@
 import type { SearchSchema } from '@spaceone/design-system/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 
 export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount: boolean): { details: Partial<DynamicLayout>[] } => ({
     details: [
@@ -73,7 +73,7 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
     ],
 });
 
-export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: boolean):DynamicLayout => ({
+export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: boolean): DynamicLayout => ({
     name: 'Base Table',
     type: 'query-search-table',
     options: {

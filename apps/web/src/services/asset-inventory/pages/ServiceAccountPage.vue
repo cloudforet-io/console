@@ -13,11 +13,10 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import type {
-    DynamicLayout,
+    DynamicLayout, DynamicLayoutOptions,
     SearchSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import type { DynamicLayoutOptions } from '@cloudforet/core-lib/component-util/dynamic-layout/layout-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
