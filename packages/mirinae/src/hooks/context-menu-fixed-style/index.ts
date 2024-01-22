@@ -14,13 +14,15 @@ interface UseContextMenuFixedStyleOptions {
     targetRef?: Ref<Vue|HTMLElement|null>;
     position?: 'left' | 'right';
     menuRef?: Ref<Vue|HTMLElement|null>;
+    multiSelectable?: Ref<boolean|undefined>|boolean;
 }
 
 export const useContextMenuFixedStyle = ({
-    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef,
+    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef, multiSelectable,
 }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
+        multiSelectable: multiSelectable ?? false,
         visibleMenu,
     });
 
@@ -28,7 +30,8 @@ export const useContextMenuFixedStyle = ({
         targetRef: targetRef ?? null,
         targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
         menuRef: menuRef ?? null,
-        menuTitleElement: computed<Element|null>(() => (contextMenuFixedStyleState.menuRef as Vue)?.$el.getElementsByClassName('context-menu-title-wrapper')[0] ?? null),
+        menuElement: computed<Element|null>(() => (contextMenuFixedStyleState.menuRef as Vue)?.$el ?? contextMenuFixedStyleState.menuRef),
+        menuTitleElement: computed<Element|null>(() => contextMenuFixedStyleState.menuElement?.getElementsByClassName('context-menu-title-wrapper')[0] ?? null),
         contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
     });
 
@@ -123,10 +126,16 @@ export const useContextMenuFixedStyle = ({
 
         if (!contextMenuFixedStyleState.targetElement) return;
 
-        const { x, y } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
+        const { x, y, height } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
 
         if (x !== prevX.value || y !== prevY.value) {
-            hideMenu();
+            if (!state.multiSelectable) {
+                hideMenu();
+            } else {
+                if (!contextMenuFixedStyleState.menuElement) return;
+                contextMenuFixedStyleState.menuElement.style.top = `${y + height}px`;
+                contextMenuFixedStyleState.menuElement.style.left = `${x}px`;
+            }
         }
 
         prevX.value = x;
