@@ -170,6 +170,7 @@ const {
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
+    multiSelectable: toRef(props, 'multiSelectable'),
 });
 
 /* focusing */
