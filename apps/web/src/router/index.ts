@@ -110,32 +110,20 @@ export class SpaceRouter {
             const targetRouterRecord = allRoutes.find((route) => route.name === to.name);
             const isValidRoute = targetRouterRecord && targetRouterRecord.regex?.test(to.path);
             const isTokenAlive = SpaceConnector.isTokenAlive;
+            // AccessToken refers to data of existing scope.
+            const { rol, wid } = getDecodedDataFromAccessToken();
+
 
 
             // 1. Common processes for all scope
             if (!isValidRoute) {
                 if (isTokenAlive) {
-                    // AccessToken refers to data of existing scope.
-                    const { rol, wid } = getDecodedDataFromAccessToken();
-
                     // Admin to Admin Case
                     if (rol === 'DOMAIN_ADMIN' && to.name && !to.name?.startsWith('admin.')) {
                         next({ name: makeAdminRouteName(to.name) });
                         return;
                     }
 
-                    // Workspace to Workspace Case
-                    if (rol.startsWith('WORKSPACE') && wid && !to.params.workspaceId) {
-                        next({
-                            ...to,
-                            name: to.name,
-                            params: {
-                                ...to.params,
-                                workspaceId: wid,
-                            },
-                        });
-                        return;
-                    }
                     next({
                         name: ERROR_ROUTE._NAME, params: { statusCode: '404' },
                     });
@@ -143,6 +131,18 @@ export class SpaceRouter {
                 }
 
                 next({ name: AUTH_ROUTE.SIGN_OUT._NAME });
+                return;
+            }
+            // Workspace to Workspace Case
+            if (rol.startsWith('WORKSPACE') && wid && !to.params.workspaceId) {
+                next({
+                    ...to,
+                    name: to.name,
+                    params: {
+                        ...to.params,
+                        workspaceId: wid,
+                    },
+                });
                 return;
             }
 
@@ -163,8 +163,6 @@ export class SpaceRouter {
             }
 
             if (isTokenAlive) {
-                // AccessToken refers to data of existing scope.
-                const { rol, wid } = getDecodedDataFromAccessToken();
                 const isScopeChanged = !rol.startsWith(routeScope);
                 const exceptionScopeChangedCase = rol.startsWith('WORKSPACE') && routeScope === 'WORKSPACE';
                 const needToChangeScope = isScopeChanged || exceptionScopeChangedCase;
