@@ -30,6 +30,8 @@ import type { CloudServiceListParameters } from '@/schema/inventory/cloud-servic
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -73,6 +75,7 @@ const props = withDefaults(defineProps<Props>(), {
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 assetInventorySettingsStore.initState();
 
 const route = useRoute();
@@ -295,7 +298,7 @@ const exportCloudServiceData = async () => {
 
 const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
     if (field.extraData?.reference) {
-        return referenceFieldFormatter(field.extraData.reference, field.data);
+        return referenceFieldFormatter({ ...field.extraData.reference, workspace_id: userWorkspaceStore.getters.currentWorkspaceId }, field.data);
     }
     return {};
 };

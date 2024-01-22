@@ -27,6 +27,8 @@ import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/excel-export';
@@ -64,6 +66,7 @@ const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -282,7 +285,7 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
 
 const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
     if (field.extraData?.reference) {
-        return referenceFieldFormatter(field.extraData.reference, field.data);
+        return referenceFieldFormatter({ ...field.extraData.reference, workspace_id: userWorkspaceStore.getters.currentWorkspaceId }, field.data);
     }
     return {};
 };
