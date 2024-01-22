@@ -29,6 +29,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
@@ -43,6 +44,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const collectorFormStore = useCollectorFormStore();
@@ -223,7 +225,7 @@ onMounted(async () => {
                 <p-link v-if="state.projects[value]"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="referenceRouter(value,{ resource_type: 'identity.Project' })"
+                        :to="getProperRouteLocation(referenceRouter(value,{ resource_type: 'identity.Project' }))"
                 >
                     {{ state.projects[value].label }}
                 </p-link>

@@ -9,7 +9,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 interface UseProperRouteLocationReturnType {
     isAdminMode: Ref<boolean>;
-    getProperRouteLocation: (location: Location) => Location;
+    getProperRouteLocation: (location?: Location) => Location;
 }
 
 export const useProperRouteLocation = (): UseProperRouteLocationReturnType => {
@@ -19,8 +19,8 @@ export const useProperRouteLocation = (): UseProperRouteLocationReturnType => {
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
 
-    const getProperRouteLocation = (location: Location): Location => {
-        if (!location.name) throw new Error('location.name is required');
+    const getProperRouteLocation = (location?: Location): Location => {
+        if (!location || !location.name) throw new Error('location.name is required');
 
         return (state.isAdminMode ? {
             ...location,

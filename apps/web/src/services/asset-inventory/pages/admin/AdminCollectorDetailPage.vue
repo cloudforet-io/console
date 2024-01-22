@@ -15,14 +15,12 @@
                     <p-icon-button name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
                                    class="delete-button"
                                    @click="handleClickDeleteButton"
                     />
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission"
                                    @click="handleClickEditButton"
                     />
                 </span>

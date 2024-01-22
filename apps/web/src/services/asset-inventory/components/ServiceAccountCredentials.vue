@@ -49,7 +49,6 @@ interface Props {
     projectId?: string;
     attachedTrustedAccountId?: string;
     editable: boolean;
-    hasManagePermission: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -61,7 +60,6 @@ const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
     attachedTrustedAccountId: undefined,
     editable: false,
-    hasManagePermission: undefined,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void; }>();
@@ -243,7 +241,6 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
                                                 :credential-data="state.credentialData"
                                                 :attached-trusted-account-id="props.attachedTrustedAccountId"
                                                 :loading="props.serviceAccountLoading || state.loading"
-                                                :has-manage-permission="hasManagePermission"
                                                 @edit="handleClickEditButton"
             />
             <service-account-credentials-form v-if="state.mode === 'UPDATE'"

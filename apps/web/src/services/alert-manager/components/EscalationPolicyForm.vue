@@ -21,6 +21,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationPolicyFormRulesInput from '@/services/alert-manager/components/EscalationPolicyFormRulesInput.vue';
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<{
     showResourceGroup: true,
     escalationPolicyData: undefined,
 });
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
@@ -162,7 +164,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
-                                 :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
+                                 :to="getProperRouteLocation(referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' }))"
                                  :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                  highlight
                         />)
@@ -182,7 +184,7 @@ watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, (
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         size="sm"
-                        :to="{ name: PROJECT_ROUTE._NAME }"
+                        :to="getProperRouteLocation({ name: PROJECT_ROUTE._NAME })"
                         :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
                         highlight
                 />

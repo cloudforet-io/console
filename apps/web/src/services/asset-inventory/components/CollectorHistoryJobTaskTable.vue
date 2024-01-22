@@ -49,6 +49,7 @@ const { isAdminMode } = useProperRouteLocation();
 const props = withDefaults(defineProps<Props>(), {
     jobId: '',
 });
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const adminFields = [
     { label: 'Service Account', name: 'service_account_id', sortable: false },
@@ -257,13 +258,13 @@ onDeactivated(() => {
                 />
             </div>
         </template>
-        <template #col-service_account_id-format="{ value, item }">
+        <template #col-service_account_id-format="{ value }">
             <p-link v-if="storeState.serviceAccounts[value]"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="referenceRouter(
+                    :to="getProperRouteLocation(referenceRouter(
                         value,
-                        { resource_type: 'identity.ServiceAccount', workspace_id: item.workspace_id })"
+                        { resource_type: 'identity.ServiceAccount' }))"
             >
                 {{ storeState.serviceAccounts[value].label }}
             </p-link>
@@ -274,22 +275,22 @@ onDeactivated(() => {
         >
             <span v-if="value === '*'">Global</span>
             <p-link v-else
-                    :to="{
+                    :to="getProperRouteLocation({
                         name: ROOT_ROUTE.WORKSPACE._NAME,
                         params: { workspaceId: value },
-                    }"
+                    })"
                     action-icon="internal-link"
                     new-tab
                     :text="storeState.workspaces[value]?.label"
             />
         </template>
-        <template #col-project_id-format="{ value, item }">
+        <template #col-project_id-format="{ value }">
             <p-link v-if="storeState.projects[value]"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="referenceRouter(
+                    :to="getProperRouteLocation(referenceRouter(
                         value,
-                        { resource_type: 'identity.Project', workspace_id: item.workspace_id })"
+                        { resource_type: 'identity.Project' }))"
             >
                 {{ storeState.projects[value].label }}
             </p-link>

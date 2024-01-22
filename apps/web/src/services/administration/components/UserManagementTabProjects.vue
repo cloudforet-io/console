@@ -16,6 +16,7 @@ import { i18n } from '@/translations';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import UserManagementRemoveModal from '@/services/administration/components/UserManagementRemoveModal.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     loading: false,
@@ -128,7 +130,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-name-format="{item}">
                 <span class="project-name-wrapper">
-                    <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id } }"
+                    <router-link :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id } })"
                                  target="_blank"
                     >
                         <span>{{ item.name }}</span>
