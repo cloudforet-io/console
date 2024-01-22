@@ -21,7 +21,6 @@ import { pinia } from '@/store/pinia';
 import { calculateIsAccessibleRoute } from '@/lib/access-control';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import { GTag } from '@/lib/site-analytics/gtag';
-import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
@@ -30,7 +29,7 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
-const getDecodedDataFromAccessToken = (): {rol: string, wid: string} => {
+const getDecodedDataFromAccessToken = (): {rol: string, wid?: string} => {
     try {
         const accessToken = SpaceConnector.getAccessToken() as string;
         const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(accessToken);
@@ -106,9 +105,12 @@ export class SpaceRouter {
                 return;
             }
 
+            const routeScope = getRouteScope(to);
+            const workspaceList = userWorkspaceStore.getters.workspaceList;
             const allRoutes = SpaceRouter.router.getRoutes() as RouteRecord[];
             const targetRouterRecord = allRoutes.find((route) => route.name === to.name);
-            const isValidRoute = targetRouterRecord && targetRouterRecord.regex?.test(to.path);
+            const invalidWorkspaceRoute = routeScope === 'WORKSPACE' && (!to.params.workspaceId || !workspaceList.length);
+            const isValidRoute = targetRouterRecord && targetRouterRecord.regex?.test(to.path) && !invalidWorkspaceRoute;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             // AccessToken refers to data of existing scope.
             const { rol, wid } = getDecodedDataFromAccessToken();
@@ -122,6 +124,25 @@ export class SpaceRouter {
                         return;
                     }
 
+                    if (invalidWorkspaceRoute) {
+                        if (!workspaceList.length) {
+                            next({ name: MY_PAGE_ROUTE._NAME });
+                            return;
+                        }
+
+                        const workspaceId = wid || await appContextStore.getValidLastAccessedWorkspaceId() || workspaceList[0].workspace_id;
+                        next({
+                            ...to,
+                            name: to.name,
+                            params: {
+                                ...to.params,
+                                workspaceId,
+                            },
+                        });
+                        return;
+                    }
+
+
                     next({
                         name: ERROR_ROUTE._NAME, params: { statusCode: '404' },
                     });
@@ -134,7 +155,6 @@ export class SpaceRouter {
 
 
             // 2. Processes by Scope
-            const routeScope = getRouteScope(to);
             let nextLocation;
             let grantFailStatus = false;
 
@@ -159,30 +179,13 @@ export class SpaceRouter {
                         const { failStatus } = await newGrantAndLoadByCurrentScope('USER');
                         grantFailStatus = failStatus;
                     } else if (routeScope === 'WORKSPACE') {
-                        const workspaceList = userWorkspaceStore.getters.workspaceList;
-                        if (!workspaceList.length) {
-                            next({ name: MY_PAGE_ROUTE._NAME });
-                            return;
-                        }
-
-
                         const targetWorkspaceId = to.params.workspaceId;
-                        if (targetWorkspaceId && wid && wid === targetWorkspaceId) {
+                        if (wid && wid === targetWorkspaceId) {
                             next();
                             return;
                         }
-                        if (wid && !to.params.workspaceId) {
-                            next({
-                                ...to,
-                                name: to.name,
-                                params: {
-                                    ...to.params,
-                                    workspaceId: wid,
-                                },
-                            });
-                            return;
-                        }
-                        if (targetWorkspaceId && !getAccessibleWorkspaceId(targetWorkspaceId, workspaceList)) {
+
+                        if (!getAccessibleWorkspaceId(targetWorkspaceId, workspaceList)) {
                             next({
                                 name: ERROR_ROUTE._NAME,
                                 params: { statusCode: '404' },
@@ -190,26 +193,13 @@ export class SpaceRouter {
                             return;
                         }
 
-                        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
-                        const cachedAccessibleWorkspaceId = getAccessibleWorkspaceId(lastAccessedWorkspaceId, workspaceList);
-                        const validWorkspaceId = targetWorkspaceId || cachedAccessibleWorkspaceId || workspaceList[0].workspace_id;
-                        const { failStatus } = await newGrantAndLoadByCurrentScope('WORKSPACE', validWorkspaceId);
+                        const { failStatus } = await newGrantAndLoadByCurrentScope('WORKSPACE', targetWorkspaceId);
                         grantFailStatus = failStatus;
 
                         if (!failStatus) {
                             const pageAccessPermissionList = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
                             const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
-                            if (isAccessibleRoute) {
-                                if (!targetWorkspaceId) {
-                                    nextLocation = {
-                                        ...to,
-                                        params: {
-                                            ...to.params,
-                                            workspaceId: validWorkspaceId,
-                                        },
-                                    };
-                                }
-                            } else {
+                            if (!isAccessibleRoute) {
                                 nextLocation = {
                                     name: ERROR_ROUTE._NAME,
                                     params: { statusCode: '403' },

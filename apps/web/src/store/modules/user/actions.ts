@@ -22,8 +22,6 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
 
-import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
-
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
@@ -121,7 +119,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             } else appContextStore.exitAdminMode();
             if (grantRequest.scope === 'WORKSPACE' && grantRequest.workspace_id) {
                 userWorkspaceStore.setCurrentWorkspace(grantRequest.workspace_id);
-                await setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
+                await appContextStore.setCurrentAccessedWorkspaceId(grantRequest.workspace_id);
             }
             if (grantRequest.scope === 'USER') userWorkspaceStore.setCurrentWorkspace();
 

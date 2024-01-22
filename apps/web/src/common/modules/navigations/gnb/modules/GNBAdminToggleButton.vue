@@ -12,7 +12,6 @@ import { ROOT_ROUTE } from '@/router/constant';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -33,7 +32,7 @@ const handleToggleAdminMode = throttle(async () => {
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
         appContextStore.exitAdminMode();
-        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
+        const lastAccessedWorkspaceId = await appContextStore.getValidLastAccessedWorkspaceId();
         if (lastAccessedWorkspaceId) {
             await router.push({
                 name: ROOT_ROUTE.WORKSPACE._NAME,
