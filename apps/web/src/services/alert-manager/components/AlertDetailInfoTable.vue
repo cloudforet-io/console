@@ -22,6 +22,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import {
     blue, coral, gray, red, violet, yellow,
@@ -60,6 +61,8 @@ const props = defineProps<{
 const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.state;
+const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const state = reactive({
     fields: computed(() => [
@@ -146,7 +149,7 @@ const getEscalationPolicy = async () => {
             <template #data-escalation_policy_id>
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
+                        :to="getProperRouteLocation({ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME })"
                         highlight
                 >
                     {{ state.escalationPolicyName }}

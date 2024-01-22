@@ -18,6 +18,7 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -31,7 +32,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
-
+const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
     loading: true,
     items: [] as any,
@@ -98,10 +99,10 @@ const init = async () => {
                 <template #col-name-format="{value, item}">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
-                            :to="{
+                            :to="getProperRouteLocation({
                                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                                 params: { serviceAccountId: item.service_account_id },
-                            }"
+                            })"
                     >
                         {{ value }}
                     </p-link>

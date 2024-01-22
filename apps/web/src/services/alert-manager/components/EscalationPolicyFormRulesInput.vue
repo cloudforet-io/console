@@ -20,6 +20,7 @@ import type { ProjectChannelModel } from '@/schema/notification/project-channel/
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
@@ -43,6 +44,7 @@ const MINIFIED_NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_le
     { name: 'LV5', label: '5' },
 ];
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
@@ -168,7 +170,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
                     :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                    :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } }"
+                    :to="getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } })"
                     highlight
             />
         </div>

@@ -16,6 +16,7 @@ import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import BudgetDetailNotificationsChannelTable
     from '@/services/cost-explorer/components/BudgetDetailNotificationsChannelTable.vue';
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
     currency: CURRENCY.USD,
 });
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -147,12 +149,12 @@ const handleBudgetNotifications = () => {
                                         new-tab
                                         size="md"
                                         :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
-                                        :to="{
+                                        :to="getProperRouteLocation({
                                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                                             params: {
                                                 id: state.budgetTargetId
                                             }
-                                        }"
+                                        })"
                                         highlight
                                 />
                             </div>

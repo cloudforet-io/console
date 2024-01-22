@@ -6,7 +6,7 @@
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="state.collector.linkLocation"
+                        :to="getProperRouteLocation(state.collector.linkLocation)"
                         class="contents"
                         size="sm"
                 >
@@ -85,12 +85,12 @@ const state = reactive({
         return {
             id,
             label: storeState.collectors[id]?.label || id,
-            linkLocation: getProperRouteLocation({
+            linkLocation: {
                 name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                 params: {
                     collectorId: id,
                 },
-            }),
+            },
         };
     }),
     plugin: computed(() => {

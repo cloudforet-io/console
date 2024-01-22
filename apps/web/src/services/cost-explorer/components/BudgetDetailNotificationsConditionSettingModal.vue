@@ -12,6 +12,7 @@ import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     loading: true,
@@ -150,12 +152,12 @@ const handleConfirm = async () => {
                 <p-link :text="$t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.SET_NOTIFICATION_CHANNEL')"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="{
+                        :to="getProperRouteLocation({
                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                             params: {
                                 id: budgetTargetId
                             }
-                        }"
+                        })"
                         highlight
                 />
             </div>

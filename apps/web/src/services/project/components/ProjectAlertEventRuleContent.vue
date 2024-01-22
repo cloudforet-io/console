@@ -14,6 +14,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 interface Props {
     data?: EventRuleModel;
 }
@@ -27,6 +29,7 @@ interface Field {
     name: keyof EventRuleOptions | keyof EventRuleActions;
     label: TranslateResult;
 }
+const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
     fields: computed<Field[]>(() => ([
         { name: 'no_notification', label: _i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
@@ -84,9 +87,9 @@ const state = reactive({
                             <td v-else-if="field.name === 'change_project'">
                                 <p-link action-icon="internal-link"
                                         new-tab
-                                        :to="referenceRouter(
+                                        :to="getProperRouteLocation(referenceRouter(
                                             state.items[field.name] ?? '',
-                                            { resource_type: 'identity.Project' })"
+                                            { resource_type: 'identity.Project' }))"
                                 >
                                     {{ state.projects[state.items[field.name]] ? state.projects[state.items[field.name]].label : state.items[field.name] }}
                                 </p-link>

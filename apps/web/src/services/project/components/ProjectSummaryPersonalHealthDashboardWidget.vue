@@ -280,7 +280,7 @@ watch(() => tabState.activeTab, () => {
                                     <p-tooltip :contents="resource.entity_value">
                                         <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                                 new-tab
-                                                :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                                :to="getProperRouteLocation(referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' }))"
                                                 class="affected-resource-link"
                                                 highlight
                                         >

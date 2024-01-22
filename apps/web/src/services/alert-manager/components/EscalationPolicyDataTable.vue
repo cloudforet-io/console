@@ -19,6 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{(e: 'update:select-index', value: number[]): void;
     (e: 'change', value: { sortBy: string; sortDesc?: boolean }): void;
 }>();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
@@ -132,9 +134,9 @@ const onChangeSort = (sortBy: string, sortDesc?: boolean) => {
             <template v-if="value && value !== '*'">
                 <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="referenceRouter(
+                        :to="getProperRouteLocation(referenceRouter(
                             value,
-                            { resource_type: 'identity.Project' })"
+                            { resource_type: 'identity.Project' }))"
                 >
                     {{ state.projects[value] ? state.projects[value].label : value }}
                 </p-link>

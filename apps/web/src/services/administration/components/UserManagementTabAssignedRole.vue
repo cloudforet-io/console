@@ -23,6 +23,7 @@ import type { ProjectReferenceItem } from '@/store/reference/project-reference-s
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 
 interface UserRoleItem {
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
@@ -61,17 +63,17 @@ const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
 });
 
-const getProjectLink = (value, isProject: true) => {
+const getProjectLink = (value, isProject: boolean) => {
     if (isProject) {
         const link = router.resolve(referenceRouter(value, {
             resource_type: 'identity.Project',
         }));
-        return link.href;
+        return link.resolved;
     }
     const link = router.resolve(referenceRouter(value, {
         resource_type: 'identity.ProjectGroup',
     }));
-    return link.href;
+    return link.resolved;
 };
 
 const getUserDetailData = async (userId) => {
@@ -113,7 +115,7 @@ watch(() => props.userId, () => {
                 <p-link v-if="value"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :href="getProjectLink(value, false)"
+                        :to="getProperRouteLocation(getProjectLink(value, false))"
                 >
                     {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
                 </p-link>
@@ -125,7 +127,7 @@ watch(() => props.userId, () => {
                 <p-link v-if="value"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :href="getProjectLink(value, true)"
+                        :to="getProperRouteLocation(getProjectLink(value, true))"
                 >
                     {{ state.projects[value] ? state.projects[value].label : value }}
                 </p-link>
