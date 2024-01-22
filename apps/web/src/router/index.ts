@@ -113,8 +113,6 @@ export class SpaceRouter {
             // AccessToken refers to data of existing scope.
             const { rol, wid } = getDecodedDataFromAccessToken();
 
-
-
             // 1. Common processes for all scope
             if (!isValidRoute) {
                 if (isTokenAlive) {
@@ -133,18 +131,7 @@ export class SpaceRouter {
                 next({ name: AUTH_ROUTE.SIGN_OUT._NAME });
                 return;
             }
-            // Workspace to Workspace Case
-            if (rol.startsWith('WORKSPACE') && wid && !to.params.workspaceId) {
-                next({
-                    ...to,
-                    name: to.name,
-                    params: {
-                        ...to.params,
-                        workspaceId: wid,
-                    },
-                });
-                return;
-            }
+
 
             // 2. Processes by Scope
             const routeScope = getRouteScope(to);
@@ -184,7 +171,17 @@ export class SpaceRouter {
                             next();
                             return;
                         }
-
+                        if (wid && !to.params.workspaceId) {
+                            next({
+                                ...to,
+                                name: to.name,
+                                params: {
+                                    ...to.params,
+                                    workspaceId: wid,
+                                },
+                            });
+                            return;
+                        }
                         if (targetWorkspaceId && !getAccessibleWorkspaceId(targetWorkspaceId, workspaceList)) {
                             next({
                                 name: ERROR_ROUTE._NAME,
