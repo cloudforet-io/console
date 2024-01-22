@@ -1,5 +1,4 @@
-import type { ReferenceType } from '@/store/reference/all-reference-store';
-
+import type { ReferenceType } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 interface CostOption {
     type: 'cost';
