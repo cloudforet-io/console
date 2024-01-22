@@ -3,17 +3,17 @@
 </template>
 
 <script lang="ts">
-import type Vue from 'vue';
 import {
-    defineComponent, getCurrentInstance, onMounted,
+    defineComponent, onMounted,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { isUserAccessibleToRoute } from '@/lib/access-control';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
@@ -42,25 +42,33 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const userWorkspaceStore = useUserWorkspaceStore();
-
+        const appContextStore = useAppContextStore();
+        const router = useRouter();
 
         const onSignIn = async () => {
-            const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
-            const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
+            appContextStore.setGlobalGrantLoading(true);
+            try {
+                const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
+                const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
 
-            if (!props.nextPath) {
-                await vm.$router.push(defaultRoute);
-                return;
-            }
+                if (!props.nextPath) {
+                    await router.push(defaultRoute);
+                    return;
+                }
 
-            const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
-            if (isAccessible) {
-                await vm.$router.push(props.nextPath);
-            } else {
-                await vm.$router.push(defaultRoute);
+                const resolvedRoute = router.resolve(props.nextPath);
+                const allRoutes = SpaceRouter.router.getRoutes();
+
+                const isValidRoute = allRoutes.some((route) => route.name === resolvedRoute.route.name);
+                if (isValidRoute) {
+                    await router.push(resolvedRoute.location);
+                } else {
+                    await router.push(defaultRoute);
+                }
+            } catch (e) {
+                appContextStore.setGlobalGrantLoading(false);
+                ErrorHandler.handleError(e);
             }
         };
 

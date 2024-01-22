@@ -38,7 +38,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import NoCollectorModal from '@/services/asset-inventory/components/CollectorHistoryNoCollectorModal.vue';
@@ -106,7 +105,6 @@ const state = reactive({
     pageSize: 30,
     thisPage: 1,
     totalCount: 0,
-    hasManagePermission: useManagePermissionState(),
     isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
@@ -354,7 +352,6 @@ watch(() => state.selectedStatus, (selectedStatus) => {
             </div>
         </div>
         <no-collector-modal :visible.sync="state.modalVisible"
-                            :manage-disabled="!state.hasManagePermission"
                             @confirm="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
         />
     </div>

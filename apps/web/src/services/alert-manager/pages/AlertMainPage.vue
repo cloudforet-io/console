@@ -12,8 +12,6 @@ import { i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
 import {
     ALERT_STATE_FILTER, ALERT_ASSIGNED_FILTER, ALERT_URGENCY_FILTER,
@@ -31,7 +29,6 @@ const state = reactive({
     urgency: queryStringToString(router.currentRoute.query.urgency) ?? ALERT_URGENCY_FILTER.ALL,
     assigned: queryStringToString(router.currentRoute.query.assigned) ?? ALERT_ASSIGNED_FILTER.ALL,
     filters: tagQueryHelper.filters,
-    hasManagePermission: useManagePermissionState(),
 });
 
 const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
@@ -75,7 +72,6 @@ const onUpdateTable = (changed: Partial<AlertListTableFilters>) => {
                 :urgency="state.urgency"
                 :assigned="state.assigned"
                 :filters="state.filters"
-                :manage-disabled="!state.hasManagePermission"
                 class="grid grid-cols-12 col-span-12 gap-4"
                 @update="onUpdateTable"
             />

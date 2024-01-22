@@ -322,8 +322,9 @@ const fetchCostQuerySet = async () => {
 watch([
     () => costDataSourceReferenceStore.getters.hasLoaded,
     () => appContextStore.getters.globalGrantLoading,
-], ([hasLoaded, loading]) => {
-    if (hasLoaded && !loading) fetchCostQuerySet();
+    () => store.getters['user/getCurrentGrantInfo'],
+], ([hasLoaded, loading, grantInfo]) => {
+    if (hasLoaded && !loading && grantInfo === 'WORKSPACE') fetchCostQuerySet();
 }, { immediate: true });
 </script>
 

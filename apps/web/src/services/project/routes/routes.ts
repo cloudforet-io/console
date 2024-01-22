@@ -1,6 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -33,7 +32,6 @@ export default {
             path: '/',
             name: PROJECT_ROUTE._NAME,
             meta: {
-                accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                 menuId: MENU_ID.PROJECT,
                 lnbVisible: true,
             },
@@ -43,7 +41,6 @@ export default {
         {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
             redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },

@@ -39,7 +39,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
@@ -95,7 +94,6 @@ const tableState = reactive({
     tags: computed(() => queryTagsHelper.queryTags.value),
 });
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     timezone: computed(() => store.state.user.timezone),
     pageTitle: computed(() => i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
     actionItems: computed(() => ([
@@ -231,7 +229,6 @@ const onChange = async (options: ToolboxOptions = {}) => {
                     <p-button class="create-button"
                               style-type="primary"
                               icon-left="ic_plus_bold"
-                              :disabled="!state.hasManagePermission"
                               @click="handleSelectAction(ACTION.create)"
                     >
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
@@ -242,7 +239,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :menu="state.actionItems"
                         :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                        :disabled="!state.selectedItem || !state.hasManagePermission"
+                        :disabled="!state.selectedItem"
                         @select="handleSelectAction"
                     />
                 </template>

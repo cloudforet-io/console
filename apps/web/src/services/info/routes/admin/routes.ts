@@ -2,7 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -20,7 +19,6 @@ const infoRoute: RouteConfig = {
     name: makeAdminRouteName(INFO_ROUTE._NAME),
     meta: {
         menuId: MENU_ID.INFO,
-        accessLevel: ACCESS_LEVEL.ADMIN_PERMISSION,
         translationId: MENU_INFO_MAP[MENU_ID.INFO].translationId,
     },
     redirect: () => ({ name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME) }),

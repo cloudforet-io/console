@@ -134,6 +134,8 @@ export const initApiClient = async (store, config) => {
         };
         const reponse = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>(grantRequest);
         SpaceConnector.setToken(reponse.access_token);
+        store.commit('user/setCurrentGrantInfo', { scope: 'USER' });
+        store.commit('user/setCurrentRoleInfo', undefined);
     } catch (e) {
         console.error(e);
     }

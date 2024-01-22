@@ -14,15 +14,13 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
+import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
-import { getRouteAccessLevel } from '@/lib/access-control';
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
@@ -43,9 +41,10 @@ const router = useRouter();
 const route = useRoute();
 
 const state = reactive({
-    showGNB: computed(() => route.matched[0]?.name === 'root' || state.isMyPage),
+    routeScope: computed(() => getRouteScope(route)),
+    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
-    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
+    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
@@ -83,15 +82,14 @@ const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAcce
 
 watch(() => route.path, () => {
     state.notificationEmailModalVisible = route.path !== '/'
-        && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED
+        && state.routeScope !== 'EXCLUDE_AUTH'
         && !state.isEmailVerified
         && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
 }, { immediate: true });
 
 
 watch(() => route.name, (routeName) => {
-    const routerAccessLevel = getRouteAccessLevel(route);
-    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && routerAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
+    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
         state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });
@@ -189,7 +187,7 @@ watch(() => state.userId, (userId) => {
                 :visible.sync="state.notificationEmailModalVisible"
                 :modal-type="MODAL_TYPE.SEND"
             />
-            <notice-popup />
+            <notice-popup v-if="!state.globalGrantLoading" />
             <!--            <survey-modal />-->
         </template>
         <!-- Modal for Cross Browsing -->

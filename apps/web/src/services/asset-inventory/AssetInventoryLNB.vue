@@ -88,25 +88,25 @@ export default defineComponent({
                     type: 'item',
                     id: MENU_ID.SERVER,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
-                    to: {
+                    to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-                    },
+                    }),
                 },
                 {
                     type: 'item',
                     id: MENU_ID.COLLECTOR,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
-                    to: {
+                    to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-                    },
+                    }),
                 },
                 {
                     type: 'item',
                     id: MENU_ID.SERVICE_ACCOUNT,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId),
-                    to: {
+                    to: getProperRouteLocation({
                         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                    },
+                    }),
                 },
             ]),
             adminModeMenuSet: computed<LNBMenu[]>(() => [

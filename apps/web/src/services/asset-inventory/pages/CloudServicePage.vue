@@ -52,7 +52,6 @@
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="mx-auto text-center"
-                                      :disabled="!hasManagePermission"
                             >
                                 {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
                             </p-button>
@@ -108,7 +107,6 @@ import {
 } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -178,7 +176,6 @@ export default {
 
         const searchQueryHelper = new QueryHelper();
         const state = reactive({
-            hasManagePermission: useManagePermissionState(),
             title: computed<string>(() => {
                 if (!isEmpty(storeState.providers[cloudServicePageState.selectedProvider])) {
                     return storeState.providers[cloudServicePageState.selectedProvider].name;
