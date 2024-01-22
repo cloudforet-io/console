@@ -24,6 +24,7 @@ const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
 const alertAssignUserStore = useAlertAssignUserStore();
+const alertAssignUserState = alertAssignUserStore.state;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -32,7 +33,7 @@ const state = reactive({
 
 /* api */
 const updateToAcknowledge = async () => {
-    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id, store.state.user.userId));
+    const promises = props.alerts?.map((d) => alertAssignUserStore.updateToAcknowledgeAndAssignUser(d.alert_id, state.isAssignedToMe ? store.state.user.userId : undefined));
     const results = await Promise.allSettled(promises);
     const rejected = results.filter((d) => d.status === 'rejected');
     if (rejected.length > 0) {
@@ -56,6 +57,7 @@ const onClickConfirm = async () => {
 /* initiators */
 const reset = async () => {
     state.isAssignedToMe = false;
+    await alertAssignUserStore.getUserList();
 };
 
 watch(() => props.visible, async (visible) => {
@@ -75,7 +77,9 @@ watch(() => props.visible, async (visible) => {
         <template #body>
             <div class="body-inner">
                 <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_YOU') }}</p>
-                <p-checkbox v-model="state.isAssignedToMe">
+                <p-checkbox v-model="state.isAssignedToMe"
+                            :disabled="alertAssignUserState.loading || !alertAssignUserState.userIds.includes(store.state.user.userId)"
+                >
                     <span> {{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_ME_YES') }}</span>
                 </p-checkbox>
             </div>
