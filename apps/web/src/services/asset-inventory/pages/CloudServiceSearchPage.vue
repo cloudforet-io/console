@@ -50,7 +50,7 @@ export default {
                     }));
                 } else {
                     queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '' }]);
-                    link = `${userWorkspaceStore.getters.currentWorkspaceId}${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
+                    link = `workspace/${userWorkspaceStore.getters.currentWorkspaceId}${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);
                         link += `&${queryString}`;
