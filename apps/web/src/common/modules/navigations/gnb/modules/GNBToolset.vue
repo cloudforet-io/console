@@ -29,7 +29,6 @@ const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     tooltipTexts: computed<Record<string, string>>(() => ({
-        search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
         recentFavorite: i18n.t('COMMON.GNB.TOOLTIP.RECENT_FAVORITE') as string,
         notifications: i18n.t('COMMON.GNB.TOOLTIP.NOTIFICATIONS') as string,
         profile: i18n.t('COMMON.GNB.TOOLTIP.PROFILE') as string,
@@ -52,14 +51,10 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
 
 <template>
     <div class="gnb-toolset">
-        <p-tooltip :contents="state.tooltipTexts.search"
-                   position="bottom"
-        >
-            <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"
-                          :visible="props.openedMenu === 'search'"
-                          @update:visible="updateOpenedMenu('search', $event)"
-            />
-        </p-tooltip>
+        <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"
+                      :visible="props.openedMenu === 'search'"
+                      @update:visible="updateOpenedMenu('search', $event)"
+        />
         <p-tooltip :contents="state.tooltipTexts.recentFavorite"
                    position="bottom"
         >

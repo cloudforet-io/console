@@ -13,20 +13,25 @@
                             @input="handleUpdateInput"
         />
 
-        <span v-else
-              :class="{'menu-button': true, 'opened': visible}"
-              tabindex="0"
-              role="button"
-              @click.stop="handleSearchButtonClick"
-              @keydown.esc="hideSearchMenu"
-              @keydown.enter="showSearchMenu"
+        <p-tooltip v-else
+                   :contents="tooltipTexts.search"
+                   position="bottom"
         >
-            <p-i name="ic_gnb_search"
-                 height="1.375rem"
-                 width="1.375rem"
-                 color="inherit"
-            />
-        </span>
+            <span :class="{'menu-button': true, 'opened': visible}"
+                  tabindex="0"
+                  role="button"
+                  @click.stop="handleSearchButtonClick"
+                  @keydown.esc="hideSearchMenu"
+                  @keydown.enter="showSearchMenu"
+            >
+                <p-i name="ic_gnb_search"
+                     height="1.375rem"
+                     width="1.375rem"
+                     color="inherit"
+                />
+            </span>
+        </p-tooltip>
+
         <g-n-b-search-dropdown v-show="visible"
                                :input-text="trimmedInputText"
                                :loading="loading"
@@ -55,7 +60,6 @@
 </template>
 
 <script lang="ts">
-
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, defineComponent, onMounted, onUnmounted,
@@ -64,13 +68,16 @@ import {
 import type { DirectiveFunction, SetupContext } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex, PI, screens } from '@spaceone/design-system';
+import {
+    getTextHighlightRegex, PI, screens, PTooltip,
+} from '@spaceone/design-system';
 import { debounce, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { RecentConfig } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
@@ -124,6 +131,7 @@ export default defineComponent<Props>({
         GNBSearchDropdown,
         GNBSearchInput,
         PI,
+        PTooltip,
     },
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
@@ -148,6 +156,9 @@ export default defineComponent<Props>({
             isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
             loading: true,
             showRecent: computed(() => !state.inputText.length),
+            tooltipTexts: computed<Record<string, string>>(() => ({
+                search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
+            })),
         });
 
         const dataState = reactive({
