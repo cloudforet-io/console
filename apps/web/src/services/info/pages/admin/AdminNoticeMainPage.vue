@@ -25,6 +25,8 @@ import {
 
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import NoticeList from '@/services/info/components/NoticeList.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
@@ -41,7 +43,7 @@ export default {
             hasDomainRoleUser: computed(() => store.getters['user/isDomainAdmin']),
         });
         const handleCreateNotice = () => {
-            router.push({ name: INFO_ROUTE.NOTICE.CREATE._NAME });
+            router.push({ name: makeAdminRouteName(INFO_ROUTE.NOTICE.CREATE._NAME) });
         };
 
         return {

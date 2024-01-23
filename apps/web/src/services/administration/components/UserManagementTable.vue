@@ -349,7 +349,7 @@ const handleRemoveButton = async () => {
                 </template>
             </template>
             <template #col-remove_button-format="value">
-                <p-button style-type="tertiary"
+                <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
                           @click.stop="handleClickButton(value.item.role_binding_info)"
