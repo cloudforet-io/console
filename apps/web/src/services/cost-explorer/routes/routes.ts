@@ -2,9 +2,6 @@ import type { RouteConfig } from 'vue-router';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
-import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -28,7 +25,7 @@ const costExplorerRoutes: RouteConfig = {
         menuId: MENU_ID.COST_EXPLORER,
         translationId: MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
     component: CostExplorerContainer,
     children: [
         {

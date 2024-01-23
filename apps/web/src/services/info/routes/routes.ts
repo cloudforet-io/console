@@ -1,8 +1,5 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
-
-import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -20,7 +17,7 @@ const infoRoute: RouteConfig = {
         menuId: MENU_ID.INFO,
         translationId: MENU_INFO_MAP[MENU_ID.INFO].translationId,
     },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: { name: INFO_ROUTE.NOTICE._NAME },
     component: InfoContainer,
     children: [
         {

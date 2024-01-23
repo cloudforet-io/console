@@ -18,9 +18,9 @@ export const integralRoutes: RouteConfig[] = [
         path: '/',
         name: ROOT_ROUTE._NAME,
         component: { template: '<router-view />' },
-        redirect: () => ({
+        redirect: {
             name: ROOT_ROUTE.WORKSPACE._NAME,
-        }),
+        },
         children: [
             ...authRoutes,
 
