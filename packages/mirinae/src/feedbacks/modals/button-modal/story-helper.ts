@@ -276,6 +276,24 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'number',
         },
     },
+    modalBodyId: {
+        name: 'modalBodyId',
+        type: { name: 'string' },
+        description: 'id for modal body',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'string',
+        },
+    },
     // model
     'v-model': {
         name: 'v-model',

@@ -43,6 +43,7 @@
                             />
                         </h3>
                         <div v-if="!hideBody"
+                             :id="modalBodyId"
                              class="modal-body"
                              :class="allBodyClass"
                         >
@@ -197,6 +198,10 @@ export default defineComponent<ButtonModalProps>({
         disabled: {
             type: Boolean,
             default: false,
+        },
+        modalBodyId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props, { emit }) {

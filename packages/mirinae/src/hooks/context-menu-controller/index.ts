@@ -44,6 +44,7 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
     position?: 'left' | 'right';
     hideHeaderWithoutItems?: Ref<boolean|undefined>|boolean;
     multiSelectable?: Ref<boolean|undefined>|boolean;
+    parentId?: Ref<string|undefined>|string;
 }
 
 
@@ -51,7 +52,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, multiSelectable,
+    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, multiSelectable, parentId,
 }: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -93,6 +94,7 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         position: state.position,
         menuRef: contextMenuRef,
         multiSelectable: multiSelectable ?? false,
+        parentId,
     });
 
     // menu filtering
