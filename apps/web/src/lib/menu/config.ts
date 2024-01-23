@@ -13,6 +13,7 @@ export const MENU_ID = Object.freeze({
     COST_EXPLORER: 'cost_explorer',
     COST_ANALYSIS: 'cost_analysis',
     BUDGET: 'budget',
+    COST_REPORT: 'cost_report',
     ALERT_MANAGER: 'alert_manager',
     ALERT_MANAGER_DASHBOARD: 'alert_manager_dashboard',
     ALERT: 'alert',
