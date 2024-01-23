@@ -24,6 +24,7 @@ import { GTag } from '@/lib/site-analytics/gtag';
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
@@ -210,8 +211,8 @@ export class SpaceRouter {
                                 }
                             } else {
                                 nextLocation = {
-                                    name: ERROR_ROUTE._NAME,
-                                    params: { statusCode: '403' },
+                                    name: HOME_DASHBOARD_ROUTE._NAME,
+                                    params: { workspaceId: validWorkspaceId },
                                 };
                             }
                         }
