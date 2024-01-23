@@ -424,6 +424,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                 >
                     <p-select-dropdown :key="menuState.contextKey"
                                        use-fixed-menu-style
+                                       parent-id="dashboard-widget-option"
                                        appearance-type="badge"
                                        is-fixed-width
                                        :is-filterable="!state.inherit"

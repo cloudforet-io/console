@@ -133,6 +133,7 @@ const handleConfirm = async () => {
 <template>
     <p-button-modal
         class="project-member-invite-modal"
+        modal-body-id="project-member-invite"
         :header-title="$t('PROJECT.DETAIL.MEMBER.INVITE_MEMBER')"
         :fade="true"
         :backdrop="true"
@@ -153,6 +154,7 @@ const handleConfirm = async () => {
                             :menu="state.userMenuItems"
                             :selected="selectedUserItems"
                             :search-text.sync="state.searchText"
+                            parent-id="project-member-invite"
                             multi-selectable
                             appearance-type="stack"
                             show-select-marker

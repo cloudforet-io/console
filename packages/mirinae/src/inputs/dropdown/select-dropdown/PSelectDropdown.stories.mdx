@@ -57,6 +57,7 @@ export const Template = (args, { argTypes }) => ({
             :show-select-marker="showSelectMarker"
             :menu-position="menuPosition"
             :index-mode="indexMode"
+            :parent-id="parentId"
             :handler="handler"
             :disable-handler="disableHandler"
             :page-size="pageSize"
@@ -459,7 +460,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PSelectDropdown, PToggleButton },
             template: `
-        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
+        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;" id="select-dropdown-wrapper">
             <div style="height: 500px;">
                 <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
                     Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
@@ -468,6 +469,8 @@ export const Template = (args, { argTypes }) => ({
                     When you scroll parent elements, the menu will be automatically hidden.
                 </p>
                 <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" />
+                <p class="text-lg mt-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">Multi Selectable</p>
+                <p-select-dropdown v-if="show" :menu="menuItems" :use-fixed-menu-style="useFixedMenuStyle" class="mt-5" multiSelectable parentId="select-dropdown-wrapper" />
             </div>
         </div>
 `,

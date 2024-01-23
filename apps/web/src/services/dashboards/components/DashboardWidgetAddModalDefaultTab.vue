@@ -72,7 +72,9 @@ const selectWidget = (widgetConfigId: string) => {
                 </li>
             </ul>
         </div>
-        <div class="right-area">
+        <div id="dashboard-widget-option"
+             class="right-area"
+        >
             <div v-if="!state.selectedWidgetConfigId"
                  class="no-selected-wrapper"
             >

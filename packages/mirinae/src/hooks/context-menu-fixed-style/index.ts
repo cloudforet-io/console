@@ -15,10 +15,11 @@ interface UseContextMenuFixedStyleOptions {
     position?: 'left' | 'right';
     menuRef?: Ref<Vue|HTMLElement|null>;
     multiSelectable?: Ref<boolean|undefined>|boolean;
+    parentId?: Ref<string|undefined>|string;
 }
 
 export const useContextMenuFixedStyle = ({
-    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef, multiSelectable,
+    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef, multiSelectable, parentId,
 }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
@@ -33,6 +34,7 @@ export const useContextMenuFixedStyle = ({
         menuElement: computed<Element|null>(() => (contextMenuFixedStyleState.menuRef as Vue)?.$el ?? contextMenuFixedStyleState.menuRef),
         menuTitleElement: computed<Element|null>(() => contextMenuFixedStyleState.menuElement?.getElementsByClassName('context-menu-title-wrapper')[0] ?? null),
         contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
+        parentId: parentId ?? undefined,
     });
 
     const hideMenu = throttle(() => {
@@ -121,6 +123,8 @@ export const useContextMenuFixedStyle = ({
 
     const prevX = ref(0);
     const prevY = ref(0);
+    const parentElement = ref<HTMLElement|null>(null);
+
     const observeElementChanges = () => {
         if (!state.useFixedMenuStyle) return;
 
@@ -135,6 +139,16 @@ export const useContextMenuFixedStyle = ({
                 if (!contextMenuFixedStyleState.menuElement) return;
                 contextMenuFixedStyleState.menuElement.style.top = `${y + height}px`;
                 contextMenuFixedStyleState.menuElement.style.left = `${x}px`;
+                if (parentElement.value) {
+                    const { y: parentY, bottom } = parentElement.value.getBoundingClientRect();
+                    /*
+                        To address the issue of the menu persistently showing when there is an upper layer of the select-dropdown,
+                        this code is written to close the menu when the select-dropdown is hidden behind an upper layer.
+                    */
+                    if ((parentY > y) || (bottom - height < y)) {
+                        hideMenu();
+                    }
+                }
             }
         }
 
@@ -146,6 +160,10 @@ export const useContextMenuFixedStyle = ({
 
     onMounted(() => {
         observeElementChanges();
+    });
+    onMounted(() => {
+        if (!contextMenuFixedStyleState.parentId) return;
+        parentElement.value = document.getElementById(contextMenuFixedStyleState.parentId);
     });
 
     return {
