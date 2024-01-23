@@ -79,8 +79,7 @@ const handleChangeTarget = (target: string) => {
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
                     </p-link>
                 </div>
-                <div class="col-span-12 lg:col-span-6">
-                </div>
+                <div class="col-span-12 lg:col-span-6" />
             </div>
             <div ref="chartContext"
                  class="chart"

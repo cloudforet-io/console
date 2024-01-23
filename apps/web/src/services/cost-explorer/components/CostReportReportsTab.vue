@@ -14,9 +14,8 @@ import type { Currency } from '@/store/modules/settings/type';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
-
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
 const state = reactive({
