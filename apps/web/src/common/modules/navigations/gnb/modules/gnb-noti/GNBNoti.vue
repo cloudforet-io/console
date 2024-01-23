@@ -18,6 +18,7 @@ import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
@@ -85,11 +86,16 @@ const handleNotiButtonClick = () => {
     setVisible(!props.visible);
 };
 
+
+
 onMounted(() => {
     store.dispatch('display/startCheckNotification');
     noticeStore.fetchNoticeReadState();
-    noticeStore.fetchNoticeCount();
 });
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], noticeStore.fetchNoticeCount);
+callApiWithGrantGuard();
+
+
 onUnmounted(() => {
     store.dispatch('display/stopCheckNotification');
 });
