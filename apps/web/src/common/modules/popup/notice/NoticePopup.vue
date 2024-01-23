@@ -79,7 +79,7 @@ watch([
     if (hasLoaded) return;
     if (isNoRoleUser || isSessionExpired) {
         state.popupList = [];
-    } else if (!globalGrantLoading && grantInfo && grantInfo?.scope !== 'USER') {
+    } else if (!globalGrantLoading && grantInfo && grantInfo?.scope !== 'USER') { // grantInfo can be undefined
         await getPostList();
         state.hasLoaded = true;
     }
