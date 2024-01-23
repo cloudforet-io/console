@@ -68,7 +68,7 @@
                             <p-e-m-key-format v-else-if="schemaProperty.componentName === 'PEMKeyFormat'"
                                               :key="`PEMKeyFormat-${schemaProperty.propertyName}`"
                                               :value="rawFormData[schemaProperty.propertyName]"
-                                              :disabled="schemaProperty.disabled"
+                                              :readonly="schemaProperty.disabled"
                                               class="input-form"
                                               @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />

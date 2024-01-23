@@ -2,7 +2,7 @@
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 interface Props {
-    disabled: any;
+    readonly: any;
     value?: string;
 }
 
@@ -20,7 +20,7 @@ const handleUpdateData = (code: string) => {
     <div>
         <p-text-editor :code="props.value"
                        disable-auto-reformat
-                       :read-only="props.disabled"
+                       :read-only="props.readonly"
                        @update:code="handleUpdateData"
         />
     </div>
