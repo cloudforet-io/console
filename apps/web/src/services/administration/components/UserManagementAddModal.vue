@@ -178,6 +178,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
 <template>
     <p-button-modal ref="containerRef"
                     class="user-management-additional-modal"
+                    modal-body-id="workspace-role-form"
                     :header-title="userPageState.modal.title"
                     size="md"
                     :theme-color="userPageState.modal.themeColor"

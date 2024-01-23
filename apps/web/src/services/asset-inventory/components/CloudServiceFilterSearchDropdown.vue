@@ -111,6 +111,7 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
         <p-select-dropdown :search-text.sync="state.searchTerm"
                            :menu="state.menuItems"
                            :selected="state.selectedItems"
+                           parent-id="cloud-service-filter-search"
                            multi-selectable
                            use-fixed-menu-style
                            appearance-type="stack"
