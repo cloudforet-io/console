@@ -16,6 +16,8 @@ import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { red } from '@/styles/colors';
 
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
@@ -46,6 +48,7 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone),
     alertStateI18n: useAlertStateI18n(),
 });
+const { getProperRouteLocation } = useProperRouteLocation();
 
 /* util */
 const badgeStyleTypeFormatter = (alertState) => {
@@ -89,7 +92,7 @@ const projectNameFormatter = (projectId) => props.projectReference?.label || pro
                         class="project-link"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
-                        :to="referenceRouter(props.item.project_id,{ resource_type: 'identity.Project' })"
+                        :to="getProperRouteLocation(referenceRouter(props.item.project_id,{ resource_type: 'identity.Project' }))"
                         hide-icon
                 >
                     {{ projectNameFormatter(props.item.project_id) }}

@@ -17,8 +17,6 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import { gray } from '@/styles/colors';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
@@ -59,7 +57,6 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     loadingWidget: true,
-    hasManagePermission: useManagePermissionState(),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     component: null as AsyncComponent|null,
     variablesSnapshot: {} as IDashboardVariables,
@@ -158,7 +155,7 @@ onBeforeUnmount(() => {
                         <p-button icon-left="ic_edit"
                                   size="md"
                                   style-type="tertiary"
-                                  :disabled="!state.hasManagePermission || state.sidebarVisible"
+                                  :disabled="state.sidebarVisible"
                                   class="edit-button"
                                   @click="handleClickEditOption"
                         >
@@ -168,7 +165,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables :is-manageable="state.hasManagePermission"
+                        <dashboard-variables is-manageable
                                              disable-more-button
                                              disable-save-button
                                              :origin-variables="state.variablesSnapshot"

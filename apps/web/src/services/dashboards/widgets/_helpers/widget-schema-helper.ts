@@ -27,7 +27,7 @@ Object.entries(WIDGET_OPTIONS_SCHEMA_PROPERTIES).forEach(([optionKey, property])
 
 export const getWidgetOptionKeyByVariableKey = (key: string): WidgetFilterOptionKey|undefined => VAR_KEY_TO_OPTION_KEY_MAP[key];
 
-export const getNonInheritedWidgetOptionsAmongUsedVariables = (
+export const getNonInheritedWidgetOptionNamesAmongUsedVariables = (
     variablesSchema: DashboardVariablesSchema,
     widgetInheritOptions: InheritOptions = {},
     schemaProperties: string[] = [],
@@ -86,7 +86,19 @@ export const getRefinedSchemaProperties = (
     storedProperties: string[],
     initialProperties: string[],
     widgetOptions?: WidgetOptions,
+    inheritOptions?: InheritOptions,
 ): string[] => {
-    const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
-    return union(initialProperties, optionExistProperties);
+    const merged = union(initialProperties, storedProperties);
+    return merged.reduce((results, property) => {
+        const isStored = storedProperties.includes(property);
+        const isInitial = initialProperties.includes(property);
+        if (isStored && isInitial) {
+            results.push(property);
+        } else if (isStored && !isInitial) {
+            if (get(widgetOptions, property)) results.push(property);
+        } else if (!isStored && isInitial) {
+            if (inheritOptions?.[property]?.enabled) results.push(property);
+        }
+        return results;
+    }, [] as string[]);
 };

@@ -11,6 +11,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
@@ -22,6 +23,8 @@ const props = defineProps<{
     alertData?: Record<string, any>;
     manageDisabled?: boolean;
 }>();
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const {
     state: alertDetailItemState,
     cancelEdit,
@@ -57,9 +60,9 @@ const onSelectProject = (selected) => {
                 <p-copy-button :value="props.alertData.project_id">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
-                            :to="referenceRouter(
+                            :to="getProperRouteLocation(referenceRouter(
                                 props.alertData.project_id,
-                                { resource_type: 'identity.Project' })"
+                                { resource_type: 'identity.Project' }))"
                             highlight
                     >
                         {{ state.projects[props.alertData.project_id] ? state.projects[props.alertData.project_id].label : props.alertData.project_id }}

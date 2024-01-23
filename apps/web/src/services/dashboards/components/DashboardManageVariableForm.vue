@@ -7,6 +7,7 @@ import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
 } from '@spaceone/design-system';
 
+import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -17,7 +18,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/components/DashboardManageVariableOptionsField.vue';
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/types/dashboard-model-type';
 import type {
     ManageVariableFormOption,
     ManageVariableOverlayStatus,

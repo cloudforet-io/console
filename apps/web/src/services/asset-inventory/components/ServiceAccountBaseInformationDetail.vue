@@ -7,6 +7,8 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -19,6 +21,7 @@ const props = defineProps<{
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     detailSchema: {} as Partial<DynamicLayout>,
@@ -35,7 +38,7 @@ const state = reactive({
 /* Util */
 const fieldHandler = (field) => {
     if (field.extraData?.reference) {
-        return referenceFieldFormatter(field.extraData.reference, field.data);
+        return referenceFieldFormatter({ ...field.extraData.reference, workspace_id: userWorkspaceStore.getters.currentWorkspaceId }, field.data);
     }
     return {};
 };

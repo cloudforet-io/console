@@ -13,11 +13,10 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import type {
-    DynamicLayout,
+    DynamicLayout, DynamicLayoutOptions,
     SearchSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import type { DynamicLayoutOptions } from '@cloudforet/core-lib/component-util/dynamic-layout/layout-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -34,6 +33,7 @@ import type { TrustedAccountListParameters } from '@/schema/identity/trusted-acc
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -61,6 +61,7 @@ const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -189,7 +190,7 @@ const exportServiceAccountData = async () => {
 /** Field Handler for display formatting(project id -> project name)* */
 const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
     if (field.extraData?.reference && field.data !== null) {
-        return referenceFieldFormatter(field.extraData.reference, field.data);
+        return referenceFieldFormatter({ ...field.extraData.reference, workspace_id: userWorkspaceStore.getters.currentWorkspaceId }, field.data);
     }
     return {};
 };

@@ -12,6 +12,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const props = defineProps<{
@@ -23,6 +25,7 @@ const props = defineProps<{
 }>();
 
 const queryHelper = new QueryHelper();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
@@ -61,7 +64,7 @@ const state = reactive({
         <p-link v-if="state.link"
                 :action-icon="ACTION_ICON.INTERNAL_LINK"
                 new-tab
-                :to="state.link"
+                :to="getProperRouteLocation(state.link)"
         >
             {{ state.label }}
         </p-link>

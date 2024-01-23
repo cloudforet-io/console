@@ -38,10 +38,10 @@ export default defineComponent({
             header: computed(() => (isAdminMode.value ? i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION].translationId) : i18n.t(MENU_INFO_MAP[MENU_ID.IAM].translationId))),
             userModeMenuSet: computed<LNBMenu[]>(() => [
                 {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: getProperRouteLocation({ name: ADMINISTRATION_ROUTE.IAM.USER._NAME }),
                 },
                 {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: { name: ADMINISTRATION_ROUTE.IAM.APP._NAME },
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: getProperRouteLocation({ name: ADMINISTRATION_ROUTE.IAM.APP._NAME }),
                 },
             ]),
             adminModeMenuSet: computed<LNBMenu[]>(() => [

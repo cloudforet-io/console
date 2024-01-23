@@ -37,7 +37,7 @@
                         {{ state.description }}
                     </span>
                     <p-link v-if="state.pluginDetailLink"
-                            :href="state.pluginDetailLink"
+                            :to="getProperRouteLocation(state.pluginDetailLink)"
                             :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
                             size="sm"
@@ -64,6 +64,7 @@
 import {
     defineProps, reactive, computed,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PLazyImg, PLabel, PI, PTooltip,
@@ -74,6 +75,8 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/constants/collector-constant';
 
@@ -89,6 +92,9 @@ const props = withDefaults(defineProps<Props>(), {
     hideLabels: false,
     emphasizeName: false,
 });
+const { getProperRouteLocation } = useProperRouteLocation();
+
+const router = useRouter();
 
 const state = reactive({
     icon: computed<string>(() => assetUrlConverter(props.plugin?.tags?.icon ?? '')),
@@ -96,7 +102,12 @@ const state = reactive({
     description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
     labels: computed<string[]>(() => (props.plugin as PluginModel)?.labels ?? []), // it is empty with collector plugin
     isBeta: computed<boolean>(() => !!(props.plugin as PluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
-    pluginDetailLink: computed<string>(() => props.plugin?.tags?.link ?? ''),
+    pluginDetailLink: computed(() => {
+        const link = props.plugin?.tags?.link ?? '';
+        if (!link) return undefined;
+        const resolvedResult = router.resolve(link);
+        return resolvedResult.resolved;
+    }),
     repositoryType: computed<string>(() => props.plugin?.repository_info?.repository_type ?? ''),
     repositoryName: computed<string>(() => props.plugin?.repository_info?.name ?? ''),
 });

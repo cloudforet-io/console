@@ -17,12 +17,16 @@ export const initWorkspace = async (userId?: string): Promise<void> => {
 
     /* Set Default Workspace */
     const { pathname } = window.location;
-    let workspaceId: string | undefined;
-    const workspacePath = pathname?.split('/')[1];
-    if (workspacePath === 'admin') {
-        workspaceId = undefined;
-    } else if (workspacePath) {
-        workspaceId = workspacePath;
-    } else workspaceId = lastAccessedWorkspaceId;
-    userWorkspaceStore.setCurrentWorkspace(workspaceId);
+    // let workspaceId: string | undefined;
+    // const workspacePath = pathname?.split('/')[1];
+    // if (workspacePath === 'admin') {
+    //     workspaceId = undefined;
+    // } else if (workspacePath) {
+    //     workspaceId = workspacePath;
+    // } else workspaceId = lastAccessedWorkspaceId;
+    // userWorkspaceStore.setCurrentWorkspace(workspaceId);
+    //
+    if (pathname?.split('/')[1] !== 'admin') {
+        userWorkspaceStore.setCurrentWorkspace(lastAccessedWorkspaceId);
+    }
 };

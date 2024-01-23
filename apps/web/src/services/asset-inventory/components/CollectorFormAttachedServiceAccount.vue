@@ -219,6 +219,7 @@ watch(() => collectorFormState.attachedServiceAccount, (value) => {
                                        :reset-selected-on-unmounted="false"
                                        is-filterable
                                        show-delete-all-button
+                                       use-fixed-menu-style
                                        @update:selected="handleSelectAttachedServiceAccount"
                     >
                         <template #dropdown-left-area>
@@ -275,7 +276,7 @@ watch(() => collectorFormState.attachedServiceAccount, (value) => {
 
             .include-exclude-selector {
                 @apply flex;
-                margin: 0.75rem 0.5rem;
+                padding: 0.75rem 0.5rem;
                 border-radius: 0.25rem;
                 overflow: hidden;
             }

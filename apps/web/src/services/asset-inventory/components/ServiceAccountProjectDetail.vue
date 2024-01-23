@@ -3,7 +3,7 @@
         <p-link v-if="!!projectName"
                 :action-icon="ACTION_ICON.INTERNAL_LINK"
                 new-tab
-                :href="projectLink"
+                :to="getProperRouteLocation(projectLink)"
         >
             {{ projectName }}
         </p-link>
@@ -40,6 +40,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
 
 export default {
     name: 'ServiceAccountProjectDetail',
@@ -59,6 +61,8 @@ export default {
         },
     },
     setup(props) {
+        const { getProperRouteLocation } = useProperRouteLocation();
+
         const allReferenceStore = useAllReferenceStore();
         const storeState = reactive({
             projects: computed(() => allReferenceStore.getters.project),
@@ -72,7 +76,7 @@ export default {
                 if (props.projectId) {
                     return SpaceRouter.router.resolve(referenceRouter(props.projectId, {
                         resource_type: 'identity.Project',
-                    })).href;
+                    })).resolved;
                 }
                 return undefined;
             }),
@@ -82,6 +86,7 @@ export default {
             ...toRefs(state),
             ACCOUNT_TYPE,
             ACTION_ICON,
+            getProperRouteLocation,
         };
     },
 };

@@ -120,7 +120,6 @@ export default defineComponent<Props>({
         width: calc(100% - 1.5rem);
         margin-left: 0.75rem;
         margin-right: 0.75rem;
-        margin-bottom: 1rem;
     }
 }
 </style>

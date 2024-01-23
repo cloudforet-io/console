@@ -25,6 +25,7 @@ import type { ProjectChannelModel } from '@/schema/notification/project-channel/
 import { i18n as _i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
     escalationPolicy: undefined,
 });
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const queryHelper = new QueryHelper();
 const state = reactive({
     finishConditions: computed<FinishConditionItem[]>(() => ([
@@ -117,7 +119,7 @@ onActivated(async () => {
             <p-link class="value"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="state.escalationPolicyLink"
+                    :to="getProperRouteLocation(state.escalationPolicyLink)"
                     highlight
             >
                 {{ state.escalationPolicyName }}

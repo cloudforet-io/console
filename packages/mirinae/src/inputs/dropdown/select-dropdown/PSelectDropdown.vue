@@ -147,7 +147,7 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideMenu);
 
 /* context menu controller */
-const menuRef = ref<any|null>(null);
+const menuRef = ref<HTMLElement|null>(null);
 const targetRef = ref<HTMLElement|null>(null);
 const {
     contextMenuStyle,
@@ -170,6 +170,7 @@ const {
     menu: toRef(props, 'menu'),
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
+    multiSelectable: toRef(props, 'multiSelectable'),
 });
 
 /* focusing */

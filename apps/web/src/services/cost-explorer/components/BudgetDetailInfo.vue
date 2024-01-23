@@ -32,6 +32,8 @@ const changeToLabelList = (providerList: string[]): string => providerList.map((
 
 const { isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -144,7 +146,7 @@ watch(() => costTypeRef.value, (costType) => {
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
-                        :to="state.targetLocation"
+                        :to="getProperRouteLocation(state.targetLocation)"
                 >
                     {{ state.targetLabel.name }}
                 </p-link>

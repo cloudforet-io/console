@@ -13,19 +13,25 @@ interface UseContextMenuFixedStyleOptions {
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
     position?: 'left' | 'right';
+    menuRef?: Ref<Vue|HTMLElement|null>;
+    multiSelectable?: Ref<boolean|undefined>|boolean;
 }
 
 export const useContextMenuFixedStyle = ({
-    useFixedMenuStyle, visibleMenu, targetRef, position,
+    useFixedMenuStyle, visibleMenu, targetRef, position, menuRef, multiSelectable,
 }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
+        multiSelectable: multiSelectable ?? false,
         visibleMenu,
     });
 
     const contextMenuFixedStyleState = reactive({
         targetRef: targetRef ?? null,
         targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
+        menuRef: menuRef ?? null,
+        menuElement: computed<Element|null>(() => (contextMenuFixedStyleState.menuRef as Vue)?.$el ?? contextMenuFixedStyleState.menuRef),
+        menuTitleElement: computed<Element|null>(() => contextMenuFixedStyleState.menuElement?.getElementsByClassName('context-menu-title-wrapper')[0] ?? null),
         contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
     });
 
@@ -33,9 +39,14 @@ export const useContextMenuFixedStyle = ({
         if (state.visibleMenu) state.visibleMenu = false;
     }, 300);
 
-    const setStyleOfContextMenu = (targetElement: Element) => {
+    const setStyleOfContextMenu = (targetElement: Element, menuElement?:Element) => {
         const targetRects: DOMRect = targetElement.getBoundingClientRect();
+        const menuTitleRects: DOMRect|undefined = menuElement?.getBoundingClientRect();
 
+        let menuHeaderHeight = 0;
+        if (menuTitleRects) {
+            menuHeaderHeight = menuTitleRects.height;
+        }
         const contextMenuStyle: Partial<CSSStyleDeclaration> = {
             // overflowY: 'auto',
             position: 'absolute',
@@ -50,7 +61,7 @@ export const useContextMenuFixedStyle = ({
             contextMenuStyle.maxWidth = '100%';
         }
 
-        if (window.innerHeight * 0.9 > (targetRects.bottom)) {
+        if (window.innerHeight * 0.9 > targetRects.bottom + menuHeaderHeight) {
             const height = window.innerHeight - targetRects.bottom - 12;
             contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
             if (state.useFixedMenuStyle) contextMenuStyle.top = `${targetRects.bottom}px`;
@@ -70,14 +81,14 @@ export const useContextMenuFixedStyle = ({
         contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
     };
 
-    watch([() => state.visibleMenu, () => contextMenuFixedStyleState.targetElement], async ([_visibleMenu, targetElement]) => {
+    watch([() => state.visibleMenu, () => contextMenuFixedStyleState.targetElement, () => contextMenuFixedStyleState.menuElement], async ([_visibleMenu, targetElement, menuElement]) => {
         if (!_visibleMenu || !targetElement) {
             contextMenuFixedStyleState.contextMenuStyle = {};
             return;
         }
         if (_visibleMenu && targetElement) {
             await nextTick(); // Needed codes for timing issues between painting DOM and visibleMenu
-            setStyleOfContextMenu(targetElement);
+            setStyleOfContextMenu(targetElement, menuElement);
         }
     }, { immediate: true });
 
@@ -92,14 +103,20 @@ export const useContextMenuFixedStyle = ({
         window.removeEventListener('resize', handleWindowResize);
     });
 
-    const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    const targetObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
         entries.forEach((entry) => {
             setStyleOfContextMenu(entry.target);
         });
     });
+    const menuObserver = new ResizeObserver((entries) => {
+        entries.forEach((entry) => {
+            setStyleOfContextMenu(contextMenuFixedStyleState.targetElement, entry.target);
+        });
+    });
 
     onMounted(() => {
-        observer.observe(contextMenuFixedStyleState.targetElement);
+        targetObserver.observe(contextMenuFixedStyleState.targetElement);
+        if (contextMenuFixedStyleState.menuTitleElement) menuObserver.observe(contextMenuFixedStyleState.menuTitleElement);
     });
 
     const prevX = ref(0);
@@ -109,10 +126,16 @@ export const useContextMenuFixedStyle = ({
 
         if (!contextMenuFixedStyleState.targetElement) return;
 
-        const { x, y } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
+        const { x, y, height } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
 
         if (x !== prevX.value || y !== prevY.value) {
-            hideMenu();
+            if (!state.multiSelectable) {
+                hideMenu();
+            } else {
+                if (!contextMenuFixedStyleState.menuElement) return;
+                contextMenuFixedStyleState.menuElement.style.top = `${y + height}px`;
+                contextMenuFixedStyleState.menuElement.style.left = `${x}px`;
+            }
         }
 
         prevX.value = x;

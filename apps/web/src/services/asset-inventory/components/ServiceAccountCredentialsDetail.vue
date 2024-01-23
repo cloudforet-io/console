@@ -13,6 +13,7 @@ import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -25,14 +26,12 @@ interface Props {
     loading: boolean;
     credentialData: Partial<SecretModel|TrustedSecretModel>;
     attachedTrustedAccountId?: string;
-    hasManagePermission: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     credentialData: () => ({}),
     attachedTrustedAccountId: undefined,
-    hasManagePermission: false,
 });
 
 const emit = defineEmits<{(e: 'edit'): void;
@@ -41,6 +40,7 @@ const storeState = reactive({
     trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
 });
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     attachedTrustedAccount: computed(() => {
@@ -93,7 +93,7 @@ const state = reactive({
 /* Util */
 const fieldHandler = (field) => {
     if (field.extraData?.reference) {
-        return referenceFieldFormatter(field.extraData.reference, field.data);
+        return referenceFieldFormatter({ ...field.extraData.reference, workspace_id: userWorkspaceStore.getters.currentWorkspaceId }, field.data);
     }
     return {};
 };
@@ -128,8 +128,7 @@ const handleClickAddButton = () => {
                 <p class="text">
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NO_CREDENTIALS') }}
                 </p>
-                <p-button v-if="props.hasManagePermission"
-                          style-type="substitutive"
+                <p-button style-type="substitutive"
                           icon-left="ic_plus_bold"
                           @click="handleClickAddButton"
                 >

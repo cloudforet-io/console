@@ -21,7 +21,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/components/CostAnalysisFiltersPopper.vue';
@@ -50,7 +49,6 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     queryFormModalVisible: false,
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
@@ -173,8 +171,7 @@ watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div v-if="state.hasManagePermission"
-                 ref="rightPartRef"
+            <div ref="rightPartRef"
                  class="right-part"
             >
                 <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">

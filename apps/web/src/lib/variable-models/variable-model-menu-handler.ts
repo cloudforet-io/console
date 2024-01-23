@@ -39,7 +39,7 @@ export const getVariableModelMenuHandler = (variableModel: VariableModel|Variabl
             start: pageStart,
             limit: pageLimit ?? 10,
             search: inputText,
-            filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
+            filters: (Array.isArray(filters) && filters.length > 0) ? filters.map((f) => f.name as string) : undefined,
             options,
         });
         return variableModels.map((model, i) => {

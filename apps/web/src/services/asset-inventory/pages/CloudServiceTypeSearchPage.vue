@@ -46,7 +46,7 @@ export default {
                         },
                     }));
                 } else {
-                    let link = `${userWorkspaceStore.getters.currentWorkspaceId}${result.url}`;
+                    let link = `workspace/${userWorkspaceStore.getters.currentWorkspaceId}${result.url}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);
                         link += `?${queryString}`;

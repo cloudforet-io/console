@@ -43,6 +43,7 @@ export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuIte
     /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
     position?: 'left' | 'right';
     hideHeaderWithoutItems?: Ref<boolean|undefined>|boolean;
+    multiSelectable?: Ref<boolean|undefined>|boolean;
 }
 
 
@@ -50,7 +51,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems,
+    useMenuFiltering, searchText, handler, pageSize, position, hideHeaderWithoutItems, multiSelectable,
 }: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -90,6 +91,8 @@ export const useContextMenuController = <Item extends MenuItem = MenuItem>({
         visibleMenu: toRef(state, 'visibleMenu'),
         targetRef,
         position: state.position,
+        menuRef: contextMenuRef,
+        multiSelectable: multiSelectable ?? false,
     });
 
     // menu filtering

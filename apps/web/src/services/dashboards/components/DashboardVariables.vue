@@ -5,6 +5,8 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
+import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardManageVariableOverlay
@@ -15,7 +17,6 @@ import DashboardVariablesMoreButton
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
 interface Props {
     isManageable?: boolean;

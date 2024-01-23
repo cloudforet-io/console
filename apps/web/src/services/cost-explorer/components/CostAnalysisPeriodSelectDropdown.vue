@@ -15,8 +15,6 @@ import { i18n } from '@/translations';
 
 import { queryStringToObject, queryStringToString } from '@/lib/router-query-string';
 
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
 import CostAnalysisCustomDateRangeModal from '@/services/cost-explorer/components/CostAnalysisCustomDateRangeModal.vue';
 import {
     PERIOD_DROPDOWN_MENU, PERIOD_DROPDOWN_MENU_ITEM_MAP,
@@ -51,30 +49,33 @@ const costAnalysisPageState = costAnalysisPageStore.state;
 
 const route = useRoute();
 const router = useRouter();
-const { i18nDayjs } = useI18nDayjs();
 const state = reactive({
     period: initiatePeriodByGranularity(GRANULARITY.MONTHLY)[0],
-    dailyPeriodItems: computed<PeriodItem[]>(() => [
-        {
-            ...PERIOD_DROPDOWN_MENU_ITEM_MAP.CURRENT_MONTH,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
-        },
-        {
-            ...PERIOD_DROPDOWN_MENU_ITEM_MAP.LAST_MONTH,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
-        },
-        ...(range(12).map((i) => {
-            const start = today.subtract(i, 'month').startOf('month');
-            const end = today.subtract(i, 'month').endOf('month');
-            return {
-                name: start.format('YYYY-MM'),
-                label: i18nDayjs.value(start).format('MMMM, YYYY'),
-                period: {
-                    start: start.format('YYYY-MM'),
-                    end: end.format('YYYY-MM'),
-                },
-            };
-        }))]),
+    dailyPeriodItems: computed<PeriodItem[]>(() => {
+        const locale = i18n.locale;
+        return [
+            {
+                ...PERIOD_DROPDOWN_MENU_ITEM_MAP.CURRENT_MONTH,
+                label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.THIS_MONTH'),
+            },
+            {
+                ...PERIOD_DROPDOWN_MENU_ITEM_MAP.LAST_MONTH,
+                label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.LAST_MONTH'),
+            },
+            ...(range(12).map((i) => {
+                const start = today.subtract(i, 'month').startOf('month');
+                const end = today.subtract(i, 'month').endOf('month');
+                return {
+                    name: start.format('YYYY-MM'),
+                    label: dayjs(start).locale(locale).format('MMMM, YYYY'),
+                    period: {
+                        start: start.format('YYYY-MM'),
+                        end: end.format('YYYY-MM'),
+                    },
+                };
+            })),
+        ];
+    }),
     monthlyPeriodItems: computed<PeriodItem[]>(() => ([
         {
             ...PERIOD_DROPDOWN_MENU_ITEM_MAP.LAST_3_MONTHS,

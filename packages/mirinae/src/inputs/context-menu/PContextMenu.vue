@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onUnmounted, reactive, useSlots, watch,
+    computed, onUnmounted, reactive, ref, useSlots, watch,
 } from 'vue';
 
 import { reduce } from 'lodash';
@@ -32,6 +32,8 @@ interface ContextMenuProps {
     searchText?: string;
     readonly?: boolean;
     resetSelectedOnUnmounted?: boolean;
+    beforeSelect?: (item: MenuItem, index: number, isSelected: boolean) => boolean;
+    beforeClearSelection?: (clearableSelectedItems: MenuItem[], allSelectedItems: MenuItem[]) => boolean;
 }
 interface ContextMenuEmits {
     (e: 'update:selected', selected: MenuItem[]): void,
@@ -55,9 +57,13 @@ const props = withDefaults(defineProps<ContextMenuProps>(), {
     searchText: '',
     readonly: false,
     resetSelectedOnUnmounted: true,
+    beforeSelect: undefined,
+    beforeClearSelection: undefined,
 });
 const emit = defineEmits<ContextMenuEmits>();
 const slots = useSlots();
+
+const contextMenuRef = ref<HTMLElement|null>(null);
 
 const state = reactive({
     proxySearchText: props.searchText ?? '',
@@ -74,6 +80,9 @@ const state = reactive({
     selectedCount: computed(() => state.proxySelected.length),
     clearableSelectedCount: computed(() => state.proxySelected.filter((item) => !item.disabled).length),
     menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
+    contextMenuHeight: 0,
+    menuTitleHeight: 0,
+    menuMaxHeight: computed<number>(() => state.contextMenuHeight - state.menuTitleHeight),
 });
 
 const {
@@ -129,6 +138,11 @@ const onClickMenu = (item: MenuItem, index) => {
     let isSelected = true;
     if (state.proxySelected.find((d) => d.name === item.name)) isSelected = false;
 
+    if (props.beforeSelect) {
+        const isContinue = props.beforeSelect(item, index, isSelected);
+        if (!isContinue) return;
+    }
+
     if (props.multiSelectable) {
         if (state.selectedNameMap[item.name ?? ''] !== undefined) {
             const indexOfSelected = state.selectedNameMap[item.name ?? ''];
@@ -148,7 +162,12 @@ const onClickEsc = (e: MouseEvent) => {
     blur();
 };
 const handleClickClearSelection = () => {
-    state.proxySelected = state.proxySelected.filter((item) => item.disabled);
+    const clearableItems = state.proxySelected.filter((item) => item.disabled);
+    if (props.beforeClearSelection) {
+        const isContinue = props.beforeClearSelection(clearableItems, state.proxySelected);
+        if (!isContinue) return;
+    }
+    state.proxySelected = clearableItems;
     emit('clear-selection');
 };
 const handleUpdateSearchText = async (value: string) => {
@@ -160,6 +179,16 @@ watch(() => props.searchText, (searchText) => {
     if (state.proxySearchText === searchText) return;
     state.proxySearchText = searchText;
 });
+
+watch(() => props.menu, () => {
+    let contextMenuHeight = 0;
+    if (contextMenuRef.value) {
+        const maxHeightValue = contextMenuRef.value?.style?.getPropertyValue('max-height');
+        contextMenuHeight = parseFloat(maxHeightValue?.replace('px', ''));
+    }
+    state.contextMenuHeight = contextMenuHeight;
+    state.menuTitleHeight = contextMenuRef.value?.getElementsByClassName('context-menu-title-wrapper')[0]?.children[0]?.offsetHeight;
+}, { immediate: true });
 
 onUnmounted(() => {
     if (props.resetSelectedOnUnmounted) state.proxySelected = [];
@@ -178,17 +207,22 @@ defineExpose({
 </script>
 
 <template>
-    <div class="p-context-menu"
+    <div ref="contextMenuRef"
+         class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
-        <slot name="header">
-            <p v-if="title"
-               class="context-menu-title"
-            >
-                {{ props.title }}
-            </p>
-        </slot>
-        <div class="menu-container">
+        <div class="context-menu-title-wrapper">
+            <slot name="header">
+                <p v-if="title"
+                   class="context-menu-title"
+                >
+                    {{ props.title }}
+                </p>
+            </slot>
+        </div>
+        <div class="menu-container"
+             :style="{maxHeight: state.menuMaxHeight + 'px'}"
+        >
             <slot v-show="props.menu.length > 0"
                   name="menu"
                   v-bind="{...props}"

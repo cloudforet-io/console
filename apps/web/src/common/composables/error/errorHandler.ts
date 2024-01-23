@@ -8,8 +8,8 @@ import {
 
 import { SpaceRouter } from '@/router';
 
-import { getRouteAccessLevel } from '@/lib/access-control';
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRouteScope } from '@/router/helpers/route-helper';
+
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
@@ -39,7 +39,7 @@ export default class ErrorHandler {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             if (!isTokenAlive
-                && getRouteAccessLevel(SpaceRouter.router.currentRoute) >= ACCESS_LEVEL.AUTHENTICATED) {
+                && getRouteScope(SpaceRouter.router.currentRoute) !== 'EXCLUDE_AUTH') {
                 ErrorHandler.authenticationErrorHandler();
             }
         } else if (isInstanceOfAuthorizationError(error)) {
