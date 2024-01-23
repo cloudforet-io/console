@@ -319,6 +319,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    parentId: {
+        name: 'parentId',
+        type: { name: 'string' },
+        description: 'The property to automatically hide the context menu when scrolling, if the Select-Dropdown\'s parent component exists.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'select',
+        },
+    },
     handler: {
         name: 'handler',
         type: { name: 'function, array of function' },

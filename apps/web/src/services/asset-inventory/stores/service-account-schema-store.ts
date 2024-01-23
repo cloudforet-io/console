@@ -84,9 +84,6 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         },
         setGeneralAccountTableSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
-            if (!accountSchema) {
-                return;
-            }
             const fields:DynamicField[] = getAccountFields(accountSchema);
             let schemaData = getDefaultTableSchema(fields, false);
             const userData = {
@@ -99,14 +96,10 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
 
             const searchSchemaData = getDefaultSearchSchema(fields, false);
             if (schemaData.options) schemaData.options.search = searchSchemaData.search;
-
             state.generalAccountTableSchema = schemaData;
         },
         setTrustedAccountTableSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT');
-            if (!accountSchema) {
-                return;
-            }
             const fields:DynamicField[] = getAccountFields(accountSchema);
             let schemaData = getDefaultTableSchema(fields, true);
             const userData = {

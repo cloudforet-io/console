@@ -276,6 +276,24 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'number',
         },
     },
+    modalBodyId: {
+        name: 'modalBodyId',
+        type: { name: 'string' },
+        description: 'Applied when utilizing the id value of the body, as in the usage within the select-dropdown component',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'string',
+        },
+    },
     // model
     'v-model': {
         name: 'v-model',

@@ -2,6 +2,7 @@
     <p-button-modal
         v-if="visible"
         class="cloud-service-filter-modal"
+        modal-body-id="cloud-service-filter-search"
         :header-title="$t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SET_FILTER')"
         :visible.sync="proxyVisible"
         :footer-reset-button-visible="true"

@@ -53,6 +53,7 @@ interface SelectDropdownProps {
     showSelectMarker?: boolean;
     menuPosition?: ContextMenuPosition;
     indexMode?: boolean;
+    parentId?: string;
 
     /* others */
     handler?: AutocompleteHandler;
@@ -80,6 +81,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     searchText: '',
     menuPosition: CONTEXT_MENU_POSITION.LEFT,
     indexMode: false,
+    parentId: undefined,
     /* others */
     handler: undefined,
     pageSize: undefined,
@@ -171,6 +173,7 @@ const {
     pageSize: toRef(props, 'pageSize'),
     hideHeaderWithoutItems: toRef(props, 'hideHeaderWithoutItems'),
     multiSelectable: toRef(props, 'multiSelectable'),
+    parentId: toRef(props, 'parentId'),
 });
 
 /* focusing */
