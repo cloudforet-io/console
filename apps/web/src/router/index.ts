@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import type { RouteConfig, RouteRecord } from 'vue-router';
+import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
 import type { JwtPayload } from 'jwt-decode';
@@ -24,6 +24,7 @@ import { GTag } from '@/lib/site-analytics/gtag';
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
@@ -49,7 +50,7 @@ const getDecodedDataFromAccessToken = (): {rol: string, wid: string} => {
 
 const getAccessibleWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
 
-const newGrantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
+const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
     const grantRequest = {
         scope,
@@ -101,24 +102,22 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
-            if (!to.name) {
+            if (!to.name && to.path === '/') {
                 next({ name: ROOT_ROUTE._NAME });
                 return;
             }
 
-            const allRoutes = SpaceRouter.router.getRoutes() as RouteRecord[];
-            const targetRouterRecord = allRoutes.find((route) => route.name === to.name);
-            const isValidRoute = targetRouterRecord && targetRouterRecord.regex?.test(to.path);
+            const isInvalidRoute = !!to?.name && to?.path === '/';
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            // AccessToken refers to data of existing scope.
-            const { rol, wid } = getDecodedDataFromAccessToken();
 
             // 1. Common processes for all scope
-            if (!isValidRoute) {
+            if (isInvalidRoute) {
                 if (isTokenAlive) {
+                    // AccessToken refers to data of existing scope.
+                    const { rol } = getDecodedDataFromAccessToken();
                     // Admin to Admin Case
-                    if (rol === 'DOMAIN_ADMIN' && to.name && !to.name?.startsWith('admin.')) {
-                        next({ name: makeAdminRouteName(to.name) });
+                    if (rol === 'DOMAIN_ADMIN') {
+                        next({ name: makeAdminRouteName(to.name as string) });
                         return;
                     }
 
@@ -131,7 +130,6 @@ export class SpaceRouter {
                 next({ name: AUTH_ROUTE.SIGN_OUT._NAME });
                 return;
             }
-
 
             // 2. Processes by Scope
             const routeScope = getRouteScope(to);
@@ -150,13 +148,15 @@ export class SpaceRouter {
             }
 
             if (isTokenAlive) {
+                // AccessToken refers to data of existing scope.
+                const { rol, wid } = getDecodedDataFromAccessToken();
                 const isScopeChanged = !rol.startsWith(routeScope);
                 const exceptionScopeChangedCase = rol.startsWith('WORKSPACE') && routeScope === 'WORKSPACE';
                 const needToChangeScope = isScopeChanged || exceptionScopeChangedCase;
 
                 if (needToChangeScope) {
                     if (routeScope === 'USER') {
-                        const { failStatus } = await newGrantAndLoadByCurrentScope('USER');
+                        const { failStatus } = await grantAndLoadByCurrentScope('USER');
                         grantFailStatus = failStatus;
                     } else if (routeScope === 'WORKSPACE') {
                         const workspaceList = userWorkspaceStore.getters.workspaceList;
@@ -165,20 +165,20 @@ export class SpaceRouter {
                             return;
                         }
 
-
                         const targetWorkspaceId = to.params.workspaceId;
                         if (targetWorkspaceId && wid && wid === targetWorkspaceId) {
                             next();
                             return;
                         }
-                        if (wid && !to.params.workspaceId) {
+                        if (wid && !targetWorkspaceId) {
                             next({
                                 ...to,
-                                name: to.name,
+                                name: to.name as string,
                                 params: {
                                     ...to.params,
                                     workspaceId: wid,
                                 },
+                                query: to.query,
                             });
                             return;
                         }
@@ -193,7 +193,7 @@ export class SpaceRouter {
                         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
                         const cachedAccessibleWorkspaceId = getAccessibleWorkspaceId(lastAccessedWorkspaceId, workspaceList);
                         const validWorkspaceId = targetWorkspaceId || cachedAccessibleWorkspaceId || workspaceList[0].workspace_id;
-                        const { failStatus } = await newGrantAndLoadByCurrentScope('WORKSPACE', validWorkspaceId);
+                        const { failStatus } = await grantAndLoadByCurrentScope('WORKSPACE', validWorkspaceId);
                         grantFailStatus = failStatus;
 
                         if (!failStatus) {
@@ -211,13 +211,13 @@ export class SpaceRouter {
                                 }
                             } else {
                                 nextLocation = {
-                                    name: ERROR_ROUTE._NAME,
-                                    params: { statusCode: '403' },
+                                    name: HOME_DASHBOARD_ROUTE._NAME,
+                                    params: { workspaceId: validWorkspaceId },
                                 };
                             }
                         }
                     } else if (routeScope === 'DOMAIN') {
-                        const { failStatus } = await newGrantAndLoadByCurrentScope('DOMAIN');
+                        const { failStatus } = await grantAndLoadByCurrentScope('DOMAIN');
                         grantFailStatus = failStatus;
                     }
                 } else appContextStore.setGlobalGrantLoading(false);
