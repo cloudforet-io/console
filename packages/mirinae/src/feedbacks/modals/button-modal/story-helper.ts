@@ -279,7 +279,7 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     modalBodyId: {
         name: 'modalBodyId',
         type: { name: 'string' },
-        description: 'id for modal body',
+        description: 'Applied when utilizing the id value of the body, as in the usage within the select-dropdown component',
         defaultValue: undefined,
         table: {
             type: {
