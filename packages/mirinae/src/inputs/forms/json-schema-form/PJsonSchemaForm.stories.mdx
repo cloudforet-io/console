@@ -102,6 +102,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |number|ajv|[Text Input](?path=/docs/inputs-input--basic)|
 |integer|ajv|[Text Input](?path=/docs/inputs-input--basic)|
 |array|ajv|[Text Input](?path=/docs/inputs-input--basic) or [Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)(with enum keyword)||
+|object|self| Json Schema Form ||
 
 ### Formats
 **string type only**
@@ -110,6 +111,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |-|-|-|
 |password|ajv-format|[Text Input](?path=/docs/inputs-input--basic)|
 |generate_id|custom|GenerateIdFormat (Internal Component)|
+|pem_key|custom||
 
 ### Keywords
 |Keywords|Validator|UI Component|Description|
@@ -186,6 +188,8 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <br/>
 
 ## Language
+
+If it is a markdown case, translation is supported.
 
 <Canvas>
     <Story name="Language" >
@@ -281,6 +285,10 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <br/>
 
 ## Validation Mode
+
+- all: It performs all validation from the beginning.
+- input: It performs validation after the user first input event.
+- none: It does not perform validation.
 
 <Canvas>
     <Story name="Validation Mode" >

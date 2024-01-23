@@ -65,6 +65,13 @@
                                                 class="input-form"
                                                 @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             />
+                            <p-e-m-key-format v-else-if="schemaProperty.componentName === 'PEMKeyFormat'"
+                                              :key="`PEMKeyFormat-${schemaProperty.propertyName}`"
+                                              :value="rawFormData[schemaProperty.propertyName]"
+                                              :disabled="schemaProperty.disabled"
+                                              class="input-form"
+                                              @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                            />
                             <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
                                                 :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
                                                 :form-data="rawFormData[schemaProperty.propertyName]"
@@ -155,6 +162,7 @@ import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
+import PEMKeyFormat from '@/inputs/forms/json-schema-form/components/PEMKeyFormat.vue';
 import { useLocalize } from '@/inputs/forms/json-schema-form/composables/localize';
 import { useValidation } from '@/inputs/forms/json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-form/custom-schema';
@@ -184,6 +192,7 @@ const PJsonSchemaForm = () => ({
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        PEMKeyFormat,
         PJsonSchemaForm,
         PSelectDropdown,
         PTextEditor,

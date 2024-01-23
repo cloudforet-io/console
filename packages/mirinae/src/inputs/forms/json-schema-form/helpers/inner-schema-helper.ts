@@ -43,6 +43,7 @@ const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined 
 
 export const getComponentNameBySchemaProperty = (schemaProperty: JsonSchema): ComponentName => {
     if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
+    if (schemaProperty.format === 'pem_key') return 'PEMKeyFormat';
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     if (isStrictArraySelectMode(schemaProperty)) return 'PFilterableDropdown';
@@ -50,6 +51,7 @@ export const getComponentNameBySchemaProperty = (schemaProperty: JsonSchema): Co
 };
 
 const getInputTypeBySchemaProperty = (schemaProperty: JsonSchema): TextInputType => {
+    if (!schemaProperty.type) return 'text';
     if (schemaProperty.format === 'password') return 'password';
     if (schemaProperty.type === 'string') return 'text';
     if (NUMERIC_TYPES.includes(schemaProperty.type)) return 'number';
