@@ -185,7 +185,7 @@ const handleClickVerifyButton = async () => {
                         >
                             <span class="button-label">{{ $t('IAM.USER.MAIN.EDIT') }}</span>
                         </p-button>
-                        <p-button style-type="tertiary"
+                        <p-button style-type="negative-secondary"
                                   icon-left="ic_delete"
                                   @click="handleClickButton(USER_MODAL_TYPE.DELETE)"
                         >
@@ -193,7 +193,7 @@ const handleClickVerifyButton = async () => {
                         </p-button>
                     </div>
                     <p-button v-else-if="userPageStore.isWorkspaceOwner"
-                              style-type="tertiary"
+                              style-type="negative-secondary"
                               :disabled="userPageStore.selectedUsers.length === 0"
                               @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                     >

@@ -72,7 +72,7 @@ const onSignIn = async (userId:string) => {
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
 
         if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
-            await router.push(defaultRoute);
+            await router.push(defaultRoute).catch(() => {});
             return;
         }
 
@@ -81,9 +81,9 @@ const onSignIn = async (userId:string) => {
 
         const isValidRoute = allRoutes.some((route) => route.name === resolvedRoute.route.name);
         if (isValidRoute) {
-            await router.push(resolvedRoute.location);
+            await router.push(resolvedRoute.location).catch(() => {});
         } else {
-            await router.push(defaultRoute);
+            await router.push(defaultRoute).catch(() => {});
         }
     } catch (e) {
         appContextStore.setGlobalGrantLoading(false);

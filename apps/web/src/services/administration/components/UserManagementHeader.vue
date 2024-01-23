@@ -73,7 +73,7 @@ const updateModalSettings = ({
                     <div v-else-if="userPageStore.isWorkspaceOwner"
                          class="toolbox"
                     >
-                        <p-button style-type="tertiary"
+                        <p-button style-type="negative-secondary"
                                   :disabled="userPageStore.selectedUsers.length === 0"
                                   @click="handleClickButton(USER_MODAL_TYPE.REMOVE)"
                         >

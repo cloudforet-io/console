@@ -106,7 +106,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
             <template v-if="userPageState.isAdminMode"
                       #extra
             >
-                <p-button style-type="secondary"
+                <p-button style-type="tertiary"
                           icon-left="ic_edit"
                           @click="handleEditTag"
                 >

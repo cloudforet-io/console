@@ -298,7 +298,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #col-remove_button-format="{ item }">
-                <p-button style-type="tertiary"
+                <p-button style-type="negative-secondary"
                           size="sm"
                           class="remove-button"
                           @click="handleClickButton(item.role_binding.role_binding_id)"
