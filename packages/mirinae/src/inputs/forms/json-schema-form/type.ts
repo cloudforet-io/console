@@ -5,7 +5,7 @@ import type { SupportLanguage } from '@/translations';
 const TEXT_INPUT_TYPES = ['password', 'text', 'number'] as const;
 export type TextInputType = typeof TEXT_INPUT_TYPES[number];
 
-const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelectDropdown', 'PFilterableDropdown'] as const;
+const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelectDropdown', 'PFilterableDropdown', 'PEMKeyFormat'] as const;
 export type ComponentName = typeof COMPONENTS[number];
 
 interface Reference {
