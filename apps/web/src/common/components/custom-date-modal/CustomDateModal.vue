@@ -8,6 +8,8 @@ import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-pi
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 interface DateOption {
     minDate?: string;
@@ -38,10 +40,7 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 }>();
 
 const state = reactive({
-    proxyVisible: computed({
-        get() { return props.visible; },
-        set(val) { emit('update:visible', val); },
-    }),
+    proxyVisible: useProxyValue('visible', props, emit),
     invalid: computed(() => {
         if (!state.startDates.length || !state.endDates.length) return true;
         const timeUnit = props.datetimePickerDataType === 'yearToDate' ? 'day' : 'month';
