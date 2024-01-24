@@ -135,7 +135,7 @@ const handleClickAllWorkspace = () => {
             />
         </component>
         <p-select-dropdown v-if="!props.isAdminMode"
-                           class="workspace-dropdown"
+                           :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
                            style-type="transparent"
                            is-filterable
                            :search-text.sync="state.searchText"
@@ -156,7 +156,9 @@ const handleClickAllWorkspace = () => {
                     </span>
                 </p-tooltip>
             </template>
-            <template #menu-bottom>
+            <template v-if="state.isDomainAdmin"
+                      #menu-bottom
+            >
                 <div class="all-workspace"
                      @click="handleClickAllWorkspace"
                 >
@@ -257,12 +259,6 @@ const handleClickAllWorkspace = () => {
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
             min-width: 12rem !important;
-            .menu-container {
-                padding-bottom: 2.25rem;
-            }
-            .bottom-slot-area {
-                padding: 0;
-            }
             .all-workspace {
                 @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t cursor-pointer;
                 bottom: 0;
@@ -272,6 +268,16 @@ const handleClickAllWorkspace = () => {
                 padding-bottom: 0.5rem;
                 padding-left: 0.5rem;
                 gap: 0.25rem;
+            }
+        }
+        &.is-domain-admin {
+            :deep(.p-context-menu) {
+                .menu-container {
+                    padding-bottom: 2.25rem;
+                }
+                .bottom-slot-area {
+                    padding: 0;
+                }
             }
         }
 

@@ -134,7 +134,7 @@ export class SpaceRouter {
             // 2. Processes by Scope
             const routeScope = getRouteScope(to);
             let nextLocation;
-            let grantFailStatus = false;
+            let grantFailStatus = SpaceRouter.router.app?.$store.getters['error/grantFailStatus'];
 
             if (routeScope === 'EXCLUDE_AUTH') {
                 if (to.meta?.isSignInPage) {
@@ -166,7 +166,7 @@ export class SpaceRouter {
                         }
 
                         const targetWorkspaceId = to.params.workspaceId;
-                        if (targetWorkspaceId && wid && wid === targetWorkspaceId) {
+                        if (targetWorkspaceId && wid && wid === targetWorkspaceId && !grantFailStatus) {
                             next();
                             return;
                         }
@@ -228,7 +228,6 @@ export class SpaceRouter {
                         name: ERROR_ROUTE._NAME,
                         params: { statusCode: '404' },
                     };
-                    SpaceRouter.router.app?.$store.commit('error/setGrantAccessFailStatus', false);
                 }
 
                 next(nextLocation);
