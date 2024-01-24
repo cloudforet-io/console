@@ -92,7 +92,6 @@ const formState = reactive({
 /* Util */
 const getInvalidText = (value?: string): string => {
     if (!value) return '';
-    console.log(value, emailValidator(value));
     if (emailValidator(value)) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.EMAIL_INVALID') as string;
     // TODO: check if email is already registered
     return '';
