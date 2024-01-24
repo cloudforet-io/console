@@ -90,6 +90,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
         subMenuList: [
             { id: MENU_ID.COST_ANALYSIS },
             { id: MENU_ID.BUDGET },
+            { id: MENU_ID.COST_REPORT },
         ],
     },
     {

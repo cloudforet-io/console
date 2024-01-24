@@ -14,6 +14,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
@@ -75,17 +77,28 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
-    menuSet: computed<LNBMenu[]>(() => [
-        ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
-        ...filterLNBMenuByAccessPermission([
-            {
+    menuSet: computed<LNBMenu[]>(() => {
+        const menuSet = [
+            ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
+            ...filterLNBMenuByAccessPermission([
+                {
+                    type: 'item',
+                    id: MENU_ID.BUDGET,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
+                    to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
+                },
+            ], store.getters['user/pageAccessPermissionList']),
+        ];
+        if (storeState.isAdminMode) {
+            menuSet.push({
                 type: 'item',
-                id: MENU_ID.BUDGET,
-                label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
-                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
-            },
-        ], store.getters['user/pageAccessPermissionList']),
-    ]),
+                id: MENU_ID.COST_REPORT,
+                label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId),
+                to: { name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME) },
+            });
+        }
+        return menuSet;
+    }),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
         (storeState.isAdminMode ? {} : { type: MENU_ITEM_TYPE.FAVORITE_ONLY }),
         {
