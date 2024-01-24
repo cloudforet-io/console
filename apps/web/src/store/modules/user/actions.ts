@@ -128,6 +128,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             if (roleInfo) {
                 await dispatch('reference/initializeAllReference', {}, { root: true });
             }
+            commit('error/setGrantAccessFailStatus', false, { root: true });
         }
     } catch (error) {
         /*
