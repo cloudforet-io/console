@@ -59,6 +59,3 @@ const handleConfirm = () => {
         </template>
     </p-button-modal>
 </template>
-
-<style lang="postcss" scoped>
-</style>

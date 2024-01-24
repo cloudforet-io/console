@@ -191,6 +191,7 @@ const handleClickResendButton = (): void => {
     float: right;
     gap: 0.5rem;
 }
+
 /* custom design-system component - p-toolbox-table */
 :deep(.p-toolbox-table) {
     .date-text {

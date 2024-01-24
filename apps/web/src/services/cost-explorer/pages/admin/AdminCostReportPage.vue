@@ -75,7 +75,4 @@ const state = reactive({
         gap: 1rem;
     }
 }
-@screen tablet {
-
-}
 </style>

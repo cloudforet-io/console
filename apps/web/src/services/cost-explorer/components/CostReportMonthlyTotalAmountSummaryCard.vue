@@ -113,6 +113,7 @@ const handleChangeTarget = (target: string) => {
 .chart {
     height: 11rem;
 }
+
 /* custom design-system component - p-date-pagination */
 :deep(.p-date-pagination) {
     .date-text {

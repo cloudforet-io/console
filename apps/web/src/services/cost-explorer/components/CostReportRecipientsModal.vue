@@ -279,6 +279,7 @@ onMounted(() => {
         width: auto;
     }
 }
+
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
     .selected-item-text {
