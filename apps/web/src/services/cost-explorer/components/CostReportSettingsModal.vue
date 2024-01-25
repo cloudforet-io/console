@@ -34,15 +34,15 @@ const state = reactive({
     nextReportDate: computed(() => '2023-08-10'),
 });
 const {
-    forms: { issueDate },
+    forms: { issueDay },
     setForm,
     invalidState,
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    issueDate: undefined,
+    issueDay: undefined,
 }, {
-    issueDate(value: number) {
+    issueDay(value: number) {
         if (state.enableLastDay) return true;
         if (!value) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REQUIRED_FIELD');
         if (value < 1) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.GREATER_THAN_OR_EQUAL_TO_1');
@@ -55,7 +55,7 @@ const {
 const handleChangeEnableLastDay = () => {
     state.enableLastDay = !state.enableLastDay;
     if (state.enableLastDay) {
-        setForm('issueDate', undefined);
+        setForm('issueDay', undefined);
     }
 };
 const handleConfirm = () => {
@@ -96,18 +96,18 @@ const handleConfirm = () => {
                         </template>
                     </p-select-dropdown>
                 </p-field-group>
-                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DATE')"
-                               :invalid="invalidState.issueDate"
-                               :invalid-text="invalidTexts.issueDate"
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DAY')"
+                               :invalid="invalidState.issueDay"
+                               :invalid-text="invalidTexts.issueDay"
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="issueDate"
+                        <p-text-input :value="issueDay"
                                       :invalid="invalid"
                                       :disabled="state.enableLastDay"
                                       type="number"
                                       class="input-field"
-                                      @update:value="setForm('issueDate', $event)"
+                                      @update:value="setForm('issueDay', $event)"
                         />
                         <p-checkbox class="checkbox"
                                     :value="true"

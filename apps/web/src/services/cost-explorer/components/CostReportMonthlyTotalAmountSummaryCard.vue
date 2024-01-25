@@ -67,11 +67,13 @@ const state = reactive({
 /* Util */
 const drawChart = () => {
     chartHelper.refreshRoot();
-    const chart = chartHelper.createDonutChart();
+    const chart = chartHelper.createDonutChart({
+        paddingLeft: 20,
+        paddingRight: 20,
+    });
     const seriesSettings = {
         categoryField: 'category', // TODO: change
         valueField: 'value', // TODO: change
-        radius: 20,
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     chart.series.push(series);
