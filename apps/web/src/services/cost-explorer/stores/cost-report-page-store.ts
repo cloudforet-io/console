@@ -45,6 +45,11 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }),
     });
 
+    /* Mutations */
+    const setCostReportConfig = (costReportConfig: CostReportConfigModel|null|undefined) => {
+        state.costReportConfig = costReportConfig;
+    };
+
     const fetchCostReportConfig = async () => {
         if (state.costReportConfig !== null) return;
         try {
@@ -78,6 +83,10 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
+    const mutations = {
+        setCostReportConfig,
+    };
+
     (async () => {
         await fetchCostReportConfig();
     })();
@@ -85,6 +94,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     return {
         state,
         getters,
+        ...mutations,
         fetchCostReportConfig,
         fetchCostReportsList,
         fetchCostReport,
