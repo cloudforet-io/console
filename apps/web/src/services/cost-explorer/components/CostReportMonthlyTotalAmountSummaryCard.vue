@@ -1,19 +1,38 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
 import {
-    PSelectButton, PDatePagination, PLink,
+    PSelectButton, PDatePagination, PLink, PDataTable,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { useAmcharts5 } from '@/common/composables/amcharts5';
+
+import { white } from '@/styles/colors';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
+interface ChartData {
+    category: string;
+    value: number;
+    pieSettings: {
+        fill: string;
+    };
+}
+
 const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     loading: false,
     targetSelectItems: [
@@ -23,17 +42,55 @@ const state = reactive({
     selectedTarget: 'workspace',
     totalAmount: 957957,
     date: dayjs.utc(),
+    chartData: computed<ChartData[]>(() => state.tableItems.map((d, idx) => ({
+        category: d.workspace_name,
+        value: d.amount,
+        pieSettings: {
+            fill: DEFAULT_CHART_COLORS[idx],
+        },
+    }))),
     tableFields: [
-        { name: 'workspace', label: 'Workspace' },
+        { name: 'workspace_name', label: 'Workspace' },
         { name: 'amount', label: 'Amount' },
     ] as Field[],
-    tableItems: [],
+    tableItems: [
+        { workspace_name: 'Walmart Inc.', amount: 1000000 },
+        { workspace_name: 'Amazon.com Inc.', amount: 9900000 },
+        { workspace_name: 'PetroChina Co. Ltd.', amount: 8800000 },
+        { workspace_name: 'Apple Inc.', amount: 6400000 },
+    ],
 });
+
+/* Util */
+const drawChart = () => {
+    chartHelper.refreshRoot();
+    const chart = chartHelper.createDonutChart();
+    const seriesSettings = {
+        categoryField: 'category', // TODO: change
+        valueField: 'value', // TODO: change
+        radius: 20,
+    };
+    const series = chartHelper.createPieSeries(seriesSettings);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        templateField: 'pieSettings',
+    });
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(series, tooltip);
+    series.slices.template.set('tooltip', tooltip);
+    series.data.setAll(cloneDeep(state.chartData));
+};
 
 /* Event */
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
+
+/* Watcher */
+watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
+    if (!loading && _chartContext) drawChart();
+}, { immediate: true });
 </script>
 
 <template>
@@ -78,13 +135,28 @@ const handleChangeTarget = (target: string) => {
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
                     </p-link>
+                    <div ref="chartContext"
+                         class="chart"
+                    />
                 </div>
-                <div class="col-span-12 lg:col-span-6" />
+                <div class="col-span-12 lg:col-span-6">
+                    <p-data-table :fields="state.tableFields"
+                                  :items="state.tableItems"
+                                  :loading="state.loading"
+                                  table-style-type="simple"
+                    >
+                        <template #col-workspace_name-format="{ value, rowIndex }">
+                            <span class="toggle-button"
+                                  :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                            />
+                            <span class="workspace-name-col">{{ value }}</span>
+                        </template>
+                        <template #col-amount-format="{ value }">
+                            <span class="amount-col">{{ currencyMoneyFormatter(value) }}</span>
+                        </template>
+                    </p-data-table>
+                </div>
             </div>
-            <div ref="chartContext"
-                 class="chart"
-            />
-            차아트
         </template>
     </cost-report-overview-card-template>
 </template>
@@ -110,8 +182,26 @@ const handleChangeTarget = (target: string) => {
         padding-left: 0.125rem;
     }
 }
+.workspace-name-col {
+    @apply text-label-md;
+    font-weight: 400;
+}
+.amount-col {
+    @apply text-label-md;
+    font-weight: 500;
+}
+.toggle-button {
+    @apply rounded-full;
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
 .chart {
-    height: 11rem;
+    width: 100%;
+    height: 12rem;
+    z-index: 1000;
 }
 
 /* custom design-system component - p-date-pagination */
