@@ -13,7 +13,7 @@
         <p-icon-button class="text"
                        name="ic_chevron-right"
                        color="inherit transparent"
-                       :disabled="nextButtonDisabled"
+                       :disabled="disableNextButton || nextButtonDisabled"
                        @click="onClickNext"
         />
     </nav>
@@ -53,6 +53,10 @@ export default {
         timezone: {
             type: String,
             default: 'UTC',
+        },
+        disableNextButton: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DatePaginationProps, { emit }) {

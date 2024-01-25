@@ -1,7 +1,7 @@
 import type { Currency } from '@/store/modules/settings/type';
 
 
-export interface CostReportUpdateParameters {
+export interface CostReportConfigUpdateParameters {
     cost_report_config_id: string;
     issue_day?: number;
     is_last_day?: boolean;
