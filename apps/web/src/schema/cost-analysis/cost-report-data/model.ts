@@ -1,4 +1,4 @@
-export interface CostReportDataModal {
+export interface CostReportDataModel {
     cost_report_data_id: string;
     cost: Record<string, number>;
     cost_report_name: string;

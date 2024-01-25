@@ -3,7 +3,7 @@ import type { CostReportStatus } from '@/schema/cost-analysis/cost-report/type';
 import type { Currency } from '@/store/modules/settings/type';
 
 
-export interface CostReportConfigModal {
+export interface CostReportModel {
     cost_report_id: string;
     cost: Record<string, number>;
     status: CostReportStatus;
