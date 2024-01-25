@@ -7,7 +7,6 @@ import {
     PSelectButton, PDatePagination, PLink, PDataTable,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
@@ -20,6 +19,7 @@ import { white } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
@@ -33,6 +33,8 @@ interface ChartData {
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
+const costReportPageStore = useCostReportPageStore();
+const costReportPageGetters = costReportPageStore.getters;
 const state = reactive({
     loading: false,
     targetSelectItems: [
@@ -41,7 +43,8 @@ const state = reactive({
     ],
     selectedTarget: 'workspace',
     totalAmount: 957957,
-    date: dayjs.utc(),
+    currentDate: undefined,
+    //
     chartData: computed<ChartData[]>(() => state.tableItems.map((d, idx) => ({
         category: d.workspace_name,
         value: d.amount,
@@ -91,6 +94,9 @@ const handleChangeTarget = (target: string) => {
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
+watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
+    state.currentDate = recentReportDate;
+}, { immediate: true });
 </script>
 
 <template>
@@ -117,7 +123,9 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
         <template #content>
             <div class="grid grid-cols-12">
                 <div class="col-span-12 lg:col-span-6">
-                    <p-date-pagination :date.sync="state.date" />
+                    <p-date-pagination :date.sync="state.currentDate"
+                                       :disable-next-button="state.currentDate.isSame(costReportPageGetters.recentReportDate, 'month')"
+                    />
                     <div class="summary-wrapper">
                         <div class="summary-label">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
