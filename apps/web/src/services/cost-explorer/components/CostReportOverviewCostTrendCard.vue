@@ -186,4 +186,11 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
     width: 100%;
     justify-content: center;
 }
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .p-context-menu-item {
+        font-weight: normal;
+    }
+}
 </style>
