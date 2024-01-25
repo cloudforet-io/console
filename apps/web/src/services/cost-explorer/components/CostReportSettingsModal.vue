@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PSelectDropdown, PBadge, PTextInput, PCheckbox, PI,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
@@ -12,6 +13,8 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
 interface Props {
@@ -23,6 +26,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
+const costReportPageStore = useCostReportPageStore();
+const costReportPageState = costReportPageStore.state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedCurrency: 'KRW',
@@ -31,18 +36,26 @@ const state = reactive({
         name: currency,
         label: `${CURRENCY_SYMBOL[currency]} ${currency}`,
     }))),
-    nextReportDate: computed(() => '2023-08-10'),
+    upcomingIssueDateText: computed<string>(() => {
+        const today = dayjs.utc();
+        const _issueDay: number = state.enableLastDay ? today.endOf('month').date() : issueDay.value ?? 10;
+        if (Number(today.format('D')) < _issueDay) {
+            return today.date(_issueDay).format('YYYY-MM-DD');
+        }
+        if (state.enableLastDay) return today.add(1, 'month').endOf('month').format('YYYY-MM-DD');
+        return today.add(1, 'month').date(_issueDay).format('YYYY-MM-DD');
+    }),
 });
 const {
-    forms: { issueDate },
+    forms: { issueDay },
     setForm,
     invalidState,
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    issueDate: undefined,
+    issueDay: undefined as number | undefined,
 }, {
-    issueDate(value: number) {
+    issueDay(value: number) {
         if (state.enableLastDay) return true;
         if (!value) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REQUIRED_FIELD');
         if (value < 1) return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.GREATER_THAN_OR_EQUAL_TO_1');
@@ -55,13 +68,27 @@ const {
 const handleChangeEnableLastDay = () => {
     state.enableLastDay = !state.enableLastDay;
     if (state.enableLastDay) {
-        setForm('issueDate', undefined);
+        const today = dayjs.utc();
+        if (today.isSame(today.endOf('month'), 'day')) {
+            setForm('issueDay', today.add(1, 'month').endOf('month').date());
+        } else {
+            setForm('issueDay', today.endOf('month').date());
+        }
     }
 };
 const handleConfirm = () => {
     // TODO
     state.proxyVisible = false;
 };
+
+/* Watcher */
+watch(() => props.visible, (visible) => {
+    if (visible && costReportPageState.costReportConfig) {
+        state.selectedCurrency = costReportPageState.costReportConfig?.currency;
+        state.enableLastDay = costReportPageState.costReportConfig?.is_last_day;
+        setForm('issueDay', costReportPageState.costReportConfig?.issue_day);
+    }
+});
 </script>
 
 <template>
@@ -96,18 +123,18 @@ const handleConfirm = () => {
                         </template>
                     </p-select-dropdown>
                 </p-field-group>
-                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DATE')"
-                               :invalid="invalidState.issueDate"
-                               :invalid-text="invalidTexts.issueDate"
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DAY')"
+                               :invalid="invalidState.issueDay"
+                               :invalid-text="invalidTexts.issueDay"
                                required
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="issueDate"
+                        <p-text-input :value="issueDay"
                                       :invalid="invalid"
                                       :disabled="state.enableLastDay"
                                       type="number"
                                       class="input-field"
-                                      @update:value="setForm('issueDate', $event)"
+                                      @update:value="setForm('issueDay', $event)"
                         />
                         <p-checkbox class="checkbox"
                                     :value="true"
@@ -125,10 +152,10 @@ const handleConfirm = () => {
                              height="1rem"
                              color="inherit"
                         />
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT_DATE') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_ISSUE_DATE') }}
                     </p>
                     <p class="text">
-                        {{ state.nextReportDate }}
+                        {{ state.upcomingIssueDateText }}
                     </p>
                 </div>
             </div>

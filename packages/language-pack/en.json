@@ -658,6 +658,7 @@
 				"GREATER_THAN_OR_EQUAL_TO_1": "Must be greater than or equal to 1",
 				"HIDE": "Hide",
 				"ISSUE_DATE": "Issue Date",
+				"ISSUE_DAY": "Issue Day",
 				"LAST_12_MONTHS_AVERAGE": "Last 12 months average",
 				"LAST_DAY_OF_THE_MONTH": "Last day of the month",
 				"LESS_THAN_OR_EQUAL_TO_31": "Must be less than or equal to 31",
@@ -679,8 +680,8 @@
 				"SETTINGS": "Settings",
 				"SHOW_DETAILS": "Show details",
 				"TOTAL_AMOUNT": "Total amount",
+				"UPCOMING_ISSUE_DATE": "Upcoming Issue Date",
 				"UPCOMING_REPORT": "Upcoming Report",
-				"UPCOMING_REPORT_DATE": "Upcoming Report Date",
 				"WORKSPACE": "Workspace",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Owner Role"

@@ -1,14 +1,30 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PButton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
+const costReportPageStore = useCostReportPageStore();
+const costReportPageGetters = costReportPageStore.getters;
 const state = reactive({
     settingsModalVisible: false,
+    upcomingReportDateText: computed(() => {
+        const issueDay = costReportPageGetters.issueDay;
+        const issueDayText = issueDay < 10 ? `0${issueDay}` : String(issueDay);
+        const upcomingIssueDate = dayjs.utc(costReportPageGetters.recentIssueDate).add(1, 'month').format('YYYY-MM');
+        return `${upcomingIssueDate}-${issueDayText}`;
+    }),
+    upcomingReportDateRangeText: computed(() => {
+        const upcomingReportDate = dayjs.utc(costReportPageGetters.recentReportDate).add(1, 'month');
+        const startOfNextMonth = upcomingReportDate.startOf('month');
+        const endOfNextMonth = upcomingReportDate.endOf('month');
+        return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
+    }),
 });
 
 /* Event */
@@ -35,17 +51,17 @@ const handleClickSettings = (): void => {
         </template>
         <template #content>
             <p class="date-text">
-                2023-08-10
+                {{ state.upcomingReportDateText }}
             </p>
             <p class="date-range-text">
-                2023-07-01 ~ 2023-07-31
+                {{ state.upcomingReportDateRangeText }}
             </p>
             <div class="currency-wrapper">
                 <span class="currency-label">
                     {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
                 </span>
                 <span class="currency-text">
-                    KRW
+                    {{ costReportPageGetters.currency }}
                 </span>
             </div>
             <cost-report-settings-modal :visible.sync="state.settingsModalVisible" />

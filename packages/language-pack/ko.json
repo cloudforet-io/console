@@ -658,6 +658,7 @@
 				"GREATER_THAN_OR_EQUAL_TO_1": "1 이상으로 설정해주세요.",
 				"HIDE": "",
 				"ISSUE_DATE": "",
+				"ISSUE_DAY": "",
 				"LAST_12_MONTHS_AVERAGE": "",
 				"LAST_DAY_OF_THE_MONTH": "",
 				"LESS_THAN_OR_EQUAL_TO_31": "31 이하로 설정해주세요",
@@ -679,8 +680,8 @@
 				"SETTINGS": "설정",
 				"SHOW_DETAILS": "",
 				"TOTAL_AMOUNT": "",
+				"UPCOMING_ISSUE_DATE": "",
 				"UPCOMING_REPORT": "",
-				"UPCOMING_REPORT_DATE": "",
 				"WORKSPACE": "워크스페이스",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Owner 역할(Role)"

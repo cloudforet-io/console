@@ -658,6 +658,7 @@
 				"GREATER_THAN_OR_EQUAL_TO_1": "1以上で設定してください",
 				"HIDE": "",
 				"ISSUE_DATE": "",
+				"ISSUE_DAY": "",
 				"LAST_12_MONTHS_AVERAGE": "",
 				"LAST_DAY_OF_THE_MONTH": "",
 				"LESS_THAN_OR_EQUAL_TO_31": "31以内で設定してください",
@@ -679,8 +680,8 @@
 				"SETTINGS": "設定",
 				"SHOW_DETAILS": "",
 				"TOTAL_AMOUNT": "",
+				"UPCOMING_ISSUE_DATE": "",
 				"UPCOMING_REPORT": "",
-				"UPCOMING_REPORT_DATE": "",
 				"WORKSPACE": "ワークスペース",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Ownerの役"
