@@ -647,6 +647,9 @@
 			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "",
+				"ADD_EMAIL": "",
+				"ADMIN_ROLE": "Admin 역할(Role)",
+				"ALT_S_COPY_REPORT_URL": "",
 				"ALT_S_UPDATE_RECIPIENTS": "",
 				"APPLY_CUSTOM_RANGE": "",
 				"COPY": "복사",

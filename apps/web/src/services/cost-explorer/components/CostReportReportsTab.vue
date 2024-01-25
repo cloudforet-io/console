@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PButton, PHeading, PLink, PToolboxTable, PSelectDropdown, PBadge,
@@ -7,41 +7,42 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
+import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
+import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
+import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
 const state = reactive({
-    loading: false,
+    loading: {
+        list: false,
+        copy: false,
+        send: false,
+    },
     totalCount: 0,
     fields: [
-        { label: 'Issue Date', name: 'date' },
-        { label: 'Report Number', name: 'number' },
-        { label: 'Workspace', name: 'workspace' },
+        { label: 'Issue Date', name: 'issue_date' },
+        { label: 'Report Number', name: 'cost_report_id' },
+        { label: 'Workspace', name: 'workspace_name' },
         { label: 'Cost', name: 'cost' },
         { label: ' ', name: 'extra' },
     ] as Field[],
-    items: [
-        {
-            date: '2024-01-10',
-            number: 'INV_2307100001',
-            workspace: 'SpaceOne',
-            cost: 1000000,
-        },
-        {
-            date: '2023-12-10',
-            number: 'INV_2302342342',
-            workspace: 'Megazone Cloud',
-            cost: 9500000,
-        },
-    ],
+    items: [] as CostReportModel[],
     tags: [],
     currency: 'KRW' as Currency,
     periodMenuItems: computed<MenuItem[]>(() => {
@@ -63,7 +64,7 @@ const state = reactive({
 
 /* Util */
 const getDateRangeText = (date: string): string => {
-    const _date = dayjs.utc(date);
+    const _date = dayjs.utc(date).subtract(1, 'month');
     return `${_date.startOf('month').format('YYYY-MM-DD')} ~ ${_date.endOf('month').format('YYYY-MM-DD')}`;
 };
 const getCustomPeriodText = (start?: string, end?: string): string => {
@@ -86,9 +87,44 @@ const handleConfirmCustomPeriod = (start: string, end: string): void => {
     state.selectedPeriod = 'custom';
     state.customPeriod = { start, end };
 };
+const handleClickCopyButton = () => {
+    fetchCostReportsUrl();
+};
 const handleClickResendButton = (): void => {
     state.resendModalVisible = true;
 };
+
+/* API */
+const fetchCostReportsList = async (): Promise<void> => {
+    state.loading.list = true;
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>();
+        state.items = results || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading.list = false;
+    }
+};
+const fetchCostReportsUrl = async (): Promise<void> => {
+    state.loading.copy = true;
+    try {
+        const res = await SpaceConnector.clientV2.costAnalysis.costReport.getUrl<CostReportGetUrlParameters, CostReportDataLinkInfoModel>();
+        if (res.cost_report_data_link !== '') {
+            console.log(res.cost_report_data_link);
+            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_COPY_REPORT_URL'), '');
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading.copy = false;
+    }
+};
+
+/* Init */
+onMounted(() => {
+    fetchCostReportsList();
+});
 </script>
 
 <template>
@@ -96,7 +132,7 @@ const handleClickResendButton = (): void => {
         <p-toolbox-table class="cost-report-reports-tab"
                          search-type="query"
                          :multi-select="false"
-                         :loading="state.loading"
+                         :loading="state.loading.list"
                          :total-count="state.totalCount"
                          :items="state.items"
                          :fields="state.fields"
@@ -129,7 +165,7 @@ const handleClickResendButton = (): void => {
                     </template>
                 </p-heading>
             </template>
-            <template #col-date-format="{value}">
+            <template #col-issue_date-format="{value}">
                 <div class="date-text">
                     {{ value }}
                 </div>
@@ -137,7 +173,8 @@ const handleClickResendButton = (): void => {
                     {{ getDateRangeText(value) }}
                 </div>
             </template>
-            <template #col-number-format="{value}">
+            <template #col-cost_report_id-format="{value}">
+                <!-- TODO: check href link-->
                 <p-link :text="value"
                         href="/"
                         highlight
@@ -146,7 +183,7 @@ const handleClickResendButton = (): void => {
             </template>
             <template #col-cost-format="{value}">
                 <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                <span class="text">{{ numberFormatter(value) }}</span>
+                <span class="text">{{ numberFormatter(value[state.currency]) }}</span>
                 <span class="currency-text">{{ state.currency }}</span>
             </template>
             <template #col-extra-format>
@@ -154,13 +191,16 @@ const handleClickResendButton = (): void => {
                     <p-button style-type="tertiary"
                               icon-left="ic_link"
                               size="sm"
-                              class="mr-2"
+                              class="copy-button"
+                              :loading="true"
+                              @click="handleClickCopyButton"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.COPY') }}
                     </p-button>
                     <p-button style-type="tertiary"
                               icon-left="ic_paper-airplane"
                               size="sm"
+                              class="resend-button"
                               @click="handleClickResendButton"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.RESEND') }}
@@ -196,15 +236,28 @@ const handleClickResendButton = (): void => {
 :deep(.p-toolbox-table) {
     .date-text {
         @apply text-paragraph-md;
+        margin-top: 0.5rem;
     }
     .date-range-text {
         @apply text-gray-500 text-paragraph-sm;
+        margin-bottom: 0.5rem;
     }
     .text {
         padding: 0 0.12rem;
     }
     .currency-symbol, .currency-text {
         @apply text-gray-700 text-paragraph-sm;
+    }
+    .float-right {
+        @apply flex;
+        gap: 1rem;
+    }
+}
+
+/* custom design-system component - p-data-table */
+:deep(.p-data-table) {
+    &.loading {
+        position: unset;
     }
 }
 </style>
