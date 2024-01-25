@@ -646,10 +646,7 @@
 				"YEARLY": "Yearly"
 			},
 			"COST_REPORT": {
-				"ADDITIONAL_EMAIL": "Additional Email",
 				"ADDITIONAL_RECIPIENTS": "Additional Recipients",
-				"ADD_EMAIL": "Add Email",
-				"ADMIN_ROLE": "Admin Role",
 				"ALT_S_UPDATE_RECIPIENTS": "Report Recipients successfully updated ",
 				"APPLY_CUSTOM_RANGE": "Apply Custom Range",
 				"COPY": "Copy",
@@ -664,6 +661,7 @@
 				"LAST_12_MONTHS_AVERAGE": "Last 12 months average",
 				"LAST_DAY_OF_THE_MONTH": "Last day of the month",
 				"LESS_THAN_OR_EQUAL_TO_31": "Must be less than or equal to 31",
+				"MANAGE_ROLES": "Manage Roles",
 				"MONTHLY_TOTAL_AMOUNT_SUMMARY": "Monthly Total Amount Summary",
 				"OVERVIEW": "Overview",
 				"PREVIOUS_TOTAL_AMOUNT": "Previous total amount",
