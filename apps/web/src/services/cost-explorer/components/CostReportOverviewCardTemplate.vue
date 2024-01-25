@@ -23,7 +23,7 @@ import {
 
 <style lang="scss" scoped>
 .cost-report-overview-card-template {
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
     .top-part {
         display: flex;
         justify-content: space-between;

@@ -80,7 +80,7 @@ const handleClickSettings = (): void => {
 }
 .date-text {
     @apply text-display-sm;
-    padding-bottom: 0.25rem;
+    padding-bottom: 0.38rem;
 }
 .date-range-text {
     @apply text-label-md;

@@ -211,7 +211,6 @@ watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
 .chart {
     width: 100%;
     height: 12rem;
-    z-index: 1000;
 }
 
 /* custom design-system component - p-date-pagination */
