@@ -680,8 +680,8 @@
 				"SETTINGS": "설정",
 				"SHOW_DETAILS": "",
 				"TOTAL_AMOUNT": "",
+				"UPCOMING_ISSUE_DATE": "",
 				"UPCOMING_REPORT": "",
-				"UPCOMING_REPORT_DATE": "",
 				"WORKSPACE": "워크스페이스",
 				"WORKSPACE_OWNER": "Workspace Owner",
 				"WORKSPACE_OWNER_ROLE": "Workspace Owner 역할(Role)"

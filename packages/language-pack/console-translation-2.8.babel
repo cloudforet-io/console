@@ -12229,7 +12229,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>UPCOMING_REPORT</name>
+                                        <name>UPCOMING_ISSUE_DATE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -12250,7 +12250,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>UPCOMING_REPORT_DATE</name>
+                                        <name>UPCOMING_REPORT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
