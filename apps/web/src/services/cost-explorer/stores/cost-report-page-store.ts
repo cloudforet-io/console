@@ -18,7 +18,15 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         costReportConfig: null as CostReportConfigModel|null|undefined,
     });
     const getters = reactive({
+        currency: computed<string>(() => state.costReportConfig?.currency ?? 'KRW'),
         issueDay: computed<number>(() => state.costReportConfig?.issue_day ?? 10),
+        recentIssueDate: computed<Dayjs>(() => {
+            const today = dayjs.utc();
+            if (Number(today.format('D')) < getters.issueDay) {
+                return today.subtract(1, 'month').date(getters.issueDay);
+            }
+            return today.date(getters.issueDay);
+        }),
         recentReportDate: computed<Dayjs>(() => {
             const today = dayjs.utc();
             if (Number(today.format('D')) < getters.issueDay) {
