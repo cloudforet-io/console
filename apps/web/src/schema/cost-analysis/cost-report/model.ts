@@ -17,3 +17,7 @@ export interface CostReportModel {
     workspace_id: string;
     domain_id: string;
 }
+
+export interface CostReportDataLinkInfoModel {
+    cost_report_data_link: string,
+}

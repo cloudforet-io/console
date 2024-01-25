@@ -647,6 +647,11 @@
 			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "Additional Recipients",
+				"ADD_EMAIL": "Add Email",
+				"ADMIN_ROLE": "Admin Role",
+				"ALT_E_RESEND_REPORT": "Resend to failed.",
+				"ALT_S_COPY_REPORT_URL": "Report link successfully copied",
+				"ALT_S_RESEND_REPORT": "Report successfully sent",
 				"ALT_S_UPDATE_RECIPIENTS": "Report Recipients successfully updated ",
 				"APPLY_CUSTOM_RANGE": "Apply Custom Range",
 				"COPY": "Copy",
