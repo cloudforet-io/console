@@ -6,7 +6,7 @@ export interface CostReportConfigUpdateParameters {
     issue_day?: number;
     is_last_day?: boolean;
     currency?: Currency;
-    data_source_filter: {
+    data_source_filter?: {
         state: string;
         data_sources: string[];
     };
