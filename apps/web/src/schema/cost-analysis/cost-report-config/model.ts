@@ -4,7 +4,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 import type { Currency } from '@/store/modules/settings/type';
 
 
-export interface CostReportConfigModal {
+export interface CostReportConfigModel {
     cost_report_config_id: string;
     state: CostReportConfigStatus;
     issue_day: number;
