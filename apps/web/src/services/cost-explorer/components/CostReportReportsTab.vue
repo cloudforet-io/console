@@ -18,7 +18,7 @@ import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -91,6 +91,10 @@ const handleClickCopyButton = () => {
     fetchCostReportsUrl();
 };
 const handleClickResendButton = async (id: string): Promise<void> => {
+    if ((costReportPageState.costReportConfig?.recipients.role_types.length || 0) === 0) {
+        showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_RESEND_REPORT'), '');
+        return;
+    }
     state.loading.item = true;
     try {
         await costReportPageStore.fetchCostReport({
