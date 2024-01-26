@@ -1,31 +1,42 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PButton, PHeading, PLink, PToolboxTable, PSelectDropdown, PBadge,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
 import type { CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
@@ -36,7 +47,6 @@ const state = reactive({
         send: false,
         item: false,
     },
-    tags: [],
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
     periodMenuItems: computed<MenuItem[]>(() => {
         const thisMonth = dayjs.utc();
@@ -54,13 +64,40 @@ const state = reactive({
     customPeriodModalVisible: false,
     resendModalVisible: false,
 });
-const tableFields: Field[] = [
-    { label: 'Issue Date', name: 'issue_date' },
-    { label: 'Report Number', name: 'cost_report_number' },
-    { label: 'Workspace', name: 'workspace_name' },
-    { label: 'Cost', name: 'cost' },
-    { label: ' ', name: 'extra' },
-];
+const tableState = reactive({
+    pageStart: 0,
+    pageLimit: 15,
+    searchFilters: [] as ConsoleFilter[],
+    field: [
+        { label: 'Issue Date', name: 'issue_date' },
+        { label: 'Report Number', name: 'cost_report_number' },
+        { label: 'Workspace', name: 'workspace_name' },
+        { label: 'Cost', name: 'cost' },
+        { label: ' ', name: 'extra' },
+    ],
+    keyItemSets: [
+        {
+            title: 'Properties',
+            items: [
+                { name: 'issue_date', label: 'Issue Date' },
+                { name: 'cost_report_number', label: 'Report Number' },
+                { name: 'workspace_name', label: 'Workspace' },
+            ],
+        }] as KeyItemSet[],
+    valueHandlerMap: {
+        issue_date: makeDistinctValueHandler('costAnalysis.costReport', 'issue_date'),
+        cost_report_number: makeDistinctValueHandler('costAnalysis.costReport', 'cost_report_number'),
+        workspace_name: makeDistinctValueHandler('costAnalysis.costReport', 'workspace_name'),
+    },
+});
+
+
+const costReportListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
+    .setSort('name', true);
+let costReportListApiQuery = costReportListApiQueryHelper.data;
+const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 /* Util */
 const getDateRangeText = (date: string): string => {
@@ -91,6 +128,10 @@ const handleClickCopyButton = () => {
     fetchCostReportsUrl();
 };
 const handleClickResendButton = async (id: string): Promise<void> => {
+    if ((costReportPageState.costReportConfig?.recipients?.role_types.length || 0) === 0) {
+        showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_RESEND_REPORT'), '');
+        return;
+    }
     state.loading.item = true;
     try {
         await costReportPageStore.fetchCostReport({
@@ -100,6 +141,17 @@ const handleClickResendButton = async (id: string): Promise<void> => {
     } finally {
         state.loading.item = false;
     }
+};
+const handleChange = (options: any = {}) => {
+    costReportListApiQuery = getApiQueryWithToolboxOptions(costReportListApiQueryHelper, options) ?? costReportListApiQuery;
+    if (options.queryTags !== undefined) {
+        tableState.searchFilters = costReportListApiQueryHelper.filters;
+    }
+    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
+    costReportPageStore.fetchCostReportsList({
+        query: costReportListApiQuery,
+    });
 };
 
 /* API */
@@ -115,6 +167,39 @@ const fetchCostReportsUrl = async (): Promise<void> => {
         state.loading.copy = false;
     }
 };
+const workspaceUserListApiQueryHelper = new ApiQueryHelper()
+    .setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER],
+        o: '=',
+    }]);
+const fetchWorkspaceUsers = async (): Promise<void> => {
+    try {
+        const { total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+            workspace_id: costReportPageState.reportItem.workspace_id,
+            query: workspaceUserListApiQueryHelper.data,
+        });
+        costReportPageState.reportItem = {
+            ...costReportPageState.reportItem,
+            recipients: [
+                {
+                    type: ROLE_TYPE.WORKSPACE_OWNER,
+                    count: total_count || 0,
+                },
+            ],
+        };
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_RESEND_REPORT'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALE_E_SEND_REPORT'));
+    }
+};
+
+/* Watcher */
+watch(() => state.resendModalVisible, (resendModalVisible) => {
+    if (resendModalVisible) {
+        fetchWorkspaceUsers();
+    }
+});
 
 /* Init */
 onMounted(() => {
@@ -130,8 +215,12 @@ onMounted(() => {
                          :loading="costReportPageState.reportListLoading"
                          :total-count="costReportPageState.reportListTotalCount"
                          :items="costReportPageState.reportListItems"
-                         :fields="tableFields"
-                         :query-tags="state.tags"
+                         :fields="tableState.field"
+                         :key-item-sets="tableState.keyItemSets"
+                         :value-handler-map="tableState.valueHandlerMap"
+                         :query-tags="queryTags"
+                         @change="handleChange"
+                         @refresh="handleChange()"
         >
             <template #toolbox-top>
                 <p-heading heading-type="sub"

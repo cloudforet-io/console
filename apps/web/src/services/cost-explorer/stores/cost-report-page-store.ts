@@ -12,9 +12,17 @@ import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-c
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { RoleType } from '@/schema/identity/role/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+interface Recipient {
+    type: RoleType;
+    count: number;
+}
+interface CostReportItem extends CostReportModel {
+    recipients?: Recipient[];
+}
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const state = reactive({
@@ -24,7 +32,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         reportListTotalCount: 0,
         reportListItems: [] as CostReportModel[],
         //
-        reportItem: {} as CostReportModel,
+        reportItem: {} as CostReportItem,
     });
     const getters = reactive({
         currency: computed<string>(() => state.costReportConfig?.currency ?? 'KRW'),
@@ -61,10 +69,10 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
-    const fetchCostReportsList = async (): Promise<void> => {
+    const fetchCostReportsList = async (params?: CostReportListParameters): Promise<void> => {
         state.reportListLoading = true;
         try {
-            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>();
+            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>(params);
             state.reportListItems = results || [];
             state.reportListTotalCount = total_count || 0;
         } catch (e) {
