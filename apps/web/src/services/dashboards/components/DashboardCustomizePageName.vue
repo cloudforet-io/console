@@ -19,7 +19,6 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const props = defineProps<{
     name: string;
     dashboardId?: string;
-    isSaving: boolean;
 }>();
 const emit = defineEmits<{(e: 'update:name', value?: string): void,
     (e: 'click-back-button'): void}>();
@@ -47,7 +46,7 @@ const {
     nameInput: props.dashboardId ? props.name : '',
 }, {
     nameInput(value: string) {
-        if (props.isSaving) return '';
+        if (dashboardDetailState.dashboardInfo?.name === undefined) return ''; // after create case: dashboardInfo is undefined but value is not empty
         if (value === dashboardDetailState.dashboardInfo?.name) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
