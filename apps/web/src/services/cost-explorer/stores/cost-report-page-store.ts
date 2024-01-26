@@ -16,12 +16,12 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface Recipients {
+interface Recipient {
     type: RoleType;
     count: number;
 }
 interface CostReportItem extends CostReportModel {
-    recipients?: Recipients[];
+    recipients?: Recipient[];
 }
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {

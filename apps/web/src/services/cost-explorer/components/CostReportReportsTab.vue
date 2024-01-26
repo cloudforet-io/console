@@ -91,12 +91,7 @@ const tableState = reactive({
     },
 });
 
-const workspaceUserListApiQueryHelper = new ApiQueryHelper()
-    .setFilters([{
-        k: 'role_type',
-        v: [ROLE_TYPE.WORKSPACE_OWNER],
-        o: '=',
-    }]);
+
 const costReportListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
     .setSort('name', true);
@@ -133,7 +128,7 @@ const handleClickCopyButton = () => {
     fetchCostReportsUrl();
 };
 const handleClickResendButton = async (id: string): Promise<void> => {
-    if ((costReportPageState.costReportConfig?.recipients.role_types.length || 0) === 0) {
+    if ((costReportPageState.costReportConfig?.recipients?.role_types.length || 0) === 0) {
         showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_RESEND_REPORT'), '');
         return;
     }
@@ -172,6 +167,12 @@ const fetchCostReportsUrl = async (): Promise<void> => {
         state.loading.copy = false;
     }
 };
+const workspaceUserListApiQueryHelper = new ApiQueryHelper()
+    .setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER],
+        o: '=',
+    }]);
 const fetchWorkspaceUsers = async (): Promise<void> => {
     try {
         const { total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
