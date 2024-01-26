@@ -954,6 +954,11 @@
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "파일 다운로드 준비 중...",
 			"ALT_S_DOWNLOAD_SUCCESS": "1개 엑셀 다운로드 완료"
 		},
+		"EXPIRED_PAGE": {
+			"DESCRIPTION": "",
+			"SIGN_IN": "",
+			"TITLE": ""
+		},
 		"FNB": {
 			"PRIVACY": "개인정보처리방침 ",
 			"PRIVACY_MSG": "준비 중입니다.",

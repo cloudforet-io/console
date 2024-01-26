@@ -39,17 +39,17 @@ const handleClickSignin = () => {
             />
             <div class="expired-description-wrapper">
                 <p class="title">
-                    The link has expired
+                    {{ $t('COMMON.EXPIRED_PAGE.TITLE') }}
                 </p>
                 <p class="description">
-                    The link was set to expire after a certain amount of time. Please contact the person who shared this link with you or your administrator.
+                    {{ $t('COMMON.EXPIRED_PAGE.DESCRIPTION') }}
                 </p>
             </div>
             <p-button style-type="primary"
                       size="md"
                       @click="handleClickSignin"
             >
-                {{ $t('Go to Sign In') }}
+                {{ $t('COMMON.EXPIRED_PAGE.SIGN_IN') }}
             </p-button>
         </article>
     </section>
