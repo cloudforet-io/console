@@ -8,8 +8,13 @@ import {
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import dayjs from 'dayjs';
 
 import { numberFormatter } from '@cloudforet/utils';
+
+import { i18n } from '@/translations';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendContent from '@/services/cost-explorer/components/CostReportOverviewCostTrendContent.vue';
@@ -50,6 +55,13 @@ const state = reactive({
         const start = `${state.selectedDate}-01`;
         const end = `${state.selectedDate}-12`;
         return { start, end };
+    }),
+    //
+    selectedPeriodTranslation: computed(() => {
+        if (state.selectedDate === 'last12Months') {
+            return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_LAST_12_MONTHS');
+        }
+        return dayjs.utc(state.selectedDate).year();
     }),
 });
 
@@ -92,19 +104,19 @@ const handleChangeTarget = (target: string) => {
             <div class="summary-wrapper">
                 <div class="summary-item">
                     <div class="summary-label">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.PREVIOUS_TOTAL_AMOUNT', { previous_month: state.period.end }) }}
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">₩</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.previousTotalAmount) }}</span>
                     </div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-label">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS_AVERAGE') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: state.selectedPeriodTranslation }) }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">₩</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.last12MonthsAverage) }}</span>
                     </div>
                 </div>
@@ -137,10 +149,6 @@ const handleChangeTarget = (target: string) => {
         font-weight: 700;
         padding-left: 0.125rem;
     }
-}
-.collapsible-toggle {
-    width: 100%;
-    justify-content: center;
 }
 
 /* custom design-system component - p-select-dropdown */

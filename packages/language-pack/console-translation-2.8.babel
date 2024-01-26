@@ -11620,48 +11620,6 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ALT_S_COPY_REPORT_URL</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>ALT_S_RESEND_REPORT</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>ALT_E_UPDATE_RECIPIENTS</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -11684,6 +11642,48 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>ALT_E_UPDATE_SETTINGS</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>ALT_S_COPY_REPORT_URL</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>ALT_S_RESEND_REPORT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -11998,27 +11998,6 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>LAST_DAY_OF_THE_MONTH</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>LESS_THAN_OR_EQUAL_TO_31</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -12083,27 +12062,6 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>OVERVIEW</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>PREVIOUS_TOTAL_AMOUNT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -12397,7 +12355,70 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>THE_AVERAGE_FOR_SELECTED_PERIOD</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>THE_LAST_12_MONTHS</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>TOTAL_AMOUNT</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>TOTAL_COST_FOR_PREVIOUS_MONTH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
