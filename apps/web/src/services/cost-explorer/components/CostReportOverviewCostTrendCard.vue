@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, ref, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
-    PSelectButton, PCollapsibleToggle, PDataTable, PSelectDropdown,
+    PCollapsibleToggle, PDataTable, PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
@@ -14,17 +14,25 @@ import dayjs from 'dayjs';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
+import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
-const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
+type CostReportDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    value_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_value_sum?: number;
+};
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const state = reactive({
@@ -53,8 +61,17 @@ const state = reactive({
     last12MonthsAverage: 726568,
     //
     isDetailsCollapsed: true,
-    data: [],
-    chartData: [],
+    data: {} as AnalyzeResponse<CostReportDataAnalyzeResult>,
+    period: computed(() => {
+        if (state.selectedDate === 'last12Months') {
+            const start = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
+            const end = costReportPageGetters.recentReportDate.format('YYYY-MM');
+            return { start, end };
+        }
+        const start = `${state.selectedDate}-01`;
+        const end = `${state.selectedDate}-12`;
+        return { start, end };
+    }),
     tableFields: computed<DataTableFieldType[]>(() => {
         const targetField = state.targetSelectItems.find((item) => item.name === state.selectedTarget) ?? {};
 
@@ -77,45 +94,34 @@ const state = reactive({
 });
 
 /* Api */
-const analyzeCostReport = async () => {
+const analyzeTrendData = async () => {
     state.loading = true;
     try {
-        const { data } = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             query: {
-                granularity: 'MONTHLY',
+                granularity: GRANULARITY.MONTHLY,
                 group_by: [state.selectedTarget],
-                start: '2022-01',
-                end: '2022-12',
+                field_group: ['date'],
+                start: state.period.start,
+                end: state.period.end,
                 fields: {
                     value_sum: {
                         key: `cost.${costReportPageGetters.currency}`,
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'value_sum', desc: true }],
+                sort: [{
+                    key: '_total_value_sum',
+                    desc: true,
+                }],
             },
         });
-        state.data = data;
     } catch (e) {
-        state.data = [];
+        state.data = {};
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
     }
-};
-
-/* Util */
-const drawChart = () => {
-    chartHelper.refreshRoot();
-    // const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
-    //
-    // // set base interval of xAxis
-    // xAxis.get('baseInterval').timeUnit = 'month';
-    //
-    // // set label adapter of yAxis
-    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // // @ts-ignore
-    // yAxis.get('renderer').remove('labels');
 };
 
 /* Event */
@@ -125,13 +131,8 @@ const handleChangeTarget = (target: string) => {
 
 /* Init */
 (async () => {
-    await analyzeCostReport();
+    await analyzeTrendData();
 })();
-
-/* Watcher */
-watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) drawChart();
-}, { immediate: true });
 </script>
 
 <template>
@@ -180,8 +181,10 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
                     </div>
                 </div>
             </div>
-            <div ref="chartContext"
-                 class="chart"
+            <cost-report-overview-cost-trend-chart :loading="state.loading"
+                                                   :data="state.data"
+                                                   :group-by="state.selectedTarget"
+                                                   :period="state.period"
             />
             <div v-if="!state.isDetailsCollapsed">
                 <p-data-table :fields="state.tableFields"
@@ -217,10 +220,6 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
         font-weight: 700;
         padding-left: 0.125rem;
     }
-}
-.chart {
-    height: 17rem;
-    width: 100%;
 }
 .collapsible-toggle {
     width: 100%;
