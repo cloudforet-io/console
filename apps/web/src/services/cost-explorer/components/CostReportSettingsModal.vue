@@ -7,14 +7,23 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { CostReportConfigUpdateParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/update';
+import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+
 
 
 interface Props {
@@ -30,7 +39,7 @@ const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    selectedCurrency: 'KRW',
+    selectedCurrency: undefined as undefined|Currency,
     enableLastDay: false,
     currencyMenuItems: computed<SelectDropdownMenuItem[]>(() => Object.values(CURRENCY).map((currency) => ({
         name: currency,
@@ -64,20 +73,43 @@ const {
     },
 });
 
+/* Util */
+const getLastDay = (): number => {
+    const today = dayjs.utc();
+    if (today.isSame(today.endOf('month'), 'day')) {
+        return today.add(1, 'month').endOf('month').date();
+    }
+    return today.endOf('month').date();
+};
+
+/* Api */
+const updateCostReportConfig = async () => {
+    try {
+        const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateParameters, CostReportConfigModel>({
+            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
+            currency: state.selectedCurrency,
+            issue_day: state.enableLastDay ? undefined : Number(issueDay.value),
+            is_last_day: state.enableLastDay,
+        });
+        costReportPageStore.setCostReportConfig(updatedConfig);
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_UPDATE_SETTINGS'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_UPDATE_SETTINGS'));
+    }
+};
+
 /* Event */
 const handleChangeEnableLastDay = () => {
     state.enableLastDay = !state.enableLastDay;
     if (state.enableLastDay) {
-        const today = dayjs.utc();
-        if (today.isSame(today.endOf('month'), 'day')) {
-            setForm('issueDay', today.add(1, 'month').endOf('month').date());
-        } else {
-            setForm('issueDay', today.endOf('month').date());
-        }
+        setForm('issueDay', getLastDay());
     }
 };
+const handleSelectCurrency = (currency: Currency) => {
+    state.selectedCurrency = currency;
+};
 const handleConfirm = () => {
-    // TODO
+    updateCostReportConfig();
     state.proxyVisible = false;
 };
 
@@ -86,7 +118,11 @@ watch(() => props.visible, (visible) => {
     if (visible && costReportPageState.costReportConfig) {
         state.selectedCurrency = costReportPageState.costReportConfig?.currency;
         state.enableLastDay = costReportPageState.costReportConfig?.is_last_day;
-        setForm('issueDay', costReportPageState.costReportConfig?.issue_day);
+        if (!costReportPageState.costReportConfig?.is_last_day) {
+            setForm('issueDay', costReportPageState.costReportConfig?.issue_day);
+        } else {
+            setForm('issueDay', getLastDay());
+        }
     }
 });
 </script>
@@ -108,6 +144,7 @@ watch(() => props.visible, (visible) => {
                                        :required="true"
                                        class="input-field"
                                        use-fixed-menu-style
+                                       @select="handleSelectCurrency"
                     >
                         <template #menu-item--format="{item}">
                             <div class="menu-item">
