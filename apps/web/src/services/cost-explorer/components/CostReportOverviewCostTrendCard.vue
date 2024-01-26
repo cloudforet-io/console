@@ -7,12 +7,17 @@ import {
     PSelectButton, PCollapsibleToggle, PDataTable, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
+import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
@@ -23,6 +28,7 @@ const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const state = reactive({
+    loading: true,
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
         const _defaultStart = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
         const _defaultEnd = costReportPageGetters.recentReportDate.format('YYYY-MM');
@@ -39,14 +45,15 @@ const state = reactive({
     }),
     selectedDate: 'last12Months',
     targetSelectItems: [
-        { name: 'workspace', label: 'Workspace' },
+        { name: 'workspace_id', label: 'Workspace' },
         { name: 'provider', label: 'Provider' },
-    ],
-    selectedTarget: 'workspace',
+    ] as SelectButtonType[],
+    selectedTarget: 'workspace_id',
     previousTotalAmount: 957957,
     last12MonthsAverage: 726568,
     //
     isDetailsCollapsed: true,
+    data: [],
     chartData: [],
     tableFields: computed<DataTableFieldType[]>(() => {
         const targetField = state.targetSelectItems.find((item) => item.name === state.selectedTarget) ?? {};
@@ -69,6 +76,34 @@ const state = reactive({
     tableItems: [],
 });
 
+/* Api */
+const analyzeCostReport = async () => {
+    state.loading = true;
+    try {
+        const { data } = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+            query: {
+                granularity: 'MONTHLY',
+                group_by: [state.selectedTarget],
+                start: '2022-01',
+                end: '2022-12',
+                fields: {
+                    value_sum: {
+                        key: `cost.${costReportPageGetters.currency}`,
+                        operator: 'sum',
+                    },
+                },
+                sort: [{ key: 'value_sum', desc: true }],
+            },
+        });
+        state.data = data;
+    } catch (e) {
+        state.data = [];
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
 /* Util */
 const drawChart = () => {
     chartHelper.refreshRoot();
@@ -87,6 +122,11 @@ const drawChart = () => {
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
+
+/* Init */
+(async () => {
+    await analyzeCostReport();
+})();
 
 /* Watcher */
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {

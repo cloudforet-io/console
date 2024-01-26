@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -36,13 +36,13 @@ const state = reactive({
 });
 
 /* Api */
-const updateRecipients = async (): Promise<boolean> => {
+const updateRecipients = async (val: boolean): Promise<boolean> => {
     try {
-        const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.update<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
+        const updatedConfig = await SpaceConnector.clientV2.costAnalysis.costReportConfig.updateRecipients<CostReportConfigUpdateRecipientsParameters, CostReportConfigModel>({
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
             recipients: {
                 ...costReportPageGetters.recipients,
-                role_types: state.enableWorkspaceOwnerRecipients ? ['WORKSPACE_OWNER'] : [],
+                role_types: val ? ['WORKSPACE_OWNER'] : [],
             },
         });
         costReportPageStore.setCostReportConfig(updatedConfig);
@@ -55,13 +55,18 @@ const updateRecipients = async (): Promise<boolean> => {
 };
 
 /* Event */
-const handleToggleRecipients = async () => {
-    const result = await updateRecipients();
-    if (result) state.enableWorkspaceOwnerRecipients = !state.enableWorkspaceOwnerRecipients;
+const handleToggleRecipients = async (val: boolean) => {
+    const result = await updateRecipients(val);
+    if (result) state.enableWorkspaceOwnerRecipients = val;
 };
 const handleClickManageRoles = () => {
     router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) });
 };
+
+/* Watcher */
+watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
+    state.enableWorkspaceOwnerRecipients = costReportConfig?.recipients?.role_types?.includes('WORKSPACE_OWNER') ?? false;
+}, { immediate: true });
 </script>
 
 <template>
