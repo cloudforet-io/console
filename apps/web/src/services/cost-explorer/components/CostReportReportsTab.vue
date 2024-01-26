@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PButton, PHeading, PLink, PToolboxTable, PSelectDropdown, PBadge,
@@ -8,10 +10,15 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
 import type { CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -107,6 +114,12 @@ const handleClickResendButton = async (id: string): Promise<void> => {
 };
 
 /* API */
+const workspaceUserListApiQueryHelper = new ApiQueryHelper()
+    .setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER],
+        o: '=',
+    }]);
 const fetchCostReportsUrl = async (): Promise<void> => {
     state.loading.copy = true;
     try {
@@ -119,6 +132,33 @@ const fetchCostReportsUrl = async (): Promise<void> => {
         state.loading.copy = false;
     }
 };
+const fetchWorkspaceUsers = async (): Promise<void> => {
+    try {
+        const { total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+            workspace_id: costReportPageState.reportItem.workspace_id,
+            query: workspaceUserListApiQueryHelper.data,
+        });
+        costReportPageState.reportItem = {
+            ...costReportPageState.reportItem,
+            recipients: [
+                {
+                    type: ROLE_TYPE.WORKSPACE_OWNER,
+                    count: total_count || 0,
+                },
+            ],
+        };
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_RESEND_REPORT'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALE_E_SEND_REPORT'));
+    }
+};
+
+/* Watcher */
+watch(() => state.resendModalVisible, (resendModalVisible) => {
+    if (resendModalVisible) {
+        fetchWorkspaceUsers();
+    }
+});
 
 /* Init */
 onMounted(() => {

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { PButtonModal, PDefinitionTable } from '@spaceone/design-system';
 
@@ -69,7 +71,6 @@ const postCostReportsResend = async (): Promise<void> => {
         state.loading = false;
     }
 };
-
 </script>
 
 <template>
@@ -92,6 +93,13 @@ const postCostReportsResend = async (): Promise<void> => {
                     <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.item.currency] }}</span>
                     <span class="text"> {{ numberFormatter(value[state.item.currency]) }}</span>
                     <span class="currency-text"> ({{ state.item.currency }})</span>
+                </template>
+                <template #data-recipients="{value}">
+                    <p v-for="(item, idx) in value"
+                       :key="`recipients-${idx}`"
+                    >
+                        <span>{{ item.type }} ({{ item.count }})</span>
+                    </p>
                 </template>
             </p-definition-table>
         </template>

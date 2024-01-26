@@ -12,9 +12,17 @@ import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-c
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { RoleType } from '@/schema/identity/role/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+interface Recipients {
+    type: RoleType;
+    count: number;
+}
+interface CostReportItem extends CostReportModel {
+    recipients?: Recipients[];
+}
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const state = reactive({
@@ -24,7 +32,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         reportListTotalCount: 0,
         reportListItems: [] as CostReportModel[],
         //
-        reportItem: {} as CostReportModel,
+        reportItem: {} as CostReportItem,
     });
     const getters = reactive({
         currency: computed<string>(() => state.costReportConfig?.currency ?? 'KRW'),
