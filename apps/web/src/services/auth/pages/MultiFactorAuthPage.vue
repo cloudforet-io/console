@@ -88,14 +88,15 @@ const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
     try {
         await loadAuth().signIn(state.credentials, 'MFA', validationState.verificationCode);
+        validationState.isVerificationCodeValid = false;
+        validationState.verificationCode = '';
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
             const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
             const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);
-            await router.push(defaultRoute);
+            await router.push(defaultRoute).catch(() => {});
         }
-        validationState.verificationCode = '';
     } catch (e: any) {
         validationState.isVerificationCodeValid = true;
         validationState.verificationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
