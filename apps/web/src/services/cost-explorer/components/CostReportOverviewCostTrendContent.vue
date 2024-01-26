@@ -10,17 +10,23 @@ import {
     PDataLoader, PDataTable, PSkeleton,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
-import { cloneDeep } from 'lodash';
+import dayjs from 'dayjs';
+import { cloneDeep, find, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
+import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { getLegends, getXYChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
@@ -36,12 +42,10 @@ type CostReportDataAnalyzeResult = {
     _total_value_sum?: number;
 };
 interface Props {
-    groupBy?: string;
+    groupBy: string;
     period: { start: string; end: string };
 }
 const props = withDefaults(defineProps<Props>(), {
-    groupBy: undefined,
-    period: undefined,
 });
 
 const DATE_FIELD_NAME = 'date';
@@ -49,6 +53,11 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
 const state = reactive({
     loading: true,
     data: {} as AnalyzeResponse<CostReportDataAnalyzeResult>,
@@ -56,17 +65,40 @@ const state = reactive({
     chartData: [] as XYChartData[],
     isDetailsCollapsed: true,
     tableFields: computed<DataTableFieldType[]>(() => {
-        const targetField = state.targetSelectItems.find((item) => item.name === state.selectedTarget) ?? {};
+        const targetField: DataTableFieldType = {
+            name: props.groupBy,
+            label: props.groupBy === 'workspace_id' ? 'Workspace' : 'Provider',
+            sortable: false,
+        };
         const subTotalField = {
             name: '_total_value_sum',
             label: 'Sub Total',
             textAlign: 'right',
             sortable: false,
         };
-        const costFields = getDataTableCostFields(GRANULARITY.MONTHLY, state.period, true);
+        const costFields = getDataTableCostFields(GRANULARITY.MONTHLY, props.period, true);
         return [targetField, subTotalField, ...costFields];
     }),
-    tableItems: [],
+    tableItems: computed<CostReportDataAnalyzeResult[]>(() => {
+        if (!state.data.results) return [];
+        const refinedTableData: CostReportDataAnalyzeResult[] = [];
+        state.data.results.forEach((d) => {
+            let target = cloneDeep(d.value_sum);
+            let now = dayjs.utc(props.period.start).clone();
+            while (now.isSameOrBefore(dayjs.utc(props.period.end), 'month')) {
+                if (!find(target, { date: now.format('YYYY-MM') })) {
+                    target?.push({ date: now.format('YYYY-MM'), value: 0 });
+                }
+                now = now.add(1, 'month');
+            }
+            target = sortBy(target, ['date']);
+            refinedTableData.push({
+                ...d,
+                value_sum: target,
+            });
+        });
+        return refinedTableData;
+    }),
 });
 
 /* Api */
@@ -174,8 +206,17 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
         </p-data-loader>
         <div v-if="!state.isDetailsCollapsed">
             <p-data-table :fields="state.tableFields"
-                          :items="state.data.results"
-            />
+                          :items="state.tableItems"
+            >
+                <template #col-format="{field, value}">
+                    <span v-if="field.name === GROUP_BY.WORKSPACE">
+                        {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                    </span>
+                    <span v-else-if="field.name === GROUP_BY.PROVIDER">
+                        {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                    </span>
+                </template>
+            </p-data-table>
         </div>
         <p-collapsible-toggle :is-collapsed.sync="state.isDetailsCollapsed"
                               class="collapsible-toggle"
@@ -194,5 +235,9 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
         height: 100%;
         width: 100%;
     }
+}
+.collapsible-toggle {
+    width: 100%;
+    justify-content: center;
 }
 </style>
