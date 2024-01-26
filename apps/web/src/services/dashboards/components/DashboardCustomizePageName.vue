@@ -11,11 +11,15 @@ import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
+import { useFormValidator } from '@/common/composables/form-validator';
+
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const props = defineProps<{
     name: string;
     dashboardId?: string;
+    isSaving: boolean;
 }>();
 const emit = defineEmits<{(e: 'update:name', value?: string): void,
     (e: 'click-back-button'): void}>();
@@ -32,20 +36,30 @@ const state = reactive({
     placeHolder: dashboardDetailState.placeholder,
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
 });
-const formState = reactive({
-    nameInput: '',
-    invalidState: false,
-    invalidTexts: '',
+const {
+    forms: {
+        nameInput,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    nameInput: props.dashboardId ? props.name : '',
+}, {
+    nameInput(value: string) {
+        if (props.isSaving) return '';
+        if (value === dashboardDetailState.dashboardInfo?.name) return '';
+        if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
+        if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
+        if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
+        return '';
+    },
 });
 
 const isTextInputFocused = ref(false);
 
 const updateName = (name: string) => {
-    formState.nameInput = name;
-    const { invalidState, invalidTexts } = validationCheck();
-    formState.invalidState = invalidState;
-    formState.invalidTexts = invalidTexts;
-    dashboardDetailStore.setIsNameValid(!invalidState);
+    setForm('nameInput', name);
     emit('update:name', name);
 };
 
@@ -55,36 +69,19 @@ const handleInput = (t: string) => {
 const handleClickBackButton = () => {
     emit('click-back-button');
 };
-const validationCheck = () => {
-    let invalidState = false;
-    let invalidTexts = '';
-    if (formState.nameInput === dashboardDetailState.dashboardInfo?.name) {
-        invalidState = true;
-        invalidTexts = '';
-    } else if (formState.nameInput.length > 100) {
-        invalidState = true;
-        invalidTexts = i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH') as string;
-    } else if (formState.nameInput.trim().length === 0) {
-        invalidState = true;
-        invalidTexts = i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT') as string;
-    } else if (state.dashboardNameList.find((d) => d === formState.nameInput)) {
-        invalidState = true;
-        invalidTexts = i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE') as string;
-    }
-    return {
-        invalidState,
-        invalidTexts,
-    };
-};
 
 watch(() => props.name, (d) => {
-    if (d === formState.nameInput) return;
+    if (d === nameInput.value) return;
     if (d) updateName(d);
     else updateName('');
 }, { immediate: true });
 
+watch(() => invalidState.nameInput, (invalid) => {
+    dashboardDetailStore.setIsNameValid(!invalid);
+});
+
 onMounted(() => {
-    if (formState.nameInput.length > 0) dashboardDetailStore.setIsNameValid(true);
+    if (nameInput.value?.length) dashboardDetailStore.setIsNameValid(true);
     else dashboardDetailStore.setIsNameValid(false);
 });
 </script>
@@ -98,11 +95,11 @@ onMounted(() => {
                     height="1.5rem"
         />
         <p-field-group v-else
-                       :invalid="formState.invalidState"
-                       :invalid-text="formState.invalidTexts"
+                       :invalid="invalidState.nameInput"
+                       :invalid-text="invalidTexts.nameInput"
         >
             <template #default="{invalid}">
-                <p-text-input :value="formState.nameInput"
+                <p-text-input :value="nameInput"
                               :invalid="invalid"
                               :placeholder="state.placeHolder"
                               :is-focused.sync="isTextInputFocused"
