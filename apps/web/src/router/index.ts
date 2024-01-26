@@ -28,6 +28,7 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
+const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i];
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
@@ -102,6 +103,12 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
+            const isDirectAccessToOldPath = !to.name && OLD_PATHS.some((path) => path.test(to.path));
+            if (isDirectAccessToOldPath) {
+                next({ name: ROOT_ROUTE._NAME });
+                return;
+            }
+
             if (!to.name && to.path === '/') {
                 next({ name: ROOT_ROUTE._NAME });
                 return;

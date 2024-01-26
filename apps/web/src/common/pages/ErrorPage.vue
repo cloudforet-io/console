@@ -32,7 +32,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 interface Props {
-    statusCode: string;
+    statusCode?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
