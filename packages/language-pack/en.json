@@ -954,6 +954,11 @@
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "Waiting download...",
 			"ALT_S_DOWNLOAD_SUCCESS": "1 Excel successfully downloaded"
 		},
+		"EXPIRED_PAGE": {
+			"DESCRIPTION": "The link was set to expire after a certain amount of time. Please contact the person who shared this link with you or your administrator.",
+			"SIGN_IN": "Go to Sign In",
+			"TITLE": "The link has expired"
+		},
 		"FNB": {
 			"PRIVACY": "Privacy Policy",
 			"PRIVACY_MSG": "Will be updated",

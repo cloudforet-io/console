@@ -6,8 +6,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
+const SSO_TOKEN_PAGES = ['/reset-password', '/expired-link', '/cost-report'];
+
 export const checkSsoAccessToken = async (store) => {
-    if (window.location.pathname === '/reset-password') {
+    if (SSO_TOKEN_PAGES.includes(window.location.pathname)) {
         if (isMobile()) store.dispatch('display/showMobileGuideModal');
         return;
     }

@@ -1,6 +1,9 @@
 
 export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
+    EXPIRED_LINK: {
+        _NAME: 'expired-link',
+    },
 });
 export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',

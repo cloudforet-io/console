@@ -954,6 +954,11 @@
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "ファイルのダウンロードを準備中",
 			"ALT_S_DOWNLOAD_SUCCESS": "１つのエクセルダウンロード完了"
 		},
+		"EXPIRED_PAGE": {
+			"DESCRIPTION": "",
+			"SIGN_IN": "",
+			"TITLE": ""
+		},
 		"FNB": {
 			"PRIVACY": "個人情報保護方針",
 			"PRIVACY_MSG": "準備中です",
