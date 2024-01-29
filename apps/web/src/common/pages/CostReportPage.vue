@@ -1,28 +1,49 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PDataLoader, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
 import TableHeader from '@/common/components/cost-report-page/table-header.vue';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray } from '@/styles/colors';
+import { gray, white } from '@/styles/colors';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
 
+
 const router = useRouter();
 
+type CostReportDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    value_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_value_sum?: number;
+};
+interface ChartData {
+    category: string;
+    value: number;
+    pieSettings: {
+        fill: string;
+    };
+}
 interface Props {
     accessToken?: string;
     costReportId?: string;
@@ -33,12 +54,16 @@ interface State {
     isExpired: boolean;
     reportDateRage: ComputedRef<string>;
     totalCost: ComputedRef<string|undefined>;
+    data?: AnalyzeResponse<CostReportDataAnalyzeResult>|undefined;
+    chartData: ComputedRef<ChartData[]>;
 }
 const props = withDefaults(defineProps<Props>(), {
     accessToken: undefined,
     costReportId: undefined,
 });
 
+const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const state = reactive<State>({
     loading: true,
     baseInfo: undefined,
@@ -52,7 +77,38 @@ const state = reactive<State>({
         return `${startDate} ~ ${endDate}`;
     }),
     totalCost: computed(() => numberFormatter(10000000)),
+    data: undefined,
+    chartData: computed<ChartData[]>(() => state.data?.results?.map((d) => ({
+        category: d.provider, // TODO: change to dynamic label (ex. storeState.providers[d.provider]?.name ?? d.provider)
+        value: d.value_sum,
+        pieSettings: {
+            fill: undefined, // TODO: change to dynamic color
+        },
+    })) ?? []),
 });
+
+/* Util */
+const drawChart = () => {
+    chartHelper.refreshRoot();
+    const chart = chartHelper.createDonutChart({
+        paddingLeft: 20,
+        paddingRight: 20,
+    });
+    const seriesSettings = {
+        categoryField: 'category',
+        valueField: 'value',
+    };
+    const series = chartHelper.createPieSeries(seriesSettings);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        templateField: 'pieSettings',
+    });
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(series, tooltip, state.baseInfo?.currency);
+    series.slices.template.set('tooltip', tooltip);
+    series.data.setAll(cloneDeep(state.chartData));
+};
 
 const fetchReportData = async () => {
     try {
@@ -85,6 +141,11 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     if (!isSucceeded) return;
     await fetchReportData();
 })();
+
+/* Watcher */
+watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
+    if (!loading && _chartContext) drawChart();
+}, { immediate: true });
 </script>
 
 <template>
@@ -151,6 +212,9 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
                     </p-link>
                 </div>
+                <div ref="chartContext"
+                     class="chart"
+                />
                 <div id="total-amount-by-provider">
                     <p class="title">
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
@@ -247,4 +311,8 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     }
 }
 
+.chart {
+    width: 100%;
+    height: 12rem;
+}
 </style>
