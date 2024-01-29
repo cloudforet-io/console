@@ -46,7 +46,7 @@ const state = reactive({
         const _defaultStart = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
         const _defaultEnd = costReportPageGetters.recentReportDate.format('YYYY-MM');
         const _default: SelectDropdownMenuItem = {
-            name: 'last12Months', label: `Last 12 Months (${_defaultStart} ~ ${_defaultEnd})`,
+            name: 'last12Months', label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS')} (${_defaultStart} ~ ${_defaultEnd})`,
         };
         const last3Years = Array.from({ length: 3 }).map((_, idx) => {
             const _year = costReportPageGetters.recentReportDate.subtract(idx - 1, 'year').format('YYYY');
@@ -77,9 +77,9 @@ const state = reactive({
     //
     selectedPeriodTranslation: computed(() => {
         if (state.selectedDate === 'last12Months') {
-            return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_LAST_12_MONTHS');
+            return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_THE_LAST_12_MONTHS');
         }
-        return dayjs.utc(state.selectedDate).year();
+        return i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: dayjs.utc(state.selectedDate).year() });
     }),
 });
 
@@ -145,8 +145,8 @@ const handleChangeTarget = (target: string) => {
 };
 
 /* Watcher */
-watch([() => state.period, () => state.selectedTarget], async (after, before) => {
-    if (isEqual(after, before)) return;
+watch([() => state.period, () => state.selectedTarget, () => costReportPageGetters.currency], async (after, before) => {
+    if (isEqual(after, before) || !costReportPageGetters.currency) return;
     await analyzeTrendData();
 }, { immediate: true });
 </script>
@@ -184,16 +184,16 @@ watch([() => state.period, () => state.selectedTarget], async (after, before) =>
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.previousTotalAmount) }}</span>
                     </div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-label">
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: state.selectedPeriodTranslation }) }}
+                        {{ state.selectedPeriodTranslation }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.last12MonthsAverage) }}</span>
                     </div>
                 </div>

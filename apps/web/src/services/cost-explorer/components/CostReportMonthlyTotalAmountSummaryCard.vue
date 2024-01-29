@@ -159,8 +159,8 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
 watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
     state.currentDate = recentReportDate;
 }, { immediate: true });
-watch([() => state.currentDate, () => state.selectedTarget], (after, before) => {
-    if (isEqual(after, before) || !state.currentDate) return;
+watch([() => state.currentDate, () => state.selectedTarget, () => costReportPageGetters.currency], (after, before) => {
+    if (isEqual(after, before) || !state.currentDate || !costReportPageGetters.currency) return;
     analyzeCostReportData();
 });
 </script>
@@ -197,7 +197,7 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                             <span class="value">{{ numberFormatter(state.totalAmount) }}</span>
                         </div>
                     </div>
@@ -236,7 +236,11 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
                             </span>
                         </template>
                         <template #col-value_sum-format="{ value }">
-                            <span class="amount-col">{{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}</span>
+                            <span v-if="costReportPageGetters.currency"
+                                  class="amount-col"
+                            >
+                                {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
+                            </span>
                         </template>
                     </p-data-table>
                 </div>
