@@ -9,6 +9,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { CostReportSendParameters } from '@/schema/cost-analysis/cost-report/api-verbs/send';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -29,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
+const costReportPageGetters = costReportPageStore.getters;
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string[]): void;
@@ -37,10 +40,11 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    item: computed(() => costReportPageState.reportItem),
+    item: computed(() => costReportPageGetters.reportItemData),
+    currency: computed(() => state.item.currency || 'KRW'),
     fields: computed(() => [
         { name: 'issue_date', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ISSUE_DATE'), disableCopy: true },
-        { name: 'cost_report_number', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORT_NUMBER'), disableCopy: true },
+        { name: 'report_number', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORT_NUMBER'), disableCopy: true },
         { name: 'workspace_name', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE'), disableCopy: true },
         { name: 'cost', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.COST'), disableCopy: true },
         { name: 'recipients', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.RECIPIENTS'), disableCopy: true },
@@ -54,7 +58,19 @@ const handleUpdateVisible = (visible: boolean) => {
 };
 const handleConfirm = () => {
     postCostReportsResend();
-    state.proxyVisible = false;
+};
+const roleFormatter = (type: RoleType) => {
+    switch (type) {
+    case ROLE_TYPE.DOMAIN_ADMIN: return {
+        name: 'Domain Admin Role',
+    };
+    case ROLE_TYPE.WORKSPACE_OWNER: return {
+        name: 'Workspace Owner Role',
+    };
+    default: return {
+        name: '',
+    };
+    }
 };
 
 /* API */
@@ -65,6 +81,7 @@ const postCostReportsResend = async (): Promise<void> => {
             cost_report_id: state.item.cost_report_id,
         });
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_RESEND_REPORT'), '');
+        state.proxyVisible = false;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALE_E_SEND_REPORT'));
     } finally {
@@ -87,18 +104,19 @@ const postCostReportsResend = async (): Promise<void> => {
         <template #body>
             <p-definition-table :fields="state.fields"
                                 :data="state.item"
+                                :loading="costReportPageState.workspaceUserLoading"
                                 :skeleton-rows="5"
             >
                 <template #data-cost="{value}">
-                    <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.item.currency] }}</span>
-                    <span class="text"> {{ numberFormatter(value[state.item.currency]) }}</span>
-                    <span class="currency-text"> ({{ state.item.currency }})</span>
+                    <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                    <span class="text"> {{ numberFormatter(value[state.currency]) }}</span>
+                    <span class="currency-text"> ({{ state.currency }})</span>
                 </template>
                 <template #data-recipients="{value}">
-                    <p v-for="(item, idx) in value"
+                    <p v-for="(item, idx) in value.role_types"
                        :key="`recipients-${idx}`"
                     >
-                        <span>{{ item.type }} ({{ item.count }})</span>
+                        <span>{{ roleFormatter(item).name }}</span>
                     </p>
                 </template>
             </p-definition-table>

@@ -16,12 +16,11 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface Recipient {
-    type: RoleType;
-    count: number;
-}
 interface CostReportItem extends CostReportModel {
-    recipients?: Recipient[];
+    recipients?: {
+        role_types: RoleType[];
+        emails: string[];
+    };
 }
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {
@@ -32,6 +31,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         reportListTotalCount: 0,
         reportListItems: [] as CostReportModel[],
         //
+        workspaceUserLoading: false,
         reportItem: {} as CostReportItem,
     });
     const getters = reactive({
@@ -51,6 +51,10 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
             }
             return today.subtract(1, 'month');
         }),
+        reportItemData: computed<CostReportItem>(() => ({
+            ...state.reportItem,
+            recipients: state.costReportConfig?.recipients,
+        })),
     });
 
     /* Mutations */
@@ -93,6 +97,8 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
 
     const mutations = {
         setCostReportConfig,
+        fetchCostReportsList,
+        fetchCostReport,
     };
 
     (async () => {
@@ -104,7 +110,5 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         getters,
         ...mutations,
         fetchCostReportConfig,
-        fetchCostReportsList,
-        fetchCostReport,
     };
 });

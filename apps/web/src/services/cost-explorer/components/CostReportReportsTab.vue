@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import {
@@ -17,12 +17,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
 import type { CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -42,11 +38,6 @@ const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 
 const state = reactive({
-    loading: {
-        copy: false,
-        send: false,
-        item: false,
-    },
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
     periodMenuItems: computed<MenuItem[]>(() => {
         const thisMonth = dayjs.utc();
@@ -70,7 +61,7 @@ const tableState = reactive({
     searchFilters: [] as ConsoleFilter[],
     field: [
         { label: 'Issue Date', name: 'issue_date' },
-        { label: 'Report Number', name: 'cost_report_number' },
+        { label: 'Report Number', name: 'report_number' },
         { label: 'Workspace', name: 'workspace_name' },
         { label: 'Cost', name: 'cost' },
         { label: ' ', name: 'extra' },
@@ -80,13 +71,13 @@ const tableState = reactive({
             title: 'Properties',
             items: [
                 { name: 'issue_date', label: 'Issue Date' },
-                { name: 'cost_report_number', label: 'Report Number' },
+                { name: 'report_number', label: 'Report Number' },
                 { name: 'workspace_name', label: 'Workspace' },
             ],
         }] as KeyItemSet[],
     valueHandlerMap: {
         issue_date: makeDistinctValueHandler('costAnalysis.costReport', 'issue_date'),
-        cost_report_number: makeDistinctValueHandler('costAnalysis.costReport', 'cost_report_number'),
+        report_number: makeDistinctValueHandler('costAnalysis.costReport', 'report_number'),
         workspace_name: makeDistinctValueHandler('costAnalysis.costReport', 'workspace_name'),
     },
 });
@@ -132,14 +123,13 @@ const handleClickResendButton = async (id: string): Promise<void> => {
         showErrorMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_E_RESEND_REPORT'), '');
         return;
     }
-    state.loading.item = true;
     try {
         await costReportPageStore.fetchCostReport({
             cost_report_id: id,
         });
         state.resendModalVisible = true;
-    } finally {
-        state.loading.item = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 const handleChange = (options: any = {}) => {
@@ -156,50 +146,14 @@ const handleChange = (options: any = {}) => {
 
 /* API */
 const fetchCostReportsUrl = async (): Promise<void> => {
-    state.loading.copy = true;
     try {
         const res = await SpaceConnector.clientV2.costAnalysis.costReport.getUrl<CostReportGetUrlParameters, CostReportDataLinkInfoModel>();
         copyAnyData(res.cost_report_data_link);
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_COPY_REPORT_URL'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
-    } finally {
-        state.loading.copy = false;
     }
 };
-const workspaceUserListApiQueryHelper = new ApiQueryHelper()
-    .setFilters([{
-        k: 'role_type',
-        v: [ROLE_TYPE.WORKSPACE_OWNER],
-        o: '=',
-    }]);
-const fetchWorkspaceUsers = async (): Promise<void> => {
-    try {
-        const { total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-            workspace_id: costReportPageState.reportItem.workspace_id,
-            query: workspaceUserListApiQueryHelper.data,
-        });
-        costReportPageState.reportItem = {
-            ...costReportPageState.reportItem,
-            recipients: [
-                {
-                    type: ROLE_TYPE.WORKSPACE_OWNER,
-                    count: total_count || 0,
-                },
-            ],
-        };
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_RESEND_REPORT'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALE_E_SEND_REPORT'));
-    }
-};
-
-/* Watcher */
-watch(() => state.resendModalVisible, (resendModalVisible) => {
-    if (resendModalVisible) {
-        fetchWorkspaceUsers();
-    }
-});
 
 /* Init */
 onMounted(() => {
@@ -257,7 +211,7 @@ onMounted(() => {
                     {{ getDateRangeText(value) }}
                 </div>
             </template>
-            <template #col-cost_report_number-format="{value}">
+            <template #col-report_number-format="{value}">
                 <!-- TODO: check href link-->
                 <p-link :text="value"
                         href="/"
@@ -267,7 +221,7 @@ onMounted(() => {
             </template>
             <template #col-cost-format="{value}">
                 <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                <span class="text">{{ numberFormatter(value[state.currency]) }}</span>
+                <span class="text">{{ numberFormatter(value[state.currency]) || 0 }}</span>
                 <span class="currency-text">{{ state.currency }}</span>
             </template>
             <template #col-extra-format="{item}">
@@ -276,7 +230,6 @@ onMounted(() => {
                               icon-left="ic_link"
                               size="sm"
                               class="copy-button"
-                              :loading="state.loading.copy"
                               @click="handleClickCopyButton"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.COPY') }}
@@ -285,7 +238,6 @@ onMounted(() => {
                               icon-left="ic_paper-airplane"
                               size="sm"
                               class="resend-button"
-                              :loading="state.loading.item"
                               @click="handleClickResendButton(item.cost_report_id)"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.RESEND') }}
