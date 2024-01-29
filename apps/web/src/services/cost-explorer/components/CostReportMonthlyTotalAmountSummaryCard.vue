@@ -219,6 +219,7 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
                                   :items="state.data?.results ?? []"
                                   :loading="state.loading"
                                   table-style-type="simple"
+                                  class="summary-data-table"
                     >
                         <template #col-format="{field, value, rowIndex}">
                             <span v-if="field.name === GROUP_BY.WORKSPACE">
@@ -284,6 +285,9 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
 .chart {
     width: 100%;
     height: 12rem;
+}
+.summary-data-table {
+    max-height: 19rem;
 }
 
 /* custom design-system component - p-date-pagination */
