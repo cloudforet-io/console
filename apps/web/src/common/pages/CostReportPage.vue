@@ -79,10 +79,10 @@ const state = reactive<State>({
     totalCost: computed(() => numberFormatter(10000000)),
     data: undefined,
     chartData: computed<ChartData[]>(() => state.data?.results?.map((d) => ({
-        category: d.provider, // TODO: storeState.providers[d.provider]?.name ?? d.provider,
+        category: d.provider, // TODO: change to dynamic label (ex. storeState.providers[d.provider]?.name ?? d.provider)
         value: d.value_sum,
         pieSettings: {
-            fill: undefined, // d.color,
+            fill: undefined, // TODO: change to dynamic color
         },
     })) ?? []),
 });
