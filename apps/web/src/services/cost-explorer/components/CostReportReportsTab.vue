@@ -114,7 +114,7 @@ const handleConfirmCustomPeriod = (start: string, end: string): void => {
 };
 const handleClickCopyButton = async (id: string) => {
     try {
-        const response = await costReportPageStore.fetchCostReportsUrl({
+        const response = await costReportPageStore.getCostReportUrl({
             cost_report_id: id,
         });
         copyAnyData(response);
@@ -150,7 +150,7 @@ const handleChange = (options: any = {}) => {
 };
 const handleClickLinkButton = async (id: string) => {
     try {
-        const response = await costReportPageStore.fetchCostReportsUrl({
+        const response = await costReportPageStore.getCostReportUrl({
             cost_report_id: id,
         });
         // TODO: check
