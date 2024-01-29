@@ -175,6 +175,7 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
             { k: 'report_month', v: selectedPeriod, o: '=' },
         ]);
     }
+    tableState.pageStart = 0;
     costReportPageStore.fetchCostReportsList({
         query: costReportListApiQueryHelper.data,
     });
@@ -198,6 +199,7 @@ onMounted(() => {
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
+                         :this-page="tableState.pageStart + 1"
                          @change="handleChange"
                          @refresh="handleChange()"
         >
@@ -251,10 +253,10 @@ onMounted(() => {
                     />
                 </p-text-button>
             </template>
-            <template #col-cost-format="{value}">
-                <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                <span class="text">{{ numberFormatter(value[state.currency]) || 0 }}</span>
-                <span class="currency-text">{{ state.currency }}</span>
+            <template #col-cost-format="{value, item}">
+                <span class="currency-symbol">{{ CURRENCY_SYMBOL[item.currency] }}</span>
+                <span class="text">{{ numberFormatter(value[item.currency]) || 0 }}</span>
+                <span class="currency-text">{{ item.currency }}</span>
             </template>
             <template #col-extra-format="{item}">
                 <div class="float-right">
