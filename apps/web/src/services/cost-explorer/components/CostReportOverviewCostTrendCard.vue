@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectButton, PSelectDropdown,
+    PSelectButton, PSelectDropdown, PSkeleton,
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -191,7 +191,13 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
                     <div class="summary-label">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                     </div>
-                    <div class="summary-value">
+                    <p-skeleton v-if="state.loading"
+                                width="8rem"
+                                height="2rem"
+                    />
+                    <div v-else
+                         class="summary-value"
+                    >
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
                     </div>
@@ -200,7 +206,13 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
                     <div class="summary-label">
                         {{ state.selectedPeriodTranslation }}
                     </div>
-                    <div class="summary-value">
+                    <p-skeleton v-if="state.loading"
+                                width="8rem"
+                                height="2rem"
+                    />
+                    <div v-else
+                         class="summary-value"
+                    >
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
                     </div>
