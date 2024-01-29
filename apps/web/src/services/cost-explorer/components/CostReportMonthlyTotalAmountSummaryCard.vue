@@ -162,7 +162,7 @@ watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
 watch([() => state.currentDate, () => state.selectedTarget, () => costReportPageGetters.currency], (after, before) => {
     if (isEqual(after, before) || !state.currentDate || !costReportPageGetters.currency) return;
     analyzeCostReportData();
-});
+}, { immediate: true });
 </script>
 
 <template>
