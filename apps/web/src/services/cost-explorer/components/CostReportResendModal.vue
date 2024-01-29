@@ -3,7 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PButtonModal, PDefinitionTable } from '@spaceone/design-system';
+import { PButtonModal, PDefinitionTable, PLink } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -107,6 +107,13 @@ const postCostReportsResend = async (): Promise<void> => {
                                 :loading="costReportPageState.workspaceUserLoading"
                                 :skeleton-rows="5"
             >
+                <template #data-report_number="{value}">
+                    <p-link :text="value"
+                            :href="state.item.report_url"
+                            new-tab
+                            action-icon="internal-link"
+                    />
+                </template>
                 <template #data-cost="{value}">
                     <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
                     <span class="text"> {{ numberFormatter(value[state.currency]) }}</span>

@@ -22,6 +22,7 @@ interface CostReportItem extends CostReportModel {
         role_types: RoleType[];
         emails: string[];
     };
+    report_url?: string;
 }
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {

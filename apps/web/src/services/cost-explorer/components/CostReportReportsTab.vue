@@ -132,6 +132,13 @@ const handleClickResendButton = async (id: string): Promise<void> => {
         await costReportPageStore.fetchCostReport({
             cost_report_id: id,
         });
+        const reportUrl = await costReportPageStore.getCostReportUrl({
+            cost_report_id: id,
+        });
+        costReportPageState.reportItem = {
+            ...costReportPageState.reportItem,
+            report_url: reportUrl,
+        };
         state.resendModalVisible = true;
     } catch (e) {
         ErrorHandler.handleError(e);
