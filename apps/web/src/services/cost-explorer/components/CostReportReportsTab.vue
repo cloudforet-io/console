@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -138,15 +138,7 @@ const handleClickResendButton = async (id: string): Promise<void> => {
     }
 };
 const handleChange = (options: any = {}) => {
-    costReportListApiQuery = getApiQueryWithToolboxOptions(costReportListApiQueryHelper, options) ?? costReportListApiQuery;
-    if (options.queryTags !== undefined) {
-        tableState.searchFilters = costReportListApiQueryHelper.filters;
-    }
-    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
-    costReportPageStore.fetchCostReportsList({
-        query: costReportListApiQuery,
-    });
+    getCostReportsList(options);
 };
 const handleClickLinkButton = async (id: string) => {
     try {
@@ -159,31 +151,48 @@ const handleClickLinkButton = async (id: string) => {
     }
 };
 
+/* API */
+const getCostReportsList = (options: any = {}) => {
+    costReportListApiQuery = getApiQueryWithToolboxOptions(costReportListApiQueryHelper, options) ?? costReportListApiQuery;
+    if (options.queryTags !== undefined) {
+        queryTagHelper.setQueryTags(options.queryTags);
+        tableState.searchFilters = costReportListApiQueryHelper.filters;
+    }
+    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
+
+    costReportPageStore.fetchCostReportsList({
+        query: costReportListApiQuery,
+    });
+};
+
 /* Watcher */
 watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, customPeriod]) => {
-    if (selectedPeriod === 'all') {
-        costReportListApiQueryHelper.setFilters([]);
-    } else if (selectedPeriod === 'custom') {
-        const { start, end } = customPeriod || {};
-        costReportListApiQueryHelper.setFilters([
-            { k: 'report_month', v: start || '', o: '>=' },
-            { k: 'report_month', v: end || '', o: '<=' },
-        ]);
-    } else {
-        costReportListApiQueryHelper.setFilters([
-            { k: 'report_month', v: selectedPeriod, o: '=' },
-        ]);
+    const filters = [...tableState.searchFilters];
+
+    if (selectedPeriod !== 'all') {
+        if (selectedPeriod === 'custom') {
+            filters.push({ k: 'report_month', v: customPeriod?.start || '', o: '>=' });
+            filters.push({ k: 'report_month', v: customPeriod?.end || '', o: '<=' });
+        } else {
+            filters.push({ k: 'report_month', v: selectedPeriod, o: '=' });
+        }
     }
-    tableState.pageStart = 0;
-    costReportPageStore.fetchCostReportsList({
-        query: costReportListApiQueryHelper.data,
+
+    costReportListApiQueryHelper.setFilters(filters);
+    getCostReportsList({
+        pageStart: 0,
     });
 });
-
-/* Init */
-onMounted(() => {
-    handleChange();
-});
+watch(() => costReportPageState.activeTab, (activeTab) => {
+    if (activeTab === 'reports') {
+        queryTagHelper.setQueryTags([]);
+        tableState.searchFilters = [];
+        state.selectedPeriod = 'all';
+        state.customPeriod = undefined;
+        getCostReportsList();
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -198,7 +207,6 @@ onMounted(() => {
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
-                         :this-page="tableState.pageStart + 1"
                          @change="handleChange"
                          @refresh="handleChange()"
         >
