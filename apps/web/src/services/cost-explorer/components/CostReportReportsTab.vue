@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PHeading, PLink, PToolboxTable, PSelectDropdown, PBadge,
+    PButton, PHeading, PI, PToolboxTable, PSelectDropdown, PBadge, PTextButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
@@ -13,12 +13,9 @@ import dayjs from 'dayjs';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
-import type { CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -115,8 +112,16 @@ const handleConfirmCustomPeriod = (start: string, end: string): void => {
     state.selectedPeriod = 'custom';
     state.customPeriod = { start, end };
 };
-const handleClickCopyButton = () => {
-    fetchCostReportsUrl();
+const handleClickCopyButton = async (id: string) => {
+    try {
+        const response = await costReportPageStore.fetchCostReportsUrl({
+            cost_report_id: id,
+        });
+        copyAnyData(response);
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_COPY_REPORT_URL'), '');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
 };
 const handleClickResendButton = async (id: string): Promise<void> => {
     if ((costReportPageState.costReportConfig?.recipients?.role_types.length || 0) === 0) {
@@ -143,15 +148,15 @@ const handleChange = (options: any = {}) => {
         query: costReportListApiQuery,
     });
 };
-
-/* API */
-const fetchCostReportsUrl = async (): Promise<void> => {
+const handleClickLinkButton = async (id: string) => {
     try {
-        const res = await SpaceConnector.clientV2.costAnalysis.costReport.getUrl<CostReportGetUrlParameters, CostReportDataLinkInfoModel>();
-        copyAnyData(res.cost_report_data_link);
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALT_S_COPY_REPORT_URL'), '');
-    } catch (e) {
-        ErrorHandler.handleError(e);
+        const response = await costReportPageStore.fetchCostReportsUrl({
+            cost_report_id: id,
+        });
+        // TODO: check
+        window.open(`${window.location.origin}/${response.split('/')[3]}`, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 
@@ -211,13 +216,20 @@ onMounted(() => {
                     {{ getDateRangeText(value) }}
                 </div>
             </template>
-            <template #col-report_number-format="{value}">
-                <!-- TODO: check href link-->
-                <p-link :text="value"
-                        href="/"
-                        highlight
-                        action-icon="external-link"
-                />
+            <template #col-report_number-format="{value, item}">
+                <p-text-button style-type="highlight"
+                               class="report-link"
+                               size="md"
+                               @click="handleClickLinkButton(item.cost_report_id)"
+                >
+                    {{ value }}
+                    <p-i name="ic_arrow-right-up"
+                         class="link-mark"
+                         height="0.875rem"
+                         width="0.875rem"
+                         color="inherit"
+                    />
+                </p-text-button>
             </template>
             <template #col-cost-format="{value}">
                 <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
@@ -230,7 +242,7 @@ onMounted(() => {
                               icon-left="ic_link"
                               size="sm"
                               class="copy-button"
-                              @click="handleClickCopyButton"
+                              @click="handleClickCopyButton(item.cost_report_id)"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.COPY') }}
                     </p-button>
@@ -298,6 +310,10 @@ onMounted(() => {
     }
     .resend-button {
         min-width: 4.625rem;
+    }
+    .report-link {
+        @apply flex items-center text-blue-700;
+        gap: 0.25rem;
     }
 }
 </style>
