@@ -82,7 +82,7 @@ const tableState = reactive({
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
-    .setSort('name', true);
+    .setSort('issue_date', true);
 let costReportListApiQuery = costReportListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
@@ -183,7 +183,7 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
 
 /* Init */
 onMounted(() => {
-    costReportPageStore.fetchCostReportsList();
+    handleChange();
 });
 </script>
 
