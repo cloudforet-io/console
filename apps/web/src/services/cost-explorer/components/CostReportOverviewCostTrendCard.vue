@@ -18,6 +18,7 @@ import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendContent from '@/services/cost-explorer/components/CostReportOverviewCostTrendContent.vue';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -40,8 +41,8 @@ const state = reactive({
     }),
     selectedDate: 'last12Months',
     targetSelectItems: [
-        { name: 'workspace_id', label: 'Workspace' },
-        { name: 'provider', label: 'Provider' },
+        GROUP_BY_ITEM_MAP.workspace_id,
+        GROUP_BY_ITEM_MAP.provider,
     ] as SelectButtonType[],
     selectedTarget: 'workspace_id',
     previousTotalAmount: 957957,
