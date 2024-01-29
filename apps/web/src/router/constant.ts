@@ -13,6 +13,9 @@ export const ROOT_ROUTE = Object.freeze({
     ADMIN: {
         _NAME: 'admin',
     },
+    COST_REPORT: {
+        _NAME: 'cost-report',
+    },
 });
 
 export const ROUTE_SCOPE = {
