@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -159,6 +159,26 @@ const handleClickLinkButton = async (id: string) => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
+
+/* Watcher */
+watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, customPeriod]) => {
+    if (selectedPeriod === 'all') {
+        costReportListApiQueryHelper.setFilters([]);
+    } else if (selectedPeriod === 'custom') {
+        const { start, end } = customPeriod || {};
+        costReportListApiQueryHelper.setFilters([
+            { k: 'report_month', v: start || '', o: '>=' },
+            { k: 'report_month', v: end || '', o: '<=' },
+        ]);
+    } else {
+        costReportListApiQueryHelper.setFilters([
+            { k: 'report_month', v: selectedPeriod, o: '=' },
+        ]);
+    }
+    costReportPageStore.fetchCostReportsList({
+        query: costReportListApiQueryHelper.data,
+    });
+});
 
 /* Init */
 onMounted(() => {
