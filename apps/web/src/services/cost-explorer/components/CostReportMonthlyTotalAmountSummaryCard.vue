@@ -99,6 +99,7 @@ const analyzeCostReportData = async () => {
             end: state.currentDate?.format('YYYY-MM'),
         };
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+            is_confirmed: true,
             query: {
                 granularity: GRANULARITY.MONTHLY,
                 group_by: [state.selectedTarget],
