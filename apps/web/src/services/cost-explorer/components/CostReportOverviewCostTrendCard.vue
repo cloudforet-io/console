@@ -13,13 +13,14 @@ import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -185,7 +186,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
                     </div>
                     <div class="summary-value">
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                        <span class="value">{{ numberFormatter(state.previousTotalAmount) }}</span>
+                        <span class="value">{{ currencyMoneyFormatter(state.previousTotalAmount, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
                     </div>
                 </div>
                 <div class="summary-item">
@@ -194,7 +195,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
                     </div>
                     <div class="summary-value">
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                        <span class="value">{{ numberFormatter(state.last12MonthsAverage) }}</span>
+                        <span class="value">{{ currencyMoneyFormatter(state.last12MonthsAverage, {currency: costReportPageGetters.currency, style: 'decimal'}) }}</span>
                     </div>
                 </div>
             </div>

@@ -22,11 +22,14 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { getLegends, getXYChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
+import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 
@@ -46,6 +49,8 @@ const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const allReferenceStore = useAllReferenceStore();
+const costReportPageStore = useCostReportPageStore();
+const costReportPageGetters = costReportPageStore.getters;
 const storeState = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -130,7 +135,8 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip);
+        const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
+        chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
         series.set('tooltip', tooltip);
 
         // set data
@@ -176,6 +182,9 @@ watch([() => props.loading, () => chartContext.value], async ([loading, _chartCo
                     </span>
                     <span v-else-if="field.name === GROUP_BY.PROVIDER">
                         {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                    </span>
+                    <span v-else-if="field.name.includes('value_sum')">
+                        {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) }}
                     </span>
                 </template>
             </p-data-table>
