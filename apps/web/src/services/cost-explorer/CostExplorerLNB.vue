@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -73,6 +74,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     loading: true,
@@ -89,12 +91,12 @@ const state = reactive({
                 },
             ], store.getters['user/pageAccessPermissionList']),
         ];
-        if (storeState.isAdminMode) {
+        if (storeState.isAdminMode || storeState.isWorkspaceOwner) {
             menuSet.push({
                 type: 'item',
                 id: MENU_ID.COST_REPORT,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId),
-                to: { name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME) },
+                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME }),
             });
         }
         return menuSet;
