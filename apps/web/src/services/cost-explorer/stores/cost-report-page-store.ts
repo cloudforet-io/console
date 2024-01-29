@@ -96,7 +96,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
-    const fetchCostReportsUrl = async (params: CostReportGetUrlParameters): Promise<string> => {
+    const getCostReportUrl = async (params: CostReportGetUrlParameters): Promise<string> => {
         try {
             const res = await SpaceConnector.clientV2.costAnalysis.costReport.getUrl<CostReportGetUrlParameters, CostReportDataLinkInfoModel>(params);
             return res.cost_report_link;
@@ -108,19 +108,15 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
 
     const mutations = {
         setCostReportConfig,
-        fetchCostReportsList,
-        fetchCostReport,
-        fetchCostReportsUrl,
     };
-
-    (async () => {
-        await fetchCostReportConfig();
-    })();
 
     return {
         state,
         getters,
         ...mutations,
+        fetchCostReportsList,
+        fetchCostReport,
+        getCostReportUrl,
         fetchCostReportConfig,
     };
 });
