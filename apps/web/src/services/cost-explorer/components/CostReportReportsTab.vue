@@ -153,8 +153,7 @@ const handleClickLinkButton = async (id: string) => {
         const response = await costReportPageStore.getCostReportUrl({
             cost_report_id: id,
         });
-        // TODO: check
-        window.open(`${window.location.origin}/${response.split('/')[3]}`, '_blank');
+        window.open(response, '_blank');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
