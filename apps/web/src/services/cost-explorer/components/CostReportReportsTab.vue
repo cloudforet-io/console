@@ -60,7 +60,7 @@ const tableState = reactive({
         { label: 'Issue Date', name: 'issue_date' },
         { label: 'Report Number', name: 'report_number' },
         { label: 'Workspace', name: 'workspace_name' },
-        { label: 'Cost', name: 'cost' },
+        { label: 'Cost', name: 'cost', textAlign: 'right' },
         { label: ' ', name: 'extra' },
     ],
     keyItemSets: [
@@ -305,6 +305,9 @@ onMounted(() => {
 
 /* custom design-system component - p-toolbox-table */
 :deep(.p-toolbox-table) {
+    .heading-sub {
+        margin-bottom: 0;
+    }
     .date-text {
         @apply text-paragraph-md;
         margin-top: 0.5rem;
