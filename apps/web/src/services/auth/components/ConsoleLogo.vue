@@ -6,10 +6,12 @@ import { store } from '@/store';
 
 interface Props {
     sizeRatio?: number;
+    positionFixed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     sizeRatio: 1,
+    positionFixed: true,
 });
 
 const state = reactive({
@@ -31,7 +33,9 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="ci-wrapper">
+    <div class="ci-wrapper"
+         :style="{ position: props.positionFixed ? 'fixed' : 'static'}"
+    >
         <!--logo image-->
         <img v-if="state.symbolImage"
              :style="state.logoImageStyle"
@@ -55,7 +59,7 @@ const state = reactive({
 
 <style scoped lang="postcss">
 .ci-wrapper {
-    @apply flex fixed;
+    @apply flex;
     flex-flow: row;
     z-index: 1000;
 

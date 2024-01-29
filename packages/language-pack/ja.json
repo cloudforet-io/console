@@ -913,6 +913,20 @@
 			"CANNOT_CANCEL": "この操作は取り消すことができません。",
 			"TITLE": "中止してもよろしいですか？"
 		},
+		"COST_REPORT": {
+			"COST_REPORT": "",
+			"CURRENCY_REFERENCE": "",
+			"DETAILS_BY_PRODUCT": "",
+			"DETAILS_BY_PROJECT": "",
+			"DETAILS_BY_PROVIDER": "",
+			"DETAILS_BY_SERVICE_ACCOUNT": "",
+			"INDEX": "",
+			"ISSUE_DATE": "",
+			"REPORT_NUMBER": "",
+			"SUBTOTAL": "",
+			"TOTAL": "",
+			"TOTAL_AMOUNT_BY_PROVIDER": ""
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "アルファベット順",
 			"ALT_E_UPDATE_COL": "フィールド変更に失敗",
