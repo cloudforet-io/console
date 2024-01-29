@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, reactive, ref, watch,
+    computed, reactive, ref,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PDataLoader, PLink } from '@spaceone/design-system';
+import { PDataLoader, PLink, PDataTable } from '@spaceone/design-system';
+import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -13,10 +14,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import { store } from '@/store';
+import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import TableHeader from '@/common/components/cost-report-page/table-header.vue';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -25,7 +32,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, white } from '@/styles/colors';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
-
 
 const router = useRouter();
 
@@ -47,23 +53,30 @@ interface ChartData {
 interface Props {
     accessToken?: string;
     costReportId?: string;
+    language?: string;
 }
 interface State {
     loading: boolean;
     baseInfo?: CostReportModel;
     isExpired: boolean;
     reportDateRage: ComputedRef<string>;
-    totalCost: ComputedRef<string|undefined>;
+    totalCost: ComputedRef<number>;
     data?: AnalyzeResponse<CostReportDataAnalyzeResult>|undefined;
     chartData: ComputedRef<ChartData[]>;
 }
 const props = withDefaults(defineProps<Props>(), {
     accessToken: undefined,
     costReportId: undefined,
+    language: 'en',
 });
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
+
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
+
 const state = reactive<State>({
     loading: true,
     baseInfo: undefined,
@@ -76,15 +89,158 @@ const state = reactive<State>({
         const endDate = lastMonth.endOf('month').format('YYYY-MM-DD');
         return `${startDate} ~ ${endDate}`;
     }),
-    totalCost: computed(() => numberFormatter(10000000)),
-    data: undefined,
-    chartData: computed<ChartData[]>(() => state.data?.results?.map((d) => ({
-        category: d.provider, // TODO: change to dynamic label (ex. storeState.providers[d.provider]?.name ?? d.provider)
-        value: d.value_sum,
+    totalCost: computed(() => (Object.values<CostByProductData[string]>(tableState.costByProductData).reduce((acc, cur) => acc + cur.subtotal, 0) ?? 0)),
+    chartData: computed<ChartData[]>(() => tableState.costByProviderData?.map((d) => ({
+        category: storeState.providers[d.provider]?.name ?? d.provider,
+        value: d.amount,
         pieSettings: {
-            fill: undefined, // TODO: change to dynamic color
+            fill: storeState.providers[d.provider]?.color,
         },
     })) ?? []),
+});
+
+const originDataState = reactive({
+    costByProduct: [],
+    costByProject: [],
+    costByServiceAccount: [],
+});
+
+const makeTableFields = (customField:DataTableFieldType, currency:string) => ([
+    {
+        name: 'index',
+        label: 'no',
+    },
+    {
+        textAlign: 'left',
+        sortable: false,
+        ...customField,
+    },
+    {
+        name: 'amount',
+        label: `Amount (${CURRENCY_SYMBOL[currency]})`,
+        textAlign: 'right',
+        sortable: false,
+    },
+]);
+
+interface CostByProductData {
+    [provider: string]: {
+        subtotal: number;
+        items: {
+            index: number;
+            product: string;
+            amount: string;
+        }[];
+    };
+}
+
+const tableState = reactive({
+    costByProductData: computed<CostByProductData>(() => {
+        const items = cloneDeep(originDataState.costByProduct);
+        const convertedItemMap = {};
+        items.forEach((item: {
+            product: string;
+            provider: string;
+            value_sum: number;
+        }) => {
+            const { product, provider, value_sum } = item;
+            if (!convertedItemMap[provider]) {
+                convertedItemMap[provider] = {
+                    subtotal: value_sum,
+                    items: [{
+                        index: 1,
+                        product,
+                        amount: value_sum ?? 0,
+                    }],
+                };
+            } else {
+                convertedItemMap[provider].items.push({
+                    index: convertedItemMap[provider].items.length + 1,
+                    product,
+                    amount: value_sum,
+                });
+                convertedItemMap[provider].subtotal += value_sum;
+            }
+        });
+        return convertedItemMap;
+    }),
+    costByProductFields: computed(() => makeTableFields({
+        name: 'product',
+        label: 'Product',
+    }, state.baseInfo?.currency)),
+    costByServiceAccountData: computed(() => {
+        const items = cloneDeep(originDataState.costByServiceAccount);
+        const convertedItemMap = {};
+        items.forEach((item: {
+            service_account_name: string;
+            provider: string;
+            value_sum: number;
+        }) => {
+            const { service_account_name, provider, value_sum } = item;
+            if (!convertedItemMap[provider]) {
+                convertedItemMap[provider] = {
+                    subtotal: value_sum,
+                    items: [{
+                        index: 1,
+                        service_account_name,
+                        amount: value_sum ?? 0,
+                    }],
+                };
+            } else {
+                convertedItemMap[provider].items.push({
+                    index: convertedItemMap[provider].items.length + 1,
+                    service_account_name,
+                    amount: value_sum,
+                });
+                convertedItemMap[provider].subtotal += value_sum;
+            }
+        });
+        return convertedItemMap;
+    }),
+    costByServiceAccountFields: computed(() => makeTableFields({
+        name: 'service_account_name',
+        label: 'Service Account Name',
+    }, state.baseInfo?.currency)),
+    costByProjectData: computed(() => {
+        const items = cloneDeep(originDataState.costByProject);
+        const convertedItemList:{
+            index: number;
+            project_name: string;
+            amount: number;
+        }[] = [];
+        items.forEach((item: {
+            project_name: string;
+            value_sum: number;
+        }) => {
+            const { project_name, value_sum } = item;
+            convertedItemList.push({
+                index: convertedItemList.length + 1,
+                project_name,
+                amount: value_sum ?? 0,
+            });
+        });
+        return convertedItemList;
+    }),
+    costByProjectFields: computed(() => makeTableFields({
+        name: 'project_name',
+        label: 'Project',
+    }, state.baseInfo?.currency)),
+    costByProviderData: computed(() => (Object.entries<CostByProductData[string]>(tableState.costByProductData).map(([provider, data]) => ({
+        provider,
+        amount: data?.subtotal ?? 0,
+    })))),
+    costByProviderFields: computed(() => ([
+        {
+            name: 'provider',
+            label: 'Provider',
+        },
+        {
+            name: 'amount',
+            label: `Amount (${CURRENCY_SYMBOL[state.baseInfo?.currency]})`,
+            textAlign: 'right',
+            sortable: false,
+        },
+    ])),
 });
 
 /* Util */
@@ -93,6 +249,7 @@ const drawChart = () => {
     const chart = chartHelper.createDonutChart({
         paddingLeft: 20,
         paddingRight: 20,
+        innerRadius: 40,
     });
     const seriesSettings = {
         categoryField: 'category',
@@ -125,6 +282,50 @@ const fetchReportData = async () => {
     }
 };
 
+interface AnalyzeDataModel {
+    more: boolean;
+    results: Record<string, any>[];
+}
+const fetchAnalyzeData = async (groupBy: string[]):Promise<AnalyzeDataModel|undefined> => {
+    try {
+        return await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeDataModel>({
+            query: {
+                group_by: groupBy,
+                fields: {
+                    value_sum: {
+                        key: `cost.${state.baseInfo?.currency}`,
+                        operator: 'sum',
+                    },
+                },
+                filter: [
+                    {
+                        k: 'cost_report_config_id',
+                        v: state.baseInfo?.cost_report_config_id,
+                        o: 'eq',
+                    },
+                    {
+                        k: 'cost_report_id',
+                        v: props.costReportId,
+                        o: 'eq',
+                    },
+                    {
+                        k: 'is_confirmed',
+                        v: true,
+                        o: 'eq',
+                    },
+                ],
+                sort: [{
+                    key: 'value_sum',
+                    desc: true,
+                }],
+            },
+        });
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+
 /* Init */
 const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     try {
@@ -136,16 +337,28 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
         return false;
     }
 };
+
 (async () => {
+    state.loading = true;
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
+    await store.dispatch('reference/provider/load');
+    await Promise.allSettled<AnalyzeDataModel|undefined>([
+        fetchAnalyzeData(['provider', 'product']),
+        fetchAnalyzeData(['project_name']),
+        fetchAnalyzeData(['provider', 'service_account_name']),
+    ]).then((results) => {
+        const [costByProduct, costByProject, costByServiceAccount] = results;
+        originDataState.costByProduct = costByProduct.value.results;
+        originDataState.costByProject = costByProject.value.results;
+        originDataState.costByServiceAccount = costByServiceAccount.value.results;
+    });
+    await setI18nLocale(props.language);
+    state.loading = false;
+    drawChart();
 })();
 
-/* Watcher */
-watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) drawChart();
-}, { immediate: true });
 </script>
 
 <template>
@@ -181,7 +394,14 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
                      :style="{borderTopColor: gray[500], borderBottomColor: gray[200]}"
                 >
                     <span class="title">{{ $t('COMMON.COST_REPORT.TOTAL') }}</span>
-                    <span>{{ state.totalCost }}</span>
+                    <div class="total-value-wrapper">
+                        <div class="total-cost">
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.baseInfo?.currency] }}</span><span class="total-text">{{ numberFormatter(state.totalCost) }}</span>
+                        </div>
+                        <div class="currency-value">
+                            {{ state.baseInfo?.currency }}
+                        </div>
+                    </div>
                 </div>
                 <div class="index-wrapper">
                     <p class="title">
@@ -205,40 +425,115 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
                     >
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                     </p-link>
-                    <p-link to="#details-by-service-account"
+                    <p-link to="#details-by-service-account'"
                             class="table-link"
                             highlight
                     >
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
                     </p-link>
                 </div>
-                <div ref="chartContext"
-                     class="chart"
-                />
                 <div id="total-amount-by-provider">
-                    <p class="title">
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
-                    </p>
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <div class="table">
+                        <p class="title">
+                            {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
+                        </p>
+                        <p-data-table :fields="tableState.costByProviderFields"
+                                      :items="tableState.costByProviderData"
+                                      :selectable="false"
+                                      :disable-copy="true"
+                                      :disable-hover="true"
+                        >
+                            <template #col-provider-format="{item, value}">
+                                <div class="legend">
+                                    <span class="legend-icon"
+                                          :style="{ 'background-color': storeState.providers[value]?.color }"
+                                    /><span>{{ value }}</span><span v-if="state.totalCost"
+                                                                    class="ratio"
+                                    >{{ ((item.amount / state.totalCost) * 100).toFixed(0) }}%</span>
+                                </div>
+                            </template>
+                            <template #col-amount-format="{value}">
+                                {{ numberFormatter(value) }}
+                            </template>
+                        </p-data-table>
+                    </div>
                 </div>
-                <div id="details-by-product">
+                <div id="details-by-product"
+                     class="data-table-section"
+                >
                     <p class="title">
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
                     </p>
-                    <table-header title="Amazon Elastic Compute Cloud - Compute"
-                                  sub-total="1,000,000"
-                                  provider="AWS"
-                                  provider-icon-src="https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws.svg"
-                    />
+                    <div v-for="(provider, idx) in Object.keys(tableState.costByProductData)"
+                         :key="idx"
+                    >
+                        <table-header :title="storeState.providers[provider]?.label"
+                                      :sub-total="numberFormatter(tableState.costByProductData[provider].subtotal)"
+                                      :provider-icon-src="storeState.providers[provider]?.icon"
+                        />
+                        <p-data-table :fields="tableState.costByProductFields"
+                                      :items="tableState.costByProductData[provider]?.items"
+                                      :skeleton-rows="3"
+                                      :stripe="false"
+                                      :selectable="false"
+                                      :disable-copy="true"
+                                      :disable-hover="true"
+                                      class="budget-summary-table"
+                        >
+                            <template #col-amount-format="{value}">
+                                {{ numberFormatter(value) }}
+                            </template>
+                        </p-data-table>
+                    </div>
                 </div>
-                <div id="details-by-project">
+                <div id="details-by-project"
+                     class="data-table-section"
+                >
                     <p class="title">
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                     </p>
+                    <p-data-table :fields="tableState.costByProjectFields"
+                                  :items="tableState.costByProjectData"
+                                  :selectable="false"
+                                  :disable-copy="true"
+                                  :disable-hover="true"
+                    >
+                        <template #col-amount-format="{value}">
+                            {{ numberFormatter(value) }}
+                        </template>
+                    </p-data-table>
                 </div>
-                <div id="details-by-service-account">
+                <div id="details-by-service-account"
+                     class="data-table-section"
+                >
                     <p class="title">
                         {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
                     </p>
+                    <div v-for="(provider, idx) in Object.keys(tableState.costByServiceAccountData)"
+                         :key="idx"
+                    >
+                        <table-header :title="provider"
+                                      :sub-total="numberFormatter(tableState.costByServiceAccountData[provider]?.subtotal)"
+                                      :provider="storeState.providers[provider]?.label"
+                                      :provider-icon-src="storeState.providers[provider]?.icon"
+                        />
+                        <p-data-table :fields="tableState.costByServiceAccountFields"
+                                      :items="tableState.costByServiceAccountData[provider]?.items"
+                                      :skeleton-rows="3"
+                                      :stripe="false"
+                                      :selectable="false"
+                                      :disable-copy="true"
+                                      :disable-hover="true"
+                                      class="budget-summary-table"
+                        >
+                            <template #col-amount-format="{value}">
+                                {{ numberFormatter(value) }}
+                            </template>
+                        </p-data-table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -251,68 +546,122 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
     margin-bottom: 0.75rem;
 }
 
-.contents-wrapper {
-    @apply flex flex-col items-center justify-center;
-    .content {
-        padding: 1.4rem 0 3rem 0;
-        width: 48rem;
+.cost-report-page {
+    &:deep() {
+        @apply bg-white;
+        overflow-y: auto;
+    }
 
-        .header {
-            @apply flex items-end justify-between;
-            width: 100%;
-            .main-title {
-                @apply text-display-lg font-bold;
-            }
-        }
+    .contents-wrapper {
+        @apply flex flex-col items-center justify-center;
+        .content {
+            padding: 1.4rem 0 3rem 0;
+            width: 48rem;
 
-        .invoice-information {
-            @apply flex flex-col;
-            margin: 3rem 0;
-
-            .report-name {
-                @apply text-display-md;
+            .header {
+                @apply flex items-end justify-between;
+                width: 100%;
+                .main-title {
+                    @apply text-display-lg font-bold;
+                }
             }
 
-            .report-info {
-                @apply text-label-md;
-                margin-top: 0.5rem;
+            .invoice-information {
+                @apply flex flex-col;
+                margin: 3rem 0;
 
-                & label {
-                    @apply text-label-md font-bold;
-                    margin-right: 0.5rem;
+                .report-name {
+                    @apply text-display-md;
                 }
 
-                &:nth-child(2) {
-                    margin-top: 1.5rem;
+                .report-info {
+                    @apply text-label-md;
+                    margin-top: 0.5rem;
+
+                    & label {
+                        @apply text-label-md font-bold;
+                        margin-right: 0.5rem;
+                    }
+
+                    &:nth-child(2) {
+                        margin-top: 1.5rem;
+                    }
+                    &:nth-child(3) {
+                        margin-bottom: 1.5rem;
+                        .real-date-range {
+                            @apply text-label-md text-gray-500;
+                        }
+                    }
                 }
-                &:nth-child(3) {
-                    margin-bottom: 1.5rem;
-                    .real-date-range {
+            }
+
+            .total {
+                @apply border-t border-b flex  justify-between;
+                padding-top: 0.875rem;
+                height: 4.75rem;
+
+                .total-value-wrapper {
+                    @apply flex flex-col items-end;
+                    .total-cost {
+                        @apply flex items-center;
+                        .currency-symbol {
+                            @apply text-label-lg;
+                            margin-right: 0.25rem;
+                        }
+                        .total-text {
+                            @apply text-display-md;
+                        }
+                    }
+
+                    .currency-value {
                         @apply text-label-md text-gray-500;
                     }
                 }
             }
-        }
 
-        .total {
-            @apply border-t border-b flex  justify-between;
-            padding-top: 0.875rem;
-            height: 4.75rem;
-        }
+            .index-wrapper {
+                @apply flex flex-col;
+                margin-top: 2rem;
+                margin-bottom: 2.25rem;
+                .table-link {
+                    margin-bottom: 0.75rem;
+                }
+            }
 
-        .index-wrapper {
-            @apply flex flex-col;
-            margin-top: 2rem;
-            margin-bottom: 2.25rem;
-            .table-link {
-                margin-bottom: 0.75rem;
+            .data-table-section {
+                margin-bottom: 3rem;
+                margin-left: 33%;
             }
         }
     }
 }
 
-.chart {
-    width: 100%;
-    height: 12rem;
+#total-amount-by-provider {
+    @apply flex;
+    .chart {
+        height: 12rem;
+        width: 33%;
+    }
+    .table {
+        flex-grow: 1;
+    }
+    margin-bottom: 3rem;
+}
+
+.legend {
+    @apply flex items-center;
+
+    .legend-icon {
+        display: inline-block;
+        width: 0.625rem;
+        height: 0.625rem;
+        border-radius: 100%;
+        margin-right: 0.5rem;
+    }
+
+    .ratio {
+        @apply text-label-md text-gray-500;
+        margin-left: 0.5rem;
+    }
 }
 </style>
