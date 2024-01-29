@@ -1,7 +1,6 @@
 export interface CostReportDataAnalyzeParameters {
     query?: any;
-    report_year?: string;
-    report_month?: string;
+    is_confirmed?: boolean;
     product?: string;
     provider?: string;
     data_source_id?: string;
