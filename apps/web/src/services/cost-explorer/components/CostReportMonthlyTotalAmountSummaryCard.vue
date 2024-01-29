@@ -50,19 +50,6 @@ type CostReportDataAnalyzeResult = {
     value_sum: number;
 };
 
-const SAMPLE_ANALYZE_DATA = [
-    {
-        date: '2023-12',
-        value_sum: 10924.11711,
-        workspace_id: 'workspace_id_1',
-    },
-    {
-        value_sum: 8005.95874,
-        workspace_id: 'workspace_id_2',
-        date: '2023-12',
-    },
-];
-
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
@@ -75,17 +62,17 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({
-    loading: false,
-    data: { more: false, results: SAMPLE_ANALYZE_DATA } as AnalyzeResponse<CostReportDataAnalyzeResult>,
+    loading: true,
+    data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     targetSelectItems: [
         GROUP_BY_ITEM_MAP.workspace_id,
         GROUP_BY_ITEM_MAP.provider,
     ],
     selectedTarget: GROUP_BY.WORKSPACE,
-    totalAmount: computed(() => sum(state.data.results.map((d) => d.value_sum))),
+    totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
     //
-    chartData: computed<ChartData[]>(() => state.data.results?.map((d, idx) => ({
+    chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => ({
         category: d[state.selectedTarget],
         value: d.value_sum,
         pieSettings: {
@@ -140,8 +127,8 @@ const drawChart = () => {
         paddingRight: 20,
     });
     const seriesSettings = {
-        categoryField: 'category', // TODO: change
-        valueField: 'value', // TODO: change
+        categoryField: 'category',
+        valueField: 'value',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     chart.series.push(series);
@@ -229,7 +216,7 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
                 </div>
                 <div class="col-span-12 lg:col-span-6">
                     <p-data-table :fields="state.tableFields"
-                                  :items="state.data.results"
+                                  :items="state.data?.results ?? []"
                                   :loading="state.loading"
                                   table-style-type="simple"
                     >
