@@ -60,7 +60,7 @@ const tableState = reactive({
         { label: 'Issue Date', name: 'issue_date' },
         { label: 'Report Number', name: 'report_number' },
         { label: 'Workspace', name: 'workspace_name' },
-        { label: 'Cost', name: 'cost' },
+        { label: 'Cost', name: 'cost', textAlign: 'right' },
         { label: ' ', name: 'extra' },
     ],
     keyItemSets: [
@@ -82,7 +82,7 @@ const tableState = reactive({
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
-    .setSort('name', true);
+    .setSort('issue_date', true);
 let costReportListApiQuery = costReportListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
@@ -175,6 +175,7 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
             { k: 'report_month', v: selectedPeriod, o: '=' },
         ]);
     }
+    tableState.pageStart = 0;
     costReportPageStore.fetchCostReportsList({
         query: costReportListApiQueryHelper.data,
     });
@@ -182,7 +183,7 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
 
 /* Init */
 onMounted(() => {
-    costReportPageStore.fetchCostReportsList();
+    handleChange();
 });
 </script>
 
@@ -198,6 +199,7 @@ onMounted(() => {
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
+                         :this-page="tableState.pageStart + 1"
                          @change="handleChange"
                          @refresh="handleChange()"
         >
@@ -251,10 +253,10 @@ onMounted(() => {
                     />
                 </p-text-button>
             </template>
-            <template #col-cost-format="{value}">
-                <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                <span class="text">{{ numberFormatter(value[state.currency]) || 0 }}</span>
-                <span class="currency-text">{{ state.currency }}</span>
+            <template #col-cost-format="{value, item}">
+                <span class="currency-symbol">{{ CURRENCY_SYMBOL[item.currency] }}</span>
+                <span class="text">{{ numberFormatter(value[item.currency]) || 0 }}</span>
+                <span class="currency-text">{{ item.currency }}</span>
             </template>
             <template #col-extra-format="{item}">
                 <div class="float-right">
@@ -303,6 +305,9 @@ onMounted(() => {
 
 /* custom design-system component - p-toolbox-table */
 :deep(.p-toolbox-table) {
+    .heading-sub {
+        margin-bottom: 0;
+    }
     .date-text {
         @apply text-paragraph-md;
         margin-top: 0.5rem;

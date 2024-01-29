@@ -81,7 +81,7 @@ const state = reactive({
     }))),
     tableFields: computed<Field[]>(() => ([
         { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
-        { name: 'value_sum', label: 'Amount' },
+        { name: 'value_sum', label: 'Amount', textAlign: 'right' },
     ])),
 });
 
@@ -202,7 +202,7 @@ watch([() => state.currentDate, () => state.selectedTarget], (after, before) => 
                         </div>
                     </div>
                     <p-link v-if="!storeState.isAdminMode"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
                             to="/"
                             new-tab
                             highlight
