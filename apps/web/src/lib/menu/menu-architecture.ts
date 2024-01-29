@@ -28,6 +28,7 @@ export const MENU_LIST: Menu[] = [
         subMenuList: [
             { id: MENU_ID.COST_ANALYSIS, needPermissionByRole: true },
             { id: MENU_ID.BUDGET, needPermissionByRole: true },
+            { id: MENU_ID.COST_REPORT, needPermissionByRole: true },
         ],
     },
     {

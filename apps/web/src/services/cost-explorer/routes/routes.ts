@@ -20,6 +20,7 @@ const CostAnalysisPage = () => import('@/services/cost-explorer/pages/CostAnalys
 const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPage.vue');
 const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
+const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -132,6 +133,22 @@ const costExplorerRoutes: RouteConfig = {
                     props: true,
                     meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
                     component: BudgetDetailPage as any,
+                },
+            ],
+        },
+        {
+            path: 'cost-report',
+            meta: {
+                menuId: MENU_ID.COST_REPORT,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId,
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
+                    meta: { lnbVisible: true },
+                    component: CostReportPage as any,
                 },
             ],
         },
