@@ -116,6 +116,7 @@ const analyzeTrendData = async () => {
     state.loading = true;
     try {
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
+            is_confirmed: true,
             query: {
                 granularity: GRANULARITY.MONTHLY,
                 group_by: [state.selectedTarget],
