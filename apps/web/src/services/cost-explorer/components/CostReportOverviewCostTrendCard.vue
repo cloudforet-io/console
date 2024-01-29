@@ -145,8 +145,8 @@ const handleChangeTarget = (target: string) => {
 };
 
 /* Watcher */
-watch([() => state.period, () => state.selectedTarget], async (after, before) => {
-    if (isEqual(after, before)) return;
+watch([() => state.period, () => state.selectedTarget, () => costReportPageGetters.currency], async (after, before) => {
+    if (isEqual(after, before) || !costReportPageGetters.currency) return;
     await analyzeTrendData();
 }, { immediate: true });
 </script>
@@ -184,7 +184,7 @@ watch([() => state.period, () => state.selectedTarget], async (after, before) =>
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_COST_FOR_PREVIOUS_MONTH', { previous_month: state.period.end }) }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.previousTotalAmount) }}</span>
                     </div>
                 </div>
@@ -193,7 +193,7 @@ watch([() => state.period, () => state.selectedTarget], async (after, before) =>
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.THE_AVERAGE_FOR_SELECTED_PERIOD', { selected_period: state.selectedPeriodTranslation }) }}
                     </div>
                     <div class="summary-value">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                         <span class="value">{{ numberFormatter(state.last12MonthsAverage) }}</span>
                     </div>
                 </div>
