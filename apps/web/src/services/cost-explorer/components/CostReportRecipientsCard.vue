@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -17,6 +17,8 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,11 +28,14 @@ import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
-
 const router = useRouter();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     enableWorkspaceOwnerRecipients: false,
 });
@@ -96,11 +101,19 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
                         />
                     </p-tooltip>
                 </div>
-                <p-toggle-button :value="state.enableWorkspaceOwnerRecipients"
+                <p-toggle-button v-if="storeState.isAdminMode"
+                                 :value="state.enableWorkspaceOwnerRecipients"
                                  @change-toggle="handleToggleRecipients"
                 />
+                <span v-else
+                      class="on-off-text"
+                      :class="{ 'on': state.enableWorkspaceOwnerRecipients }"
+                >
+                    {{ state.enableWorkspaceOwnerRecipients ? 'ON' : 'OFF' }}
+                </span>
             </div>
-            <p-button class="manage-roles-button"
+            <p-button v-if="storeState.isAdminMode"
+                      class="manage-roles-button"
                       style-type="tertiary"
                       icon-left="ic_settings"
                       size="sm"
@@ -134,6 +147,12 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
     .tooltip {
         @apply text-gray-500;
         display: flex;
+    }
+    .on-off-text {
+        @apply text-gray-300 text-label-md;
+        &.on {
+            @apply text-secondary;
+        }
     }
 }
 .manage-roles-button {
