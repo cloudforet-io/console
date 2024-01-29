@@ -94,7 +94,10 @@ const state = reactive({
 /* Util */
 const drawChart = () => {
     chartHelper.refreshRoot();
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({
+        paddingTop: 35,
+        paddingBottom: 20,
+    });
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -188,8 +191,6 @@ watch([() => props.loading, () => chartContext.value], async ([loading, _chartCo
 <style lang="postcss" scoped>
 .chart-wrapper {
     height: 17rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1rem;
     .chart {
         height: 100%;
         width: 100%;

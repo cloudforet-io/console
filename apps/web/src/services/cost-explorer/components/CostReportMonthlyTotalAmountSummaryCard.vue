@@ -206,7 +206,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                             to="/"
                             new-tab
                             highlight
-                            size="sm"
+                            size="md"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
                     </p-link>
