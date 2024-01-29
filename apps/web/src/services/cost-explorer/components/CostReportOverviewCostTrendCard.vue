@@ -217,6 +217,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
 .summary-wrapper {
     display: flex;
     gap: 1.5rem;
+
     @screen mobile {
         flex-direction: column;
         gap: 0.5rem;
