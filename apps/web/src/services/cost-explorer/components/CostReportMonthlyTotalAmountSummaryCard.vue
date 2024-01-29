@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectButton, PDatePagination, PLink, PDataTable,
+    PSelectButton, PDatePagination, PLink, PDataTable, PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { Dayjs } from 'dayjs';
@@ -194,7 +194,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
             </div>
         </template>
         <template #content>
-            <div class="grid grid-cols-12">
+            <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-12 lg:col-span-6">
                     <p-date-pagination :date.sync="state.currentDate"
                                        :disable-next-button="state.currentDate.isSame(costReportPageGetters.recentReportDate, 'month')"
@@ -203,7 +203,13 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                         <div class="summary-label">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
                         </div>
-                        <div class="summary-value">
+                        <p-skeleton v-if="state.loading"
+                                    width="8rem"
+                                    height="2rem"
+                        />
+                        <div v-else
+                             class="summary-value"
+                        >
                             <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
                             <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
                         </div>
@@ -217,9 +223,19 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
                     </p-link>
-                    <div ref="chartContext"
-                         class="chart"
-                    />
+                    <p-data-loader class="chart-wrapper"
+                                   :loading="state.loading"
+                                   :data="state.chartData"
+                    >
+                        <template #loader>
+                            <p-skeleton height="15rem"
+                                        width="100%"
+                            />
+                        </template>
+                        <div ref="chartContext"
+                             class="chart"
+                        />
+                    </p-data-loader>
                 </div>
                 <div class="col-span-12 lg:col-span-6">
                     <p-data-table :fields="state.tableFields"
@@ -287,6 +303,10 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
     width: 0.5rem;
     height: 0.5rem;
     margin-right: 0.5rem;
+}
+.chart-wrapper {
+    height: 12rem;
+    padding-top: 0.5rem;
 }
 .chart {
     width: 100%;

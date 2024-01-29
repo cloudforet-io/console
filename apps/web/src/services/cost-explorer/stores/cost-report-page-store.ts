@@ -26,6 +26,7 @@ interface CostReportItem extends CostReportModel {
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const state = reactive({
+        reportConfigLoading: false,
         costReportConfig: null as CostReportConfigModel|null|undefined,
         //
         reportListLoading: false,
@@ -66,11 +67,14 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const fetchCostReportConfig = async () => {
         if (state.costReportConfig !== null) return;
         try {
+            state.reportConfigLoading = true;
             const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
             state.costReportConfig = results?.[0];
         } catch (e) {
             ErrorHandler.handleError(e);
             state.costReportConfig = undefined;
+        } finally {
+            state.reportConfigLoading = false;
         }
     };
 

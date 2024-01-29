@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -13,6 +13,7 @@ import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-rep
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
+const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -58,20 +59,26 @@ const handleClickSettings = (): void => {
             </p-button>
         </template>
         <template #content>
-            <p class="date-text">
-                {{ state.upcomingReportDateText }}
-            </p>
-            <p class="date-range-text">
-                {{ state.upcomingReportDateRangeText }}
-            </p>
-            <div class="currency-wrapper">
-                <span class="currency-label">
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
-                </span>
-                <span class="currency-text">
-                    {{ costReportPageGetters.currency }}
-                </span>
-            </div>
+            <p-skeleton v-if="costReportPageState.reportConfigLoading"
+                        width="8rem"
+                        height="1.875rem"
+            />
+            <template v-else>
+                <p class="date-text">
+                    {{ state.upcomingReportDateText }}
+                </p>
+                <p class="date-range-text">
+                    {{ state.upcomingReportDateRangeText }}
+                </p>
+                <div class="currency-wrapper">
+                    <span class="currency-label">
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
+                    </span>
+                    <span class="currency-text">
+                        {{ costReportPageGetters.currency }}
+                    </span>
+                </div>
+            </template>
             <cost-report-settings-modal :visible.sync="state.settingsModalVisible" />
         </template>
     </cost-report-overview-card-template>
