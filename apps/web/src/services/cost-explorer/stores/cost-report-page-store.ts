@@ -17,7 +17,10 @@ import type { RoleType } from '@/schema/identity/role/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface CostReportItem extends CostReportModel {
-    recipients?: RoleType[] | string[];
+    recipients?: {
+        role_types: RoleType[];
+        emails: string[];
+    };
 }
 
 export const useCostReportPageStore = defineStore('cost-report-page', () => {
@@ -48,7 +51,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
             }
             return today.subtract(1, 'month');
         }),
-        reportItemData: computed(() => ({
+        reportItemData: computed<CostReportItem>(() => ({
             ...state.reportItem,
             recipients: state.costReportConfig?.recipients,
         })),
