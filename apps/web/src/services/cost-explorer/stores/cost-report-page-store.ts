@@ -10,8 +10,9 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
+import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
 import type { RoleType } from '@/schema/identity/role/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -95,10 +96,21 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
+    const fetchCostReportsUrl = async (params: CostReportGetUrlParameters): Promise<string> => {
+        try {
+            const res = await SpaceConnector.clientV2.costAnalysis.costReport.getUrl<CostReportGetUrlParameters, CostReportDataLinkInfoModel>(params);
+            return res.cost_report_link;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            throw e;
+        }
+    };
+
     const mutations = {
         setCostReportConfig,
         fetchCostReportsList,
         fetchCostReport,
+        fetchCostReportsUrl,
     };
 
     (async () => {

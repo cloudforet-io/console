@@ -19,5 +19,5 @@ export interface CostReportModel {
 }
 
 export interface CostReportDataLinkInfoModel {
-    cost_report_data_link: string,
+    cost_report_link: string,
 }
