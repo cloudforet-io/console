@@ -73,9 +73,9 @@ const tableState = reactive({
             ],
         }] as KeyItemSet[],
     valueHandlerMap: {
-        issue_date: makeDistinctValueHandler('costAnalysis.costReport', 'issue_date'),
-        report_number: makeDistinctValueHandler('costAnalysis.costReport', 'report_number'),
-        workspace_name: makeDistinctValueHandler('costAnalysis.costReport', 'workspace_name'),
+        issue_date: makeDistinctValueHandler('cost_analysis.CostReport', 'issue_date'),
+        report_number: makeDistinctValueHandler('cost_analysis.CostReport', 'report_number'),
+        workspace_name: makeDistinctValueHandler('cost_analysis.CostReport', 'workspace_name'),
     },
 });
 
