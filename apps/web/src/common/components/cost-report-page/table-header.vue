@@ -4,14 +4,12 @@ import { PLazyImg } from '@spaceone/design-system';
 interface Props {
     title?: string;
     subTotal?: string;
-    provider?: string;
     providerIconSrc?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     title: '',
     subTotal: '',
-    provider: '',
     providerIconSrc: '',
 });
 

@@ -31,6 +31,7 @@ export const integralRoutes: RouteConfig[] = [
                 props: (route) => ({
                     accessToken: route.query.sso_access_token,
                     costReportId: route.query.cost_report_id,
+                    language: route.query.language,
                 }),
                 component: CostReportPage,
             },

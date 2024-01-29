@@ -9,4 +9,5 @@ export interface DataSourceListParameters {
     state?: 'ENABLED' | 'DISABLED';
     monitoring_type?: MonitoringType;
     provider?: string;
+    workspace_id?: string;
 }
