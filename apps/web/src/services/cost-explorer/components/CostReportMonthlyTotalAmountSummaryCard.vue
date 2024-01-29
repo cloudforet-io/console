@@ -7,18 +7,32 @@ import {
     PSelectButton, PDatePagination, PLink, PDataTable,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import { cloneDeep } from 'lodash';
+import type { Dayjs } from 'dayjs';
+import { cloneDeep, isEqual, sum } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
+
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
+import { store } from '@/store';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { white } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
@@ -30,39 +44,93 @@ interface ChartData {
         fill: string;
     };
 }
+type CostReportDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    date: string;
+    value_sum: number;
+};
+
+const SAMPLE_ANALYZE_DATA = [
+    {
+        date: '2023-12',
+        value_sum: 10924.11711,
+        workspace_id: 'workspace_id_1',
+    },
+    {
+        value_sum: 8005.95874,
+        workspace_id: 'workspace_id_2',
+        date: '2023-12',
+    },
+];
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
+const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
 const state = reactive({
     loading: false,
+    data: { more: false, results: SAMPLE_ANALYZE_DATA } as AnalyzeResponse<CostReportDataAnalyzeResult>,
     targetSelectItems: [
-        { name: 'workspace', label: 'Workspace' },
-        { name: 'provider', label: 'Provider' },
+        GROUP_BY_ITEM_MAP.workspace_id,
+        GROUP_BY_ITEM_MAP.provider,
     ],
-    selectedTarget: 'workspace',
-    totalAmount: 957957,
-    currentDate: undefined,
+    selectedTarget: GROUP_BY.WORKSPACE,
+    totalAmount: computed(() => sum(state.data.results.map((d) => d.value_sum))),
+    currentDate: undefined as Dayjs | undefined,
     //
-    chartData: computed<ChartData[]>(() => state.tableItems.map((d, idx) => ({
-        category: d.workspace_name,
-        value: d.amount,
+    chartData: computed<ChartData[]>(() => state.data.results?.map((d, idx) => ({
+        category: d[state.selectedTarget],
+        value: d.value_sum,
         pieSettings: {
             fill: DEFAULT_CHART_COLORS[idx],
         },
     }))),
-    tableFields: [
-        { name: 'workspace_name', label: 'Workspace' },
-        { name: 'amount', label: 'Amount' },
-    ] as Field[],
-    tableItems: [
-        { workspace_name: 'Walmart Inc.', amount: 1000000 },
-        { workspace_name: 'Amazon.com Inc.', amount: 9900000 },
-        { workspace_name: 'PetroChina Co. Ltd.', amount: 8800000 },
-        { workspace_name: 'Apple Inc.', amount: 6400000 },
-    ],
+    tableFields: computed<Field[]>(() => ([
+        { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
+        { name: 'value_sum', label: 'Amount' },
+    ])),
 });
+
+/* Api */
+const analyzeCostReportData = async () => {
+    state.loading = true;
+    try {
+        const _period = {
+            start: state.currentDate?.format('YYYY-MM'),
+            end: state.currentDate?.format('YYYY-MM'),
+        };
+        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+            query: {
+                granularity: GRANULARITY.MONTHLY,
+                group_by: [state.selectedTarget],
+                start: _period.start,
+                end: _period.end,
+                fields: {
+                    value_sum: {
+                        key: `cost.${costReportPageGetters.currency}`,
+                        operator: 'sum',
+                    },
+                },
+                sort: [{
+                    key: 'value_sum',
+                    desc: true,
+                }],
+            },
+        });
+    } catch (e) {
+        state.data = {};
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
 
 /* Util */
 const drawChart = () => {
@@ -92,6 +160,11 @@ const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
 
+/* Init */
+(async () => {
+    await store.dispatch('reference/provider/load');
+})();
+
 /* Watcher */
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) drawChart();
@@ -99,6 +172,10 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
 watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
     state.currentDate = recentReportDate;
 }, { immediate: true });
+watch([() => state.currentDate, () => state.selectedTarget], (after, before) => {
+    if (isEqual(after, before) || !state.currentDate) return;
+    analyzeCostReportData();
+});
 </script>
 
 <template>
@@ -133,11 +210,12 @@ watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
                         </div>
                         <div class="summary-value">
-                            <span class="currency-symbol">₩</span>
+                            <span class="currency-symbol">{{ CURRENCY_SYMBOL[costReportPageGetters.currency] }}</span>
                             <span class="value">{{ numberFormatter(state.totalAmount) }}</span>
                         </div>
                     </div>
-                    <p-link :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    <p-link v-if="!storeState.isAdminMode"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             to="/"
                             new-tab
                             highlight
@@ -151,18 +229,26 @@ watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
                 </div>
                 <div class="col-span-12 lg:col-span-6">
                     <p-data-table :fields="state.tableFields"
-                                  :items="state.tableItems"
+                                  :items="state.data.results"
                                   :loading="state.loading"
                                   table-style-type="simple"
                     >
-                        <template #col-workspace_name-format="{ value, rowIndex }">
-                            <span class="toggle-button"
-                                  :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
-                            />
-                            <span class="workspace-name-col">{{ value }}</span>
+                        <template #col-format="{field, value, rowIndex}">
+                            <span v-if="field.name === GROUP_BY.WORKSPACE">
+                                <span class="toggle-button"
+                                      :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                                />
+                                {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                            </span>
+                            <span v-else-if="field.name === GROUP_BY.PROVIDER">
+                                <span class="toggle-button"
+                                      :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                                />
+                                {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                            </span>
                         </template>
-                        <template #col-amount-format="{ value }">
-                            <span class="amount-col">{{ currencyMoneyFormatter(value) }}</span>
+                        <template #col-value_sum-format="{ value }">
+                            <span class="amount-col">{{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}</span>
                         </template>
                     </p-data-table>
                 </div>
