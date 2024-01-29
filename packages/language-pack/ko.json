@@ -669,6 +669,7 @@
 				"ISSUE_DATE": "",
 				"ISSUE_DAY": "",
 				"LAST_12_MONTHS_AVERAGE": "",
+				"LAST_DAY_OF_THE_MONTH": "",
 				"LESS_THAN_OR_EQUAL_TO_31": "31 이하로 설정해주세요",
 				"MANAGE_ROLES": "",
 				"MONTHLY_TOTAL_AMOUNT_SUMMARY": "",
