@@ -11,7 +11,6 @@ import type { Dayjs } from 'dayjs';
 import { cloneDeep, isEqual, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
@@ -72,13 +71,19 @@ const state = reactive({
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
     //
-    chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => ({
-        category: d[state.selectedTarget],
-        value: d.value_sum,
-        pieSettings: {
-            fill: DEFAULT_CHART_COLORS[idx],
-        },
-    }))),
+    chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
+        const _category = d[state.selectedTarget];
+        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE
+            ? storeState.workspaces[_category]?.label ?? d.workspace_id
+            : storeState.providers[_category]?.name ?? d.provider;
+        return {
+            category: _categoryLabel,
+            value: d.value_sum,
+            pieSettings: {
+                fill: DEFAULT_CHART_COLORS[idx],
+            },
+        };
+    })),
     tableFields: computed<Field[]>(() => ([
         { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
         { name: 'value_sum', label: 'Amount', textAlign: 'right' },
@@ -137,7 +142,7 @@ const drawChart = () => {
         templateField: 'pieSettings',
     });
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(series, tooltip);
+    chartHelper.setPieTooltipText(series, tooltip, costReportPageGetters.currency);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
 };
@@ -198,7 +203,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                         </div>
                         <div class="summary-value">
                             <span class="currency-symbol">{{ CURRENCY_SYMBOL?.[costReportPageGetters.currency] }}</span>
-                            <span class="value">{{ numberFormatter(state.totalAmount) }}</span>
+                            <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
                         </div>
                     </div>
                     <p-link v-if="!storeState.isAdminMode"
@@ -206,7 +211,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                             to="/"
                             new-tab
                             highlight
-                            size="sm"
+                            size="md"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
                     </p-link>
@@ -270,10 +275,6 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
         padding-left: 0.125rem;
     }
 }
-.workspace-name-col {
-    @apply text-label-md;
-    font-weight: 400;
-}
 .amount-col {
     @apply text-label-md;
     font-weight: 500;
@@ -283,7 +284,6 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
     display: inline-block;
     width: 0.5rem;
     height: 0.5rem;
-    cursor: pointer;
     margin-right: 0.5rem;
 }
 .chart {

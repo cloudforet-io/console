@@ -31,6 +31,10 @@ import {
         .title {
             @apply text-label-lg font-bold;
         }
+
+        @screen mobile {
+            display: block;
+        }
     }
     .content-wrapper {
         padding-top: 1rem;
