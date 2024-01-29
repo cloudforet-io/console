@@ -648,7 +648,6 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     margin-bottom: 3rem;
 }
 
-
 .legend {
     @apply flex items-center;
 
