@@ -11,7 +11,9 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
-import { cloneDeep, find, sortBy } from 'lodash';
+import {
+    cloneDeep, find, isEqual, sortBy,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -178,7 +180,7 @@ const drawChart = () => {
 
 /* Init */
 (async () => {
-    await analyzeTrendData();
+    await store.dispatch('reference/provider/load');
 })();
 
 /* Watcher */
@@ -188,6 +190,10 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
         state.chartData = getXYChartData(state.data, GRANULARITY.MONTHLY, props.period, props.groupBy);
         drawChart();
     }
+}, { immediate: true });
+watch([() => props.period, () => props.groupBy], async (after, before) => {
+    if (isEqual(after, before)) return;
+    await analyzeTrendData();
 }, { immediate: true });
 </script>
 
