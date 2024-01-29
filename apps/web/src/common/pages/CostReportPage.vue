@@ -31,7 +31,7 @@ interface State {
     loading: boolean;
     baseInfo?: CostReportModel;
     isExpired: boolean;
-    realDateRange: ComputedRef<string>;
+    reportDateRage: ComputedRef<string>;
     totalCost: ComputedRef<string|undefined>;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -43,7 +43,7 @@ const state = reactive<State>({
     loading: true,
     baseInfo: undefined,
     isExpired: false,
-    realDateRange: computed(() => {
+    reportDateRage: computed(() => {
         const baseDate = dayjs(state.baseInfo?.issue_date);
         if (!baseDate) return '';
         const lastMonth = baseDate.subtract(1, 'month');
@@ -110,7 +110,7 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
                         <label>{{ $t('COMMON.COST_REPORT.REPORT_NUMBER') }}:</label>{{ state.baseInfo?.report_number }}
                     </p>
                     <p class="report-info">
-                        <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.realDateRange }})</span>
+                        <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
                     </p>
                     <p class="report-info">
                         <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }}({{ state.baseInfo?.bank_name }})
