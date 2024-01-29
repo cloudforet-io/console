@@ -76,11 +76,14 @@ const state = reactive({
         const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE
             ? storeState.workspaces[_category]?.label ?? d.workspace_id
             : storeState.providers[_category]?.name ?? d.provider;
+        const _color = state.selectedTarget === GROUP_BY.WORKSPACE
+            ? DEFAULT_CHART_COLORS[idx]
+            : storeState.providers[_category]?.color ?? DEFAULT_CHART_COLORS[idx];
         return {
             category: _categoryLabel,
             value: d.value_sum,
             pieSettings: {
-                fill: DEFAULT_CHART_COLORS[idx],
+                fill: _color,
             },
         };
     })),
@@ -254,7 +257,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                             </span>
                             <span v-else-if="field.name === GROUP_BY.PROVIDER">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': storeState.providers[value]?.color ?? DEFAULT_CHART_COLORS[rowIndex] }"
                                 />
                                 {{ storeState.providers[value] ? storeState.providers[value].name : value }}
                             </span>
