@@ -67,7 +67,7 @@ const state = reactive({
         GROUP_BY_ITEM_MAP.workspace_id,
         GROUP_BY_ITEM_MAP.provider,
     ],
-    selectedTarget: GROUP_BY.WORKSPACE,
+    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
     //
@@ -177,7 +177,9 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.MONTHLY_TOTAL_AMOUNT_SUMMARY') }}
             </span>
         </template>
-        <template #right-extra>
+        <template v-if="storeState.isAdminMode"
+                  #right-extra
+        >
             <div class="select-button-wrapper">
                 <p-select-button v-for="item in state.targetSelectItems"
                                  :key="`cost-trend-select-button-${item.name}`"

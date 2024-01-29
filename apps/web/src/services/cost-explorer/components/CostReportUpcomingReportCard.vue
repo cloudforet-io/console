@@ -4,6 +4,8 @@ import { computed, reactive } from 'vue';
 import { PButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
@@ -11,6 +13,10 @@ import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-rep
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     settingsModalVisible: false,
     upcomingReportDateText: computed(() => {
@@ -40,7 +46,9 @@ const handleClickSettings = (): void => {
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.UPCOMING_REPORT') }}
             </span>
         </template>
-        <template #right-extra>
+        <template v-if="storeState.isAdminMode"
+                  #right-extra
+        >
             <p-button style-type="tertiary"
                       icon-left="ic_settings"
                       size="sm"
