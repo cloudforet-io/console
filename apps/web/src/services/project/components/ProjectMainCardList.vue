@@ -458,12 +458,12 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                 @apply bg-gray-100 rounded-full inline-flex justify-center items-center;
                 height: 1.25rem;
                 width: 1.25rem;
+                &:hover {
+                    @apply bg-blue-300;
+                }
             }
             &:hover {
                 @apply text-secondary font-bold;
-                .icon-wrapper {
-                    @apply bg-blue-300;
-                }
             }
             .icon-link {
                 @apply flex-shrink-0 inline-block mr-2;

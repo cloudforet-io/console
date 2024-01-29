@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -8,23 +8,40 @@ import {
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import { isEqual } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import CostReportOverviewCostTrendContent from '@/services/cost-explorer/components/CostReportOverviewCostTrendContent.vue';
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
+type CostReportDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    value_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_value_sum?: number;
+};
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const state = reactive({
+    loading: true,
+    data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
         const _defaultStart = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
         const _defaultEnd = costReportPageGetters.recentReportDate.format('YYYY-MM');
@@ -45,8 +62,8 @@ const state = reactive({
         GROUP_BY_ITEM_MAP.provider,
     ] as SelectButtonType[],
     selectedTarget: 'workspace_id',
-    previousTotalAmount: 957957,
-    last12MonthsAverage: 726568,
+    previousTotalAmount: computed<number>(() => getPreviousTotalAmount(costReportPageGetters.recentReportDate, state.data?.results)),
+    last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(state.data?.results)),
     period: computed(() => {
         if (state.selectedDate === 'last12Months') {
             const start = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
@@ -66,6 +83,59 @@ const state = reactive({
     }),
 });
 
+/* Util */
+const getPreviousTotalAmount = (recentReportDate: Dayjs, results?: CostReportDataAnalyzeResult[]): number => {
+    if (!results) return 0;
+    let _totalAmount = 0;
+    const previousMonth = recentReportDate.format('YYYY-MM');
+    results.forEach((item) => {
+        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === previousMonth);
+        if (_valueSum) {
+            _totalAmount += _valueSum.value;
+        }
+    });
+    return _totalAmount;
+};
+const getLast12MonthsAverage = (results?: CostReportDataAnalyzeResult[]): number => {
+    if (!results) return 0;
+    let _totalAmount = 0;
+    results.forEach((item) => {
+        _totalAmount += item._total_value_sum || 0;
+    });
+    return _totalAmount / 12;
+};
+
+/* Api */
+const analyzeTrendData = async () => {
+    state.loading = true;
+    try {
+        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
+            query: {
+                granularity: GRANULARITY.MONTHLY,
+                group_by: [state.selectedTarget],
+                field_group: ['date'],
+                start: state.period.start,
+                end: state.period.end,
+                fields: {
+                    value_sum: {
+                        key: `cost.${costReportPageGetters.currency}`,
+                        operator: 'sum',
+                    },
+                },
+                sort: [{
+                    key: '_total_value_sum',
+                    desc: true,
+                }],
+            },
+        });
+    } catch (e) {
+        state.data = undefined;
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
 /* Event */
 const handleSelectDate = (date: string) => {
     state.selectedDate = date;
@@ -73,6 +143,12 @@ const handleSelectDate = (date: string) => {
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
+
+/* Watcher */
+watch([() => state.period, () => state.selectedTarget], async (after, before) => {
+    if (isEqual(after, before)) return;
+    await analyzeTrendData();
+}, { immediate: true });
 </script>
 
 <template>
@@ -122,9 +198,11 @@ const handleChangeTarget = (target: string) => {
                     </div>
                 </div>
             </div>
-            <cost-report-overview-cost-trend-content
+            <cost-report-overview-cost-trend-chart
                 :group-by="state.selectedTarget"
                 :period="state.period"
+                :data="state.data"
+                :loading="state.loading"
             />
         </template>
     </cost-report-overview-card-template>
