@@ -170,6 +170,21 @@ export const getLinkArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    useHashScroll: {
+        name: 'useHashScroll',
+        type: { name: 'boolean' },
+        description: "Whether to use a tag's hash scroll or not.",
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+    },
     defaultSlot: {
         name: 'default',
         description: 'Slot for text',
