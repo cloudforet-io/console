@@ -14,6 +14,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
+import { CostReportPath } from '@/router/constant';
 import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -78,7 +79,11 @@ const goToSignIn = async () => {
     await router.push(res);
     state.isRoutingToSignIn = false;
 };
-const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
+const showsBrowserRecommendation = () => {
+    const currentPath = window.location.pathname;
+    if (currentPath === CostReportPath) return false;
+    return (!supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation'));
+};
 
 watch(() => route.path, () => {
     state.notificationEmailModalVisible = route.path !== '/'

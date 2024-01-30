@@ -10,8 +10,8 @@ import type { DataTableFieldType } from '@spaceone/design-system/src/data-displa
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
@@ -24,6 +24,8 @@ import { ERROR_ROUTE } from '@/router/constant';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import TableHeader from '@/common/components/cost-report-page/table-header.vue';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -58,6 +60,7 @@ interface Props {
 interface State {
     loading: boolean;
     baseInfo?: CostReportModel;
+    currency: ComputedRef<string>;
     isExpired: boolean;
     reportDateRage: ComputedRef<string>;
     totalCost: ComputedRef<number>;
@@ -80,6 +83,7 @@ const storeState = reactive({
 const state = reactive<State>({
     loading: true,
     baseInfo: undefined,
+    currency: computed(() => state.baseInfo?.currency ?? 'USD'),
     isExpired: false,
     reportDateRage: computed(() => {
         const baseDate = dayjs(state.baseInfo?.issue_date);
@@ -418,10 +422,11 @@ const setBodyTag = () => {
                 <span class="title">{{ $t('COMMON.COST_REPORT.TOTAL') }}</span>
                 <div class="total-value-wrapper">
                     <div class="total-cost">
-                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.baseInfo?.currency] }}</span><span class="total-text">{{ numberFormatter(state.totalCost) }}</span>
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
+                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, {currency:state.currency, style: 'decimal'}) }}</span>
                     </div>
                     <div class="currency-value">
-                        {{ state.baseInfo?.currency }}
+                        {{ state.currency }}
                     </div>
                 </div>
             </div>
@@ -478,7 +483,7 @@ const setBodyTag = () => {
                             </div>
                         </template>
                         <template #col-amount-format="{value}">
-                            {{ numberFormatter(value) }}
+                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -493,7 +498,7 @@ const setBodyTag = () => {
                      :key="idx"
                 >
                     <table-header :title="storeState.providers[provider]?.label"
-                                  :sub-total="numberFormatter(tableState.costByProductData[provider].subtotal)"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByProductData[provider].subtotal, {currency:state.currency, style: 'decimal'})"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
                     <p-data-table :fields="tableState.costByProductFields"
@@ -506,7 +511,7 @@ const setBodyTag = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ numberFormatter(value) }}
+                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -524,7 +529,7 @@ const setBodyTag = () => {
                               :disable-hover="true"
                 >
                     <template #col-amount-format="{value}">
-                        {{ numberFormatter(value) }}
+                        {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
                     </template>
                 </p-data-table>
             </div>
@@ -538,7 +543,7 @@ const setBodyTag = () => {
                      :key="idx"
                 >
                     <table-header :title="provider"
-                                  :sub-total="numberFormatter(tableState.costByServiceAccountData[provider]?.subtotal)"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal, {currency:state.currency, style: 'decimal'})"
                                   :provider="storeState.providers[provider]?.label"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
@@ -552,7 +557,7 @@ const setBodyTag = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ numberFormatter(value) }}
+                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
                         </template>
                     </p-data-table>
                 </div>
