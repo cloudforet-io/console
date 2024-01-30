@@ -167,6 +167,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
             <p-select-dropdown style-type="transparent"
                                :menu="state.dateSelectDropdown"
                                :selected="state.selectedDate"
+                               class="cost-trend-period-select-dropdown"
                                @select="handleSelectDate"
             />
         </template>
@@ -255,11 +256,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
         padding-left: 0.125rem;
     }
 }
-
-/* custom design-system component - p-select-dropdown */
-:deep(.p-select-dropdown) {
-    .p-context-menu-item {
-        font-weight: normal;
-    }
+.cost-trend-period-select-dropdown {
+    @apply font-normal;
 }
 </style>
