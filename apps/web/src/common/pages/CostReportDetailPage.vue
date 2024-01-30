@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
-import {
-    computed, reactive, ref,
-} from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PLink, PDataTable } from '@spaceone/design-system';
@@ -66,7 +64,10 @@ interface State {
     totalCost: ComputedRef<number>;
     data?: AnalyzeResponse<CostReportDataAnalyzeResult>|undefined;
     chartData: ComputedRef<ChartData[]>;
+    numberFormatterOption: ComputedRef<Intl.NumberFormatOptions>;
 }
+
+
 const props = withDefaults(defineProps<Props>(), {
     accessToken: undefined,
     costReportId: undefined,
@@ -101,6 +102,7 @@ const state = reactive<State>({
             fill: storeState.providers[d.provider]?.color,
         },
     })) ?? []),
+    numberFormatterOption: computed(() => ({ currency: state.currency, style: 'decimal', notation: 'standard' })),
 });
 
 const originDataState = reactive({
@@ -358,17 +360,20 @@ const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
     if (viewportEl) viewportEl.attributes.content.value = 'width=928';
 };
-const setBodyTag = () => {
+const setRootTagStyle = () => {
+    const htmlEl = document.querySelector('html');
     const bodyEl = document.querySelector('body');
     const appEl = document.querySelector('#app');
-    if (bodyEl) bodyEl.style.height = 'auto';
-    if (appEl) appEl.style.height = 'auto';
+    if (htmlEl) {
+        htmlEl.style.height = 'unset';
+        htmlEl.style.overflow = 'auto';
+    }
+    if (bodyEl) bodyEl.style.height = 'unset';
+    if (appEl) appEl.style.height = 'unset';
 };
 
 (async () => {
     state.loading = true;
-    setMetaTag();
-    setBodyTag();
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
@@ -386,6 +391,8 @@ const setBodyTag = () => {
     await setI18nLocale(props.language);
     state.loading = false;
     drawChart();
+    setMetaTag();
+    setRootTagStyle();
 })();
 
 </script>
@@ -423,7 +430,7 @@ const setBodyTag = () => {
                 <div class="total-value-wrapper">
                     <div class="total-cost">
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, {currency:state.currency, style: 'decimal'}) }}</span>
+                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, state.numberFormatterOption) }}</span>
                     </div>
                     <div class="currency-value">
                         {{ state.currency }}
@@ -487,7 +494,7 @@ const setBodyTag = () => {
                             </div>
                         </template>
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -502,7 +509,7 @@ const setBodyTag = () => {
                      :key="idx"
                 >
                     <table-header :title="storeState.providers[provider]?.label"
-                                  :sub-total="currencyMoneyFormatter(tableState.costByProductData[provider].subtotal, {currency:state.currency, style: 'decimal'})"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByProductData[provider].subtotal, state.numberFormatterOption)"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
                     <p-data-table :fields="tableState.costByProductFields"
@@ -515,7 +522,7 @@ const setBodyTag = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -533,7 +540,7 @@ const setBodyTag = () => {
                               :disable-hover="true"
                 >
                     <template #col-amount-format="{value}">
-                        {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                        {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                     </template>
                 </p-data-table>
             </div>
@@ -547,7 +554,7 @@ const setBodyTag = () => {
                      :key="idx"
                 >
                     <table-header :title="provider"
-                                  :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal, {currency:state.currency, style: 'decimal'})"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal,state.numberFormatterOption)"
                                   :provider="storeState.providers[provider]?.label"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
@@ -561,7 +568,7 @@ const setBodyTag = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -574,6 +581,13 @@ const setBodyTag = () => {
 .title {
     @apply text-label-xl font-bold;
     margin-bottom: 0.75rem;
+}
+
+/* custom design-system component - p-data-table */
+:deep() {
+    .p-data-table {
+        min-height: unset;
+    }
 }
 
 .body {
