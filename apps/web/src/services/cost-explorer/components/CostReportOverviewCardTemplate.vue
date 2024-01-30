@@ -3,11 +3,19 @@ import {
     PPaneLayout,
 } from '@spaceone/design-system';
 
+interface Props {
+    displayBlockInMobile?: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+    displayBlockInMobile: false,
+});
 </script>
 
 <template>
     <p-pane-layout class="cost-report-overview-card-template">
-        <div class="top-part">
+        <div class="top-part"
+             :class="{ 'block-in-mobile': props.displayBlockInMobile }"
+        >
             <span class="title">
                 <slot name="title" />
             </span>
@@ -33,7 +41,9 @@ import {
         }
 
         @screen mobile {
-            display: block;
+            &.block-in-mobile {
+                display: block;
+            }
         }
     }
     .content-wrapper {

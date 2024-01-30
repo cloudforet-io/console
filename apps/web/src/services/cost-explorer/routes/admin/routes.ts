@@ -20,7 +20,7 @@ const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
-const AdminCostReportPage = () => import('@/services/cost-explorer/pages/admin/AdminCostReportPage.vue');
+const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 
 const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -143,7 +143,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
                     meta: { lnbVisible: true },
-                    component: AdminCostReportPage as any,
+                    component: CostReportPage as any,
                 },
             ],
         },

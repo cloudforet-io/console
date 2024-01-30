@@ -159,7 +159,7 @@ watch([() => state.period, () => state.selectedTarget, () => costReportPageGette
 </script>
 
 <template>
-    <cost-report-overview-card-template>
+    <cost-report-overview-card-template display-block-in-mobile>
         <template #title>
             <span class="mr-3">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.COST_TREND') }}
