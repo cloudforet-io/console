@@ -583,6 +583,13 @@ const setRootTagStyle = () => {
     margin-bottom: 0.75rem;
 }
 
+/* custom design-system component - p-data-table */
+:deep() {
+    .p-data-table {
+        min-height: unset;
+    }
+}
+
 .body {
     @apply flex justify-center bg-white;
     font-size: 0.9625rem;
