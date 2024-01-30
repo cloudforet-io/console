@@ -4,17 +4,18 @@ import {
 } from 'vue';
 
 import {
-    PSelectButton, PDatePagination, PLink, PDataTable, PSkeleton, PDataLoader,
+    PSelectButton, PDatePagination, PDataTable, PSkeleton, PDataLoader, PTextButton, PI,
 } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import { cloneDeep, isEqual, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
+import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
+import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -33,7 +34,7 @@ import { white } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
@@ -72,6 +73,7 @@ const state = reactive({
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
+    currentReportId: undefined as string|undefined,
     //
     chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
         const _category = d[state.selectedTarget];
@@ -106,7 +108,6 @@ const analyzeCostReportData = async () => {
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
             is_confirmed: true,
             query: {
-                granularity: GRANULARITY.MONTHLY,
                 group_by: [state.selectedTarget],
                 start: _period.start,
                 end: _period.end,
@@ -127,6 +128,23 @@ const analyzeCostReportData = async () => {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
+    }
+};
+const listCostReport = async () => {
+    try {
+        const res = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+            query: {
+                filter: [
+                    { k: 'report_month', v: state.currentDate?.format('YYYY-MM'), o: 'eq' },
+                ],
+            },
+            status: 'SUCCESS',
+        });
+        if (res.results?.length) state.currentReportId = res.results[0].cost_report_id;
+        else state.currentReportId = undefined;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.currentReportId = undefined;
     }
 };
 
@@ -158,6 +176,16 @@ const drawChart = () => {
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
 };
+const handleClickDetailsLink = async () => {
+    try {
+        const reportUrl = await costReportPageStore.getCostReportUrl({
+            cost_report_id: state.currentReportId,
+        });
+        window.open(reportUrl, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
+};
 
 /* Init */
 (async () => {
@@ -169,11 +197,15 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
 watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
+    // init current date when config is updated
     state.currentDate = recentReportDate;
 }, { immediate: true });
 watch([() => state.currentDate, () => state.selectedTarget, () => costReportPageGetters.currency], (after, before) => {
     if (isEqual(after, before) || !state.currentDate || !costReportPageGetters.currency) return;
     analyzeCostReportData();
+}, { immediate: true });
+watch(() => state.currentDate, () => {
+    listCostReport();
 }, { immediate: true });
 </script>
 
@@ -221,15 +253,20 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
                             <span class="value">{{ currencyMoneyFormatter(state.totalAmount, { currency: costReportPageGetters.currency, style: 'decimal' }) }}</span>
                         </div>
                     </div>
-                    <p-link v-if="!storeState.isAdminMode"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            to="/"
-                            new-tab
-                            highlight
-                            size="md"
+                    <p-text-button v-if="!storeState.isAdminMode && state.currentReportId"
+                                   style-type="highlight"
+                                   class="report-link"
+                                   size="md"
+                                   @click="handleClickDetailsLink"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.SEE_DETAILS') }}
-                    </p-link>
+                        <p-i name="ic_arrow-right-up"
+                             class="link-mark"
+                             height="0.875rem"
+                             width="0.875rem"
+                             color="inherit"
+                        />
+                    </p-text-button>
                     <p-data-loader class="chart-wrapper"
                                    :loading="state.loading"
                                    :data="state.chartData"
