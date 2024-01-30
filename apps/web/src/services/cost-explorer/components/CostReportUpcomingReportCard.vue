@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { PButton, PSkeleton } from '@spaceone/design-system';
+import { PButton, PSkeleton, PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { languages } from '@/store/modules/user/config';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportSettingsModal from '@/services/cost-explorer/components/CostReportSettingsModal.vue';
@@ -70,11 +71,20 @@ const handleClickSettings = (): void => {
                 <p class="date-range-text">
                     {{ state.upcomingReportDateRangeText }}
                 </p>
-                <div class="currency-wrapper">
-                    <span class="currency-label">
+                <div class="language-currency-wrapper">
+                    <span class="label">
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.LANGUAGE') }}:
+                    </span>
+                    <span class="text">
+                        {{ languages[costReportPageGetters.language] ?? costReportPageGetters.language }}
+                    </span>
+                    <p-divider class="divider"
+                               vertical
+                    />
+                    <span class="label">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY') }}:
                     </span>
-                    <span class="currency-text">
+                    <span class="text">
                         {{ costReportPageGetters.currency }}
                     </span>
                 </div>
@@ -100,14 +110,28 @@ const handleClickSettings = (): void => {
 .date-range-text {
     @apply text-label-md;
 }
-.currency-wrapper {
+.language-currency-wrapper {
     @apply text-label-md;
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
     padding-top: 1rem;
-    .currency-label {
+    .label {
         @apply text-gray-600;
+        display: none;
     }
-    .currency-text {
+    .text {
         font-weight: 500;
+    }
+    .divider {
+        height: 1rem;
+        margin: 0 0.25rem;
+    }
+
+    @screen lg {
+        .label {
+            display: inline-block;
+        }
     }
 }
 </style>
