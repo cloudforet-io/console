@@ -45,15 +45,7 @@ const state = reactive({
         name: currency,
         label: `${CURRENCY_SYMBOL[currency]} ${currency}`,
     }))),
-    upcomingIssueDateText: computed<string>(() => {
-        const today = dayjs.utc();
-        const _issueDay: number = state.enableLastDay ? today.endOf('month').date() : issueDay.value ?? 10;
-        if (Number(today.format('D')) < _issueDay) {
-            return today.date(_issueDay).format('YYYY-MM-DD');
-        }
-        if (state.enableLastDay) return today.add(1, 'month').endOf('month').format('YYYY-MM-DD');
-        return today.add(1, 'month').date(_issueDay).format('YYYY-MM-DD');
-    }),
+    upcomingIssueDateText: computed<string>(() => getUpcomingIssueDate(state.enableLastDay, issueDay.value)),
 });
 const {
     forms: { issueDay },
@@ -80,6 +72,24 @@ const getLastDay = (): number => {
         return today.add(1, 'month').endOf('month').date();
     }
     return today.endOf('month').date();
+};
+const getUpcomingIssueDate = (enableLastDay: boolean, _issueDay?: number): string => {
+    const today = dayjs.utc();
+    const __issueDay: number = enableLastDay ? today.endOf('month').date() : _issueDay ?? 10;
+
+    // 1. case for today(2024-01-15) is before issue day(31) -> 2024-01-31
+    if (Number(today.format('D')) < __issueDay) {
+        return today.date(__issueDay).format('YYYY-MM-DD');
+    }
+
+    // 2. case for next month(2024-02) has less days than issue day(31) -> 2024-02-29
+    const nextMonth = today.add(1, 'month');
+    if (nextMonth.endOf('month').date() < __issueDay) {
+        return nextMonth.endOf('month').format('YYYY-MM-DD');
+    }
+
+    // 3. case for next month(2024-02) has equal or more days than issue day(10) -> 2024-02-10
+    return nextMonth.date(__issueDay).format('YYYY-MM-DD');
 };
 
 /* Api */
