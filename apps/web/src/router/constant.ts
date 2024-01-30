@@ -24,3 +24,5 @@ export const ROUTE_SCOPE = {
     WORKSPACE: 'WORKSPACE',
     DOMAIN: 'DOMAIN',
 } as const;
+
+export const CostReportPath = '/cost-report';
