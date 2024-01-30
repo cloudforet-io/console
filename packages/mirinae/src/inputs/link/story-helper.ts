@@ -170,6 +170,21 @@ export const getLinkArgTypes = (): ArgTypes => ({
             type: 'object',
         },
     },
+    useAnchorScroll: {
+        name: 'useAnchorScroll',
+        type: { name: 'boolean' },
+        description: "Whether to use 'a' tag's scroll to specific element or not.",
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+    },
     defaultSlot: {
         name: 'default',
         description: 'Slot for text',

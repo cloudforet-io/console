@@ -2,13 +2,12 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
+import { additionalRoutes } from '@/router/additional-routes';
 import { adminRoutes } from '@/router/admin-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
-
-import CostReportPage from '@/common/pages/CostReportDetailPage.vue';
 
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
@@ -25,16 +24,7 @@ export const integralRoutes: RouteConfig[] = [
         }),
         children: [
             ...authRoutes,
-            {
-                path: 'cost-report',
-                name: ROOT_ROUTE.COST_REPORT._NAME,
-                props: (route) => ({
-                    accessToken: route.query.sso_access_token,
-                    costReportId: route.query.cost_report_id,
-                    language: route.query.language,
-                }),
-                component: CostReportPage,
-            },
+            ...additionalRoutes,
             {
                 path: '/admin',
                 name: ROOT_ROUTE.ADMIN._NAME,
