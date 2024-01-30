@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PHeading, PTab,
@@ -18,8 +20,9 @@ import CostReportReportsTab from '@/services/cost-explorer/components/CostReport
 import CostReportUpcomingReportCard from '@/services/cost-explorer/components/CostReportUpcomingReportCard.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
-
 const costReportPageStore = useCostReportPageStore();
+const costReportPageState = costReportPageStore.state;
+
 const state = reactive({
     tabs: computed<TabItem[]>(() => [
         {
@@ -35,6 +38,11 @@ const state = reactive({
     ]),
     activeTab: 'overview',
     currency: 'KRW' as Currency,
+});
+
+/* Watcher */
+watch(() => state.activeTab, (activeTab) => {
+    costReportPageState.activeTab = activeTab;
 });
 
 onMounted(() => {
