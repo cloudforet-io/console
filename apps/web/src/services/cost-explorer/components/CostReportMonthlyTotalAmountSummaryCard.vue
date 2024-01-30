@@ -73,6 +73,10 @@ const state = reactive({
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
+    currentDateRangeText: computed<string>(() => {
+        if (!state.currentDate) return '';
+        return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
+    }),
     currentReportId: undefined as string|undefined,
     //
     chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
@@ -234,10 +238,13 @@ watch(() => state.currentDate, () => {
         </template>
         <template #content>
             <div class="grid grid-cols-12 gap-4">
-                <div class="col-span-12 lg:col-span-6">
+                <div class="left-part">
                     <p-date-pagination :date.sync="state.currentDate"
                                        :disable-next-button="state.currentDate.isSame(costReportPageGetters.recentReportDate, 'month')"
                     />
+                    <div class="date-range-text">
+                        {{ state.currentDateRangeText }}
+                    </div>
                     <div class="summary-wrapper">
                         <div class="summary-label">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.TOTAL_AMOUNT') }}
@@ -281,7 +288,7 @@ watch(() => state.currentDate, () => {
                         />
                     </p-data-loader>
                 </div>
-                <div class="col-span-12 lg:col-span-6">
+                <div class="right-part">
                     <p-data-table :fields="state.tableFields"
                                   :items="state.data?.results ?? []"
                                   :loading="state.loading"
@@ -322,43 +329,62 @@ watch(() => state.currentDate, () => {
     gap: 0.25rem;
     padding-top: 0.5rem;
 }
-.summary-wrapper {
-    padding-top: 1rem;
-    padding-bottom: 0.5rem;
-    .summary-label {
-        @apply text-label-md text-gray-600;
-        padding-bottom: 0.25rem;
+.left-part {
+    @apply col-span-12;
+
+    @screen lg {
+        @apply col-span-6;
     }
-    .currency-symbol {
-        @apply text-label-xl text-gray-600;
+
+    .date-range-text {
+        @apply text-label-md text-gray-500;
     }
-    .value {
-        @apply text-display-md;
-        font-weight: 700;
-        padding-left: 0.125rem;
+    .summary-wrapper {
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
+        .summary-label {
+            @apply text-label-md text-gray-600;
+            padding-bottom: 0.25rem;
+        }
+        .currency-symbol {
+            @apply text-label-xl text-gray-600;
+        }
+        .value {
+            @apply text-display-md;
+            font-weight: 700;
+            padding-left: 0.125rem;
+        }
+    }
+    .chart-wrapper {
+        height: 12rem;
+        padding-top: 0.5rem;
+    }
+    .chart {
+        width: 100%;
+        height: 11rem;
     }
 }
-.amount-col {
-    @apply text-label-md;
-    font-weight: 500;
-}
-.toggle-button {
-    @apply rounded-full;
-    display: inline-block;
-    width: 0.5rem;
-    height: 0.5rem;
-    margin-right: 0.5rem;
-}
-.chart-wrapper {
-    height: 12rem;
-    padding-top: 0.5rem;
-}
-.chart {
-    width: 100%;
-    height: 11rem;
-}
-.summary-data-table {
-    max-height: 19rem;
+.right-part {
+    @apply col-span-12;
+
+    @screen lg {
+        @apply col-span-6;
+    }
+
+    .amount-col {
+        @apply text-label-md;
+        font-weight: 500;
+    }
+    .toggle-button {
+        @apply rounded-full;
+        display: inline-block;
+        width: 0.5rem;
+        height: 0.5rem;
+        margin-right: 0.5rem;
+    }
+    .summary-data-table {
+        max-height: 19rem;
+    }
 }
 
 /* custom design-system component - p-date-pagination */
