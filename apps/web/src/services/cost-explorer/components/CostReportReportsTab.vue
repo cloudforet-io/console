@@ -355,4 +355,13 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
         gap: 0.25rem;
     }
 }
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    &.period-select-dropdown {
+        .selected-item-text {
+            margin-top: -0.005rem;
+        }
+    }
+}
 </style>
