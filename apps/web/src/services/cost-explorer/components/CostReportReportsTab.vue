@@ -180,9 +180,9 @@ watch([() => state.selectedPeriod, () => state.customPeriod], ([selectedPeriod, 
     if (selectedPeriod !== 'all') {
         if (selectedPeriod === 'custom') {
             filters.push({ k: 'issue_date', v: dayjs(customPeriod?.start).format('YYYY-MM') || '', o: '>=' });
-            filters.push({ k: 'issue_date', v: dayjs(customPeriod?.end).format('YYYY-MM') || '', o: '<=' });
+            filters.push({ k: 'issue_date', v: dayjs(customPeriod?.end).add(1, 'month').format('YYYY-MM') || '', o: '<' });
         } else {
-            filters.push({ k: 'report_month', v: selectedPeriod, o: '=' });
+            filters.push({ k: 'report_month', v: dayjs(selectedPeriod).subtract(1, 'month').format('YYYY-MM'), o: '=' });
         }
     }
 
