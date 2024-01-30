@@ -8,7 +8,7 @@ import { errorRoutes } from '@/router/error-routes';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
-import CostReportPage from '@/common/pages/CostReportPage.vue';
+import CostReportPage from '@/common/pages/CostReportDetailPage.vue';
 
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
