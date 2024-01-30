@@ -27,7 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import CostReportOverviewCostTrendChart from '@/services/cost-explorer/components/CostReportOverviewCostTrendChart.vue';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -63,10 +63,10 @@ const state = reactive({
         return [_default, ...last3Years];
     }),
     selectedDate: 'last12Months',
-    targetSelectItems: [
-        GROUP_BY_ITEM_MAP.workspace_id,
-        GROUP_BY_ITEM_MAP.provider,
-    ] as SelectButtonType[],
+    targetSelectItems: computed(() => ([
+        { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+        { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
+    ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     previousTotalAmount: computed<number>(() => getPreviousTotalAmount(costReportPageGetters.recentReportDate, state.data?.results)),
     last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(state.data?.results)),

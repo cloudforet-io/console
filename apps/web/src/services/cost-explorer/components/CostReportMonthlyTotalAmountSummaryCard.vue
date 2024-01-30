@@ -7,6 +7,7 @@ import {
     PSelectButton, PDatePagination, PLink, PDataTable, PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import { cloneDeep, isEqual, sum } from 'lodash';
 
@@ -15,6 +16,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -63,10 +65,10 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
-    targetSelectItems: [
-        GROUP_BY_ITEM_MAP.workspace_id,
-        GROUP_BY_ITEM_MAP.provider,
-    ],
+    targetSelectItems: computed(() => ([
+        { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+        { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
+    ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
