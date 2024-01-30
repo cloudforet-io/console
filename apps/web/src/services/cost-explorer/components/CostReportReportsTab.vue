@@ -37,13 +37,14 @@ const costReportPageState = costReportPageStore.state;
 const state = reactive({
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
     periodMenuItems: computed<MenuItem[]>(() => {
+        const locale = i18n.locale;
         const thisMonth = dayjs.utc();
         const last12Months = Array.from({ length: 12 }, (_, i) => thisMonth.subtract(i, 'month'));
         return [
-            { name: 'all', label: 'All' },
-            ...last12Months.map((month) => ({ name: month.format('YYYY-MM'), label: month.format('MMMM YYYY') })),
+            { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.ALL') },
+            ...last12Months.map((month) => ({ name: month.locale(locale).format('YYYY-MM'), label: month.locale(locale).format('MMMM YYYY') })),
             { type: 'divider' },
-            { name: 'custom', label: 'Custom' },
+            { name: 'custom', label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.CUSTOM') },
         ];
     }),
     originalSelectedPeriod: 'all',
@@ -234,7 +235,7 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
                                 :menu="state.periodMenuItems"
                                 :selected="state.selectedPeriod"
                                 reset-selection-on-menu-close
-                                selection-label="Period"
+                                :selection-label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.PERIOD')"
                                 style-type="rounded"
                                 class="period-select-dropdown"
                                 @select="handleSelectPeriodMenuItem"
@@ -352,6 +353,15 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
     .report-link {
         @apply flex items-center text-blue-700;
         gap: 0.25rem;
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    &.period-select-dropdown {
+        .selected-item-text {
+            margin-top: -0.005rem;
+        }
     }
 }
 </style>
