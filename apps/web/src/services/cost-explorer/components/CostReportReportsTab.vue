@@ -38,7 +38,7 @@ const state = reactive({
     currency: computed(() => costReportPageState.costReportConfig?.currency || 'KRW' as Currency),
     periodMenuItems: computed<MenuItem[]>(() => {
         const thisMonth = dayjs.utc();
-        const last12Months = Array.from({ length: 12 }, (_, i) => thisMonth.subtract(i, 'month')).reverse();
+        const last12Months = Array.from({ length: 12 }, (_, i) => thisMonth.subtract(i, 'month'));
         return [
             { name: 'all', label: 'All' },
             ...last12Months.map((month) => ({ name: month.format('YYYY-MM'), label: month.format('MMMM YYYY') })),
@@ -81,7 +81,6 @@ const tableState = reactive({
 
 
 const costReportListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
     .setSort('issue_date', true);
 let costReportListApiQuery = costReportListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
@@ -167,7 +166,7 @@ const getCostReportsList = (options: any = {}) => {
     }
     if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
     if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
-
+    costReportListApiQueryHelper.setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit);
     costReportPageStore.fetchCostReportsList({
         query: costReportListApiQuery,
     });
