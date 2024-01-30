@@ -64,7 +64,10 @@ interface State {
     totalCost: ComputedRef<number>;
     data?: AnalyzeResponse<CostReportDataAnalyzeResult>|undefined;
     chartData: ComputedRef<ChartData[]>;
+    numberFormatterOption: ComputedRef<Intl.NumberFormatOptions>;
 }
+
+
 const props = withDefaults(defineProps<Props>(), {
     accessToken: undefined,
     costReportId: undefined,
@@ -99,6 +102,7 @@ const state = reactive<State>({
             fill: storeState.providers[d.provider]?.color,
         },
     })) ?? []),
+    numberFormatterOption: computed(() => ({ currency: state.currency, style: 'decimal', notation: 'standard' })),
 });
 
 const originDataState = reactive({
@@ -426,7 +430,7 @@ const setRootTagStyle = () => {
                 <div class="total-value-wrapper">
                     <div class="total-cost">
                         <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, {currency:state.currency, style: 'decimal'}) }}</span>
+                        <span class="total-text">{{ currencyMoneyFormatter(state.totalCost, state.numberFormatterOption) }}</span>
                     </div>
                     <div class="currency-value">
                         {{ state.currency }}
@@ -490,7 +494,7 @@ const setRootTagStyle = () => {
                             </div>
                         </template>
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -505,7 +509,7 @@ const setRootTagStyle = () => {
                      :key="idx"
                 >
                     <table-header :title="storeState.providers[provider]?.label"
-                                  :sub-total="currencyMoneyFormatter(tableState.costByProductData[provider].subtotal, {currency:state.currency, style: 'decimal'})"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByProductData[provider].subtotal, state.numberFormatterOption)"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
                     <p-data-table :fields="tableState.costByProductFields"
@@ -518,7 +522,7 @@ const setRootTagStyle = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
@@ -536,7 +540,7 @@ const setRootTagStyle = () => {
                               :disable-hover="true"
                 >
                     <template #col-amount-format="{value}">
-                        {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                        {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                     </template>
                 </p-data-table>
             </div>
@@ -550,7 +554,7 @@ const setRootTagStyle = () => {
                      :key="idx"
                 >
                     <table-header :title="provider"
-                                  :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal, {currency:state.currency, style: 'decimal'})"
+                                  :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal,state.numberFormatterOption)"
                                   :provider="storeState.providers[provider]?.label"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
                     />
@@ -564,7 +568,7 @@ const setRootTagStyle = () => {
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
-                            {{ currencyMoneyFormatter(value, {currency:state.currency, style: 'decimal'}) }}
+                            {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
                         </template>
                     </p-data-table>
                 </div>
