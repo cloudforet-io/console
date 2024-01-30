@@ -2,6 +2,7 @@ import type { CostReportConfigStatus } from '@/schema/cost-analysis/cost-report-
 import type { RoleType } from '@/schema/identity/role/type';
 
 import type { Currency } from '@/store/modules/settings/type';
+import type { LanguageCode } from '@/store/modules/user/type';
 
 
 export interface CostReportConfigModel {
@@ -17,7 +18,8 @@ export interface CostReportConfigModel {
     data_source_filter: {
         state: Extract<CostReportConfigStatus, 'ENABLED' | 'DISABLED'>;
         data_sources: string[];
-    }
+    };
+    language?: LanguageCode;
     domain_id: string;
     created_at: string;
     updated_at: string;

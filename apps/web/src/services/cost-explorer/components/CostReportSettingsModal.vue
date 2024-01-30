@@ -6,6 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
+import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -15,6 +16,8 @@ import { i18n } from '@/translations';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
+import { languages } from '@/store/modules/user/config';
+import type { LanguageCode } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -40,11 +43,15 @@ const costReportPageState = costReportPageStore.state;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     selectedCurrency: undefined as undefined|Currency,
+    selectedLanguage: undefined as undefined|LanguageCode,
     enableLastDay: false,
     currencyMenuItems: computed<SelectDropdownMenuItem[]>(() => Object.values(CURRENCY).map((currency) => ({
         name: currency,
         label: `${CURRENCY_SYMBOL[currency]} ${currency}`,
     }))),
+    languageMenuItems: map(languages, (d, k) => ({
+        type: 'item', label: d, name: k,
+    })) as SelectDropdownMenuItem[],
     upcomingIssueDateText: computed<string>(() => getUpcomingIssueDate(state.enableLastDay, issueDay.value)),
 });
 const {
@@ -99,6 +106,7 @@ const updateCostReportConfig = async () => {
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id ?? '',
             currency: state.selectedCurrency,
             issue_day: state.enableLastDay ? undefined : Number(issueDay.value),
+            language: state.selectedLanguage,
             is_last_day: state.enableLastDay,
         });
         costReportPageStore.setCostReportConfig(updatedConfig);
@@ -128,6 +136,7 @@ watch(() => props.visible, (visible) => {
     if (visible && costReportPageState.costReportConfig) {
         state.selectedCurrency = costReportPageState.costReportConfig?.currency;
         state.enableLastDay = costReportPageState.costReportConfig?.is_last_day;
+        state.selectedLanguage = costReportPageState.costReportConfig?.language;
         if (!costReportPageState.costReportConfig?.is_last_day) {
             setForm('issueDay', costReportPageState.costReportConfig?.issue_day);
         } else {
@@ -146,6 +155,15 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <div class="modal-content-wrapper">
+                <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.LANGUAGE')"
+                               required
+                >
+                    <p-select-dropdown :menu="state.languageMenuItems"
+                                       :selected.sync="state.selectedLanguage"
+                                       :page-size="10"
+                                       class="input-field"
+                    />
+                </p-field-group>
                 <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_REPORT.CURRENCY')"
                                required
                 >
