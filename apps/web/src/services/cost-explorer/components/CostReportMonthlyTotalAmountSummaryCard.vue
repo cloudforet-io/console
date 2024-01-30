@@ -6,6 +6,7 @@ import {
 import {
     PSelectButton, PDatePagination, PDataTable, PSkeleton, PDataLoader, PTextButton, PI,
 } from '@spaceone/design-system';
+import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import { cloneDeep, isEqual, sum } from 'lodash';
 
