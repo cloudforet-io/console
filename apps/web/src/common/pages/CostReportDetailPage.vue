@@ -432,28 +432,28 @@ const setBodyTag = () => {
                 <p-link :to="{ ...router.currentRoute, hash: '#total-amount-by-provider' }"
                         class="table-link"
                         highlight
-                        use-hash-scroll
+                        use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.TOTAL_AMOUNT_BY_PROVIDER') }}
                 </p-link>
                 <p-link :to="{ ...router.currentRoute, hash: '#details-by-product' }"
                         class="table-link"
                         highlight
-                        use-hash-scroll
+                        use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
                 </p-link>
                 <p-link :to="{ ...router.currentRoute, hash: '#details-by-project' }"
                         class="table-link"
                         highlight
-                        use-hash-scroll
+                        use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                 </p-link>
                 <p-link :to="{ ...router.currentRoute, hash: '#details-by-service-account' }"
                         class="table-link"
                         highlight
-                        use-hash-scroll
+                        use-anchor-scroll
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
                 </p-link>

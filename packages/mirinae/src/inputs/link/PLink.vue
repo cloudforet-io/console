@@ -10,7 +10,7 @@
                    :target="state.target"
                    :href="props.to ? (toHref || props.href ): props.href"
                    @click.stop="(event) => {
-                       if (props.useHashScroll) return;
+                       if (props.useAnchorScroll) return;
                        navigate(event);
                    }"
                 >
@@ -69,7 +69,7 @@ const props = withDefaults(defineProps<LinkProps>(), {
     actionIcon: 'none',
     href: undefined,
     to: undefined,
-    useHashScroll: false,
+    useAnchorScroll: false,
 });
 
 const linkRef = ref<HTMLElement|null>(null);
