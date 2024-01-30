@@ -134,6 +134,7 @@ const drawChart = () => {
     const chart = chartHelper.createDonutChart({
         paddingLeft: 20,
         paddingRight: 20,
+        innerRadius: 40,
     });
     const seriesSettings = {
         categoryField: 'category',
