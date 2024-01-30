@@ -447,7 +447,7 @@ const setBodyTag = () => {
                 >
                     {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
                 </p-link>
-                <p-link to="#details-by-service-account'"
+                <p-link to="#details-by-service-account"
                         class="table-link"
                         highlight
                 >
