@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PDataLoader, PLink, PDataTable } from '@spaceone/design-system';
+import { PLink, PDataTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -139,10 +139,10 @@ const tableState = reactive({
         const items = cloneDeep(originDataState.costByProduct);
         const convertedItemMap = {};
         if (!items.length) {
-            return ({
+            return {
                 subtotal: 0,
                 items: [],
-            });
+            };
         }
         items.forEach((item: {
             product: string;
@@ -177,10 +177,10 @@ const tableState = reactive({
     costByServiceAccountData: computed(() => {
         const items = cloneDeep(originDataState.costByServiceAccount);
         if (!items.length) {
-            return ({
+            return {
                 subtotal: 0,
                 items: [],
-            });
+            };
         }
         const convertedItemMap = {};
         items.forEach((item: {
@@ -350,8 +350,21 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     }
 };
 
+const setMetaTag = () => {
+    const viewportEl = document.querySelector('head meta[name="viewport"]');
+    if (viewportEl) viewportEl.attributes.content.value = 'width=928';
+};
+const setBodyTag = () => {
+    const bodyEl = document.querySelector('body');
+    const appEl = document.querySelector('#app');
+    if (bodyEl) bodyEl.style.height = 'auto';
+    if (appEl) appEl.style.height = 'auto';
+};
+
 (async () => {
     state.loading = true;
+    setMetaTag();
+    setBodyTag();
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
@@ -374,182 +387,178 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
 </script>
 
 <template>
-    <p-data-loader
-        class="cost-report-page"
-        :loading="state.loading"
-    >
-        <div class="contents-wrapper">
-            <div class="content">
-                <div class="header">
-                    <p class="main-title">
-                        {{ $t('COMMON.COST_REPORT.COST_REPORT') }}
-                    </p>
-                    <console-logo :size-ratio="0.8"
-                                  :position-fixed="false"
-                    />
-                </div>
-                <div class="invoice-information">
-                    <p class="report-name">
-                        {{ state.baseInfo?.cost_report_id }}
-                    </p>
-                    <p class="report-info">
-                        <label>{{ $t('COMMON.COST_REPORT.REPORT_NUMBER') }}:</label>{{ state.baseInfo?.report_number }}
-                    </p>
-                    <p class="report-info">
-                        <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
-                    </p>
-                    <p class="report-info">
-                        <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }}({{ state.baseInfo?.bank_name }})
-                    </p>
-                </div>
-                <div class="total"
-                     :style="{borderTopColor: gray[500], borderBottomColor: gray[200]}"
-                >
-                    <span class="title">{{ $t('COMMON.COST_REPORT.TOTAL') }}</span>
-                    <div class="total-value-wrapper">
-                        <div class="total-cost">
-                            <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.baseInfo?.currency] }}</span><span class="total-text">{{ numberFormatter(state.totalCost) }}</span>
-                        </div>
-                        <div class="currency-value">
-                            {{ state.baseInfo?.currency }}
-                        </div>
+    <div class="body">
+        <div class="invoice">
+            <div class="header">
+                <p class="main-title">
+                    {{ $t('COMMON.COST_REPORT.COST_REPORT') }}
+                </p>
+                <console-logo :size-ratio="0.8"
+                              :position-fixed="false"
+                              :is-hidden-if-tablet="false"
+                />
+            </div>
+            <div class="invoice-information">
+                <p class="report-name">
+                    {{ state.baseInfo?.workspace_name }}
+                </p>
+                <p class="report-info">
+                    <label>{{ $t('COMMON.COST_REPORT.REPORT_NUMBER') }}:</label>{{ state.baseInfo?.report_number }}
+                </p>
+                <p class="report-info">
+                    <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
+                </p>
+                <p class="report-info">
+                    <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }}({{ state.baseInfo?.bank_name }})
+                </p>
+            </div>
+            <div class="total"
+                 :style="{borderTopColor: gray[500], borderBottomColor: gray[200]}"
+            >
+                <span class="title">{{ $t('COMMON.COST_REPORT.TOTAL') }}</span>
+                <div class="total-value-wrapper">
+                    <div class="total-cost">
+                        <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.baseInfo?.currency] }}</span><span class="total-text">{{ numberFormatter(state.totalCost) }}</span>
+                    </div>
+                    <div class="currency-value">
+                        {{ state.baseInfo?.currency }}
                     </div>
                 </div>
-                <div class="index-wrapper">
-                    <p class="title">
-                        {{ $t('COMMON.COST_REPORT.INDEX') }}
-                    </p>
-                    <p-link to="#total-amount-by-provider"
-                            class="table-link"
-                            highlight
-                    >
-                        {{ $t('COMMON.COST_REPORT.TOTAL_AMOUNT_BY_PROVIDER') }}
-                    </p-link>
-                    <p-link to="#details-by-product"
-                            class="table-link"
-                            highlight
-                    >
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
-                    </p-link>
-                    <p-link to="#details-by-project"
-                            class="table-link"
-                            highlight
-                    >
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
-                    </p-link>
-                    <p-link to="#details-by-service-account'"
-                            class="table-link"
-                            highlight
-                    >
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
-                    </p-link>
-                </div>
-                <div id="total-amount-by-provider">
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                    <div class="table">
-                        <p class="title">
-                            {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
-                        </p>
-                        <p-data-table :fields="tableState.costByProviderFields"
-                                      :items="tableState.costByProviderData"
-                                      :selectable="false"
-                                      :disable-copy="true"
-                                      :disable-hover="true"
-                        >
-                            <template #col-provider-format="{item, value}">
-                                <div class="legend">
-                                    <span class="legend-icon"
-                                          :style="{ 'background-color': storeState.providers[value]?.color }"
-                                    /><span>{{ value }}</span><span v-if="state.totalCost"
-                                                                    class="ratio"
-                                    >{{ ((item.amount / state.totalCost) * 100).toFixed(0) }}%</span>
-                                </div>
-                            </template>
-                            <template #col-amount-format="{value}">
-                                {{ numberFormatter(value) }}
-                            </template>
-                        </p-data-table>
-                    </div>
-                </div>
-                <div id="details-by-product"
-                     class="data-table-section"
+            </div>
+            <div class="index-wrapper">
+                <p class="title">
+                    {{ $t('COMMON.COST_REPORT.INDEX') }}
+                </p>
+                <p-link to="#total-amount-by-provider"
+                        class="table-link"
+                        highlight
                 >
-                    <p class="title">
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
-                    </p>
-                    <div v-for="(provider, idx) in Object.keys(tableState.costByProductData)"
-                         :key="idx"
-                    >
-                        <table-header :title="storeState.providers[provider]?.label"
-                                      :sub-total="numberFormatter(tableState.costByProductData[provider].subtotal)"
-                                      :provider-icon-src="storeState.providers[provider]?.icon"
-                        />
-                        <p-data-table :fields="tableState.costByProductFields"
-                                      :items="tableState.costByProductData[provider]?.items"
-                                      :skeleton-rows="3"
-                                      :stripe="false"
-                                      :selectable="false"
-                                      :disable-copy="true"
-                                      :disable-hover="true"
-                                      class="budget-summary-table"
-                        >
-                            <template #col-amount-format="{value}">
-                                {{ numberFormatter(value) }}
-                            </template>
-                        </p-data-table>
-                    </div>
-                </div>
-                <div id="details-by-project"
-                     class="data-table-section"
+                    {{ $t('COMMON.COST_REPORT.TOTAL_AMOUNT_BY_PROVIDER') }}
+                </p-link>
+                <p-link to="#details-by-product"
+                        class="table-link"
+                        highlight
                 >
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
+                </p-link>
+                <p-link to="#details-by-project"
+                        class="table-link"
+                        highlight
+                >
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
+                </p-link>
+                <p-link to="#details-by-service-account"
+                        class="table-link"
+                        highlight
+                >
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
+                </p-link>
+            </div>
+            <div id="total-amount-by-provider">
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="table">
                     <p class="title">
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
+                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROVIDER') }}
                     </p>
-                    <p-data-table :fields="tableState.costByProjectFields"
-                                  :items="tableState.costByProjectData"
+                    <p-data-table :fields="tableState.costByProviderFields"
+                                  :items="tableState.costByProviderData"
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                    >
+                        <template #col-provider-format="{item, value}">
+                            <div class="legend">
+                                <span class="legend-icon"
+                                      :style="{ 'background-color': storeState.providers[value]?.color }"
+                                /><span>{{ value }}</span><span v-if="state.totalCost"
+                                                                class="ratio"
+                                >{{ ((item.amount / state.totalCost) * 100).toFixed(0) }}%</span>
+                            </div>
+                        </template>
+                        <template #col-amount-format="{value}">
+                            {{ numberFormatter(value) }}
+                        </template>
+                    </p-data-table>
+                </div>
+            </div>
+            <div id="details-by-product"
+                 class="data-table-section"
+            >
+                <p class="title">
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PRODUCT') }}
+                </p>
+                <div v-for="(provider, idx) in Object.keys(tableState.costByProductData)"
+                     :key="idx"
+                >
+                    <table-header :title="storeState.providers[provider]?.label"
+                                  :sub-total="numberFormatter(tableState.costByProductData[provider].subtotal)"
+                                  :provider-icon-src="storeState.providers[provider]?.icon"
+                    />
+                    <p-data-table :fields="tableState.costByProductFields"
+                                  :items="tableState.costByProductData[provider]?.items"
+                                  :skeleton-rows="3"
+                                  :stripe="false"
+                                  :selectable="false"
+                                  :disable-copy="true"
+                                  :disable-hover="true"
+                                  class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
                             {{ numberFormatter(value) }}
                         </template>
                     </p-data-table>
                 </div>
-                <div id="details-by-service-account"
-                     class="data-table-section"
+            </div>
+            <div id="details-by-project"
+                 class="data-table-section"
+            >
+                <p class="title">
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_PROJECT') }}
+                </p>
+                <p-data-table :fields="tableState.costByProjectFields"
+                              :items="tableState.costByProjectData"
+                              :selectable="false"
+                              :disable-copy="true"
+                              :disable-hover="true"
                 >
-                    <p class="title">
-                        {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
-                    </p>
-                    <div v-for="(provider, idx) in Object.keys(tableState.costByServiceAccountData)"
-                         :key="idx"
+                    <template #col-amount-format="{value}">
+                        {{ numberFormatter(value) }}
+                    </template>
+                </p-data-table>
+            </div>
+            <div id="details-by-service-account"
+                 class="data-table-section"
+            >
+                <p class="title">
+                    {{ $t('COMMON.COST_REPORT.DETAILS_BY_SERVICE_ACCOUNT') }}
+                </p>
+                <div v-for="(provider, idx) in Object.keys(tableState.costByServiceAccountData)"
+                     :key="idx"
+                >
+                    <table-header :title="provider"
+                                  :sub-total="numberFormatter(tableState.costByServiceAccountData[provider]?.subtotal)"
+                                  :provider="storeState.providers[provider]?.label"
+                                  :provider-icon-src="storeState.providers[provider]?.icon"
+                    />
+                    <p-data-table :fields="tableState.costByServiceAccountFields"
+                                  :items="tableState.costByServiceAccountData[provider]?.items"
+                                  :skeleton-rows="3"
+                                  :stripe="false"
+                                  :selectable="false"
+                                  :disable-copy="true"
+                                  :disable-hover="true"
+                                  class="budget-summary-table"
                     >
-                        <table-header :title="provider"
-                                      :sub-total="numberFormatter(tableState.costByServiceAccountData[provider]?.subtotal)"
-                                      :provider="storeState.providers[provider]?.label"
-                                      :provider-icon-src="storeState.providers[provider]?.icon"
-                        />
-                        <p-data-table :fields="tableState.costByServiceAccountFields"
-                                      :items="tableState.costByServiceAccountData[provider]?.items"
-                                      :skeleton-rows="3"
-                                      :stripe="false"
-                                      :selectable="false"
-                                      :disable-copy="true"
-                                      :disable-hover="true"
-                                      class="budget-summary-table"
-                        >
-                            <template #col-amount-format="{value}">
-                                {{ numberFormatter(value) }}
-                            </template>
-                        </p-data-table>
-                    </div>
+                        <template #col-amount-format="{value}">
+                            {{ numberFormatter(value) }}
+                        </template>
+                    </p-data-table>
                 </div>
             </div>
         </div>
-    </p-data-loader>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -558,92 +567,93 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     margin-bottom: 0.75rem;
 }
 
-.cost-report-page {
-    &:deep() {
-        @apply bg-white;
-        overflow-y: auto;
-    }
+.body {
+    @apply flex justify-center bg-white;
+    font-size: 0.9625rem;
+    font-family: Helvetica, Arial, sans-serif;
+    color: #232533;
+    font-weight: 400;
+    overflow: auto;
+    .invoice {
+        width: 100%;
+        min-width: 7.6in;
+        max-width: 8.5in;
+        margin: 0 1rem;
+        padding: 1.4rem 0 3rem 0;
 
-    .contents-wrapper {
-        @apply flex flex-col items-center justify-center;
-        .content {
-            padding: 1.4rem 0 3rem 0;
-            width: 48rem;
+        .header {
+            @apply flex items-end justify-between;
+            width: 100%;
+            .main-title {
+                @apply text-display-lg font-bold;
+            }
+        }
 
-            .header {
-                @apply flex items-end justify-between;
-                width: 100%;
-                .main-title {
-                    @apply text-display-lg font-bold;
-                }
+        .invoice-information {
+            @apply flex flex-col;
+            margin: 3rem 0;
+
+            .report-name {
+                @apply text-display-md;
             }
 
-            .invoice-information {
-                @apply flex flex-col;
-                margin: 3rem 0;
+            .report-info {
+                @apply text-label-md;
+                margin-top: 0.5rem;
 
-                .report-name {
-                    @apply text-display-md;
+                & label {
+                    @apply text-label-md font-bold;
+                    margin-right: 0.5rem;
                 }
 
-                .report-info {
-                    @apply text-label-md;
-                    margin-top: 0.5rem;
-
-                    & label {
-                        @apply text-label-md font-bold;
-                        margin-right: 0.5rem;
-                    }
-
-                    &:nth-child(2) {
-                        margin-top: 1.5rem;
-                    }
-                    &:nth-child(3) {
-                        margin-bottom: 1.5rem;
-                        .real-date-range {
-                            @apply text-label-md text-gray-500;
-                        }
-                    }
+                &:nth-child(2) {
+                    margin-top: 1.5rem;
                 }
-            }
-
-            .total {
-                @apply border-t border-b flex  justify-between;
-                padding-top: 0.875rem;
-                height: 4.75rem;
-
-                .total-value-wrapper {
-                    @apply flex flex-col items-end;
-                    .total-cost {
-                        @apply flex items-center;
-                        .currency-symbol {
-                            @apply text-label-lg;
-                            margin-right: 0.25rem;
-                        }
-                        .total-text {
-                            @apply text-display-md;
-                        }
-                    }
-
-                    .currency-value {
+                &:nth-child(3) {
+                    margin-bottom: 1.5rem;
+                    .real-date-range {
                         @apply text-label-md text-gray-500;
                     }
                 }
             }
+        }
 
-            .index-wrapper {
-                @apply flex flex-col;
-                margin-top: 2rem;
-                margin-bottom: 2.25rem;
-                .table-link {
-                    margin-bottom: 0.75rem;
+        .total {
+            @apply border-t border-b flex  justify-between;
+            padding-top: 0.875rem;
+            height: 4.75rem;
+
+            .total-value-wrapper {
+                @apply flex flex-col items-end;
+                .total-cost {
+                    @apply flex items-center;
+                    .currency-symbol {
+                        @apply text-label-lg;
+                        margin-right: 0.25rem;
+                    }
+                    .total-text {
+                        @apply text-display-md;
+                    }
+                }
+
+                .currency-value {
+                    @apply text-label-md text-gray-500;
                 }
             }
+        }
 
-            .data-table-section {
-                margin-bottom: 3rem;
-                margin-left: 33%;
+        .index-wrapper {
+            @apply flex flex-col;
+            margin-top: 2rem;
+            margin-bottom: 2.25rem;
+            .table-link {
+                margin-bottom: 0.75rem;
             }
+        }
+
+        .data-table-section {
+            margin-bottom: 3rem;
+            margin-left: 33%;
         }
     }
 }

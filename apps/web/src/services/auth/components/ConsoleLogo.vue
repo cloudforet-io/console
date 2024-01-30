@@ -7,11 +7,13 @@ import { store } from '@/store';
 interface Props {
     sizeRatio?: number;
     positionFixed?: boolean;
+    isHiddenIfTablet?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     sizeRatio: 1,
     positionFixed: true,
+    isHiddenIfTablet: true,
 });
 
 const state = reactive({
@@ -34,6 +36,7 @@ const state = reactive({
 
 <template>
     <div class="ci-wrapper"
+         :class="{ 'hidden-option': props.isHiddenIfTablet }"
          :style="{ position: props.positionFixed ? 'fixed' : 'static'}"
     >
         <!--logo image-->
@@ -62,8 +65,10 @@ const state = reactive({
     @apply flex;
     flex-flow: row;
     z-index: 1000;
+}
 
-    @screen tablet {
+@screen tablet {
+    .hidden-option {
         @apply hidden;
     }
 }
