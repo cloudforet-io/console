@@ -568,10 +568,8 @@ const setBodyTag = () => {
 }
 
 .body {
-    display: flex;
-    justify-content: center;
-    background: #FFF;
-    font-size: 15.4px;
+    @apply flex justify-center bg-white;
+    font-size: 0.9625rem;
     font-family: Helvetica, Arial, sans-serif;
     color: #232533;
     font-weight: 400;
