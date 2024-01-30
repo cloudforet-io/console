@@ -175,7 +175,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
 </script>
 
 <template>
-    <cost-report-overview-card-template>
+    <cost-report-overview-card-template display-block-in-mobile>
         <template #title>
             <span class="title">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.MONTHLY_TOTAL_AMOUNT_SUMMARY') }}
@@ -280,6 +280,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
 .select-button-wrapper {
     display: flex;
     gap: 0.25rem;
+    padding-top: 0.5rem;
 }
 .summary-wrapper {
     padding-top: 1rem;
@@ -314,7 +315,7 @@ watch([() => state.currentDate, () => state.selectedTarget, () => costReportPage
 }
 .chart {
     width: 100%;
-    height: 12rem;
+    height: 11rem;
 }
 .summary-data-table {
     max-height: 19rem;
