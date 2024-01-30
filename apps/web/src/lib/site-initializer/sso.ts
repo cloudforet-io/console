@@ -9,8 +9,9 @@ import { loadAuth } from '@/services/auth/authenticator/loader';
 const SSO_TOKEN_PAGES = ['/reset-password', '/expired-link', '/cost-report'];
 
 export const checkSsoAccessToken = async (store) => {
-    if (SSO_TOKEN_PAGES.includes(window.location.pathname)) {
-        if (isMobile()) store.dispatch('display/showMobileGuideModal');
+    const currentPath = window.location.pathname;
+    if (SSO_TOKEN_PAGES.includes(currentPath)) {
+        if (isMobile() && (currentPath !== '/cost-report')) store.dispatch('display/showMobileGuideModal');
         return;
     }
 

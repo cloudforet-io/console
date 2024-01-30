@@ -78,7 +78,11 @@ const goToSignIn = async () => {
     await router.push(res);
     state.isRoutingToSignIn = false;
 };
-const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
+const showsBrowserRecommendation = () => {
+    const currentPath = window.location.pathname;
+    if (currentPath === '/cost-report') return false;
+    return (!supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation'));
+};
 
 watch(() => route.path, () => {
     state.notificationEmailModalVisible = route.path !== '/'
