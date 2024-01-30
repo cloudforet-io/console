@@ -95,6 +95,7 @@ const state = reactive({
                 id: MENU_ID.COST_REPORT,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId),
                 to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME }),
+                highlightTag: 'new',
             });
         }
         return menuSet;
