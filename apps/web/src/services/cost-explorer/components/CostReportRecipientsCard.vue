@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
-    PTooltip, PI, PToggleButton, PButton,
+    PTooltip, PI, PToggleButton, PLink,
 } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -28,7 +28,6 @@ import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
-const router = useRouter();
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
@@ -64,9 +63,6 @@ const handleToggleRecipients = async (val: boolean) => {
     const result = await updateRecipients(val);
     if (result) state.enableWorkspaceOwnerRecipients = val;
 };
-const handleClickManageRoles = () => {
-    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) });
-};
 
 /* Watcher */
 watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
@@ -80,6 +76,17 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
             <span class="title">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.REPORT_RECIPIENTS') }}
             </span>
+        </template>
+        <template #right-extra>
+            <p-link v-if="storeState.isAdminMode"
+                    :action-icon="ACTION_ICON.INTERNAL_LINK"
+                    highlight
+                    :to="{ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) }"
+                    size="md"
+                    new-tab
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.MANAGE_ROLES') }}
+            </p-link>
         </template>
         <template #content>
             <div class="recipient-wrapper">
@@ -112,15 +119,6 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
                     {{ state.enableWorkspaceOwnerRecipients ? 'ON' : 'OFF' }}
                 </span>
             </div>
-            <p-button v-if="storeState.isAdminMode"
-                      class="manage-roles-button"
-                      style-type="tertiary"
-                      icon-left="ic_settings"
-                      size="sm"
-                      @click="handleClickManageRoles"
-            >
-                {{ $t('BILLING.COST_MANAGEMENT.COST_REPORT.MANAGE_ROLES') }}
-            </p-button>
         </template>
     </cost-report-overview-card-template>
 </template>
@@ -154,9 +152,5 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
             @apply text-secondary;
         }
     }
-}
-.manage-roles-button {
-    margin-top: 0.75rem;
-    width: 100%;
 }
 </style>
