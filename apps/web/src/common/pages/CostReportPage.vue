@@ -138,6 +138,12 @@ const tableState = reactive({
     costByProductData: computed<CostByProductData>(() => {
         const items = cloneDeep(originDataState.costByProduct);
         const convertedItemMap = {};
+        if (!items.length) {
+            return ({
+                subtotal: 0,
+                items: [],
+            });
+        }
         items.forEach((item: {
             product: string;
             provider: string;
@@ -170,6 +176,12 @@ const tableState = reactive({
     }, state.baseInfo?.currency)),
     costByServiceAccountData: computed(() => {
         const items = cloneDeep(originDataState.costByServiceAccount);
+        if (!items.length) {
+            return ({
+                subtotal: 0,
+                items: [],
+            });
+        }
         const convertedItemMap = {};
         items.forEach((item: {
             service_account_name: string;
