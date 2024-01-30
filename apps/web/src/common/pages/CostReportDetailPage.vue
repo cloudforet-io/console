@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
-import {
-    computed, reactive, ref,
-} from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PLink, PDataTable } from '@spaceone/design-system';
@@ -358,17 +356,20 @@ const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
     if (viewportEl) viewportEl.attributes.content.value = 'width=928';
 };
-const setBodyTag = () => {
+const setRootTagStyle = () => {
+    const htmlEl = document.querySelector('html');
     const bodyEl = document.querySelector('body');
     const appEl = document.querySelector('#app');
-    if (bodyEl) bodyEl.style.height = 'auto';
-    if (appEl) appEl.style.height = 'auto';
+    if (htmlEl) {
+        htmlEl.style.height = 'unset';
+        htmlEl.style.overflow = 'auto';
+    }
+    if (bodyEl) bodyEl.style.height = 'unset';
+    if (appEl) appEl.style.height = 'unset';
 };
 
 (async () => {
     state.loading = true;
-    setMetaTag();
-    setBodyTag();
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
@@ -386,6 +387,8 @@ const setBodyTag = () => {
     await setI18nLocale(props.language);
     state.loading = false;
     drawChart();
+    setMetaTag();
+    setRootTagStyle();
 })();
 
 </script>
