@@ -10,7 +10,7 @@ export const makeAdminRouteName = (routeName: string): string => {
 
 
 export const getRouteScope = (route: Route): RouteScopeType => {
-    const routeScope = route.matched[1].meta?.scope;
+    const routeScope = route.matched[1]?.meta?.scope;
     if (!routeScope) return ROUTE_SCOPE.EXCLUDE_AUTH;
     return routeScope;
 };
