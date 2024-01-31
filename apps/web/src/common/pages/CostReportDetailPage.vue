@@ -489,8 +489,9 @@ const setRootTagStyle = () => {
                             <div class="legend">
                                 <span class="legend-icon"
                                       :style="{ 'background-color': storeState.providers[value]?.color }"
-                                /><span>{{ value }}</span><span v-if="state.totalCost"
-                                                                class="ratio"
+                                /><span>{{ storeState.providers[value]?.label ?? value }}</span>
+                                <span v-if="state.totalCost"
+                                      class="ratio"
                                 >{{ ((item.amount / state.totalCost) * 100).toFixed(0) }}%</span>
                             </div>
                         </template>
@@ -556,7 +557,7 @@ const setRootTagStyle = () => {
                 <div v-for="(provider, idx) in Object.keys(tableState.costByServiceAccountData)"
                      :key="idx"
                 >
-                    <table-header :title="provider"
+                    <table-header :title="storeState.providers[provider]?.label ?? provider"
                                   :sub-total="currencyMoneyFormatter(tableState.costByServiceAccountData[provider]?.subtotal,state.numberFormatterOption)"
                                   :provider="storeState.providers[provider]?.label"
                                   :provider-icon-src="storeState.providers[provider]?.icon"
