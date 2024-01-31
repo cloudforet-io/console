@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectButton, PDatePagination, PDataTable, PSkeleton, PDataLoader, PTextButton, PI,
+    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI,
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
@@ -275,19 +275,15 @@ watch(() => state.currentDate, () => {
                              color="inherit"
                         />
                     </p-text-button>
-                    <p-data-loader class="chart-wrapper"
-                                   :loading="state.loading"
-                                   :data="state.chartData"
-                    >
-                        <template #loader>
-                            <p-skeleton height="15rem"
-                                        width="100%"
-                            />
-                        </template>
+                    <div class="chart-wrapper">
+                        <p-skeleton v-if="state.loading"
+                                    height="15rem"
+                                    width="100%"
+                        />
                         <div ref="chartContext"
                              class="chart"
                         />
-                    </p-data-loader>
+                    </div>
                 </div>
                 <div class="right-part">
                     <p-data-table :fields="state.tableFields"
@@ -357,12 +353,11 @@ watch(() => state.currentDate, () => {
         }
     }
     .chart-wrapper {
-        height: 12rem;
         padding-top: 0.5rem;
     }
     .chart {
         width: 100%;
-        height: 11rem;
+        height: 12rem;
     }
 }
 .right-part {
