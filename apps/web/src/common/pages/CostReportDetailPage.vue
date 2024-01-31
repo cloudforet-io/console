@@ -295,8 +295,6 @@ const fetchReportData = async () => {
     } catch (e: any) {
         ErrorHandler.handleError(e);
         await router.push({ name: ERROR_ROUTE.EXPIRED_LINK._NAME });
-    } finally {
-        state.loading = false;
     }
 };
 
@@ -356,6 +354,18 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     }
 };
 
+const fetchTableData = async () => {
+    const results = await Promise.allSettled<AnalyzeDataModel|undefined>([
+        fetchAnalyzeData(['provider', 'product']),
+        fetchAnalyzeData(['project_name']),
+        fetchAnalyzeData(['provider', 'service_account_name']),
+    ]);
+    const [costByProduct, costByProject, costByServiceAccount] = results;
+    originDataState.costByProduct = costByProduct.value.results;
+    originDataState.costByProject = costByProject.value.results;
+    originDataState.costByServiceAccount = costByServiceAccount.value.results;
+};
+
 const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
     if (viewportEl) viewportEl.attributes.content.value = 'width=928';
@@ -373,25 +383,16 @@ const setRootTagStyle = () => {
 
 (async () => {
     setMetaTag();
-    setRootTagStyle();
     state.loading = true;
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
     await store.dispatch('reference/provider/load');
-    await Promise.allSettled<AnalyzeDataModel|undefined>([
-        fetchAnalyzeData(['provider', 'product']),
-        fetchAnalyzeData(['project_name']),
-        fetchAnalyzeData(['provider', 'service_account_name']),
-    ]).then((results) => {
-        const [costByProduct, costByProject, costByServiceAccount] = results;
-        originDataState.costByProduct = costByProduct.value.results;
-        originDataState.costByProject = costByProject.value.results;
-        originDataState.costByServiceAccount = costByServiceAccount.value.results;
-    });
     await setI18nLocale(props.language);
+    await fetchTableData();
     state.loading = false;
     drawChart();
+    setRootTagStyle();
 })();
 
 </script>
@@ -482,6 +483,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                     >
                         <template #col-provider-format="{item, value}">
                             <div class="legend">
@@ -518,6 +520,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
@@ -537,6 +540,7 @@ const setRootTagStyle = () => {
                               :selectable="false"
                               :disable-copy="true"
                               :disable-hover="true"
+                              :loading="state.loading"
                 >
                     <template #col-amount-format="{value}">
                         {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
@@ -564,6 +568,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
