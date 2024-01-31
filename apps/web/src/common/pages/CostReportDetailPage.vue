@@ -730,10 +730,11 @@ const handlePrint = () => {
 
 .download-button {
     @apply fixed bottom-0 right-0;
-    box-shadow: 0px 2px 4px 0px #0000001A;
+    box-shadow: 0 2px 4px 0 #0000001a;
     margin: 2rem;
     z-index: 100;
 }
+
 @media print {
     .download-button {
         display: none;
