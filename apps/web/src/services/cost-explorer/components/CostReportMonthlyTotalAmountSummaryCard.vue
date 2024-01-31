@@ -277,10 +277,11 @@ watch(() => state.currentDate, () => {
                     </p-text-button>
                     <div class="chart-wrapper">
                         <p-skeleton v-if="state.loading"
-                                    height="15rem"
+                                    height="100%"
                                     width="100%"
                         />
-                        <div ref="chartContext"
+                        <div v-show="!state.loading"
+                             ref="chartContext"
                              class="chart"
                         />
                     </div>
@@ -354,10 +355,11 @@ watch(() => state.currentDate, () => {
     }
     .chart-wrapper {
         padding-top: 0.5rem;
+        height: 12rem;
     }
     .chart {
         width: 100%;
-        height: 12rem;
+        height: 100%;
     }
 }
 .right-part {
