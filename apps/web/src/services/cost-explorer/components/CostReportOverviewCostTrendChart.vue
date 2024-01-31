@@ -6,8 +6,7 @@ import {
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
-    PCollapsibleToggle,
-    PDataLoader, PDataTable, PSkeleton,
+    PCollapsibleToggle, PDataTable, PSkeleton,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -100,9 +99,6 @@ const state = reactive({
 const drawChart = () => {
     chartHelper.refreshRoot();
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
-    chart.get('cursor')?.lineX.setAll({
-        visible: true,
-    });
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -111,14 +107,6 @@ const drawChart = () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     yAxis.get('renderer').remove('labels');
-
-    // create tooltip
-    const tooltip = chartHelper.createTooltip();
-    const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
-    chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
-    chart.plotContainer.set('tooltipPosition', 'pointer');
-    chart.plotContainer.set('tooltipText', 'a');
-    chart.plotContainer.set('tooltip', tooltip);
 
     // set min value of yAxis
     state.legends.forEach((legend) => {
@@ -141,6 +129,10 @@ const drawChart = () => {
             dateFields: [DATE_FIELD_NAME],
         });
 
+        // create tooltip and set on series
+        const tooltip = chartHelper.createTooltip();
+        const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
+        chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
         // set tooltip
         series.set('tooltip', tooltip);
 
@@ -166,17 +158,14 @@ watch([() => props.loading, () => chartContext.value], async ([loading, _chartCo
 
 <template>
     <div>
-        <p-data-loader class="chart-wrapper"
-                       :loading="props.loading"
-                       :data="state.chartData"
-        >
-            <template #loader>
-                <p-skeleton height="100%" />
-            </template>
+        <div class="chart-wrapper">
+            <p-skeleton v-if="props.loading"
+                        height="100%"
+            />
             <div ref="chartContext"
                  class="chart"
             />
-        </p-data-loader>
+        </div>
         <div v-if="!state.isDetailsCollapsed">
             <p-data-table :fields="state.tableFields"
                           :items="state.tableItems"
