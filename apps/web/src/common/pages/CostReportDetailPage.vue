@@ -295,8 +295,6 @@ const fetchReportData = async () => {
     } catch (e: any) {
         ErrorHandler.handleError(e);
         await router.push({ name: ERROR_ROUTE.EXPIRED_LINK._NAME });
-    } finally {
-        state.loading = false;
     }
 };
 
@@ -356,6 +354,18 @@ const initStatesByUrlSSOToken = async ():Promise<boolean> => {
     }
 };
 
+const fetchTableData = async () => {
+    const results = await Promise.allSettled<AnalyzeDataModel|undefined>([
+        fetchAnalyzeData(['provider', 'product']),
+        fetchAnalyzeData(['project_name']),
+        fetchAnalyzeData(['provider', 'service_account_name']),
+    ]);
+    const [costByProduct, costByProject, costByServiceAccount] = results;
+    originDataState.costByProduct = costByProduct.value.results;
+    originDataState.costByProject = costByProject.value.results;
+    originDataState.costByServiceAccount = costByServiceAccount.value.results;
+};
+
 const setMetaTag = () => {
     const viewportEl = document.querySelector('head meta[name="viewport"]');
     if (viewportEl) viewportEl.attributes.content.value = 'width=928';
@@ -365,33 +375,23 @@ const setRootTagStyle = () => {
     const bodyEl = document.querySelector('body');
     const appEl = document.querySelector('#app');
     if (htmlEl) {
-        htmlEl.style.height = 'unset';
-        htmlEl.style.overflow = 'auto';
+        htmlEl.style.overflowY = 'auto';
     }
     if (bodyEl) bodyEl.style.height = 'unset';
     if (appEl) appEl.style.height = 'unset';
 };
 
 (async () => {
+    setMetaTag();
     state.loading = true;
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
     await store.dispatch('reference/provider/load');
-    await Promise.allSettled<AnalyzeDataModel|undefined>([
-        fetchAnalyzeData(['provider', 'product']),
-        fetchAnalyzeData(['project_name']),
-        fetchAnalyzeData(['provider', 'service_account_name']),
-    ]).then((results) => {
-        const [costByProduct, costByProject, costByServiceAccount] = results;
-        originDataState.costByProduct = costByProduct.value.results;
-        originDataState.costByProject = costByProject.value.results;
-        originDataState.costByServiceAccount = costByServiceAccount.value.results;
-    });
     await setI18nLocale(props.language);
+    await fetchTableData();
     state.loading = false;
     drawChart();
-    setMetaTag();
     setRootTagStyle();
 })();
 
@@ -420,7 +420,7 @@ const setRootTagStyle = () => {
                     <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
                 </p>
                 <p class="report-info">
-                    <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }}({{ state.baseInfo?.bank_name }})
+                    <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }} ({{ state.baseInfo?.bank_name }})
                 </p>
             </div>
             <div class="total"
@@ -483,6 +483,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                     >
                         <template #col-provider-format="{item, value}">
                             <div class="legend">
@@ -519,6 +520,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">
@@ -538,6 +540,7 @@ const setRootTagStyle = () => {
                               :selectable="false"
                               :disable-copy="true"
                               :disable-hover="true"
+                              :loading="state.loading"
                 >
                     <template #col-amount-format="{value}">
                         {{ currencyMoneyFormatter(value, state.numberFormatterOption) }}
@@ -565,6 +568,7 @@ const setRootTagStyle = () => {
                                   :selectable="false"
                                   :disable-copy="true"
                                   :disable-hover="true"
+                                  :loading="state.loading"
                                   class="budget-summary-table"
                     >
                         <template #col-amount-format="{value}">

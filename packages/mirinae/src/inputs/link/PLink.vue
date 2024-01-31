@@ -59,7 +59,7 @@ interface LinkProps {
     newTab?: boolean;
     href?: string;
     to?: Location;
-    useHashScroll?: boolean;
+    useAnchorScroll?: boolean;
 }
 
 const props = withDefaults(defineProps<LinkProps>(), {
