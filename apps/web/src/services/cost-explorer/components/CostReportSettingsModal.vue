@@ -177,7 +177,7 @@ watch(() => props.visible, (visible) => {
                         <template #menu-item--format="{item}">
                             <div class="menu-item">
                                 <span>{{ item?.label }}</span>
-                                <p-badge v-if="item.name === CURRENCY.USD"
+                                <p-badge v-if="item.name === CURRENCY.KRW"
                                          class="ml-1"
                                          badge-type="subtle"
                                          style-type="indigo100"
