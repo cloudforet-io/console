@@ -100,6 +100,9 @@ const state = reactive({
 const drawChart = () => {
     chartHelper.refreshRoot();
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
+    chart.get('cursor')?.lineX.setAll({
+        visible: true,
+    });
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -108,6 +111,14 @@ const drawChart = () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     yAxis.get('renderer').remove('labels');
+
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
+    chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
+    chart.plotContainer.set('tooltipPosition', 'pointer');
+    chart.plotContainer.set('tooltipText', 'a');
+    chart.plotContainer.set('tooltip', tooltip);
 
     // set min value of yAxis
     state.legends.forEach((legend) => {
@@ -130,10 +141,7 @@ const drawChart = () => {
             dateFields: [DATE_FIELD_NAME],
         });
 
-        // create tooltip and set on series
-        const tooltip = chartHelper.createTooltip();
-        const formatter = (value) => currencyMoneyFormatter(value, { currency: costReportPageGetters.currency, style: 'decimal' }) as string;
-        chartHelper.setXYSharedTooltipText(chart, tooltip, formatter);
+        // set tooltip
         series.set('tooltip', tooltip);
 
         // set data
