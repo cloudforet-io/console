@@ -359,8 +359,13 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
 /* custom design-system component - p-select-dropdown */
 :deep(.p-select-dropdown) {
     &.period-select-dropdown {
+        .selection-wrapper {
+            height: 1.125rem;
+            line-height: 1.125rem;
+        }
         .selected-item-text {
-            margin-top: -0.005rem;
+            @apply block;
+            height: 1.125rem;
         }
     }
 }
