@@ -35,4 +35,10 @@ export const getDatePaginationArgTypes = (): ArgTypes => ({
             options: ['UTC', 'Asia/Seoul'],
         },
     },
+    disableNextButton: {
+        name: 'disableNextButton',
+        type: { name: 'boolean' },
+        description: 'Decide whether to disable the next button',
+        defaultValue: false,
+    },
 });

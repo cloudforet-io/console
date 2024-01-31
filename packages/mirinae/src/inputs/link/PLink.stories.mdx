@@ -223,6 +223,27 @@ This component prevents the propagation of the click event by default.
 <br/>
 <br/>
 
+## Use Anchor Scroll
+
+<Canvas>
+    <Story name="Use Anchor Scroll">
+        {{
+            components: { PLink },
+            router,
+            template: `
+            <div>
+                <p-link class='block' highlight href="#first" use-anchor-scroll>First Section</p-link>
+                <p-link class='block' highlight href="#second"  use-anchor-scroll>Second Section</p-link>
+                <h1 id="first" class="py-8"># First Section</h1>
+                <h1 id="second" class="py-8"># Second Section</h1>
+            </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 

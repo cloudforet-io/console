@@ -20,6 +20,7 @@ const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin
 const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetDetailPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
+const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
 
 const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -127,6 +128,22 @@ const adminCostExplorerRoutes: RouteConfig = {
                     props: true,
                     meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
                     component: AdminBudgetDetailPage as any,
+                },
+            ],
+        },
+        {
+            path: 'cost-report',
+            meta: {
+                menuId: MENU_ID.COST_REPORT,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId,
+            },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
+                    meta: { lnbVisible: true },
+                    component: CostReportPage as any,
                 },
             ],
         },

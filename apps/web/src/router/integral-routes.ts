@@ -2,6 +2,7 @@ import type { RouteConfig } from 'vue-router';
 
 import { store } from '@/store';
 
+import { additionalRoutes } from '@/router/additional-routes';
 import { adminRoutes } from '@/router/admin-routes';
 import { ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
@@ -23,7 +24,7 @@ export const integralRoutes: RouteConfig[] = [
         }),
         children: [
             ...authRoutes,
-
+            ...additionalRoutes,
             {
                 path: '/admin',
                 name: ROOT_ROUTE.ADMIN._NAME,

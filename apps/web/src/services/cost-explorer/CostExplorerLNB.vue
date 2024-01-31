@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -71,21 +72,34 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
 });
 const state = reactive({
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
-    menuSet: computed<LNBMenu[]>(() => [
-        ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
-        ...filterLNBMenuByAccessPermission([
-            {
+    menuSet: computed<LNBMenu[]>(() => {
+        const menuSet = [
+            ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
+            ...filterLNBMenuByAccessPermission([
+                {
+                    type: 'item',
+                    id: MENU_ID.BUDGET,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
+                    to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
+                },
+            ], store.getters['user/pageAccessPermissionList']),
+        ];
+        if (storeState.isAdminMode || storeState.isWorkspaceOwner) {
+            menuSet.push({
                 type: 'item',
-                id: MENU_ID.BUDGET,
-                label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
-                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.BUDGET._NAME }),
-            },
-        ], store.getters['user/pageAccessPermissionList']),
-    ]),
+                id: MENU_ID.COST_REPORT,
+                label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId),
+                to: getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME }),
+                highlightTag: 'new',
+            });
+        }
+        return menuSet;
+    }),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
         (storeState.isAdminMode ? {} : { type: MENU_ITEM_TYPE.FAVORITE_ONLY }),
         {

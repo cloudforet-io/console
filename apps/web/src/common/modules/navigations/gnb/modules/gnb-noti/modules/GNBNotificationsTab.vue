@@ -7,7 +7,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty,
+    PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty, PTextBeautifier,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { Dayjs } from 'dayjs';
@@ -308,6 +308,7 @@ onMounted(() => {
                         <b>{{ $t('COMMON.GNB.NOTICE.DETAIL_LINK') }} </b>
                         <p-link :href="state.selectedItem.message.link"
                                 :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                                class="detail-link"
                         >
                             {{ state.selectedItem.message.link }}
                         </p-link>
@@ -316,7 +317,7 @@ onMounted(() => {
                 <div v-if="state.selectedItem.message.description"
                      class="description-wrapper"
                 >
-                    {{ state.selectedItem.message.description }}
+                    <p-text-beautifier :value="state.selectedItem.message.description" />
                 </div>
                 <div v-if="state.definitionData">
                     <p-definition-table :fields="state.definitionFields"
@@ -340,6 +341,13 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     min-height: 13rem;
+
+    /* custom design-system component - p-link */
+    .detail-link:deep {
+        > a {
+            display: inline;
+        }
+    }
 
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
@@ -393,6 +401,7 @@ onMounted(() => {
             line-height: 1.5;
             padding: 0.75rem 1rem;
             margin-bottom: 0.75rem;
+            white-space: pre-line;
         }
     }
 }

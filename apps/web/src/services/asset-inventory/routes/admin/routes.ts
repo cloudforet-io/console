@@ -14,7 +14,6 @@ const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetIn
 // const CloudServiceDetailPage = () => import('@/services/asset-inventory/pages/CloudServiceDetailPage.vue');
 // const CloudServiceSearch = () => import('@/services/asset-inventory/pages/CloudServiceSearchPage.vue');
 // const CloudServiceTypeSearch = () => import('@/services/asset-inventory/pages/CloudServiceTypeSearchPage.vue');
-//
 // const CloudServicePage = () => import('@/services/asset-inventory/pages/CloudServicePage.vue');
 // const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 //
@@ -32,7 +31,6 @@ const adminAssetInventoryRoute: RouteConfig = {
     meta: { menuId: MENU_ID.ASSET_INVENTORY, translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId },
     component: AssetInventoryContainer,
     children: [
-        // TODO: low priority features, so hide it for now
         // {
         //     path: 'cloud-service',
         //     meta: {

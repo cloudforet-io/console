@@ -114,7 +114,7 @@ const handleClickAnchor = (navigateFn, event: Event) => {
 
         .contents-left {
             @apply flex items-center;
-            width: 100%;
+            width: auto;
             .label {
                 @apply truncate;
                 display: inline-block;

@@ -1,6 +1,9 @@
 
 export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
+    EXPIRED_LINK: {
+        _NAME: 'expired-link',
+    },
 });
 export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',
@@ -10,6 +13,9 @@ export const ROOT_ROUTE = Object.freeze({
     ADMIN: {
         _NAME: 'admin',
     },
+    COST_REPORT: {
+        _NAME: 'cost-report',
+    },
 });
 
 export const ROUTE_SCOPE = {
@@ -18,3 +24,5 @@ export const ROUTE_SCOPE = {
     WORKSPACE: 'WORKSPACE',
     DOMAIN: 'DOMAIN',
 } as const;
+
+export const CostReportPath = '/cost-report';

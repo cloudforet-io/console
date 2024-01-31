@@ -9,7 +9,10 @@
                    :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
                    :target="state.target"
                    :href="props.to ? (toHref || props.href ): props.href"
-                   @click.stop="navigate"
+                   @click.stop="(event) => {
+                       if (props.useAnchorScroll) return;
+                       navigate(event);
+                   }"
                 >
                     <p-i v-if="state.hasText && !!props.iconLeft"
                          :name="props.iconLeft"
@@ -56,6 +59,7 @@ interface LinkProps {
     newTab?: boolean;
     href?: string;
     to?: Location;
+    useAnchorScroll?: boolean;
 }
 
 const props = withDefaults(defineProps<LinkProps>(), {
@@ -65,6 +69,7 @@ const props = withDefaults(defineProps<LinkProps>(), {
     actionIcon: 'none',
     href: undefined,
     to: undefined,
+    useAnchorScroll: false,
 });
 
 const linkRef = ref<HTMLElement|null>(null);

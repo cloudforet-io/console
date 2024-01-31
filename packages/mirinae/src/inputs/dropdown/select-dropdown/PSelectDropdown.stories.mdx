@@ -237,13 +237,13 @@ export const Template = (args, { argTypes }) => ({
                     <tbody>
                         <tr>
                             <th>default</th>
-                            <th v-for="styleType in styleTypes" :key="styleType">
+                            <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
                                 <p-select-dropdown :menu="menuItems" :styleType="styleType" class="m-2"/>
                             </th>
                         </tr>
                         <tr>
                             <th>readOnly</th>
-                            <th v-for="styleType in styleTypes" :key="styleType">
+                            <th v-for="styleType in styleTypes" :key="styleType" class="font-normal">
                                 <p-select-dropdown readonly :menu="menuItems" :styleType="styleType" class="m-2" />
                             </th>
                         </tr>
@@ -276,10 +276,10 @@ export const Template = (args, { argTypes }) => ({
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <th>
+                                                <th class="font-normal">
                                                     <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-6/12" invalid/>
                                                 </th>
-                                                <th>
+                                                <th class="font-normal">
                                                     <p-select-dropdown :menu="menuItems" styleType="rounded" class="m-2 mx-auto w-6/12" invalid/>
                                                 </th>
                                             </tr>
@@ -515,8 +515,8 @@ export const Template = (args, { argTypes }) => ({
                     </thead>
                     <tbody>
                         <tr >
-                            <th><p-select-dropdown :menu="menuItems" style-type="icon-button" /></th>
-                            <th><p-select-dropdown :menu="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
+                            <th class="font-normal"><p-select-dropdown :menu="menuItems" style-type="icon-button" /></th>
+                            <th class="font-normal"><p-select-dropdown :menu="menuItems" style-type="icon-button" button-icon="ic_settings" /></th>
                         </tr>
                     </tbody>
                 </table>
@@ -750,10 +750,10 @@ interface AutocompleteHandler {
                     </thead>
                     <tbody>
                         <tr>
-                            <th>
+                            <th class="font-normal">
                                 <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-24"  />
                             </th>
-                            <th>
+                            <th class="font-normal">
                                 <p-select-dropdown :menu="menuItems" class="m-2 mx-auto w-24" menu-position="right"/>
                             </th>
                         </tr>

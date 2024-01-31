@@ -88,7 +88,6 @@ onBeforeUnmount(() => {
     <div class="dashboard-customize">
         <dashboard-customize-page-name :name.sync="state.name"
                                        :dashboard-id="props.dashboardId"
-                                       :is-saving="props.loading"
                                        @update:name="handleUpdateDashboardName"
                                        @click-back-button="goBack"
         />

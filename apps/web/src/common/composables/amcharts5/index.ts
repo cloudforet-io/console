@@ -5,6 +5,7 @@ import {
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
+import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 import type * as am5map from '@amcharts/amcharts5/map';
 import * as am5percent from '@amcharts/amcharts5/percent';
@@ -28,6 +29,14 @@ import {
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
+const rootSettings: IRootSettings = {
+    tooltipContainerBounds: {
+        top: 100,
+        right: 1000,
+        bottom: 0,
+        left: 1000,
+    },
+};
 export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
 ) => {
@@ -39,7 +48,7 @@ export const useAmcharts5 = (
     const refreshRoot = () => {
         disposeRoot();
         if (state.chartContext) {
-            const root = am5.Root.new(state.chartContext as HTMLElement);
+            const root = am5.Root.new(state.chartContext as HTMLElement, rootSettings);
             state.root = root;
             initRoot(root);
         }
@@ -79,7 +88,7 @@ export const useAmcharts5 = (
     watch(() => state.chartContext, (ctx) => {
         if (ctx) {
             disposeRoot();
-            state.root = am5.Root.new(ctx);
+            state.root = am5.Root.new(ctx, rootSettings);
             initRoot(state.root as Root);
         }
     });
