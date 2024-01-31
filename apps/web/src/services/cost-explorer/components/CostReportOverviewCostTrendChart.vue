@@ -159,7 +159,9 @@ watch([() => props.loading, () => chartContext.value], async ([loading, _chartCo
 <template>
     <div>
         <div class="chart-wrapper">
-            <p-skeleton v-if="props.loading" height="100%" />
+            <p-skeleton v-if="props.loading"
+                        height="100%"
+            />
             <div ref="chartContext"
                  class="chart"
             />
