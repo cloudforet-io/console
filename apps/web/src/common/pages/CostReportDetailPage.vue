@@ -365,14 +365,15 @@ const setRootTagStyle = () => {
     const bodyEl = document.querySelector('body');
     const appEl = document.querySelector('#app');
     if (htmlEl) {
-        htmlEl.style.height = 'unset';
-        htmlEl.style.overflow = 'auto';
+        htmlEl.style.overflowY = 'auto';
     }
     if (bodyEl) bodyEl.style.height = 'unset';
     if (appEl) appEl.style.height = 'unset';
 };
 
 (async () => {
+    setMetaTag();
+    setRootTagStyle();
     state.loading = true;
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
@@ -391,8 +392,6 @@ const setRootTagStyle = () => {
     await setI18nLocale(props.language);
     state.loading = false;
     drawChart();
-    setMetaTag();
-    setRootTagStyle();
 })();
 
 </script>
@@ -420,7 +419,7 @@ const setRootTagStyle = () => {
                     <label>{{ $t('COMMON.COST_REPORT.ISSUE_DATE') }}:</label>{{ state.baseInfo?.issue_date }} <span class="real-date-range">({{ state.reportDateRage }})</span>
                 </p>
                 <p class="report-info">
-                    <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }}({{ state.baseInfo?.bank_name }})
+                    <label>{{ $t('COMMON.COST_REPORT.CURRENCY_REFERENCE') }}:</label> {{ state.baseInfo?.currency_date }} ({{ state.baseInfo?.bank_name }})
                 </p>
             </div>
             <div class="total"
