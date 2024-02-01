@@ -54,8 +54,9 @@ const state = reactive({
         const _default: SelectDropdownMenuItem = {
             name: 'last12Months', label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS')} (${_defaultStart} ~ ${_defaultEnd})`,
         };
+        const recentYear = dayjs.utc().year();
         const last3Years = Array.from({ length: 3 }).map((_, idx) => {
-            const _year = costReportPageGetters.recentReportDate.subtract(idx - 1, 'year').format('YYYY');
+            const _year = (recentYear - idx).toString();
             return {
                 name: _year, label: `${_year} (${_year}-01 ~ 12)`,
             };
