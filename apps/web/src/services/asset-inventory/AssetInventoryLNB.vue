@@ -55,7 +55,10 @@ export default defineComponent({
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId) as string),
             backLink: computed<BackLink|undefined>(() => {
                 if (!state.isCloudServiceDetailPage) return undefined;
-                return { label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
+                return {
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId),
+                    to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME }),
+                };
             }),
             topTitle: computed<TopTitle|undefined>(() => {
                 if (!state.detailPageParams) return undefined;
@@ -132,10 +135,12 @@ export default defineComponent({
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     }),
                 }]);
-                if (isAdminMode.value) return menu.concat(state.adminModeMenuSet);
+                const lnbMenuSet = isAdminMode.value
+                    ? menu.concat(state.adminModeMenuSet)
+                    : menu.concat(state.userModeMenuSet);
                 return [
                     (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
-                    ...filterLNBMenuByAccessPermission(menu.concat(state.userModeMenuSet), store.getters['user/pageAccessPermissionList']),
+                    ...filterLNBMenuByAccessPermission(lnbMenuSet, store.getters['user/pageAccessPermissionList']),
                 ];
             }),
         });
