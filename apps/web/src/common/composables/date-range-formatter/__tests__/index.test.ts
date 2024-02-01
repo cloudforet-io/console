@@ -67,7 +67,7 @@ describe('Date Range Formatter Composable', () => {
     //     expect(dateEl.text()).toBe('Sep 11, 2023');
     // });
 
-    it('Should be displayed in the format of "Jan ~ Feb 2023" when the start and end dates are in the same year but different months.', async () => {
+    it('Should be displayed in the format of "Jan ~ Feb 28, 2023" when the start and end dates are in the same year but different months.', async () => {
         await wrapper.setProps({
             dateRange: {
                 start: '2023-01-01',
@@ -75,10 +75,10 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan ~ Feb 2023');
+        expect(dateEl.text()).toBe('Jan ~ Feb 28, 2023');
     });
 
-    it('Should be displayed in the format of "Jan 2023 ~ Feb 2024" when the start and end dates are in different years.', async () => {
+    it('Should be displayed in the format of "Jan 2023 ~ Feb 28, 2024" when the start and end dates are in different years.', async () => {
         await wrapper.setProps({
             dateRange: {
                 start: '2023-01-01',
@@ -86,6 +86,6 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan 2023 ~ Feb 2024');
+        expect(dateEl.text()).toBe('Jan 2023 ~ Feb 28, 2024');
     });
 });
