@@ -10,11 +10,11 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 
+
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
@@ -29,6 +29,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import CostReportResendModal from '@/services/cost-explorer/components/CostReportResendModal.vue';
+import { useCostFormatter } from '@/services/cost-explorer/helpers/cost-report-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 const costReportPageStore = useCostReportPageStore();
@@ -137,7 +138,7 @@ const handleClickResendButton = async (id: string): Promise<void> => {
         });
         costReportPageState.reportItem = {
             ...costReportPageState.reportItem,
-            report_url: reportUrl,
+            report_url: reportUrl || undefined,
         };
         state.resendModalVisible = true;
     } catch (e) {
@@ -269,7 +270,7 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
             </template>
             <template #col-cost-format="{value, item}">
                 <span class="currency-symbol">{{ CURRENCY_SYMBOL[item.currency] }}</span>
-                <span class="text">{{ numberFormatter(value[item.currency]) || 0 }}</span>
+                <span class="text">{{ useCostFormatter(value, item.currency) || 0 }}</span>
                 <span class="currency-text">{{ item.currency }}</span>
             </template>
             <template #col-extra-format="{item}">

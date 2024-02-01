@@ -5,8 +5,8 @@ import {
 
 import { PButtonModal, PDefinitionTable, PLink } from '@spaceone/design-system';
 
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { CostReportSendParameters } from '@/schema/cost-analysis/cost-report/api-verbs/send';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -20,6 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useCostFormatter } from '@/services/cost-explorer/helpers/cost-report-helper';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 interface Props {
@@ -116,7 +117,7 @@ const postCostReportsResend = async (): Promise<void> => {
                 </template>
                 <template #data-cost="{value}">
                     <span class="currency-symbol">{{ CURRENCY_SYMBOL[state.currency] }}</span>
-                    <span class="text"> {{ numberFormatter(value[state.currency]) }}</span>
+                    <span class="text"> {{ useCostFormatter(value, state.currency) }}</span>
                     <span class="currency-text"> ({{ state.currency }})</span>
                 </template>
                 <template #data-recipients="{value}">
