@@ -42,6 +42,7 @@ import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string'
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -83,6 +84,8 @@ assetInventorySettingsStore.initState();
 
 const route = useRoute();
 const router = useRouter();
+
+const { isAdminMode } = useProperRouteLocation();
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -182,7 +185,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         if (props.isServerPage) {
             params.resource_type = 'inventory.Server';
             params.options = {
-                include_workspace_info: true,
+                include_workspace_info: isAdminMode.value,
                 // is_default: false,
             };
         } else {
@@ -191,7 +194,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
                 provider: props.provider,
                 cloud_service_group: props.group,
                 cloud_service_type: props.name,
-                include_workspace_info: true,
+                include_workspace_info: isAdminMode.value,
                 // is_default: false,
             };
         }
@@ -495,7 +498,12 @@ debouncedWatch([() => props.group, () => props.name], async () => {
         />
         <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             resource-type="inventory.CloudService"
-                            :options="{provider: props.provider, cloudServiceGroup: props.group, cloudServiceType: props.name}"
+                            :options="{
+                                provider: props.provider,
+                                cloudServiceGroup: props.group,
+                                cloudServiceType: props.name,
+                                include_workspace_info: isAdminMode,
+                            }"
                             :is-server-page="props.isServerPage"
                             @update:visible="handleCustomFieldModalVisibleUpdate"
                             @complete="reloadTable"

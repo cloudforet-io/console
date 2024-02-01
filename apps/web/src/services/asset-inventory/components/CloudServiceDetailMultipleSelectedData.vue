@@ -38,11 +38,11 @@ import type { Reference } from '@/lib/reference/type';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-
 
 interface Props {
     cloudServiceIdList: string[];
@@ -70,6 +70,8 @@ const workspaceReferenceStore = useWorkspaceReferenceStore();
 const workspaceReferenceGetters = workspaceReferenceStore.getters;
 
 const router = useRouter();
+
+const { isAdminMode } = useProperRouteLocation();
 
 const state = reactive({
     data: undefined as any,
@@ -144,7 +146,7 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceIdList[0],
-                include_workspace_info: true,
+                include_workspace_info: isAdminMode.value,
                 is_multiple: true,
             },
         };

@@ -38,6 +38,7 @@ interface Props {
         provider?: string;
         cloudServiceGroup?: string;
         cloudServiceType?: string;
+        include_workspace_info?: boolean;
     };
     isServerPage?: boolean;
 }
@@ -147,10 +148,13 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         const options: GetSchemaParams['options'] = {
             include_optional_fields: includeOptionalFields,
         };
-        const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+        const {
+            provider, cloudServiceGroup, cloudServiceType, include_workspace_info,
+        } = props.options;
         if (provider)options.provider = provider;
         if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
         if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+        if (include_workspace_info) options.include_workspace_info = include_workspace_info;
 
         let res;
         if (state.isServiceAccountTable && props.resourceType) {

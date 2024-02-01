@@ -27,6 +27,7 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import CloudServiceFilterModal from '@/services/asset-inventory/components/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
@@ -60,6 +61,8 @@ const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): v
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+
+const { isAdminMode } = useProperRouteLocation();
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
@@ -132,7 +135,7 @@ const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataFiel
                 provider: data.provider,
                 cloud_service_group: data.cloud_service_group,
                 cloud_service_type: data.cloud_service_type,
-                include_workspace_info: true,
+                include_workspace_info: isAdminMode.value,
             },
         });
         if (schema.options) {
