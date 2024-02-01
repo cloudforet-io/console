@@ -29,6 +29,7 @@ const adminAssetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE._NAME),
     meta: { menuId: MENU_ID.ASSET_INVENTORY, translationId: MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId },
+    redirect: () => ({ name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME) }),
     component: AssetInventoryContainer,
     children: [
         {
