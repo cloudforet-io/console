@@ -9,7 +9,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
-import { currencyMoneyFormatter } from 'web/src/lib/helper/currency-helper';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -22,6 +21,7 @@ import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';

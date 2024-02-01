@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import { PButtonModal, PDefinitionTable, PLink } from '@spaceone/design-system';
-import { currencyMoneyFormatter } from 'web/src/lib/helper/currency-helper';
+
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -15,6 +15,7 @@ import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
