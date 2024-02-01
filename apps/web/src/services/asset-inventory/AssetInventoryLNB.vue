@@ -57,7 +57,7 @@ export default defineComponent({
                 if (!state.isCloudServiceDetailPage) return undefined;
                 return {
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId),
-                    to: { name: isAdminMode.value ? makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME) : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                    to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME }),
                 };
             }),
             topTitle: computed<TopTitle|undefined>(() => {
