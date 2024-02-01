@@ -1,16 +1,26 @@
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PDynamicLayout, PTab, PEmpty } from '@spaceone/design-system';
+import {
+    PDynamicLayout, PTab, PEmpty, PTextButton, PI,
+} from '@spaceone/design-system';
 import type { DynamicLayoutFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import { get } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
+
+import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import type { Reference } from '@/lib/reference/type';
 
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
@@ -26,7 +36,7 @@ import CloudServiceLogTab
     from '@/services/asset-inventory/components/CloudServiceLogTab.vue';
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/components/CloudServiceTagsPanel.vue';
-
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 
 interface Props {
@@ -41,6 +51,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const workspaceReferenceStore = useWorkspaceReferenceStore();
+const workspaceReferenceGetters = workspaceReferenceStore.getters;
+
+const router = useRouter();
 
 /* Tabs */
 const singleItemTabState = reactive({
@@ -62,6 +76,25 @@ const multiItemTabState = reactive({
     ])),
     activeTab: 'data',
 });
+
+/* Event */
+const handleClickLinkButton = async (id: string) => {
+    try {
+        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+            cloud_service_id: id,
+        });
+        window.open(router.resolve({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+            },
+        }).href, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
+};
 
 /* Monitoring Tab */
 const monitoringState: MonitoringProps = reactive({
@@ -127,7 +160,22 @@ const monitoringState: MonitoringProps = reactive({
                               :data="tableState.selectedItems"
                               :field-handler="fieldHandler"
                               class="selected-data-tab"
-            />
+            >
+                <template #col-workspace_id-format="{value, item}">
+                    <p-text-button class="report-link"
+                                   size="md"
+                                   @click="handleClickLinkButton(item.cloud_service_id)"
+                    >
+                        {{ workspaceReferenceGetters.workspaceItems[value].name }}
+                        <p-i name="ic_arrow-right-up"
+                             class="link-mark"
+                             height="0.875rem"
+                             width="0.875rem"
+                             color="inherit"
+                        />
+                    </p-text-button>
+                </template>
+            </p-dynamic-layout>
             <cloud-service-multiple-selected-data v-else
                                                   :cloud-service-group="props.group"
                                                   :cloud-service-type="props.name"
@@ -144,3 +192,12 @@ const monitoringState: MonitoringProps = reactive({
         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
     </p-empty>
 </template>
+
+<style lang="postcss" scoped>
+.selected-data-tab {
+    .report-link {
+        @apply flex items-center text-gray-900;
+        gap: 0.25rem;
+    }
+}
+</style>
