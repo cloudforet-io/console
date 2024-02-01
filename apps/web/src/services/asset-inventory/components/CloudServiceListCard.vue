@@ -64,6 +64,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceItem } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -100,10 +103,12 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props) {
+        const appContextStore = useAppContextStore();
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
 
         const state = reactive({
+            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             cloudServiceTypeToItemMap: computed(() => {
@@ -142,7 +147,6 @@ export default defineComponent<Props>({
             }
 
             const res: Location = {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,
@@ -153,6 +157,11 @@ export default defineComponent<Props>({
                     period: objectToQueryString(cloudServicePageState.period),
                 },
             };
+            if (state.isAdminMode) {
+                res.name = makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME);
+            } else {
+                res.name = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
+            }
             return res;
         };
 
