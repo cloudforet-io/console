@@ -75,7 +75,7 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan ~ Feb 2023');
+        expect(dateEl.text()).toBe('Jan ~ Feb 28, 2023');
     });
 
     it('Should be displayed in the format of "Jan 2023 ~ Feb 2024" when the start and end dates are in different years.', async () => {
@@ -86,6 +86,6 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan 2023 ~ Feb 2024');
+        expect(dateEl.text()).toBe('Jan 2023 ~ Feb 28, 2024');
     });
 });

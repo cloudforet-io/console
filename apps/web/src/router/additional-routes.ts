@@ -6,7 +6,7 @@ import CostReportDetailPage from '@/common/pages/CostReportDetailPage.vue';
 
 export const additionalRoutes: RouteConfig[] = [
     {
-        path: 'cost-report',
+        path: 'cost-report-detail',
         name: ROOT_ROUTE.COST_REPORT._NAME,
         props: (route) => ({
             accessToken: route.query.sso_access_token,
