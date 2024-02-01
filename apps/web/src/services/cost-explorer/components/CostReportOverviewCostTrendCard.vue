@@ -58,7 +58,7 @@ const state = reactive({
         const last3Years = Array.from({ length: 3 }).map((_, idx) => {
             const _year = (recentYear - idx).toString();
             return {
-                name: _year, label: `${_year} (${_year}-01 ~ 12)`,
+                name: _year, label: `${_year} (${_year}-01 ~ ${_year}-12)`,
             };
         });
         return [_default, ...last3Years];
