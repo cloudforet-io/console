@@ -3,7 +3,7 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PLink, PDataTable } from '@spaceone/design-system';
+import { PLink, PDataTable, PIconButton } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -65,6 +65,7 @@ interface State {
     data?: AnalyzeResponse<CostReportDataAnalyzeResult>|undefined;
     chartData: ComputedRef<ChartData[]>;
     numberFormatterOption: ComputedRef<Intl.NumberFormatOptions>;
+    printMode: boolean;
 }
 
 
@@ -103,6 +104,7 @@ const state = reactive<State>({
         },
     })) ?? []),
     numberFormatterOption: computed(() => ({ currency: state.currency, style: 'decimal', notation: 'standard' })),
+    printMode: false,
 });
 
 const originDataState = reactive({
@@ -381,6 +383,10 @@ const setRootTagStyle = () => {
     if (appEl) appEl.style.height = 'unset';
 };
 
+const handlePrint = () => {
+    window.print();
+};
+
 (async () => {
     setMetaTag();
     state.loading = true;
@@ -579,6 +585,13 @@ const setRootTagStyle = () => {
                 </div>
             </div>
         </div>
+        <p-icon-button v-if="!state.printMode"
+                       name="ic_print"
+                       size="lg"
+                       class="download-button"
+                       style-type="tertiary"
+                       @click="handlePrint"
+        />
     </div>
 </template>
 
@@ -712,6 +725,19 @@ const setRootTagStyle = () => {
     .ratio {
         @apply text-label-md text-gray-500;
         margin-left: 0.5rem;
+    }
+}
+
+.download-button {
+    @apply fixed bottom-0 right-0;
+    box-shadow: 0 2px 4px 0 #0000001a;
+    margin: 2rem;
+    z-index: 100;
+}
+
+@media print {
+    .download-button {
+        display: none;
     }
 }
 </style>
