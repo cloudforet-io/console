@@ -151,7 +151,7 @@ export default defineComponent({
         };
 
         const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
-            await vm.$router.replace({
+            await vm.$router.replace(getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: params.provider,
@@ -159,7 +159,7 @@ export default defineComponent({
                     name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
                 },
                 query: vm.$route.query,
-            });
+            }));
             await cloudServiceDetailPageStore.setSelectedCloudServiceType();
         };
 
