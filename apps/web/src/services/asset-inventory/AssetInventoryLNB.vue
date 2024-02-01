@@ -17,6 +17,8 @@ import { get } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { filterLNBMenuByAccessPermission } from '@/lib/access-control/page-access-helper';
@@ -44,7 +46,8 @@ export default defineComponent({
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
+            isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
+                || vm.$route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME)),
             detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
                 if (state.isCloudServiceDetailPage) return vm.$route.params as unknown as CloudServiceDetailPageParams;
                 return undefined;
