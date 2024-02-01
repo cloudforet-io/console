@@ -18,6 +18,7 @@ import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import {
@@ -60,6 +61,8 @@ const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): v
 
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
@@ -132,7 +135,7 @@ const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataFiel
                 provider: data.provider,
                 cloud_service_group: data.cloud_service_group,
                 cloud_service_type: data.cloud_service_type,
-                include_workspace_info: true,
+                include_workspace_info: appContextGetters.isAdminMode,
             },
         });
         if (schema.options) {

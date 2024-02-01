@@ -28,6 +28,7 @@ import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
@@ -42,7 +43,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-
 
 interface Props {
     cloudServiceIdList: string[];
@@ -68,6 +68,8 @@ const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceReferenceStore = useWorkspaceReferenceStore();
 const workspaceReferenceGetters = workspaceReferenceStore.getters;
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const router = useRouter();
 
@@ -144,7 +146,7 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceIdList[0],
-                include_workspace_info: true,
+                include_workspace_info: appContextGetters.isAdminMode,
                 is_multiple: true,
             },
         };
