@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { debouncedWatch } from '@vueuse/core';
 import { reactive, computed, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider, PTextButton, PI,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -26,11 +26,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -50,12 +52,12 @@ import CloudServiceDetailTabs
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import CloudServiceUsageOverview
     from '@/services/asset-inventory/components/CloudServiceUsageOverview.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
 } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
-
 
 interface Props {
     provider?: string;
@@ -71,7 +73,8 @@ const props = withDefaults(defineProps<Props>(), {
     isServerPage: false,
 });
 
-
+const workspaceReferenceStore = useWorkspaceReferenceStore();
+const workspaceReferenceGetters = workspaceReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
@@ -79,6 +82,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 assetInventorySettingsStore.initState();
 
 const route = useRoute();
+const router = useRouter();
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -206,6 +210,23 @@ const resetSort = (schemaOptions: DynamicLayoutOptions) => {
     } else {
         fetchOptionState.sortBy = 'created_at';
         fetchOptionState.sortDesc = true;
+    }
+};
+const handleClickLinkButton = async (id: string) => {
+    try {
+        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+            cloud_service_id: id,
+        });
+        window.open(router.resolve({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+            },
+        }).href, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 
@@ -424,6 +445,20 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                       @export="exportCloudServiceData"
                                       @click-settings="handleClickSettings"
                     >
+                        <template #col-workspace_id-format="{value, item}">
+                            <p-text-button class="report-link"
+                                           size="md"
+                                           @click="handleClickLinkButton(item.cloud_service_id)"
+                            >
+                                {{ workspaceReferenceGetters.workspaceItems[value].name }}
+                                <p-i name="ic_arrow-right-up"
+                                     class="link-mark"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                     color="inherit"
+                                />
+                            </p-text-button>
+                        </template>
                         <template #toolbox-left>
                             <p-button style-type="secondary"
                                       :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
@@ -510,6 +545,15 @@ debouncedWatch([() => props.group, () => props.name], async () => {
     @apply border border-gray-200 rounded-lg;
     .p-data-table {
         min-height: unset;
+    }
+    .report-link {
+        @apply flex items-center text-gray-900;
+        gap: 0.25rem;
+    }
+    .tr-selected {
+        .report-link {
+            @apply text-blue-700;
+        }
     }
 }
 

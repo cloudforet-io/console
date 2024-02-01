@@ -1,10 +1,12 @@
 <script setup lang="ts">
-
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
+import {
+    PDynamicLayout, PButtonTab, PTextButton, PI,
+} from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
@@ -20,12 +22,14 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -36,8 +40,8 @@ import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynami
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-
 
 
 interface Props {
@@ -59,8 +63,14 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 
 const fetchOptionsMap = {};
 const dataMap = {};
+
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceReferenceStore = useWorkspaceReferenceStore();
+const workspaceReferenceGetters = workspaceReferenceStore.getters;
+
+const router = useRouter();
+
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -97,6 +107,27 @@ const state = reactive({
     rootPath: computed(() => state.currentLayout.options?.unwind?.path ?? ''),
     isBaseInformationSchema: computed(() => (state.currentLayout.name === BASE_INFORMATION)),
 });
+
+/* Event */
+const handleClickLinkButton = async (id: string) => {
+    try {
+        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+            cloud_service_id: id,
+        });
+        window.open(router.resolve({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: response.provider,
+                group: response.cloud_service_group,
+                name: response.cloud_service_type,
+            },
+        }).href, '_blank');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
+};
+
+/* API */
 const schemaQueryHelper = new QueryHelper();
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => (state.currentLayout?.options?.search ?? [])),
@@ -298,7 +329,22 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"
-                    />
+                    >
+                        <template #col-workspace_id-format="{value, item}">
+                            <p-text-button class="report-link"
+                                           size="md"
+                                           @click="handleClickLinkButton(item.cloud_service_id)"
+                            >
+                                {{ workspaceReferenceGetters.workspaceItems[value].name }}
+                                <p-i name="ic_arrow-right-up"
+                                     class="link-mark"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                     color="inherit"
+                                />
+                            </p-text-button>
+                        </template>
+                    </p-dynamic-layout>
                 </div>
             </template>
         </p-button-tab>
@@ -315,6 +361,10 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                 min-height: 200px;
             }
         }
+    }
+    .report-link {
+        @apply flex items-center text-gray-900;
+        gap: 0.25rem;
     }
 }
 </style>
