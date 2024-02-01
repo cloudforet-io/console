@@ -31,6 +31,7 @@ import type { CloudServiceListParameters } from '@/schema/inventory/cloud-servic
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
@@ -42,7 +43,6 @@ import { queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string'
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
@@ -80,12 +80,12 @@ const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 assetInventorySettingsStore.initState();
 
 const route = useRoute();
 const router = useRouter();
-
-const { isAdminMode } = useProperRouteLocation();
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -185,7 +185,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         if (props.isServerPage) {
             params.resource_type = 'inventory.Server';
             params.options = {
-                include_workspace_info: isAdminMode.value,
+                include_workspace_info: appContextGetters.isAdminMode,
                 // is_default: false,
             };
         } else {
@@ -194,7 +194,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
                 provider: props.provider,
                 cloud_service_group: props.group,
                 cloud_service_type: props.name,
-                include_workspace_info: isAdminMode.value,
+                include_workspace_info: appContextGetters.isAdminMode,
                 // is_default: false,
             };
         }
@@ -502,7 +502,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                 provider: props.provider,
                                 cloudServiceGroup: props.group,
                                 cloudServiceType: props.name,
-                                include_workspace_info: isAdminMode,
+                                include_workspace_info: appContextGetters.isAdminMode,
                             }"
                             :is-server-page="props.isServerPage"
                             @update:visible="handleCustomFieldModalVisibleUpdate"

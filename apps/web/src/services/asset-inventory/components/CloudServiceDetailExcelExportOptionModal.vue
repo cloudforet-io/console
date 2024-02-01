@@ -19,11 +19,12 @@ import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/e
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
@@ -47,8 +48,8 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
-
-const { isAdminMode } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const MAIN_TABLE = 'Main Table';
 
@@ -136,7 +137,7 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceId,
-                include_workspace_info: isAdminMode.value,
+                include_workspace_info: appContextGetters.isAdminMode,
                 is_multiple: true,
             },
         };
