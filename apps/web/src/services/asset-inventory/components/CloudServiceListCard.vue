@@ -64,8 +64,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceItem } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -73,6 +71,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -80,7 +79,6 @@ import { useCloudServicePageStore } from '@/services/asset-inventory/stores/clou
 import type { Period } from '@/services/asset-inventory/types/type';
 
 import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '../types/cloud-service-card-type';
-
 
 interface Props {
     item: CloudServiceAnalyzeResult;
@@ -106,6 +104,8 @@ export default defineComponent<Props>({
         const appContextStore = useAppContextStore();
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
+
+        const { getProperRouteLocation } = useProperRouteLocation();
 
         const state = reactive({
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -146,7 +146,8 @@ export default defineComponent<Props>({
                 cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
             }
 
-            const res: Location = {
+            const res: Location = getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,
@@ -156,12 +157,7 @@ export default defineComponent<Props>({
                     filters: cloudServiceDetailQueryHelper.rawQueryStrings,
                     period: objectToQueryString(cloudServicePageState.period),
                 },
-            };
-            if (state.isAdminMode) {
-                res.name = makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME);
-            } else {
-                res.name = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
-            }
+            });
             return res;
         };
 
