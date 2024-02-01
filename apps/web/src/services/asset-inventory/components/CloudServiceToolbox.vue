@@ -132,6 +132,7 @@ const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataFiel
                 provider: data.provider,
                 cloud_service_group: data.cloud_service_group,
                 cloud_service_type: data.cloud_service_type,
+                include_workspace_info: true,
             },
         });
         if (schema.options) {

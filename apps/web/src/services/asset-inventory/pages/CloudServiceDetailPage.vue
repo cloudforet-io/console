@@ -177,13 +177,17 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         };
         if (props.isServerPage) {
             params.resource_type = 'inventory.Server';
-            // params.options = { is_default: false };
+            params.options = {
+                include_workspace_info: true,
+                // is_default: false,
+            };
         } else {
             params.resource_type = 'inventory.CloudService';
             params.options = {
                 provider: props.provider,
                 cloud_service_group: props.group,
                 cloud_service_type: props.name,
+                include_workspace_info: true,
                 // is_default: false,
             };
         }

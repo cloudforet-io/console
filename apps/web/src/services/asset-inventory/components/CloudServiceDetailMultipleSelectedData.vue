@@ -113,6 +113,7 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceIdList[0],
+                include_workspace_info: true,
                 is_multiple: true,
             },
         };

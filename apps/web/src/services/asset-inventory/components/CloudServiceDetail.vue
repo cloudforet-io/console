@@ -123,6 +123,7 @@ const getSchema = async () => {
                 schema: 'details',
                 options: {
                     cloud_service_id: props.cloudServiceId,
+                    include_workspace_info: true,
                 },
             };
             if (props.isServerPage) {
