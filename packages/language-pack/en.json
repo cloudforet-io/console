@@ -677,6 +677,7 @@
 				"LESS_THAN_OR_EQUAL_TO_31": "Must be less than or equal to 31",
 				"MANAGE_ROLES": "Manage Roles",
 				"MONTHLY_TOTAL_AMOUNT_SUMMARY": "Monthly Total Amount Summary",
+				"NO_REPORT": "Cost report has not been issued yet.",
 				"OVERVIEW": "Overview",
 				"PERIOD": "Period",
 				"PROVIDER": "Provider",

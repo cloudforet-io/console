@@ -105,10 +105,10 @@ const handleClickSettings = (): void => {
 }
 .date-text {
     @apply text-display-sm;
-    padding-bottom: 0.38rem;
+    padding-bottom: 0.125rem;
 }
 .date-range-text {
-    @apply text-label-md;
+    @apply text-label-md text-gray-500;
 }
 .language-currency-wrapper {
     @apply text-label-md;
