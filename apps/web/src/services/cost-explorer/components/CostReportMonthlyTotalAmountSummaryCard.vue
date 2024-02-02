@@ -8,7 +8,7 @@ import {
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
-import { cloneDeep, isEqual, sum } from 'lodash';
+import { cloneDeep, debounce, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -103,7 +103,7 @@ const state = reactive({
 });
 
 /* Api */
-const analyzeCostReportData = async () => {
+const analyzeCostReportData = debounce(async () => {
     state.loading = true;
     try {
         const _period = {
@@ -134,7 +134,7 @@ const analyzeCostReportData = async () => {
     } finally {
         state.loading = false;
     }
-};
+}, 300);
 const listCostReport = async () => {
     try {
         const res = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
@@ -180,6 +180,7 @@ const drawChart = () => {
 /* Event */
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
+    analyzeCostReportData();
 };
 const handleClickDetailsLink = async () => {
     try {
@@ -201,13 +202,13 @@ const handleClickDetailsLink = async () => {
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
-watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
-    // init current date when config is updated
-    state.currentDate = recentReportDate;
+watch(() => costReportPageGetters.recentReportDate, async (after, before) => {
+    if (after.format('YYYY-MM') === before.format('YYYY-MM')) return;
+    state.currentDate = after;
+    await analyzeCostReportData();
 }, { immediate: true });
-watch([() => state.currentDate, () => state.selectedTarget, () => costReportPageGetters.currency], (after, before) => {
-    if (isEqual(after, before) || !state.currentDate || !costReportPageGetters.currency) return;
-    analyzeCostReportData();
+watch(() => costReportPageGetters.currency, (_currency) => {
+    if (_currency) analyzeCostReportData();
 }, { immediate: true });
 watch(() => state.currentDate, () => {
     listCostReport();
