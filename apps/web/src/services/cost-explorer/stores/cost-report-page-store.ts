@@ -85,7 +85,10 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const fetchCostReportsList = async (params?: CostReportListParameters): Promise<void> => {
         state.reportListLoading = true;
         try {
-            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>(params);
+            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+                ...params,
+                status: 'SUCCESS',
+            });
             state.reportListItems = results || [];
             state.reportListTotalCount = total_count || 0;
         } catch (e) {
