@@ -203,6 +203,7 @@ watch([() => state.loading, () => chartContext.value], async ([loading, _chartCo
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
 watch(() => costReportPageGetters.recentReportDate, async (after, before) => {
+    if (!after || !before) return;
     if (after.format('YYYY-MM') === before.format('YYYY-MM')) return;
     state.currentDate = after;
     await analyzeCostReportData();
@@ -242,7 +243,7 @@ watch(() => state.currentDate, () => {
             <div class="grid grid-cols-12 gap-4">
                 <div class="left-part">
                     <p-date-pagination :date.sync="state.currentDate"
-                                       :disable-next-button="state.currentDate.isSame(costReportPageGetters.recentReportDate, 'month')"
+                                       :disable-next-button="state.currentDate?.isSame(costReportPageGetters.recentReportDate, 'month')"
                     />
                     <div class="date-range-text">
                         {{ state.currentDateRangeText }}
