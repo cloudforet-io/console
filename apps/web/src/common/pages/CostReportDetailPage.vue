@@ -490,10 +490,8 @@ const handlePrint = () => {
 }
 
 /* custom design-system component - p-data-table */
-:deep() {
-    .p-data-table {
-        min-height: unset;
-    }
+:deep(.p-data-table) {
+    min-height: 10rem;
 }
 
 .body {
@@ -505,7 +503,7 @@ const handlePrint = () => {
     overflow: auto;
     .invoice {
         width: 100%;
-        min-width: 7.6in;
+        min-width: 7.4in;
         max-width: 8.5in;
         margin: 0 1rem;
         padding: 1.4rem 0 3rem 0;
