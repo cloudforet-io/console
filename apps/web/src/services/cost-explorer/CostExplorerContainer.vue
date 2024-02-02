@@ -2,6 +2,7 @@
     <fragment>
         <vertical-page-layout v-if="$route.meta.lnbVisible"
                               :breadcrumbs="breadcrumbs"
+                              class="cost-explorer-container"
         >
             <template #sidebar>
                 <cost-explorer-l-n-b />
@@ -102,6 +103,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.cost-explorer-container {
+    :deep(.right-container) {
+        overflow-x: hidden;
+    }
+}
 .cost-centered-layout {
     &::before {
         opacity: 1;

@@ -192,6 +192,10 @@ const handleClickDetailsLink = async () => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
+const handleChangeDate = (date: Dayjs) => {
+    state.currentDate = date;
+    analyzeCostReportData();
+};
 
 /* Init */
 (async () => {
@@ -202,17 +206,15 @@ const handleClickDetailsLink = async () => {
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
-watch(() => costReportPageGetters.recentReportDate, async (after, before) => {
-    if (!after || !before) return;
-    if (after.format('YYYY-MM') === before.format('YYYY-MM')) return;
+watch(() => costReportPageGetters.recentReportDate, async (after) => {
+    if (!after) return;
     state.currentDate = after;
-    await analyzeCostReportData();
 }, { immediate: true });
 watch(() => costReportPageGetters.currency, (_currency) => {
     if (_currency) analyzeCostReportData();
 }, { immediate: true });
 watch(() => state.currentDate, () => {
-    listCostReport();
+    if (state.currentDate) listCostReport();
 }, { immediate: true });
 </script>
 
@@ -242,8 +244,9 @@ watch(() => state.currentDate, () => {
         <template #content>
             <div class="grid grid-cols-12 gap-4">
                 <div class="left-part">
-                    <p-date-pagination :date.sync="state.currentDate"
+                    <p-date-pagination :date="state.currentDate"
                                        :disable-next-button="state.currentDate?.isSame(costReportPageGetters.recentReportDate, 'month')"
+                                       @update:date="handleChangeDate"
                     />
                     <div class="date-range-text">
                         {{ state.currentDateRangeText }}
