@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -15,7 +14,7 @@ import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { i18n } from '@/translations';
 
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { Reference } from '@/lib/reference/type';
 
@@ -37,7 +36,7 @@ import CloudServiceLogTab
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/components/CloudServiceTagsPanel.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
     tableState: any;
@@ -51,8 +50,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const workspaceReferenceStore = useWorkspaceReferenceStore();
-const workspaceReferenceGetters = workspaceReferenceStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const router = useRouter();
 
@@ -78,21 +77,29 @@ const multiItemTabState = reactive({
 });
 
 /* Event */
-const handleClickLinkButton = async (id: string) => {
-    try {
-        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-            cloud_service_id: id,
-        });
+const handleClickLinkButton = async (type: string, workspaceId: string, id: string) => {
+    if (type === 'workspace') {
+        try {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: id,
+            });
+            window.open(router.resolve({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: response.provider,
+                    group: response.cloud_service_group,
+                    name: response.cloud_service_type,
+                    workspaceId,
+                },
+            }).href, '_blank');
+        } catch (e: any) {
+            ErrorHandler.handleRequestError(e, e.message);
+        }
+    } else {
         window.open(router.resolve({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: {
-                provider: response.provider,
-                group: response.cloud_service_group,
-                name: response.cloud_service_type,
-            },
+            name: PROJECT_ROUTE.DETAIL._NAME,
+            params: { id, workspaceId },
         }).href, '_blank');
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 
@@ -164,9 +171,23 @@ const monitoringState: MonitoringProps = reactive({
                 <template #col-workspace_id-format="{value, item}">
                     <p-text-button class="report-link"
                                    size="md"
-                                   @click="handleClickLinkButton(item.cloud_service_id)"
+                                   @click="handleClickLinkButton('workspace', value, item.cloud_service_id)"
                     >
-                        {{ workspaceReferenceGetters.workspaceItems[value].name }}
+                        {{ allReferenceGetters.workspace[value]?.label }}
+                        <p-i name="ic_arrow-right-up"
+                             class="link-mark"
+                             height="0.875rem"
+                             width="0.875rem"
+                             color="inherit"
+                        />
+                    </p-text-button>
+                </template>
+                <template #col-project_id-format="{value, item}">
+                    <p-text-button class="report-link"
+                                   size="md"
+                                   @click="handleClickLinkButton('project', item.workspace_id, value)"
+                    >
+                        {{ allReferenceGetters.project[value]?.label }}
                         <p-i name="ic_arrow-right-up"
                              class="link-mark"
                              height="0.875rem"
