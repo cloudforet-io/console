@@ -22,7 +22,9 @@ import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -169,7 +171,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         });
     }
     try {
-        const results = await userPageStore.listRoles({
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
         dropdownState.menuItems = (results ?? []).map((role) => ({

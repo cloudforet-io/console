@@ -31,7 +31,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import {
     dynamicFieldsToExcelDataFields,
@@ -45,6 +45,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
     cloudServiceId: string;
@@ -70,8 +71,8 @@ const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 
-const workspaceReferenceStore = useWorkspaceReferenceStore();
-const workspaceReferenceGetters = workspaceReferenceStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -118,21 +119,29 @@ const state = reactive({
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
 });
 
-const handleClickLinkButton = async () => {
-    try {
-        const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
-            cloud_service_id: state.data.cloud_service_id,
-        });
+const handleClickLinkButton = async (type: string, id: string) => {
+    if (type === 'workspace') {
+        try {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: state.data.cloud_service_id,
+            });
+            window.open(router.resolve({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: response.provider,
+                    group: response.cloud_service_group,
+                    name: response.cloud_service_type,
+                    workspaceId: id,
+                },
+            }).href, '_blank');
+        } catch (e: any) {
+            ErrorHandler.handleRequestError(e, e.message);
+        }
+    } else {
         window.open(router.resolve({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: {
-                provider: response.provider,
-                group: response.cloud_service_group,
-                name: response.cloud_service_type,
-            },
+            name: PROJECT_ROUTE.DETAIL._NAME,
+            params: { id, workspaceId: state.data.workspace_id },
         }).href, '_blank');
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 
@@ -375,9 +384,23 @@ watch(() => props.cloudServiceId, async (after, before) => {
                         <template #data-workspace_id="{value}">
                             <p-text-button class="report-link"
                                            size="md"
-                                           @click="handleClickLinkButton"
+                                           @click="handleClickLinkButton('workspace', value)"
                             >
-                                {{ workspaceReferenceGetters.workspaceItems[value].name }}
+                                {{ allReferenceGetters.workspace[value]?.label }}
+                                <p-i name="ic_arrow-right-up"
+                                     class="link-mark"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                     color="inherit"
+                                />
+                            </p-text-button>
+                        </template>
+                        <template #data-project_id="{value}">
+                            <p-text-button class="report-link"
+                                           size="md"
+                                           @click="handleClickLinkButton('project', value)"
+                            >
+                                {{ allReferenceGetters.project[value]?.label }}
                                 <p-i name="ic_arrow-right-up"
                                      class="link-mark"
                                      height="0.875rem"
