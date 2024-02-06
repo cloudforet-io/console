@@ -24,11 +24,11 @@ const state = reactive({
     upcomingReportDateText: computed(() => {
         const issueDay = costReportPageGetters.issueDay;
         const issueDayText = issueDay < 10 ? `0${issueDay}` : String(issueDay);
-        const upcomingIssueDate = dayjs.utc(costReportPageGetters.recentIssueDate).add(1, 'month').format('YYYY-MM');
+        const upcomingIssueDate = dayjs.utc(costReportPageState.recentIssueDate).add(1, 'month').format('YYYY-MM');
         return `${upcomingIssueDate}-${issueDayText}`;
     }),
     upcomingReportDateRangeText: computed(() => {
-        const upcomingReportDate = dayjs.utc(costReportPageGetters.recentReportDate).add(1, 'month');
+        const upcomingReportDate = dayjs.utc(costReportPageState.recentReportMonth).add(1, 'month');
         const startOfNextMonth = upcomingReportDate.startOf('month');
         const endOfNextMonth = upcomingReportDate.endOf('month');
         return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;
