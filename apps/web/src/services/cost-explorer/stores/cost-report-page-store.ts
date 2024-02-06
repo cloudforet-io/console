@@ -1,6 +1,5 @@
 import { computed, reactive } from 'vue';
 
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
@@ -32,6 +31,11 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         reportConfigLoading: false,
         costReportConfig: null as CostReportConfigModel|null|undefined,
         //
+        recentReportDataLoading: false,
+        hasReport: false,
+        recentReportMonth: undefined as string|undefined,
+        recentIssueDate: undefined as string|undefined,
+        //
         reportListLoading: false,
         reportListTotalCount: 0,
         reportListItems: [] as CostReportModel[],
@@ -43,20 +47,6 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         currency: computed<string|undefined>(() => state.costReportConfig?.currency),
         language: computed<string|undefined>(() => state.costReportConfig?.language),
         issueDay: computed<number>(() => state.costReportConfig?.issue_day ?? 10),
-        recentIssueDate: computed<Dayjs>(() => {
-            const today = dayjs.utc();
-            if (Number(today.format('D')) < getters.issueDay) {
-                return today.subtract(1, 'month').date(getters.issueDay);
-            }
-            return today.date(getters.issueDay);
-        }),
-        recentReportDate: computed<Dayjs>(() => {
-            const today = dayjs.utc();
-            if (Number(today.format('D')) < getters.issueDay) {
-                return today.subtract(2, 'month');
-            }
-            return today.subtract(1, 'month');
-        }),
         reportItemData: computed<CostReportItem>(() => ({
             ...state.reportItem,
             recipients: state.costReportConfig?.recipients,
@@ -68,6 +58,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         state.costReportConfig = costReportConfig;
     };
 
+    /* Actions */
     const fetchCostReportConfig = async () => {
         if (state.costReportConfig !== null) return;
         try {
@@ -117,6 +108,27 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
+    const fetchRecentReportData = async () => {
+        try {
+            state.recentReportDataLoading = true;
+            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+                status: 'SUCCESS',
+                query: {
+                    only: ['report_month', 'issue_date'],
+                },
+            });
+            const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];
+            const issueDateList: string[] = results?.map((report) => report.issue_date) ?? [];
+            state.recentReportMonth = reportMonthList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
+            state.recentIssueDate = issueDateList.sort((a, b) => (dayjs.utc(b).isSameOrAfter(dayjs.utc(a)) ? 1 : -1))[0];
+            state.hasReport = (total_count ?? 0) > 0;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        } finally {
+            state.recentReportDataLoading = false;
+        }
+    };
+
     const mutations = {
         setCostReportConfig,
     };
@@ -129,5 +141,6 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         fetchCostReport,
         getCostReportUrl,
         fetchCostReportConfig,
+        fetchRecentReportData,
     };
 });
