@@ -5,7 +5,6 @@ import {
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
-import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 import type * as am5map from '@amcharts/amcharts5/map';
 import * as am5percent from '@amcharts/amcharts5/percent';
@@ -29,14 +28,6 @@ import {
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
-const rootSettings: IRootSettings = {
-    tooltipContainerBounds: {
-        top: 100,
-        right: 1000,
-        bottom: 0,
-        left: 1000,
-    },
-};
 export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
 ) => {
@@ -48,7 +39,7 @@ export const useAmcharts5 = (
     const refreshRoot = () => {
         disposeRoot();
         if (state.chartContext) {
-            const root = am5.Root.new(state.chartContext as HTMLElement, rootSettings);
+            const root = am5.Root.new(state.chartContext as HTMLElement);
             state.root = root;
             initRoot(root);
         }
@@ -67,6 +58,10 @@ export const useAmcharts5 = (
         if (!state.root) return;
         state.root.dispose();
         state.root = undefined;
+    };
+
+    const setRoot = (root: Root) => {
+        state.root = root;
     };
 
     const clearChildrenOfRoot = () => {
@@ -88,7 +83,7 @@ export const useAmcharts5 = (
     watch(() => state.chartContext, (ctx) => {
         if (ctx) {
             disposeRoot();
-            state.root = am5.Root.new(ctx, rootSettings);
+            state.root = am5.Root.new(ctx);
             initRoot(state.root as Root);
         }
     });
@@ -102,6 +97,7 @@ export const useAmcharts5 = (
         refreshRoot,
         disposeRoot,
         clearChildrenOfRoot,
+        setRoot,
         //
         createXYDateChart: (settings?: am5xy.IXYChartSettings, dateAxisSettings?: Partial<am5xy.IDateAxisSettings<any>>) => {
             if (!state.root) throw new Error('No root');

@@ -3,6 +3,8 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { Root } from '@amcharts/amcharts5';
+import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import {
     PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI,
 } from '@spaceone/design-system';
@@ -51,6 +53,15 @@ type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
     date: string;
     value_sum: number;
+};
+
+const CHART_ROOT_OPTIONS: IRootSettings = {
+    tooltipContainerBounds: {
+        top: 100,
+        right: 1000,
+        bottom: 0,
+        left: 1000,
+    },
 };
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -155,7 +166,8 @@ const listCostReport = async () => {
 
 /* Util */
 const drawChart = () => {
-    chartHelper.refreshRoot();
+    chartHelper.disposeRoot();
+    chartHelper.setRoot(Root.new(chartContext.value as HTMLElement, CHART_ROOT_OPTIONS));
     const chart = chartHelper.createDonutChart({
         paddingLeft: 20,
         paddingRight: 20,
