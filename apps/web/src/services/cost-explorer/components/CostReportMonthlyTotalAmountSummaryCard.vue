@@ -10,6 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { cloneDeep, debounce, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -67,6 +68,7 @@ const CHART_ROOT_OPTIONS: IRootSettings = {
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
+const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
@@ -84,7 +86,7 @@ const state = reactive({
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
-    currentDate: undefined as Dayjs | undefined,
+    currentDate: undefined as string | undefined,
     currentDateRangeText: computed<string>(() => {
         if (!state.currentDate) return '';
         return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
@@ -218,9 +220,9 @@ const handleChangeDate = (date: Dayjs) => {
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) drawChart();
 }, { immediate: true });
-watch(() => costReportPageGetters.recentReportDate, async (after) => {
+watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
-    state.currentDate = after;
+    state.currentDate = dayjs.utc(after);
 }, { immediate: true });
 watch(() => costReportPageGetters.currency, (_currency) => {
     if (_currency) analyzeCostReportData();
@@ -257,7 +259,7 @@ watch(() => state.currentDate, () => {
             <div class="grid grid-cols-12 gap-4">
                 <div class="left-part">
                     <p-date-pagination :date="state.currentDate"
-                                       :disable-next-button="state.currentDate?.isSame(costReportPageGetters.recentReportDate, 'month')"
+                                       :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
                                        @update:date="handleChangeDate"
                     />
                     <div class="date-range-text">
