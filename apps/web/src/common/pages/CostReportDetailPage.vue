@@ -129,6 +129,7 @@ const makeTableFields = (customField:DataTableFieldType, currency:string, valueF
     {
         name: 'index',
         label: 'no',
+        width: '3.125rem',
     },
     {
         textAlign: 'left',
