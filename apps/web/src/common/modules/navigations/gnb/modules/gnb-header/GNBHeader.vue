@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PTooltip, PI,
+    PSelectDropdown, PTooltip, PI, PButton, PDivider,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { clone } from 'lodash';
@@ -13,16 +13,16 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
@@ -50,23 +50,21 @@ const state = reactive({
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
         const menuList: SelectDropdownMenuItem[] = [
-            { type: 'header', name: 'current_workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.CURRENT_WORKSPACE') } as SelectDropdownMenuItem,
-            { type: 'header', name: 'switch_to_header', label: i18n.t('COMMON.GNB.WORKSPACE.SWITCH_TO') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'starred_header', label: i18n.t('COMMON.GNB.WORKSPACE.STARRED') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES') } as SelectDropdownMenuItem,
         ];
         state.workspaceList.forEach((_workspace) => {
             if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
                 menuList.push({
                     name: _workspace.workspace_id,
                     label: _workspace.name,
-                    icon: 'ic_check',
-                    iconColor: violet[500],
-                    headerName: 'current_workspace_header',
+                    headerName: 'starred_header',
                 } as SelectDropdownMenuItem);
             } else {
                 menuList.push({
                     name: _workspace.workspace_id,
                     label: _workspace.name,
-                    headerName: 'switch_to_header',
+                    headerName: 'workspace_header',
                 } as SelectDropdownMenuItem);
             }
             return menuList;
@@ -102,10 +100,6 @@ const selectWorkspace = (name: string): void => {
         router.push({ name: MENU_INFO_MAP[closestMenuId].routeName, params: { workspaceId } });
     }
 };
-
-const handleClickAllWorkspace = () => {
-    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) });
-};
 </script>
 
 <template>
@@ -137,8 +131,6 @@ const handleClickAllWorkspace = () => {
         <p-select-dropdown v-if="!props.isAdminMode"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
                            style-type="transparent"
-                           is-filterable
-                           :search-text.sync="state.searchText"
                            :menu="state.workspaceMenuList"
                            hide-header-without-items
                            :selected="state.selectedWorkspace?.workspace_id"
@@ -156,39 +148,55 @@ const handleClickAllWorkspace = () => {
                     </span>
                 </p-tooltip>
             </template>
+            <template #menu-header>
+                <div class="menu-header-selected-workspace">
+                    <div class="workspace-wrapper">
+                        <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
+                                             :theme="state.selectedWorkspace?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span>{{ state.selectedWorkspace?.name }}</span>
+                    </div>
+                    <p-i name="ic_check"
+                         :color="violet[600]"
+                         width="1rem"
+                         height="1rem"
+                    />
+                </div>
+            </template>
+            <template #menu-item--format="{item}">
+                <div class="menu-item-wrapper">
+                    <span class="label">{{ item.label }}</span>
+                    <favorite-button :item-id="item.name"
+                                     :favorite-type="FAVORITE_TYPE.MENU"
+                                     scale="0.875"
+                                     class="favorite-button"
+                    />
+                </div>
+            </template>
             <template v-if="state.isDomainAdmin"
                       #menu-bottom
             >
-                <div class="all-workspace"
-                     @click="handleClickAllWorkspace"
-                >
-                    <p-i name="ic_list-card"
-                         height="1rem"
-                         width="1rem"
-                         class="verified-icon"
-                    />
-                    <span>{{ $t('COMMON.GNB.WORKSPACE.ALL_WORKSPACES') }}</span>
+                <div class="workspace-toolbox-wrapper">
+                    <p-divider />
+                    <div class="workspace-toolbox">
+                        <p-button style-type="substitutive"
+                                  size="sm"
+                                  class="create-new-button tool"
+                                  icon-left="ic_plus_bold"
+                        >
+                            {{ $t("COMMON.GNB.WORKSPACE.CREATE_WORKSPACE") }}
+                        </p-button>
+                        <p-button style-type="tertiary"
+                                  size="sm"
+                                  class="manage-button tool"
+                                  icon-left="ic_settings"
+                        >
+                            {{ $t("COMMON.GNB.WORKSPACE.MANAGE_WORKSPACE") }}
+                        </p-button>
+                    </div>
                 </div>
             </template>
-            <!--            <template #menu-item&#45;&#45;format="{ item }">-->
-            <!--                <span class="menu-wrapper">-->
-            <!--                    <span v-if="item.name === state.selectedWorkspace?.workspace_id"-->
-            <!--                          class="selected-icon"-->
-            <!--                    >-->
-            <!--                        <p-i name="ic_check"-->
-            <!--                             width="1rem"-->
-            <!--                             height="1rem"-->
-            <!--                             color="inherit"-->
-            <!--                        />-->
-            <!--                    </span>-->
-            <!--                    <p-text-highlighting class="selected-text"-->
-            <!--                                         :text="item.label"-->
-            <!--                                         :term="state.searchText"-->
-            <!--                                         style-type="secondary"-->
-            <!--                    />-->
-            <!--                </span>-->
-            <!--                &lt;!&ndash;                {{ item.label }}&ndash;&gt;-->
-            <!--            </template>-->
         </p-select-dropdown>
     </div>
 </template>
@@ -256,24 +264,66 @@ const handleClickAllWorkspace = () => {
             width: 3.625rem;
         }
 
+        .menu-header-selected-workspace {
+            @apply flex items-center justify-between text-label-md font-medium;
+            padding: 0.875rem 1rem;
+            border-bottom: 3px solid #dddddf;
+            .workspace-wrapper {
+                @apply flex items-center;
+                gap: 0.75rem;
+            }
+        }
+
+        .menu-item-wrapper {
+            @apply flex justify-between;
+        }
+
+        .workspace-toolbox-wrapper {
+            @apply flex flex-col absolute bg-white;
+            padding: 0.5rem 1rem;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            gap: 0.5rem;
+            .workspace-toolbox {
+                @apply relative flex flex-col;
+                gap: 1.25rem;
+                &::before {
+                    @apply absolute;
+                    content: "";
+                    top: 50%;
+                    left: -1rem;
+                    width: calc(100% + 2rem);
+                    border-bottom: 3px solid #dddddf;
+                }
+                .tool {
+                    height: 1.5rem;
+                }
+            }
+        }
+
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
-            min-width: 12rem !important;
-            .all-workspace {
-                @apply flex items-center absolute bg-white text-label-md border-gray-200 border-t cursor-pointer;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                padding-top: 0.5rem;
-                padding-bottom: 0.5rem;
-                padding-left: 0.5rem;
-                gap: 0.25rem;
+            min-width: 20rem !important;
+            margin-left: -2rem;
+            .p-context-menu-item {
+                .favorite-button {
+                    &:not(.active) {
+                        @apply hidden;
+                    }
+                    transform: scale(1);
+                }
+                &:hover {
+                    .favorite-button {
+                        @apply block;
+                    }
+                }
             }
         }
         &.is-domain-admin {
             :deep(.p-context-menu) {
                 .menu-container {
-                    padding-bottom: 2.25rem;
+                    padding-bottom: 5.75rem;
                 }
                 .bottom-slot-area {
                     padding: 0;
@@ -282,7 +332,7 @@ const handleClickAllWorkspace = () => {
         }
 
         .selected-workspace {
-            @apply text-label-lg text-gray-800 inline-block font-bold;
+            @apply text-label-lg text-gray-800 inline-block font-medium;
             max-width: 9.1875rem;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -308,25 +358,6 @@ const handleClickAllWorkspace = () => {
 
             @screen mobile {
                 @apply hidden;
-            }
-        }
-        .menu-wrapper {
-            @apply inline-flex items-center gap-1;
-            max-height: 2.25rem;
-            max-width: 19rem;
-
-            .selected-icon {
-                @apply inline-block text-violet-500;
-                width: 1rem;
-            }
-
-            .selected-text {
-                text-overflow: ellipsis;
-                overflow: hidden;
-
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
             }
         }
     }
