@@ -7,7 +7,7 @@ import type { GNBLogoIconTheme } from '@/common/modules/navigations/gnb/types/ty
 interface Props {
     theme?: GNBLogoIconTheme;
     text: string;
-    size?: 'sm'|'md';
+    size?: 'xs'|'sm'|'md';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +34,14 @@ const state = reactive({
 .workspace-logo-icon {
     @apply flex items-center justify-center text-white  font-bold;
     border-radius: 0.375rem;
+    &.xs {
+        @apply text-label-sm;
+        width: 1.25rem;
+        height: 1.25rem;
+        &.english-logo {
+            @apply text-label-sm;
+        }
+    }
     &.sm {
         @apply text-label-xl;
         width: 2rem;

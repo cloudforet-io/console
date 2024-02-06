@@ -1077,9 +1077,10 @@
 				"SEARCH": "Search"
 			},
 			"WORKSPACE": {
-				"ALL_WORKSPACES": "All workspaces",
-				"CURRENT_WORKSPACE": "Current Workspace",
-				"SWITCH_TO": "Switch To"
+				"CREATE_WORKSPACE": "Create New Workspace",
+				"MANAGE_WORKSPACE": "Manage Workspace",
+				"STARRED": "Starred",
+				"WORKSPACES": "Workspaces"
 			}
 		},
 		"HANDBOOK_BUTTON": {
