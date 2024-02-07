@@ -218,8 +218,8 @@ const handleChangeDate = (date: Dayjs) => {
 })();
 
 /* Watcher */
-watch([() => chartContext.value, () => state.chartData], async ([_chartContext]) => {
-    if (_chartContext) {
+watch([() => chartContext.value, () => state.chartData], async ([_chartContext, _chartData]) => {
+    if (_chartContext && _chartData) {
         drawChart();
     }
 }, { immediate: true });
