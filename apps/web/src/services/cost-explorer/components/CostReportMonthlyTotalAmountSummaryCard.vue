@@ -118,6 +118,7 @@ const state = reactive({
 /* Api */
 const analyzeCostReportData = debounce(async () => {
     state.loading = true;
+    chartHelper.clearChildrenOfRoot();
     try {
         const _period = {
             start: state.currentDate?.format('YYYY-MM'),
@@ -194,7 +195,6 @@ const drawChart = () => {
 /* Event */
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
-    chartHelper.clearChildrenOfRoot();
     analyzeCostReportData();
 };
 const handleClickDetailsLink = async () => {
@@ -209,7 +209,6 @@ const handleClickDetailsLink = async () => {
 };
 const handleChangeDate = (date: Dayjs) => {
     state.currentDate = date;
-    chartHelper.clearChildrenOfRoot();
     analyzeCostReportData();
 };
 
@@ -219,7 +218,7 @@ const handleChangeDate = (date: Dayjs) => {
 })();
 
 /* Watcher */
-watch([() => chartContext.value, () => state.data], async ([_chartContext]) => {
+watch([() => chartContext.value, () => state.chartData], async ([_chartContext]) => {
     if (_chartContext) {
         drawChart();
     }
