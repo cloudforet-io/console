@@ -47,7 +47,7 @@ const state = reactive({
     }),
     recentJob: computed<JobAnalyzeStatus|undefined>(() => {
         if (!props.item) return undefined;
-        return (props.item.recentJobAnalyze ?? [])[0];
+        return props.item.recentJobAnalyze?.[0];
     }),
     isScheduleActivated: false,
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
