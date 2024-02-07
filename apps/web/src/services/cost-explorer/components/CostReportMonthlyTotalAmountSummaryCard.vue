@@ -118,6 +118,7 @@ const state = reactive({
 /* Api */
 const analyzeCostReportData = debounce(async () => {
     state.loading = true;
+    chartHelper.clearChildrenOfRoot();
     try {
         const _period = {
             start: state.currentDate?.format('YYYY-MM'),
@@ -180,7 +181,6 @@ const drawChart = () => {
         valueField: 'value',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
-    chart.series.push(series);
     series.slices.template.setAll({
         stroke: chartHelper.color(white),
         templateField: 'pieSettings',
@@ -189,6 +189,7 @@ const drawChart = () => {
     chartHelper.setPieTooltipText(series, tooltip, costReportPageGetters.currency);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
+    chart.series.push(series);
 };
 
 /* Event */
@@ -217,8 +218,10 @@ const handleChangeDate = (date: Dayjs) => {
 })();
 
 /* Watcher */
-watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) drawChart();
+watch([() => chartContext.value, () => state.chartData], async ([_chartContext]) => {
+    if (_chartContext) {
+        drawChart();
+    }
 }, { immediate: true });
 watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
@@ -295,12 +298,12 @@ watch(() => state.currentDate, () => {
                         />
                     </p-text-button>
                     <div class="chart-wrapper">
-                        <p-skeleton v-if="state.loading"
+                        <p-skeleton v-show="state.loading"
                                     height="100%"
                                     width="100%"
+                                    class="chart-skeleton"
                         />
-                        <div v-show="!state.loading"
-                             ref="chartContext"
+                        <div ref="chartContext"
                              class="chart"
                         />
                     </div>
@@ -375,10 +378,19 @@ watch(() => state.currentDate, () => {
     .chart-wrapper {
         padding-top: 0.5rem;
         height: 12rem;
-    }
-    .chart {
-        width: 100%;
-        height: 100%;
+        position: relative;
+
+        .chart-skeleton {
+            position: absolute;
+            top: 0;
+            z-index: 3;
+            height: 100%;
+        }
+
+        .chart {
+            width: 100%;
+            height: 100%;
+        }
     }
 }
 .right-part {
