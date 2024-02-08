@@ -28,7 +28,7 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
-const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i];
+const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i, /^\/dashboard(?:\/(?=$))?$/i];
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 
@@ -49,7 +49,7 @@ const getDecodedDataFromAccessToken = (): {rol: string, wid: string} => {
     }
 };
 
-const getAccessibleWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
+const getValidWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
 
 const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
     const refreshToken = SpaceConnector.getRefreshToken();
@@ -109,11 +109,6 @@ export class SpaceRouter {
                 return;
             }
 
-            if (!to.name && to.path === '/') {
-                next({ name: ROOT_ROUTE._NAME });
-                return;
-            }
-
             const isInvalidRoute = !!to?.name && to?.path === '/';
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
@@ -140,9 +135,9 @@ export class SpaceRouter {
 
             // 2. Processes by Scope
             const routeScope = getRouteScope(to);
-            let nextLocation;
-            let grantFailStatus = SpaceRouter.router.app?.$store.getters['error/grantFailStatus'];
+            const grantFailStatus = SpaceRouter.router.app?.$store.getters['error/grantFailStatus'];
 
+            // 2-1. Exclude Auth Page
             if (routeScope === 'EXCLUDE_AUTH') {
                 if (to.meta?.isSignInPage) {
                     if (isTokenAlive) {
@@ -154,17 +149,28 @@ export class SpaceRouter {
                 return;
             }
 
+            // 2-2. Authenticated Page
             if (isTokenAlive) {
                 // AccessToken refers to data of existing scope.
-                const { rol, wid } = getDecodedDataFromAccessToken();
-                const isScopeChanged = !rol.startsWith(routeScope);
-                const exceptionScopeChangedCase = rol.startsWith('WORKSPACE') && routeScope === 'WORKSPACE';
-                const needToChangeScope = isScopeChanged || exceptionScopeChangedCase;
+                const { rol: prevRole, wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
+                const isScopeChanged = !prevRole.startsWith(routeScope);
+                const needNewScope = !prevRole;
+                const exceptionScopeChangedCase = prevRole.startsWith('WORKSPACE') && routeScope === 'WORKSPACE';
+                const needToChangeScope = isScopeChanged || needNewScope || exceptionScopeChangedCase;
 
                 if (needToChangeScope) {
+                    // 2-2-1. User Scope Route
                     if (routeScope === 'USER') {
                         const { failStatus } = await grantAndLoadByCurrentScope('USER');
-                        grantFailStatus = failStatus;
+                        if (failStatus) {
+                            await userWorkspaceStore.load();
+                            next({
+                                name: ERROR_ROUTE._NAME,
+                                params: { statusCode: '404' },
+                            });
+                        } else next();
+
+                    // 2-2-2. Workspace Scope Route
                     } else if (routeScope === 'WORKSPACE') {
                         const workspaceList = userWorkspaceStore.getters.workspaceList;
                         if (!workspaceList.length) {
@@ -172,73 +178,90 @@ export class SpaceRouter {
                             return;
                         }
 
-                        const targetWorkspaceId = to.params.workspaceId;
-                        if (targetWorkspaceId && wid && wid === targetWorkspaceId && !grantFailStatus) {
-                            next();
-                            return;
+                        const workspaceIdFromParams = to.params.workspaceId;
+                        let targetWorkspaceId = workspaceIdFromParams;
+
+                        if (workspaceIdFromParams) {
+                            if (prevWorkspaceId === workspaceIdFromParams && !grantFailStatus) {
+                                next();
+                                return;
+                            }
+                        } else {
+                            if (prevWorkspaceId) {
+                                next({
+                                    ...to,
+                                    name: to.name as string,
+                                    params: {
+                                        ...to.params,
+                                        workspaceId: prevWorkspaceId,
+                                    },
+                                    query: to.query,
+                                });
+                                return;
+                            }
+
+                            const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
+                            if (lastAccessedWorkspaceId) {
+                                targetWorkspaceId = lastAccessedWorkspaceId;
+                            } else targetWorkspaceId = workspaceList[0].workspace_id;
                         }
-                        if (wid && !targetWorkspaceId) {
-                            next({
-                                ...to,
-                                name: to.name as string,
-                                params: {
-                                    ...to.params,
-                                    workspaceId: wid,
-                                },
-                                query: to.query,
-                            });
-                            return;
-                        }
-                        if (targetWorkspaceId && !getAccessibleWorkspaceId(targetWorkspaceId, workspaceList)) {
+
+                        if (!getValidWorkspaceId(targetWorkspaceId, workspaceList)) {
                             next({
                                 name: ERROR_ROUTE._NAME,
                                 params: { statusCode: '404' },
                             });
-                            return;
-                        }
+                        } else {
+                            const { failStatus } = await grantAndLoadByCurrentScope('WORKSPACE', targetWorkspaceId);
 
-                        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
-                        const cachedAccessibleWorkspaceId = getAccessibleWorkspaceId(lastAccessedWorkspaceId, workspaceList);
-                        const validWorkspaceId = targetWorkspaceId || cachedAccessibleWorkspaceId || workspaceList[0].workspace_id;
-                        const { failStatus } = await grantAndLoadByCurrentScope('WORKSPACE', validWorkspaceId);
-                        grantFailStatus = failStatus;
-
-                        if (!failStatus) {
-                            const pageAccessPermissionList = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
-                            const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
-                            if (isAccessibleRoute) {
-                                if (!targetWorkspaceId) {
-                                    nextLocation = {
+                            if (failStatus) {
+                                await userWorkspaceStore.load();
+                                next({
+                                    name: ERROR_ROUTE._NAME,
+                                    params: { statusCode: '404' },
+                                });
+                            } else {
+                                const pageAccessPermissionList = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
+                                const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
+                                if (isAccessibleRoute) {
+                                    next({
                                         ...to,
+                                        name: to.name as string,
                                         params: {
                                             ...to.params,
-                                            workspaceId: validWorkspaceId,
+                                            workspaceId: targetWorkspaceId,
                                         },
-                                    };
+                                        query: to.query,
+                                    });
+                                } else {
+                                    next({
+                                        name: HOME_DASHBOARD_ROUTE._NAME,
+                                        params: { workspaceId: targetWorkspaceId },
+                                    });
                                 }
-                            } else {
-                                nextLocation = {
-                                    name: HOME_DASHBOARD_ROUTE._NAME,
-                                    params: { workspaceId: validWorkspaceId },
-                                };
                             }
                         }
+
+
+
+
+                    // 2-2-3. Domain Scope Route
                     } else if (routeScope === 'DOMAIN') {
                         const { failStatus } = await grantAndLoadByCurrentScope('DOMAIN');
-                        grantFailStatus = failStatus;
+                        if (failStatus) {
+                            await userWorkspaceStore.load();
+                            next({
+                                name: ERROR_ROUTE._NAME,
+                                params: { statusCode: '404' },
+                            });
+                        } else next();
                     }
-                } else appContextStore.setGlobalGrantLoading(false);
-
-                if (grantFailStatus) {
-                    await userWorkspaceStore.load();
-                    nextLocation = {
-                        name: ERROR_ROUTE._NAME,
-                        params: { statusCode: '404' },
-                    };
+                } else next();
+            } else {
+                if (to.name === AUTH_ROUTE.SIGN_OUT._NAME) {
+                    next();
+                    return;
                 }
-
-                next(nextLocation);
-            } else if (to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                 next({
                     name: AUTH_ROUTE.SIGN_OUT._NAME,
                     query: { nextPath: to.fullPath },
