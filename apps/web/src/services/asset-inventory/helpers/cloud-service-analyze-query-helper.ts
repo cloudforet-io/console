@@ -27,7 +27,7 @@ const DEFAULT_SORT = [
     { key: 'provider', desc: false },
     { key: 'cloud_service_group', desc: false },
 ];
-export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: Page, period?: Period): Query => {
+export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: Page, period?: Period, allOption = false): Query => {
     // initialize query helper
     cloudServiceQueryHelper.setOrFilters([])
         .setFilters([])
@@ -37,7 +37,7 @@ export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: 
     cloudServiceQueryHelper.addFilter(...allFilters);
 
     // set default filters
-    cloudServiceQueryHelper.addFilter({ k: 'ref_cloud_service_type.is_primary', v: true, o: '=' });
+    if (!allOption) cloudServiceQueryHelper.addFilter({ k: 'ref_cloud_service_type.is_primary', v: true, o: '=' });
 
     // set filters by period
     if (period) {
