@@ -32,7 +32,7 @@ export class GTag {
         return GTag._gtag;
     }
 
-    static setGtagUserID(domainId?: string, userId?: string) {
+    static setGtagUserID(domainId?: string, userId?: string, domainName?: string) {
         if (GTag.gtag) {
             try {
                 if (domainId && userId) {
@@ -41,6 +41,7 @@ export class GTag {
                     GTag.gtag.set({
                         user_id: `${domainId}:${hashids.encode(1)}`,
                         domain_id: domainId,
+                        page_title: `${document.title} | ${domainName}`,
                     });
                 }
             } catch (e) {
