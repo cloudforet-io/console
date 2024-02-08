@@ -2467,6 +2467,11 @@
 				"USAGE_OVERVIEW": "利用概要",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}の利用状況"
 			},
+			"MAIN_EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "主要クラウドサービスのデータは、複数のファイルとしてダウンロードされます。",
+				"NOTICE_DESCRIPTION": "「全クラウドサービス」を選択した場合、データ量の増加により、ダウンロードにかなりの時間がかかる可能性があります。",
+				"OPTION_TITLE": "全クラウドサービス（推奨されません）"
+			},
 			"PAGE": {
 				"ACTION": "作業",
 				"ALL": "すべて",
