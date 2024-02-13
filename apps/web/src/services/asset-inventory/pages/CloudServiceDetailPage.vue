@@ -199,7 +199,16 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
                 // is_default: false,
             };
         }
-        return await SpaceConnector.client.addOns.pageSchema.get(params);
+        const response = await SpaceConnector.client.addOns.pageSchema.get(params);
+        /*
+        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
+        * Therefore, it is segmented as follows:
+        * */
+        const workspaceIndex = response.options.fields.findIndex((field) => field.name === 'Workspace');
+        if (!appContextGetters.isAdminMode) {
+            response.options.fields.splice(workspaceIndex, 1);
+        }
+        return response;
     } catch (e) {
         ErrorHandler.handleError(e);
         return null;
