@@ -11,7 +11,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.vue';
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
-import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
+import GNBSearchClone from '@/common/modules/navigations/gnb/modules/gnb-search-clone/GNBSearch.vue';
 import GNBAdminToggleButton from '@/common/modules/navigations/gnb/modules/GNBAdminToggleButton.vue';
 
 const props = withDefaults(defineProps<{
@@ -51,10 +51,15 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
 
 <template>
     <div class="gnb-toolset">
-        <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"
-                      :visible="props.openedMenu === 'search'"
-                      @update:visible="updateOpenedMenu('search', $event)"
+        <g-n-b-search-clone v-if="!state.isAdminMode && !state.isGrantLoading"
+                            :visible="props.openedMenu === 'search'"
+                            @update:visible="updateOpenedMenu('search', $event)"
         />
+
+        <!--        <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"-->
+        <!--                      :visible="props.openedMenu === 'search'"-->
+        <!--                      @update:visible="updateOpenedMenu('search', $event)"-->
+        <!--        />-->
         <p-tooltip :contents="state.tooltipTexts.recentFavorite"
                    position="bottom"
         >
