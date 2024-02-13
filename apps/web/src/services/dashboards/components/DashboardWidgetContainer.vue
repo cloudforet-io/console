@@ -202,13 +202,13 @@ const handleDeleteModalConfirm = () => {
     widgetDeleteState.targetWidget = null;
 };
 
-/* widget edit modal */
+/* widget full mode */
 const widgetFullModeState = reactive({
-    visibleModal: false,
+    visibleFullMode: false,
     targetWidget: null as ReformedWidgetInfo|null,
 });
 const handleUpdateViewModalVisible = async (visible: boolean) => {
-    widgetFullModeState.visibleModal = visible;
+    widgetFullModeState.visibleFullMode = visible;
     if (visible) return;
 
     const widgetKey = widgetFullModeState.targetWidget?.widget_key;
@@ -262,8 +262,8 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                 </template>
             </div>
         </p-data-loader>
-        <widget-full-mode-modal v-if="widgetFullModeState.visibleModal"
-                                :visible="widgetFullModeState.visibleModal"
+        <widget-full-mode-modal v-if="widgetFullModeState.visibleFullMode"
+                                :visible="widgetFullModeState.visibleFullMode"
                                 :widget-key="widgetFullModeState.targetWidget?.widget_key"
                                 :size="widgetFullModeState.targetWidget?.size"
                                 :theme="widgetFullModeState.targetWidget?.theme"
