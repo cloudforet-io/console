@@ -1,40 +1,5 @@
-<template>
-    <div class="gnb-search-input"
-         @click.stop="$emit('click')"
-    >
-        <p-i v-if="!isFocused"
-             name="ic_search"
-             height="1.5rem"
-             width="1.5rem"
-             color="inherit"
-        />
-        <input ref="inputRef"
-               :value="value"
-               :placeholder="placeholder"
-               @input="$emit('input', $event.target.value)"
-               @focus="$emit('update:isFocused', true)"
-               @blur="$emit('update:isFocused', false)"
-               @keyup.esc="$emit('esc')"
-               @keydown.up="$emit('arrow-up')"
-               @keydown.down="$emit('arrow-down')"
-        >
-        <p-i v-if="value"
-             name="ic_close"
-             height="1rem"
-             width="1rem"
-             color="inherit"
-             class="delete-button"
-             @click.stop="$emit('input', '')"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive, watch } from 'vue';
 
 import { PI } from '@spaceone/design-system';
 
@@ -45,43 +10,56 @@ interface Props {
     isFocused: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'GNBSearchInput',
-    components: {
-        PI,
-    },
-    model: {
-        prop: 'value',
-        event: 'input',
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        isFocused: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            inputRef: null as null|HTMLElement,
-            placeholder: computed(() => (i18n.t('COMMON.GNB.SEARCH.SERACH'))),
-        });
-
-        watch(() => props.isFocused, (isFocused) => {
-            if (!state.inputRef) return;
-            if (isFocused) state.inputRef.focus();
-            else state.inputRef.blur();
-        });
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    value: '',
+    isFocused: false,
 });
+
+
+const state = reactive({
+    inputRef: null as null|HTMLElement,
+    placeholder: computed(() => (i18n.t('COMMON.GNB.SEARCH.SERACH'))),
+});
+
+watch(() => props.isFocused, (isFocused) => {
+    if (!state.inputRef) return;
+    if (isFocused) state.inputRef.focus();
+    else state.inputRef.blur();
+});
+
+
 </script>
+
+<template>
+    <div class="gnb-search-input"
+         @click.stop="$emit('click')"
+    >
+        <p-i v-if="!props.isFocused"
+             name="ic_search"
+             height="1.5rem"
+             width="1.5rem"
+             color="inherit"
+        />
+        <input ref="inputRef"
+               :value="props.value"
+               :placeholder="state.placeholder"
+               @input="$emit('input', $event.target.value)"
+               @focus="$emit('update:isFocused', true)"
+               @blur="$emit('update:isFocused', false)"
+               @keyup.esc="$emit('esc')"
+               @keydown.up="$emit('arrow-up')"
+               @keydown.down="$emit('arrow-down')"
+        >
+        <p-i v-if="props.value"
+             name="ic_close"
+             height="1rem"
+             width="1rem"
+             color="inherit"
+             class="delete-button"
+             @click.stop="$emit('input', '')"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .gnb-search-input {
