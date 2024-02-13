@@ -29,7 +29,7 @@ export interface WidgetProps<T = any> {
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
-    disableViewMode?: boolean;
+    disableFullMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
     dashboardSettings?: DashboardSettings;
     dashboardVariablesSchema?: DashboardVariablesSchema;
@@ -44,7 +44,7 @@ export interface NewWidgetProps {
     widgetInfo: DashboardLayoutWidgetInfo;
     editMode?: boolean;
     errorMode?: boolean;
-    disableViewMode?: boolean;
+    disableFullMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     settings?: DashboardSettings;

@@ -53,7 +53,7 @@ export const useWidgetFrame = (
         currency: widgetState.currency,
         disableFullSize: !widgetState.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
         isOnlyFullSize: widgetState.widgetConfig?.sizes.length === 1 && widgetState.widgetConfig?.sizes[0] === WIDGET_SIZE.full,
-        disableViewMode: props.disableViewMode,
+        disableFullMode: props.disableFullMode,
         widgetLocation: widgetState.widgetLocation,
         errorMode: props.errorMode,
         theme: props.theme,
