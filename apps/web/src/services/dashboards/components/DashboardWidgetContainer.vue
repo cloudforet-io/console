@@ -126,7 +126,7 @@ const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
         dashboardDetailStore.toggleWidgetSize(widget.widget_key);
     } else {
         widgetFullModeState.targetWidget = widget;
-        widgetFullModeState.visibleModal = true;
+        widgetFullModeState.visibleFullMode = true;
     }
 };
 
