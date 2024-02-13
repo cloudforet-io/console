@@ -54,7 +54,7 @@ interface AutocompleteResourceResult {
     data?: CloudServiceData;
 }
 
-const LAPTOP_WINDOW_SIZE = screens.laptop.max;
+const MOBILE_WINDOW_SIZE = screens.mobile.max;
 
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
@@ -81,7 +81,7 @@ const state = reactive({
         if (state.inputText) return state.inputText.trim();
         return '';
     }),
-    isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
+    isOverMobileSize: window.innerWidth > MOBILE_WINDOW_SIZE,
     loading: true,
     showRecent: computed(() => !state.inputText.length),
     tooltipTexts: computed<Record<string, string>>(() => ({
@@ -319,7 +319,7 @@ const handleSelect = (index: number, type: SuggestionType) => {
 };
 
 const onWindowResize = throttle(() => {
-    state.isOverLaptopSize = window.innerWidth > LAPTOP_WINDOW_SIZE;
+    state.isOverMobileSize = window.innerWidth > MOBILE_WINDOW_SIZE;
 }, 500);
 
 onMounted(() => {
@@ -353,7 +353,7 @@ watch(() => props.visible, async (visible) => {
          class="gnb-search"
          @click.stop
     >
-        <g-n-b-search-input v-if="state.isOverLaptopSize"
+        <g-n-b-search-input v-if="state.isOverMobileSize"
                             v-model="state.inputText"
                             :is-focused.sync="state.isFocusOnInput"
                             @click="showSearchMenu"
@@ -395,7 +395,7 @@ watch(() => props.visible, async (visible) => {
                                @select="handleSelect"
         >
             <template #search-input>
-                <g-n-b-search-input v-if="!state.isOverLaptopSize"
+                <g-n-b-search-input v-if="!state.isOverMobileSize"
                                     v-model="state.inputText"
                                     :is-focused.sync="state.isFocusOnInput"
                                     @click="showSearchMenu"
