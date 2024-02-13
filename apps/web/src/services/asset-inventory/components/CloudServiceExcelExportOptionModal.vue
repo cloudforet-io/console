@@ -187,10 +187,14 @@ const handleConfirm = async () => {
     };
     downloadExcelByExportFetcher(excelExportFetcher);
     emits('update:visible', false);
+    state.allOptionValue = false;
     state.downloadLoading = false;
 };
 const handleUpdateVisible = (visible: boolean) => {
     emits('update:visible', visible);
+    if (!visible) {
+        state.allOptionValue = false;
+    }
 };
 
 
