@@ -12,7 +12,6 @@ import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.v
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearchClone from '@/common/modules/navigations/gnb/modules/gnb-search-clone/GNBSearch.vue';
-import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 import GNBAdminToggleButton from '@/common/modules/navigations/gnb/modules/GNBAdminToggleButton.vue';
 
 const props = withDefaults(defineProps<{
