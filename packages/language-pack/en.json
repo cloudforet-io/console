@@ -2468,8 +2468,8 @@
 				"USAGE_OVERVIEW_OF_RESOURCE": "Usage Overview of {resource}"
 			},
 			"MAIN_EXCEL_EXPORT_MODAL": {
-				"DESCRIPTION": "The data of Main Cloud Services will downloaded as Multiple Files",
-				"NOTICE_DESCRIPTION": "If checked, this may significantly increase download time due to the large volume of data.",
+				"DESCRIPTION": "The data from the Main Cloud Services will be downloaded as multiple files.",
+				"NOTICE_DESCRIPTION": "If switched to ON, it may significantly increase the download time due to the large volume of data involved.",
 				"OPTION_TITLE": "All Cloud Service (Not Recommended)"
 			},
 			"PAGE": {

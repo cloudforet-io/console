@@ -185,7 +185,7 @@ const handleConfirm = async () => {
         };
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
-    downloadExcelByExportFetcher(excelExportFetcher);
+    await downloadExcelByExportFetcher(excelExportFetcher);
     emits('update:visible', false);
     state.allOptionValue = false;
     state.downloadLoading = false;
