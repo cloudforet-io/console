@@ -8,16 +8,9 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
-import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/settings/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostReportMonthlyTotalAmountSummaryCard
     from '@/services/cost-explorer/components/CostReportMonthlyTotalAmountSummaryCard.vue';
@@ -46,25 +39,7 @@ const state = reactive({
     ]),
     activeTab: 'overview',
     currency: 'KRW' as Currency,
-    loading: true,
-    hasReport: false,
 });
-
-/* Api */
-const listCostReport = async () => {
-    try {
-        state.loading = true;
-        const { total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
-            status: 'SUCCESS',
-            query: { count_only: true },
-        });
-        state.hasReport = (total_count ?? 0) > 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
-};
 
 /* Watcher */
 watch(() => state.activeTab, (activeTab) => {
@@ -73,7 +48,7 @@ watch(() => state.activeTab, (activeTab) => {
 
 onMounted(() => {
     costReportPageStore.fetchCostReportConfig();
-    listCostReport();
+    costReportPageStore.fetchRecentReportData();
 });
 </script>
 
@@ -84,16 +59,16 @@ onMounted(() => {
                :active-tab.sync="state.activeTab"
         >
             <template #overview>
-                <div v-if="!state.loading"
+                <div v-if="!costReportPageState.recentReportDataLoading"
                      class="overview-tab-pane"
                 >
-                    <cost-report-overview-cost-trend-card v-if="!state.loading && state.hasReport"
+                    <cost-report-overview-cost-trend-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
                                                           class="col-span-12"
                     />
-                    <cost-report-monthly-total-amount-summary-card v-if="!state.loading & state.hasReport"
+                    <cost-report-monthly-total-amount-summary-card v-if="!costReportPageState.recentReportDataLoading & costReportPageState.hasReport"
                                                                    class="xl:col-span-8 lg:col-span-6 col-span-12"
                     />
-                    <p-empty v-if="!state.loading && !state.hasReport"
+                    <p-empty v-if="!costReportPageState.recentReportDataLoading && !costReportPageState.hasReport"
                              class="xl:col-span-8 lg:col-span-6 col-span-12 empty-card"
                              show-image
                              :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.NO_REPORT')"

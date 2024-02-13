@@ -10,7 +10,7 @@ import { debounce } from 'lodash';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import DashboardWidgetEditModal from '@/services/dashboards/components/DashboardWidgetEditModal.vue';
-import WidgetViewModeModal from '@/services/dashboards/components/WidgetViewModeModal.vue';
+import WidgetFullModeModal from '@/services/dashboards/components/WidgetFullModeModal.vue';
 import {
     useDashboardContainerWidth,
 } from '@/services/dashboards/composables/use-dashboard-container-width';
@@ -25,6 +25,7 @@ import type {
     UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
@@ -63,7 +64,7 @@ const getWidgetLoading = (widgetKey: string) => {
     if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetKey]) return true;
-    if (widgetViewState.targetWidget?.widget_key === widgetKey) return true;
+    if (widgetFullModeState.targetWidget?.widget_key === widgetKey) return true;
     return false;
 };
 
@@ -124,8 +125,8 @@ const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
     if (props.editMode) {
         dashboardDetailStore.toggleWidgetSize(widget.widget_key);
     } else {
-        widgetViewState.targetWidget = widget;
-        widgetViewState.visibleModal = true;
+        widgetFullModeState.targetWidget = widget;
+        widgetFullModeState.visibleFullMode = true;
     }
 };
 
@@ -201,22 +202,22 @@ const handleDeleteModalConfirm = () => {
     widgetDeleteState.targetWidget = null;
 };
 
-/* widget edit modal */
-const widgetViewState = reactive({
-    visibleModal: false,
+/* widget full mode */
+const widgetFullModeState = reactive({
+    visibleFullMode: false,
     targetWidget: null as ReformedWidgetInfo|null,
 });
 const handleUpdateViewModalVisible = async (visible: boolean) => {
-    widgetViewState.visibleModal = visible;
+    widgetFullModeState.visibleFullMode = visible;
     if (visible) return;
 
-    const widgetKey = widgetViewState.targetWidget?.widget_key;
+    const widgetKey = widgetFullModeState.targetWidget?.widget_key;
     const foundWidgetRef = widgetRef.value.find((comp) => comp?.$el.id === widgetKey);
     if (foundWidgetRef) {
         await nextTick();
         foundWidgetRef.refreshWidget();
     }
-    widgetViewState.targetWidget = null;
+    widgetFullModeState.targetWidget = null;
 };
 </script>
 
@@ -246,7 +247,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :edit-mode="props.editMode"
                                :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
-                               :disable-refresh-on-variable-change="widgetViewState.visibleModal"
+                               :disable-refresh-on-variable-change="widgetFullModeState.visibleFullMode"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
@@ -261,11 +262,11 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                 </template>
             </div>
         </p-data-loader>
-        <widget-view-mode-modal v-if="widgetViewState.visibleModal"
-                                :visible="widgetViewState.visibleModal"
-                                :widget-key="widgetViewState.targetWidget?.widget_key"
-                                :size="widgetViewState.targetWidget?.size"
-                                :theme="widgetViewState.targetWidget?.theme"
+        <widget-full-mode-modal v-if="widgetFullModeState.visibleFullMode"
+                                :visible="widgetFullModeState.visibleFullMode"
+                                :widget-key="widgetFullModeState.targetWidget?.widget_key"
+                                :size="widgetFullModeState.targetWidget?.size"
+                                :theme="widgetFullModeState.targetWidget?.theme"
                                 @update:visible="handleUpdateViewModalVisible"
         />
         <dashboard-widget-edit-modal v-if="widgetEditState.targetWidget"

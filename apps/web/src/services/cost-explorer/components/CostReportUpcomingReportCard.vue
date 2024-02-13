@@ -2,6 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import { PButton, PSkeleton, PDivider } from '@spaceone/design-system';
+import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -21,14 +22,28 @@ const storeState = reactive({
 });
 const state = reactive({
     settingsModalVisible: false,
+    recentIssueDate: computed<Dayjs>(() => {
+        const today = dayjs.utc();
+        if (Number(today.format('D')) < costReportPageGetters.issueDay) {
+            return today.subtract(1, 'month').date(costReportPageGetters.issueDay);
+        }
+        return today.date(costReportPageGetters.issueDay);
+    }),
+    recentReportDate: computed<Dayjs>(() => {
+        const today = dayjs.utc();
+        if (Number(today.format('D')) < costReportPageGetters.issueDay) {
+            return today.subtract(2, 'month');
+        }
+        return today.subtract(1, 'month');
+    }),
     upcomingReportDateText: computed(() => {
         const issueDay = costReportPageGetters.issueDay;
         const issueDayText = issueDay < 10 ? `0${issueDay}` : String(issueDay);
-        const upcomingIssueDate = dayjs.utc(costReportPageGetters.recentIssueDate).add(1, 'month').format('YYYY-MM');
+        const upcomingIssueDate = state.recentIssueDate.add(1, 'month').format('YYYY-MM');
         return `${upcomingIssueDate}-${issueDayText}`;
     }),
     upcomingReportDateRangeText: computed(() => {
-        const upcomingReportDate = dayjs.utc(costReportPageGetters.recentReportDate).add(1, 'month');
+        const upcomingReportDate = state.recentReportDate.add(1, 'month');
         const startOfNextMonth = upcomingReportDate.startOf('month');
         const endOfNextMonth = upcomingReportDate.endOf('month');
         return `${startOfNextMonth.format('YYYY-MM-DD')} ~ ${endOfNextMonth.format('YYYY-MM-DD')}`;

@@ -8,7 +8,6 @@ import {
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
@@ -41,6 +40,7 @@ type CostReportDataAnalyzeResult = {
 };
 const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
+const costReportPageState = costReportPageStore.state;
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -49,8 +49,8 @@ const state = reactive({
     loading: true,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     dateSelectDropdown: computed<SelectDropdownMenuItem[]>(() => {
-        const _defaultStart = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
-        const _defaultEnd = costReportPageGetters.recentReportDate.format('YYYY-MM');
+        const _defaultStart = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
+        const _defaultEnd = costReportPageState.recentReportMonth;
         const _default: SelectDropdownMenuItem = {
             name: 'last12Months', label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.LAST_12_MONTHS')} (${_defaultStart} ~ ${_defaultEnd})`,
         };
@@ -69,12 +69,15 @@ const state = reactive({
         { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
-    previousTotalAmount: computed<number>(() => getPreviousTotalAmount(costReportPageGetters.recentReportDate, state.data?.results)),
+    previousTotalAmount: computed<number>(() => {
+        if (!costReportPageState.recentReportMonth) return 0;
+        return getPreviousTotalAmount(costReportPageState.recentReportMonth, state.data?.results);
+    }),
     last12MonthsAverage: computed<number>(() => getLast12MonthsAverage(state.data?.results)),
     period: computed(() => {
         if (state.selectedDate === 'last12Months') {
-            const start = costReportPageGetters.recentReportDate.subtract(11, 'month').format('YYYY-MM');
-            const end = costReportPageGetters.recentReportDate.format('YYYY-MM');
+            const start = dayjs.utc(costReportPageState.recentReportMonth).subtract(11, 'month').format('YYYY-MM');
+            const end = costReportPageState.recentReportMonth;
             return { start, end };
         }
         const start = `${state.selectedDate}-01`;
@@ -91,12 +94,11 @@ const state = reactive({
 });
 
 /* Util */
-const getPreviousTotalAmount = (recentReportDate: Dayjs, results?: CostReportDataAnalyzeResult[]): number => {
+const getPreviousTotalAmount = (recentReportMonth: string, results?: CostReportDataAnalyzeResult[]): number => {
     if (!results) return 0;
     let _totalAmount = 0;
-    const previousMonth = recentReportDate.format('YYYY-MM');
     results.forEach((item) => {
-        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === previousMonth);
+        const _valueSum = item.value_sum?.find((valueSum) => valueSum.date === recentReportMonth);
         if (_valueSum) {
             _totalAmount += _valueSum.value;
         }

@@ -76,7 +76,7 @@ const state = reactive({
 
 const selectWorkspace = (name: string): void => {
     const workspaceId = name;
-    if (workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+    if (!workspaceId || workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
@@ -93,12 +93,9 @@ const selectWorkspace = (name: string): void => {
     }
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-    const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
-    if (workspaceId) {
-        if (workspaceId === state.selectedWorkspace?.workspace_id) return;
-        userWorkspaceStore.setCurrentWorkspace(workspaceId);
-        router.push({ name: MENU_INFO_MAP[closestMenuId].routeName, params: { workspaceId } });
-    }
+    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+    userWorkspaceStore.setCurrentWorkspace(workspaceId);
+    router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
 };
 </script>
 

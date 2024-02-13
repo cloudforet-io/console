@@ -2468,6 +2468,11 @@
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},
+			"MAIN_EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "전체 데이터 중 주요 클라우드 서비스 데이터가 다중 파일로 다운로드 됩니다.",
+				"NOTICE_DESCRIPTION": "‘전체 클라우드 서비스’ 선택 시, 데이터 양의 대폭 증가로 인해 상당한 다운로드 시간이 소요될 수 있습니다.",
+				"OPTION_TITLE": "전체 클라우드 서비스 (추천하지 않음)"
+			},
 			"PAGE": {
 				"ACTION": "작업",
 				"ALL": "전체",

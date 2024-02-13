@@ -1,5 +1,3 @@
-import type { AsyncComponent } from 'vue';
-
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type {
@@ -53,7 +51,6 @@ export interface BaseConfigInfo {
 }
 export interface WidgetConfig {
     widget_config_id: string;
-    widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
     labels?: Array<'Cost'|'Asset'|'Budget'|string>;
