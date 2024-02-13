@@ -13,6 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { UserState } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -70,6 +71,9 @@ const emit = defineEmits<{(e: 'complete'): void;
     (e: 'update:selected-tag-keys', tagKeys: string[]): void;
 }>();
 
+
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 let schema: any = {};
 const _userConfigMap = computed<UserState>(() => store.state.user);
@@ -172,6 +176,14 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
                 schema: 'table',
                 options,
             });
+        }
+        /*
+        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
+        * Therefore, it is segmented as follows:
+        * */
+        const workspaceIndex = res.options.fields.findIndex((field) => field.name === 'Workspace');
+        if (!appContextGetters.isAdminMode) {
+            res.options.fields.splice(workspaceIndex, 1);
         }
         schema = res;
         delete schema.options?.search;
