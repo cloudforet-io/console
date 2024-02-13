@@ -109,6 +109,7 @@ export class SpaceRouter {
                 return;
             }
 
+
             const isInvalidRoute = !!to?.name && to?.path === '/';
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
@@ -256,7 +257,10 @@ export class SpaceRouter {
                             });
                         } else next();
                     }
-                } else next();
+                } else {
+                    appContextStore.setGlobalGrantLoading(false);
+                    next();
+                }
             } else {
                 if (to.name === AUTH_ROUTE.SIGN_OUT._NAME) {
                     next();
