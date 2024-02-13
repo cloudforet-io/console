@@ -21,7 +21,7 @@ import { gray } from '@/styles/colors';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
-import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
+import WidgetFullModeModalSidebar from '@/services/dashboards/components/WidgetFullModeModalSidebar.vue';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -32,7 +32,7 @@ import type {
 } from '@/services/dashboards/widgets/_types/widget-type';
 
 
-interface WidgetViewModeModalProps {
+interface WidgetFullModeModalProps {
     visible: boolean;
     widgetKey?: string;
     size?: WidgetSize;
@@ -40,7 +40,7 @@ interface WidgetViewModeModalProps {
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
-const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
+const props = withDefaults(defineProps<WidgetFullModeModalProps>(), {
     visible: false,
     widgetKey: undefined,
     size: undefined,
@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
 
 <template>
     <transition name="slide-up">
-        <div class="widget-view-mode-modal">
+        <div class="widget-full-mode-modal">
             <div class="content-wrapper">
                 <div class="top-wrapper">
                     <p-button icon-left="ic_arrow-left"
@@ -198,14 +198,14 @@ onBeforeUnmount(() => {
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="state.loadingWidget"
-                               disable-view-mode
+                               disable-full-mode
                                @mounted="state.loadingWidget = false"
                                @update-widget-info="handleUpdateWidgetInfo(props.widgetKey, $event)"
                                @update-widget-validation="handleUpdateValidation(props.widgetKey, $event)"
                     />
                 </div>
             </div>
-            <widget-view-mode-modal-sidebar v-if="state.originWidgetInfo"
+            <widget-full-mode-modal-sidebar v-if="state.originWidgetInfo"
                                             v-show="state.sidebarVisible"
                                             :widget-config-id="state.originWidgetInfo.widget_name"
                                             :widget-key="state.originWidgetInfo.widget_key"
@@ -219,7 +219,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-view-mode-modal {
+.widget-full-mode-modal {
     @apply bg-gray-100;
     position: fixed;
     top: 0;

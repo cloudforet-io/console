@@ -47,7 +47,7 @@ export interface WidgetFrameProps {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
-    disableViewMode?: boolean;
+    disableFullMode?: boolean;
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
@@ -154,7 +154,7 @@ const state = reactive({
 const handleEditButtonClick = () => {
     emit('click-edit');
 };
-const handleClickViewModeButton = () => {
+const handleClickFullModeButton = () => {
     emit('click-expand');
 };
 </script>
@@ -169,13 +169,13 @@ const handleClickViewModeButton = () => {
                 {{ props.title }}
             </h3><slot name="header-right" />
         </div>
-        <p-icon-button v-if="!props.editMode && !props.disableViewMode"
+        <p-icon-button v-if="!props.editMode && !props.disableFullMode"
                        v-tooltip.bottom="$t('DASHBOARDS.FULL_SCREEN_VIEW.FULL_SCREEN_VIEW')"
-                       class="view-mode-button"
+                       class="full-mode-button"
                        name="ic_arrows-expand-all"
                        shape="square"
                        style-type="tertiary"
-                       @click="handleClickViewModeButton"
+                       @click="handleClickFullModeButton"
         />
         <div class="body"
              :style="{overflowY: props.overflowY}"
@@ -305,14 +305,14 @@ const handleClickViewModeButton = () => {
         border-color: inherit;
         flex: 0 0;
     }
-    .view-mode-button {
+    .full-mode-button {
         position: absolute;
         display: none;
         right: 0.25rem;
         top: 0.25rem;
     }
     &:hover {
-        .view-mode-button {
+        .full-mode-button {
             display: flex;
         }
     }
