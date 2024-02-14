@@ -3173,7 +3173,8 @@
 		"SERVICE_ACCOUNT": "サービスアカウント",
 		"SERVICE_ACCOUNT_TYPE": "アカウントタイプ",
 		"TAGS": "タグ",
-		"UPDATED_AT": "変更日"
+		"UPDATED_AT": "変更日",
+		"WORKSPACE": "ワークスペース"
 	},
 	"PLUGIN": {
 		"COLLECTOR": {

@@ -13,6 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { UserState } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -38,6 +39,7 @@ interface Props {
         provider?: string;
         cloudServiceGroup?: string;
         cloudServiceType?: string;
+        include_workspace_info?: boolean;
     };
     isServerPage?: boolean;
 }
@@ -69,6 +71,9 @@ const emit = defineEmits<{(e: 'complete'): void;
     (e: 'update:selected-tag-keys', tagKeys: string[]): void;
 }>();
 
+
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 let schema: any = {};
 const _userConfigMap = computed<UserState>(() => store.state.user);
@@ -147,10 +152,13 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         const options: GetSchemaParams['options'] = {
             include_optional_fields: includeOptionalFields,
         };
-        const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+        const {
+            provider, cloudServiceGroup, cloudServiceType, include_workspace_info,
+        } = props.options;
         if (provider)options.provider = provider;
         if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
         if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+        if (include_workspace_info) options.include_workspace_info = include_workspace_info;
 
         let res;
         if (state.isServiceAccountTable && props.resourceType) {
@@ -168,6 +176,14 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
                 schema: 'table',
                 options,
             });
+        }
+        /*
+        * NOTE: The storage for schema config is the same for both user and admin modes, making it difficult to distinguish data on the entry level.
+        * Therefore, it is segmented as follows:
+        * */
+        const workspaceIndex = res.options.fields.findIndex((field) => field.name === 'Workspace');
+        if (!appContextGetters.isAdminMode) {
+            res.options.fields.splice(workspaceIndex, 1);
         }
         schema = res;
         delete schema.options?.search;

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
+import {
+    PDynamicLayout, PButtonTab, PTextButton, PI,
+} from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
@@ -27,7 +29,9 @@ import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import {
     dynamicFieldsToExcelDataFields,
@@ -39,8 +43,9 @@ import type { Reference } from '@/lib/reference/type';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
     cloudServiceId: string;
@@ -65,8 +70,16 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
+
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
+
+const router = useRouter();
+
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -106,6 +119,32 @@ const state = reactive({
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
 });
 
+const handleClickLinkButton = async (type: string, id: string) => {
+    if (type === 'workspace') {
+        try {
+            const response = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
+                cloud_service_id: state.data.cloud_service_id,
+            });
+            window.open(router.resolve({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: response.provider,
+                    group: response.cloud_service_group,
+                    name: response.cloud_service_type,
+                    workspaceId: id,
+                },
+            }).href, '_blank');
+        } catch (e: any) {
+            ErrorHandler.handleRequestError(e, e.message);
+        }
+    } else {
+        window.open(router.resolve({
+            name: PROJECT_ROUTE.DETAIL._NAME,
+            params: { id, workspaceId: state.data.workspace_id },
+        }).href, '_blank');
+    }
+};
+
 const schemaQueryHelper = new QueryHelper();
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => (state.currentLayout?.options?.search ?? [])),
@@ -123,6 +162,7 @@ const getSchema = async () => {
                 schema: 'details',
                 options: {
                     cloud_service_id: props.cloudServiceId,
+                    include_workspace_info: appContextGetters.isAdminMode,
                 },
             };
             if (props.isServerPage) {
@@ -164,8 +204,6 @@ const setListQuery = (options, type?:DynamicLayoutType): any => {
     setOnlyQuery(apiQuery, type);
 };
 
-
-
 const getListApiParams = (type?: DynamicLayoutType) => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
     setListQuery(options, type);
@@ -195,8 +233,6 @@ const getListApiParams = (type?: DynamicLayoutType) => {
 
     return params;
 };
-
-
 
 const getQueryForGetDataAPI = (): any => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
@@ -344,7 +380,36 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"
-                    />
+                    >
+                        <template #data-workspace_id="{value}">
+                            <p-text-button class="report-link"
+                                           size="md"
+                                           @click="handleClickLinkButton('workspace', value)"
+                            >
+                                {{ allReferenceGetters.workspace[value]?.label }}
+                                <p-i name="ic_arrow-right-up"
+                                     class="link-mark"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                     color="inherit"
+                                />
+                            </p-text-button>
+                        </template>
+                        <template #data-project_id="{value}">
+                            <p-text-button class="report-link"
+                                           size="md"
+                                           @click="handleClickLinkButton('project', value)"
+                            >
+                                {{ allReferenceGetters.project[value]?.label }}
+                                <p-i name="ic_arrow-right-up"
+                                     class="link-mark"
+                                     height="0.875rem"
+                                     width="0.875rem"
+                                     color="inherit"
+                                />
+                            </p-text-button>
+                        </template>
+                    </p-dynamic-layout>
                 </div>
             </template>
         </p-button-tab>
@@ -372,6 +437,11 @@ watch(() => props.cloudServiceId, async (after, before) => {
                 width: 22rem;
             }
         }
+    }
+
+    .report-link {
+        @apply inline-block text-gray-900;
+        padding: 0;
     }
 }
 </style>

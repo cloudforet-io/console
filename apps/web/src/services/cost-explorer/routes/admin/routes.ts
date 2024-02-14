@@ -138,6 +138,19 @@ const adminCostExplorerRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.COST_REPORT].translationId,
             },
             component: { template: '<router-view />' },
+            beforeEnter: async (to, from, next) => {
+                try {
+                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                    const results = response?.results || [];
+                    if (results.length === 0) { // none-data-source case
+                        next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                    } else {
+                        next();
+                    }
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            },
             children: [
                 {
                     path: '/',
