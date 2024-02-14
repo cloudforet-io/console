@@ -3172,7 +3172,8 @@
 		"SERVICE_ACCOUNT": "Service Accounts",
 		"SERVICE_ACCOUNT_TYPE": "Account Type",
 		"TAGS": "Tags",
-		"UPDATED_AT": "Updated"
+		"UPDATED_AT": "Updated",
+		"WORKSPACE": "Workspaces"
 	},
 	"PLUGIN": {
 		"COLLECTOR": {

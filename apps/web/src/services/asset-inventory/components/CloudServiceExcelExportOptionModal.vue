@@ -17,6 +17,7 @@ import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-ser
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -40,6 +41,8 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const DEFAULT_CONTENTS = 'Default Contents';
 
@@ -113,6 +116,7 @@ const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataFiel
                 provider: data.provider,
                 cloud_service_group: data.cloud_service_group,
                 cloud_service_type: data.cloud_service_type,
+                include_workspace_info: appContextGetters.isAdminMode,
             },
         });
         if (schema.options) {

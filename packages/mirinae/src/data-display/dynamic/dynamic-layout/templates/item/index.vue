@@ -15,7 +15,16 @@
             >
                 <p-dynamic-field :key="slotName"
                                  v-bind="item"
+                                 :data="item.data"
                                  :handler="fieldHandler"
+                />
+            </template>
+            <template v-for="(_, slot) of $scopedSlots"
+                      #[slot]="scope"
+            >
+                <slot v-if="!dynamicFieldSlots[slot]"
+                      :name="slot"
+                      v-bind="scope"
                 />
             </template>
         </p-definition-table>
@@ -26,6 +35,7 @@
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
