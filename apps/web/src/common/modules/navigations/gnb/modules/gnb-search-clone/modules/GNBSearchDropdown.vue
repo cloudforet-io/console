@@ -5,7 +5,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { PDataLoader, PEmpty } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
@@ -49,7 +49,7 @@ const state = reactive({
 
         let results: SuggestionItem[] = [];
         if (menuItems.suggestionItems.length) {
-            results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
+            results.push({ name: 'title', label: props.isRecent ? _i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : _i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
             results = results.concat(menuItems.suggestionItems);
         }
         return results;
@@ -61,7 +61,7 @@ const state = reactive({
         let results: SuggestionItem[] = [];
         if (cloudServiceItems.suggestionItems.length) {
             if (state.menuSuggestionItems?.length) results.push({ type: 'divider' });
-            results.push({ name: 'title', label: props.isRecent ? i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : i18n.t('COMMON.GNB.SEARCH.CLOUD_SERVICE'), type: 'header' });
+            results.push({ name: 'title', label: props.isRecent ? _i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : _i18n.t('COMMON.GNB.SEARCH.CLOUD_SERVICE'), type: 'header' });
             results = results.concat(cloudServiceItems.suggestionItems);
         }
         return results;
@@ -185,13 +185,15 @@ watch(() => props.isFocused, (isFocused) => {
 
 <style lang="postcss" scoped>
 .gnb-search-dropdown {
-    @apply absolute bg-white rounded-xs border border-gray-200;
+    @apply fixed bg-white rounded-xs border border-gray-200;
     display: flex;
     flex-direction: column;
-    width: 27.5rem;
-    padding-top: 1rem;
-    top: 100%;
+    max-width: 47.5rem;
+    width: 100%;
+    top: 3.125rem;
+    left: 0;
     right: 0;
+    margin: 0 auto;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
     z-index: 1000;
 
@@ -221,12 +223,6 @@ watch(() => props.isFocused, (isFocused) => {
             margin-top: -3rem;
             margin-bottom: 1rem;
         }
-    }
-}
-
-@screen laptop {
-    .gnb-search-dropdown {
-        margin-right: -0.5rem;
     }
 }
 
