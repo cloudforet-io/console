@@ -35,11 +35,11 @@ const handleToggleAdminMode = throttle(async () => {
         appContextStore.exitAdminMode();
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         if (lastAccessedWorkspaceId) {
-            await router.push({
+            router.push({
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 params: { workspaceId: lastAccessedWorkspaceId },
             });
-        } else await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        } else router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
@@ -51,7 +51,7 @@ const handleToggleAdminMode = throttle(async () => {
         return;
     }
     appContextStore.enterAdminMode();
-    await router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+    router.push({ name: ROOT_ROUTE.ADMIN._NAME });
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',
