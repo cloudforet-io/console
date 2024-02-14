@@ -143,7 +143,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
                     const results = response?.results || [];
                     if (results.length === 0) { // none-data-source case
-                        next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                        next({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME) });
                     } else {
                         next();
                     }
