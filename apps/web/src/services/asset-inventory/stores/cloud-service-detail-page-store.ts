@@ -1,4 +1,4 @@
-import { find } from 'lodash';
+import { find, uniqBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -44,13 +44,7 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
                 const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
                     query: _getCloudServiceTypeQuery(this.provider, this.group),
                 });
-                this.cloudServiceTypeList = (results || []).reduce((acc: CloudServiceTypeModel[], cur) => {
-                    const idx = acc.findIndex((item) => item.cloud_service_type_key === cur.cloud_service_type_key);
-                    if (idx === -1) {
-                        acc.push(cur);
-                    }
-                    return acc;
-                }, []);
+                this.cloudServiceTypeList = uniqBy(results || [], 'cloud_service_type_key');
                 await this.setSelectedCloudServiceType(this.name);
             } catch (e) {
                 ErrorHandler.handleError(e);
