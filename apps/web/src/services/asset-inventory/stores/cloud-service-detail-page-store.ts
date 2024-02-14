@@ -44,7 +44,13 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
                 const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
                     query: _getCloudServiceTypeQuery(this.provider, this.group),
                 });
-                this.cloudServiceTypeList = results ?? [];
+                this.cloudServiceTypeList = (results || []).reduce((acc: CloudServiceTypeModel[], cur) => {
+                    const idx = acc.findIndex((item) => item.cloud_service_type_key === cur.cloud_service_type_key);
+                    if (idx === -1) {
+                        acc.push(cur);
+                    }
+                    return acc;
+                }, []);
                 await this.setSelectedCloudServiceType(this.name);
             } catch (e) {
                 ErrorHandler.handleError(e);
