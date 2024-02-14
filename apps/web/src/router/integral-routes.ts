@@ -17,16 +17,19 @@ import myPageRoutes from '@/services/my-page/routes/routes';
 export const integralRoutes: RouteConfig[] = [
     {
         path: '/',
-        name: ROOT_ROUTE._NAME,
         component: { template: '<router-view />' },
-        redirect: () => ({
-            name: ROOT_ROUTE.WORKSPACE._NAME,
-        }),
         children: [
+            {
+                path: '',
+                name: ROOT_ROUTE._NAME,
+                redirect: () => ({
+                    name: ROOT_ROUTE.WORKSPACE._NAME,
+                }),
+            },
             ...authRoutes,
             ...additionalRoutes,
             {
-                path: '/admin',
+                path: 'admin',
                 name: ROOT_ROUTE.ADMIN._NAME,
                 meta: { scope: ROUTE_SCOPE.DOMAIN },
                 redirect: () => {

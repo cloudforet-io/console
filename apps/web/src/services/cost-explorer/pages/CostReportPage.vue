@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PTab,
+    PHeading, PTab, PEmpty,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
@@ -19,6 +19,7 @@ import CostReportRecipientsCard from '@/services/cost-explorer/components/CostRe
 import CostReportReportsTab from '@/services/cost-explorer/components/CostReportReportsTab.vue';
 import CostReportUpcomingReportCard from '@/services/cost-explorer/components/CostReportUpcomingReportCard.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+
 
 const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
@@ -47,6 +48,7 @@ watch(() => state.activeTab, (activeTab) => {
 
 onMounted(() => {
     costReportPageStore.fetchCostReportConfig();
+    costReportPageStore.fetchRecentReportData();
 });
 </script>
 
@@ -57,9 +59,20 @@ onMounted(() => {
                :active-tab.sync="state.activeTab"
         >
             <template #overview>
-                <div class="overview-tab-pane">
-                    <cost-report-overview-cost-trend-card class="col-span-12" />
-                    <cost-report-monthly-total-amount-summary-card class="xl:col-span-8 lg:col-span-6 col-span-12" />
+                <div v-if="!costReportPageState.recentReportDataLoading"
+                     class="overview-tab-pane"
+                >
+                    <cost-report-overview-cost-trend-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
+                                                          class="col-span-12"
+                    />
+                    <cost-report-monthly-total-amount-summary-card v-if="!costReportPageState.recentReportDataLoading & costReportPageState.hasReport"
+                                                                   class="xl:col-span-8 lg:col-span-6 col-span-12"
+                    />
+                    <p-empty v-if="!costReportPageState.recentReportDataLoading && !costReportPageState.hasReport"
+                             class="xl:col-span-8 lg:col-span-6 col-span-12 empty-card"
+                             show-image
+                             :title="$t('BILLING.COST_MANAGEMENT.COST_REPORT.NO_REPORT')"
+                    />
                     <div class="xl:col-span-4 lg:col-span-6 col-span-12 grid gap-4">
                         <cost-report-upcoming-report-card class="col-span-12" />
                         <cost-report-recipients-card class="col-span-12" />
@@ -82,6 +95,10 @@ onMounted(() => {
     padding: 1.5rem;
     .cost-report-monthly-total-amount-summary-card {
         @apply col-span-8;
+    }
+    .empty-card {
+        @apply border border-gray-200 rounded-md;
+        height: 28.875rem;
     }
     .right-part {
         @apply col-span-4;

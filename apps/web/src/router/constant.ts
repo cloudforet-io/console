@@ -25,4 +25,4 @@ export const ROUTE_SCOPE = {
     DOMAIN: 'DOMAIN',
 } as const;
 
-export const CostReportPath = '/cost-report';
+export const CostReportDetailPath = '/cost-report-detail';

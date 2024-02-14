@@ -677,6 +677,7 @@
 				"LESS_THAN_OR_EQUAL_TO_31": "31 이하로 설정해주세요",
 				"MANAGE_ROLES": "역할 관리 바로가기 ",
 				"MONTHLY_TOTAL_AMOUNT_SUMMARY": "월별 총 비용 요약",
+				"NO_REPORT": "발행된 비용 리포트가 없습니다.",
 				"OVERVIEW": "전체 요약",
 				"PERIOD": "기간",
 				"PROVIDER": "프로바이더",
@@ -697,7 +698,7 @@
 				"THE_AVERAGE_FOR_THE_LAST_12_MONTHS": "최근 12개월 월 평균 비용",
 				"THE_LAST_12_MONTHS": "최근 12개월",
 				"TOTAL_AMOUNT": "총 비용",
-				"TOTAL_COST_FOR_PREVIOUS_MONTH": "{previous_month}\u001c 기간 내 총비용 ",
+				"TOTAL_COST_FOR_PREVIOUS_MONTH": "{previous_month} 기간 내 총비용 ",
 				"UPCOMING_ISSUE_DATE": "다음 리포트 발행일",
 				"UPCOMING_REPORT": "다음 리포트",
 				"WORKSPACE": "워크스페이스",
@@ -2465,6 +2466,11 @@
 				"TITLE": "{provider} 클라우드 서비스 ",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
+			},
+			"MAIN_EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "전체 데이터 중 주요 클라우드 서비스 데이터가 다중 파일로 다운로드 됩니다.",
+				"NOTICE_DESCRIPTION": "‘전체 클라우드 서비스’ 선택 시, 데이터 양의 대폭 증가로 인해 상당한 다운로드 시간이 소요될 수 있습니다.",
+				"OPTION_TITLE": "전체 클라우드 서비스 (추천하지 않음)"
 			},
 			"PAGE": {
 				"ACTION": "작업",

@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { CostReportPath } from '@/router/constant';
+import { CostReportDetailPath } from '@/router/constant';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -8,12 +8,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
-const SSO_TOKEN_PAGES = ['/reset-password', '/expired-link', CostReportPath];
+const SSO_TOKEN_PAGES = ['/reset-password', '/expired-link', CostReportDetailPath];
+
 
 export const checkSsoAccessToken = async (store) => {
     const currentPath = window.location.pathname;
     if (SSO_TOKEN_PAGES.includes(currentPath)) {
-        if (isMobile() && (currentPath !== CostReportPath)) store.dispatch('display/showMobileGuideModal');
+        if (isMobile() && (currentPath !== CostReportDetailPath)) store.dispatch('display/showMobileGuideModal');
         return;
     }
 

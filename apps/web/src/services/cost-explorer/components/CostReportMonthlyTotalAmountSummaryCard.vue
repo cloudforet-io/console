@@ -3,12 +3,15 @@ import {
     computed, reactive, ref, watch,
 } from 'vue';
 
+import { Root } from '@amcharts/amcharts5';
+import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import {
     PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI,
 } from '@spaceone/design-system';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
-import { cloneDeep, isEqual, sum } from 'lodash';
+import dayjs from 'dayjs';
+import { cloneDeep, debounce, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -53,9 +56,19 @@ type CostReportDataAnalyzeResult = {
     value_sum: number;
 };
 
+const CHART_ROOT_OPTIONS: IRootSettings = {
+    tooltipContainerBounds: {
+        top: 100,
+        right: 1000,
+        bottom: 0,
+        left: 1000,
+    },
+};
+
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const costReportPageStore = useCostReportPageStore();
+const costReportPageState = costReportPageStore.state;
 const costReportPageGetters = costReportPageStore.getters;
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
@@ -73,7 +86,7 @@ const state = reactive({
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
-    currentDate: undefined as Dayjs | undefined,
+    currentDate: undefined as string | undefined,
     currentDateRangeText: computed<string>(() => {
         if (!state.currentDate) return '';
         return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
@@ -103,8 +116,9 @@ const state = reactive({
 });
 
 /* Api */
-const analyzeCostReportData = async () => {
+const analyzeCostReportData = debounce(async () => {
     state.loading = true;
+    chartHelper.clearChildrenOfRoot();
     try {
         const _period = {
             start: state.currentDate?.format('YYYY-MM'),
@@ -134,7 +148,7 @@ const analyzeCostReportData = async () => {
     } finally {
         state.loading = false;
     }
-};
+}, 300);
 const listCostReport = async () => {
     try {
         const res = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
@@ -155,7 +169,8 @@ const listCostReport = async () => {
 
 /* Util */
 const drawChart = () => {
-    chartHelper.refreshRoot();
+    chartHelper.disposeRoot();
+    chartHelper.setRoot(Root.new(chartContext.value as HTMLElement, CHART_ROOT_OPTIONS));
     const chart = chartHelper.createDonutChart({
         paddingLeft: 20,
         paddingRight: 20,
@@ -166,7 +181,6 @@ const drawChart = () => {
         valueField: 'value',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
-    chart.series.push(series);
     series.slices.template.setAll({
         stroke: chartHelper.color(white),
         templateField: 'pieSettings',
@@ -175,11 +189,13 @@ const drawChart = () => {
     chartHelper.setPieTooltipText(series, tooltip, costReportPageGetters.currency);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
+    chart.series.push(series);
 };
 
 /* Event */
 const handleChangeTarget = (target: string) => {
     state.selectedTarget = target;
+    analyzeCostReportData();
 };
 const handleClickDetailsLink = async () => {
     try {
@@ -191,6 +207,10 @@ const handleClickDetailsLink = async () => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
+const handleChangeDate = (date: Dayjs) => {
+    state.currentDate = date;
+    analyzeCostReportData();
+};
 
 /* Init */
 (async () => {
@@ -198,19 +218,20 @@ const handleClickDetailsLink = async () => {
 })();
 
 /* Watcher */
-watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) drawChart();
+watch([() => chartContext.value, () => state.chartData], async ([_chartContext, _chartData]) => {
+    if (_chartContext && _chartData) {
+        drawChart();
+    }
 }, { immediate: true });
-watch(() => costReportPageGetters.recentReportDate, (recentReportDate) => {
-    // init current date when config is updated
-    state.currentDate = recentReportDate;
+watch(() => costReportPageState.recentReportMonth, async (after) => {
+    if (!after) return;
+    state.currentDate = dayjs.utc(after);
 }, { immediate: true });
-watch([() => state.currentDate, () => state.selectedTarget, () => costReportPageGetters.currency], (after, before) => {
-    if (isEqual(after, before) || !state.currentDate || !costReportPageGetters.currency) return;
-    analyzeCostReportData();
+watch(() => costReportPageGetters.currency, (_currency) => {
+    if (_currency) analyzeCostReportData();
 }, { immediate: true });
 watch(() => state.currentDate, () => {
-    listCostReport();
+    if (state.currentDate) listCostReport();
 }, { immediate: true });
 </script>
 
@@ -240,8 +261,9 @@ watch(() => state.currentDate, () => {
         <template #content>
             <div class="grid grid-cols-12 gap-4">
                 <div class="left-part">
-                    <p-date-pagination :date.sync="state.currentDate"
-                                       :disable-next-button="state.currentDate.isSame(costReportPageGetters.recentReportDate, 'month')"
+                    <p-date-pagination :date="state.currentDate"
+                                       :disable-next-button="state.currentDate?.isSame(dayjs.utc(costReportPageState.recentReportMonth), 'month')"
+                                       @update:date="handleChangeDate"
                     />
                     <div class="date-range-text">
                         {{ state.currentDateRangeText }}
@@ -276,9 +298,10 @@ watch(() => state.currentDate, () => {
                         />
                     </p-text-button>
                     <div class="chart-wrapper">
-                        <p-skeleton v-if="state.loading"
-                                    height="15rem"
+                        <p-skeleton v-show="state.loading"
+                                    height="100%"
                                     width="100%"
+                                    class="chart-skeleton"
                         />
                         <div ref="chartContext"
                              class="chart"
@@ -354,10 +377,20 @@ watch(() => state.currentDate, () => {
     }
     .chart-wrapper {
         padding-top: 0.5rem;
-    }
-    .chart {
-        width: 100%;
         height: 12rem;
+        position: relative;
+
+        .chart-skeleton {
+            position: absolute;
+            top: 0;
+            z-index: 3;
+            height: 100%;
+        }
+
+        .chart {
+            width: 100%;
+            height: 100%;
+        }
     }
 }
 .right-part {

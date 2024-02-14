@@ -10,7 +10,7 @@ import { DOMAIN_CONFIG_TYPE } from './type';
 
 export const extendedAuthTypeLabel = (state: DomainState): string => extendedAuthTypes[state.extendedAuthType as string] || state.extendedAuthType;
 
-export const domainExtraMenu: Getter<DomainState, any> = (state): any => state.config?.[DOMAIN_CONFIG_TYPE.EXTRA_MENU];
+export const domainExtraMenu: Getter<DomainState, any> = (state): any => state.config?.settings?.[DOMAIN_CONFIG_TYPE.EXTRA_MENU];
 
 export const domainSymbolImage: Getter<DomainState, any> = (state): string|undefined => {
     const domainSettings = state.config?.settings;

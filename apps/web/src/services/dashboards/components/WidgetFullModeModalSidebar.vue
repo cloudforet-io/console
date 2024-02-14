@@ -107,7 +107,7 @@ watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllO
 
 <template>
     <transition name="slide-left">
-        <div class="widget-view-mode-sidebar">
+        <div class="widget-full-mode-sidebar">
             <p-sidebar :visible="true"
                        style-type="primary"
                        size="md"
@@ -169,7 +169,7 @@ watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllO
 </template>
 
 <style lang="postcss" scoped>
-.widget-view-mode-sidebar {
+.widget-full-mode-sidebar {
     position: absolute;
     width: 20rem;
     top: 0;
