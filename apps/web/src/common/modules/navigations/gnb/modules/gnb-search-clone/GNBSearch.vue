@@ -418,6 +418,9 @@ watch(() => state.visible, async (visible) => {
                 />
             </template>
         </g-n-b-search-dropdown>
+        <div v-if="state.visible"
+             class="background-block"
+        />
     </div>
 </template>
 
@@ -438,6 +441,11 @@ watch(() => state.visible, async (visible) => {
         &.opened {
             @apply text-blue-600 bg-blue-200;
         }
+    }
+    .background-block {
+        @apply fixed inset-0 bg-black;
+        opacity: 30%;
+        z-index: 100;
     }
 }
 </style>
