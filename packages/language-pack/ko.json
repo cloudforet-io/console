@@ -1060,6 +1060,7 @@
 				"RECENT_CLOUD_SERVICE": "최근 검색 [클라우드 서비스]",
 				"RECENT_MENU": "최근 검색 [메뉴]",
 				"SERACH": "검색",
+				"SERACH_PLACEHOLDER": "",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다.",
 				"TRY_SEARCH_AGAIN": "보다 자세하게 검색해주세요."
 			},
