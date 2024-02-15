@@ -1059,7 +1059,8 @@
 				"NO_RESULT_2": "クラウドサービスまたはメニューに関連する他のキーワードを試してください。",
 				"RECENT_CLOUD_SERVICE": "最近の検索[クラウドサービス]",
 				"RECENT_MENU": "最近の検索[メニュー]",
-				"SERACH": "検索...",
+				"SERACH": "検索",
+				"SERACH_PLACEHOLDER": "",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。",
 				"TRY_SEARCH_AGAIN": "より詳しく検索してください。"
 			},

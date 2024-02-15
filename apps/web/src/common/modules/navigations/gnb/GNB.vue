@@ -54,7 +54,9 @@ const state = reactive({
     }),
     visibleGnbMenuList: computed<GNBMenuType[]>(() => {
         const menuList = state.gnbMenuList;
-        const result = menuList.slice(0, state.availableMenuCount);
+        // WARNING: This is a temporary solution to show only 2 menus in the GNB
+        const result = menuList.slice(0, 2);
+        // const result = menuList.slice(0, state.availableMenuCount);
         return result;
     }),
     invisibleGnbMenuList: computed<MenuItem[]>(() => {

@@ -31,13 +31,14 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
     SUGGESTION_TYPE,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchDropdown.vue';
-import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
-import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+} from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
+import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchDropdown.vue';
+import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchInput.vue';
+import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
@@ -54,22 +55,15 @@ interface AutocompleteResourceResult {
     data?: CloudServiceData;
 }
 
-const LAPTOP_WINDOW_SIZE = screens.laptop.max;
+const MOBILE_WINDOW_SIZE = screens.mobile.max;
 
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
 
-interface Props {
-    visible: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    visible: false,
-});
-
 const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
+const gnbSearchStore = useGnbSearchStore();
 
 const router = useRouter();
 const state = reactive({
@@ -81,12 +75,13 @@ const state = reactive({
         if (state.inputText) return state.inputText.trim();
         return '';
     }),
-    isOverLaptopSize: window.innerWidth > LAPTOP_WINDOW_SIZE,
+    isOverMobileSize: window.innerWidth > MOBILE_WINDOW_SIZE,
     loading: true,
     showRecent: computed(() => !state.inputText.length),
     tooltipTexts: computed<Record<string, string>>(() => ({
         search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
     })),
+    visible: computed(() => gnbSearchStore.getters.isActivated),
 });
 
 const dataState = reactive({
@@ -232,16 +227,18 @@ const createSearchRecent = async (type: SuggestionType, id: string) => {
 const showSearchMenu = async () => {
     state.isFocusOnSuggestion = false;
     if (!state.isFocusOnInput) state.isFocusOnInput = true;
-    if (!props.visible) {
+    if (!state.visible) {
         state.loading = true;
         state.loading = false;
-        setVisible(true);
+        setVisible(true); // Note: When the GNB is refactored, this emit would be removed.
+        gnbSearchStore.setIsActivated(true);
     }
 };
 
 const hideSearchMenu = () => {
-    if (props.visible) {
-        setVisible(false);
+    if (state.visible) {
+        setVisible(false); // Note: When the GNB is refactored, this emit would be removed.
+        gnbSearchStore.setIsActivated(false);
         state.inputText = '';
         state.isFocusOnInput = false;
         state.isFocusOnSuggestion = false;
@@ -251,14 +248,17 @@ const hideSearchMenu = () => {
 };
 
 const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
-    if (!props.visible) setVisible(true);
+    if (!state.visible) {
+        setVisible(true); // Note: When the GNB is refactored, this emit would be removed.
+        gnbSearchStore.setIsActivated(true);
+    }
     state.focusingDirection = focusingDirection;
     state.isFocusOnInput = false;
     state.isFocusOnSuggestion = true;
 };
 
 const handleSearchButtonClick = () => {
-    if (!props.visible) showSearchMenu();
+    if (!state.visible) showSearchMenu();
     else hideSearchMenu();
 };
 
@@ -319,14 +319,26 @@ const handleSelect = (index: number, type: SuggestionType) => {
 };
 
 const onWindowResize = throttle(() => {
-    state.isOverLaptopSize = window.innerWidth > LAPTOP_WINDOW_SIZE;
+    state.isOverMobileSize = window.innerWidth > MOBILE_WINDOW_SIZE;
 }, 500);
+
+// Keyboard Event: Meta([ctrl or cmd] + K
+const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.metaKey && e.code === 'KeyK') {
+        gnbSearchStore.setIsActivated(!state.visible);
+        state.isFocusOnInput = state.visible;
+    } else if (e.code === 'Escape') {
+        gnbSearchStore.setIsActivated(false);
+    }
+};
 
 onMounted(() => {
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener('keydown', handleKeyDown);
 });
 onUnmounted(() => {
     window.removeEventListener('resize', onWindowResize);
+    window.removeEventListener('keydown', handleKeyDown);
 });
 
 /* Init */
@@ -337,7 +349,7 @@ onUnmounted(() => {
 })();
 
 /* Watcher */
-watch(() => props.visible, async (visible) => {
+watch(() => state.visible, async (visible) => {
     if (visible) {
         await Promise.allSettled([
             listSearchRecent(SUGGESTION_TYPE.MENU),
@@ -353,7 +365,7 @@ watch(() => props.visible, async (visible) => {
          class="gnb-search"
          @click.stop
     >
-        <g-n-b-search-input v-if="state.isOverLaptopSize"
+        <g-n-b-search-input v-if="state.isOverMobileSize"
                             v-model="state.inputText"
                             :is-focused.sync="state.isFocusOnInput"
                             @click="showSearchMenu"
@@ -367,7 +379,7 @@ watch(() => props.visible, async (visible) => {
                    :contents="state.tooltipTexts.search"
                    position="bottom"
         >
-            <span :class="{'menu-button': true, 'opened': props.visible}"
+            <span :class="{'menu-button': true, 'opened': state.visible}"
                   tabindex="0"
                   role="button"
                   @click.stop="handleSearchButtonClick"
@@ -382,7 +394,7 @@ watch(() => props.visible, async (visible) => {
             </span>
         </p-tooltip>
 
-        <g-n-b-search-dropdown v-show="props.visible"
+        <g-n-b-search-dropdown v-show="state.visible"
                                :input-text="state.trimmedInputText"
                                :loading="state.loading"
                                :items="dataState.dropdownItems"
@@ -395,7 +407,7 @@ watch(() => props.visible, async (visible) => {
                                @select="handleSelect"
         >
             <template #search-input>
-                <g-n-b-search-input v-if="!state.isOverLaptopSize"
+                <g-n-b-search-input v-if="!state.isOverMobileSize"
                                     v-model="state.inputText"
                                     :is-focused.sync="state.isFocusOnInput"
                                     @click="showSearchMenu"
@@ -406,6 +418,9 @@ watch(() => props.visible, async (visible) => {
                 />
             </template>
         </g-n-b-search-dropdown>
+        <div v-if="state.visible"
+             class="background-block"
+        />
     </div>
 </template>
 
@@ -426,6 +441,11 @@ watch(() => props.visible, async (visible) => {
         &.opened {
             @apply text-blue-600 bg-blue-200;
         }
+    }
+    .background-block {
+        @apply fixed inset-0 bg-black;
+        opacity: 30%;
+        z-index: 100;
     }
 }
 </style>
