@@ -431,7 +431,7 @@ watch(() => state.visible, async (visible) => {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
         height: 2rem;
-        line-height: $gnb-height;
+        line-height: $top-bar-height;
         cursor: pointer;
 
         &:hover {

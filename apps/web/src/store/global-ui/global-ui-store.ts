@@ -4,7 +4,7 @@ import { styleVariables } from '@spaceone/design-system';
 import { defineStore } from 'pinia';
 
 export const useGlobalUIStore = defineStore('global-ui', () => {
-    const gnbHeight = styleVariables['gnb-height'];
+    const gnbHeight = styleVariables['top-bar-height'];
     const state = reactive({
         topNotificationHeight: 0,
     });

@@ -219,10 +219,10 @@ watch(() => state.userId, (userId) => {
         }
     }
 
-    .gnb {
+    .top-bar {
         position: fixed;
         width: 100%;
-        height: $gnb-height;
+        height: $top-bar-height;
         z-index: 100;
         flex-shrink: 0;
         top: 0;
@@ -233,7 +233,6 @@ watch(() => state.userId, (userId) => {
         flex-direction: column;
         overflow-y: hidden;
         width: 100%;
-        margin-top: $gnb-height;
         flex-grow: 1;
         .p-sidebar .non-sidebar-wrapper {
             min-height: 100%;

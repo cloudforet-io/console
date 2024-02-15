@@ -250,7 +250,7 @@ export default defineComponent<Props>({
     display: flex;
     width: 100%;
     height: 100%;
-    top: $gnb-height;
+    top: $top-bar-height;
     left: 0;
     flex-direction: column;
     z-index: 99;
@@ -291,7 +291,7 @@ export default defineComponent<Props>({
         .content-wrapper {
             @apply flex;
             position: relative;
-            height: calc(100vh - $(gnb-height) - 4rem);
+            height: calc(100vh - $(top-bar-height) - 4rem);
             gap: 1rem;
             padding: 1rem 1.5rem;
 

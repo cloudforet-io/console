@@ -108,8 +108,8 @@ onMounted(() => {
 .tags-overlay {
     position: fixed;
     width: 100vw;
-    height: calc(100vh - $(gnb-height));
-    top: $gnb-height;
+    height: calc(100vh - $(top-bar-height));
+    top: $top-bar-height;
     left: 0;
     z-index: 99;
     background-color: $bg-color;
