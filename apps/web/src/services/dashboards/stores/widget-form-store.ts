@@ -329,7 +329,7 @@ const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: D
         };
     }
     if (dashboardScope === 'PROJECT') {
-        const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, optional: false, readonly: true }]]);
+        const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, readonly: true }]]);
         return {
             ...config,
             options_schema: {

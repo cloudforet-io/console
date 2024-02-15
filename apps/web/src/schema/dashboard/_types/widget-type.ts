@@ -23,7 +23,6 @@ export interface WidgetOptionsSchemaProperty {
     selection_type?: 'SINGLE'|'MULTI';
     readonly?: boolean;
     fixed?: boolean;
-    optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
