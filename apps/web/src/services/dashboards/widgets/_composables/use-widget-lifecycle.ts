@@ -61,7 +61,7 @@ export const useWidgetLifecycle = <Data = any>({
     }, { deep: true });
 
     const stopVariablesSchemaWatch = watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!initiated.value || !props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
+        if (!initiated.value || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
             || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
 
         const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
