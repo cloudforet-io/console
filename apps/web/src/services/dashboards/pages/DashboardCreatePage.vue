@@ -35,14 +35,14 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useGoBack } from '@/common/composables/go-back';
 
+import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
-import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
+// import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
-
 
 interface Step {
     step: number;
@@ -153,24 +153,25 @@ defineExpose({ setPathFrom });
                                       show-close-button
                                       @close="handleClickClose"
             />
-            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    @click="$router.go(-1)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!state.isValid"
-                    @click="goStep('next')"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
+            <dashboard-create-step1 />
+            <!--            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />-->
+            <!--            <div class="button-area">-->
+            <!--                <p-button-->
+            <!--                    style-type="transparent"-->
+            <!--                    size="lg"-->
+            <!--                    @click="$router.go(-1)"-->
+            <!--                >-->
+            <!--                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}-->
+            <!--                </p-button>-->
+            <!--                <p-button-->
+            <!--                    style-type="primary"-->
+            <!--                    size="lg"-->
+            <!--                    :disabled="!state.isValid"-->
+            <!--                    @click="goStep('next')"-->
+            <!--                >-->
+            <!--                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}-->
+            <!--                </p-button>-->
+            <!--            </div>-->
         </div>
         <div v-if="state.currentStep === state.steps[1].step">
             <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
