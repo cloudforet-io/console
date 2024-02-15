@@ -331,6 +331,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
     }
 };
 
+const handleHideSearchMenu = () => { hideSearchMenu(); };
+
 onMounted(() => {
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('keydown', handleKeyDown);
@@ -367,7 +369,7 @@ watch(() => state.visible, async (visible) => {
                             v-model="state.inputText"
                             :is-focused.sync="state.isFocusOnInput"
                             @click="showSearchMenu"
-                            @esc="hideSearchMenu"
+                            @esc="handleHideSearchMenu"
                             @arrow-up="moveFocusToSuggestion('UPWARD')"
                             @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                             @input="handleUpdateInput"
@@ -381,7 +383,7 @@ watch(() => state.visible, async (visible) => {
                   tabindex="0"
                   role="button"
                   @click.stop="handleSearchButtonClick"
-                  @keydown.esc="hideSearchMenu"
+                  @keydown.esc="handleHideSearchMenu"
                   @keydown.enter="showSearchMenu"
             >
                 <p-i name="ic_gnb_search"
@@ -401,7 +403,7 @@ watch(() => state.visible, async (visible) => {
                                :is-recent="state.showRecent"
                                :search-limit="SEARCH_LIMIT"
                                @move-focus-end="handleMoveFocusEnd"
-                               @close="hideSearchMenu"
+                               @close="handleHideSearchMenu"
                                @select="handleSelect"
         >
             <template #search-input>
@@ -418,7 +420,7 @@ watch(() => state.visible, async (visible) => {
         </g-n-b-search-dropdown>
         <div v-if="state.visible"
              class="background-block"
-             @click="hideSearchMenu"
+             @click="handleHideSearchMenu"
         />
     </div>
 </template>
