@@ -55,7 +55,7 @@ const handleClickMenuButton = () => {
 
 <style scoped lang="postcss">
 .gnb-toolbox {
-    @apply justify-between border-b border-t;
+    @apply justify-between border-b;
     top: 0;
     width: 100%;
     height: $gnb-toolbox-height;
