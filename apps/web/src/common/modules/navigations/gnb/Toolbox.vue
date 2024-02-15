@@ -68,7 +68,8 @@ const handleClickMenuButton = () => {
             @apply border-none text-gray-900;
             margin-bottom: -0.025rem;
             &:hover {
-                @apply text-blue-600; }
+                @apply text-blue-600;
+            }
         }
     }
     .extra-section {
