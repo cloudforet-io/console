@@ -24,7 +24,6 @@ const state = reactive({
 });
 
 const handleClickMenuButton = () => {
-    console.log(state.proxyIsMinimizeGnb);
     state.proxyIsMinimizeGnb = !state.proxyIsMinimizeGnb;
 };
 </script>
@@ -33,7 +32,7 @@ const handleClickMenuButton = () => {
     <div class="gnb-toolbox">
         <div class="navigation-section">
             <p-icon-button name="ic_gnb_menu"
-                           style-type="tertiary"
+                           style-type="transparent"
                            class="menu-button"
                            size="md"
                            @click="handleClickMenuButton"
@@ -66,8 +65,11 @@ const handleClickMenuButton = () => {
         @apply flex items-center;
         gap: 0.625rem;
         .menu-button {
-            @apply border-none;
+            @apply border-none text-gray-900;
             margin-bottom: -0.025rem;
+            &:hover {
+                @apply text-blue-600;
+            }
         }
     }
     .extra-section {

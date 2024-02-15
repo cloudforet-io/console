@@ -29,7 +29,6 @@ const state = reactive({
 
 <style scoped lang="postcss">
 .gnb {
-    z-index: 100;
     .gnb-item {
         @apply absolute flex items-center bg-white border-gray-200;
     }
