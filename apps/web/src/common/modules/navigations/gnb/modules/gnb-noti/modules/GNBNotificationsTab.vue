@@ -364,7 +364,7 @@ onMounted(() => {
         &.loading {
             min-height: 13rem;
         }
-        max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
+        max-height: calc(100vh - $top-bar-height - 1.5rem - 2.75rem);
         position: relative;
         overflow-y: scroll;
         padding: 0.25rem 0.5rem 0.5rem 0.5rem;

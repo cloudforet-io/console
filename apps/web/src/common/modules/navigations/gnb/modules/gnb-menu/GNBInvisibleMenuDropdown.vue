@@ -109,7 +109,7 @@ const handleSelectMenu = (menu: MenuItem[]) => {
 
     .dropdown-context-menu {
         @apply absolute;
-        top: $gnb-height;
+        top: $top-bar-height;
         margin-top: -0.5rem;
         left: 0.5rem;
         z-index: 1000;

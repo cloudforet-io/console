@@ -185,7 +185,7 @@ callApiWithGrantGuard();
         }
     }
     .content-wrapper {
-        max-height: calc(100vh - $gnb-height - 1.5rem - 2.75rem);
+        max-height: calc(100vh - $top-bar-height - 1.5rem - 2.75rem);
         overflow-y: scroll;
         padding: 0.25rem 0.5rem 3.5rem 0.5rem;
         .pinned-header-wrapper {

@@ -1069,6 +1069,9 @@
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "사용자 가이드"
 			},
+			"TOOLBOX": {
+				"ID": "아이디"
+			},
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",

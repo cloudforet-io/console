@@ -33,8 +33,8 @@ export default {
     position: fixed;
     display: flex;
     width: 100%;
-    height: calc(100vh - $(gnb-height));
-    top: $gnb-height;
+    height: calc(100vh - $(top-bar-height));
+    top: $top-bar-height;
     left: 0;
     flex-direction: column;
     z-index: 99;

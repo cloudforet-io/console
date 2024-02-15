@@ -201,7 +201,7 @@ watch(() => props.isFocused, (isFocused) => {
     :deep(.p-data-loader) {
         flex-grow: 1;
         .data-loader-container {
-            max-height: calc(100vh - $gnb-height - 5rem);
+            max-height: calc(100vh - $top-bar-height - 5rem);
             min-height: 14.875rem;
             overflow-y: auto;
             padding-bottom: 1rem;
@@ -230,9 +230,9 @@ watch(() => props.isFocused, (isFocused) => {
     .gnb-search-dropdown {
         @apply flex flex-col;
         position: fixed;
-        top: $gnb-height;
+        top: $top-bar-height;
         width: 100vw;
-        height: calc(100vh - $gnb-height - 0.5rem);
+        height: calc(100vh - $top-bar-height - 0.5rem);
         margin-top: -0.5rem;
 
         /* custom design-system component - p-data-loader */

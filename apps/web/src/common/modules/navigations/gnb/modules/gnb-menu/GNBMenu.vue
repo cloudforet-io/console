@@ -174,7 +174,7 @@ const handleMenu = () => {
         @apply text-gray-900 relative;
         height: 2rem;
         font-size: 0.875rem;
-        line-height: $gnb-height;
+        line-height: $top-bar-height;
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
@@ -234,7 +234,7 @@ const handleMenu = () => {
     .sub-menu-wrapper {
         @apply bg-white border border-gray-200 rounded-xs text-gray-900;
         position: absolute;
-        top: $gnb-height;
+        top: $top-bar-height;
         margin-top: -1.125rem;
         left: 0;
         min-width: 10rem;
@@ -262,7 +262,7 @@ const handleMenu = () => {
         cursor: auto;
         position: absolute;
         z-index: 1000;
-        top: $gnb-height;
+        top: $top-bar-height;
         margin-top: -1.125rem;
         left: 0;
         min-width: 10rem;

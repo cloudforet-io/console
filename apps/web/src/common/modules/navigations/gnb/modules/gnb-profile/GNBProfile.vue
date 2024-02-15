@@ -324,7 +324,7 @@ const handleClickSignOut = async () => {
         width: 2rem;
         height: 2rem;
         cursor: pointer;
-        line-height: $gnb-height;
+        line-height: $top-bar-height;
 
         &:hover {
             @apply text-blue-600 bg-blue-100;
