@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
@@ -361,8 +360,7 @@ watch(() => state.visible, async (visible) => {
 </script>
 
 <template>
-    <div v-on-click-outside="hideSearchMenu"
-         class="gnb-search"
+    <div class="gnb-search"
          @click.stop
     >
         <g-n-b-search-input v-if="state.isOverMobileSize"
@@ -420,6 +418,7 @@ watch(() => state.visible, async (visible) => {
         </g-n-b-search-dropdown>
         <div v-if="state.visible"
              class="background-block"
+             @click="hideSearchMenu"
         />
     </div>
 </template>
