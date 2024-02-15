@@ -30,7 +30,7 @@ import NotificationEmailModal from '@/common/modules/modals/notification-email-m
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
-import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
+import GNBContainer from '@/common/modules/navigations/gnb/GNBContainer.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
@@ -117,61 +117,55 @@ watch(() => state.userId, (userId) => {
             <p-notice-alert group="noticeBottomRight" />
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
-            <template v-if="state.showGNB">
-                <my-page-g-n-b v-if="state.isMyPage"
-                               class="gnb"
-                />
-                <g-n-b v-else
-                       class="gnb"
-                />
-                <div v-if="!state.globalGrantLoading"
-                     class="app-body"
-                     :style="{ height: globalUIGetters.appBodyHeight }"
+            <!-- TODO: change name to topBar-->
+            <g-n-b class="top-bar" />
+            <g-n-b-container />
+            <div v-if="!state.globalGrantLoading"
+                 class="app-body"
+                 :style="{ height: globalUIGetters.appBodyHeight }"
+            >
+                <p-sidebar :visible="store.state.display.visibleSidebar"
+                           :style-type="store.getters['display/sidebarProps'].styleType"
+                           :size="store.getters['display/sidebarProps'].size"
+                           :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
+                           :hide-close-button="store.getters['display/sidebarProps'].disableButton"
+                           :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
+                           @close="store.dispatch('display/hideSidebar')"
                 >
-                    <p-sidebar :visible="store.state.display.visibleSidebar"
-                               :style-type="store.getters['display/sidebarProps'].styleType"
-                               :size="store.getters['display/sidebarProps'].size"
-                               :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
-                               :hide-close-button="store.getters['display/sidebarProps'].disableButton"
-                               :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
-                               @close="store.dispatch('display/hideSidebar')"
-                    >
-                        <main class="main">
-                            <portal-target ref="topNotiRef"
-                                           name="top-notification"
-                                           :slot-props="{hasDefaultMessage: true}"
-                            />
-                            <router-view />
-                        </main>
-                        <template #title>
-                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
-                                           name="info-title"
-                            />
-                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
-                                           name="widget-title"
-                            />
-                            <portal-target v-else
-                                           name="handbook-title"
-                            />
-                        </template>
-                        <template #sidebar>
-                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
-                                           name="info-contents"
-                            />
-                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
-                                           name="widget-contents"
-                            />
-                            <portal-target v-else
-                                           name="handbook-contents"
-                            />
-                        </template>
-                        <template #footer>
-                            <portal-target name="widget-footer" />
-                        </template>
-                    </p-sidebar>
-                </div>
-            </template>
-            <router-view v-else />
+                    <main class="main">
+                        <portal-target ref="topNotiRef"
+                                       name="top-notification"
+                                       :slot-props="{hasDefaultMessage: true}"
+                        />
+                        <router-view />
+                    </main>
+                    <template #title>
+                        <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                       name="info-title"
+                        />
+                        <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                       name="widget-title"
+                        />
+                        <portal-target v-else
+                                       name="handbook-title"
+                        />
+                    </template>
+                    <template #sidebar>
+                        <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                       name="info-contents"
+                        />
+                        <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                       name="widget-contents"
+                        />
+                        <portal-target v-else
+                                       name="handbook-contents"
+                        />
+                    </template>
+                    <template #footer>
+                        <portal-target name="widget-footer" />
+                    </template>
+                </p-sidebar>
+            </div>
             <p-data-loader v-if="state.globalGrantLoading"
                            :loading="state.globalGrantLoading"
                            :data="true"
