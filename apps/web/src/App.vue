@@ -228,8 +228,13 @@ watch(() => state.userId, (userId) => {
         overflow-y: hidden;
         width: 100%;
         flex-grow: 1;
-        .p-sidebar .non-sidebar-wrapper {
-            min-height: 100%;
+        .p-sidebar {
+            .sidebar-container {
+                @apply bg-gray-100;
+            }
+            .non-sidebar-wrapper {
+                min-height: 100%;
+            }
         }
         .main-content {
             display: flex;
