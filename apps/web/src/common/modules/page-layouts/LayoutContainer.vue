@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import GNBToolbox from '@/common/modules/page-layouts/modules/GNBToolbox.vue';
+import Toolbox from '@/common/modules/navigations/gnb/Toolbox.vue';
 </script>
 
 <template>
     <div class="layout-container">
         <div class="gnb">
-            <g-n-b-toolbox />
+            <toolbox />
         </div>
         <main class="main">
             <slot name="main" />
