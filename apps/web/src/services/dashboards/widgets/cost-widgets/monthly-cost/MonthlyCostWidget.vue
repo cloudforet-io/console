@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, watch,
 } from 'vue';
 
+import type { AxisRenderer, DateAxis } from '@amcharts/amcharts5/xy';
 import {
     PDivider, PDataLoader, PI, PSkeleton,
 } from '@spaceone/design-system';
@@ -45,6 +46,7 @@ const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 const VALUE_FIELD_NAME = 'value';
 const STROKE_FIELD_NAME = 'strokeSettings';
+const CHART_XAXIS_CHANGE_THRESHOLD_WIDTH = 370;
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -136,6 +138,7 @@ const displayState = reactive({
         return displayState.isDecreased ? green[600] : red[500];
     }),
     currencySymbol: computed<CurrencySymbol>(() => (widgetState.currency ? CURRENCY_SYMBOL[widgetState.currency] : CURRENCY_SYMBOL.USD)),
+    chartXAxis: undefined as undefined|DateAxis<AxisRenderer>,
 });
 
 /* Api */
@@ -261,6 +264,9 @@ const drawChart = (chartData: ChartData[]) => {
             }),
         });
     });
+
+    // for responsive design
+    displayState.chartXAxis = xAxis;
 };
 
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
@@ -303,11 +309,18 @@ defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });
+
+watch(() => props.width, (_width) => {
+    if (_width && (_width < CHART_XAXIS_CHANGE_THRESHOLD_WIDTH)) {
+        displayState.chartXAxis.get('dateFormats').month = 'M';
+    } else {
+        displayState.chartXAxis.get('dateFormats').month = 'MMM';
+    }
+});
 </script>
 
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  :width="props.disableFullMode ? undefined : 542"
                   v-on="widgetFrameEventHandlers"
     >
         <div class="monthly-cost">
