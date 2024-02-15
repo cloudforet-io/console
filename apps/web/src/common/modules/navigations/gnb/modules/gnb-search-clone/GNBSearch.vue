@@ -34,7 +34,7 @@ import {
     SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchDropdown.vue';
+import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchInput.vue';
 import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
@@ -426,6 +426,7 @@ watch(() => state.visible, async (visible) => {
 <style lang="postcss" scoped>
 .gnb-search {
     @apply relative;
+    box-shadow: 0px 0px 8px 0px #00000014;
     .menu-button {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
@@ -444,7 +445,7 @@ watch(() => state.visible, async (visible) => {
     .background-block {
         @apply fixed inset-0 bg-black;
         opacity: 30%;
-        z-index: 100;
+        z-index: 999;
     }
 }
 </style>
