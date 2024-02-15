@@ -31,6 +31,11 @@ const state = reactive({
         if (width.value < screens.tablet.max) return i18n.t('COMMON.GNB.SEARCH.SERACH');
         return i18n.t('COMMON.GNB.SEARCH.SERACH_PLACEHOLDER');
     }),
+    metaName: computed(() => {
+        const userAgent = window.navigator.userAgent;
+        if (userAgent.indexOf('Mac') !== -1) return 'cmd';
+        return 'Ctrl';
+    }),
 });
 
 watch(() => props.isFocused, async (isFocused) => {
@@ -80,6 +85,10 @@ watch(() => props.isFocused, async (isFocused) => {
                  class="delete-button"
                  @click.stop="$emit('input', '')"
             />
+            <div class="shortcut-wrapper">
+                <span class="tag-box">{{ state.metaName }}</span>
+                <span class="tag-box">k</span>
+            </div>
         </div>
     </div>
 </template>
@@ -134,6 +143,19 @@ watch(() => props.isFocused, async (isFocused) => {
         .delete-button {
             @apply text-gray-400;
             cursor: pointer;
+        }
+
+        .shortcut-wrapper {
+            @apply flex items-center;
+            margin-left: 0.5rem;
+            line-height: 1.5;
+
+            .tag-box {
+                @apply rounded-md border border-gray-200 text-label-sm text-gray-400;
+                display: inline-block;
+                padding: 0.125rem 0.375rem;
+                margin-right: 0.25rem;
+            }
         }
     }
 }
