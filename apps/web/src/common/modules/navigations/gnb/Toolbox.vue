@@ -1,12 +1,31 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+
 import { PIconButton, PBreadcrumbs, PCopyButton } from '@spaceone/design-system';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+interface Props {
+    isMinimizeGnb?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isMinimizeGnb: false,
+});
 
 const { breadcrumbs } = useBreadcrumbs();
 
+const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
+}>();
+
+const state = reactive({
+    proxyIsMinimizeGnb: useProxyValue('isMinimizeGnb', props, emit),
+});
+
 const handleClickMenuButton = () => {
-    console.log('click menu!');
+    console.log(state.proxyIsMinimizeGnb);
+    state.proxyIsMinimizeGnb = !state.proxyIsMinimizeGnb;
 };
 </script>
 
@@ -37,7 +56,9 @@ const handleClickMenuButton = () => {
 
 <style scoped lang="postcss">
 .gnb-toolbox {
-    @apply flex justify-between items-center bg-white border-gray-200 border-b;
+    @apply justify-between border-b;
+    top: 0;
+    width: 100%;
     height: $gnb-toolbox-height;
     padding-right: 1rem;
     padding-left: 0.625rem;
