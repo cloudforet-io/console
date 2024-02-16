@@ -40,16 +40,19 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.CLOUD_SERVICE,
         routeName: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         translationId: 'MENU.ASSET_INVENTORY_CLOUD_SERVICE',
+        icon: 'ic_service_cloud-service',
     },
     [MENU_ID.SERVER]: {
         menuId: MENU_ID.SERVER,
         routeName: ASSET_INVENTORY_ROUTE.SERVER._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVER',
+        icon: 'ic_service_server',
     },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
         routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
         translationId: 'MENU.ASSET_INVENTORY_COLLECTOR',
+        icon: 'ic_service_collector',
     },
     [MENU_ID.SERVICE_ACCOUNT]: {
         menuId: MENU_ID.SERVICE_ACCOUNT,
@@ -66,17 +69,20 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
+        icon: 'ic_service_cost-analysis',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
         routeName: COST_EXPLORER_ROUTE.BUDGET._NAME,
         translationId: 'MENU.COST_EXPLORER_BUDGET',
+        icon: 'ic_service_budget',
     },
     [MENU_ID.COST_REPORT]: {
         menuId: MENU_ID.COST_REPORT,
         routeName: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
         translationId: 'MENU.COST_EXPLORER_REPORT',
         highlightTag: 'new',
+        icon: 'ic_service_cost-report',
     },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
@@ -88,16 +94,19 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.ALERT_MANAGER_DASHBOARD,
         routeName: ALERT_MANAGER_ROUTE.DASHBOARD._NAME,
         translationId: 'MENU.ALERT_MANAGER_DASHBOARD',
+        icon: 'ic_service_alert-dashboard',
     },
     [MENU_ID.ALERT]: {
         menuId: MENU_ID.ALERT,
         routeName: ALERT_MANAGER_ROUTE.ALERT._NAME,
         translationId: 'MENU.ALERT_MANAGER_ALERT',
+        icon: 'ic_service_alert',
     },
     [MENU_ID.ESCALATION_POLICY]: {
         menuId: MENU_ID.ESCALATION_POLICY,
         routeName: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
         translationId: 'MENU.ALERT_MANAGER_ESCALATION_POLICY',
+        icon: 'ic_service_escalation-policy',
     },
     [MENU_ID.ADMINISTRATION]: {
         menuId: MENU_ID.ADMINISTRATION,
@@ -109,11 +118,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.IAM,
         routeName: ADMINISTRATION_ROUTE.IAM._NAME,
         translationId: 'MENU.ADMINISTRATION_IAM',
+        icon: 'ic_service_user',
     },
     [MENU_ID.USER]: {
         menuId: MENU_ID.USER,
         routeName: ADMINISTRATION_ROUTE.IAM.USER._NAME,
         translationId: 'MENU.ADMINISTRATION_USER',
+        icon: 'ic_service_user',
     },
     [MENU_ID.ROLE]: {
         menuId: MENU_ID.ROLE,
@@ -124,6 +135,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.APP,
         routeName: ADMINISTRATION_ROUTE.IAM.APP._NAME,
         translationId: 'MENU.ADMINISTRATION_APP',
+        icon: 'ic_service_app',
     },
     [MENU_ID.PREFERENCE]: {
         menuId: MENU_ID.PREFERENCE,
