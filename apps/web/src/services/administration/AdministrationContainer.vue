@@ -1,16 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
-                              :breadcrumbs="breadcrumbs"
-        >
-            <template #sidebar>
-                <administration-l-n-b />
-            </template>
-            <router-view />
-        </vertical-page-layout>
-        <general-page-layout v-else
-                             :breadcrumbs="breadcrumbs"
-        >
+        <general-page-layout>
             <template v-if="handbookState.isVisible"
                       #handbook
             >
@@ -39,10 +29,8 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
-import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 import RoleCreateEditHandbook from '@/services/administration/components/RoleCreateEditHandbook.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
@@ -50,8 +38,6 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 export default defineComponent({
     name: 'AdministrationContainer',
     components: {
-        AdministrationLNB,
-        VerticalPageLayout,
         GeneralPageLayout,
         HandbookButton,
         RoleCreateEditHandbook,
