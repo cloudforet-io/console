@@ -77,7 +77,6 @@ const state = reactive({
     selected: [] as SelectDropdownMenuItem[],
     errorMessage: computed<string|undefined>(() => {
         if (!state.isOptionInitiated) return undefined;
-        if (state.schemaProperty?.optional) return undefined;
         if (!state.selected?.length) {
             return i18n.t('DASHBOARDS.WIDGET.NO_SELECTED_ITEM') as string;
         }
@@ -182,7 +181,6 @@ const initSelectedInInheritCase = (inheritOption: InheritOptions[WidgetOptionKey
 };
 
 const initSelectedInNoStoredOptionCase = async (): Promise<SelectDropdownMenuItem[]> => {
-    if (state.schemaProperty?.optional) return [];
     const menuHandler = menuState.menuHandler;
     if (menuHandler) {
         const res = await menuHandler('', undefined, undefined, undefined, 0);
