@@ -43,7 +43,7 @@ const route = useRoute();
 
 const state = reactive({
     routeScope: computed(() => getRouteScope(route)),
-    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace'),
+    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
     isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,
