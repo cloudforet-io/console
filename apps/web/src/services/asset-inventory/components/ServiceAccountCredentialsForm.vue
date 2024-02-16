@@ -159,7 +159,12 @@ const checkJsonStringAvailable = (str: string): boolean => {
 /* Api */
 const listTrustAccounts = async () => {
     try {
-        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>();
+        if (!props.provider) return;
+        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>(
+            {
+                query: new ApiQueryHelper().setFilters([{ k: 'provider', v: props.provider, o: '=' }]).data,
+            },
+        );
         state.trustedAccounts = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
