@@ -130,6 +130,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.ROLE,
         routeName: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
         translationId: 'MENU.ADMINISTRATION_ROLE',
+        icon: 'ic_service_role',
     },
     [MENU_ID.APP]: {
         menuId: MENU_ID.APP,
@@ -146,11 +147,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.DOMAIN_SETTINGS,
         routeName: ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME,
         translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
+        icon: 'ic_service_domain-settings',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
         routeName: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
+        icon: 'ic_service_workspaces',
     },
     [MENU_ID.MY_PAGE]: {
         menuId: MENU_ID.MY_PAGE,
