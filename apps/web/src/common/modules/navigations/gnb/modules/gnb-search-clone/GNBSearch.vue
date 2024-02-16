@@ -428,7 +428,7 @@ watch(() => state.visible, async (visible) => {
 <style lang="postcss" scoped>
 .gnb-search {
     @apply relative;
-    box-shadow: 0px 0px 8px 0px #00000014;
+    box-shadow: 0 0 8px 0 #00000014;
     .menu-button {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
