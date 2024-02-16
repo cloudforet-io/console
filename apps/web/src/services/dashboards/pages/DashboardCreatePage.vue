@@ -51,7 +51,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: { dashboardTemplate, dashboardProject },
-    setForm,
+    // setForm,
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,

@@ -196,6 +196,7 @@ const handleConfirmProject = () => {
         .board-description {
             @apply text-label-md text-gray-900;
         }
+
         /* custom design-system component - p-board-item */
         :deep(&.p-board-item) {
             .right-overlay-wrapper {
