@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
@@ -35,7 +34,7 @@ import {
     SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchDropdown.vue';
+import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchInput.vue';
 import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
@@ -332,6 +331,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
     }
 };
 
+const handleHideSearchMenu = () => { hideSearchMenu(); };
+
 onMounted(() => {
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('keydown', handleKeyDown);
@@ -361,15 +362,14 @@ watch(() => state.visible, async (visible) => {
 </script>
 
 <template>
-    <div v-on-click-outside="hideSearchMenu"
-         class="gnb-search"
+    <div class="gnb-search"
          @click.stop
     >
         <g-n-b-search-input v-if="state.isOverMobileSize"
                             v-model="state.inputText"
                             :is-focused.sync="state.isFocusOnInput"
                             @click="showSearchMenu"
-                            @esc="hideSearchMenu"
+                            @esc="handleHideSearchMenu"
                             @arrow-up="moveFocusToSuggestion('UPWARD')"
                             @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                             @input="handleUpdateInput"
@@ -383,7 +383,7 @@ watch(() => state.visible, async (visible) => {
                   tabindex="0"
                   role="button"
                   @click.stop="handleSearchButtonClick"
-                  @keydown.esc="hideSearchMenu"
+                  @keydown.esc="handleHideSearchMenu"
                   @keydown.enter="showSearchMenu"
             >
                 <p-i name="ic_gnb_search"
@@ -403,7 +403,7 @@ watch(() => state.visible, async (visible) => {
                                :is-recent="state.showRecent"
                                :search-limit="SEARCH_LIMIT"
                                @move-focus-end="handleMoveFocusEnd"
-                               @close="hideSearchMenu"
+                               @close="handleHideSearchMenu"
                                @select="handleSelect"
         >
             <template #search-input>
@@ -420,6 +420,7 @@ watch(() => state.visible, async (visible) => {
         </g-n-b-search-dropdown>
         <div v-if="state.visible"
              class="background-block"
+             @click="handleHideSearchMenu"
         />
     </div>
 </template>
@@ -427,6 +428,7 @@ watch(() => state.visible, async (visible) => {
 <style lang="postcss" scoped>
 .gnb-search {
     @apply relative;
+    box-shadow: 0 0 8px 0 #00000014;
     .menu-button {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
@@ -445,7 +447,7 @@ watch(() => state.visible, async (visible) => {
     .background-block {
         @apply fixed inset-0 bg-black;
         opacity: 30%;
-        z-index: 100;
+        z-index: 999;
     }
 }
 </style>

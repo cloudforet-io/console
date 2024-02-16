@@ -1,19 +1,25 @@
-
-
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PDataLoader, PEmpty } from '@spaceone/design-system';
+import { PDivider, PDataLoader } from '@spaceone/design-system';
 
 import { i18n as _i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import GNBSearchEmpty
+    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchEmpty.vue';
+import GNBSearchWorkspaceFilter
+    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
+import {
+    SUGGESTION_TYPE,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import type {
-    DropdownItem, FocusingDirection,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+    SuggestionItem,
+    SuggestionType,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
+
 
 interface Props {
     inputText: string;
@@ -38,7 +44,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(event: 'select', index: number, type?: SuggestionType): void;
     (event: 'move-focus-end'): void;
 }>();
-
 
 const state = reactive({
     menuTotalCount: computed<undefined|number>(() => props.items?.find((d) => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
@@ -75,7 +80,6 @@ const state = reactive({
     focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
 });
 
-/* Event */
 const handleSelect = (item: SuggestionItem, index: number) => {
     let itemIndex = index - 1; // extract header
     if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE && state.menuSuggestionItems?.length) itemIndex -= 1; // extract divider
@@ -110,10 +114,8 @@ watch(() => props.isFocused, (isFocused) => {
     }
 });
 </script>
-
 <template>
-    <div class="gnb-search-dropdown">
-        <slot name="search-input" />
+    <div class="g-n-b-search-service-tab">
         <p-data-loader :data="state.allItems"
                        :loading="props.loading"
         >
@@ -148,65 +150,21 @@ watch(() => props.isFocused, (isFocused) => {
                 <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
             <template #no-data>
-                <p-empty
-                    v-if="props.isRecent"
-                    show-image
-                    image-size="md"
-                >
-                    <template #image>
-                        <img src="@/assets/images/illust_microscope.svg"
-                             alt="empty-image"
-                        >
-                    </template>
-                    {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
-                </p-empty>
-                <p-empty
-                    v-if="props.inputText"
-                    show-image
-                >
-                    <template #image>
-                        <img src="@/assets/images/illust_ghost.svg"
-                             alt="empty-image"
-                        >
-                    </template>
-                    <p class="no-data-text">
-                        <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
-                            <template #inputText>
-                                <em>{{ props.inputText }}</em>
-                            </template>
-                        </i18n>
-                        <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
-                    </p>
-                </p-empty>
+                <g-n-b-search-empty :input-text="props.inputText"
+                                    :is-recent="props.isRecent"
+                />
             </template>
         </p-data-loader>
+        <p-divider vertical />
+        <g-n-b-search-workspace-filter class="filter" />
     </div>
 </template>
 
-<style lang="postcss" scoped>
-.gnb-search-dropdown {
-    @apply fixed bg-white rounded-xs border border-gray-200;
-    display: flex;
-    flex-direction: column;
-    max-width: 47.5rem;
-    width: 100%;
-    top: 3.125rem;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
-    z-index: 1000;
-
-    /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader) {
-        flex-grow: 1;
-        .data-loader-container {
-            max-height: calc(100vh - $top-bar-height - 5rem);
-            min-height: 14.875rem;
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-    }
+<style scoped lang="postcss">
+.g-n-b-search-service-tab {
+    @apply flex gap-3 h-full;
+    padding: 1rem 0;
+    height: 100%;
 
     .too-many-results-wrapper {
         @apply text-gray-400;
@@ -224,38 +182,9 @@ watch(() => props.isFocused, (isFocused) => {
             margin-bottom: 1rem;
         }
     }
-}
 
-@screen mobile {
-    .gnb-search-dropdown {
-        @apply flex flex-col;
-        position: fixed;
-        top: $top-bar-height;
-        width: 100vw;
-        height: calc(100vh - $top-bar-height - 0.5rem);
-        margin-top: -0.5rem;
-
-        /* custom design-system component - p-data-loader */
-        :deep(.p-data-loader) {
-            @apply flex-grow;
-            .data-loader-container {
-                @apply flex items-center;
-                .data-wrapper {
-                    width: 100%;
-                }
-            }
-        }
-    }
-}
-
-/* custom design-system component - p-empty */
-:deep(.p-empty) {
-    margin: 2.5rem 0;
-
-    .no-data-text {
-        em {
-            @apply font-bold text-gray-500;
-        }
+    .filter {
+        width: 13.25rem;
     }
 }
 </style>
