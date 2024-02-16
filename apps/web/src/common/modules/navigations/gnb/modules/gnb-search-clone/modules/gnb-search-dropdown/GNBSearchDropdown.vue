@@ -1,24 +1,40 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PTab } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { store } from '@/store';
+
+import type { RecentConfig } from '@/store/modules/recent/type';
+import { RECENT_TYPE } from '@/store/modules/recent/type';
+
+import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
+import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
 import GNBSearchServiceTab
     from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
 
 
 interface Props {
-    inputText: string;
-    loading: boolean;
+    isFocused: boolean;
+    focusingDirection: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    inputText: '',
-    loading: true,
+    isFocused: false,
+    focusingDirection: '',
 });
-
+const emit = defineEmits<{(event: 'move-focus-end'): void;
+}>();
+const RECENT_LIMIT = 5;
+const SEARCH_LIMIT = 15;
 
 const state = reactive({
+    loading: true,
     activeTab: 'service',
     tabs: [
         { label: 'Service', name: 'service' },
@@ -30,6 +46,51 @@ const state = reactive({
     ],
 });
 
+const dataState = reactive({
+    recentMenuList: [] as RecentConfig[]|null,
+    allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
+    isRecent: computed(() => dataState.recentMenuList?.length > 0),
+});
+
+
+// const createSearchRecent = async (type: SuggestionType, id: string) => {
+//     try {
+//         await SpaceConnector.client.addOns.recent.search.create({
+//             type,
+//             id,
+//         });
+//     } catch (e) {
+//         ErrorHandler.handleError(e);
+//     }
+// };
+
+const fetchSearchRecent = async (type: SuggestionType) => {
+    try {
+        state.loading = true;
+        const { results } = await SpaceConnector.client.addOns.recent.search.list({
+            type,
+            limit: RECENT_LIMIT,
+        });
+        dataState.recentMenuList = results.map((d) => ({
+            itemType: d.data.type,
+            itemId: d.data.id,
+            updatedAt: d.updated_at,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        dataState.recentMenuList = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+const handleMoveFocusEnd = () => {
+    emit('move-focus-end');
+};
+
+(async () => {
+    await fetchSearchRecent(RECENT_TYPE.MENU);
+})();
 
 </script>
 
@@ -41,8 +102,12 @@ const state = reactive({
         >
             <template #service>
                 <g-n-b-search-service-tab
-                    :input-text="props.inputText"
-                    :loading="props.loading"
+                    :is-recent="dataState.isRecent"
+                    :search-limit="SEARCH_LIMIT"
+                    :loading="state.loading"
+                    :focusing-direction="props.focusingDirection"
+                    :is-focused="props.isFocused"
+                    @move-focus-end="handleMoveFocusEnd"
                 />
             </template>
         </p-tab>

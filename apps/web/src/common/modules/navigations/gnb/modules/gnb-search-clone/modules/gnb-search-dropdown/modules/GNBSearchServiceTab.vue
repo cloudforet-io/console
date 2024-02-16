@@ -1,160 +1,156 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PDivider, PDataLoader } from '@spaceone/design-system';
+import { PDivider, getTextHighlightRegex } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
-import { i18n as _i18n } from '@/translations';
+import { store } from '@/store';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
+import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+import type { MenuInfo } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import GNBSearchEmpty
-    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchEmpty.vue';
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
+import { createSearchRecent } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/helper';
 import GNBSearchWorkspaceFilter
     from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
+import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
 import {
     SUGGESTION_TYPE,
 } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import type {
-    SuggestionItem,
-    SuggestionType,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 
 interface Props {
-    inputText: string;
     loading: boolean;
-    items: DropdownItem[];
-    isFocused: boolean;
-    focusingDirection: FocusingDirection;
     isRecent: boolean;
     searchLimit: number;
+    isFocused: boolean;
+    focusingDirection: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    inputText: '',
     loading: true,
-    items: () => [],
-    isFocused: false,
-    focusingDirection: undefined,
     isRecent: false,
     searchLimit: 15,
+    isFocused: false,
+    focusingDirection: 'DOWNWARD',
 });
 
-const emit = defineEmits<{(event: 'select', index: number, type?: SuggestionType): void;
-    (event: 'move-focus-end'): void;
+const userWorkspaceStore = useUserWorkspaceStore();
+const gnbSearchStore = useGnbSearchStore();
+const router = useRouter();
+const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
 
 const state = reactive({
-    menuTotalCount: computed<undefined|number>(() => props.items?.find((d) => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
-    cloudServiceTotalCount: computed<undefined|number>(() => props.items?.find((d) => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE)?.totalCount),
-    menuSuggestionItems: computed<SuggestionItem[]|null>(() => {
-        const menuItems = props.items?.find((d) => d.itemType === SUGGESTION_TYPE.MENU);
-        if (!menuItems?.suggestionItems) return null;
-
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    inputText: computed(() => gnbSearchStore.getters.inputText),
+    trimmedInputText: computed(() => gnbSearchStore.getters.trimmedInputText),
+    allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
+    serviceMenuList: [] as SuggestionMenu[],
+    serviceMenuCount: computed(() => state.serviceMenuList.length),
+    defaultServiceMenuList: computed(() => state.allMenuList.filter((menu) => !menu.parents)),
+    defaultServiceMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
-        if (menuItems.suggestionItems.length) {
-            results.push({ name: 'title', label: props.isRecent ? _i18n.t('COMMON.GNB.SEARCH.RECENT_MENU') : _i18n.t('COMMON.GNB.SEARCH.MENU'), type: 'header' });
-            results = results.concat(menuItems.suggestionItems);
+        if (state.defaultServiceMenuList.length) {
+            results.push({ name: 'title', label: 'Site Navigation', type: 'header' });
+            results = results.concat(state.defaultServiceMenuList);
         }
         return results;
-    }),
-    cloudServiceSuggestionItems: computed<SuggestionItem[]|null>(() => {
-        const cloudServiceItems = props.items?.find((d) => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE);
-        if (!cloudServiceItems?.suggestionItems) return null;
-
-        let results: SuggestionItem[] = [];
-        if (cloudServiceItems.suggestionItems.length) {
-            if (state.menuSuggestionItems?.length) results.push({ type: 'divider' });
-            results.push({ name: 'title', label: props.isRecent ? _i18n.t('COMMON.GNB.SEARCH.RECENT_CLOUD_SERVICE') : _i18n.t('COMMON.GNB.SEARCH.CLOUD_SERVICE'), type: 'header' });
-            results = results.concat(cloudServiceItems.suggestionItems);
-        }
-        return results;
-    }),
-    allItems: computed(() => {
-        if (state.cloudServiceSuggestionItems && state.menuSuggestionItems) return [...state.cloudServiceSuggestionItems, ...state.menuSuggestionItems];
-        return null;
     }),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
     focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
 });
 
-const handleSelect = (item: SuggestionItem, index: number) => {
-    let itemIndex = index - 1; // extract header
-    if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE && state.menuSuggestionItems?.length) itemIndex -= 1; // extract divider
-    emit('select', itemIndex, item.itemType);
-};
-const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
-    if (type === SUGGESTION_TYPE.MENU) {
-        if (direction === 'DOWNWARD' && state.cloudServiceSuggestionItems?.length) {
-            state.proxyFocusingDirection = direction;
-            state.focusingType = SUGGESTION_TYPE.CLOUD_SERVICE;
-        } else {
-            emit('move-focus-end');
-        }
-    } else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) {
-        if (direction === 'UPWARD' && state.menuSuggestionItems?.length) {
-            state.proxyFocusingDirection = direction;
-            state.focusingType = SUGGESTION_TYPE.MENU;
-        } else {
-            emit('move-focus-end');
-        }
-    }
+const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
+    const regex = getTextHighlightRegex(searchTerm);
+    const results = menu.map((d) => ({
+        id: d.id,
+        label: d.label,
+        parents: d.parents ? d.parents : undefined,
+        icon: d.parents?.[0]?.icon ?? d.icon,
+    })).filter((d) => {
+        if (regex.test(d.label as string)) return true;
+        return d.parents && d.parents.some((p) => regex.test(p.label as string));
+    });
+    return results.slice(0, props.searchLimit);
 };
 
-/* Watcher */
-watch(() => props.isFocused, (isFocused) => {
-    if (isFocused) {
-        if (props.focusingDirection === 'DOWNWARD') {
-            state.focusingType = props.items[0].itemType;
-        } else {
-            state.focusingType = props.items[props.items.length - 1].itemType;
-        }
+const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
+    if (type === SUGGESTION_TYPE.MENU && direction === 'DOWNWARD') {
+        state.proxyFocusingDirection = direction;
     }
-});
+    emit('move-focus-end');
+};
+
+const handleSelect = (item) => {
+    const menuId = item.id;
+    const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
+    if (menuInfo && router.currentRoute.name !== menuId) {
+        router.push({ name: menuInfo.routeName }).catch(() => {});
+        if (!state.showRecent) createSearchRecent(SUGGESTION_TYPE.MENU, menuId, state.currentWorkspaceId);
+    }
+    gnbSearchStore.setIsActivated(false);
+};
+
+watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
+    if (trimmedText) {
+        state.serviceMenuList = filterMenuItemsBySearchTerm(state.allMenuList, trimmedText);
+    } else {
+        state.serviceMenuList = [];
+    }
+}, 300, {
+    leading: true,
+}));
+
+// /* Watcher */
+// TODO: for focusing
+// watch(() => props.isFocused, (isFocused) => {
+//     if (isFocused) {
+//         if (props.focusingDirection === 'DOWNWARD') {
+//             if (state.inputText.length === 0) {
+//                 state.focusingType = SUGGESTION_TYPE.MENU;
+//         } else {
+//             state.focusingType = props.items[props.items.length - 1].itemType;
+//         }
+//     }
+// });
 </script>
 <template>
     <div class="g-n-b-search-service-tab">
-        <p-data-loader :data="state.allItems"
-                       :loading="props.loading"
+        <g-n-b-suggestion-list v-show="!state.inputText.length"
+                               :items="state.defaultServiceMenuItems || []"
+                               :input-text="state.inputText"
+                               :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                               :focusing-direction="props.focusingDirection"
+                               @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                               @close="$emit('close')"
+                               @select="handleSelect"
+        />
+        <g-n-b-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
+                               :items="state.serviceMenuList || []"
+                               :input-text="state.inputText"
+                               :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                               :focusing-direction="props.focusingDirection"
+                               @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                               @close="$emit('close')"
+                               @select="handleSelect"
+        />
+        <!--TODO: Recent List-->
+        <div v-if="state.inputText && state.serviceMenuCount > props.searchLimit"
+             class="too-many-results-wrapper"
         >
-            <g-n-b-suggestion-list v-show="state.menuSuggestionItems && state.menuSuggestionItems.length > 0"
-                                   :items="state.menuSuggestionItems || []"
-                                   :input-text="props.inputText"
-                                   :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                   :focusing-direction="props.focusingDirection"
-                                   @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                   @close="$emit('close')"
-                                   @select="handleSelect"
-            />
-            <div v-if="props.inputText && state.menuTotalCount > props.searchLimit"
-                 class="too-many-results-wrapper"
-            >
-                <div class="dim-wrapper" />
-                <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
-            </div>
-            <g-n-b-suggestion-list v-show="state.cloudServiceSuggestionItems && state.cloudServiceSuggestionItems.length > 0"
-                                   :items="state.cloudServiceSuggestionItems || []"
-                                   :input-text="props.inputText"
-                                   :is-focused="state.focusingType === SUGGESTION_TYPE.CLOUD_SERVICE ? isFocused : false"
-                                   :focusing-direction="props.focusingDirection"
-                                   @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.CLOUD_SERVICE, ...arguments)"
-                                   @close="$emit('close')"
-                                   @select="handleSelect"
-            />
-            <div v-if="props.inputText && state.cloudServiceTotalCount > props.searchLimit"
-                 class="too-many-results-wrapper"
-            >
-                <div class="dim-wrapper" />
-                <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
-            </div>
-            <template #no-data>
-                <g-n-b-search-empty :input-text="props.inputText"
-                                    :is-recent="props.isRecent"
-                />
-            </template>
-        </p-data-loader>
+            <div class="dim-wrapper" />
+            <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
+        </div>
         <p-divider vertical />
         <g-n-b-search-workspace-filter class="filter" />
     </div>
