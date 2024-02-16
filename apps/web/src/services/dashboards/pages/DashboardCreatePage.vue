@@ -36,9 +36,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useGoBack } from '@/common/composables/go-back';
 
 import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
+import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
-// import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
-import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -52,7 +51,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: { dashboardTemplate, dashboardProject },
-    setForm,
+    // setForm,
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,
@@ -129,8 +128,13 @@ const createDashboard = async () => {
     }
 };
 
+/* Event */
 const handleClickClose = () => {
     state.closeConfirmModalVisible = true;
+};
+const handleSelectTemplate = () => {
+    // TODO: set template
+    goStep('next');
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
@@ -144,48 +148,19 @@ defineExpose({ setPathFrom });
     <div class="dashboard-create-page"
          :class="`step-${state.currentStep}`"
     >
-        <div v-if="state.currentStep === state.steps[0].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-create-step1 />
-            <!--            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />-->
-            <!--            <div class="button-area">-->
-            <!--                <p-button-->
-            <!--                    style-type="transparent"-->
-            <!--                    size="lg"-->
-            <!--                    @click="$router.go(-1)"-->
-            <!--                >-->
-            <!--                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}-->
-            <!--                </p-button>-->
-            <!--                <p-button-->
-            <!--                    style-type="primary"-->
-            <!--                    size="lg"-->
-            <!--                    :disabled="!state.isValid"-->
-            <!--                    @click="goStep('next')"-->
-            <!--                >-->
-            <!--                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}-->
-            <!--                </p-button>-->
-            <!--            </div>-->
-        </div>
-        <div v-if="state.currentStep === state.steps[1].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-template-form
-                :dashboard-scope="dashboardDetailState.dashboardScope"
-                @set-template="setForm('dashboardTemplate', $event)"
-            />
+        <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                  :description="state.steps[state.currentStep - 1].description"
+                                  :total-steps="state.steps.length"
+                                  :current-step="state.currentStep"
+                                  show-step
+                                  show-close-button
+                                  @close="handleClickClose"
+        />
+        <dashboard-create-step1 v-if="state.currentStep === 1"
+                                @select-template="handleSelectTemplate"
+        />
+        <template v-else-if="state.currentStep === 2">
+            <dashboard-create-step2 />
             <div class="button-area">
                 <p-button
                     style-type="transparent"
@@ -204,15 +179,8 @@ defineExpose({ setPathFrom });
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[2].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
+        </template>
+        <div v-if="state.currentStep === 3">
             <dashboard-customize :loading="state.loading"
                                  :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
                                  hide-cancel-button
@@ -228,12 +196,11 @@ defineExpose({ setPathFrom });
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    min-width: 25rem;
+    &.step-1 {
+        width: 60rem;
+    }
     &.step-2 {
-        @apply absolute;
-        top: 2rem;
-        width: 100%;
-        max-width: 1000px;
+        width: 45rem;
     }
     &.step-3 {
         width: 100%;

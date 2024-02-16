@@ -12,6 +12,9 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 
+
+const emit = defineEmits<{(event: 'select-template'): void;
+}>();
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     outOfTheBoxTemplateSets: [
@@ -81,6 +84,9 @@ const state = reactive({
     ],
 });
 
+const handleClickCreateButton = () => {
+    emit('select-template');
+};
 </script>
 
 <template>
@@ -129,6 +135,7 @@ const state = reactive({
                                     <p-button size="md"
                                               style-type="substitutive"
                                               icon-right="ic_arrow-right"
+                                              @click="handleClickCreateButton"
                                     >
                                         Create
                                     </p-button>
@@ -185,7 +192,6 @@ const state = reactive({
 <style lang="postcss" scoped>
 .dashboard-create-step-1 {
     @apply flex flex-col;
-    min-width: 59.5625rem;
     width: 100%;
     overflow: visible;
     .contents-container {
