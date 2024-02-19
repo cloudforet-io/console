@@ -4,16 +4,25 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { clone } from 'lodash';
 
 import { store } from '@/store';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+// import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+
+// import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
     type: string;
+    name?: string;
 }
 interface Props {
     isMinimizeGnb?: boolean;
@@ -46,8 +55,10 @@ const state = reactive({
         return result;
     }),
     selectedMenuId: computed(() => {
-        const selectedMenu = state.visibleGnbMenuList.find((menu) => route.matched[route.matched.length - 1].meta.menuId === menu.id);
-        return selectedMenu.id;
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        return targetMenuId;
     }),
 });
 
@@ -62,7 +73,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
 </script>
 
 <template>
-    <div class="navigation-rail"
+    <div class="g-n-b-navigation-rail"
          :class="{'is-minimize': props.isMinimizeGnb}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
@@ -84,30 +95,45 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
                      width="1.25rem"
                      color="inherit"
                 />
-                <span v-if="!props.isMinimizeGnb || state.isHovered"
-                      class="menu-title"
-                >
-                    {{ item.label }}
-                </span>
+                <div>
+                    <span v-if="!props.isMinimizeGnb || state.isHovered"
+                          class="menu-title"
+                    >
+                        {{ item.label }}
+                    </span>
+                    <span v-if="item.highlightTag && (!props.isMinimizeGnb || state.isHovered)"
+                          class="mark"
+                    >
+                        <new-mark v-if="item.highlightTag === 'new'"
+                                  class="mark-item"
+                        />
+                        <update-mark v-else-if="item.highlightTag === 'update'"
+                                     class="mark-item"
+                        />
+                        <beta-mark v-else-if="item.highlightTag === 'beta'"
+                                   class="mark-item"
+                        />
+                    </span>
+                </div>
             </div>
-            <favorite-button v-if="item.subMenuList?.length === 0"
-                             class="favorite-button"
-                             :item-id="item.id"
-                             :favorite-type="FAVORITE_TYPE.MENU"
-                             scale="0.65"
-            />
+            <!--            TODO: low priority -->
+            <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
+            <!--                             class="favorite-button"-->
+            <!--                             :item-id="item.id"-->
+            <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
+            <!--                             scale="0.65"-->
+            <!--            />-->
         </router-link>
     </div>
 </template>
 
 <style scoped lang="postcss">
-.navigation-rail {
-    @apply flex-col items-start border-r;
+.g-n-b-navigation-rail {
+    @apply flex-col items-start bg-white border-r;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
     height: 100%;
     padding: 1rem 0.75rem;
-    transition: width 0.3s ease;
     .service-menu {
         @apply flex items-center justify-between text-label-md;
         width: 100%;
@@ -115,6 +141,14 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.75rem;
+        border-radius: 0.25rem;
+        .menu-wrapper {
+            @apply flex items-center;
+            gap: 0.625rem;
+            .mark-item {
+                margin-left: 0.125rem;
+            }
+        }
         .favorite-button {
             @apply hidden;
         }
@@ -144,10 +178,29 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         }
     }
     &.is-minimize {
-        @apply cursor-pointer;
+        @apply bg-gray-100 cursor-pointer;
         width: $gnb-navigation-rail-min-width;
+        .service-menu {
+            width: 2.25rem;
+            &:hover:not(.is-only-label) {
+                @apply bg-violet-200;
+            }
+            &.is-selected {
+                @apply bg-violet-200;
+            }
+        }
         &:hover {
+            @apply bg-white;
             width: $gnb-navigation-rail-max-width;
+            .service-menu {
+                width: 100%;
+                &:hover:not(.is-only-label) {
+                    @apply bg-violet-100;
+                }
+                &.is-selected {
+                    @apply bg-violet-100;
+                }
+            }
         }
     }
 }

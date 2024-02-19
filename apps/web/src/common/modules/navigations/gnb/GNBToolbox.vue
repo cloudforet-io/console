@@ -29,11 +29,12 @@ const handleClickMenuButton = () => {
 </script>
 
 <template>
-    <div class="gnb-toolbox">
+    <div class="g-n-b-toolbox">
         <div class="navigation-section">
             <p-icon-button name="ic_gnb_menu"
                            style-type="transparent"
                            class="menu-button"
+                           shape="square"
                            size="md"
                            @click="handleClickMenuButton"
             />
@@ -54,8 +55,8 @@ const handleClickMenuButton = () => {
 </template>
 
 <style scoped lang="postcss">
-.gnb-toolbox {
-    @apply justify-between border-b;
+.g-n-b-toolbox {
+    @apply justify-between bg-white border-b;
     top: 0;
     width: 100%;
     height: $gnb-toolbox-height;
