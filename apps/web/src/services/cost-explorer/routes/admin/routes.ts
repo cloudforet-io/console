@@ -34,7 +34,7 @@ const adminCostExplorerRoutes: RouteConfig = {
     children: [
         {
             path: 'landing',
-            meta: { centeredLayout: true },
+            meta: { menuId: MENU_ID.COST_EXPLORER, centeredLayout: true },
             name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME),
             component: CostExplorerHome as any,
         },
@@ -49,7 +49,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.COST_ANALYSIS, lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
                             const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
@@ -76,6 +76,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: ':dataSourceId/:costQuerySetId',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                     meta: {
+                        menuId: MENU_ID.COST_ANALYSIS,
                         lnbVisible: true,
                         label: ({ params }) => (params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS ? undefined : params.costQuerySetId),
                         copiable: ({ params }) => ![DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
@@ -88,7 +89,7 @@ const adminCostExplorerRoutes: RouteConfig = {
         {
             path: 'budget',
             meta: {
-                menuId: makeAdminRouteName(MENU_ID.BUDGET),
+                menuId: MENU_ID.BUDGET,
                 translationId: MENU_INFO_MAP[MENU_ID.BUDGET].translationId,
             },
             component: { template: '<router-view />' },
@@ -119,14 +120,16 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME),
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', menuId: MENU_ID.BUDGET },
                     component: AdminBudgetCreatePage as any,
                 },
                 {
                     path: ':budgetId',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    meta: {
+                        lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true, menuId: MENU_ID.BUDGET,
+                    },
                     component: AdminBudgetDetailPage as any,
                 },
             ],
@@ -155,7 +158,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.COST_REPORT, lnbVisible: true },
                     component: CostReportPage as any,
                 },
             ],

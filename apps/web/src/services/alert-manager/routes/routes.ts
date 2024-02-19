@@ -52,7 +52,9 @@ const alertManagerRoutes: RouteConfig = {
                 {
                     path: ':id?',
                     name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
+                    meta: {
+                        lnbVisible: true, label: ({ params }) => params.id, copiable: true, menuId: MENU_ID.ALERT,
+                    },
                     props: true,
                     component: AlertDetailPage as any,
                 },

@@ -43,36 +43,38 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.CLOUD_SERVICE, lnbVisible: true },
                     component: CloudServicePage as any,
                 },
                 {
                     path: 'search/:searchKey/:id',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME),
+                    meta: { menuId: MENU_ID.CLOUD_SERVICE },
                     props: true,
                     component: CloudServiceSearch,
                 },
                 {
                     path: 'type/search/:id',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME),
+                    meta: { menuId: MENU_ID.CLOUD_SERVICE },
                     props: true,
                     component: CloudServiceTypeSearch,
                 },
                 {
                     path: 'no-resource',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME),
-                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE', menuId: MENU_ID.CLOUD_SERVICE },
                     component: NoResourcePage as any,
                 },
                 {
                     path: ':provider/:group',
-                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}`, menuId: MENU_ID.CLOUD_SERVICE },
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: ':name?',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
-                            meta: { lnbVisible: true, label: ({ params }) => params.name },
+                            meta: { lnbVisible: true, label: ({ params }) => params.name, menuId: MENU_ID.CLOUD_SERVICE },
                             props: true,
                             component: CloudServiceDetailPage as any,
                         },
@@ -94,31 +96,33 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.COLLECTOR, lnbVisible: true },
                     props: true,
                     component: AdminCollectorMainPage as any,
                 },
                 {
                     path: 'create',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME),
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true },
+                    meta: { menuId: MENU_ID.COLLECTOR, translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true },
                     component: AdminCollectorCreatePage as any,
                 },
                 {
                     path: 'history',
-                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
+                    meta: { menuId: MENU_ID.COLLECTOR, translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
                     component: { template: '<keep-alive><router-view /></keep-alive>' },
                     children: [
                         {
                             path: '/',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME),
-                            meta: { lnbVisible: true },
+                            meta: { menuId: MENU_ID.COLLECTOR, lnbVisible: true },
                             component: AdminCollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME),
-                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
+                            meta: {
+                                menuId: MENU_ID.COLLECTOR, lnbVisible: true, label: ({ params }) => params.jobId, copiable: true,
+                            },
                             props: true,
                             component: AdminCollectHistoryJobPage as any,
                         },
@@ -128,7 +132,9 @@ const adminAssetInventoryRoute: RouteConfig = {
                     path: ':collectorId',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME),
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
+                    meta: {
+                        menuId: MENU_ID.COLLECTOR, lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true,
+                    },
                     component: AdminCollectorDetailPage as any,
                 },
             ],

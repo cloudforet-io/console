@@ -35,7 +35,11 @@ const adminDashboardsRoute: RouteConfig = {
                 {
                     path: 'all',
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
-                    meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
+                    meta: {
+                        lnbVisible: true,
+                        translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL',
+                        menuId: MENU_ID.DASHBOARDS,
+                    },
                     component: AdminDashboardMainPage,
                 },
                 {
@@ -44,13 +48,19 @@ const adminDashboardsRoute: RouteConfig = {
                     meta: {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
+                        menuId: MENU_ID.DASHBOARDS,
                     },
                     component: AdminDashboardCreatePage,
                 },
                 {
                     path: 'detail/:dashboardId',
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
-                    meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                    meta: {
+                        lnbVisible: true,
+                        label: ({ params }) => params.dashboardId,
+                        copiable: true,
+                        menuId: MENU_ID.DASHBOARDS,
+                    },
                     props: true,
                     component: AdminDashboardDetailPage,
                 },
@@ -58,6 +68,7 @@ const adminDashboardsRoute: RouteConfig = {
                     path: 'customize/:dashboardId?',
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.CUSTOMIZE._NAME),
                     meta: {
+                        menuId: MENU_ID.DASHBOARDS,
                         breadcrumbs: ({ params }) => {
                             const breadcrumbs: Breadcrumb[] = [
                                 {

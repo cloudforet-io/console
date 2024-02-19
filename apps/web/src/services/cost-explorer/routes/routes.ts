@@ -34,7 +34,7 @@ const costExplorerRoutes: RouteConfig = {
     children: [
         {
             path: 'landing',
-            meta: { centeredLayout: true },
+            meta: { menuId: MENU_ID.COST_EXPLORER, centeredLayout: true },
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
             component: CostExplorerHome as any,
         },
@@ -49,7 +49,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.COST_ANALYSIS, lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
                             const workspaceId = to.params.workspaceId;
@@ -85,6 +85,7 @@ const costExplorerRoutes: RouteConfig = {
                     path: ':dataSourceId/:costQuerySetId',
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     meta: {
+                        menuId: MENU_ID.COST_ANALYSIS,
                         lnbVisible: true,
                         label: ({ params }) => (params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS ? undefined : params.costQuerySetId),
                         copiable: ({ params }) => ![DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
@@ -124,14 +125,16 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', menuId: MENU_ID.BUDGET },
                     component: BudgetCreatePage as any,
                 },
                 {
                     path: ':budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    meta: {
+                        lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true, menuId: MENU_ID.BUDGET,
+                    },
                     component: BudgetDetailPage as any,
                 },
             ],
@@ -160,7 +163,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.COST_REPORT },
                     component: CostReportPage as any,
                 },
             ],

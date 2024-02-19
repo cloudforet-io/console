@@ -74,20 +74,20 @@ const adminAdministrationRoutes: RouteConfig = {
                         {
                             path: '/',
                             name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME),
-                            meta: { lnbVisible: true },
+                            meta: { menuId: MENU_ID.ROLE, lnbVisible: true },
                             props: true,
                             component: RolePage,
                         },
                         {
                             path: 'create',
                             name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME),
-                            meta: { translationId: 'IAM.ROLE.FORM.CREATE_TITLE' },
+                            meta: { menuId: MENU_ID.ROLE, translationId: 'IAM.ROLE.FORM.CREATE_TITLE' },
                             component: RoleCreatePage,
                         },
                         {
                             path: 'edit/:id',
                             name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME),
-                            meta: { translationId: 'IAM.ROLE.FORM.EDIT_TITLE' },
+                            meta: { menuId: MENU_ID.ROLE, translationId: 'IAM.ROLE.FORM.EDIT_TITLE' },
                             props: true,
                             component: RoleUpdatePage,
                         },

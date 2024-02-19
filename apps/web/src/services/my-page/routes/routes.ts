@@ -52,14 +52,14 @@ const myPageRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: MY_PAGE_ROUTE.NOTIFICATION._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { menuId: MENU_ID.NOTIFICATIONS, lnbVisible: true },
                     component: UserNotificationPage as any,
                 },
                 {
                     path: ':protocolId',
                     name: MY_PAGE_ROUTE.NOTIFICATION.ADD._NAME,
                     meta: {
-                        translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL',
+                        menuId: MENU_ID.NOTIFICATIONS, translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL',
                     },
                     props: true,
                     component: UserNotificationAddPage as any,

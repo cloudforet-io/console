@@ -57,30 +57,32 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'search/:searchKey/:id',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
+                    meta: { menuId: MENU_ID.CLOUD_SERVICE },
                     props: true,
                     component: CloudServiceSearch,
                 },
                 {
                     path: 'type/search/:id',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
+                    meta: { menuId: MENU_ID.CLOUD_SERVICE },
                     props: true,
                     component: CloudServiceTypeSearch,
                 },
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE', menuId: MENU_ID.CLOUD_SERVICE },
                     component: NoResourcePage as any,
                 },
                 {
                     path: ':provider/:group',
-                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}`, menuId: MENU_ID.CLOUD_SERVICE },
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: ':name?',
                             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.name },
+                            meta: { lnbVisible: true, label: ({ params }) => params.name, menuId: MENU_ID.CLOUD_SERVICE },
                             props: true,
                             component: CloudServiceDetailPage as any,
                         },
@@ -109,24 +111,26 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true },
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', centeredLayout: true, menuId: MENU_ID.COLLECTOR },
                     component: CreateCollectorPage as any,
                 },
                 {
                     path: 'history',
-                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE' },
+                    meta: { translationId: 'MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE', menuId: MENU_ID.COLLECTOR },
                     component: { template: '<keep-alive><router-view /></keep-alive>' },
                     children: [
                         {
                             path: '/',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
-                            meta: { lnbVisible: true },
+                            meta: { lnbVisible: true, menuId: MENU_ID.COLLECTOR },
                             component: CollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
                             name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
+                            meta: {
+                                lnbVisible: true, label: ({ params }) => params.jobId, copiable: true, menuId: MENU_ID.COLLECTOR,
+                            },
                             props: true,
                             component: CollectJobPage as any,
                         },
@@ -136,7 +140,9 @@ const assetInventoryRoute: RouteConfig = {
                     path: ':collectorId',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME,
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
+                    meta: {
+                        lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true, menuId: MENU_ID.COLLECTOR,
+                    },
                     component: CollectorDetailPage as any,
                 },
             ],
@@ -156,13 +162,15 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'no-resource',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
-                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
+                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE', menuId: MENU_ID.SERVICE_ACCOUNT },
                     component: NoResourcePage as any,
                 },
                 {
                     path: ':serviceAccountId',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, copiable: true },
+                    meta: {
+                        lnbVisible: true, label: ({ params }) => params.serviceAccountId, copiable: true, menuId: MENU_ID.SERVICE_ACCOUNT,
+                    },
                     props: true,
                     component: ServiceAccountDetailPage,
                 },
@@ -170,6 +178,7 @@ const assetInventoryRoute: RouteConfig = {
                     path: 'add/:provider/:serviceAccountType',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                     meta: {
+                        menuId: MENU_ID.SERVICE_ACCOUNT,
                         translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
                             type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
                         }]),

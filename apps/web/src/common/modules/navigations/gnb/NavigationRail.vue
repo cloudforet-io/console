@@ -47,7 +47,7 @@ const state = reactive({
     }),
     selectedMenuId: computed(() => {
         const selectedMenu = state.visibleGnbMenuList.find((menu) => route.matched[route.matched.length - 1].meta.menuId === menu.id);
-        return selectedMenu.id;
+        return selectedMenu?.id;
     }),
 });
 
@@ -115,6 +115,10 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.75rem;
+        .menu-wrapper {
+            @apply flex items-center;
+            gap: 0.625rem;
+        }
         .favorite-button {
             @apply hidden;
         }

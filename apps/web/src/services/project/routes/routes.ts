@@ -55,12 +55,14 @@ export default {
                         {
                             path: 'summary',
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                            meta: { menuId: MENU_ID.PROJECT },
                             props: true,
                             component: ProjectSummaryPage,
                         },
                         {
                             path: 'member',
                             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                            meta: { menuId: MENU_ID.PROJECT },
                             props: true,
                             component: ProjectMemberPage,
                         },
@@ -74,18 +76,21 @@ export default {
                                 {
                                     path: 'alert',
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+                                    meta: { menuId: MENU_ID.PROJECT },
                                     props: true,
                                     component: ProjectAlertListPage,
                                 },
                                 {
                                     path: 'webhook',
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
+                                    meta: { menuId: MENU_ID.PROJECT },
                                     props: true,
                                     component: ProjectWebhookPage,
                                 },
                                 {
                                     path: 'settings',
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME,
+                                    meta: { menuId: MENU_ID.PROJECT },
                                     props: true,
                                     component: ProjectAlertSettingsPage,
                                 },
@@ -94,12 +99,14 @@ export default {
                         {
                             path: 'notification',
                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                            meta: { menuId: MENU_ID.PROJECT },
                             props: true,
                             component: ProjectNotificationsPage,
                         },
                         {
                             path: 'tag',
                             name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+                            meta: { menuId: MENU_ID.PROJECT },
                             props: true,
                             component: ProjectTagPage,
                         },
@@ -112,12 +119,14 @@ export default {
                 {
                     path: 'event-rule',
                     name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
+                    meta: { menuId: MENU_ID.PROJECT },
                     props: (route) => ({ projectId: route.params.id }),
                     component: ProjectAlertEventRulePage,
                 },
                 {
                     path: 'notification/:protocolId',
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+                    meta: { menuId: MENU_ID.PROJECT },
                     component: ProjectNotificationAddPage,
                     props: true,
                 },
