@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import NavigationRail from '@/common/modules/navigations/gnb/NavigationRail.vue';
-import Toolbox from '@/common/modules/navigations/gnb/Toolbox.vue';
+import GNBNavigationRail from '@/common/modules/navigations/gnb/GNBNavigationRail.vue';
+import GNBToolbox from '@/common/modules/navigations/gnb/GNBToolbox.vue';
 
 const state = reactive({
     isMinimizeGnb: false,
@@ -12,11 +12,11 @@ const state = reactive({
 <template>
     <div class="layout-container">
         <div class="gnb">
-            <toolbox class="gnb-item"
-                     :is-minimize-gnb.sync="state.isMinimizeGnb"
+            <g-n-b-toolbox class="g-n-b-item"
+                           :is-minimize-gnb.sync="state.isMinimizeGnb"
             />
-            <navigation-rail class="gnb-item"
-                             :is-minimize-gnb="state.isMinimizeGnb"
+            <g-n-b-navigation-rail class="g-n-b-item"
+                                   :is-minimize-gnb="state.isMinimizeGnb"
             />
         </div>
         <main class="main"
@@ -30,7 +30,7 @@ const state = reactive({
 <style scoped lang="postcss">
 .gnb {
     z-index: 10;
-    .gnb-item {
+    .g-n-b-item {
         @apply absolute flex bg-white border-gray-200;
     }
 }

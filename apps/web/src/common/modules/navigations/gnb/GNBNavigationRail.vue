@@ -146,8 +146,14 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
     &.is-minimize {
         @apply cursor-pointer;
         width: $gnb-navigation-rail-min-width;
+        .service-menu {
+            width: 2.25rem;
+        }
         &:hover {
             width: $gnb-navigation-rail-max-width;
+            .service-menu {
+                width: 100%;
+            }
         }
     }
 }
