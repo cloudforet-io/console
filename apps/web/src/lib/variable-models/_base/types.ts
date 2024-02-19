@@ -12,8 +12,8 @@ export interface IBaseVariableModel {
     prefetch?: boolean; // whether to prefetch data on site init
     //
     scope?: {
-        resourceGroup: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
-        value: string;
+        resourceGroup?: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
+        value?: string;
     };
     labelsSchema?: Record<string, {
         key: string;
@@ -27,7 +27,7 @@ export interface IBaseVariableModel {
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
 }
-export interface IResourceNameVariableModel extends IBaseVariableModel {
+export interface IResourceVariableModel extends IBaseVariableModel {
     resourceType: string;
     idKey: string;
     nameKey: string;
@@ -46,11 +46,11 @@ export interface EnumVariableModelConfig {
     name?: string;
     values: Value[];
 }
-export interface ResourceValueVariableModelConfig {
-    type: 'RESOURCE_VALUE',
+export interface ResourceVariableModelConfig {
+    type: 'RESOURCE';
     name?: string;
     resource_type: string;
-    reference_key: string;
+    id_key: string;
 }
 
 // related types

@@ -5,7 +5,6 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type {
     ListResponse, ListQuery, IResourceValueVariableModel,
-    ResourceValueVariableModelConfig,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -24,7 +23,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: string[], total_count: number }>>;
 
-    constructor(config?: ResourceValueVariableModelConfig) {
+    constructor(config) {
         if (!config) return;
         if (!config.resource_type) throw new Error('resource_type is required');
         if (!config.reference_key) throw new Error('reference_key is required');
