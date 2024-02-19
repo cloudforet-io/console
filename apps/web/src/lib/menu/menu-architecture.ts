@@ -5,7 +5,6 @@ export const MENU_LIST: Menu[] = [
     {
         id: MENU_ID.HOME_DASHBOARD,
         needPermissionByRole: true,
-        hideOnGNB: true,
     },
     {
         id: MENU_ID.DASHBOARDS,
