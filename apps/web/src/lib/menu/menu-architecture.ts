@@ -50,7 +50,6 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.MY_PAGE,
-        hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
             { id: MENU_ID.ACCOUNT_PROFILE },

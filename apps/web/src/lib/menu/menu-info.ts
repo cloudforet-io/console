@@ -161,11 +161,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.ACCOUNT_PROFILE,
         routeName: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME,
         translationId: 'MENU.MY_PAGE_ACCOUNT_PROFILE',
+        icon: 'ic_my-page_account-and-profile',
     },
     [MENU_ID.NOTIFICATIONS]: {
         menuId: MENU_ID.NOTIFICATIONS,
         routeName: MY_PAGE_ROUTE.NOTIFICATION._NAME,
         translationId: 'MENU.MY_PAGE_NOTIFICATIONS',
+        highlightTag: 'beta',
+        icon: 'ic_my-page_notifications-channel',
     },
     [MENU_ID.INFO]: {
         menuId: MENU_ID.INFO,
