@@ -63,11 +63,11 @@ onUnmounted(() => {
                     class="gnb-suggestion-list"
                     :menu="state.refinedItems"
                     no-select-indication
-                    @keyup:up:end="$emit('move-focus-end', 'UPWARD')"
-                    @keyup:down:end="$emit('move-focus-end', 'DOWNWARD')"
-                    @keyup:esc="$emit('close')"
-                    @focus="$emit('update:isFocused', true)"
-                    @blur="$emit('update:isFocused', false)"
+                    @keyup:up:end="emit('move-focus-end', 'UPWARD')"
+                    @keyup:down:end="emit('move-focus-end', 'DOWNWARD')"
+                    @keyup:esc="emit('close')"
+                    @focus="emit('update:isFocused', true)"
+                    @blur="emit('update:isFocused', false)"
                     @select="handleSelect"
     >
         <template #header-title="{ item }">

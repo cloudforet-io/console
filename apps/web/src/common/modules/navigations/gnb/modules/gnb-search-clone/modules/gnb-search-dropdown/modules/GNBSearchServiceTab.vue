@@ -132,7 +132,6 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
                                :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
                                :focusing-direction="props.focusingDirection"
                                @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                               @close="$emit('close')"
                                @select="handleSelect"
         />
         <g-n-b-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
@@ -141,7 +140,6 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
                                :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
                                :focusing-direction="props.focusingDirection"
                                @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                               @close="$emit('close')"
                                @select="handleSelect"
         />
         <!--TODO: Recent List-->
