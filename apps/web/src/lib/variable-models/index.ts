@@ -1,8 +1,10 @@
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+
 import EnumVariableModel from './_base/enum-variable-model';
-import ResourceValueVariableModel from './_base/resource-value-variable-model';
 import type {
     IBaseVariableModel, ListQuery, ListResponse,
-    EnumVariableModelConfig, ResourceValueVariableModelConfig,
+    EnumVariableModelConfig,
+    ResourceVariableModelConfig,
 } from './_base/types';
 import type { ManagedVariableModelKey } from './managed';
 import MANAGED_VARIABLE_MODELS from './managed';
@@ -13,26 +15,41 @@ export interface ManagedVariableModelConfig {
     key: ManagedVariableModelKey;
     name?: string;
 }
-export type CustomVariableModelConfig = EnumVariableModelConfig|ResourceValueVariableModelConfig;
+export interface VariableModelAdditionalConfig {
+    scope?: IBaseVariableModel['scope'];
+    labelsSchema?: IBaseVariableModel['labelsSchema'];
+    labels?: IBaseVariableModel['labels'];
+}
+export type CustomVariableModelConfig = EnumVariableModelConfig|ResourceVariableModelConfig;
 export type VariableModelConfig = ManagedVariableModelConfig|CustomVariableModelConfig;
-export type VariableModelConfigType = 'MANAGED'|'ENUM'|'RESOURCE_VALUE';
+export type VariableModelConfigType = 'MANAGED'|'ENUM'|'RESOURCE';
 
 export class VariableModel implements IBaseVariableModel {
     key: string;
 
     name: string;
 
+    scope: IBaseVariableModel['scope'];
+
+    labelsSchema: IBaseVariableModel['labelsSchema'];
+
+    labels: IBaseVariableModel['labels'];
+
     #model: IBaseVariableModel;
 
     #type: VariableModelConfigType;
 
-    constructor(config: VariableModelConfig) {
+    constructor(config: VariableModelConfig, additionalConfig?: VariableModelAdditionalConfig) {
+        this.scope = additionalConfig?.scope;
+        this.labelsSchema = additionalConfig?.labelsSchema;
+        this.labels = additionalConfig?.labels;
+
         if (config.type === 'MANAGED') {
             if (!config.key) throw new Error('key is required');
             const Model = MANAGED_VARIABLE_MODELS[config.key];
             this.#model = new Model();
-        } else if (config.type === 'RESOURCE_VALUE') {
-            this.#model = new ResourceValueVariableModel(config);
+        } else if (config.type === 'RESOURCE') {
+            this.#model = new ResourceVariableModel(config);
         } else if (config.type === 'ENUM') {
             this.#model = new EnumVariableModel(config);
         } else {
