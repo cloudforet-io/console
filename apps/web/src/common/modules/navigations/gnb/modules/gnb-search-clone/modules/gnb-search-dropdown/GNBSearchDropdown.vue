@@ -17,6 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
 import GNBSearchServiceTab
     from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 
 
 interface Props {
@@ -33,9 +34,11 @@ const emit = defineEmits<{(event: 'move-focus-end'): void;
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
 
+const topBarSearchStore = useTopBarSearchStore();
+
 const state = reactive({
     loading: true,
-    activeTab: 'service',
+    activeTab: computed(() => topBarSearchStore.state.activateTab),
     tabs: [
         { label: 'Service', name: 'service' },
         { label: 'Service Account', name: 'service-account' },
@@ -88,6 +91,12 @@ const handleMoveFocusEnd = () => {
     emit('move-focus-end');
 };
 
+const handleUpdateActiveTab = (tab: string) => {
+    topBarSearchStore.$patch((_state) => {
+        _state.state.activateTab = tab;
+    });
+};
+
 (async () => {
     await fetchSearchRecent(RECENT_TYPE.MENU);
 })();
@@ -97,8 +106,9 @@ const handleMoveFocusEnd = () => {
 <template>
     <div class="gnb-search-dropdown">
         <slot name="search-input" />
-        <p-tab :active-tab.sync="state.activeTab"
+        <p-tab :active-tab="state.activeTab"
                :tabs="state.tabs"
+               @update:activeTab="handleUpdateActiveTab"
         >
             <template #service>
                 <g-n-b-search-service-tab

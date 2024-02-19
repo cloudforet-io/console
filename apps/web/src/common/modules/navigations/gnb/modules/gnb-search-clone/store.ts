@@ -5,12 +5,14 @@ import { defineStore } from 'pinia';
 interface GNBSearchStoreState {
     isActivated: boolean;
     inputText: string;
+    activateTab: string;
 }
 
 export const useTopBarSearchStore = defineStore('gnb-search', () => {
     const state = reactive<GNBSearchStoreState>({
         isActivated: false,
         inputText: '',
+        activateTab: 'service',
     });
 
     const getters = reactive({
@@ -23,8 +25,15 @@ export const useTopBarSearchStore = defineStore('gnb-search', () => {
     });
 
     const actions = {
-        setIsActivated(isActivated: boolean) {
+        setIsActivated(isActivated: boolean, initSearch = true) {
             state.isActivated = isActivated;
+            if (initSearch) {
+                actions.initSearch();
+            }
+        },
+        initSearch() {
+            state.inputText = '';
+            state.activateTab = 'service';
         },
     };
 
