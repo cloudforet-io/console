@@ -4,16 +4,21 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { clone } from 'lodash';
 
 import { store } from '@/store';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
     type: string;
+    name?: string;
 }
 interface Props {
     isMinimizeGnb?: boolean;
@@ -46,8 +51,10 @@ const state = reactive({
         return result;
     }),
     selectedMenuId: computed(() => {
-        const selectedMenu = state.visibleGnbMenuList.find((menu) => route.matched[route.matched.length - 1].meta.menuId === menu.id);
-        return selectedMenu.id;
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        return targetMenuId;
     }),
 });
 
