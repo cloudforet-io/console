@@ -7,7 +7,7 @@ interface GNBSearchStoreState {
     inputText: string;
 }
 
-export const useGnbSearchStore = defineStore('gnb-search', () => {
+export const useTopBarSearchStore = defineStore('gnb-search', () => {
     const state = reactive<GNBSearchStoreState>({
         isActivated: false,
         inputText: '',

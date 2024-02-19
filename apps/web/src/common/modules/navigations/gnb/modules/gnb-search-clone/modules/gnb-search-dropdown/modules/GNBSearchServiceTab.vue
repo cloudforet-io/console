@@ -19,7 +19,7 @@ import type { SuggestionItem, SuggestionType } from '@/common/modules/navigation
 import { createSearchRecent } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/helper';
 import GNBSearchWorkspaceFilter
     from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
-import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
 import {
     SUGGESTION_TYPE,
@@ -44,15 +44,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const gnbSearchStore = useGnbSearchStore();
+const topBarSearchStore = useTopBarSearchStore();
 const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
 
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    inputText: computed(() => gnbSearchStore.getters.inputText),
-    trimmedInputText: computed(() => gnbSearchStore.getters.trimmedInputText),
+    inputText: computed(() => topBarSearchStore.getters.inputText),
+    trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
     serviceMenuList: [] as SuggestionMenu[],
     serviceMenuCount: computed(() => state.serviceMenuList.length),
@@ -98,7 +98,7 @@ const handleSelect = (item) => {
         router.push({ name: menuInfo.routeName }).catch(() => {});
         if (!state.showRecent) createSearchRecent(SUGGESTION_TYPE.MENU, menuId, state.currentWorkspaceId);
     }
-    gnbSearchStore.setIsActivated(false);
+    topBarSearchStore.setIsActivated(false);
 };
 
 watch(() => state.trimmedInputText, debounce(async (trimmedText) => {

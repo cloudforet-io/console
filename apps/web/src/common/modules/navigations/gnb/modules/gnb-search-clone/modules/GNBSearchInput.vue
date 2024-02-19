@@ -8,7 +8,7 @@ import { PI, screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 
 interface Props {
     isFocused: boolean;
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
     isFocused: false,
 });
 
-const gnbSearchStore = useGnbSearchStore();
+const topBarSearchStore = useTopBarSearchStore();
 
 const inputRef = ref<null|HTMLInputElement>(null);
 
@@ -38,7 +38,7 @@ const state = reactive({
 
 const handleUpdateInput = (event: InputEvent) => {
     const target = event.target as HTMLInputElement;
-    gnbSearchStore.$patch((_state) => {
+    topBarSearchStore.$patch((_state) => {
         _state.state.inputText = target.value;
     });
 };
@@ -64,7 +64,7 @@ watch(() => props.isFocused, async (isFocused) => {
             />
             <span>{{ state.placeholder }}</span>
         </div>
-        <div v-if="gnbSearchStore.getters.isActivated"
+        <div v-if="topBarSearchStore.getters.isActivated"
              class="enabled-input"
         >
             <p-i name="ic_search"
@@ -73,7 +73,7 @@ watch(() => props.isFocused, async (isFocused) => {
                  color="inherit"
             />
             <input ref="inputRef"
-                   :value="gnbSearchStore.state.inputText"
+                   :value="topBarSearchStore.state.inputText"
                    :placeholder="state.placeholder"
                    @input="handleUpdateInput"
                    @focus="$emit('update:isFocused', true)"
@@ -82,7 +82,7 @@ watch(() => props.isFocused, async (isFocused) => {
                    @keydown.up="$emit('arrow-up')"
                    @keydown.down="$emit('arrow-down')"
             >
-            <p-i v-if="gnbSearchStore.state.inputText"
+            <p-i v-if="topBarSearchStore.state.inputText"
                  name="ic_close"
                  height="1rem"
                  width="1rem"
