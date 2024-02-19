@@ -31,7 +31,7 @@ const state = reactive({
 .gnb {
     z-index: 10;
     .g-n-b-item {
-        @apply absolute flex bg-white border-gray-200;
+        @apply absolute flex border-gray-200;
     }
 }
 .main {

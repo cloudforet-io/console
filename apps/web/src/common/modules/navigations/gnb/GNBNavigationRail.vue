@@ -62,7 +62,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
 </script>
 
 <template>
-    <div class="navigation-rail"
+    <div class="g-n-b-navigation-rail"
          :class="{'is-minimize': props.isMinimizeGnb}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
@@ -101,8 +101,8 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
 </template>
 
 <style scoped lang="postcss">
-.navigation-rail {
-    @apply flex-col items-start border-r;
+.g-n-b-navigation-rail {
+    @apply flex-col items-start bg-white border-r;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
     height: 100%;
@@ -115,6 +115,11 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.75rem;
+        border-radius: 0.25rem;
+        .menu-wrapper {
+            @apply flex items-center;
+            gap: 0.625rem;
+        }
         .favorite-button {
             @apply hidden;
         }
@@ -144,15 +149,28 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         }
     }
     &.is-minimize {
-        @apply cursor-pointer;
+        @apply bg-gray-100 cursor-pointer;
         width: $gnb-navigation-rail-min-width;
         .service-menu {
             width: 2.25rem;
+            &:hover:not(.is-only-label) {
+                @apply bg-violet-200;
+            }
+            &.is-selected {
+                @apply bg-violet-200;
+            }
         }
         &:hover {
+            @apply bg-white;
             width: $gnb-navigation-rail-max-width;
             .service-menu {
                 width: 100%;
+                &:hover:not(.is-only-label) {
+                    @apply bg-violet-100;
+                }
+                &.is-selected {
+                    @apply bg-violet-100;
+                }
             }
         }
     }
