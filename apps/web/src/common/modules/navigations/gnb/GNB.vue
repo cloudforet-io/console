@@ -93,7 +93,7 @@ const state = reactive({
         }
         const adminSiteMapList: GNBMenuType[] = [];
         basicSiteMapList.forEach((menu) => {
-            if (menu.id === MENU_ID.ADMINISTRATION) {
+            if (menu.id === MENU_ID.IAM) {
                 let integralSubMenuList: GNBMenuType[] = [];
                 (menu.subMenuList ?? []).forEach((subMenu) => {
                     integralSubMenuList = [...integralSubMenuList, ...(subMenu.subMenuList ?? [])];

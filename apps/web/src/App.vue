@@ -34,9 +34,9 @@ import LayoutContainer from '@/common/modules/page-layouts/LayoutContainer.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
@@ -94,7 +94,7 @@ watch(() => route.path, () => {
 
 
 watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
+    if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
         state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });

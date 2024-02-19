@@ -23,9 +23,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
 
 const costReportPageStore = useCostReportPageStore();
@@ -81,7 +81,7 @@ watch(() => costReportPageState.costReportConfig, (costReportConfig) => {
             <p-link v-if="storeState.isAdminMode"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     highlight
-                    :to="{ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) }"
+                    :to="{ name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME) }"
                     size="md"
                     new-tab
             >

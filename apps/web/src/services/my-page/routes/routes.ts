@@ -16,9 +16,6 @@ const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.v
 const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
 const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
-// eslint-disable-next-line max-len
-// const UserManageNotificationPage = () => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue');
-
 const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,

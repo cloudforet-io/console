@@ -27,7 +27,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-head
 
 import { violet } from '@/styles/colors';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     isAdminMode: boolean;
@@ -81,7 +81,7 @@ const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
     if (name === 'all_workspaces') {
         appContextStore.enterAdminMode();
-        router.push(getProperRouteLocation({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME }));
+        router.push(getProperRouteLocation({ name: PREFERENCE_ROUTE.WORKSPACES._NAME }));
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',

@@ -1,14 +1,15 @@
 import type { MenuId, MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
@@ -58,6 +59,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.SERVICE_ACCOUNT,
         routeName: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVICE_ACCOUNT',
+        icon: 'ic_service_service-account',
     },
     [MENU_ID.COST_EXPLORER]: {
         menuId: MENU_ID.COST_EXPLORER,
@@ -69,7 +71,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-analysis',
+        icon: 'ic_service_cost-anlaysis',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
@@ -108,50 +110,44 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ALERT_MANAGER_ESCALATION_POLICY',
         icon: 'ic_service_escalation-policy',
     },
-    [MENU_ID.ADMINISTRATION]: {
-        menuId: MENU_ID.ADMINISTRATION,
-        routeName: ADMINISTRATION_ROUTE._NAME,
-        translationId: 'MENU.ADMINISTRATION',
-        icon: 'ic_service_administration',
-    },
     [MENU_ID.IAM]: {
         menuId: MENU_ID.IAM,
-        routeName: ADMINISTRATION_ROUTE.IAM._NAME,
+        routeName: IAM_ROUTE._NAME,
         translationId: 'MENU.ADMINISTRATION_IAM',
         icon: 'ic_service_user',
     },
     [MENU_ID.USER]: {
         menuId: MENU_ID.USER,
-        routeName: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+        routeName: IAM_ROUTE.USER._NAME,
         translationId: 'MENU.ADMINISTRATION_USER',
         icon: 'ic_service_user',
     },
     [MENU_ID.ROLE]: {
         menuId: MENU_ID.ROLE,
-        routeName: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
+        routeName: IAM_ROUTE.ROLE._NAME,
         translationId: 'MENU.ADMINISTRATION_ROLE',
         icon: 'ic_service_role',
     },
     [MENU_ID.APP]: {
         menuId: MENU_ID.APP,
-        routeName: ADMINISTRATION_ROUTE.IAM.APP._NAME,
+        routeName: IAM_ROUTE.APP._NAME,
         translationId: 'MENU.ADMINISTRATION_APP',
         icon: 'ic_service_app',
     },
     [MENU_ID.PREFERENCE]: {
         menuId: MENU_ID.PREFERENCE,
-        routeName: ADMINISTRATION_ROUTE.PREFERENCE._NAME,
+        routeName: PREFERENCE_ROUTE._NAME,
         translationId: 'MENU.ADMINISTRATION_PREFERENCE',
     },
     [MENU_ID.DOMAIN_SETTINGS]: {
         menuId: MENU_ID.DOMAIN_SETTINGS,
-        routeName: ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME,
+        routeName: PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME,
         translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
         icon: 'ic_service_domain-settings',
     },
     [MENU_ID.WORKSPACES]: {
         menuId: MENU_ID.WORKSPACES,
-        routeName: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME,
+        routeName: PREFERENCE_ROUTE.WORKSPACES._NAME,
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
     },
