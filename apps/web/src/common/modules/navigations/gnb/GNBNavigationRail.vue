@@ -14,6 +14,10 @@ import type { DisplayMenu } from '@/store/modules/display/type';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+
 // import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
@@ -91,11 +95,26 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
                      width="1.25rem"
                      color="inherit"
                 />
-                <span v-if="!props.isMinimizeGnb || state.isHovered"
-                      class="menu-title"
-                >
-                    {{ item.label }}
-                </span>
+                <div>
+                    <span v-if="!props.isMinimizeGnb || state.isHovered"
+                          class="menu-title"
+                    >
+                        {{ item.label }}
+                    </span>
+                    <span v-if="item.highlightTag && (!props.isMinimizeGnb || state.isHovered)"
+                          class="mark"
+                    >
+                        <new-mark v-if="item.highlightTag === 'new'"
+                                  class="mark-item"
+                        />
+                        <update-mark v-else-if="item.highlightTag === 'update'"
+                                     class="mark-item"
+                        />
+                        <beta-mark v-else-if="item.highlightTag === 'beta'"
+                                   class="mark-item"
+                        />
+                    </span>
+                </div>
             </div>
             <!--            TODO: low priority -->
             <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
@@ -126,6 +145,9 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         .menu-wrapper {
             @apply flex items-center;
             gap: 0.625rem;
+            .mark-item {
+                margin-left: 0.125rem;
+            }
         }
         .favorite-button {
             @apply hidden;
