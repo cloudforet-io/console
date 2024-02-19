@@ -5,7 +5,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
-    ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
+    ListQuery, ListResponse, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -17,8 +17,6 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
     key = 'asset_additional_info_key';
 
     name = 'Asset Additional Info';
-
-    labels = ['asset'] as VariableModelLabel[];
 
     dependencies = {
         cloud_service_query_set: 'query_set_id',

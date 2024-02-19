@@ -3,15 +3,12 @@ import { getTextHighlightRegex } from '@spaceone/design-system';
 import type {
     ListResponse, ListQuery, IEnumVariableModel,
     EnumVariableModelConfig,
-    VariableModelLabel,
 } from '@/lib/variable-models/_base/types';
 
 export default class EnumVariableModel implements IEnumVariableModel {
     key = '';
 
     name = '';
-
-    labels: VariableModelLabel[] = [];
 
     values: IEnumVariableModel['values'] = [];
 

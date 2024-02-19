@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type {
-    ListResponse, VariableModelLabel, ListQuery, IResourceNameVariableModel,
+    ListResponse, ListQuery, IResourceNameVariableModel,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -13,8 +13,6 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
     key = '';
 
     name = '';
-
-    labels: VariableModelLabel[] = [];
 
     resourceType = '';
 

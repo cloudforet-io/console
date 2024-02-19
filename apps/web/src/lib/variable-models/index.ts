@@ -1,7 +1,7 @@
 import EnumVariableModel from './_base/enum-variable-model';
 import ResourceValueVariableModel from './_base/resource-value-variable-model';
 import type {
-    IBaseVariableModel, ListQuery, ListResponse, VariableModelLabel,
+    IBaseVariableModel, ListQuery, ListResponse,
     EnumVariableModelConfig, ResourceValueVariableModelConfig,
 } from './_base/types';
 import type { ManagedVariableModelKey } from './managed';
@@ -22,8 +22,6 @@ export class VariableModel implements IBaseVariableModel {
 
     name: string;
 
-    labels: VariableModelLabel[];
-
     #model: IBaseVariableModel;
 
     #type: VariableModelConfigType;
@@ -43,7 +41,6 @@ export class VariableModel implements IBaseVariableModel {
 
         this.key = this.#model.key;
         this.name = config.name ?? (this.#model.name || this.#model.key);
-        this.labels = this.#model.labels;
         this.#type = config.type;
     }
 

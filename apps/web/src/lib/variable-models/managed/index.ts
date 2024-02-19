@@ -1,7 +1,6 @@
 import type {
     IEnumVariableModel,
     IResourceNameVariableModel,
-    VariableModelLabel,
     Value,
     IResourceValueVariableModel,
 } from '@/lib/variable-models/_base/types';
@@ -68,7 +67,6 @@ export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
 interface ModelConfig {
     key: ManagedVariableModelKey;
     name: string;
-    labels: VariableModelLabel[];
     values?: Value[];
     resourceType?: string;
     idKey?: string;
@@ -84,7 +82,6 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
         value: {
             key: model.key,
             name: model.name,
-            labels: model.labels,
             values: (model as IEnumVariableModel).values,
             resourceType: (model as IResourceNameVariableModel).resourceType,
             idKey: (model as IResourceNameVariableModel).idKey,

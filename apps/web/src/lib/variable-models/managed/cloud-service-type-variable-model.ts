@@ -1,12 +1,9 @@
 import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 
 export default class CloudServiceTypeVariableModel extends ResourceNameVariableModel {
     key = 'cloud_service_type';
 
     name = 'Cloud Service Type';
-
-    labels: VariableModelLabel[] = [];
 
     resourceType = 'inventory.CloudServiceType';
 

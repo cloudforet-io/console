@@ -7,7 +7,7 @@ import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
 
 import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel, ListQuery, ListResponse } from '@/lib/variable-models/_base/types';
+import type { ListQuery, ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,8 +36,6 @@ export default class ProjectVariableModel extends ResourceNameVariableModel {
     key = 'project';
 
     name = 'Project';
-
-    labels: VariableModelLabel[] = ['cost', 'asset'];
 
     resourceType = 'identity.Project';
 
