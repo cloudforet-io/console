@@ -29,7 +29,7 @@ import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
-import TopBar from '@/common/modules/navigations/gnb/GNB.vue';
+import TopBar from '@/common/modules/navigations/top-bar/TopBar.vue';
 import LayoutContainer from '@/common/modules/page-layouts/LayoutContainer.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
@@ -118,7 +118,6 @@ watch(() => state.userId, (userId) => {
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
             <div v-if="state.showGNB">
-                <!-- TODO: change file name-->
                 <top-bar class="top-bar" />
                 <layout-container class="app-body"
                                   :style="{ height: globalUIGetters.appBodyHeight }"
