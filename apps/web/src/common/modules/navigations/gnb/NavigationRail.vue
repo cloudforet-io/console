@@ -54,11 +54,17 @@ const state = reactive({
 const handleMouseEvent = (value: boolean) => {
     state.isHovered = value;
 };
-const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.map((menu) => ({
-    ...menu,
-    name: menu.id,
-    type: menuType,
-}));
+const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.flatMap((menu) => {
+    const subMenuList = menu.subMenuList ? convertGNBMenuToMenuItem(menu.subMenuList as GNBMenuType[]) : [];
+    return [
+        {
+            ...menu,
+            name: menu.id,
+            type: menuType,
+        },
+        ...subMenuList,
+    ];
+});
 </script>
 
 <template>

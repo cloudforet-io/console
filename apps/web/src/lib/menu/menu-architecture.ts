@@ -93,23 +93,18 @@ export const ADMIN_MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ADMINISTRATION,
+        id: MENU_ID.IAM,
         subMenuList: [
-            {
-                id: MENU_ID.IAM,
-                subMenuList: [
-                    { id: MENU_ID.USER },
-                    { id: MENU_ID.APP },
-                    { id: MENU_ID.ROLE },
-                ],
-            },
-            {
-                id: MENU_ID.PREFERENCE,
-                subMenuList: [
-                    { id: MENU_ID.WORKSPACES },
-                    { id: MENU_ID.DOMAIN_SETTINGS },
-                ],
-            },
+            { id: MENU_ID.USER },
+            { id: MENU_ID.APP },
+            { id: MENU_ID.ROLE },
+        ],
+    },
+    {
+        id: MENU_ID.PREFERENCE,
+        subMenuList: [
+            { id: MENU_ID.WORKSPACES },
+            { id: MENU_ID.DOMAIN_SETTINGS },
         ],
     },
     {
