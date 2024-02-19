@@ -1,14 +1,28 @@
+import type { ResourceGroupType } from '@/schema/_common/type';
+
 // variable models
 export interface IBaseVariableModel {
     key: string;
     name: string;
-    labels: VariableModelLabel[];
     list(query?: ListQuery): Promise<ListResponse>;
     nameFormatter?: (data: any) => string;
     dependencies?: {
         [variableModelKey: string]: string;
     }
     prefetch?: boolean; // whether to prefetch data on site init
+    //
+    scope?: {
+        resourceGroup: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
+        value: string;
+    };
+    labelsSchema?: Record<string, {
+        key: string;
+        name: string;
+        type: 'REFERENCE_KEY'|'FILTER';
+    }>;
+    labels?: {
+        [labelKey: string]: any;
+    };
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
@@ -40,7 +54,6 @@ export interface ResourceValueVariableModelConfig {
 }
 
 // related types
-export type VariableModelLabel = 'cost'|'asset';
 export interface ListQuery {
     search?: string;
     start?: number;
