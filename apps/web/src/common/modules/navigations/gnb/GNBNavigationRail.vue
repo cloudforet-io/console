@@ -114,7 +114,6 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
     width: $gnb-navigation-rail-max-width;
     height: 100%;
     padding: 1rem 0.75rem;
-    transition: width 0.3s ease;
     .service-menu {
         @apply flex items-center justify-between text-label-md;
         width: 100%;
