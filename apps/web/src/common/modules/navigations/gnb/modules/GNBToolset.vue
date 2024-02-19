@@ -51,9 +51,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
 
 <template>
     <div class="gnb-toolset">
-        <g-n-b-search-clone v-if="!state.isAdminMode && !state.isGrantLoading"
-                            @update:visible="updateOpenedMenu('search', $event)"
-        />
+        <g-n-b-search-clone v-if="!state.isAdminMode && !state.isGrantLoading" />
 
         <!--        <g-n-b-search v-if="!state.isAdminMode && !state.isGrantLoading"-->
         <!--                      :visible="props.openedMenu === 'search'"-->

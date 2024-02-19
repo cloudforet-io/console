@@ -11,14 +11,12 @@ import { i18n } from '@/translations';
 import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 
 interface Props {
-    value: string;
     isFocused: boolean;
 }
 
 const { width } = useWindowSize();
 
 const props = withDefaults(defineProps<Props>(), {
-    value: '',
     isFocused: false,
 });
 
@@ -37,6 +35,13 @@ const state = reactive({
         return 'Ctrl';
     }),
 });
+
+const handleUpdateInput = (event: InputEvent) => {
+    const target = event.target as HTMLInputElement;
+    gnbSearchStore.$patch((_state) => {
+        _state.state.inputText = target.value;
+    });
+};
 
 watch(() => props.isFocused, async (isFocused) => {
     await nextTick();
@@ -68,16 +73,16 @@ watch(() => props.isFocused, async (isFocused) => {
                  color="inherit"
             />
             <input ref="inputRef"
-                   :value="props.value"
+                   :value="gnbSearchStore.state.inputText"
                    :placeholder="state.placeholder"
-                   @input="$emit('input', $event.target.value)"
+                   @input="handleUpdateInput"
                    @focus="$emit('update:isFocused', true)"
                    @blur="$emit('update:isFocused', false)"
                    @keyup.esc="$emit('esc')"
                    @keydown.up="$emit('arrow-up')"
                    @keydown.down="$emit('arrow-down')"
             >
-            <p-i v-if="props.value"
+            <p-i v-if="gnbSearchStore.state.inputText"
                  name="ic_close"
                  height="1rem"
                  width="1rem"
@@ -162,9 +167,9 @@ watch(() => props.isFocused, async (isFocused) => {
 
 @screen laptop {
     .gnb-search-input {
-        width: calc(100% - 1.5rem);
-        margin-left: 0.75rem;
-        margin-right: 0.75rem;
+        .disabled-input {
+            padding: 0 0.75rem;
+        }
     }
 }
 </style>
