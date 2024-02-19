@@ -1,6 +1,6 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class UserVariableModel extends ResourceNameVariableModel {
+export default class UserVariableModel extends ResourceVariableModel {
     key = 'user';
 
     name = 'User';

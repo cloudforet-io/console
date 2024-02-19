@@ -1,6 +1,6 @@
 import type {
     IEnumVariableModel,
-    IResourceNameVariableModel,
+    IResourceVariableModel,
     Value,
     IResourceValueVariableModel,
 } from '@/lib/variable-models/_base/types';
@@ -83,8 +83,8 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
             key: model.key,
             name: model.name,
             values: (model as IEnumVariableModel).values,
-            resourceType: (model as IResourceNameVariableModel).resourceType,
-            idKey: (model as IResourceNameVariableModel).idKey,
+            resourceType: (model as IResourceVariableModel).resourceType,
+            idKey: (model as IResourceVariableModel).idKey,
             referenceKey: (model as IResourceValueVariableModel).referenceKey,
             prefetch: model.prefetch,
         },

@@ -1,6 +1,6 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class CloudServiceTypeVariableModel extends ResourceNameVariableModel {
+export default class CloudServiceTypeVariableModel extends ResourceVariableModel {
     key = 'cloud_service_type';
 
     name = 'Cloud Service Type';
