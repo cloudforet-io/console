@@ -45,7 +45,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
+import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
 

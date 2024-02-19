@@ -11,7 +11,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     visible?: boolean;
@@ -32,7 +32,7 @@ const router = useRouter();
 const handleMoveCreateWorkspace = () => {
     appContextStore.enterAdminMode();
     router.push({
-        name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkpspace: 'true',
         },

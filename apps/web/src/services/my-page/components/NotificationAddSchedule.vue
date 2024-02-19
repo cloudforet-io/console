@@ -17,7 +17,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import {
     timezoneToUtcFormatter,
     utcToTimezoneFormatter,
-} from '@/services/administration/helpers/user-notification-timezone-helper';
+} from '@/services/iam/helpers/user-notification-timezone-helper';
 import type { NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 
 const START_TIME_LIST = range(0, 24);
