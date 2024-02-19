@@ -9,12 +9,12 @@ import { clone } from 'lodash';
 import { store } from '@/store';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+// import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+// import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
     type: string;
@@ -97,12 +97,13 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
                     {{ item.label }}
                 </span>
             </div>
-            <favorite-button v-if="item.subMenuList?.length === 0"
-                             class="favorite-button"
-                             :item-id="item.id"
-                             :favorite-type="FAVORITE_TYPE.MENU"
-                             scale="0.65"
-            />
+            <!--            TODO: low priority -->
+            <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
+            <!--                             class="favorite-button"-->
+            <!--                             :item-id="item.id"-->
+            <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
+            <!--                             scale="0.65"-->
+            <!--            />-->
         </router-link>
     </div>
 </template>
