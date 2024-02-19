@@ -58,6 +58,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.SERVICE_ACCOUNT,
         routeName: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
         translationId: 'MENU.ASSET_INVENTORY_SERVICE_ACCOUNT',
+        icon: 'ic_service_service-account',
     },
     [MENU_ID.COST_EXPLORER]: {
         menuId: MENU_ID.COST_EXPLORER,
@@ -69,7 +70,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-analysis',
+        icon: 'ic_service_cost-anlaysis',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
