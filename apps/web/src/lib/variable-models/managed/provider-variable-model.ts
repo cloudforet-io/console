@@ -1,12 +1,9 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class ProviderVariableModel extends ResourceNameVariableModel {
+export default class ProviderVariableModel extends ResourceVariableModel {
     key = 'provider';
 
     name = 'Provider';
-
-    labels: VariableModelLabel[] = ['cost', 'asset'];
 
     resourceType = 'identity.Provider';
 

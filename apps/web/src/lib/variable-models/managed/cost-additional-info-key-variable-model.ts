@@ -5,7 +5,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
-    ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
+    ListQuery, ListResponse, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -17,8 +17,6 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
     key = 'cost_additional_info_key';
 
     name = 'Cost Additional Info';
-
-    labels = ['cost'] as VariableModelLabel[];
 
     dependencies = {
         cost_data_source: 'data_source_id',

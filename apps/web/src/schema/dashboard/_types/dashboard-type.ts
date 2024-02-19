@@ -5,7 +5,7 @@ import type {
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import type { ManagedVariableModelConfig } from '@/lib/variable-models';
-import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
+import type { EnumVariableModelConfig, ResourceVariableModelConfig } from '@/lib/variable-models/_base/types';
 
 
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
@@ -16,7 +16,7 @@ export type VariableSelectionType = 'SINGLE' | 'MULTI';
 
 export type VariableType = 'MANAGED' | 'CUSTOM';
 
-export type DashboardVariableOptions = ManagedVariableModelConfig|EnumVariableModelConfig|ResourceValueVariableModelConfig;
+export type DashboardVariableOptions = ManagedVariableModelConfig|EnumVariableModelConfig|ResourceVariableModelConfig;
 
 export interface DashboardVariableSchemaProperty {
     name: string;

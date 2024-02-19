@@ -1,12 +1,9 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class ServiceAccountVariableModel extends ResourceNameVariableModel {
+export default class ServiceAccountVariableModel extends ResourceVariableModel {
     key = 'service_account';
 
     name = 'Service Account';
-
-    labels: VariableModelLabel[] = ['cost'];
 
     resourceType = 'identity.ServiceAccount';
 

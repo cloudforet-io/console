@@ -1,13 +1,9 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-
-export default class SecretVariableModel extends ResourceNameVariableModel {
+export default class SecretVariableModel extends ResourceVariableModel {
     key = 'secret';
 
     name = 'Secret';
-
-    labels: VariableModelLabel[] = [];
 
     resourceType = 'secret.Secret';
 

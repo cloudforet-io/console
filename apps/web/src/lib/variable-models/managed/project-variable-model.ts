@@ -6,8 +6,8 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
 
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel, ListQuery, ListResponse } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { ListQuery, ListResponse } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -32,12 +32,10 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
         return [];
     }
 };
-export default class ProjectVariableModel extends ResourceNameVariableModel {
+export default class ProjectVariableModel extends ResourceVariableModel {
     key = 'project';
 
     name = 'Project';
-
-    labels: VariableModelLabel[] = ['cost', 'asset'];
 
     resourceType = 'identity.Project';
 

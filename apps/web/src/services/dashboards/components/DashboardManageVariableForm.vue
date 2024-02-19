@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';
-import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
+import type { EnumVariableModelConfig, ResourceVariableModelConfig } from '@/lib/variable-models/_base/types';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -133,10 +133,11 @@ const handleSave = () => {
         } as EnumVariableModelConfig;
     } else {
         options = {
-            type: 'RESOURCE_VALUE',
-            reference_key: '',
+            type: 'RESOURCE',
+            name: '',
             resource_type: '',
-        } as ResourceValueVariableModelConfig;
+            id_key: state.resourceKey,
+        } as ResourceVariableModelConfig;
     }
     const variableToSave = {
         variable_type: 'CUSTOM',

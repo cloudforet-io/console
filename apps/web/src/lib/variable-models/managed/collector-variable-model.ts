@@ -1,12 +1,9 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class CollectorVariableModel extends ResourceNameVariableModel {
+export default class CollectorVariableModel extends ResourceVariableModel {
     key = 'collector';
 
     name = 'Collector';
-
-    labels: VariableModelLabel[] = [];
 
     resourceType = 'inventory.Collector';
 

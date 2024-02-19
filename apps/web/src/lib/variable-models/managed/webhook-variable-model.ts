@@ -1,12 +1,9 @@
-import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class WebhookVariableModel extends ResourceNameVariableModel {
+export default class WebhookVariableModel extends ResourceVariableModel {
     key = 'webhook';
 
     name = 'Webhook';
-
-    labels: VariableModelLabel[] = [];
 
     resourceType = 'monitoring.Webhook';
 
