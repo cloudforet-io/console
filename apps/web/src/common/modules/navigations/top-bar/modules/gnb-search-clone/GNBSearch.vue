@@ -9,15 +9,15 @@ import { throttle } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
-import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchInput.vue';
-import { useGnbSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
-import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
+import GNBSearchDropdown from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
+import GNBSearchInput from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/GNBSearchInput.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 
 
 const MOBILE_WINDOW_SIZE = screens.mobile.max;
 
-const gnbSearchStore = useGnbSearchStore();
+const topBarSearchStore = useTopBarSearchStore();
 
 const state = reactive({
     isFocusOnInput: false,
@@ -27,7 +27,7 @@ const state = reactive({
     tooltipTexts: computed<Record<string, string>>(() => ({
         search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
     })),
-    visible: computed(() => gnbSearchStore.getters.isActivated),
+    visible: computed(() => topBarSearchStore.getters.isActivated),
 });
 
 /* Event */
@@ -35,14 +35,14 @@ const showSearchMenu = async () => {
     state.isFocusOnSuggestion = false;
     if (!state.isFocusOnInput) state.isFocusOnInput = true;
     if (!state.visible) {
-        gnbSearchStore.setIsActivated(true);
+        topBarSearchStore.setIsActivated(true);
     }
 };
 
 const hideSearchMenu = () => {
     if (state.visible) {
-        gnbSearchStore.setIsActivated(false);
-        gnbSearchStore.$patch((_state) => {
+        topBarSearchStore.setIsActivated(false);
+        topBarSearchStore.$patch((_state) => {
             _state.state.inputText = '';
         });
         state.isFocusOnInput = false;
@@ -54,7 +54,7 @@ const hideSearchMenu = () => {
 
 const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
     if (!state.visible) {
-        gnbSearchStore.setIsActivated(true);
+        topBarSearchStore.setIsActivated(true);
     }
     state.focusingDirection = focusingDirection;
     state.isFocusOnInput = false;
@@ -79,10 +79,10 @@ const onWindowResize = throttle(() => {
 // Keyboard Event: Meta([ctrl or cmd] + K
 const handleKeyDown = (e: KeyboardEvent) => {
     if (e.metaKey && e.code === 'KeyK') {
-        gnbSearchStore.setIsActivated(!state.visible);
+        topBarSearchStore.setIsActivated(!state.visible);
         state.isFocusOnInput = state.visible;
     } else if (e.code === 'Escape') {
-        gnbSearchStore.setIsActivated(false);
+        topBarSearchStore.setIsActivated(false);
     }
 };
 
