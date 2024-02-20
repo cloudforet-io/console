@@ -52,7 +52,7 @@ const emit = defineEmits<{(event: 'move-focus-end'): void;
 
 const contentRef = ref<null | HTMLElement>(null);
 const parentEl = useParentElement(contentRef);
-
+const MAIN_SERVICE_ID_LIST = ['dashboards', 'project', 'asset_inventory', 'cost_explorer', 'alert_manager'];
 
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -61,12 +61,12 @@ const state = reactive({
     allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
     serviceMenuList: [] as SuggestionMenu[],
     serviceMenuCount: computed(() => state.serviceMenuList.length),
-    defaultServiceMenuList: computed(() => state.allMenuList.filter((menu) => !menu.parents)),
+    defaultServiceMenuList: computed(() => state.allMenuList.filter((menu) => MAIN_SERVICE_ID_LIST.includes(menu.id) && !menu.parents)),
     defaultServiceMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
         if (state.defaultServiceMenuList.length) {
             results.push({ name: 'title', label: 'Site Navigation', type: 'header' });
-            results = results.concat(state.defaultServiceMenuList).concat(state.defaultServiceMenuList);
+            results = results.concat(state.defaultServiceMenuList);
         }
         return results;
     }),
@@ -149,8 +149,8 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
                                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
                                    @select="handleSelect"
             />
-            <g-n-b-suggestion-list v-show="!state.inputText.length"
-                                   :items="state.defaultServiceMenuItems || []"
+            <g-n-b-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
+                                   :items="state.serviceMenuList || []"
                                    :input-text="state.inputText"
                                    :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
                                    :focusing-direction="props.focusingDirection"
@@ -158,15 +158,6 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
                                    @select="handleSelect"
             />
         </div>
-        <g-n-b-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
-                               :items="state.serviceMenuList || []"
-                               :input-text="state.inputText"
-                               :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                               :focusing-direction="props.focusingDirection"
-                               @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                               @select="handleSelect"
-        />
-        <!--TODO: Recent List-->
     </div>
 </template>
 
