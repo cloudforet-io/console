@@ -1,7 +1,6 @@
 <template>
     <fragment>
         <vertical-page-layout v-if="$route.meta.lnbVisible"
-                              :breadcrumbs="breadcrumbs"
                               class="cost-explorer-container"
         >
             <template #sidebar>
