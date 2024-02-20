@@ -9,7 +9,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import getRandomId from '@/lib/random-id-generator';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';

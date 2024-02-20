@@ -1,5 +1,5 @@
 import { VariableModel } from '@/lib/variable-models';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 export const prefetchResources = () => {
     Object.values(MANAGED_VARIABLE_MODEL_CONFIGS).forEach((config) => {

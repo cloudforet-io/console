@@ -4,7 +4,7 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { WidgetFiltersMap, WidgetFilterKey } from '@/schema/dashboard/_types/widget-type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 /**
  * @param filtersMap

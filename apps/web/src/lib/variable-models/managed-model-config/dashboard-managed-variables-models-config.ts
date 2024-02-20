@@ -4,7 +4,7 @@ import type {
     IEnumVariableModel,
     IResourceVariableModel,
 } from '@/lib/variable-models/_base/types';
-import MANAGED_VARIABLE_MODELS from '@/lib/variable-models/managed';
+import MANAGED_VARIABLE_MODELS from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 
 interface ManagedVariableModel {

@@ -25,8 +25,10 @@ import { i18n } from '@/translations';
 import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import {
+    MANAGED_VARIABLE_MODEL_CONFIGS,
+    ManagedVariableModelKey
+} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import DashboardCostWidgetValueOptionDropdown

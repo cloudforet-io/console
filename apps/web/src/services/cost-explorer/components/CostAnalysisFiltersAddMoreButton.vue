@@ -11,7 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { debounce } from 'lodash';
 
 import { VariableModel } from '@/lib/variable-models';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

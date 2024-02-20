@@ -21,7 +21,7 @@ import type {
     ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

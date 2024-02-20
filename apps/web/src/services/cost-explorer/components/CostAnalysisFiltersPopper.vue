@@ -12,8 +12,12 @@ import { cloneDeep } from 'lodash';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { VariableModel } from '@/lib/variable-models';
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import type {
+    ManagedVariableModelKey,
+} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+import {
+    MANAGED_VARIABLE_MODEL_CONFIGS,
+} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -31,11 +35,12 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
     [GROUP_BY.WORKSPACE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key })],
     [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
     [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
-    [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
+    // TODO: cost_product, cost_usage_type
+    // [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
     [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
     [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
     [GROUP_BY.REGION]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key })],
-    [GROUP_BY.USAGE_TYPE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key })],
+    // [GROUP_BY.USAGE_TYPE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key })],
 };
 
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
@@ -76,7 +81,7 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
         let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
         if (!variableModels) {
             variableModels = new VariableModel(({
-                type: 'RESOURCE_VALUE',
+                type: 'RESOURCE',
                 resource_type: 'cost_analysis.Cost',
                 reference_key: groupBy,
                 name: groupBy,
