@@ -52,7 +52,8 @@ export interface ResourceVariableModelConfig {
     type: 'RESOURCE';
     name?: string;
     resource_type: string;
-    id_key: string;
+    reference_key?: string;
+    id_key?: string;
 }
 
 // related types
