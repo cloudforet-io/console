@@ -3,7 +3,7 @@ import type {
     WidgetOptionsSchemaProperty,
 } from '@/schema/dashboard/_types/widget-type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 // HACK: Modeling it like any other option thereafter

@@ -12,7 +12,7 @@ import { useProjectReferenceStore } from '@/store/reference/project-reference-st
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS, ManagedVariableModelKey } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS, ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'protocol'

@@ -20,7 +20,7 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
-import { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+import { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();

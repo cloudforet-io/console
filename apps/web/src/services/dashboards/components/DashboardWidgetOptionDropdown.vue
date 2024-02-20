@@ -28,7 +28,7 @@ import { VariableModel } from '@/lib/variable-models';
 import {
     MANAGED_VARIABLE_MODEL_CONFIGS,
     ManagedVariableModelKey
-} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import DashboardCostWidgetValueOptionDropdown

@@ -1,4 +1,4 @@
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 export interface ReferenceItem<Data = Record<string, any>> {
     key?: string;

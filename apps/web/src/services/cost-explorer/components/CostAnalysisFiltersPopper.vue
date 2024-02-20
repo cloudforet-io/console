@@ -14,10 +14,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { VariableModel } from '@/lib/variable-models';
 import type {
     ManagedVariableModelKey,
-} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import {
     MANAGED_VARIABLE_MODEL_CONFIGS,
-} from '@/lib/variable-models/managed-model-configs/base-managed-model-config';
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
