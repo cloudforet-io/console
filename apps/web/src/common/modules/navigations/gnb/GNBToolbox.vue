@@ -62,6 +62,7 @@ const handleClickMenuButton = () => {
     height: $gnb-toolbox-height;
     padding-right: 1rem;
     padding-left: 0.625rem;
+    z-index: 100;
     .navigation-section {
         @apply flex items-center;
         gap: 0.625rem;
