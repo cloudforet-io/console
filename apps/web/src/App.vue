@@ -30,6 +30,7 @@ import NotificationEmailModal from '@/common/modules/modals/notification-email-m
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import TopBar from '@/common/modules/navigations/top-bar/TopBar.vue';
+import TopBarMyPage from '@/common/modules/navigations/top-bar/TopBarMyPage.vue';
 import LayoutContainer from '@/common/modules/page-layouts/LayoutContainer.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
@@ -118,7 +119,10 @@ watch(() => state.userId, (userId) => {
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
             <div v-if="state.showGNB">
-                <top-bar class="top-bar" />
+                <div class="top-bar">
+                    <top-bar-my-page v-if="state.isMyPage" />
+                    <top-bar v-else />
+                </div>
                 <layout-container class="app-body"
                                   :style="{ height: globalUIGetters.appBodyHeight }"
                 >
