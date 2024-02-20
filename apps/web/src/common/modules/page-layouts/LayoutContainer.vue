@@ -1,12 +1,30 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
+
+import { screens } from '@spaceone/design-system';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import GNBNavigationRail from '@/common/modules/navigations/gnb/GNBNavigationRail.vue';
 import GNBToolbox from '@/common/modules/navigations/gnb/GNBToolbox.vue';
 
+
+const route = useRoute();
+
 const state = reactive({
     isMinimizeGnb: false,
 });
+
+// mobile
+window.addEventListener('resize', () => {
+    state.isMinimizeGnb = window.innerWidth < screens.mobile.max;
+});
+
+watch([() => isMobile(), () => route.path], ([isMobileState]) => {
+    if (!isMobileState) return;
+    state.isMinimizeGnb = isMobileState;
+}, { immediate: true });
 </script>
 
 <template>
@@ -20,7 +38,7 @@ const state = reactive({
             />
         </div>
         <main class="main"
-              :class="{'is-minimize': state.isMinimizeGnb}"
+              :class="{'is-minimize': state.isMinimizeGnb, 'is-mobile': isMobile() }"
         >
             <slot name="main" />
         </main>
@@ -40,7 +58,7 @@ const state = reactive({
     left: $gnb-navigation-rail-max-width;
     width: calc(100% - $gnb-navigation-rail-max-width);
     transition: left 0.3s ease, width 0.3s ease;
-    &.is-minimize {
+    &.is-minimize, &.is-mobile {
         left: $gnb-navigation-rail-min-width;
         width: calc(100% - $gnb-navigation-rail-min-width);
     }
