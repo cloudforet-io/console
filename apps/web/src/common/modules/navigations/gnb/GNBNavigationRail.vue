@@ -11,6 +11,7 @@ import { store } from '@/store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 // import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -63,6 +64,7 @@ const state = reactive({
 });
 
 const handleMouseEvent = (value: boolean) => {
+    if (isMobile()) return;
     state.isHovered = value;
 };
 const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.map((menu) => ({
@@ -74,7 +76,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
 
 <template>
     <div class="g-n-b-navigation-rail"
-         :class="{'is-minimize': props.isMinimizeGnb}"
+         :class="{'is-minimize': props.isMinimizeGnb, 'is-mobile': isMobile()}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
     >
@@ -177,6 +179,9 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
             }
         }
     }
+    &.is-mobile {
+        transition: width 0.3s ease;
+    }
     &.is-minimize {
         @apply bg-gray-100 cursor-pointer;
         width: $gnb-navigation-rail-min-width;
@@ -189,16 +194,18 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
                 @apply bg-violet-200;
             }
         }
-        &:hover {
-            @apply bg-white;
-            width: $gnb-navigation-rail-max-width;
-            .service-menu {
-                width: 100%;
-                &:hover:not(.is-only-label) {
-                    @apply bg-violet-100;
-                }
-                &.is-selected {
-                    @apply bg-violet-100;
+        &:not(.is-mobile) {
+            &:hover {
+                @apply bg-white;
+                width: $gnb-navigation-rail-max-width;
+                .service-menu {
+                    width: 100%;
+                    &:hover:not(.is-only-label) {
+                        @apply bg-violet-100;
+                    }
+                    &.is-selected {
+                        @apply bg-violet-100;
+                    }
                 }
             }
         }
