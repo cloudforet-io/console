@@ -11,8 +11,8 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.vue';
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
-import GNBSearchClone from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/GNBSearch.vue';
 import GNBAdminToggleButton from '@/common/modules/navigations/gnb/modules/GNBAdminToggleButton.vue';
+import GNBSearchClone from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/GNBSearch.vue';
 
 const props = withDefaults(defineProps<{
     openedMenu?: string|null;

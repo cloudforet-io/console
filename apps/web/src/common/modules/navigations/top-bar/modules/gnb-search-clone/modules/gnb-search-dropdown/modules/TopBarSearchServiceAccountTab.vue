@@ -15,16 +15,16 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import {
+    SUGGESTION_TYPE,
+} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/helper';
 import GNBSearchWorkspaceFilter
     from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
-import {
-    SUGGESTION_TYPE,
-} from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 
 interface Props {
