@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useParentElement } from '@vueuse/core';
-import {
-    computed, reactive, ref, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex } from '@spaceone/design-system';
+import { PDivider, getTextHighlightRegex } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { store } from '@/store';
@@ -20,6 +17,8 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
 import { createSearchRecent } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/helper';
+import GNBSearchWorkspaceFilter
+    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
 import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
 import {
@@ -50,10 +49,6 @@ const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
 
-const contentRef = ref<null | HTMLElement>(null);
-const parentEl = useParentElement(contentRef);
-
-
 const state = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
@@ -66,20 +61,13 @@ const state = reactive({
         let results: SuggestionItem[] = [];
         if (state.defaultServiceMenuList.length) {
             results.push({ name: 'title', label: 'Site Navigation', type: 'header' });
-            results = results.concat(state.defaultServiceMenuList).concat(state.defaultServiceMenuList);
+            results = results.concat(state.defaultServiceMenuList);
         }
         return results;
     }),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
     focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
-    tabHeaderHeight: computed(() => {
-        if (parentEl.value) {
-            const tabHeaderHeight = parentEl.value.previousElementSibling?.clientHeight;
-            if (tabHeaderHeight) return (tabHeaderHeight + 4) ?? 0;
-        }
-        return 0;
-    }),
 });
 
 const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
@@ -137,9 +125,7 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 // });
 </script>
 <template>
-    <div ref="contentRef"
-         class="g-n-b-search-service-tab"
-    >
+    <div class="g-n-b-search-service-tab">
         <div class="service-item-list">
             <g-n-b-suggestion-list v-show="!state.inputText.length"
                                    :items="state.defaultServiceMenuItems || []"
@@ -157,26 +143,66 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
                                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
                                    @select="handleSelect"
             />
+            <g-n-b-suggestion-list v-show="!state.inputText.length"
+                                   :items="state.defaultServiceMenuItems || []"
+                                   :input-text="state.inputText"
+                                   :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                                   :focusing-direction="props.focusingDirection"
+                                   @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                                   @select="handleSelect"
+            />
+            <g-n-b-suggestion-list v-show="!state.inputText.length"
+                                   :items="state.defaultServiceMenuItems || []"
+                                   :input-text="state.inputText"
+                                   :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                                   :focusing-direction="props.focusingDirection"
+                                   @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                                   @select="handleSelect"
+            />
+            <!--TODO: Recent List-->
+            <div v-if="state.inputText && state.serviceMenuCount > props.searchLimit"
+                 class="too-many-results-wrapper"
+            >
+                <div class="dim-wrapper" />
+                <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
+            </div>
         </div>
-        <g-n-b-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
-                               :items="state.serviceMenuList || []"
-                               :input-text="state.inputText"
-                               :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                               :focusing-direction="props.focusingDirection"
-                               @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                               @select="handleSelect"
-        />
-        <!--TODO: Recent List-->
+        <p-divider vertical />
+        <g-n-b-search-workspace-filter class="filter" />
     </div>
 </template>
 
 <style scoped lang="postcss">
 .g-n-b-search-service-tab {
+    @apply flex gap-3 h-full;
     padding: 1rem 0;
     height: 100%;
+
     .service-item-list {
         height: 100%;
+        width: 100%;
         overflow-y: auto;
+    }
+
+    .too-many-results-wrapper {
+        @apply text-gray-400;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        text-align: center;
+        padding: 1rem 0.75rem;
+
+        .dim-wrapper {
+            position: relative;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, white 100%);
+            height: 2rem;
+            pointer-events: none;
+            margin-top: -3rem;
+            margin-bottom: 1rem;
+        }
+    }
+
+    .filter {
+        width: 13.25rem;
     }
 }
 </style>
