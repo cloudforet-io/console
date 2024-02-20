@@ -1,68 +1,70 @@
 import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import {
+    MANAGED_VARIABLE_MODEL_KEY_MAP,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
     properties: {
-        [MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
+        workspace: {
+            name: 'Workspace',
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace,
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.project.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
+        project: {
+            name: 'Project',
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.project,
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.provider.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
+        provider: {
+            name: 'Provider',
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
+        service_account: {
+            name: 'Service Account',
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_SERVICE_ACCOUNT',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.region.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
+        region: {
+            name: 'Region',
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_REGION',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.region,
             }],
         },
         // Variable for Cost Dashboard
-        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
+        cost_data_source: {
+            name: 'Data Source',
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'SINGLE',
@@ -70,34 +72,36 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
             required: true,
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_source,
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
+        cost_product: {
+            name: 'Product (Cost)',
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PRODUCT',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost,
+                dataKey: 'product',
             }],
         },
         // Variable for Asset
-        [MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
+        asset_account: {
+            name: 'AWS Asset Account ID (Asset)',
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT',
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service,
+                dataKey: 'account',
             }],
         },
-        [MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]: {
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.name,
+        cloud_service_query_set: {
+            name: 'Compliance Framework',
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'SINGLE',
@@ -105,19 +109,19 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
             required: true,
             options: [{
                 type: 'MANAGED',
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+                key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service_query_set,
             }],
         },
     },
     order: [
-        MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
-        MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_source,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service_query_set,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.workspace,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.project,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.region,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.cost_product,
+        MANAGED_VARIABLE_MODEL_KEY_MAP.asset_account,
     ],
 };

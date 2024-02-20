@@ -1,6 +1,9 @@
+import type { RegionModel } from '@/schema/inventory/region/model';
+
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class RegionVariableModel extends ResourceVariableModel {
+
+export default class RegionVariableModel extends ResourceVariableModel<RegionModel> {
     key = 'region';
 
     name = 'Region';
@@ -14,4 +17,7 @@ export default class RegionVariableModel extends ResourceVariableModel {
     nameFormatter(data: any): string {
         return `${data[this.nameKey]} | ${data[this.idKey]}`;
     }
+
+    // properties
+    provider = this.property({ key: 'provider', name: 'Provider' });
 }

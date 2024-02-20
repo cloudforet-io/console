@@ -32,7 +32,7 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
         return [];
     }
 };
-export default class ProjectVariableModel extends ResourceVariableModel {
+export default class ProjectVariableModel extends ResourceVariableModel<ProjectModel> {
     key = 'project';
 
     name = 'Project';
