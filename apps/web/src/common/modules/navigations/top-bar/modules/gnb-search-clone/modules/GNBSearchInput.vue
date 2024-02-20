@@ -8,7 +8,7 @@ import { PI, screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 
 interface Props {
     isFocused: boolean;

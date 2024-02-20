@@ -15,6 +15,7 @@ import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import GNBSearchClone from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/GNBSearch.vue';
 import TopBarHeader from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarHeader.vue';
 import TopBarToolset from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/TopBarToolset.vue';
 
@@ -56,6 +57,7 @@ const handleOpenMenu = (menuId: MenuId) => {
                         :to="state.logoLink"
                         :is-admin-mode="state.isAdminMode"
         />
+        <g-n-b-search-clone v-if="!state.isAdminMode" />
         <top-bar-toolset ref="topBarToolsetRef"
                          class="toolset"
                          :opened-menu="state.openedMenu"

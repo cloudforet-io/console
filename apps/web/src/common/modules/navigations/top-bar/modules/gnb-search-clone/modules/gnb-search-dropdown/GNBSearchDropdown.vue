@@ -16,12 +16,12 @@ import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/config';
+import type { SuggestionType } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import GNBSearchServiceTab
-    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
+    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
 import TopBarSearchServiceAccountTab
-    from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
+    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 
 
 interface Props {

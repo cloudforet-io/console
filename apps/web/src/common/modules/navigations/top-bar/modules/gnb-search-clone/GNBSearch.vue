@@ -9,10 +9,10 @@ import { throttle } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
-import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search-clone/modules/GNBSearchInput.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/store';
-import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search-clone/type';
+import GNBSearchDropdown from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
+import GNBSearchInput from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/GNBSearchInput.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 
 
 const MOBILE_WINDOW_SIZE = screens.mobile.max;

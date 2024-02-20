@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
         show-image
     >
         <template #image>
-            <img src="@/assets/images/illust_ghost.svg"
+            <img src="../../../../../../../../../assets/images/illust_ghost.svg"
                  alt="empty-image"
             >
         </template>
@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
         image-size="md"
     >
         <template #image>
-            <img src="@/assets/images/illust_microscope.svg"
+            <img src="../../../../../../../../../assets/images/illust_microscope.svg"
                  alt="empty-image"
             >
         </template>
