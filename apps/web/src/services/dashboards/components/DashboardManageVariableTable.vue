@@ -14,7 +14,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
