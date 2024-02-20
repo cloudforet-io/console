@@ -104,5 +104,9 @@
 	"TEXT_INPUT": {
 		"HIDE": "Hide",
 		"SHOW": "Show"
+	},
+	"VERTICAL_LAYOUT": {
+		"COLLAPSE": "Collapse",
+		"EXPAND": "Expand Left Panel"
 	}
 }

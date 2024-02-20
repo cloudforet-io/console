@@ -1,184 +1,165 @@
-<template>
-    <div class="p-vertical-layout"
-         :style="{height: height}"
-    >
-        <div class="sidebar-container"
-             :style="sidebarContainerStyle"
-             :class="{transition:transition}"
-        >
-            <div :style="sidebarStyle">
-                <slot name="sidebar"
-                      v-bind="{width, hide, transition, height}"
-                />
-            </div>
-        </div>
-        <div class="resizer-container line"
-             :class="{transition:transition}"
-             :style="resizerStyle"
-             @mousedown="startResizing"
-             @mousemove="isResizing"
-             @mouseup="endResizing"
-        >
-            <span class="resizer"
-                  :class="{hide}"
-            >
-                <span @click="hideSidebar">
-                    <slot name="resizer-button">
-                        <p-i class="resizer-button"
-                             width="1.25rem"
-                             height="1.25rem"
-                             :name="hide ? 'ic_chevron-right-circle-filled' : 'ic_chevron-right-circle'"
-                             :color="hide ? 'primary2 white' : 'white inherit'"
-                        />
-                    </slot>
-                </span>
-            </span>
-        </div>
-        <div class="main"
-             :style="mainStyle"
-        >
-            <slot />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    toRefs, reactive, computed, onMounted, onUnmounted,
+    reactive, computed, onMounted, onUnmounted,
 } from 'vue';
 
+import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { screens } from '@/index';
 
-const SCREEN_WIDTH_SM = 767;
+interface Props {
+    height?: string;
+    initWidth?: number;
+    minWidth?: number;
+    maxWidth?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    height: '100%',
+    initWidth: 300,
+    minWidth: 100,
+    maxWidth: 500,
+});
 
 const documentEventMount = (eventName: string, func: any) => {
     onMounted(() => document.addEventListener(eventName, func));
     onUnmounted(() => document.removeEventListener(eventName, func));
 };
 
-export default {
-    name: 'PVerticalLayout',
-    components: {
-        PI,
-    },
-    props: {
-        height: {
-            type: String,
-            default: '100%',
-        },
-        initWidth: {
-            type: Number,
-            default: 300,
-        },
-        minWidth: {
-            type: Number,
-            default: 100,
-        },
-        maxWidth: {
-            type: Number,
-            default: 500,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            width: props.initWidth,
-            resizing: false,
-            clientX: null,
-            hide: false,
-            transition: false,
-            sidebarContainerStyle: computed(() => ({
-                width: `${state.width}px`,
-                height: '100%',
-                'overflow-y': 'auto',
-                'overflow-x': 'hidden',
-            })),
-            sidebarStyle: computed(() => ({
-                width: 'auto',
-                // height: '100%',
-                minWidth: `${props.minWidth}px`,
-                maxWidth: `${props.maxWidth}px`,
-                opacity: state.hide && !state.transition ? 0 : 1,
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                height: '100%',
-            })),
-            resizerStyle: computed(() => ({
-                left: `${state.width}px`,
-            })),
-            mainStyle: computed(() => ({
-                width: `calc( 100% - ${state.width}px )`,
-                height: props.height,
-            })),
-        });
+const state = reactive({
+    width: props.initWidth,
+    resizing: false,
+    clientX: null,
+    hide: false,
+    transition: false,
+    sidebarContainerStyle: computed(() => ({
+        width: `${state.width}px`,
+        height: '100%',
+        'overflow-y': 'auto',
+        'overflow-x': 'hidden',
+    })),
+    sidebarStyle: computed(() => ({
+        width: 'auto',
+        // height: '100%',
+        minWidth: `${props.minWidth}px`,
+        maxWidth: `${props.maxWidth}px`,
+        opacity: state.hide && !state.transition ? 0 : 1,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        height: '100%',
+    })),
+    resizerStyle: computed(() => ({
+        left: `${state.width}px`,
+    })),
+    mainStyle: computed(() => ({
+        width: `calc( 100% - ${state.width}px )`,
+        height: props.height,
+    })),
+});
 
-        /* Resizing */
-        const isResizing = (event) => {
-            if (state.resizing) {
-                if (state.clientX === null) {
-                    state.clientX = event.clientX;
-                    return;
-                }
-                const delta = state.clientX - event.clientX;
-                const width = state.width - delta;
-                if (!(width <= props.minWidth || width > props.maxWidth)) {
-                    state.width = width;
-                }
-                state.clientX = event.clientX;
-            }
-            // event.preventDefault();
-        };
-        const endResizing = () => {
-            state.resizing = false;
-            state.clientX = null;
-        };
-        const startResizing = () => {
-            state.resizing = true;
-        };
-
-        /* Toggle hide Sidebar */
-        const offTransition = () => { state.transition = false; };
-        const hideSidebar = () => {
-            if (!state.hide) {
-                state.hide = true;
-                state.transition = true;
-                state.width = 10;
-                setTimeout(offTransition, 500);
-            } else {
-                state.width = props.initWidth;
-                state.transition = true;
-                state.hide = false;
-                setTimeout(offTransition, 500);
-            }
-        };
-        documentEventMount('mousemove', isResizing);
-        documentEventMount('mouseup', endResizing);
-
-        const detectWindowResizing = () => {
-            if (!state.hide) {
-                if (window.innerWidth <= SCREEN_WIDTH_SM) {
-                    state.hide = false;
-                    hideSidebar();
-                } else {
-                    state.hide = true;
-                    hideSidebar();
-                }
-            }
-        };
-
-        detectWindowResizing();
-        window.addEventListener('resize', detectWindowResizing);
-
-        return {
-            ...toRefs(state),
-            hideSidebar,
-            startResizing,
-            isResizing,
-            endResizing,
-            detectWindowResizing,
-        };
-    },
+/* Resizing */
+const isResizing = (event) => {
+    if (state.resizing) {
+        if (state.clientX === null) {
+            state.clientX = event.clientX;
+            return;
+        }
+        const delta = state.clientX - event.clientX;
+        const width = state.width - delta;
+        if (!(width <= props.minWidth || width > props.maxWidth)) {
+            state.width = width;
+        }
+        state.clientX = event.clientX;
+    }
+    // event.preventDefault();
 };
+const endResizing = () => {
+    state.resizing = false;
+    state.clientX = null;
+};
+const startResizing = () => {
+    state.resizing = true;
+};
+
+/* Toggle hide Sidebar */
+const offTransition = () => { state.transition = false; };
+const hideSidebar = () => {
+    if (!state.hide) {
+        state.hide = true;
+        state.transition = true;
+        state.width = 0;
+        setTimeout(offTransition, 500);
+    } else {
+        state.width = props.initWidth;
+        state.transition = true;
+        state.hide = false;
+        setTimeout(offTransition, 500);
+    }
+};
+documentEventMount('mousemove', isResizing);
+documentEventMount('mouseup', endResizing);
+
+const detectWindowResizing = () => {
+    if (!state.hide) {
+        if (window.innerWidth <= screens.mobile.max) {
+            state.hide = false;
+            hideSidebar();
+        } else {
+            state.hide = true;
+            hideSidebar();
+        }
+    }
+};
+
+detectWindowResizing();
+window.addEventListener('resize', detectWindowResizing);
 </script>
+
+<template>
+    <div class="p-vertical-layout"
+         :style="{height: props.height}"
+    >
+        <div class="sidebar-container"
+             :style="state.sidebarContainerStyle"
+             :class="{transition: state.transition}"
+        >
+            <div :style="state.sidebarStyle">
+                <slot name="sidebar"
+                      v-bind="{width: state.width, hide: state.hide, transition: state.transition, height: props.height}"
+                />
+            </div>
+        </div>
+        <div class="resizer-container line"
+             :class="{transition: state.transition}"
+             :style="state.resizerStyle"
+             @mousedown="startResizing"
+             @mousemove="isResizing"
+             @mouseup="endResizing"
+        >
+            <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
+                       position="right"
+                       :class="{hide: state.hide}"
+                       class="resizer"
+                       @click="hideSidebar"
+            >
+                <span class="resizer-button">
+                    <slot name="resizer-button">
+                        <p-i width="1.5rem"
+                             height="1.5rem"
+                             :name="state.hide ? 'ic_chevron-right' : 'ic_chevron-left'"
+                             color="inherit"
+                        />
+                    </slot>
+                </span>
+            </p-tooltip>
+        </div>
+        <div class="main"
+             :style="state.mainStyle"
+        >
+            <slot />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss">
 .p-vertical-layout {
@@ -212,6 +193,7 @@ export default {
         top: 0;
         height: 100%;
         width: 0;
+        z-index: 1;
         &.transition {
             transition: left 0.2s;
         }
@@ -219,33 +201,40 @@ export default {
             @apply border-l border-transparent;
             background-color: transparent;
             &:hover {
-                @apply border-l border-secondary;
+                @apply border-l;
                 cursor: ew-resize;
             }
         }
         .resizer {
-            @apply text-gray-400;
-            display: inline-block;
-            position: absolute;
+            @apply absolute flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-600 cursor-pointer;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-top: 1rem;
             font-size: 1.5rem;
             font-weight: 600;
-            text-align: center;
             z-index: 1;
             cursor: col-resize;
-            > span {
-                margin-right: 0.65rem;
-                cursor: pointer;
-            }
             &.hide {
-                @apply text-primary-2;
+                @apply bg-white justify-end;
+                left: -1px;
+                width: 1.25rem;
+                margin-right: -0.25rem;
+                border-top-left-radius: 50%;
+                border-bottom-left-radius: 50%;
+                border-left: 0;
+                .resizer-button > svg {
+                    margin-right: -0.125rem;
+                }
+                &:hover {
+                    @apply text-secondary;
+                    width: 2.5rem;
+                    .resizer-button > svg {
+                        margin-right: 0;
+                    }
+                }
             }
-        }
-        .resizer-button {
-            margin-top: 1rem;
-            margin-left: 0.55rem;
-            justify-content: center;
             &:hover {
-                @apply text-secondary;
+                @apply bg-blue-200 cursor-pointer;
             }
         }
     }

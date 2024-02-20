@@ -104,5 +104,9 @@
 	"TEXT_INPUT": {
 		"HIDE": "숨기기",
 		"SHOW": "보이기"
+	},
+	"VERTICAL_LAYOUT": {
+		"COLLAPSE": "",
+		"EXPAND": ""
 	}
 }
