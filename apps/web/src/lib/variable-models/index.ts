@@ -17,7 +17,6 @@ export interface ManagedVariableModelConfig {
 }
 export interface VariableModelAdditionalConfig {
     scope?: IBaseVariableModel['scope'];
-    labelsSchema?: IBaseVariableModel['labelsSchema'];
     labels?: IBaseVariableModel['labels'];
 }
 export type CustomVariableModelConfig = EnumVariableModelConfig|ResourceVariableModelConfig;
@@ -41,7 +40,6 @@ export class VariableModel implements IBaseVariableModel {
 
     constructor(config: VariableModelConfig, additionalConfig?: VariableModelAdditionalConfig) {
         this.scope = additionalConfig?.scope;
-        this.labelsSchema = additionalConfig?.labelsSchema;
         this.labels = additionalConfig?.labels;
 
         if (config.type === 'MANAGED') {
