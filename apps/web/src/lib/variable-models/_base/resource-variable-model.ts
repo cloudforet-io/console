@@ -1,4 +1,4 @@
-import { camelCase, get } from 'lodash';
+import { camelCase, get, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -58,8 +58,10 @@ export default class ResourceVariableModel implements IResourceVariableModel {
     }
 
     get referenceKey(): string|undefined {
-        if (!this.labelsSchema) return undefined;
-        return Object.values(this.labelsSchema)?.find((d) => d.type === 'REFERENCE_KEY')?.key;
+        if (isEmpty(this.labelsSchema) || isEmpty(this.labels)) return undefined;
+        const referenceKey = Object.values(this.labelsSchema)?.find((d) => d.type === 'REFERENCE_KEY')?.key;
+        if (!referenceKey) return undefined;
+        return this.labels[referenceKey];
     }
 
     #getFetcher(): ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>|undefined {

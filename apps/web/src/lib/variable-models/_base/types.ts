@@ -1,6 +1,7 @@
 import type { ResourceGroupType } from '@/schema/_common/type';
 
 // variable models
+type LabelsSchemaType = 'FILTER'|string;
 export interface IBaseVariableModel {
     key: string;
     name: string;
@@ -18,7 +19,7 @@ export interface IBaseVariableModel {
     labelsSchema?: Record<string, {
         key: string;
         name: string;
-        type: 'REFERENCE_KEY'|'FILTER';
+        type: LabelsSchemaType;
     }>;
     labels?: {
         [labelKey: string]: any;
@@ -29,6 +30,7 @@ export interface IEnumVariableModel extends IBaseVariableModel {
 }
 export interface IResourceVariableModel extends IBaseVariableModel {
     resourceType: string;
+    resourceKey?: string;
     idKey: string;
     nameKey: string;
     only: string[];
