@@ -3,13 +3,15 @@ import {
     reactive, computed, onMounted, onUnmounted,
 } from 'vue';
 
+import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { screens } from '@/index';
 
 interface Props {
-    height: string;
-    initWidth: number;
-    minWidth: number;
-    maxWidth: number;
+    height?: string;
+    initWidth?: number;
+    minWidth?: number;
+    maxWidth?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,8 +20,6 @@ const props = withDefaults(defineProps<Props>(), {
     minWidth: 100,
     maxWidth: 500,
 });
-
-const SCREEN_WIDTH_SM = 767;
 
 const documentEventMount = (eventName: string, func: any) => {
     onMounted(() => document.addEventListener(eventName, func));
@@ -87,7 +87,7 @@ const hideSidebar = () => {
     if (!state.hide) {
         state.hide = true;
         state.transition = true;
-        state.width = 10;
+        state.width = 0;
         setTimeout(offTransition, 500);
     } else {
         state.width = props.initWidth;
@@ -101,7 +101,7 @@ documentEventMount('mouseup', endResizing);
 
 const detectWindowResizing = () => {
     if (!state.hide) {
-        if (window.innerWidth <= SCREEN_WIDTH_SM) {
+        if (window.innerWidth <= screens.mobile.max) {
             state.hide = false;
             hideSidebar();
         } else {
@@ -136,20 +136,22 @@ window.addEventListener('resize', detectWindowResizing);
              @mousemove="isResizing"
              @mouseup="endResizing"
         >
-            <span class="resizer"
-                  :class="{hide: state.hide}"
+            <p-tooltip :contents="state.hide ? $t('COMPONENT.VERTICAL_LAYOUT.EXPAND') : $t('COMPONENT.VERTICAL_LAYOUT.COLLAPSE')"
+                       position="right"
+                       :class="{hide: state.hide}"
+                       class="resizer"
+                       @click="hideSidebar"
             >
-                <span @click="hideSidebar">
+                <span class="resizer-button">
                     <slot name="resizer-button">
-                        <p-i class="resizer-button"
-                             width="1.25rem"
-                             height="1.25rem"
-                             :name="state.hide ? 'ic_chevron-right-circle-filled' : 'ic_chevron-right-circle'"
-                             :color="state.hide ? 'primary2 white' : 'white inherit'"
+                        <p-i width="1.5rem"
+                             height="1.5rem"
+                             :name="state.hide ? 'ic_chevron-right' : 'ic_chevron-left'"
+                             color="inherit"
                         />
                     </slot>
                 </span>
-            </span>
+            </p-tooltip>
         </div>
         <div class="main"
              :style="state.mainStyle"
@@ -191,6 +193,7 @@ window.addEventListener('resize', detectWindowResizing);
         top: 0;
         height: 100%;
         width: 0;
+        z-index: 1;
         &.transition {
             transition: left 0.2s;
         }
@@ -198,33 +201,40 @@ window.addEventListener('resize', detectWindowResizing);
             @apply border-l border-transparent;
             background-color: transparent;
             &:hover {
-                @apply border-l border-secondary;
+                @apply border-l;
                 cursor: ew-resize;
             }
         }
         .resizer {
-            @apply text-gray-400;
-            display: inline-block;
-            position: absolute;
+            @apply absolute flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-600 cursor-pointer;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-top: 1rem;
             font-size: 1.5rem;
             font-weight: 600;
-            text-align: center;
             z-index: 1;
             cursor: col-resize;
-            > span {
-                margin-right: 0.65rem;
-                cursor: pointer;
-            }
             &.hide {
-                @apply text-primary-2;
+                @apply bg-white justify-end;
+                left: -1px;
+                width: 1.25rem;
+                margin-right: -0.25rem;
+                border-top-left-radius: 50%;
+                border-bottom-left-radius: 50%;
+                border-left: 0;
+                .resizer-button > svg {
+                    margin-right: -0.125rem;
+                }
+                &:hover {
+                    @apply text-secondary;
+                    width: 2.5rem;
+                    .resizer-button > svg {
+                        margin-right: 0;
+                    }
+                }
             }
-        }
-        .resizer-button {
-            margin-top: 1rem;
-            margin-left: 0.55rem;
-            justify-content: center;
             &:hover {
-                @apply text-secondary;
+                @apply bg-blue-200 cursor-pointer;
             }
         }
     }
