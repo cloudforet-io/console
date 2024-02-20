@@ -108,6 +108,24 @@ export const getCheckboxArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    indeterminate: {
+        name: 'indeterminate',
+        type: { name: 'boolean' },
+        description: 'Apply indeterminate style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slot */
     defaultSlot: {
         name: 'default',

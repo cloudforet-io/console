@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCheckbox from './PCheckbox.vue';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { computed, getCurrentInstance, reactive, toRefs } from 'vue';
 import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
 import { useProxyValue } from '@/hooks';
 
@@ -171,6 +171,57 @@ export const Template = (args, { argTypes }) => ({
                     values: [0, 1, 2, 3]
                 })
                 return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Indeterminate
+
+<Canvas>
+    <Story name="Indeterminate">
+        {{
+            components: { PCheckbox },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-checkbox :value="true"
+                            :indeterminate="isIndeterminate"
+                            :selected="isAllSelected"
+                            @change="handleCheckAll"
+                >
+                    You can confirm that all items are selected.
+                </p-checkbox>
+                <p-checkbox v-for="value in values" :key="value"
+                            v-model="selected"
+                            :value="value"
+                >
+                    {{value}}
+                </p-checkbox>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    isAllSelected: computed(() => state.selected.length === state.values.length),
+                    selected: [],
+                    values: [0, 1, 2, 3],
+                    isIndeterminate: computed(() => {
+                        if (state.selected.length > 0 && state.selected.length < state.values.length) return true
+                        else return false
+                    })
+                })
+                const handleCheckAll = (val) => {
+                    state.selected = val ? state.values : []
+                }
+                return {
+                    handleCheckAll,
                     ...toRefs(state)
                 };
             },
