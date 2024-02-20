@@ -3,40 +3,32 @@ import type {
     IResourceVariableModel,
     Value,
 } from '@/lib/variable-models/_base/types';
+import AssetDefaultFieldVariableModel from '@/lib/variable-models/managed/enum-model/asset-default-field-variable-model';
+import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/enum-model/cost-default-data-type-variable-model';
+import CostDefaultFieldVariableModel from '@/lib/variable-models/managed/enum-model/cost-default-field-variable-model';
+import GranularityVariableModel from '@/lib/variable-models/managed/enum-model/granularity-variable-model';
+import CloudServiceQuerySetVariableModel from '@/lib/variable-models/managed/resource-model/cloud-service-query-set-variable-model';
+import CloudServiceTypeVariableModel from '@/lib/variable-models/managed/resource-model/cloud-service-type-variable-model';
+import CollectorVariableModel from '@/lib/variable-models/managed/resource-model/collector-variable-model';
+import CostDataSourceVariableModel from '@/lib/variable-models/managed/resource-model/cost-data-source-variable-model';
+import ProjectGroupVariableModel from '@/lib/variable-models/managed/resource-model/project-group-variable-model';
+import ProjectVariableModel from '@/lib/variable-models/managed/resource-model/project-variable-model';
+import ProviderVariableModel from '@/lib/variable-models/managed/resource-model/provider-variable-model';
+import RegionVariableModel from '@/lib/variable-models/managed/resource-model/region-variable-model';
+import SecretVariableModel from '@/lib/variable-models/managed/resource-model/secret-variable-model';
+import ServiceAccountVariableModel from '@/lib/variable-models/managed/resource-model/service-account-variable-model';
+import UserVariableModel from '@/lib/variable-models/managed/resource-model/user-variable-model';
+import WebhookVariableModel from '@/lib/variable-models/managed/resource-model/webhook-variable-model';
+import WorkspaceVariableModel from '@/lib/variable-models/managed/resource-model/workspace-variable-model';
 
-import AssetAccountVariableModel from './asset-account-variable-model';
-import AssetAdditionalInfoKeyVariableModel from './asset-additional-info-key-variable-model';
-import AssetDataKeyVariableModel from './asset-data-key-variable-model';
-import AssetDefaultFieldVariableModel from './asset-default-field-variable-model';
-import CloudServiceQuerySetVariableModel from './cloud-service-query-set-variable-model';
-import CloudServiceTypeVariableModel from './cloud-service-type-variable-model';
-import CollectorVariableModel from './collector-variable-model';
-import CostAdditionalInfoKeyVariableModel from './cost-additional-info-key-variable-model';
-import CostDataKeyVariableModel from './cost-data-key-variable-model';
-import CostDataSourceVariableModel from './cost-data-source-variable-model';
-import CostDefaultDataTypeVariableModel from './cost-default-data-type-variable-model';
-import CostDefaultFieldVariableModel from './cost-default-field-variable-model';
-import CostProductVariableModel from './cost-product-variable-model';
-import CostTagKeyVariableModel from './cost-tag-key-variable-model';
-import CostUsageTypeVariableModel from './cost-usage-type-variable-model';
-import GranularityVariableModel from './granularity-variable-model';
-import ProjectGroupVariableModel from './project-group-variable-model';
-import ProjectVariableModel from './project-variable-model';
-import ProviderVariableModel from './provider-variable-model';
-import RegionVariableModel from './region-variable-model';
-import SecretVariableModel from './secret-variable-model';
-import ServiceAccountVariableModel from './service-account-variable-model';
-import UserVariableModel from './user-variable-model';
-import WebhookVariableModel from './webhook-variable-model';
-import WorkspaceVariableModel from './workspace-variable-model';
 
-const MANAGED_VARIABLE_MODELS = {
-    // enum variable model
+const ENUM_VARIABLE_MODELS: Record<string, new () => IEnumVariableModel> = {
     granularity: GranularityVariableModel,
     cost_default_field: CostDefaultFieldVariableModel,
     cost_default_data_type: CostDefaultDataTypeVariableModel,
     asset_default_field: AssetDefaultFieldVariableModel,
-    // resource name variable model
+};
+const RESOURCE_VARIABLE_MODELS: Record<string, new () => IResourceVariableModel> = {
     cost_data_source: CostDataSourceVariableModel,
     provider: ProviderVariableModel,
     cloud_service_query_set: CloudServiceQuerySetVariableModel,
@@ -50,17 +42,12 @@ const MANAGED_VARIABLE_MODELS = {
     user: UserVariableModel,
     webhook: WebhookVariableModel,
     workspace: WorkspaceVariableModel,
-    // resource value variable model
-    asset_account: AssetAccountVariableModel,
-    cost_product: CostProductVariableModel,
-    cost_usage_type: CostUsageTypeVariableModel,
-    // custom resource variable model
-    cost_additional_info_key: CostAdditionalInfoKeyVariableModel,
-    cost_tag_key: CostTagKeyVariableModel,
-    cost_data_key: CostDataKeyVariableModel,
-    asset_data_key: AssetDataKeyVariableModel,
-    asset_additional_info_key: AssetAdditionalInfoKeyVariableModel,
 };
+const MANAGED_VARIABLE_MODELS = {
+    ...ENUM_VARIABLE_MODELS,
+    ...RESOURCE_VARIABLE_MODELS,
+};
+
 
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
 interface ModelConfig {
