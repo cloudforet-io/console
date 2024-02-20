@@ -3,8 +3,8 @@ import { isEqual, merge } from 'lodash';
 import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
 import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 export const getRefinedWidgetOptions = (
     widgetConfig?: WidgetConfig,

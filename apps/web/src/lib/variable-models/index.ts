@@ -1,4 +1,6 @@
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import EnumVariableModel from './_base/enum-variable-model';
 import type {
@@ -6,8 +8,7 @@ import type {
     EnumVariableModelConfig,
     ResourceVariableModelConfig,
 } from './_base/types';
-import type { ManagedVariableModelKey } from './managed';
-import MANAGED_VARIABLE_MODELS from './managed';
+
 
 // config
 export interface ManagedVariableModelConfig {
@@ -38,10 +39,7 @@ export class VariableModel implements IBaseVariableModel {
 
     #type: VariableModelConfigType;
 
-    constructor(config: VariableModelConfig, additionalConfig?: VariableModelAdditionalConfig) {
-        this.scope = additionalConfig?.scope;
-        this.labels = additionalConfig?.labels;
-
+    constructor(config: VariableModelConfig) {
         if (config.type === 'MANAGED') {
             if (!config.key) throw new Error('key is required');
             const Model = MANAGED_VARIABLE_MODELS[config.key];
