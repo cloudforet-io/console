@@ -28,7 +28,7 @@ const adminDashboardsRoute: RouteConfig = {
         {
             path: '/',
             name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
-            meta: { lnbVisible: true, menuId: MENU_ID.DASHBOARDS },
+            meta: { lsbVisible: true, menuId: MENU_ID.DASHBOARDS },
             component: AdminDashboardMainPage,
         },
         {
@@ -43,7 +43,7 @@ const adminDashboardsRoute: RouteConfig = {
         {
             path: 'detail/:dashboardId',
             name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
-            meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+            meta: { lsbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
             props: true,
             component: AdminDashboardDetailPage,
         },
