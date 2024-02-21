@@ -5,17 +5,17 @@ import type { IBaseVariableModel, IEnumVariableModel, IResourceVariableModel } f
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const _getTitle = (modelInfo: VariableModelInfo) => {
+export interface VariableModelMenuHandlerInfo {
+    variableModel: IBaseVariableModel|IResourceVariableModel|IEnumVariableModel;
+    dataKey?: string;
+}
+
+const _getTitle = (modelInfo: VariableModelMenuHandlerInfo) => {
     const _dataKey = modelInfo.dataKey;
     return _dataKey ? modelInfo.variableModel[_dataKey].name : modelInfo.variableModel.meta?.name;
 };
-// dataKey
-interface VariableModelInfo {
-    variableModel: IBaseVariableModel|IResourceVariableModel|IEnumVariableModel;
-    dataKey: 'product';
-}
 
-export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelInfo[], options?: Record<string, any>): AutocompleteHandler => {
+export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelMenuHandlerInfo[], options?: Record<string, any>): AutocompleteHandler => {
     const _variableModelInfoList = variableModelInfoList;
     return async (inputText: string, pageStart, pageLimit, filters, resultIndex) => {
         const _query = {
