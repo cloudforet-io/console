@@ -4,14 +4,14 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class CollectorVariableModel extends ResourceVariableModel<CollectorModel> {
-    key = 'collector';
-
-    name = 'Collector';
-
-    resourceType = 'inventory.Collector';
-
-    idKey = 'collector_id';
-
-    // properties
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
+
+    meta = {
+        key: 'collector',
+        name: 'Collector',
+        resourceType: 'inventory.Collector',
+        idKey: 'collector_id',
+        nameKey: 'name',
+        _properties: [this.provider.key],
+    };
 }

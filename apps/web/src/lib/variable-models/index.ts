@@ -1,22 +1,15 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type { IBaseVariableModel, IEnumVariableModel, IResourceVariableModel } from '@/lib/variable-models/_base/types';
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { MANAGED_VARIABLE_MODEL_KEY_MAP, MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-// config
-export interface GenerationConfig {
-    type: 'MANAGED';
-    key?: ManagedVariableModelKey;
-    name?: string;
-}
 
 interface GenerateVariableModelOptions {
     key: string;
     type: 'ENUM'|'RESOURCE';
 }
 
-type GeneratedVariableModel = (new (config, option) => IBaseVariableModel|IResourceVariableModel|IEnumVariableModel)|undefined;
+export type GeneratedVariableModel = (new (config, option) => IBaseVariableModel|IResourceVariableModel|IEnumVariableModel)|undefined;
 export const generateVariableModel = ({ key, type }: GenerateVariableModelOptions): GeneratedVariableModel => {
     const isMangedModel = !!MANAGED_VARIABLE_MODEL_KEY_MAP[key];
     if (isMangedModel) return MANAGED_VARIABLE_MODELS[key];

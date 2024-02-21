@@ -5,15 +5,19 @@ import type {
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 
-
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 
 // dashboard variable schema types
-export type VariableSelectionType = 'SINGLE' | 'MULTI';
+type VariableSelectionType = 'SINGLE' | 'MULTI';
 
 export type VariableType = 'MANAGED' | 'CUSTOM';
 
+interface DashboardVariableOptions {
+    type: VariableType;
+    key: string;
+    dataKey?: string;
+}
 
 export interface DashboardVariableSchemaProperty {
     name: string;
@@ -27,7 +31,7 @@ export interface DashboardVariableSchemaProperty {
     required?: boolean; // value is required
 }
 
-export type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
+type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
 
 export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;

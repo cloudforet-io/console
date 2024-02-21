@@ -1,8 +1,3 @@
-import type {
-    IBaseVariableModel,
-    IEnumVariableModel,
-    IResourceVariableModel,
-} from '@/lib/variable-models/_base/types';
 import AssetAdditionalInfoKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-additional-info-key-variable-model';
 import AssetDataKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-data-key-variable-model';
 import CostAdditionalInfoKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/cost-additional-info-key-variable-model';
@@ -29,13 +24,13 @@ import WebhookVariableModel from '@/lib/variable-models/managed/resource-model/w
 import WorkspaceVariableModel from '@/lib/variable-models/managed/resource-model/workspace-variable-model';
 
 
-export const ENUM_VARIABLE_MODELS: Record<string, new () => IEnumVariableModel> = {
+export const ENUM_VARIABLE_MODELS = {
     granularity: GranularityVariableModel,
     cost_default_field: CostDefaultFieldVariableModel,
     cost_default_data_type: CostDefaultDataTypeVariableModel,
     asset_default_field: AssetDefaultFieldVariableModel,
-};
-const RESOURCE_VARIABLE_MODELS: Record<string, new () => IResourceVariableModel> = {
+} as const;
+const RESOURCE_VARIABLE_MODELS = {
     cost_data_source: CostDataSourceVariableModel,
     provider: ProviderVariableModel,
     cloud_service_query_set: CloudServiceQuerySetVariableModel,
@@ -51,20 +46,20 @@ const RESOURCE_VARIABLE_MODELS: Record<string, new () => IResourceVariableModel>
     webhook: WebhookVariableModel,
     workspace: WorkspaceVariableModel,
     cost: CostVariableModel,
-};
-const CUSTOM_RESOURCE_VARIABLE_MODELS: Record<string, new () => IBaseVariableModel> = {
+} as const;
+const CUSTOM_RESOURCE_VARIABLE_MODELS = {
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,
     cost_tag_key: CostTagKeyVariableModel,
     cost_data_key: CostDataKeyVariableModel,
     asset_data_key: AssetDataKeyVariableModel,
     asset_additional_info_key: AssetAdditionalInfoKeyVariableModel,
-};
+} as const;
 
-export const MANAGED_VARIABLE_MODELS: Record<string, new (config, option) => IBaseVariableModel|IResourceVariableModel|IEnumVariableModel> = {
+export const MANAGED_VARIABLE_MODELS = {
     ...ENUM_VARIABLE_MODELS,
     ...RESOURCE_VARIABLE_MODELS,
     ...CUSTOM_RESOURCE_VARIABLE_MODELS,
-};
+} as const;
 
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
 export const MANAGED_VARIABLE_MODEL_KEY_MAP: Record<ManagedVariableModelKey, string> = {};

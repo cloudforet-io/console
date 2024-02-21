@@ -5,7 +5,7 @@ import {
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
-export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
+export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
     properties: {
         workspace: {
             name: 'Workspace',
@@ -121,7 +121,7 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
         MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
         MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
         MANAGED_VARIABLE_MODEL_KEY_MAP.region,
-        MANAGED_VARIABLE_MODEL_KEY_MAP.cost_product,
-        MANAGED_VARIABLE_MODEL_KEY_MAP.asset_account,
+        // MANAGED_VARIABLE_MODEL_KEY_MAP.cost_product,
+        // MANAGED_VARIABLE_MODEL_KEY_MAP.asset_account,
     ],
 };

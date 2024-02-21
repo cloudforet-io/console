@@ -14,9 +14,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class CostAdditionalInfoKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_additional_info_key';
-
-    name = 'Cost Additional Info';
+    meta = {
+        key: 'cost_additional_info_key',
+        name: 'Cost Additional Info',
+    };
 
     dependencies = {
         cost_data_source: 'data_source_id',

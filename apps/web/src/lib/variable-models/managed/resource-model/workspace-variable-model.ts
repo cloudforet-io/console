@@ -4,11 +4,11 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class WorkspaceVariableModel extends ResourceVariableModel<WorkspaceModel> {
-    key = 'workspace';
-
-    name = 'Workspace';
-
-    resourceType = 'identity.Workspace';
-
-    idKey = 'workspace_id';
+    meta = {
+        key: 'workspace',
+        name: 'Workspace',
+        resourceType: 'identity.Workspace',
+        idKey: 'workspace_id',
+        nameKey: 'name',
+    };
 }

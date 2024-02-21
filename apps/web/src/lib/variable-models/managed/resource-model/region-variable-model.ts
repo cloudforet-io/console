@@ -4,20 +4,19 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class RegionVariableModel extends ResourceVariableModel<RegionModel> {
-    key = 'region';
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    name = 'Region';
-
-    resourceType = 'inventory.Region';
-
-    idKey = 'region_code';
-
-    _searchTargets = ['name', 'provider', 'region_code'];
+    meta = {
+        key: 'region',
+        name: 'Region',
+        resourceType: 'inventory.Region',
+        idKey: 'region_code',
+        nameKey: 'name',
+        _searchTargets: ['name', 'provider', 'region_code'],
+        _properties: [this.provider.key],
+    };
 
     nameFormatter(data: any): string {
-        return `${data[this.nameKey]} | ${data[this.idKey]}`;
+        return `${data[this.meta.nameKey]} | ${data[this.meta.idKey]}`;
     }
-
-    // properties
-    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }

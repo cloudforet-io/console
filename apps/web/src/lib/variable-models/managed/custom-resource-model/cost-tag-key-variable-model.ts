@@ -14,9 +14,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class CostTagKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_tag_key';
-
-    name = 'Cost Tags';
+    meta = {
+        key: 'cost_tag_key',
+        name: 'Cost Tags',
+    };
 
     dependencies = {
         cost_data_source: 'data_source_id',

@@ -1,9 +1,10 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
 
 export default class CostDefaultFieldVariableModel extends EnumVariableModel {
-    key = 'cost_default_field';
-
-    name = 'Data Field (Cost)';
+    meta = {
+        key: 'cost_default_field',
+        name: 'Data Field (Cost)',
+    };
 
     values = [
         { key: 'provider', name: 'Provider' },
