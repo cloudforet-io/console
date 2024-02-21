@@ -19,7 +19,7 @@ import type { SuggestionItem, SuggestionType } from '@/common/modules/navigation
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/helper';
 import GNBSearchWorkspaceFilter
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchWorkspaceFilter.vue';
+    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
@@ -125,30 +125,6 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 <template>
     <div class="g-n-b-search-service-tab">
         <div class="service-item-list">
-            <top-bar-suggestion-list v-show="!state.inputText.length"
-                                     :items="state.defaultServiceMenuItems || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
-            <top-bar-suggestion-list v-show="!state.inputText.length"
-                                     :items="state.defaultServiceMenuItems || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
-            <top-bar-suggestion-list v-show="!state.inputText.length"
-                                     :items="state.defaultServiceMenuItems || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
             <top-bar-suggestion-list v-show="!state.inputText.length"
                                      :items="state.defaultServiceMenuItems || []"
                                      :input-text="state.inputText"
