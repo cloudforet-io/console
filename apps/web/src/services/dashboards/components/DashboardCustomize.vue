@@ -47,7 +47,7 @@ const getDashboardData = async () => {
         await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.ALL._NAME }));
+        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     }
 };
 

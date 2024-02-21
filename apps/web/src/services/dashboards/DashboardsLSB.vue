@@ -104,7 +104,7 @@ const state = reactive({
                 id: MENU_ID.DASHBOARDS,
                 foldable: false,
                 to: getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                    name: DASHBOARDS_ROUTE._NAME,
                 }),
                 hideFavorite: true,
             },
