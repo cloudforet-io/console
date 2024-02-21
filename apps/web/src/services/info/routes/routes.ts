@@ -26,7 +26,6 @@ const infoRoute: RouteConfig = {
         {
             path: 'notice',
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.NOTICE,
                 translationId: MENU_INFO_MAP[MENU_ID.NOTICE].translationId,
             },
@@ -35,14 +34,13 @@ const infoRoute: RouteConfig = {
                 {
                     path: '/',
                     name: INFO_ROUTE.NOTICE._NAME,
-                    meta: { lnbVisible: true },
                     component: NoticeMainPage as any,
                 },
                 {
                     path: ':postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     meta: {
-                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, label: ({ params }) => params.postId, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', label: ({ params }) => params.postId, copiable: true,
                     },
                     component: NoticeDetailPage as any,
                     props: true,

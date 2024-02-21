@@ -5,7 +5,7 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
+import DashboardsLSB from '@/services/dashboards/DashboardsLSB.vue';
 
 
 const dashboardStore = useDashboardStore();
@@ -17,9 +17,9 @@ const dashboardStore = useDashboardStore();
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible">
+        <vertical-page-layout v-if="$route.meta.lsbVisible">
             <template #sidebar>
-                <dashboards-l-n-b />
+                <dashboards-l-s-b />
             </template>
             <template #default>
                 <router-view />

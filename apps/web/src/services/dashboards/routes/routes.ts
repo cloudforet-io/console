@@ -35,7 +35,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'all',
                     name: DASHBOARDS_ROUTE.ALL._NAME,
-                    meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
+                    meta: { lsbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
                     component: DashboardsMainPage,
                 },
                 {
@@ -50,7 +50,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'detail/:dashboardId',
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                    meta: { lsbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                     props: true,
                     component: DashboardDetailPage,
                 },

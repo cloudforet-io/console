@@ -11,7 +11,7 @@ import {
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
-import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
+import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 
 export const getDefaultPageAccessPermissionList = (roleType?: RoleType): MenuId[] => {
     if (roleType === 'SYSTEM_ADMIN') return SYSTEM_USER_DEFAULT_PERMISSIONS;
@@ -61,21 +61,21 @@ export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: str
     return result;
 };
 
-const hasAccessPermissionToLNBItem = (lnbItem: LNBItem, pageAccessList: MenuId[]): boolean => {
-    const { id } = lnbItem;
+const hasAccessPermissionToLSBItem = (lsbItem: LSBItem, pageAccessList: MenuId[]): boolean => {
+    const { id } = lsbItem;
     return pageAccessList.some((menuId) => menuId === id);
 };
-export const filterLNBMenuByAccessPermission = (menuSet: LNBMenu[], pagePermissionList: MenuId[]): LNBMenu[] => menuSet.reduce((results, menuData) => {
+export const filterLSBMenuByAccessPermission = (menuSet: LSBMenu[], pagePermissionList: MenuId[]): LSBMenu[] => menuSet.reduce((results, menuData) => {
     if (Array.isArray(menuData)) {
-        const filteredMenuData = menuData.filter((lnbItem) => hasAccessPermissionToLNBItem(lnbItem, pagePermissionList));
+        const filteredMenuData = menuData.filter((lsbItem) => hasAccessPermissionToLSBItem(lsbItem, pagePermissionList));
         if (filteredMenuData.length) {
             results.push(filteredMenuData);
         }
-    } else if (hasAccessPermissionToLNBItem(menuData, pagePermissionList)) {
+    } else if (hasAccessPermissionToLSBItem(menuData, pagePermissionList)) {
         results.push(menuData);
     }
 
     return results;
-}, [] as LNBMenu[]);
+}, [] as LSBMenu[]);
 
 export const getAccessPermissionOfMenu = (menuId: MenuId, pagePermissions: MenuId[]): boolean => pagePermissions.some((id) => id === menuId);
