@@ -8,6 +8,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -61,6 +62,11 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
+            <favorite-button :item-id="topBarHeaderGetters.favoriteItem?.id"
+                             :favorite-type="topBarHeaderGetters.favoriteItem?.type"
+                             scale="0.8"
+                             class="favorite-button"
+            />
         </div>
         <div v-if="topBarHeaderGetters.id"
              class="extra-section"
@@ -94,6 +100,9 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
             &:hover {
                 @apply text-blue-600;
             }
+        }
+        .favorite-button {
+            margin-left: -0.25rem;
         }
     }
     .extra-section {

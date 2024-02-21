@@ -2,6 +2,8 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -9,6 +11,7 @@ interface TopBarHeaderStoreState {
     breadcrumbs: Breadcrumb[];
     selectedItem: Breadcrumb;
     id?: string;
+    favoriteItem?: FavoriteOptions;
 }
 
 export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
@@ -16,6 +19,7 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
         breadcrumbs: [],
         selectedItem: {} as Breadcrumb,
         id: '',
+        favoriteItem: {} as FavoriteOptions,
     });
 
     const getters = reactive({
@@ -25,6 +29,7 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
         }),
         selectedItem: computed<Breadcrumb>(() => state.selectedItem),
         id: computed<string|undefined>(() => state.id),
+        favoriteItem: computed<FavoriteOptions|undefined>(() => state.favoriteItem),
     });
 
     const actions = {
@@ -34,13 +39,17 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
         setId: (id?: string) => {
             state.id = id;
         },
-
         setSelectedItem: (item: Breadcrumb) => {
             state.selectedItem = item;
         },
+        setFavoriteItemId: (favoriteItem: FavoriteOptions) => {
+            state.favoriteItem = favoriteItem;
+        },
         initState: () => {
             state.breadcrumbs = [];
+            state.selectedItem = {} as Breadcrumb;
             state.id = '';
+            state.favoriteItem = {} as FavoriteOptions;
         },
     };
 
