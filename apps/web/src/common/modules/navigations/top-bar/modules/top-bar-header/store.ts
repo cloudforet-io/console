@@ -28,17 +28,17 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
     });
 
     const actions = {
-        setBreadcrumbs(breadcrumbs: Breadcrumb[]) {
+        setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
             state.breadcrumbs = breadcrumbs;
         },
-        setId(id: string) {
+        setId: (id: string) => {
             state.id = id;
         },
 
-        setSelectedItem(item: Breadcrumb) {
+        setSelectedItem: (item: Breadcrumb) => {
             state.selectedItem = item;
         },
-        initState() {
+        initState: () => {
             state.breadcrumbs = [];
             state.id = '';
         },
