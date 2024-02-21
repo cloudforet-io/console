@@ -6,7 +6,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHeading, PBreadcrumbs, PButton, PContextMenu, useContextMenuController, PIconButton,
+    PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -19,6 +19,8 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
@@ -26,12 +28,13 @@ import ProjectMainProjectGroupFormModal from '@/services/project/components/Proj
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type {
-    ProjectGroupTreeNodeData, ProjectGroupTreeItem,
-} from '@/services/project/types/project-tree-type';
+import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
 const router = useRouter();
+
+const topBarHeaderStore = useTopBarHeaderStore();
+const topBarHeaderGetters = topBarHeaderStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
@@ -99,7 +102,7 @@ const {
 onClickOutside(menuRef, hideContextMenu);
 
 /* Navigation */
-const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroupTreeNodeData}) => {
+const onProjectGroupNavClick = async (item: Breadcrumb) => {
     if (item.data) await projectPageStore.selectNode(item.data.id);
 };
 
@@ -134,6 +137,12 @@ watch(() => route.query, async (after, before) => {
         await projectPageStore.selectNode(after.select_pg);
     }
 });
+watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+    topBarHeaderStore.setBreadcrumbs(projectGroupNavigation);
+});
+watch(() => topBarHeaderGetters.selectedItem, (selectedItem) => {
+    onProjectGroupNavClick(selectedItem);
+});
 
 onUnmounted(() => {
     projectPageStore.reset();
@@ -150,13 +159,6 @@ onUnmounted(() => {
 
 <template>
     <div class="page-wrapper">
-        <div class="parents-info">
-            <span class="group-name">
-                <p-breadcrumbs :routes="state.projectGroupNavigation"
-                               @click="onProjectGroupNavClick"
-                />
-            </span>
-        </div>
         <p-heading :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECTS')"
                    use-total-count
                    :total-count="storeState.projectCount || 0"

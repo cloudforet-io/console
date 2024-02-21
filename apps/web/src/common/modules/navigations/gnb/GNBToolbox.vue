@@ -2,9 +2,11 @@
 import { reactive } from 'vue';
 
 import { PIconButton, PBreadcrumbs, PCopyButton } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 interface Props {
     isMinimizeGnb?: boolean;
@@ -14,7 +16,8 @@ const props = withDefaults(defineProps<Props>(), {
     isMinimizeGnb: false,
 });
 
-const { breadcrumbs } = useBreadcrumbs();
+const topBarHeaderStore = useTopBarHeaderStore();
+const topBarHeaderGetters = topBarHeaderStore.getters;
 
 const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
 }>();
@@ -25,6 +28,15 @@ const state = reactive({
 
 const handleClickMenuButton = () => {
     state.proxyIsMinimizeGnb = !state.proxyIsMinimizeGnb;
+};
+const handleClickBreadcrumbsItem = (item: Breadcrumb) => {
+    if (item) topBarHeaderStore.setSelectedItem(item);
+};
+const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
+    if (item) {
+        const selectedItem = topBarHeaderGetters.breadcrumbs.find((breadcrumb) => breadcrumb.name === item.name);
+        if (selectedItem) topBarHeaderStore.setSelectedItem(selectedItem);
+    }
 };
 </script>
 
@@ -38,8 +50,10 @@ const handleClickMenuButton = () => {
                            size="md"
                            @click="handleClickMenuButton"
             />
-            <p-breadcrumbs v-if="breadcrumbs.length"
-                           :routes="breadcrumbs"
+            <p-breadcrumbs v-if="topBarHeaderGetters.breadcrumbs.length > 0"
+                           :routes="topBarHeaderGetters.breadcrumbs"
+                           @click="handleClickBreadcrumbsItem"
+                           @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
         </div>
         <div class="extra-section">
