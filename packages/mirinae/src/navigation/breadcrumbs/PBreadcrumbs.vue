@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import { screens } from '@/index';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import BreadcrumbsEllipsisItem from '@/navigation/breadcrumbs/modules/BreadcrumbsEllipsisItem.vue';
 import BreadcrumbsItem from '@/navigation/breadcrumbs/modules/BreadcrumbsItem.vue';
 import type { Route } from '@/navigation/breadcrumbs/type';
@@ -18,7 +19,9 @@ const props = withDefaults(defineProps<Props>(), {
     copiable: false,
 });
 
-const emit = defineEmits<{(e: 'click', route: Route, idx: number): void}>();
+const emit = defineEmits<{(e: 'click', route: Route, idx: number): void,
+    (e: 'click-dropdown-menu-item', value: MenuItem): void
+}>();
 
 const state = reactive({
     isShown: false,
@@ -32,9 +35,14 @@ const state = reactive({
         })),
     })),
 });
-const handleClickEllipsisItem = () => { state.isShown = true; };
+const handleClickEllipsisItem = () => {
+    state.isShown = true;
+};
 const handleClickBreadcrumbsItem = (route, idx) => {
     emit('click', route, idx);
+};
+const handleClickDropdownItem = (value) => {
+    emit('click-dropdown-menu-item', value);
 };
 const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
 const setSliceMenuCount = () => {
@@ -55,7 +63,9 @@ onMounted(() => setSliceMenuCount());
         <span v-if="props.routes.length > 2 && state.sliceMenuCount < 3"
               class="breadcrumb-container"
         >
-            <breadcrumbs-ellipsis-item :menu="state.slicedMenu.hidden" />
+            <breadcrumbs-ellipsis-item :menu="state.slicedMenu.hidden"
+                                       @click-menu="handleClickDropdownItem"
+            />
             <span v-for="(route, idx) in state.slicedMenu.visible"
                   :key="idx"
                   class="breadcrumb-wrapper"
@@ -64,6 +74,7 @@ onMounted(() => setSliceMenuCount());
                                   :routes="state.slicedMenu.visible"
                                   :copiable="props.copiable"
                                   :idx="idx"
+                                  @click="handleClickBreadcrumbsItem(route, idx)"
                 />
             </span>
         </span>
