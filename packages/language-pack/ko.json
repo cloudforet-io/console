@@ -1135,6 +1135,11 @@
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
 		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": ""
+			}
+		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "스팸 메일을 확인하거나 조금만 더 기다려 주세요. 만일 아직도 이메일을 받지 못한 경우, ",
 			"COLLAPSE_TITLE": "인증 코드를 받지 못하셨나요?",

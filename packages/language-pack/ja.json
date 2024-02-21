@@ -1135,6 +1135,11 @@
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
 		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": ""
+			}
+		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
 			"COLLAPSE_TITLE": "認証コードが届きませんか？",

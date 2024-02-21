@@ -212,10 +212,7 @@ export const Template = (args, { argTypes }) => ({
                     isAllSelected: computed(() => state.selected.length === state.values.length),
                     selected: [],
                     values: [0, 1, 2, 3],
-                    isIndeterminate: computed(() => {
-                        if (state.selected.length > 0 && state.selected.length < state.values.length) return true
-                        else return false
-                    })
+                    isIndeterminate: computed(() => state.selected.length > 0 && state.selected.length < state.values.length)
                 })
                 const handleCheckAll = (val) => {
                     state.selected = val ? state.values : []

@@ -1135,6 +1135,11 @@
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
 		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": "All Workspaces"
+			}
+		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble,",
 			"COLLAPSE_TITLE": "Didn't get verification code?",
