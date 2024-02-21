@@ -23,7 +23,7 @@ const emit = defineEmits<{(e: 'click', route: Route, idx: number): void}>();
 const state = reactive({
     isShown: false,
     sliceMenuCount: props.routes.length,
-    sliceMenu: computed(() => ({
+    slicedMenu: computed(() => ({
         visible: props.routes.slice(-state.sliceMenuCount),
         hidden: props.routes.slice(0, props.routes.length - state.sliceMenuCount).map((route) => ({
             name: route.name,
@@ -55,13 +55,13 @@ onMounted(() => setSliceMenuCount());
         <span v-if="props.routes.length > 2 && state.sliceMenuCount < 3"
               class="breadcrumb-container"
         >
-            <breadcrumbs-ellipsis-item :menu="state.sliceMenu.hidden" />
-            <span v-for="(route, idx) in state.sliceMenu.visible"
+            <breadcrumbs-ellipsis-item :menu="state.slicedMenu.hidden" />
+            <span v-for="(route, idx) in state.slicedMenu.visible"
                   :key="idx"
                   class="breadcrumb-wrapper"
             >
                 <breadcrumbs-item :route="route"
-                                  :routes="state.sliceMenu.visible"
+                                  :routes="state.slicedMenu.visible"
                                   :copiable="props.copiable"
                                   :idx="idx"
                 />
