@@ -71,6 +71,7 @@ const handleCheckAll = (val) => {
 .top-bar-search-workspace-filter {
     @apply pr-3;
     flex: 1 0 13.25rem;
+    overflow-y: auto;
 
     .workspace-item {
         @apply inline-flex items-center gap-1;
