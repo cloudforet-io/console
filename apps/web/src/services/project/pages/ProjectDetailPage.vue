@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
+    PBadge, PButtonModal, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -202,6 +202,9 @@ watch([
 watch([() => singleItemTabState.activeTab, () => state.item], () => {
     topBarHeaderStore.setBreadcrumbs(state.pageNavigation);
 });
+watch(() => projectDetailPageState.projectId, (projectId) => {
+    topBarHeaderStore.setId(projectId);
+}, { immediate: true });
 
 onUnmounted(() => {
     projectDetailPageStore.reset();
@@ -257,15 +260,6 @@ onUnmounted(() => {
                                     <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
                                 </div>
                             </p-badge>
-                        </div>
-                        <div class="top-right-group">
-                            <p class="copy-project-id">
-                                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                                {{ projectDetailPageState.projectId }}
-                                <p-copy-button class="icon"
-                                               :value="projectDetailPageState.projectId"
-                                />
-                            </p>
                         </div>
                     </template>
                 </p-heading>
@@ -350,21 +344,6 @@ onUnmounted(() => {
             display: flex;
             align-content: center;
             gap: 0.25rem;
-        }
-    }
-    .top-right-group {
-        @apply inline-flex items-center justify-end flex-wrap;
-        float: right;
-        .copy-project-id {
-            @apply inline-flex items-center text-gray-500;
-            font-size: 0.875rem;
-            height: 2rem;
-            .label {
-                @apply text-gray-dark;
-            }
-            .icon {
-                @apply ml-2 text-gray-dark;
-            }
         }
     }
 }
