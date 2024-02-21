@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -13,6 +13,7 @@ import { SpaceRouter } from '@/router';
 import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { i18n } from '@/translations';
 
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
@@ -21,7 +22,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 
 import { gray } from '@/styles/colors';
 
@@ -36,6 +37,7 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const topBarHeaderStore = useTopBarHeaderStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
@@ -52,6 +54,10 @@ const state = reactive({
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
     isEditableQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.COST_ANALYSIS,
+        id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || ''),
+    })),
 });
 
 /* Event Handlers */
@@ -86,6 +92,10 @@ const handleDeleteQueryConfirm = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }
 };
+
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+});
 </script>
 
 <template>
@@ -110,12 +120,6 @@ const handleDeleteQueryConfirm = async () => {
                     <div v-if="costAnalysisPageGetters.selectedQueryId"
                          class="title-right-extra icon-wrapper"
                     >
-                        <div class="favorite-button-wrapper">
-                            <favorite-button :item-id="getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId,costAnalysisPageGetters.selectedQueryId)"
-                                             :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
-                                             scale="0.8"
-                            />
-                        </div>
                         <template v-if="state.isEditableQuerySet && !state.isManagedCostQuerySet">
                             <p-icon-button name="ic_edit-text"
                                            size="md"
@@ -170,11 +174,6 @@ const handleDeleteQueryConfirm = async () => {
         margin-bottom: -0.25rem;
         &.icon-wrapper {
             gap: 0.5rem;
-            .favorite-button-wrapper {
-                @apply flex items-center justify-center;
-                width: 1.25rem;
-                height: 1.25rem;
-            }
         }
         &.currency-wrapper {
             @apply justify-end text-gray-800;

@@ -21,6 +21,7 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -31,7 +32,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
@@ -95,6 +95,10 @@ const state = reactive({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
     projectGroupMoveModalVisible: false,
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.PROJECT,
+        id: projectDetailPageState.projectId,
+    })),
 });
 
 /** Tabs */
@@ -205,6 +209,9 @@ watch([() => singleItemTabState.activeTab, () => state.item], () => {
 watch(() => projectDetailPageState.projectId, (projectId) => {
     topBarHeaderStore.setId(projectId);
 }, { immediate: true });
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
 
 onUnmounted(() => {
     projectDetailPageStore.reset();
@@ -226,11 +233,6 @@ onUnmounted(() => {
                 >
                     <template #title-right-extra>
                         <div class="button-wrapper">
-                            <span class="favorite-button-wrapper">
-                                <favorite-button :item-id="projectDetailPageState.projectId"
-                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
-                                />
-                            </span>
                             <template v-if="projectPageState.isWorkspaceOwner">
                                 <p-icon-button name="ic_settings"
                                                class="edit-btn"
@@ -336,9 +338,6 @@ onUnmounted(() => {
     @apply mb-8 flex flex-wrap items-center;
     .button-wrapper {
         @apply inline-flex items-center;
-        .favorite-button-wrapper {
-            @apply inline-flex ml-2;
-        }
         .badge-content-wrapper {
             @apply text-gray-900;
             display: flex;
@@ -350,9 +349,5 @@ onUnmounted(() => {
 
 .p-tab {
     @apply rounded-lg;
-}
-
-.edit-btn {
-    @apply ml-3;
 }
 </style>

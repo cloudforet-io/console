@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-    onUnmounted, ref, watch,
+    computed,
+    onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -9,7 +10,11 @@ import {
 
 import { SpaceRouter } from '@/router';
 
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
@@ -26,10 +31,18 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const topBarHeaderStore = useTopBarHeaderStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+const state = reactive({
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.DASHBOARD,
+        id: props.dashboardId,
+    })),
+});
 
 const getDashboardData = async (dashboardId: string) => {
     try {
@@ -63,6 +76,9 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
         dashboardDetailStore.reset();
     }
     await getDashboardData(dashboardId);
+}, { immediate: true });
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
