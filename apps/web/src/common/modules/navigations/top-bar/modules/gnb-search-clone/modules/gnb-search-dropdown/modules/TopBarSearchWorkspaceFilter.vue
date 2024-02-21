@@ -44,7 +44,7 @@ const handleCheckAll = (val:boolean) => {
                     :selected="state.isAllSelected"
                     @change="handleCheckAll"
         >
-            {{ $t('All Workspaces') }}
+            {{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}
         </p-checkbox>
         <p-tooltip v-for="workspace in state.workspaces"
                    :key="workspace.value"
