@@ -4,47 +4,42 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
-    ListResponse, ListQuery, IResourceVariableModel, IBaseVariableModel, ResourceVariableModelConfig,
     PropertyObject,
+    ListResponse, ListQuery, IResourceVariableModel,
     PropertyOptions,
+    ResourceVariableModelConstructorOptions, VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 
-export default class ResourceVariableModel<T> implements IResourceVariableModel<T> {
-    key = '';
-
-    name = '';
-
-    resourceType = '';
-
-    idKey = '';
-
-    nameKey = 'name';
-
-    scope: IBaseVariableModel['scope'];
-
-    protected _only?: string[];
-
-    protected _searchTargets?: string[];
+export default class ResourceVariableModel<T=any> implements IResourceVariableModel<T> {
+    meta: IResourceVariableModel['meta'] = {
+        key: '',
+        name: '',
+        resourceType: '',
+        idKey: '',
+        nameKey: 'name',
+    };
 
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>;
 
-    constructor(config?: ResourceVariableModelConfig) {
-        if (!config) return;
-        // if (!config.resource_type) throw new Error('resource_type is required');
-        // if (config.name) this.name = config.name;
-        // this.resourceType = config.resource_type;
+    constructor(config: VariableModelConstructorConfig = {}, options?: ResourceVariableModelConstructorOptions) {
+        if (config.key) this.meta.key = config.key;
+        if (config.name) this.meta.name = config.name;
+        if (config.resource_type) this.meta.resourceType = config.resource_type;
+        if (config.id_key) this.meta.idKey = config.id_key;
+
         this.#fetcher = this.#getFetcher();
 
-        if (!config.options) return;
-        Object.entries(config.options).forEach(([key, value]) => {
+        if (!options) return;
+        Object.entries(options.fixedOptions ?? {}).forEach(([key, value]) => {
             if (!this[key]) return;
             this[key].fixedValue = value;
         });
@@ -52,8 +47,10 @@ export default class ResourceVariableModel<T> implements IResourceVariableModel<
 
 
     nameFormatter(data: any): string {
-        return data[this.nameKey];
+        return data[this.meta.nameKey];
     }
+
+    #properties = [];
 
     protected generateProperty(options: PropertyOptions<T>): PropertyObject<T> {
         const {
@@ -76,21 +73,21 @@ export default class ResourceVariableModel<T> implements IResourceVariableModel<
     }
 
     get only(): string[] {
-        if (this._only) return this._only;
-        return [this.idKey, this.nameKey];
+        if (this.meta._only) return this.meta._only;
+        return [this.meta.idKey, this.meta.nameKey];
     }
 
     get searchTargets(): string[] {
-        if (this._searchTargets) return this._searchTargets;
-        return [this.idKey, this.nameKey];
+        if (this.meta._searchTargets) return this.meta._searchTargets;
+        return [this.meta.idKey, this.meta.nameKey];
     }
 
     #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>|undefined {
-        if (!this.resourceType) return undefined;
-        const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
+        if (!this.meta.resourceType) return undefined;
+        const apiPath = this.meta.resourceType.split('.').map((d) => camelCase(d));
 
         const api = get(SpaceConnector.clientV2, apiPath);
-        if (!api) throw new Error(`Invalid resourceType: ${this.resourceType}`);
+        if (!api) throw new Error(`Invalid resourceType: ${this.meta.resourceType}`);
 
         if (dataKey) {
             return getCancellableFetcher(api.stat);
@@ -99,63 +96,62 @@ export default class ResourceVariableModel<T> implements IResourceVariableModel<
     }
 
     protected getStatParams(query: ListQuery = {}, dataKey: string): Record<string, any> {
-        const _query: Record<string, any> = {
-            filter: [
-                {
-                    key: dataKey,
-                    value: [null, ''],
-                    operator: 'not_in',
-                },
-            ],
-        };
-        _query.distinct = dataKey;
+        const apiQueryHelper = new ApiQueryHelper();
+
+        apiQueryHelper.setFilters([
+            { k: dataKey, v: [null, ''], o: '!=' },
+        ]);
+
         if (query.search) {
-            _query.filter.push({
-                key: dataKey,
-                value: query.search,
-                operator: 'contain',
-            });
+            apiQueryHelper.addFilter({ k: dataKey, v: query.search, o: '' });
         }
         if (query.filters) {
-            _query.filter.push({
-                key: dataKey,
-                value: query.filters,
-                operator: 'in',
-            });
+            apiQueryHelper.addFilter({ k: dataKey, v: query.filters, o: '=' });
         }
 
+        this.meta._properties?.forEach((key) => {
+            if (this[key]?.fixedValue) {
+                apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
+            }
+        });
+
         return {
-            query: _query,
+            query: {
+                distinct: dataKey,
+                ...apiQueryHelper.data,
+            },
         };
     }
 
     protected _getParams(query: ListQuery = {}): Record<string, any> {
-        const _query: Record<string, any> = {
-            filter: [
-                {
-                    key: this.idKey,
-                    value: [null, ''],
-                    operator: 'not_in',
-                },
-            ],
-        };
-        _query.only = this.only;
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters([
+            { k: this.meta.idKey, v: [null, ''], o: '!=' },
+        ]);
+
         if (query.search) {
-            _query.filter_or = this.searchTargets.map((key) => ({
+            const orFilters = this.searchTargets.map((key) => ({
                 k: key,
-                v: query.search,
-                o: 'contain',
+                v: query.search ?? '',
+                o: '',
             }));
+            apiQueryHelper.setOrFilters(orFilters);
         }
         if (query.start !== undefined && query.limit !== undefined) {
-            _query.page = {
-                start: query.start,
-                limit: query.limit,
-            };
+            apiQueryHelper.setPage(query.start, query.limit);
         }
 
+        this.meta._properties?.forEach((key) => {
+            if (this[key]?.fixedValue) {
+                apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
+            }
+        });
+
         return {
-            query: _query,
+            query: {
+                only: this.only,
+                ...apiQueryHelper.data,
+            },
         };
     }
 
@@ -174,7 +170,7 @@ export default class ResourceVariableModel<T> implements IResourceVariableModel<
                     more = (query.start * query.limit) < response.total_count;
                 }
                 this.#response = {
-                    results: response.results ? response.results.map((d) => ({ key: d[this.idKey], name: this.nameFormatter(d) })) : [],
+                    results: response.results ? response.results.map((d) => ({ key: d[this.meta.idKey], name: this.nameFormatter(d) })) : [],
                     more,
                 };
             }

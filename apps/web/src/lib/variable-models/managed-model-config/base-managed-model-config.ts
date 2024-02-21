@@ -59,7 +59,8 @@ const CUSTOM_RESOURCE_VARIABLE_MODELS: Record<string, new () => IBaseVariableMod
     asset_data_key: AssetDataKeyVariableModel,
     asset_additional_info_key: AssetAdditionalInfoKeyVariableModel,
 };
-export const MANAGED_VARIABLE_MODELS: Record<string, new () => IBaseVariableModel|IResourceVariableModel|IEnumVariableModel> = {
+
+export const MANAGED_VARIABLE_MODELS: Record<string, new (config, option) => IBaseVariableModel|IResourceVariableModel|IEnumVariableModel> = {
     ...ENUM_VARIABLE_MODELS,
     ...RESOURCE_VARIABLE_MODELS,
     ...CUSTOM_RESOURCE_VARIABLE_MODELS,

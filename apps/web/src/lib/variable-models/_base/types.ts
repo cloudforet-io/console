@@ -2,30 +2,42 @@ import type { ResourceGroupType } from '@/schema/_common/type';
 
 // variable models
 export interface IBaseVariableModel {
-    key: string;
-    name: string;
+    // key: string;
+    // name: string;
+    meta?: Record<string, any>;
     list(query?: ListQuery): Promise<ListResponse>;
     nameFormatter?: (data: any) => string;
     dependencies?: {
         [variableModelKey: string]: string;
     }
-    prefetch?: boolean; // whether to prefetch data on site init
+    // prefetch?: boolean; // whether to prefetch data on site init
     //
-    scope?: {
-        resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
-        value?: string;
-    };
+    // scope?: {
+    //     resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    //     value?: string;
+    // };
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
-    values: Value[];
+   meta: {
+       key: string;
+       name: string;
+   };
+   values: Value[];
 }
 
-export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
+interface ResourceVariableMeta {
+    key: string;
+    name: string;
     resourceType: string;
     idKey: string;
     nameKey: string;
-    only: string[];
-    searchTargets: string[];
+    _properties?: string[];
+    _only?: string[]; // protected
+    _searchTargets?: string[]; // protected
+}
+
+export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
+    meta: ResourceVariableMeta;
     nameFormatter(data: any): string;
     keys?(): string[];
     [propertyKey: string]: PropertyObject<T> | any;
@@ -52,19 +64,18 @@ export interface PropertyObject<T> {
     keys?(): any;
 }
 
-// variable model configs
-export interface EnumVariableModelConfig {
-    type: 'ENUM';
+// variable model constructor configs
+export interface VariableModelConstructorConfig {
+    key?: string;
     name?: string;
-    values: Value[];
-}
-export interface ResourceVariableModelConfig {
-    type: 'RESOURCE';
-    name?: string;
-    resource_type: string;
-    reference_key?: string;
+    // resource model only
+    resource_type?: string;
     id_key?: string;
-    options: Record<string, string>
+    // enum model only
+    values?: Value[];
+}
+export interface ResourceVariableModelConstructorOptions {
+    fixedOptions?: Record<string, any>;
 }
 
 // related types
