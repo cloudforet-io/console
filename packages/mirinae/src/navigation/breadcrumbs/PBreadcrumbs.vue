@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
+
+import { useWindowSize } from '@vueuse/core';
 
 import { screens } from '@/index';
 import type { MenuItem } from '@/inputs/context-menu/type';
@@ -23,9 +25,21 @@ const emit = defineEmits<{(e: 'click', route: Route, idx: number): void,
     (e: 'click-dropdown-menu-item', value: MenuItem): void
 }>();
 
+const { width } = useWindowSize();
+
 const state = reactive({
     isShown: false,
-    sliceMenuCount: props.routes.length,
+    isEllipsisShown: computed(() => width.value < screens.tablet.max),
+    isMobileSize: computed(() => width.value < screens.mobile.max),
+    sliceMenuCount: computed(() => {
+        if (state.isEllipsisShown) {
+            if (state.isMobileSize) {
+                return 1;
+            }
+            return 2;
+        }
+        return props.routes.length;
+    }),
     slicedMenu: computed(() => ({
         visible: props.routes.slice(-state.sliceMenuCount),
         hidden: props.routes.slice(0, props.routes.length - state.sliceMenuCount).map((route) => ({
@@ -45,22 +59,11 @@ const handleClickDropdownItem = (value) => {
     emit('click-dropdown-menu-item', value);
 };
 const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
-const setSliceMenuCount = () => {
-    if (window.innerWidth < screens.tablet.max && window.innerWidth > screens.mobile.max) {
-        state.sliceMenuCount = 2;
-    } else if (window.innerWidth < screens.mobile.max) {
-        state.sliceMenuCount = 1;
-    } else state.sliceMenuCount = props.routes.length;
-};
-
-window.addEventListener('resize', setSliceMenuCount);
-
-onMounted(() => setSliceMenuCount());
 </script>
 
 <template>
     <div class="p-breadcrumbs">
-        <span v-if="props.routes.length > 2 && state.sliceMenuCount < 3"
+        <span v-if="state.isEllipsisShown"
               class="breadcrumb-container"
         >
             <breadcrumbs-ellipsis-item :menu="state.slicedMenu.hidden"

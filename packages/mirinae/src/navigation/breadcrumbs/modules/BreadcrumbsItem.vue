@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
+import { useWindowSize } from '@vueuse/core';
 import type { Location } from 'vue-router';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -24,8 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'click'): void}>();
 
+const { width } = useWindowSize();
+
 const state = reactive({
-    isMobile: false,
+    isMobile: computed(() => width.value < screens.mobile.max),
 });
 
 const getLocation = (route: Route): Location => {
@@ -33,13 +36,6 @@ const getLocation = (route: Route): Location => {
     if (route.path) return { path: route.path };
     return {};
 };
-const setMobileSize = () => {
-    state.isMobile = window.innerWidth < screens.mobile.max;
-};
-
-window.addEventListener('resize', setMobileSize);
-
-onMounted(() => setMobileSize());
 </script>
 
 <template>
