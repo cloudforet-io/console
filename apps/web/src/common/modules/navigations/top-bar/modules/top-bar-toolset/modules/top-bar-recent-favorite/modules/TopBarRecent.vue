@@ -72,8 +72,8 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
+import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';

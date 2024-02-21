@@ -8,9 +8,9 @@ import {
 } from '@spaceone/design-system';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
-import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
+import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 
 interface Props {
     items: SuggestionItem[];

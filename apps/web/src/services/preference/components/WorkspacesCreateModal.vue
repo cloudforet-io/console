@@ -23,8 +23,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/gnb/constants/constant';
-import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
+import { WORKSPACE_LOGO_ICON_THEMES } from '@/common/modules/navigations/top-bar/constants/constant';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
