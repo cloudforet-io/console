@@ -8,10 +8,12 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
+const topBarSearchStore = useTopBarSearchStore();
 
 const state = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
@@ -20,17 +22,15 @@ const state = reactive({
         value: workspace.workspace_id,
         tags: workspace.tags,
     } as { label: string, value: string, tags: { theme: string } | undefined }))),
-    selectedWorkspaces: [],
+    selectedWorkspaces: computed(() => topBarSearchStore.state.selectedWorkspaces),
     isAllSelected: computed(() => state.selectedWorkspaces.length === state.workspaces.length),
     isIndeterminate: computed(() => state.selectedWorkspaces.length > 0 && state.selectedWorkspaces.length < state.workspaces.length),
 });
 
-const handleSelected = (selected: string[]) => {
-    state.selectedWorkspaces = selected;
-};
+const handleSelected = (selected: string[]) => { topBarSearchStore.setSelectedWorkspaces(selected); };
 
-const handleCheckAll = (val) => {
-    state.selectedWorkspaces = val ? state.workspaces.map((w) => w.value) : [];
+const handleCheckAll = (val:boolean) => {
+    topBarSearchStore.setSelectedWorkspaces(val ? state.workspaces.map((w) => w.value) : []);
 };
 
 </script>

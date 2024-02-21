@@ -2,17 +2,19 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-interface GNBSearchStoreState {
+interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activateTab: string;
+    selectedWorkspaces: string[]; // Workspace Filter(TopBarSearchWorkspaceFilter)
 }
 
 export const useTopBarSearchStore = defineStore('gnb-search', () => {
-    const state = reactive<GNBSearchStoreState>({
+    const state = reactive<TopBarSearchStoreState>({
         isActivated: false,
         inputText: '',
         activateTab: 'service',
+        selectedWorkspaces: [],
     });
 
     const getters = reactive({
@@ -25,15 +27,18 @@ export const useTopBarSearchStore = defineStore('gnb-search', () => {
     });
 
     const actions = {
-        setIsActivated(isActivated: boolean, initSearch = true) {
+        setIsActivated: (isActivated: boolean, initSearch = true) => {
             state.isActivated = isActivated;
             if (initSearch) {
                 actions.initSearch();
             }
         },
-        initSearch() {
+        initSearch: () => {
             state.inputText = '';
             state.activateTab = 'service';
+        },
+        setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
+            state.selectedWorkspaces = selectedWorkspaces;
         },
     };
 
