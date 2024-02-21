@@ -1,8 +1,3 @@
-import type {
-    IBaseVariableModel,
-    IEnumVariableModel,
-    IResourceVariableModel,
-} from '@/lib/variable-models/_base/types';
 import AssetAdditionalInfoKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-additional-info-key-variable-model';
 import AssetDataKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-data-key-variable-model';
 import CostAdditionalInfoKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/cost-additional-info-key-variable-model';

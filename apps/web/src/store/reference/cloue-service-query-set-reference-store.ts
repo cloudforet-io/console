@@ -19,8 +19,6 @@ import type {
     ReferenceLoadOptions, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 type PickedQuerySetModel = Pick<CloudServiceQuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
