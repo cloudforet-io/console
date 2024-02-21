@@ -57,6 +57,7 @@ watch([() => isMobile(), () => route.path], ([isMobileState]) => {
     top: $gnb-toolbox-height;
     left: $gnb-navigation-rail-max-width;
     width: calc(100% - $gnb-navigation-rail-max-width);
+    height: calc(100% - $top-bar-height - $gnb-toolbox-height);
     transition: left 0.3s ease, width 0.3s ease;
     &.is-minimize, &.is-mobile {
         left: $gnb-navigation-rail-min-width;

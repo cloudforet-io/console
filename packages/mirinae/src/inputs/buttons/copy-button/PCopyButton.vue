@@ -45,11 +45,12 @@ import type { PropType } from 'vue';
 import type Vue from 'vue';
 
 
+import { useWindowSize } from '@vueuse/core';
+
 import PI from '@/foundation/icons/PI.vue';
 import type { Size } from '@/inputs/buttons/copy-button/type';
 import { SIZE } from '@/inputs/buttons/copy-button/type';
 import { copyAnyData, isNotEmpty } from '@/utils/helpers';
-
 
 interface Props {
     value?: string;
@@ -82,6 +83,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, { emit }) {
+        const { width } = useWindowSize();
         const state = reactive({
             click: false,
             isAlertVisible: false,
@@ -96,7 +98,7 @@ export default defineComponent<Props>({
                 const alertWidth = state.alertRef.clientWidth;
 
                 const left = iconRect.right + ALERT_PAD;
-                if (left + alertWidth > window.innerWidth) {
+                if (left + alertWidth > width.value) {
                     return {
                         right: `${ALERT_PAD}px`,
                         top: `${iconRect.top - alertHeight - ALERT_PAD}px`,
