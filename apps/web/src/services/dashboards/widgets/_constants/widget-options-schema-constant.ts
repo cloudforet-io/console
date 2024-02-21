@@ -3,135 +3,133 @@ import type {
     WidgetOptionsSchemaProperty,
 } from '@/schema/dashboard/_types/widget-type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODEL_KEY_MAP } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 // HACK: Modeling it like any other option thereafter
 export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
     cost_tag_value: {
         key: 'cost_tag_value',
-        name: 'Cost Tag',
     },
     cost_additional_info_value: {
         key: 'cost_additional_info_value',
-        name: 'Cost Additional Info',
     },
 } as const;
 
 export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
     'filters.workspace': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace,
+        name: 'Workspace',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
         ],
     },
     'filters.provider': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
+        name: 'Provider',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
         ],
     },
     'filters.project': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.project,
+        name: 'Project',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
         ],
     },
     'filters.service_account': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
+        name: 'Service Account',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
         ],
     },
     'filters.region': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.region,
+        name: 'Region',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
         ],
     },
     'filters.cost_product': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
+        key: 'cost_product',
+        name: 'Product (Cost)',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
         ],
     },
     'filters.cost_tag_value': {
         key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key,
-        name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.name,
+        name: 'Cost Tag',
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_tag_key },
         ],
     },
     'filters.cost_additional_info_value': {
         key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key,
-        name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.name,
+        name: 'Cost Additional Info',
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
         ],
     },
     'filters.cost_usage_type': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
+        key: 'cost_usage_type',
+        name: 'Usage Type (Cost)',
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
         ],
     },
     'filters.asset_account': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
+        key: 'asset_account',
+        name: 'AWS Account ID (Asset)',
         selection_type: 'MULTI',
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service, dataKey: 'account' },
         ],
     },
 };
 
 export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterOptionKey> = {
     granularity: {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.granularity,
+        name: 'Granularity',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.granularity },
         ],
     },
     cost_data_source: {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_source,
+        name: 'Data Source',
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         scope: 'GLOBAL',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_source },
         ],
     },
     cost_data_type: {
@@ -141,20 +139,20 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_data_type.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_data_type },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_key },
         ],
     },
     cost_data_field: {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_field,
         name: 'Data Field (Cost)',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_field },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_tag_key },
         ],
     },
     cost_secondary_data_field: {
@@ -164,20 +162,20 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_field },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_tag_key },
         ],
     },
     cloud_service_query_set: {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service_query_set,
         name: 'Compliance Framework',
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         scope: 'GLOBAL',
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service_query_set },
         ],
     },
     //
@@ -188,7 +186,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_data_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_data_key },
         ],
     },
     asset_data_field: {
@@ -198,8 +196,8 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_default_field },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_additional_info_key },
         ],
     },
     asset_secondary_data_field: {
@@ -210,8 +208,8 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_default_field },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_additional_info_key },
         ],
     },
 };
