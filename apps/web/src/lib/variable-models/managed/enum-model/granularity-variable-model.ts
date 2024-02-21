@@ -1,9 +1,10 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
 
 export default class GranularityVariableModel extends EnumVariableModel {
-    key = 'granularity';
-
-    name = 'Granularity';
+    meta = {
+        key: 'granularity',
+        name: 'Granularity',
+    };
 
     values = [
         { key: 'DAILY', name: 'Daily' },

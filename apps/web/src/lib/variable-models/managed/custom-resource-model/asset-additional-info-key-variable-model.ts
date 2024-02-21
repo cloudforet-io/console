@@ -15,9 +15,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariableModel {
-    key = 'asset_additional_info_key';
-
-    name = 'Asset Additional Info';
+    meta = {
+        key: 'asset_additional_info_key',
+        name: 'Asset Additional Info',
+    };
 
     dependencies = {
         cloud_service_query_set: 'query_set_id',

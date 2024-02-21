@@ -34,10 +34,6 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
 };
 
 export default class ProjectVariableModel extends ResourceVariableModel<ProjectModel> {
-    #response: ListResponse = { results: [] };
-
-    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: ProjectModel[]; total_count: number }>>;
-
     meta = {
         key: 'project',
         name: 'Project',
@@ -46,6 +42,10 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
         nameKey: 'name',
         _only: ['project_id', 'name', 'project_group_id'],
     };
+
+    #response: ListResponse = { results: [] };
+
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: ProjectModel[]; total_count: number }>>;
 
     #nameFormatter(data: ProjectModel, projectGroupList: ProjectGroupModel[]): string {
         if (data.project_group_id) {

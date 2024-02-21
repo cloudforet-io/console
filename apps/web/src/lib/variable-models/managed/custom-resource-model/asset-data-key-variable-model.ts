@@ -14,9 +14,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class AssetDataKeyVariableModel implements IBaseVariableModel {
-    key = 'asset_data_key';
-
-    name = 'Data Type (Asset)';
+    meta = {
+        key: 'asset_data_key',
+        name: 'Data Type (Asset)',
+    };
 
     dependencies = {
         cloud_service_query_set: 'query_set_id',
