@@ -13,5 +13,5 @@ export default class SecretVariableModel extends ResourceVariableModel<SecretMod
     idKey = 'secret_id';
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }

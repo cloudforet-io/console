@@ -1,5 +1,5 @@
 import {
-    camelCase, capitalize, get,
+    camelCase, get,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -7,18 +7,15 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type {
     ListResponse, ListQuery, IResourceVariableModel, IBaseVariableModel, ResourceVariableModelConfig,
+    PropertyObject,
+    PropertyOptions,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-interface PropertyBuilderOptions<T> {
-    key: keyof T;
-    name?: string;
-    isDataKey?: boolean;
-    isFilter?: boolean;
-}
-export default class ResourceVariableModel<T=any> implements IResourceVariableModel {
+
+export default class ResourceVariableModel<T> implements IResourceVariableModel<T> {
     key = '';
 
     name = '';
@@ -41,10 +38,16 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
 
     constructor(config?: ResourceVariableModelConfig) {
         if (!config) return;
-        if (!config.resource_type) throw new Error('resource_type is required');
-        if (config.name) this.name = config.name;
-        this.resourceType = config.resource_type;
+        // if (!config.resource_type) throw new Error('resource_type is required');
+        // if (config.name) this.name = config.name;
+        // this.resourceType = config.resource_type;
         this.#fetcher = this.#getFetcher();
+
+        if (!config.options) return;
+        Object.entries(config.options).forEach(([key, value]) => {
+            if (!this[key]) return;
+            this[key].fixedValue = value;
+        });
     }
 
 
@@ -52,17 +55,24 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         return data[this.nameKey];
     }
 
-    protected property(options: PropertyBuilderOptions<T>) {
-        const result = {
-            key: options?.key,
-            name: options.name,
-            isDataKey: options.isDataKey ?? false,
-            isFilter: options.isFilter ?? false,
-            values: options.isDataKey ?? this.#fetch,
+    protected generateProperty(options: PropertyOptions<T>): PropertyObject<T> {
+        const {
+            key,
+            name,
+            isDataKey = true,
+            isFilter = true,
+        } = options;
+
+        const propertyObject: PropertyObject<T> = {
+            key,
+            name,
+            isDataKey,
+            isFilter,
+            values: options.isDataKey ? this.stat(key as string) : undefined,
         };
 
-        // TODO: keys
-        return result;
+        // TODO: keys method binding
+        return propertyObject;
     }
 
     get only(): string[] {
@@ -149,18 +159,14 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         };
     }
 
-    // async #values(query: ListQuery = {}): Promise<ListResponse> {
-    //     fetchResourceVariable(this.#fetcher, this.key);
-    // }
-
-    async #fetch(query: ListQuery = {}, dataKey?: string): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
             if (!this.#fetcher) {
-                this.#fetcher = this.#getFetcher(dataKey);
+                this.#fetcher = this.#getFetcher();
                 if (!this.#fetcher) return this.#response;
             }
             const { status, response } = await this.#fetcher(
-                dataKey ? this.getStatParams(query, dataKey) : this._getParams(query),
+                this._getParams(query),
             );
             if (status === 'succeed') {
                 let more = false;
@@ -168,12 +174,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     more = (query.start * query.limit) < response.total_count;
                 }
                 this.#response = {
-                    results: response.results ? response.results.map((d) => {
-                        if (dataKey) {
-                            return { key: d, name: d };
-                        }
-                        return { key: d[this.idKey], name: this.nameFormatter(d) };
-                    }) : [],
+                    results: response.results ? response.results.map((d) => ({ key: d[this.idKey], name: this.nameFormatter(d) })) : [],
                     more,
                 };
             }
@@ -184,5 +185,32 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         }
     }
 
-    list = this.#fetch;
+    stat(dataKey: string): (query?: ListQuery) => Promise<ListResponse> {
+        const _dataKey = dataKey;
+        return async (query: ListQuery = {}) => {
+            try {
+                if (!this.#fetcher) {
+                    this.#fetcher = this.#getFetcher(_dataKey);
+                    if (!this.#fetcher) return this.#response;
+                }
+                const { status, response } = await this.#fetcher(
+                    this.getStatParams(query, _dataKey),
+                );
+                if (status === 'succeed') {
+                    let more = false;
+                    if (query.start !== undefined && query.limit !== undefined && response.total_count !== undefined) {
+                        more = (query.start * query.limit) < response.total_count;
+                    }
+                    this.#response = {
+                        results: response.results ? response.results.map((d) => ({ key: d, name: d })) : [],
+                        more,
+                    };
+                }
+                return this.#response;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return this.#response;
+            }
+        };
+    }
 }

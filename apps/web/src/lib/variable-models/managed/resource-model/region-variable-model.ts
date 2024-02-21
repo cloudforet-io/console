@@ -19,5 +19,5 @@ export default class RegionVariableModel extends ResourceVariableModel<RegionMod
     }
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }

@@ -13,5 +13,5 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
     idKey = 'data_source_id';
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }

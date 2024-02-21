@@ -13,5 +13,5 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
     idKey = 'cloud_service_id';
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }

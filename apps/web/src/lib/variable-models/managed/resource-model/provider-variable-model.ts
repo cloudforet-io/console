@@ -13,5 +13,5 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
     idKey = 'provider';
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }
