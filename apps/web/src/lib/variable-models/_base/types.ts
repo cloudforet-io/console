@@ -15,31 +15,41 @@ export interface IBaseVariableModel {
         resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
         value?: string;
     };
-    fixedOptions: Record<string, any>;
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
 }
-// resourceType: string;
-// resourceKey?: string;
-// idKey: string;
-// nameKey: string;
-// only: string[];
-// searchTargets: string[];
-// nameFormatter: (data: any) => string;
-export interface IResourceVariableModel extends IBaseVariableModel {
+
+export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
     resourceType: string;
     idKey: string;
     nameKey: string;
     only: string[];
     searchTargets: string[];
-    nameFormatter: (data: any) => string;
-    //
+    nameFormatter(data: any): string;
     keys?(): string[];
+    [propertyKey: string]: PropertyObject<T> | any;
 }
 export interface IResourceValueVariableModel extends IBaseVariableModel {
     resourceType: string;
     referenceKey: string;
+}
+
+// property
+export interface PropertyOptions<T> {
+    key: keyof T;
+    name?: string;
+    isDataKey?: boolean;
+    isFilter?: boolean;
+}
+export interface PropertyObject<T> {
+    key: keyof T;
+    name?: string;
+    isDataKey?: boolean;
+    isFilter?: boolean;
+    fixedValue?: any;
+    values?(query?: ListQuery): Promise<ListResponse>;
+    keys?(): any;
 }
 
 // variable model configs
@@ -54,6 +64,7 @@ export interface ResourceVariableModelConfig {
     resource_type: string;
     reference_key?: string;
     id_key?: string;
+    options: Record<string, string>
 }
 
 // related types

@@ -5,7 +5,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
-    ListQuery, ListResponse, IBaseVariableModel,
+    ListQuery, ListResponse,
+    IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -13,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class AssetAdditionalInfoKeyVariableModel implements z {
+export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariableModel {
     key = 'asset_additional_info_key';
 
     name = 'Asset Additional Info';
