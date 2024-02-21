@@ -4,14 +4,6 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class CostVariableModel extends ResourceVariableModel<CostModel> {
-    key = 'cost';
-
-    name = 'Cost';
-
-    resourceType = 'cost_analysis.Cost';
-
-    idKey = 'cost_id';
-
     // properties
     cost_id = this.generateProperty({ key: 'cost_id', name: 'Cost ID' });
 
@@ -21,7 +13,12 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
 
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    // get keys() {
-    //     return [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key];
-    // }
+    meta = {
+        key: 'cost',
+        name: 'Cost',
+        resourceType: 'cost_analysis.Cost',
+        idKey: 'cost_id',
+        nameKey: 'name',
+        _properties: [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key],
+    };
 }

@@ -23,7 +23,7 @@ import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
-import { VariableModel } from '@/lib/variable-models';
+import { generateVariableModel, VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -59,7 +59,11 @@ const state = reactive({
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
         if (!Array.isArray(options)) return undefined;
-        const variableModels = options.map((config) => new VariableModel(config));
+        const variableModels = options.map((config) => {
+            const generatorOption = { key: config.key, type: config.type };
+            const Model = generateVariableModel(config);
+            return new Model(config);
+        });
         return getVariableModelMenuHandler(variableModels);
     }),
 });
