@@ -11,13 +11,17 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { VariableModel } from '@/lib/variable-models';
 import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import {
-    MANAGED_VARIABLE_MODEL_CONFIGS,
-} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import CostVariableModel from '@/lib/variable-models/managed/resource-model/cost-variable-model';
+import ProjectGroupVariableModel from '@/lib/variable-models/managed/resource-model/project-group-variable-model';
+import ProjectVariableModel from '@/lib/variable-models/managed/resource-model/project-variable-model';
+import ProviderVariableModel from '@/lib/variable-models/managed/resource-model/provider-variable-model';
+import RegionVariableModel from '@/lib/variable-models/managed/resource-model/region-variable-model';
+import ServiceAccountVariableModel from '@/lib/variable-models/managed/resource-model/service-account-variable-model';
+import WorkspaceVariableModel from '@/lib/variable-models/managed/resource-model/workspace-variable-model';
+import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -31,16 +35,16 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
-const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
-    [GROUP_BY.WORKSPACE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key })],
-    [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
-    [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
-    // TODO: cost_product, cost_usage_type
-    // [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
-    [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
-    [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
-    [GROUP_BY.REGION]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key })],
-    // [GROUP_BY.USAGE_TYPE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key })],
+
+const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModelMenuHandlerInfo> = {
+    [GROUP_BY.WORKSPACE]: { variableModel: new WorkspaceVariableModel() },
+    [GROUP_BY.PROJECT]: { variableModel: new ProjectVariableModel() },
+    [GROUP_BY.PROJECT_GROUP]: { variableModel: new ProjectGroupVariableModel() },
+    [GROUP_BY.PRODUCT]: { variableModel: new CostVariableModel(), dataKey: 'product' },
+    [GROUP_BY.PROVIDER]: { variableModel: new ProviderVariableModel() },
+    [GROUP_BY.SERVICE_ACCOUNT]: { variableModel: new ServiceAccountVariableModel() },
+    [GROUP_BY.REGION]: { variableModel: new RegionVariableModel() },
+    [GROUP_BY.USAGE_TYPE]: { variableModel: new CostVariableModel(), dataKey: 'usage_type' },
 };
 
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
@@ -78,16 +82,14 @@ const state = reactive({
 
 const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
-        let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
-        if (!variableModels) {
-            variableModels = new VariableModel(({
-                type: 'RESOURCE',
-                resource_type: 'cost_analysis.Cost',
-                reference_key: groupBy,
-                name: groupBy,
-            }));
+        let variableModelInfo = GROUP_BY_TO_VAR_MODELS[groupBy];
+        if (!variableModelInfo) {
+            variableModelInfo = {
+                variableModel: new CostVariableModel(),
+                dataKey: groupBy,
+            };
         }
-        const handler = getVariableModelMenuHandler(variableModels, listQueryOptions);
+        const handler = getVariableModelMenuHandler([variableModelInfo], listQueryOptions);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
