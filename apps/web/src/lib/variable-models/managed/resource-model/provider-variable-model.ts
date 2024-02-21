@@ -4,14 +4,14 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class ProviderVariableModel extends ResourceVariableModel<ProviderModel> {
-    key = 'provider';
-
-    name = 'Provider';
-
-    resourceType = 'identity.Provider';
-
-    idKey = 'provider';
-
-    // properties
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
+
+    meta = {
+        key: 'provider',
+        name: 'Provider',
+        resourceType: 'identity.Provider',
+        idKey: 'provider_id',
+        nameKey: 'name',
+        _properties: [this.provider.key],
+    };
 }

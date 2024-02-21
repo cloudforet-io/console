@@ -4,14 +4,14 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class ServiceAccountVariableModel extends ResourceVariableModel<ServiceAccountModel> {
-    key = 'service_account';
-
-    name = 'Service Account';
-
-    resourceType = 'identity.ServiceAccount';
-
-    idKey = 'service_account_id';
-
-    // properties
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
+
+    meta = {
+        key: 'service_account',
+        name: 'Service Account',
+        resourceType: 'identity.ServiceAccount',
+        idKey: 'service_account_id',
+        nameKey: 'name',
+        _properties: [this.provider.key],
+    };
 }

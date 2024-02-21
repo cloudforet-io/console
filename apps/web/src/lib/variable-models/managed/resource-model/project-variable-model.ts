@@ -32,20 +32,20 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
         return [];
     }
 };
+
 export default class ProjectVariableModel extends ResourceVariableModel<ProjectModel> {
-    key = 'project';
-
-    name = 'Project';
-
-    resourceType = 'identity.Project';
-
-    idKey = 'project_id';
-
-    _only = ['project_id', 'name', 'project_group_id'];
-
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: ProjectModel[]; total_count: number }>>;
+
+    meta = {
+        key: 'project',
+        name: 'Project',
+        resourceType: 'identity.Project',
+        idKey: 'project_id',
+        nameKey: 'name',
+        _only: ['project_id', 'name', 'project_group_id'],
+    };
 
     #nameFormatter(data: ProjectModel, projectGroupList: ProjectGroupModel[]): string {
         if (data.project_group_id) {
@@ -54,7 +54,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
                 return `${targetProjectGroup.name} > ${data.name}`;
             }
         }
-        return data[this.nameKey];
+        return data[this.meta.nameKey];
     }
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
@@ -76,7 +76,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
 
                 this.#response = {
                     results: response.results ? response.results.map((d) => ({
-                        key: d[this.idKey], name: this.#nameFormatter(d, projectGroupList),
+                        key: d[this.meta.idKey], name: this.#nameFormatter(d, projectGroupList),
                     })) : [],
                     more,
                 };

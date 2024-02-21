@@ -4,14 +4,14 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class CostDataSourceVariableModel extends ResourceVariableModel<CostDataSourceModel> {
-    key = 'cost_data_source';
-
-    name = 'Data Source';
-
-    resourceType = 'cost_analysis.DataSource';
-
-    idKey = 'data_source_id';
-
-    // properties
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
+
+    meta = {
+        key: 'cost_data_source',
+        name: 'Data Source',
+        resourceType: 'cost_analysis.DataSource',
+        idKey: 'data_source_id',
+        nameKey: 'name',
+        _properties: [this.provider.key],
+    };
 }

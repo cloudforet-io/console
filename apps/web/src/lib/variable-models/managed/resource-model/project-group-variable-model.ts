@@ -4,11 +4,11 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class ProjectGroupVariableModel extends ResourceVariableModel<ProjectGroupModel> {
-    key = 'project_group';
-
-    name = 'Project Group';
-
-    resourceType = 'identity.ProjectGroup';
-
-    idKey = 'project_group_id';
+    meta = {
+        key: 'project_group',
+        name: 'Project Group',
+        resourceType: 'identity.ProjectGroup',
+        idKey: 'project_group_id',
+        nameKey: 'name',
+    };
 }

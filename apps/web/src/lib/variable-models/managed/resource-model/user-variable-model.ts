@@ -4,15 +4,15 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class UserVariableModel extends ResourceVariableModel<UserModel> {
-    key = 'user';
-
-    name = 'User';
-
-    resourceType = 'identity.User';
-
-    idKey = 'user_id';
+    meta = {
+        key: 'user',
+        name: 'User',
+        resourceType: 'identity.User',
+        idKey: 'user_id',
+        nameKey: 'name',
+    };
 
     nameFormatter(): string {
-        return this.nameKey || this.idKey;
+        return this.meta.nameKey || this.meta.idKey;
     }
 }
