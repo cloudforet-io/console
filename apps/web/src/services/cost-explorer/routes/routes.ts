@@ -160,7 +160,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.COST_REPORT },
                     component: CostReportPage as any,
                 },
             ],
