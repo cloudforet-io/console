@@ -4,7 +4,6 @@ import { defineStore } from 'pinia';
 
 import type { FavoriteOptions } from '@/store/modules/favorite/type';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 interface TopBarHeaderStoreState {
@@ -23,10 +22,7 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
     });
 
     const getters = reactive({
-        breadcrumbs: computed<Breadcrumb[]>(() => {
-            const { breadcrumbs } = useBreadcrumbs();
-            return state.breadcrumbs.length === 0 ? breadcrumbs.value : state.breadcrumbs;
-        }),
+        breadcrumbs: computed<Breadcrumb[]>(() => state.breadcrumbs),
         selectedItem: computed<Breadcrumb>(() => state.selectedItem),
         id: computed<string|undefined>(() => state.id),
         favoriteItem: computed<FavoriteOptions|undefined>(() => state.favoriteItem),
