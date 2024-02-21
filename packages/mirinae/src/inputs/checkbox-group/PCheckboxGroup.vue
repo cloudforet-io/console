@@ -1,37 +1,24 @@
-<template>
-    <div class="p-checkbox-group"
-         :class="direction"
-    >
-        <slot name="default" />
-    </div>
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    defineComponent,
-} from 'vue';
-
+<script setup lang="ts">
 import type { Direction } from '@/inputs/checkbox-group/type';
 import { DIRECTION } from '@/inputs/checkbox-group/type';
 
 interface CheckboxGroupProps {
     direction?: Direction;
 }
-export default defineComponent<CheckboxGroupProps>({
-    name: 'PRadioGroup',
-    components: { },
-    props: {
-        direction: {
-            type: String as PropType<Direction>,
-            default: DIRECTION.horizontal,
-            validator(value: Direction) {
-                return Object.values(DIRECTION).includes(value);
-            },
-        },
-    },
+
+const props = withDefaults(defineProps<CheckboxGroupProps>(), {
+    direction: DIRECTION.horizontal,
 });
+
 </script>
+
+<template>
+    <div class="p-checkbox-group"
+         :class="props.direction"
+    >
+        <slot name="default" />
+    </div>
+</template>
 
 <style lang="postcss">
 .p-checkbox-group {
