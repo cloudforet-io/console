@@ -6,7 +6,7 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import ProjectLNB from '@/services/project/ProjectLNB.vue';
+import ProjectLSB from '@/services/project/ProjectLSB.vue';
 
 const topBarHeaderStore = useTopBarHeaderStore();
 
@@ -17,9 +17,9 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible">
+        <vertical-page-layout v-if="$route.meta.lsbVisible">
             <template #sidebar>
-                <project-l-n-b />
+                <project-l-s-b />
             </template>
             <template #default>
                 <router-view />

@@ -43,7 +43,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { lsbVisible: true },
                     component: CloudServicePage as any,
                 },
                 {
@@ -61,7 +61,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: 'no-resource',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME),
-                    meta: { lnbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
+                    meta: { lsbVisible: true, translationId: 'COMMON.ERROR.NO_RESOURCE_TITLE' },
                     component: NoResourcePage as any,
                 },
                 {
@@ -72,7 +72,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                         {
                             path: ':name?',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
-                            meta: { lnbVisible: true, label: ({ params }) => params.name },
+                            meta: { lsbVisible: true, label: ({ params }) => params.name },
                             props: true,
                             component: CloudServiceDetailPage as any,
                         },
@@ -83,7 +83,7 @@ const adminAssetInventoryRoute: RouteConfig = {
         {
             path: 'server',
             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVER._NAME),
-            meta: { lnbVisible: true, menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
+            meta: { lsbVisible: true, menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
             component: ServerPage as any,
         },
         {
@@ -94,7 +94,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { lsbVisible: true },
                     props: true,
                     component: AdminCollectorMainPage as any,
                 },
@@ -112,13 +112,13 @@ const adminAssetInventoryRoute: RouteConfig = {
                         {
                             path: '/',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME),
-                            meta: { lnbVisible: true },
+                            meta: { lsbVisible: true },
                             component: AdminCollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME),
-                            meta: { lnbVisible: true, label: ({ params }) => params.jobId, copiable: true },
+                            meta: { lsbVisible: true, label: ({ params }) => params.jobId, copiable: true },
                             props: true,
                             component: AdminCollectHistoryJobPage as any,
                         },
@@ -128,7 +128,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                     path: ':collectorId',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME),
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
+                    meta: { lsbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
                     component: AdminCollectorDetailPage as any,
                 },
             ],

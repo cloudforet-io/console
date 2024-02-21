@@ -53,7 +53,7 @@ const handleRouteToDashboard = () => {
 </script>
 
 <template>
-    <section class="cost-explorer-lnb-relocate-dashboard-modal">
+    <section class="cost-explorer-l-s-b-relocate-dashboard-modal">
         <transition v-if="visible"
                     name="modal"
         >
@@ -104,7 +104,7 @@ const handleRouteToDashboard = () => {
 </template>
 
 <style lang="postcss" scoped>
-.cost-explorer-lnb-relocate-dashboard-modal {
+.cost-explorer-l-s-b-relocate-dashboard-modal {
     display: inline-block;
 
     .modal-content {

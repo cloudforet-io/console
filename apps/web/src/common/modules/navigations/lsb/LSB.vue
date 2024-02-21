@@ -12,17 +12,17 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
+import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vue';
 import type {
-    BackLink, LNBMenu, TopTitle,
-} from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+    BackLink, LSBMenu, TopTitle,
+} from '@/common/modules/navigations/lsb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
     header?: string;
     backLink?: BackLink;
     topTitle?: TopTitle;
-    menuSet: LNBMenu[];
+    menuSet: LSBMenu[];
     showFavoriteOnly?: boolean;
     hideHeader?: boolean;
 }
@@ -53,7 +53,7 @@ const handleSelect = (id: string, selected: string) => {
 </script>
 
 <template>
-    <nav class="lnb">
+    <nav class="l-s-b">
         <template v-if="!props.hideHeader">
             <div class="header">
                 <slot name="header">
@@ -122,7 +122,7 @@ const handleSelect = (id: string, selected: string) => {
                           v-bind="menuData"
                     />
                 </div>
-                <l-n-b-menu-item v-else
+                <l-s-b-menu-item v-else
                                  :key="`${idx}-${getRandomId()}`"
                                  :menu-data="menuData"
                                  :current-path="state.currentPath"
@@ -136,14 +136,14 @@ const handleSelect = (id: string, selected: string) => {
                               v-bind="scope"
                         />
                     </template>
-                </l-n-b-menu-item>
+                </l-s-b-menu-item>
             </template>
         </div>
     </nav>
 </template>
 
 <style lang="postcss" scoped>
-.lnb {
+.l-s-b {
     .header {
         @apply font-bold;
         padding-left: 1.25rem;

@@ -13,7 +13,7 @@ import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
+import CostExplorerLSB from '@/services/cost-explorer/CostExplorerLSB.vue';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
@@ -63,11 +63,11 @@ onUnmounted(() => {
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
+        <vertical-page-layout v-if="$route.meta.lsbVisible"
                               class="cost-explorer-container"
         >
             <template #sidebar>
-                <cost-explorer-l-n-b />
+                <cost-explorer-l-s-b />
             </template>
             <template #default>
                 <router-view />

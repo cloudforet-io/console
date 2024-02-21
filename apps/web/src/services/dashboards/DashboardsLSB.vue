@@ -20,9 +20,9 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+import LSB from '@/common/modules/navigations/lsb/LSB.vue';
+import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
@@ -50,7 +50,7 @@ const state = reactive({
         }
         return result;
     }),
-    domainMenuSet: computed<LNBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
+    domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
         type: 'item',
         id: d.public_dashboard_id,
         label: d.name,
@@ -65,7 +65,7 @@ const state = reactive({
             id: d.public_dashboard_id,
         },
     }))),
-    workspaceMenuSet: computed<LNBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
+    workspaceMenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
         type: 'item',
         id: d.public_dashboard_id,
         label: d.name,
@@ -80,8 +80,8 @@ const state = reactive({
             id: d.public_dashboard_id,
         },
     }))),
-    projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
-    privateMenuSet: computed<LNBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
+    projectMenuSet: computed<LSBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
+    privateMenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
         type: 'item',
         id: d.private_dashboard_id,
         label: d.name,
@@ -96,7 +96,7 @@ const state = reactive({
             id: d.private_dashboard_id,
         },
     }))),
-    menuSet: computed<LNBMenu[]>(() => {
+    menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet = [
             {
                 type: 'item',
@@ -120,18 +120,18 @@ const state = reactive({
         }
         return [
             ...defaultMenuSet,
-            ...(storeState.isWorkspaceOwner ? filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)) : []),
-            ...filterLNBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
-            ...filterLNBItemsByPagePermission('PRIVATE', filterFavoriteItems(state.privateMenuSet)),
+            ...(storeState.isWorkspaceOwner ? filterLSBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)) : []),
+            ...filterLSBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
+            ...filterLSBItemsByPagePermission('PRIVATE', filterFavoriteItems(state.privateMenuSet)),
         ];
     }),
 });
 
-const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[]): LNBMenu[] => {
+const filterLSBItemsByPagePermission = (scope: DashboardScope, items: LSBMenu[]): LSBMenu[] => {
     let label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
     if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
     else if (scope === 'PRIVATE') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-    const topTitle: LNBMenu = {
+    const topTitle: LSBMenu = {
         type: 'top-title',
         label,
     };
@@ -144,7 +144,7 @@ const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[])
     return [topTitle, ...items];
 };
 
-const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LNBMenu[] => {
+const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LSBMenu[] => {
     const dashboardItemsWithGroup = {} as Record<string, PublicDashboardModel[]>;
     dashboardList.forEach((d) => {
         const projectGroupLabel: string = storeState.projects[d.project_id]?.label || d.project_id;
@@ -156,7 +156,7 @@ const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LNBMenu
     });
 
     // Result to return
-    const result = [] as LNBMenu[];
+    const result = [] as LSBMenu[];
 
     // The mapped group items are in the form of an array along with the title, and each item is mapped to LNBItem type and pushed to result.
     Object.keys(dashboardItemsWithGroup).forEach((d) => {
@@ -189,9 +189,9 @@ const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LNBMenu
     return result;
 };
 
-const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
+const filterFavoriteItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     if (!state.showFavoriteOnly) return menuItems;
-    const result = [] as LNBMenu[];
+    const result = [] as LSBMenu[];
     menuItems.forEach((d) => {
         if (Array.isArray(d)) {
             const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
@@ -213,7 +213,7 @@ const handleClickCreateDashboard = () => {
 </script>
 
 <template>
-    <l-n-b class="dashboards-lnb"
+    <l-s-b class="dashboards-l-s-b"
            :class="{'admin-mode': isAdminMode}"
            :menu-set="state.menuSet"
            :show-favorite-only.sync="state.showFavoriteOnly"
@@ -227,17 +227,17 @@ const handleClickCreateDashboard = () => {
                 />
             </div>
         </template>
-    </l-n-b>
+    </l-s-b>
 </template>
 
 <style lang="postcss" scoped>
-.dashboards-lnb {
+.dashboards-l-s-b {
     .header-wrapper {
         @apply flex justify-between items-center font-bold;
         padding-right: 1.25rem;
     }
 
-    /* custom lnb */
+    /* custom lsb */
     &.admin-mode {
         :deep(.favorite-only-wrapper) {
             padding-bottom: 0.5rem;
