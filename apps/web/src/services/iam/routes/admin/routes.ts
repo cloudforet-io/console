@@ -31,7 +31,6 @@ const adminIamRoutes: RouteConfig = {
             path: 'user',
             name: makeAdminRouteName(IAM_ROUTE.USER._NAME),
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.USER,
                 translationId: MENU_INFO_MAP[MENU_ID.USER].translationId,
             },
@@ -41,7 +40,6 @@ const adminIamRoutes: RouteConfig = {
             path: 'app',
             name: makeAdminRouteName(IAM_ROUTE.APP._NAME),
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.APP,
                 translationId: MENU_INFO_MAP[MENU_ID.APP].translationId,
             },
@@ -58,7 +56,6 @@ const adminIamRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),
-                    meta: { lnbVisible: true },
                     props: true,
                     component: RolePage,
                 },

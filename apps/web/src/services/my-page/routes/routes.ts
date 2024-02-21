@@ -31,7 +31,6 @@ const myPageRoutes: RouteConfig = {
             path: 'profile',
             name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME,
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.ACCOUNT_PROFILE,
                 translationId: MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId,
             },
@@ -40,7 +39,6 @@ const myPageRoutes: RouteConfig = {
         {
             path: 'notification',
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.NOTIFICATIONS,
                 translationId: MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId,
             },
@@ -49,7 +47,6 @@ const myPageRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: MY_PAGE_ROUTE.NOTIFICATION._NAME,
-                    meta: { lnbVisible: true },
                     component: UserNotificationPage as any,
                 },
                 {

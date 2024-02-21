@@ -1,5 +1,5 @@
 <template>
-    <l-n-b :header="header"
+    <l-s-b :header="header"
            :back-link="backLink"
            :top-title="topTitle"
            :menu-set="menuSet"
@@ -21,15 +21,15 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import { filterLNBMenuByAccessPermission } from '@/lib/access-control/page-access-helper';
+import { filterLSBMenuByAccessPermission } from '@/lib/access-control/page-access-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import LNB from '@/common/modules/navigations/lnb/LNB.vue';
+import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
-    BackLink, LNBItem, LNBMenu, TopTitle,
-} from '@/common/modules/navigations/lnb/type';
+    BackLink, LSBItem, LSBMenu, TopTitle,
+} from '@/common/modules/navigations/lsb/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
@@ -37,8 +37,8 @@ import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/ty
 
 
 export default defineComponent({
-    name: 'AssetInventoryLNB',
-    components: { LNB },
+    name: 'AssetInventoryLSB',
+    components: { LSB },
     setup() {
         const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
@@ -64,8 +64,8 @@ export default defineComponent({
                 if (!state.detailPageParams) return undefined;
                 return { label: state.detailPageParams.group, icon: get(cloudServiceDetailPageState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
             }),
-            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
-                const results: LNBItem[] = [];
+            cloudServiceDetailMenuSet: computed<LSBItem[]>(() => {
+                const results: LSBItem[] = [];
                 cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
                     results.push({
                         type: 'item',
@@ -81,7 +81,7 @@ export default defineComponent({
                 results.push({ type: 'divider' });
                 return results;
             }),
-            userModeMenuSet: computed<LNBMenu[]>(() => [
+            userModeMenuSet: computed<LSBMenu[]>(() => [
                 {
                     type: 'item',
                     id: MENU_ID.SERVER,
@@ -107,7 +107,7 @@ export default defineComponent({
                     }),
                 },
             ]),
-            adminModeMenuSet: computed<LNBMenu[]>(() => [
+            adminModeMenuSet: computed<LSBMenu[]>(() => [
                 {
                     type: 'item',
                     id: MENU_ID.SERVER,
@@ -126,8 +126,8 @@ export default defineComponent({
                 },
 
             ]),
-            menuSet: computed<LNBMenu[]>(() => {
-                const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
+            menuSet: computed<LSBMenu[]>(() => {
+                const menu: LSBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
                     id: MENU_ID.CLOUD_SERVICE,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId),
@@ -135,17 +135,17 @@ export default defineComponent({
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     }),
                 }]);
-                const lnbMenuSet = isAdminMode.value
+                const lsbMenuSet = isAdminMode.value
                     ? menu.concat(state.adminModeMenuSet)
                     : menu.concat(state.userModeMenuSet);
                 return [
                     (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
-                    ...filterLNBMenuByAccessPermission(lnbMenuSet, store.getters['user/pageAccessPermissionList']),
+                    ...filterLSBMenuByAccessPermission(lsbMenuSet, store.getters['user/pageAccessPermissionList']),
                 ];
             }),
         });
 
-        const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
+        const initCloudServiceDetailLSB = async (params: CloudServiceDetailPageParams) => {
             cloudServiceDetailPageStore.setProviderGroupName(params);
             cloudServiceDetailPageStore.listCloudServiceTypeData();
         };
@@ -166,7 +166,7 @@ export default defineComponent({
         /* Watchers */
         watch(() => state.detailPageParams, async (params) => {
             if (!params) return;
-            await initCloudServiceDetailLNB(params);
+            await initCloudServiceDetailLSB(params);
             if (!params.name) await routeToFirstCloudServiceType(params);
         }, { immediate: true });
 

@@ -29,7 +29,7 @@ const adminPreferenceRoutes: RouteConfig = {
             path: 'workspaces',
             name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
             meta: {
-                lnbVisible: true,
+                lsbVisible: true,
                 menuId: MENU_ID.WORKSPACES,
                 translationId: MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId,
             },
@@ -39,7 +39,7 @@ const adminPreferenceRoutes: RouteConfig = {
             path: 'domain-settings',
             name: makeAdminRouteName(PREFERENCE_ROUTE.DOMAIN_SETTINGS._NAME),
             meta: {
-                lnbVisible: true,
+                lsbVisible: true,
                 menuId: MENU_ID.DOMAIN_SETTINGS,
                 translationId: MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId,
             },

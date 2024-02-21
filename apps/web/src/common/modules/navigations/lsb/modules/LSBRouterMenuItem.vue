@@ -12,10 +12,10 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { LNBMenu, LNBIcon } from '@/common/modules/navigations/lnb/type';
+import type { LSBMenu, LSBIcon } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    item: LNBMenu;
+    item: LSBMenu;
     depth?: number;
     isAdminMode?: boolean;
     idx?: number | string;
@@ -44,7 +44,7 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (!resolvedHref.endsWith('/')) resolvedHref += '/';
     return currentPath.startsWith(resolvedHref);
 };
-const getIconName = (icon: LNBIcon): string => {
+const getIconName = (icon: LSBIcon): string => {
     if (typeof icon === 'string') return icon;
     return icon.name;
 };
@@ -52,7 +52,7 @@ const getIconName = (icon: LNBIcon): string => {
 </script>
 
 <template>
-    <router-link class="l-n-b-router-menu-item"
+    <router-link class="l-s-b-router-menu-item"
                  :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
                  :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
@@ -96,7 +96,7 @@ const getIconName = (icon: LNBIcon): string => {
 </template>
 
 <style lang="postcss" scoped>
-.l-n-b-router-menu-item {
+.l-s-b-router-menu-item {
     @apply border border-transparent inline-flex items-center w-full h-full justify-between;
     font-size: 0.875rem;
     line-height: 125%;

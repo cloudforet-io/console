@@ -49,7 +49,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { lsbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
                             const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
@@ -76,7 +76,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: ':dataSourceId/:costQuerySetId',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                     meta: {
-                        lnbVisible: true,
+                        lsbVisible: true,
                         label: ({ params }) => (params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS ? undefined : params.costQuerySetId),
                         copiable: ({ params }) => ![DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
                     },
@@ -113,7 +113,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME),
-                    meta: { lnbVisible: true, menuId: MENU_ID.BUDGET },
+                    meta: { lsbVisible: true, menuId: MENU_ID.BUDGET },
                     component: AdminBudgetMainPage as any,
                 },
                 {
@@ -126,7 +126,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: ':budgetId',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
                     props: true,
-                    meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    meta: { lsbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
                     component: AdminBudgetDetailPage as any,
                 },
             ],
@@ -155,7 +155,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
-                    meta: { lnbVisible: true },
+                    meta: { lsbVisible: true },
                     component: CostReportPage as any,
                 },
             ],

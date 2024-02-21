@@ -15,7 +15,7 @@ const handleMenuDismiss = () => {
 </script>
 
 <template>
-    <div class="cost-explorer-lnb-relocate-dashboard-notification">
+    <div class="cost-explorer-l-s-b-relocate-dashboard-notification">
         <div class="relocate-notification-wrapper">
             <p class="notification-title">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_NOTI_TITLE') }}
@@ -40,7 +40,7 @@ const handleMenuDismiss = () => {
 </template>
 
 <style lang="postcss" scoped>
-.cost-explorer-lnb-relocate-dashboard-notification {
+.cost-explorer-l-s-b-relocate-dashboard-notification {
     padding: 0 0.5rem;
 
     .relocate-notification-wrapper {

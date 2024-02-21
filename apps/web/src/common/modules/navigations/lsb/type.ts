@@ -24,10 +24,10 @@ export interface SelectOptions {
     defaultSelected?: string | number;
 }
 
-export type LNBIcon = string | { name: string; color?: string; };
+export type LSBIcon = string | { name: string; color?: string; };
 export type hightlightTagType = 'new' | 'beta' | 'update';
 
-export interface LNBItem {
+export interface LSBItem {
     type: MenuItemType;
     label?: TranslateResult;
     id?: MenuId | string; // It can be change MenuId or etc.
@@ -36,11 +36,11 @@ export interface LNBItem {
     highlightTag?: hightlightTagType;
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
-    icon?: LNBIcon;
+    icon?: LSBIcon;
     selectOptions?: SelectOptions;
 }
 
-export type LNBMenu = LNBItem[]|LNBItem;
+export type LSBMenu = LSBItem[]|LSBItem;
 
 export interface BackLink {
     label: TranslateResult;

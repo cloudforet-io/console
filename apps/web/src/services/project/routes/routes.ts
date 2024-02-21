@@ -33,7 +33,7 @@ export default {
             name: PROJECT_ROUTE._NAME,
             meta: {
                 menuId: MENU_ID.PROJECT,
-                lnbVisible: true,
+                lsbVisible: true,
             },
             props: true,
             component: ProjectMainPage,

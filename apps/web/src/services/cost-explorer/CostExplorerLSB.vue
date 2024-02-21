@@ -24,7 +24,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import {
-    filterLNBMenuByAccessPermission,
+    filterLSBMenuByAccessPermission,
 } from '@/lib/access-control/page-access-helper';
 import {
     getCompoundKeyWithManagedCostQuerySetFavoriteKey,
@@ -33,16 +33,16 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import LNB from '@/common/modules/navigations/lnb/LNB.vue';
-import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
-import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
-import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+import LSB from '@/common/modules/navigations/lsb/LSB.vue';
+import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
+import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
+import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray } from '@/styles/colors';
 
-import CostExplorerLNBRelocateDashboardModal from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardModal.vue';
-import CostExplorerLNBRelocateDashboardNotification from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardNotification.vue';
+import CostExplorerLSBRelocateDashboardModal from '@/services/cost-explorer/components/CostExplorerLSBRelocateDashboardModal.vue';
+import CostExplorerLSBRelocateDashboardNotification from '@/services/cost-explorer/components/CostExplorerLSBRelocateDashboardNotification.vue';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { RelocateDashboardStatus } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
@@ -77,10 +77,10 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
-    menuSet: computed<LNBMenu[]>(() => {
+    menuSet: computed<LSBMenu[]>(() => {
         const menuSet = [
-            ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
-            ...filterLNBMenuByAccessPermission([
+            ...filterCostAnalysisLSBMenuByPagePermission(state.costAnalysisMenuSet),
+            ...filterLSBMenuByAccessPermission([
                 {
                     type: 'item',
                     id: MENU_ID.BUDGET,
@@ -100,7 +100,7 @@ const state = reactive({
         }
         return menuSet;
     }),
-    costAnalysisMenuSet: computed<LNBMenu[]>(() => [
+    costAnalysisMenuSet: computed<LSBMenu[]>(() => [
         (storeState.isAdminMode ? {} : { type: MENU_ITEM_TYPE.FAVORITE_ONLY }),
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
@@ -115,8 +115,8 @@ const state = reactive({
             type: MENU_ITEM_TYPE.DIVIDER,
         },
     ]),
-    queryMenuSet: computed<LNBMenu>(() => {
-        const currentQueryMenuList: LNBMenu = costQuerySetState.costQuerySetList.map((d) => {
+    queryMenuSet: computed<LSBMenu>(() => {
+        const currentQueryMenuList: LSBMenu = costQuerySetState.costQuerySetList.map((d) => {
             if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
                 return {
                     type: 'item',
@@ -156,7 +156,7 @@ const state = reactive({
             };
         });
 
-        const showMoreMenuSet: LNBMenu = [{
+        const showMoreMenuSet: LSBMenu = [{
             type: 'slot',
             id: SHOW_MORE_MENU_ID,
         }];
@@ -197,7 +197,7 @@ const dataSourceState = reactive({
 const relocateNotificationState = reactive({
     isBannerVisible: false,
     isModalVisible: false,
-    data: computed<LNBItem>(() => {
+    data: computed<LSBItem>(() => {
         const dashboardQuery = new QueryHelper().setFilters([{
             k: 'label',
             v: ['Cost'],
@@ -221,7 +221,7 @@ const relocateNotificationState = reactive({
     userId: computed(() => store.state.user.userId),
 });
 
-const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
+const filterFavoriteItems = (menuItems: LSBItem[] = []): LSBItem[] => {
     if (!state.showFavoriteOnly) return menuItems;
     return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
 };
@@ -236,7 +236,7 @@ const getCurrentCurrencySet = (dataSourceKey: string): string => {
     return result || defaultCurrencySet;
 };
 
-const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
+const filterCostAnalysisLSBMenuByPagePermission = (menuSet: LSBItem[]): LSBItem[] => {
     const pagePermission = store.getters['user/pageAccessPermissionMap'];
     const routeName = MENU_ID.COST_ANALYSIS;
 
@@ -279,14 +279,14 @@ onMounted(() => {
 
 <template>
     <aside class="sidebar-menu">
-        <l-n-b :header="state.header"
+        <l-s-b :header="state.header"
                :menu-set="state.menuSet"
                :show-favorite-only.sync="state.showFavoriteOnly"
         >
             <template v-if="!storeState.isAdminMode"
                       #default
             >
-                <l-n-b-router-menu-item :item="relocateNotificationState.data"
+                <l-s-b-router-menu-item :item="relocateNotificationState.data"
                                         open-new-tab
                 >
                     <template #after-text>
@@ -296,13 +296,13 @@ onMounted(() => {
                              class="link-icon"
                         />
                     </template>
-                </l-n-b-router-menu-item>
-                <cost-explorer-l-n-b-relocate-dashboard-notification
+                </l-s-b-router-menu-item>
+                <cost-explorer-l-s-b-relocate-dashboard-notification
                     v-if="relocateNotificationState.isBannerVisible"
                     @click-dismiss="handleDismissRelocateNotification"
                     @click-learn-more="handleLearnMoreRelocateNotification"
                 />
-                <l-n-b-divider-menu-item />
+                <l-s-b-divider-menu-item />
             </template>
             <template #slot-show-more>
                 <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus" />
@@ -338,8 +338,8 @@ onMounted(() => {
                     </template>
                 </p-select-dropdown>
             </template>
-        </l-n-b>
-        <cost-explorer-l-n-b-relocate-dashboard-modal
+        </l-s-b>
+        <cost-explorer-l-s-b-relocate-dashboard-modal
             v-if="!storeState.isAdminMode"
             :visible.sync="relocateNotificationState.isModalVisible"
         />

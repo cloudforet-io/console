@@ -10,19 +10,19 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
-import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
-import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
-import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
+import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
+import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    menuData: LNBMenu;
+    menuData: LSBMenu;
     currentPath: string;
     depth: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    menuData: () => ({}) as LNBItem,
+    menuData: () => ({}) as LSBItem,
     currentPath: undefined,
     depth: 1,
 });
@@ -30,7 +30,7 @@ const emit = defineEmits<{(e: 'select', id: string, selected: string|number): vo
 const appContextStore = useAppContextStore();
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
+    processedMenuData: computed<LSBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
     isFolded: false,
     isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
     showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
@@ -48,10 +48,10 @@ const handleSelect = (id: string, selected: string) => {
 </script>
 
 <template>
-    <div class="lnb-menu-list">
+    <div class="l-s-b-menu-list">
         <div v-for="(item, idx) in state.processedMenuData"
              :key="item.id"
-             class="lnb-menu-item"
+             class="l-s-b-menu-item"
         >
             <p v-if="item.type === MENU_ITEM_TYPE.TITLE"
                class="title-wrapper"
@@ -103,8 +103,8 @@ const handleSelect = (id: string, selected: string) => {
                                    @update:selected="handleSelect(item.id, $event)"
                 />
             </div>
-            <l-n-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
-            <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
+            <l-s-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
+            <l-s-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
                                     :depth="depth"
                                     :is-admin-mode="state.isAdminMode"
@@ -118,13 +118,13 @@ const handleSelect = (id: string, selected: string) => {
                           v-bind="scope"
                     />
                 </template>
-            </l-n-b-router-menu-item>
+            </l-s-b-router-menu-item>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.lnb-menu-item {
+.l-s-b-menu-list {
     .title-wrapper {
         @apply text-gray-400 font-bold inline-flex items-center;
         font-size: 0.75rem;
