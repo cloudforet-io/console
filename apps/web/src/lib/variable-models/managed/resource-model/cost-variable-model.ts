@@ -13,13 +13,13 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
     idKey = 'cost_id';
 
     // properties
-    cost_id = this.property({ key: 'cost_id', name: 'Cost ID' });
+    cost_id = this.generateProperty({ key: 'cost_id', name: 'Cost ID' });
 
-    product = this.property({ key: 'product', name: 'Product' });
+    product = this.generateProperty({ key: 'product', name: 'Product' });
 
-    usage_type = this.property({ key: 'usage_type', name: 'Usage Type' });
+    usage_type = this.generateProperty({ key: 'usage_type', name: 'Usage Type' });
 
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
     // get keys() {
     //     return [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key];

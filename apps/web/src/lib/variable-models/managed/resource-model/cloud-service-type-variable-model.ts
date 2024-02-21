@@ -20,5 +20,5 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
     }
 
     // properties
-    provider = this.property({ key: 'provider', name: 'Provider' });
+    provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 }
