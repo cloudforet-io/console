@@ -14,18 +14,10 @@
                  :style="{ height: globalUIGetters.appBodyHeight }"
             >
                 <portal-target name="page-top-notification" />
-                <div class="header"
-                     :class="{'without-breadcrumbs': !breadcrumbs.length}"
-                >
-                    <p-breadcrumbs v-if="breadcrumbs.length"
-                                   :routes="breadcrumbs"
-                                   :copiable="copiable"
-                    />
+                <div class="header">
                     <slot name="handbook" />
                 </div>
-                <div class="page-contents"
-                     :class="{'without-breadcrumbs': !breadcrumbs.length}"
-                >
+                <div class="page-contents">
                     <slot name="default" />
                 </div>
                 <div class="fnb">
@@ -37,19 +29,17 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
-import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
+import { PVerticalLayout } from '@spaceone/design-system';
 
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 export default {
     name: 'VerticalPageLayout',
-    components: { PVerticalLayout, PBreadcrumbs, FNB },
+    components: { PVerticalLayout, FNB },
     props: {
         initWidth: {
             type: Number,
@@ -62,10 +52,6 @@ export default {
         maxWidth: {
             type: Number,
             default: 400,
-        },
-        breadcrumbs: {
-            type: Array as PropType<Breadcrumb[]>,
-            default: () => [],
         },
     },
     setup(props) {
@@ -84,10 +70,6 @@ export default {
         return {
             containerRef,
             globalUIGetters,
-            copiable: computed(() => {
-                const last = props.breadcrumbs?.[props.breadcrumbs.length - 1];
-                return last?.copiable;
-            }),
         };
     },
 };

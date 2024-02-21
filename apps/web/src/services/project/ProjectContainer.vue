@@ -8,9 +8,7 @@ import ProjectLNB from '@/services/project/ProjectLNB.vue';
 
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
-                              :breadcrumbs="undefined"
-        >
+        <vertical-page-layout v-if="$route.meta.lnbVisible">
             <template #sidebar>
                 <project-l-n-b />
             </template>
@@ -23,9 +21,7 @@ import ProjectLNB from '@/services/project/ProjectLNB.vue';
         >
             <router-view />
         </centered-page-layout>
-        <general-page-layout v-else
-                             :breadcrumbs="undefined"
-        >
+        <general-page-layout v-else>
             <router-view />
         </general-page-layout>
     </fragment>
