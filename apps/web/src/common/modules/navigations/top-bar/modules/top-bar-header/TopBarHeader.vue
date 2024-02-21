@@ -59,12 +59,14 @@ const state = reactive({
                     name: _workspace.workspace_id,
                     label: _workspace.name,
                     headerName: 'starred_header',
+                    tags: _workspace.tags,
                 } as SelectDropdownMenuItem);
             } else {
                 menuList.push({
                     name: _workspace.workspace_id,
                     label: _workspace.name,
                     headerName: 'workspace_header',
+                    tags: _workspace.tags,
                 } as SelectDropdownMenuItem);
             }
             return menuList;
@@ -163,7 +165,13 @@ const selectWorkspace = (name: string): void => {
             </template>
             <template #menu-item--format="{item}">
                 <div class="menu-item-wrapper">
-                    <span class="label">{{ item.label }}</span>
+                    <div class="label">
+                        <workspace-logo-icon :text="item?.label || ''"
+                                             :theme="item?.tags?.theme"
+                                             size="xs"
+                        />
+                        <span>{{ item.label }}</span>
+                    </div>
                     <favorite-button :item-id="item.name"
                                      :favorite-type="FAVORITE_TYPE.MENU"
                                      scale="0.875"
@@ -273,6 +281,10 @@ const selectWorkspace = (name: string): void => {
 
         .menu-item-wrapper {
             @apply flex justify-between;
+
+            .label {
+                @apply flex items-center gap-1;
+            }
         }
 
         .workspace-toolbox-wrapper {
