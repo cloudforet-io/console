@@ -11,6 +11,11 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone, isEmpty } from 'lodash';
 
+import { store } from '@/store';
+
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -53,6 +58,14 @@ const state = reactive({
         const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
         return targetMenuId;
     }),
+    currentMenuId: computed(() => route.matched[route.matched.length - 1].meta?.menuId),
+    favoriteOptions: computed<FavoriteOptions|undefined>(() => {
+        if (!state.currentMenuId) return undefined;
+        return {
+            type: FAVORITE_TYPE.MENU,
+            id: state.currentMenuId,
+        };
+    }),
 });
 
 const handleClickMenuButton = () => {
@@ -68,9 +81,17 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
     }
 };
 
-watch(() => state.selectedMenuId, () => {
-    topBarHeaderStore.initState();
+watch(() => state.selectedMenuId, async () => {
+    await topBarHeaderStore.initState();
+    await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
 });
+watch(() => state.currentMenuId, async () => {
+    await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
+});
+
+(async () => {
+    await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
+})();
 </script>
 
 <template>
@@ -87,7 +108,7 @@ watch(() => state.selectedMenuId, () => {
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button v-if="!isEmpty(topBarHeaderGetters.favoriteItem)"
+            <favorite-button v-if="state.routes.length > 0 && !isEmpty(topBarHeaderGetters.favoriteItem)"
                              :item-id="topBarHeaderGetters.favoriteItem.id || ''"
                              :favorite-type="topBarHeaderGetters.favoriteItem.type || ''"
                              scale="0.8"

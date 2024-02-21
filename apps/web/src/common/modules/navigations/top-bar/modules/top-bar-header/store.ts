@@ -38,7 +38,7 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
         setSelectedItem: (item: Breadcrumb) => {
             state.selectedItem = item;
         },
-        setFavoriteItemId: (favoriteItem: FavoriteOptions) => {
+        setFavoriteItemId: (favoriteItem?: FavoriteOptions) => {
             state.favoriteItem = favoriteItem;
         },
         initState: () => {
