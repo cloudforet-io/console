@@ -31,7 +31,7 @@ export const useTopBarHeaderStore = defineStore('top-bar-header', () => {
         setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
             state.breadcrumbs = breadcrumbs;
         },
-        setId: (id: string) => {
+        setId: (id?: string) => {
             state.id = id;
         },
 

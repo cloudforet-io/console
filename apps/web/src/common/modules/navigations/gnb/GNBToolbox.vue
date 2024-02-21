@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { useWindowSize } from '@vueuse/core';
+import { computed, reactive } from 'vue';
 
-import { PIconButton, PBreadcrumbs, PCopyButton } from '@spaceone/design-system';
+import {
+    PIconButton, PBreadcrumbs, PCopyButton, screens,
+} from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -19,11 +22,14 @@ const props = withDefaults(defineProps<Props>(), {
 const topBarHeaderStore = useTopBarHeaderStore();
 const topBarHeaderGetters = topBarHeaderStore.getters;
 
+const { width } = useWindowSize();
+
 const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
 }>();
 
 const state = reactive({
     proxyIsMinimizeGnb: useProxyValue('isMinimizeGnb', props, emit),
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
 const handleClickMenuButton = () => {
@@ -56,13 +62,15 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
         </div>
-        <div class="extra-section">
+        <div v-if="topBarHeaderGetters.id"
+             class="extra-section"
+        >
             <b>{{ $t('COMMON.GNB.TOOLBOX.ID') }}: </b>
-            <!-- TODO: apply data-->
             <p-copy-button class="copy-button"
                            size="sm"
+                           :value="topBarHeaderGetters.id"
             >
-                data id
+                {{ state.isMobileSize ? '' : topBarHeaderGetters.id }}
             </p-copy-button>
         </div>
     </div>
@@ -94,6 +102,13 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
         .copy-button {
             @apply flex items-center text-gray-500;
         }
+    }
+}
+
+/* custom design-system component - p-copy-button */
+:deep(.p-copy-button) {
+    .copy-button-alert {
+        top: calc($top-bar-height + $gnb-toolbox-height - 0.5rem) !important;
     }
 }
 </style>
