@@ -118,7 +118,7 @@ const handleClickClose = () => {
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
-    name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
+    name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
 });
 
 defineExpose({ setPathFrom });

@@ -208,7 +208,7 @@ const relocateNotificationState = reactive({
             id: MENU_ID.DASHBOARDS,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
             to: getProperRouteLocation({
-                name: DASHBOARDS_ROUTE.ALL._NAME,
+                name: DASHBOARDS_ROUTE._NAME,
                 query: {
                     filters: dashboardQuery,
                 },
