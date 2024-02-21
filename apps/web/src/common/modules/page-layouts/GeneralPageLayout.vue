@@ -2,19 +2,11 @@
     <div class="general-page-layout"
          :class="overflow"
     >
-        <div class="header"
-             :class="{'without-breadcrumbs': !breadcrumbs.length}"
-        >
-            <p-breadcrumbs v-if="breadcrumbs.length"
-                           :routes="breadcrumbs"
-                           :copiable="copiable"
-            />
+        <div class="header">
             <slot name="handbook" />
         </div>
 
-        <div class="page-contents"
-             :class="{'without-breadcrumbs': !breadcrumbs.length}"
-        >
+        <div class="page-contents">
             <slot />
         </div>
         <div class="fnb">
@@ -25,34 +17,17 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { computed } from 'vue';
-
-import { PBreadcrumbs } from '@spaceone/design-system';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 export default {
     name: 'GeneralPageLayout',
-    components: { PBreadcrumbs, FNB },
+    components: { FNB },
     props: {
-        breadcrumbs: {
-            type: Array as PropType<Breadcrumb[]>,
-            default: () => [],
-        },
         overflow: {
             type: String as PropType<'auto'|'scroll'>,
             default: 'auto',
         },
-    },
-    setup(props) {
-        return {
-            copiable: computed(() => {
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
-                return last?.copiable;
-            }),
-        };
     },
 };
 </script>

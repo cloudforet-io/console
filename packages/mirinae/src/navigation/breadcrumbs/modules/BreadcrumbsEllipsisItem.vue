@@ -20,7 +20,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
-const emit = defineEmits<{(e: 'click'): void}>();
+const emit = defineEmits<{(e: 'click'): void,
+    (e: 'click-menu', value: MenuItem): void,
+}>();
 
 const containerRef = ref<HTMLElement | null>(null);
 const contextMenuRef = ref<HTMLElement | null>(null);
@@ -51,8 +53,9 @@ const handleClickItem = () => {
     }
 };
 const handleSelectMenu = (value) => {
-    if (value[0]?.to) {
-        router.push(value[0]?.to);
+    emit('click-menu', value);
+    if (value?.to) {
+        router.push(value?.to);
     }
 };
 
@@ -81,7 +84,7 @@ onClickOutside(containerRef, hideContextMenu);
                         :menu="props.menu"
                         :style="contextMenuStyle"
                         :selected="state.selectedMenu"
-                        @update:selected="handleSelectMenu"
+                        @select="handleSelectMenu"
         />
     </span>
 </template>

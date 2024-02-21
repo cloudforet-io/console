@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PBreadcrumbs, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
+    PBadge, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -32,6 +32,7 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -50,6 +51,7 @@ const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const topBarHeaderStore = useTopBarHeaderStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
@@ -65,7 +67,7 @@ const state = reactive({
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
-        const results: Route[] = [
+        let results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
@@ -74,7 +76,19 @@ const state = reactive({
                 to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
-        results.push({ name: state.item?.name });
+        if (route.name === PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME) {
+            results = results.concat([
+                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
+            ]);
+        } else if (route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
+            results = results.concat([
+                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
+            ]);
+        } else {
+            results.push({ name: state.item?.name });
+        }
         return results;
     }),
     counts: computed(() => ({
@@ -185,6 +199,10 @@ watch([
     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
+watch([() => singleItemTabState.activeTab, () => state.item], () => {
+    topBarHeaderStore.setBreadcrumbs(state.pageNavigation);
+});
+
 onUnmounted(() => {
     projectDetailPageStore.reset();
 });
@@ -196,7 +214,6 @@ onUnmounted(() => {
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
-            <p-breadcrumbs :routes="state.pageNavigation" />
             <div v-if="state.item"
                  class="top-wrapper"
             >
