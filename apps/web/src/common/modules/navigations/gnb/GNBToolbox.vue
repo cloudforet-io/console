@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PIconButton, PBreadcrumbs, PCopyButton, screens,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { clone, isEmpty } from 'lodash';
 
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
@@ -23,7 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
 const topBarHeaderStore = useTopBarHeaderStore();
 const topBarHeaderGetters = topBarHeaderStore.getters;
 
+const route = useRoute();
 const { width } = useWindowSize();
+const { breadcrumbs } = useBreadcrumbs();
 
 const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
 }>();
@@ -31,6 +41,18 @@ const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
 const state = reactive({
     proxyIsMinimizeGnb: useProxyValue('isMinimizeGnb', props, emit),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
+    routes: computed(() => {
+        if (topBarHeaderGetters.breadcrumbs.length === 0) {
+            return breadcrumbs.value;
+        }
+        return topBarHeaderGetters.breadcrumbs;
+    }),
+    selectedMenuId: computed(() => {
+        const reversedMatched = clone(route.matched).reverse();
+        const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        return targetMenuId;
+    }),
 });
 
 const handleClickMenuButton = () => {
@@ -45,6 +67,10 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
         if (selectedItem) topBarHeaderStore.setSelectedItem(selectedItem);
     }
 };
+
+watch(() => state.selectedMenuId, () => {
+    topBarHeaderStore.initState();
+});
 </script>
 
 <template>
@@ -57,13 +83,13 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
                            size="md"
                            @click="handleClickMenuButton"
             />
-            <p-breadcrumbs v-if="topBarHeaderGetters.breadcrumbs.length > 0"
-                           :routes="topBarHeaderGetters.breadcrumbs"
+            <p-breadcrumbs :routes="state.routes"
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button :item-id="topBarHeaderGetters.favoriteItem?.id"
-                             :favorite-type="topBarHeaderGetters.favoriteItem?.type"
+            <favorite-button v-if="!isEmpty(topBarHeaderGetters.favoriteItem)"
+                             :item-id="topBarHeaderGetters.favoriteItem.id || ''"
+                             :favorite-type="topBarHeaderGetters.favoriteItem.type || ''"
                              scale="0.8"
                              class="favorite-button"
             />
