@@ -1,6 +1,9 @@
+import type { UserModel } from '@/schema/identity/user/model';
+
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class UserVariableModel extends ResourceVariableModel {
+
+export default class UserVariableModel extends ResourceVariableModel<UserModel> {
     key = 'user';
 
     name = 'User';

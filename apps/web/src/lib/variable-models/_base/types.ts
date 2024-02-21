@@ -1,7 +1,6 @@
 import type { ResourceGroupType } from '@/schema/_common/type';
 
 // variable models
-type LabelsSchemaType = 'FILTER'|string;
 export interface IBaseVariableModel {
     key: string;
     name: string;
@@ -13,29 +12,30 @@ export interface IBaseVariableModel {
     prefetch?: boolean; // whether to prefetch data on site init
     //
     scope?: {
-        resourceGroup?: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
+        resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
         value?: string;
     };
-    labelsSchema?: Record<string, {
-        key: string;
-        name: string;
-        type: LabelsSchemaType;
-    }>;
-    labels?: {
-        [labelKey: string]: any;
-    };
+    fixedOptions: Record<string, any>;
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
 }
+// resourceType: string;
+// resourceKey?: string;
+// idKey: string;
+// nameKey: string;
+// only: string[];
+// searchTargets: string[];
+// nameFormatter: (data: any) => string;
 export interface IResourceVariableModel extends IBaseVariableModel {
     resourceType: string;
-    resourceKey?: string;
     idKey: string;
     nameKey: string;
     only: string[];
     searchTargets: string[];
     nameFormatter: (data: any) => string;
+    //
+    keys?(): string[];
 }
 export interface IResourceValueVariableModel extends IBaseVariableModel {
     resourceType: string;

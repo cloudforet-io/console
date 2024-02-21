@@ -14,6 +14,7 @@ import type {
 export interface ManagedVariableModelConfig {
     type: 'MANAGED';
     key: ManagedVariableModelKey;
+    dataKey?: string;
     name?: string;
 }
 export interface VariableModelAdditionalConfig {
@@ -31,15 +32,15 @@ export class VariableModel implements IBaseVariableModel {
 
     scope: IBaseVariableModel['scope'];
 
-    labelsSchema: IBaseVariableModel['labelsSchema'];
+    // labelsSchema: IBaseVariableModel['labelsSchema'];
 
-    labels: IBaseVariableModel['labels'];
+    // labels: IBaseVariableModel['labels'];
 
     #model: IBaseVariableModel;
 
     #type: VariableModelConfigType;
 
-    constructor(config: VariableModelConfig) {
+    constructor(config: VariableModelConfig, additionalConfig?: VariableModelAdditionalConfig) {
         if (config.type === 'MANAGED') {
             if (!config.key) throw new Error('key is required');
             const Model = MANAGED_VARIABLE_MODELS[config.key];

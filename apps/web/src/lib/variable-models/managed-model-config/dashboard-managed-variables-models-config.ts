@@ -4,7 +4,7 @@ import type {
     IEnumVariableModel,
     IResourceVariableModel,
 } from '@/lib/variable-models/_base/types';
-import MANAGED_VARIABLE_MODELS from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 interface ManagedVariableModel {
@@ -14,18 +14,9 @@ interface ManagedVariableModel {
         key?: string;
         referenceKey?: string;
         prefetch?: boolean;
-        labelsSchema?: IBaseVariableModel['labelsSchema'];
     };
     additionalConfig?: VariableModelAdditionalConfig;
 }
-
-const DASHBOARD_LABELS_SCHEMA = {
-    provider: {
-        key: 'provider',
-        name: 'Provider',
-        type: 'FILTER',
-    },
-};
 
 const DASHBOARD_MANAGED_VARIABLE_MODELS: Record<string, ManagedVariableModel> = {
     // [MANAGED_VARIABLE_MODELS]
@@ -38,7 +29,9 @@ const DASHBOARD_MANAGED_VARIABLE_MODELS: Record<string, ManagedVariableModel> = 
     // asset_default_field: AssetDefaultFieldVariableModel,
     // // resource name variable model
     // cost_data_source: CostDataSourceVariableModel,
-    // provider: ProviderVariableModel,
+    provider: {
+        model: MANAGED_VARIABLE_MODELS.provider,
+    },
     // cloud_service_query_set: CloudServiceQuerySetVariableModel,
     // cloud_service_type: CloudServiceTypeVariableModel,
     // collector: CollectorVariableModel,
@@ -58,8 +51,7 @@ const DASHBOARD_MANAGED_VARIABLE_MODELS: Record<string, ManagedVariableModel> = 
         config: {
             key: 'cost_product',
             name: 'Product (Cost)',
-            referenceKey: 'product',
-            labelsSchema: DASHBOARD_LABELS_SCHEMA,
+            dataKey: 'product',
         },
     },
     // cost_usage_type: CostUsageTypeVariableModel,

@@ -13,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariableModel {
+export default class AssetAdditionalInfoKeyVariableModel implements z {
     key = 'asset_additional_info_key';
 
     name = 'Asset Additional Info';

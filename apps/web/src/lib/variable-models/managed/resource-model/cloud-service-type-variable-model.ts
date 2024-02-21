@@ -1,6 +1,8 @@
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 
-export default class CloudServiceTypeVariableModel extends ResourceVariableModel {
+export default class CloudServiceTypeVariableModel extends ResourceVariableModel<CloudServiceTypeModel> {
     key = 'cloud_service_type';
 
     name = 'Cloud Service Type';
@@ -16,4 +18,7 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
     nameFormatter(data: any): string {
         return `${data.group} > ${data[this.nameKey]}`;
     }
+
+    // properties
+    provider = this.property({ key: 'provider', name: 'Provider' });
 }

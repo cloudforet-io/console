@@ -2,7 +2,6 @@ import type {
     IBaseVariableModel,
     IEnumVariableModel,
     IResourceVariableModel,
-    Value,
 } from '@/lib/variable-models/_base/types';
 import AssetAdditionalInfoKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-additional-info-key-variable-model';
 import AssetDataKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/asset-data-key-variable-model';
@@ -15,6 +14,7 @@ import CostDefaultFieldVariableModel from '@/lib/variable-models/managed/enum-mo
 import GranularityVariableModel from '@/lib/variable-models/managed/enum-model/granularity-variable-model';
 import CloudServiceQuerySetVariableModel from '@/lib/variable-models/managed/resource-model/cloud-service-query-set-variable-model';
 import CloudServiceTypeVariableModel from '@/lib/variable-models/managed/resource-model/cloud-service-type-variable-model';
+import CloudServiceVariableModel from '@/lib/variable-models/managed/resource-model/cloud-service-variable-model';
 import CollectorVariableModel from '@/lib/variable-models/managed/resource-model/collector-variable-model';
 import CostDataSourceVariableModel from '@/lib/variable-models/managed/resource-model/cost-data-source-variable-model';
 import CostVariableModel from '@/lib/variable-models/managed/resource-model/cost-variable-model';
@@ -39,6 +39,7 @@ const RESOURCE_VARIABLE_MODELS: Record<string, new () => IResourceVariableModel>
     cost_data_source: CostDataSourceVariableModel,
     provider: ProviderVariableModel,
     cloud_service_query_set: CloudServiceQuerySetVariableModel,
+    cloud_service: CloudServiceVariableModel,
     cloud_service_type: CloudServiceTypeVariableModel,
     collector: CollectorVariableModel,
     project_group: ProjectGroupVariableModel,
@@ -64,34 +65,8 @@ export const MANAGED_VARIABLE_MODELS: Record<string, new () => IBaseVariableMode
     ...CUSTOM_RESOURCE_VARIABLE_MODELS,
 };
 
-
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
-interface ModelConfig {
-    key: ManagedVariableModelKey;
-    name: string;
-    values?: Value[];
-    resourceType?: string;
-    idKey?: string;
-    referenceKey?: string;
-    prefetch?: boolean;
-}
-export const MANAGED_VARIABLE_MODEL_CONFIGS: Record<ManagedVariableModelKey, ModelConfig> = {} as any;
+export const MANAGED_VARIABLE_MODEL_KEY_MAP: Record<ManagedVariableModelKey, string> = {};
 Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
-    const model = new MANAGED_VARIABLE_MODELS[key]();
-    Object.defineProperty(MANAGED_VARIABLE_MODEL_CONFIGS, key, {
-        configurable: false,
-        writable: false,
-        value: {
-            key: model.key,
-            name: model.name,
-            values: (model as IEnumVariableModel).values,
-            resourceType: (model as IResourceVariableModel).resourceType,
-            idKey: (model as IResourceVariableModel).idKey,
-            prefetch: model.prefetch,
-        },
-    });
+    MANAGED_VARIABLE_MODEL_KEY_MAP[key as ManagedVariableModelKey] = key;
 });
-
-
-
-export default MANAGED_VARIABLE_MODELS;
