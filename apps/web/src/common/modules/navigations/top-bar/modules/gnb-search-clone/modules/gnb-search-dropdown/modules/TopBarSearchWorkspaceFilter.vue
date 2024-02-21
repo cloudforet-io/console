@@ -81,6 +81,5 @@ const handleCheckAll = (val) => {
             width: 9.625rem;
         }
     }
-
 }
 </style>
