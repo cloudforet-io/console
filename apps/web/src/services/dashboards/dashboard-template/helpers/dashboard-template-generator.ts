@@ -9,9 +9,8 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import getRandomId from '@/lib/random-id-generator';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
@@ -55,7 +54,7 @@ const COST_VARIABLE_KEYS: string[] = [
     MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
 ];
 export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode = false): DashboardVariablesSchema => {
-    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
+    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA);
 
     if (!isAdminMode) {
         delete _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key];

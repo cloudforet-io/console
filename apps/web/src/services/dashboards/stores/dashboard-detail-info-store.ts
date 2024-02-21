@@ -20,7 +20,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -47,11 +47,11 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
 
 const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
     let projectPropertySchema = {
-        ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
     };
     if (labels?.includes('Asset')) {
         projectPropertySchema = {
-            ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+            ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
         };
     }
     const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };

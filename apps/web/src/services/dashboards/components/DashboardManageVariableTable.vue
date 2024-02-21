@@ -14,7 +14,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
@@ -95,7 +95,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
-                description: MANAGED_DASH_VAR_SCHEMA.properties[d]?.description ?? properties[d].description ?? '',
+                description: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[d]?.description ?? properties[d].description ?? '',
             };
         }
         return {
