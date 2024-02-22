@@ -309,7 +309,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
         </sidebar-title>
 
         <p-data-loader :loading="state.loading">
-            <div class="mx-3">
+            <div>
                 <p-tree :data-fetcher="() => state.allProjectNode"
                         :toggle-options="{disabled: true}"
                         :edit-options="{disabled: true}"
