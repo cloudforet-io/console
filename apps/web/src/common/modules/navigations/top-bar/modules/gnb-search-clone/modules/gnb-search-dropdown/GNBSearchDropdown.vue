@@ -7,18 +7,15 @@ import { PTab } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
 import type { RecentConfig } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
-
-import type { SuggestionMenu } from '@/lib/helper/menu-suggestion-helper';
-import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SuggestionType } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import GNBSearchServiceTab
     from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
+import SearchTabContent
+    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchServiceAccountTab
     from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
@@ -80,8 +77,7 @@ const state = reactive({
 
 const dataState = reactive({
     recentMenuList: [] as RecentConfig[]|null,
-    allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
-    isRecent: computed(() => dataState.recentMenuList?.length > 0),
+    searchMenuList: [],
 });
 
 
@@ -148,7 +144,6 @@ const handleUpdateActiveTab = (tab: string) => {
         >
             <template #service>
                 <g-n-b-search-service-tab
-                    :is-recent="dataState.isRecent"
                     :search-limit="SEARCH_LIMIT"
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
@@ -159,7 +154,6 @@ const handleUpdateActiveTab = (tab: string) => {
             </template>
             <template #service-account>
                 <top-bar-search-service-account-tab
-                    :is-recent="dataState.isRecent"
                     :search-limit="SEARCH_LIMIT"
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
@@ -167,6 +161,20 @@ const handleUpdateActiveTab = (tab: string) => {
                     :style="{ height: state.tabContextHeight + 'px'}"
                     @move-focus-end="handleMoveFocusEnd"
                 />
+            </template>
+            <template #project>
+                <search-tab-content
+                    :search-limit="SEARCH_LIMIT"
+                    :loading="state.loading"
+                    :focusing-direction="props.focusingDirection"
+                    :is-focused="props.isFocused"
+                    :style="{ height: state.tabContextHeight + 'px'}"
+                    @move-focus-end="handleMoveFocusEnd"
+                >
+                    <template #item-format="item">
+                        <p-i :name="item.icon" /><div>{{ item?.label }}</div>
+                    </template>
+                </search-tab-content>
             </template>
         </p-tab>
     </div>
