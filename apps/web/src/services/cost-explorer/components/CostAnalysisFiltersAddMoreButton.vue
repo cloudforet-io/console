@@ -10,7 +10,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-import CostTagKeyVariableModel from '@/lib/variable-models/managed/custom-resource-model/cost-tag-key-variable-model';
+import CostTagKeyVariableModel from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

@@ -14,13 +14,13 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import CostVariableModel from '@/lib/variable-models/managed/resource-model/cost-variable-model';
-import ProjectGroupVariableModel from '@/lib/variable-models/managed/resource-model/project-group-variable-model';
-import ProjectVariableModel from '@/lib/variable-models/managed/resource-model/project-variable-model';
-import ProviderVariableModel from '@/lib/variable-models/managed/resource-model/provider-variable-model';
-import RegionVariableModel from '@/lib/variable-models/managed/resource-model/region-variable-model';
-import ServiceAccountVariableModel from '@/lib/variable-models/managed/resource-model/service-account-variable-model';
-import WorkspaceVariableModel from '@/lib/variable-models/managed/resource-model/workspace-variable-model';
+import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
+import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/project-group-variable-model';
+import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
+import ProviderVariableModel from '@/lib/variable-models/managed-model/resource-model/provider-variable-model';
+import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
+import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
+import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
 import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
