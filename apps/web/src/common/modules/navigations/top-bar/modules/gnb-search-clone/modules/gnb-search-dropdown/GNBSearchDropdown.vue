@@ -172,7 +172,7 @@ const handleUpdateActiveTab = (tab: string) => {
                     @move-focus-end="handleMoveFocusEnd"
                 >
                     <template #item-format="item">
-                        <p-i :name="item.icon" /><div>{{ item?.label }}</div>
+                        <div>{{ item?.label }}</div>
                     </template>
                 </search-tab-content>
             </template>

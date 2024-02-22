@@ -53,7 +53,17 @@ const state = reactive({
     refinedSearchMenu: computed(() => state.searchMenuMap),
     recentMenuList: computed(() => topBarSearchStore.state.recentMenuList),
     serviceMenuCount: computed(() => Object.keys(state.searchMenuMap).length),
-    selectedWorkspaceList: computed(() => workspaceStoreGetter.workspaceList.filter((workspace) => topBarSearchStore.state.selectedWorkspaces.includes(workspace.workspace_id))),
+    currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
+    selectedWorkspaceList: computed(() => {
+        const isSelectedWorkspace = (id:string) => topBarSearchStore.state.selectedWorkspaces.includes(id);
+        const selectedWorkspaceList = workspaceStoreGetter.workspaceList.filter((workspace) => isSelectedWorkspace(workspace.workspace_id));
+        const orderedSelectedWorkspaceList = selectedWorkspaceList.sort((a, b) => {
+            if (a.workspace_id === state.currentWorkspaceId) return -1;
+            if (b.workspace_id === state.currentWorkspaceId) return 1;
+            return 0;
+        });
+        return orderedSelectedWorkspaceList;
+    }),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
     focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
