@@ -1,9 +1,5 @@
-import type { ResourceGroupType } from '@/schema/_common/type';
-
 // variable models
 export interface IBaseVariableModel {
-    // key: string;
-    // name: string;
     meta?: Record<string, any>;
     list(query?: ListQuery): Promise<ListResponse>;
     nameFormatter?: (data: any) => string;
@@ -42,10 +38,9 @@ export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
     keys?(): string[];
     [propertyKey: string]: PropertyObject<T> | any;
 }
-export interface IResourceValueVariableModel extends IBaseVariableModel {
-    resourceType: string;
-    referenceKey: string;
-}
+
+export type VariableModel = IBaseVariableModel | IEnumVariableModel | IResourceVariableModel;
+
 
 // property
 export interface PropertyOptions<T> {
