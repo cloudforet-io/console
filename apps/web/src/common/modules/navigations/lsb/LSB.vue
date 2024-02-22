@@ -11,7 +11,6 @@ import {
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import getRandomId from '@/lib/random-id-generator';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vue';
 import type {
     BackLink, LSBMenu, TopTitle,
@@ -19,28 +18,22 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    header?: string;
     backLink?: BackLink;
     topTitle?: TopTitle;
     menuSet: LSBMenu[];
-    showFavoriteOnly?: boolean;
     hideHeader?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    header: '',
     backLink: () => ({}) as BackLink,
     topTitle: () => ({}) as TopTitle,
     menuSet: () => [],
-    showFavoriteOnly: undefined,
 });
 const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void;
-    (e: 'update:show-favorite-only', value: boolean): void;
 }>();
 const route = useRoute();
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
 });
 const handleSelect = (id: string, selected: string) => {
     emit('select', id, selected);
@@ -51,35 +44,35 @@ const handleSelect = (id: string, selected: string) => {
 <template>
     <aside class="l-s-b">
         <div class="menu-wrapper">
-            <router-link v-if="backLink.label"
+            <router-link v-if="props.backLink.label"
                          class="back-link"
-                         :to="backLink.to"
+                         :to="props.backLink.to"
             >
                 <p-i name="ic_chevron-left"
                      width="1rem"
                      height="1rem"
                      color="inherit transparent"
                 />
-                {{ backLink.label }}
+                {{ props.backLink.label }}
             </router-link>
             <slot />
-            <div v-if="topTitle.label"
+            <div v-if="props.topTitle.label"
                  class="top-title"
             >
                 <div class="icon-label-wrapper">
                     <p-lazy-img
-                        v-if="topTitle.icon"
-                        :src="assetUrlConverter(topTitle.icon)"
+                        v-if="props.topTitle.icon"
+                        :src="assetUrlConverter(props.topTitle.icon)"
                         width="1.5rem"
                         height="1.5rem"
                         class="icon"
                     />
-                    <span :class="{'icon-label': topTitle.icon}"
+                    <span :class="{'icon-label': props.topTitle.icon}"
                           class="label"
-                    >{{ topTitle.label }}</span>
+                    >{{ props.topTitle.label }}</span>
                 </div>
-                <router-link v-if="topTitle.visibleAddButton"
-                             :to="topTitle.addButtonLink"
+                <router-link v-if="props.topTitle.visibleAddButton"
+                             :to="props.topTitle.addButtonLink"
                 >
                     <p-i name="ic_plus"
                          width="1rem"
@@ -88,7 +81,7 @@ const handleSelect = (id: string, selected: string) => {
                     />
                 </router-link>
             </div>
-            <template v-for="(menuData, idx) in menuSet">
+            <template v-for="(menuData, idx) in props.menuSet">
                 <div v-if="menuData.type === MENU_ITEM_TYPE.SLOT"
                      :key="`${idx}-${getRandomId()}`"
                      class="slot-menu-wrapper"
@@ -128,9 +121,7 @@ const handleSelect = (id: string, selected: string) => {
         line-height: 125%;
     }
     .menu-wrapper {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-        padding-bottom: 2rem;
+        padding: 1rem 0.5rem 2rem;
     }
     .divider {
         margin-bottom: 1.25rem;
@@ -145,11 +136,6 @@ const handleSelect = (id: string, selected: string) => {
             @apply text-gray-800 cursor-pointer;
             text-decoration: underline;
         }
-    }
-    .favorite-only-wrapper {
-        @apply flex justify-between items-center text-gray-500;
-        font-size: 0.75rem;
-        padding: 0 0.5rem;
     }
     .slot-menu-wrapper {
         @apply flex items-center;

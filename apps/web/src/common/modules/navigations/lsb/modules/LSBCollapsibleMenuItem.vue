@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    isCollapsed: true,
+    isCollapsed: false,
 });
 
 const handleClickCollapsibleTitle = () => {
@@ -38,7 +38,7 @@ const handleClickCollapsibleTitle = () => {
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">
-            <slot name="default" />
+            <slot name="collapsible-contents" />
         </div>
     </div>
 </template>
@@ -54,9 +54,9 @@ const handleClickCollapsibleTitle = () => {
     }
     .collapsible-contents {
         margin-top: 0.5rem;
-        padding-bottom: 0.75rem;
+        padding-bottom: 0.25rem;
         opacity: 1;
-        transition: opacity 0.2s ease;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     &.is-collapsed {
         .collapsible-title {
@@ -65,8 +65,11 @@ const handleClickCollapsibleTitle = () => {
             }
         }
         .collapsible-contents {
-            opacity: 0;
             height: 0;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            transition: opacity 0s ease;
         }
     }
 }
