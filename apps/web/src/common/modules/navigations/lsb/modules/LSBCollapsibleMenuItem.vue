@@ -38,7 +38,9 @@ const handleClickCollapsibleTitle = () => {
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">
-            <slot name="collapsible-contents" />
+            <slot name="collapsible-contents"
+                  v-bind="{...$props}"
+            />
         </div>
     </div>
 </template>

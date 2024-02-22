@@ -130,6 +130,7 @@ const handleSelect = (id: string, selected: string) => {
         @apply flex items-center;
         height: 2rem;
         margin-bottom: 0.5rem;
+        margin-left: 0.5rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;
