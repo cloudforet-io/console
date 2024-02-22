@@ -121,7 +121,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
         MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
         MANAGED_VARIABLE_MODEL_KEY_MAP.region,
-        // MANAGED_VARIABLE_MODEL_KEY_MAP.cost_product,
-        // MANAGED_VARIABLE_MODEL_KEY_MAP.asset_account,
+        'cost_product',
+        'asset_account',
     ],
 };
