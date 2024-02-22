@@ -10,6 +10,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
@@ -103,6 +104,9 @@ const handleSelect = (id: string, selected: string) => {
                                    @update:selected="handleSelect(item.id, $event)"
                 />
             </div>
+            <l-s-b-collapsible-menu-item v-else-if="item.type === MENU_ITEM_TYPE.COLLAPSIBLE"
+                                         :item="item"
+            />
             <l-s-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
             <l-s-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
