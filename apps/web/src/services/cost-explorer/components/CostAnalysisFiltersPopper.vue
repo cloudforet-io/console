@@ -11,17 +11,13 @@ import { cloneDeep } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import { VariableModelFactory } from '@/lib/variable-models';
 import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
-import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/project-group-variable-model';
-import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
-import ProviderVariableModel from '@/lib/variable-models/managed-model/resource-model/provider-variable-model';
-import RegionVariableModel from '@/lib/variable-models/managed-model/resource-model/region-variable-model';
-import ServiceAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/service-account-variable-model';
-import WorkspaceVariableModel from '@/lib/variable-models/managed-model/resource-model/workspace-variable-model';
-import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
+import {
+    MANAGED_VARIABLE_MODEL_KEY_MAP,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -36,15 +32,20 @@ const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 
-const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModelMenuHandlerInfo> = {
-    [GROUP_BY.WORKSPACE]: { variableModel: new WorkspaceVariableModel() },
-    [GROUP_BY.PROJECT]: { variableModel: new ProjectVariableModel() },
-    [GROUP_BY.PROJECT_GROUP]: { variableModel: new ProjectGroupVariableModel() },
-    [GROUP_BY.PRODUCT]: { variableModel: new CostVariableModel(), dataKey: 'product' },
-    [GROUP_BY.PROVIDER]: { variableModel: new ProviderVariableModel() },
-    [GROUP_BY.SERVICE_ACCOUNT]: { variableModel: new ServiceAccountVariableModel() },
-    [GROUP_BY.REGION]: { variableModel: new RegionVariableModel() },
-    [GROUP_BY.USAGE_TYPE]: { variableModel: new CostVariableModel(), dataKey: 'usage_type' },
+interface VariableOption {
+    key: ManagedVariableModelKey;
+    dataKey?: string;
+}
+
+const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
+    [GROUP_BY.WORKSPACE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    [GROUP_BY.PROJECT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
+    [GROUP_BY.PROJECT_GROUP]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
+    [GROUP_BY.PRODUCT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
+    [GROUP_BY.PROVIDER]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
+    [GROUP_BY.SERVICE_ACCOUNT]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
+    [GROUP_BY.REGION]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
+    [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
@@ -82,10 +83,14 @@ const state = reactive({
 
 const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
-        let variableModelInfo = GROUP_BY_TO_VAR_MODELS[groupBy];
+        const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
+        let variableModelInfo = {
+            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
+            dataKey: _variableOption.dataKey,
+        };
         if (!variableModelInfo) {
             variableModelInfo = {
-                variableModel: new CostVariableModel(),
+                variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost }),
                 dataKey: groupBy,
             };
         }
