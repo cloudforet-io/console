@@ -18,7 +18,12 @@ import type {
 import {
     MANAGED_VARIABLE_MODEL_KEY_MAP,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+import type {
+    VariableModelMenuHandlerInfo,
+} from '@/lib/variable-models/variable-model-menu-handler';
+import {
+    getVariableModelMenuHandler,
+} from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -83,12 +88,14 @@ const state = reactive({
 
 const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
+        let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
-        let variableModelInfo = {
-            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
-            dataKey: _variableOption.dataKey,
-        };
-        if (!variableModelInfo) {
+        if (_variableOption) {
+            variableModelInfo = {
+                variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: _variableOption.key }),
+                dataKey: _variableOption.dataKey,
+            };
+        } else {
             variableModelInfo = {
                 variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost }),
                 dataKey: groupBy,
