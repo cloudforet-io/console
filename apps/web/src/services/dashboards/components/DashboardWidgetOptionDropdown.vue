@@ -16,9 +16,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {
     InheritanceMode, InheritOption,
-    InheritOptions, WidgetFiltersMap,
-    WidgetOptionKey,
+    InheritOptions, WidgetOptionKey,
     WidgetOptionsSchemaProperty,
+    WidgetFilterKey,
 } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
@@ -35,8 +35,9 @@ import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import {
-    COST_VALUE_WIDGET_OPTION_CONFIGS, MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES,
+    COST_VALUE_WIDGET_OPTION_CONFIGS,
 } from '@/services/dashboards/widgets/_constants/managed-widget-options-schema.js';
+import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboards/widgets/_helpers/widget-options-filters-helper';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
@@ -279,45 +280,24 @@ const initMenuHandlers = (globalOptionValue?: any) => {
     menuState.contextKey = getRandomId();
 };
 
-const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
-    const targetProperty: WidgetOptionsSchemaProperty = MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES[filterKey];
-    if (!targetProperty) {
-        console.error(new Error(`Invalid widget options filter key: ${filterKey}`));
-        return filtersMap;
-    }
-
-    const _filtersMap = cloneDeep(filtersMap);
-    targetProperty.item_options?.forEach((itemOption) => {
-        const idKey = itemOption.key;
-        const dataKey = itemOption.dataKey;
-        if (!idKey && !dataKey) {
-            console.error(new Error(`Invalid referencing idKey|dataKey of variable model by options filter key: ${filterKey}`));
-        } else {
-            const _value = Array.isArray(value) ? value : [value];
-            // TODO: need to check if it is valid
-            _filtersMap[filterKey] = [{ k: idKey ?? dataKey, v: _value, o: '=' }];
-        }
-    });
-    return _filtersMap;
-};
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
     const widgetOptions = cloneDeep(widgetFormState.widgetOptions);
-    const dataName = propertyName.replace('filters.', '');
+    const dataName = propertyName.replace('filters.', '') as WidgetFilterKey;
 
     // add case
     if (selected?.length && selected[0] !== undefined) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
             const value = selected[0].name as string;
             if (propertyName.startsWith('filters.')) {
-                widgetOptions.filters = addWidgetFilters(dataName, value, widgetOptions.filters);
+                widgetOptions.filters = setFilterAndGetWidgetFiltersMap(widgetOptions.filters, dataName, value);
             } else {
                 widgetOptions[propertyName] = value;
             }
         } else {
             const values = selected.map((item) => item.name) as string[];
             if (propertyName.startsWith('filters.')) {
-                widgetOptions.filters = addWidgetFilters(dataName, values, widgetOptions.filters);
+                widgetOptions.filters = setFilterAndGetWidgetFiltersMap(widgetOptions.filters, dataName, values);
             } else {
                 widgetOptions[propertyName] = values;
             }
