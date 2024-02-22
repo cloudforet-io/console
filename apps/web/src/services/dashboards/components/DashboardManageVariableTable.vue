@@ -2,6 +2,7 @@
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
@@ -10,12 +11,12 @@ import { cloneDeep } from 'lodash';
 
 import type {
     DashboardVariableSchemaProperty,
-    VariableType,
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;
@@ -26,6 +27,8 @@ interface EmitFn {
     (e: 'edit', name: string): void;
     (e: 'clone', name: string): void;
 }
+
+type VariableType = 'ALL'|'MANAGED'|'CUSTOM';
 
 const emit = defineEmits<EmitFn>();
 
@@ -39,7 +42,7 @@ const state = reactive({
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
     ]),
-    selectedVariableType: 'ALL',
+    selectedVariableType: 'ALL' as VariableType,
     variableFields: [
         { name: 'name', label: 'Name', width: '220px' },
         { name: 'selection_type', label: 'Selection Type' },
@@ -52,14 +55,14 @@ const state = reactive({
         SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
         MULTI: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
     })),
-    variableType: computed(() => ({
+    variableType: computed<Partial<Record<VariableType, TranslateResult>>>(() => ({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
 });
 
 /* EVENT */
-const handleSelectType = (selected) => {
+const handleSelectType = (selected: VariableType) => {
     state.selectedVariableType = selected;
 };
 const handleCloneVariable = (propertyName: string) => {
@@ -106,7 +109,11 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
     });
     if (state.selectedVariableType === 'ALL') {
         state.orderedVariables = convertedVariables;
-    } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
+    } else if (state.selectedVariableType === 'MANAGED') {
+        state.orderedVariables = convertedVariables.filter((d) => d.variable_type === 'MANAGED');
+    } else {
+        state.orderedVariables = convertedVariables.filter((d) => d.variable_type !== 'MANAGED');
+    }
 };
 
 watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVariableType], ([_order]) => {

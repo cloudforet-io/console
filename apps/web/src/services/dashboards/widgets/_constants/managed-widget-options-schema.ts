@@ -16,7 +16,7 @@ export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
     },
 } as const;
 
-export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
+export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
     'filters.workspace': {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace,
         name: 'Workspace',
@@ -110,7 +110,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
     },
 };
 
-export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterOptionKey> = {
+export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterOptionKey> = {
     granularity: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.granularity,
         name: 'Granularity',

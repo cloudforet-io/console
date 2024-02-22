@@ -8,9 +8,11 @@ import type {
     WIDGET_SIZE,
 } from '@/schema/dashboard/_constants/widget-constant';
 
+import type { VariableModelType } from '@/lib/variable-models';
+
 
 interface WidgetItemOptions {
-    type: 'MANAGED'|'CUSTOM';
+    type: VariableModelType;
     key: string;
     dataKey?: string;
 }

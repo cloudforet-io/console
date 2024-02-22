@@ -16,28 +16,31 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {
     InheritanceMode, InheritOption,
-    InheritOptions, WidgetFilterKey, WidgetFiltersMap,
-    WidgetOptionKey,
+    InheritOptions, WidgetOptionKey,
     WidgetOptionsSchemaProperty,
+    WidgetFilterKey,
 } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
-import type { VariableModelConfig } from '@/lib/variable-models';
-import { VariableModel } from '@/lib/variable-models';
+import { VariableModelFactory } from '@/lib/variable-models';
+import type {
+    VariableModelMenuHandlerInfo,
+} from '@/lib/variable-models/variable-model-menu-handler';
 import {
-    MANAGED_VARIABLE_MODEL_CONFIGS,
-    ManagedVariableModelKey
-} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+    getVariableModelMenuHandler,
+} from '@/lib/variable-models/variable-model-menu-handler';
 
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import {
     COST_VALUE_WIDGET_OPTION_CONFIGS,
-} from '@/services/dashboards/widgets/_constants/widget-options-schema-constant.js';
+} from '@/services/dashboards/widgets/_constants/managed-widget-options-schema.js';
+import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboards/widgets/_helpers/widget-options-filters-helper';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+
+
 
 const props = defineProps<{
     propertyName: string;
@@ -98,23 +101,13 @@ const state = reactive({
     globalOptionValue: computed<any>(() => widgetFormGetters.globalOptionInfo?.value),
 });
 const menuState = reactive({
-    variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
+    // variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
     menuHandler: undefined as AutocompleteHandler|undefined,
     contextKey: getRandomId(),
 });
 
 /* Util */
-const getVariableModels = (schema?: WidgetOptionsSchemaProperty): VariableModel[] => {
-    if (!schema?.item_options) return [];
-
-    const variableModels: VariableModel[] = [];
-    schema.item_options?.forEach((conf: VariableModelConfig) => {
-        const variableModel = new VariableModel(conf);
-        variableModels.push(variableModel);
-    });
-    return variableModels;
-};
 const getInheritOptionMenuHandler = (schema?: WidgetOptionsSchemaProperty): AutocompleteHandler => {
     if (!schema) return () => ({ results: [] });
 
@@ -255,6 +248,20 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     return results;
 };
 
+const getVariableModelMenuHandlerInfoList = (schema?: WidgetOptionsSchemaProperty): VariableModelMenuHandlerInfo[] => {
+    if (!schema?.item_options) return [];
+
+    const _results: VariableModelMenuHandlerInfo[] = [];
+    schema.item_options?.forEach((conf) => {
+        // TODO: set modelOptions after provider is ready
+        const variableModel = new VariableModelFactory(conf);
+        _results.push({
+            variableModel,
+            dataKey: conf.dataKey,
+        });
+    });
+    return _results;
+};
 const getListQueryOptions = (globalOptionValue?: any) => {
     const globalOptionInfo = widgetFormGetters.globalOptionInfo;
     if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
@@ -267,48 +274,30 @@ const initMenuHandlers = (globalOptionValue?: any) => {
         menuState.menuHandler = menuState.inheritOptionMenuHandler;
     } else {
         const listQueryOptions = getListQueryOptions(globalOptionValue);
-        const variableModels = menuState.variableModels;
-        menuState.menuHandler = getVariableModelMenuHandler(variableModels, listQueryOptions);
+        const variableModelMenuHandlerInfoList = getVariableModelMenuHandlerInfoList(state.schemaProperty);
+        menuState.menuHandler = getVariableModelMenuHandler(variableModelMenuHandlerInfoList, listQueryOptions);
     }
     menuState.contextKey = getRandomId();
 };
 
-const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
-    const modelConf = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as WidgetFilterKey];
-    if (!modelConf) {
-        console.error(new Error(`Invalid widget options filter key: ${filterKey}`));
-        return filtersMap;
-    }
-    const idKey = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].idKey;
-    const referenceKey = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].referenceKey;
-    if (!idKey && !referenceKey) {
-        console.error(new Error(`Invalid referencing idKey|referenceKey of variable model by options filter key: ${filterKey}`));
-        return filtersMap;
-    }
-
-    const _filtersMap = { ...filtersMap };
-    const _value = Array.isArray(value) ? value : [value];
-    _filtersMap[filterKey] = [{ k: idKey ?? referenceKey, v: _value, o: '=' }];
-    return _filtersMap;
-};
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
     const widgetOptions = cloneDeep(widgetFormState.widgetOptions);
-    const dataName = propertyName.replace('filters.', '');
+    const dataName = propertyName.replace('filters.', '') as WidgetFilterKey;
 
     // add case
     if (selected?.length && selected[0] !== undefined) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
             const value = selected[0].name as string;
             if (propertyName.startsWith('filters.')) {
-                widgetOptions.filters = addWidgetFilters(dataName, value, widgetOptions.filters);
+                widgetOptions.filters = setFilterAndGetWidgetFiltersMap(widgetOptions.filters, dataName, value);
             } else {
                 widgetOptions[propertyName] = value;
             }
         } else {
             const values = selected.map((item) => item.name) as string[];
             if (propertyName.startsWith('filters.')) {
-                widgetOptions.filters = addWidgetFilters(dataName, values, widgetOptions.filters);
+                widgetOptions.filters = setFilterAndGetWidgetFiltersMap(widgetOptions.filters, dataName, values);
             } else {
                 widgetOptions[propertyName] = values;
             }
