@@ -133,6 +133,7 @@ const tableState = reactive({
         if (!tableState.schema) return [];
         return tableState.schema.options.fields ?? [];
     }),
+    hasAdminOrWorkspaceOwnerRole: computed(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
 });
 
 const schemaQueryHelper = new QueryHelper();

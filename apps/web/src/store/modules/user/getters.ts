@@ -21,6 +21,8 @@ export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInf
 
 export const hasSystemRole = (state: UserState): boolean => state.roleType === 'SYSTEM_ADMIN';
 
+export const hasAdminOrWorkspaceOwnerRole = (state: UserState): boolean => state.roleType === 'DOMAIN_ADMIN' || state.roleType === 'WORKSPACE_OWNER';
+
 // TODO: this need to calculate with user workspace list
 export const hasPermission = (state: UserState): boolean => !!state.currentRoleInfo;
 
