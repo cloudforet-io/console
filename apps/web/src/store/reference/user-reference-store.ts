@@ -21,7 +21,7 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -78,9 +78,9 @@ export const useUserReferenceStore = defineStore('user-reference', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         userTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.user.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.user.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.user.name,
+            type: MANAGED_VARIABLE_MODELS.user.prototype.meta.key,
+            key: MANAGED_VARIABLE_MODELS.user.prototype.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.user.prototype.meta.name,
             referenceMap: getters.userItems,
         })),
     });
