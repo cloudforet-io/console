@@ -4,6 +4,8 @@ import type {
 } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
+import type { VariableModelType } from '@/lib/variable-models';
+
 
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
@@ -14,14 +16,14 @@ type VariableSelectionType = 'SINGLE' | 'MULTI';
 export type VariableType = 'MANAGED' | 'CUSTOM';
 
 interface DashboardVariableOptions {
-    type: VariableType;
+    type: VariableModelType;
     key: string;
     dataKey?: string;
 }
 
 export interface DashboardVariableSchemaProperty {
     name: string;
-    variable_type: VariableType;
+    variable_type: VariableModelType;
     use: boolean;
     selection_type: VariableSelectionType;
     description?: string;

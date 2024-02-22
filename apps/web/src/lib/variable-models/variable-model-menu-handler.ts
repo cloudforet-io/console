@@ -1,12 +1,12 @@
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import type { IBaseVariableModel, IEnumVariableModel, IResourceVariableModel } from '@/lib/variable-models/_base/types';
+import type { VariableModel } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export interface VariableModelMenuHandlerInfo {
-    variableModel: IBaseVariableModel|IResourceVariableModel|IEnumVariableModel;
+    variableModel: VariableModel;
     dataKey?: string;
 }
 
