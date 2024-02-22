@@ -29,14 +29,14 @@ watch([() => isMobile(), () => route.path], ([isMobileState]) => {
 
 <template>
     <div class="layout-container">
-        <div class="gnb">
+        <nav class="gnb">
             <g-n-b-toolbox class="g-n-b-item"
                            :is-minimize-gnb.sync="state.isMinimizeGnb"
             />
             <g-n-b-navigation-rail class="g-n-b-item"
                                    :is-minimize-gnb="state.isMinimizeGnb"
             />
-        </div>
+        </nav>
         <main class="main"
               :class="{'is-minimize': state.isMinimizeGnb, 'is-mobile': isMobile() }"
         >

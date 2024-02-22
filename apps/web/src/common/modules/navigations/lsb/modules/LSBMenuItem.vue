@@ -7,9 +7,7 @@ import { PI, PSelectDropdown } from '@spaceone/design-system';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
@@ -57,27 +55,19 @@ const handleSelect = (id: string, selected: string) => {
                class="title-wrapper"
             >
                 <span v-if="item.foldable"
-                      class="title foldable"
-                      @click="handleFoldableToggle"
-                >{{ item.label }}</span>
-                <span v-else
-                      class="title"
-                >{{ item.label }}</span>
-                <slot name="title-right"
-                      v-bind="$props"
-                />
-                <new-mark v-if="item.highlightTag === 'new'" />
-                <update-mark v-else-if="item.highlightTag === 'update'" />
-                <beta-mark v-else-if="item.highlightTag === 'beta'" />
-                <span v-if="item.foldable"
                       class="toggle-button"
                       @click="handleFoldableToggle"
                 >
                     <p-i width="1rem"
                          height="1rem"
-                         :name="state.isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         name="ic_chevron-down"
                          color="inherit transparent"
+                         class="arrow-button"
+                         :class="{ 'is-Folded': state.isFolded }"
                     />
+                    <span class="title">
+                        {{ item.label }}
+                    </span>
                 </span>
             </p>
             <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
@@ -103,6 +93,17 @@ const handleSelect = (id: string, selected: string) => {
                                    @update:selected="handleSelect(item.id, $event)"
                 />
             </div>
+            <l-s-b-collapsible-menu-item v-else-if="item.type === MENU_ITEM_TYPE.COLLAPSIBLE"
+                                         :item="item"
+            >
+                <template v-for="(_, slot) of $scopedSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="slot"
+                          v-bind="scope"
+                    />
+                </template>
+            </l-s-b-collapsible-menu-item>
             <l-s-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
             <l-s-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
@@ -129,29 +130,27 @@ const handleSelect = (id: string, selected: string) => {
         @apply text-gray-400 font-bold inline-flex items-center;
         font-size: 0.75rem;
         line-height: 125%;
-        padding-left: 0.5rem;
-        height: 2rem;
-        .title {
-            &.foldable {
-                &:hover {
-                    @apply text-gray-800 cursor-pointer underline;
-                }
-            }
-        }
-
+        padding-top: 0.25rem;
+        padding-left: 0.25rem;
         .toggle-button {
+            @apply text-gray-600 cursor-pointer;
             &:hover {
-                @apply text-gray-800 cursor-pointer;
+                @apply text-gray-600 underline;
+            }
+            .arrow-button {
+                transition: transform 0.3s ease-in-out;
+                &.is-Folded {
+                    transform: rotate(-90deg);
+                }
             }
         }
     }
     .top-title-wrapper {
-        @apply font-bold inline-flex items-center;
-        font-size: 0.75rem;
-        line-height: 125%;
-        padding-top: 1.25rem;
+        @apply text-label-md font-bold inline-flex items-center;
+        height: 2rem;
+        margin-top: 0.25rem;
         padding-left: 0.5rem;
-        padding-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
         .top-title-icon {
             margin-left: 0.25rem;
         }

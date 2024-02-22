@@ -21,6 +21,7 @@ interface Props {
     idx?: number | string;
     currentPath?: string;
     openNewTab?: boolean;
+    isHideFavorite?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -52,8 +53,8 @@ const getIconName = (icon: LSBIcon): string => {
 </script>
 
 <template>
-    <router-link class="l-s-b-router-menu-item"
-                 :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+    <router-link class="l-s-b-router-menu-item "
+                 :class="[{'second-depth': depth === 2, 'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
                  :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click.native="$event.stopImmediatePropagation()"
@@ -116,6 +117,16 @@ const getIconName = (icon: LSBIcon): string => {
     }
     &.selected {
         @apply bg-blue-200;
+    }
+    &.is-hide-favorite {
+        .favorite-button {
+            @apply hidden;
+        }
+        &:hover {
+            .favorite-button {
+                @apply block;
+            }
+        }
     }
     &:hover {
         @apply bg-blue-100 cursor-pointer;

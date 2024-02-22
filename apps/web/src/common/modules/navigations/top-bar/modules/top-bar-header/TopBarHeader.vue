@@ -50,7 +50,7 @@ const state = reactive({
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
         const menuList: SelectDropdownMenuItem[] = [
-            { type: 'header', name: 'starred_header', label: i18n.t('COMMON.GNB.WORKSPACE.STARRED') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') } as SelectDropdownMenuItem,
             { type: 'header', name: 'workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES') } as SelectDropdownMenuItem,
         ];
         state.workspaceList.forEach((_workspace) => {

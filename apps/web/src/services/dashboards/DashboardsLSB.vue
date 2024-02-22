@@ -2,9 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
-
-import { PIconButton } from '@spaceone/design-system';
+import { useRoute } from 'vue-router/composables';
 
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -17,29 +15,31 @@ import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favo
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
+import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
-const router = useRouter();
+const route = useRoute();
+
 const allReferenceStore = useAllReferenceStore();
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
+
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     projects: computed(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     loading: true,
-    showFavoriteOnly: false,
-    header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
+    currentPath: computed(() => route.fullPath),
     favoriteItemMap: computed(() => {
         const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.DASHBOARD];
         const result: Record<string, FavoriteConfig> = {};
@@ -99,8 +99,8 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet = [
             {
-                type: 'item',
-                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
+                type: 'collapsible',
+                label: i18n.t('COMMON.STARRED'),
                 id: MENU_ID.DASHBOARDS,
                 foldable: false,
                 to: getProperRouteLocation({
@@ -109,7 +109,6 @@ const state = reactive({
                 hideFavorite: true,
             },
             { type: 'divider' },
-            { type: 'favorite-only' },
         ];
 
         if (isAdminMode.value) {
@@ -120,11 +119,16 @@ const state = reactive({
         }
         return [
             ...defaultMenuSet,
-            ...(storeState.isWorkspaceOwner ? filterLSBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)) : []),
-            ...filterLSBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
-            ...filterLSBItemsByPagePermission('PRIVATE', filterFavoriteItems(state.privateMenuSet)),
+            ...(storeState.isWorkspaceOwner ? filterLSBItemsByPagePermission('WORKSPACE', filterMenuItems(state.workspaceMenuSet)) : []),
+            ...filterLSBItemsByPagePermission('PROJECT', filterMenuItems(state.projectMenuSet)),
+            ...filterLSBItemsByPagePermission('PRIVATE', filterMenuItems(state.privateMenuSet)),
         ];
     }),
+    starredMenuSet: computed<LSBMenu[]>(() => [
+        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceMenuSet) : []),
+        ...filterStarredItems(state.projectMenuSet),
+        ...filterStarredItems(state.privateMenuSet),
+    ]),
 });
 
 const filterLSBItemsByPagePermission = (scope: DashboardScope, items: LSBMenu[]): LSBMenu[] => {
@@ -189,21 +193,28 @@ const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LSBMenu
     return result;
 };
 
-const filterFavoriteItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
-    if (!state.showFavoriteOnly) return menuItems;
+const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
     menuItems.forEach((d) => {
         if (Array.isArray(d)) {
-            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
-            const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
-            if (hasProject) result.push(filtered);
-        } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
+            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) && menu.type === MENU_ITEM_TYPE.ITEM);
+            if (filtered.length > 0) result.push(...filtered);
+        } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) && d.type === MENU_ITEM_TYPE.ITEM) result.push(d);
     });
     return result;
 };
-
-const handleClickCreateDashboard = () => {
-    router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE.CREATE._NAME }));
+const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
+    const result = [] as LSBMenu[];
+    menuItems.forEach((d) => {
+        if (Array.isArray(d)) {
+            const filtered = d.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+            const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
+            if (hasProject) result.push(filtered);
+        } else if (!(d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) {
+            result.push(d);
+        }
+    });
+    return result;
 };
 
 
@@ -216,32 +227,16 @@ const handleClickCreateDashboard = () => {
     <l-s-b class="dashboards-l-s-b"
            :class="{'admin-mode': isAdminMode}"
            :menu-set="state.menuSet"
-           :show-favorite-only.sync="state.showFavoriteOnly"
     >
-        <template #header>
-            <div class="header-wrapper">
-                <span>{{ state.header }}</span>
-                <p-icon-button name="ic_plus_bold"
-                               size="sm"
-                               @click="handleClickCreateDashboard"
-                />
-            </div>
+        <template #collapsible-contents>
+            <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+                                    :key="idx"
+                                    :item="item"
+                                    :is-admin-mode="state.isAdminMode"
+                                    :idx="idx"
+                                    :current-path="state.currentPath"
+                                    is-hide-favorite
+            />
         </template>
     </l-s-b>
 </template>
-
-<style lang="postcss" scoped>
-.dashboards-l-s-b {
-    .header-wrapper {
-        @apply flex justify-between items-center font-bold;
-        padding-right: 1.25rem;
-    }
-
-    /* custom lsb */
-    &.admin-mode {
-        :deep(.favorite-only-wrapper) {
-            padding-bottom: 0.5rem;
-        }
-    }
-}
-</style>
