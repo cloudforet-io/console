@@ -18,6 +18,7 @@ export default class EnumVariableModel implements IEnumVariableModel {
     constructor(config?: VariableModelConstructorConfig) {
         if (!config) return;
         if (!config.values) throw new Error('values is required');
+        if (config.key) this.meta.key = config.key;
         if (config.name) this.meta.name = config.name;
         this.values = config.values;
     }
