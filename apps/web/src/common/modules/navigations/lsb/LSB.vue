@@ -112,19 +112,8 @@ const handleSelect = (id: string, selected: string) => {
 
 <style lang="postcss" scoped>
 .l-s-b {
-    .header {
-        @apply font-bold;
-        padding-left: 1.25rem;
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
-        font-size: 1rem;
-        line-height: 125%;
-    }
     .menu-wrapper {
         padding: 1rem 0.5rem 2rem;
-    }
-    .divider {
-        margin-bottom: 1.25rem;
     }
     .back-link {
         @apply flex text-gray-500;

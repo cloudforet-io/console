@@ -23,7 +23,7 @@ const handleClickCollapsibleTitle = () => {
 </script>
 
 <template>
-    <div class="l-s-b-collapsible-menu-itm"
+    <div class="l-s-b-collapsible-menu-item"
          :class="{ 'is-collapsed': state.isCollapsed }"
     >
         <div class="collapsible-title"
@@ -44,7 +44,7 @@ const handleClickCollapsibleTitle = () => {
 </template>
 
 <style scoped lang="postcss">
-.l-s-b-collapsible-menu-itm {
+.l-s-b-collapsible-menu-item {
     @apply flex flex-col text-label-md;
     .collapsible-title {
         @apply flex items-center font-bold;
