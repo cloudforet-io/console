@@ -281,7 +281,6 @@ onMounted(() => {
     <aside class="sidebar-menu">
         <l-s-b :header="state.header"
                :menu-set="state.menuSet"
-               :show-favorite-only.sync="state.showFavoriteOnly"
         >
             <template v-if="!storeState.isAdminMode"
                       #default
