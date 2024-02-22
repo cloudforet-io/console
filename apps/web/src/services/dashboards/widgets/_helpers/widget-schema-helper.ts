@@ -13,7 +13,7 @@ import type {
 import {
     WIDGET_FILTERS_SCHEMA_PROPERTIES,
     WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-} from '@/services/dashboards/widgets/_constants/widget-options-schema-constant';
+} from '@/services/dashboards/widgets/_constants/widget-managed-options-schema';
 
 const VAR_KEY_TO_OPTION_KEY_MAP = {};
 Object.entries(WIDGET_FILTERS_SCHEMA_PROPERTIES).forEach(([optionKey, property]) => {

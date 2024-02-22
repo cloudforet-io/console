@@ -36,7 +36,7 @@ import DashboardCostWidgetValueOptionDropdown
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 import {
     COST_VALUE_WIDGET_OPTION_CONFIGS,
-} from '@/services/dashboards/widgets/_constants/widget-options-schema-constant.js';
+} from '@/services/dashboards/widgets/_constants/widget-managed-options-schema.js';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{

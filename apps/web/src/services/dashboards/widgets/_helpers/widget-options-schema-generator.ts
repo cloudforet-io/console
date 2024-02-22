@@ -3,7 +3,7 @@ import type { WidgetOptionKey, WidgetOptionsSchema, WidgetOptionsSchemaProperty 
 import {
     WIDGET_FILTERS_SCHEMA_PROPERTIES,
     WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-} from '@/services/dashboards/widgets/_constants/widget-options-schema-constant';
+} from '@/services/dashboards/widgets/_constants/widget-managed-options-schema';
 
 type CustomOptionTuple = [WidgetOptionKey, Partial<WidgetOptionsSchemaProperty>];
 export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTuple)[]): WidgetOptionsSchema => {
