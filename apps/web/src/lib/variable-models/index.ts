@@ -41,7 +41,6 @@ export class VariableModelFactory implements IBaseVariableModel {
         modelProperties.forEach((property) => {
             Object.defineProperty(this, property, {
                 get: () => this.#model[property],
-                writable: false,
             });
         });
     }
