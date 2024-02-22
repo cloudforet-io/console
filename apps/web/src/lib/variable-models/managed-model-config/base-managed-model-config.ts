@@ -62,7 +62,7 @@ export const MANAGED_VARIABLE_MODELS = {
 } as const;
 
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
-export const MANAGED_VARIABLE_MODEL_KEY_MAP: Record<ManagedVariableModelKey, string> = {};
+export const MANAGED_VARIABLE_MODEL_KEY_MAP: Record<ManagedVariableModelKey, ManagedVariableModelKey> = {};
 Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
-    MANAGED_VARIABLE_MODEL_KEY_MAP[key as ManagedVariableModelKey] = key;
+    MANAGED_VARIABLE_MODEL_KEY_MAP[key] = key;
 });
