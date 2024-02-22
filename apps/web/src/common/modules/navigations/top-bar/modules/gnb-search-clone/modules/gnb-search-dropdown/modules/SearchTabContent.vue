@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
+import type { Location } from 'vue-router/types/router';
 
-import { PDivider, PContextMenu } from '@spaceone/design-system';
+import { PDivider, PContextMenu, PLink } from '@spaceone/design-system';
+import { clone } from 'lodash';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import type { MenuInfo } from '@/lib/menu/config';
+import type { MenuInfo, MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
@@ -18,6 +23,7 @@ import GNBSearchWorkspaceFilter
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
 
 
 interface Props {
@@ -36,6 +42,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
+const appContextStore = useAppContextStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 const topBarSearchStore = useTopBarSearchStore();
 const router = useRouter();
 
@@ -87,6 +95,18 @@ const handleSelect = (item) => {
     topBarSearchStore.setIsActivated(false);
 };
 
+const handleClickLink = (workspaceId:string) => {
+    topBarSearchStore.setIsActivated(false);
+    router.push(getTargetWorkspaceRoute(workspaceId));
+};
+
+const getTargetWorkspaceRoute = (workspaceId: string): Location => {
+    const reversedMatched = clone(router.currentRoute.matched).reverse();
+    const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+    return { name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } };
+};
+
 // /* Watcher */
 // TODO: for focusing
 // watch(() => props.isFocused, (isFocused) => {
@@ -123,10 +143,19 @@ const handleSelect = (item) => {
                 >
                     <template #header>
                         <div class="context-header">
-                            <workspace-logo-icon :text="workspace.name"
-                                                 :theme="workspace.tags?.theme"
-                                                 size="xs"
-                            /><span class="label"> {{ workspace.name }}</span>
+                            <div class="left-part">
+                                <workspace-logo-icon :text="workspace.name"
+                                                     :theme="workspace.tags?.theme"
+                                                     size="xs"
+                                /><span class="label"> {{ workspace.name }}</span>
+                            </div>
+                            <p-link v-if="workspace.workspace_id !== state.currentWorkspaceId"
+                                    highlight
+                                    action-icon="internal-link"
+                                    size="sm"
+                            >
+                                <span @click="handleClickLink(workspace.workspace_id)">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_SWITCH_LINK') }}</span>
+                            </p-link>
                         </div>
                     </template>
                     <template #item--format="{ item }">
@@ -169,16 +198,18 @@ const handleSelect = (item) => {
             /* custom design-system component - p-context-menu */
             :deep() {
                 .context-header {
-                    @apply inline-flex items-center gap-1;
-                    margin-top: 0;
-                    margin-bottom: 0.25rem;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
+                    @apply flex justify-between;
+                    .left-part {
+                        @apply inline-flex items-center gap-1;
+                        margin-top: 0;
+                        margin-bottom: 0.25rem;
+                        padding-left: 0.5rem;
+                        padding-right: 0.5rem;
+                    }
 
                     .label {
                         @apply text-label-md font-bold text-gray-700;
                     }
-
                 }
 
                 .p-context-menu-item {
