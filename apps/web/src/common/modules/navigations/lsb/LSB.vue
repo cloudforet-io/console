@@ -5,7 +5,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
+    PI, PLazyImg,
 } from '@spaceone/design-system';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -42,10 +42,6 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
 });
-
-const handleFavoriteToggle = () => {
-    state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
-};
 const handleSelect = (id: string, selected: string) => {
     emit('select', id, selected);
 };
@@ -53,15 +49,7 @@ const handleSelect = (id: string, selected: string) => {
 </script>
 
 <template>
-    <nav class="l-s-b">
-        <template v-if="!props.hideHeader">
-            <div class="header">
-                <slot name="header">
-                    {{ header }}
-                </slot>
-            </div>
-            <p-divider class="divider" />
-        </template>
+    <aside class="l-s-b">
         <div class="menu-wrapper">
             <router-link v-if="backLink.label"
                          class="back-link"
@@ -101,20 +89,7 @@ const handleSelect = (id: string, selected: string) => {
                 </router-link>
             </div>
             <template v-for="(menuData, idx) in menuSet">
-                <div v-if="menuData.type === MENU_ITEM_TYPE.FAVORITE_ONLY"
-                     :key="`${idx}-${getRandomId()}`"
-                     class="favorite-only-wrapper"
-                >
-                    <p-field-title :label="$t('DASHBOARDS.LNB.ONLY_FAVORITE')"
-                                   color="gray"
-                                   font-weight="regular"
-                                   size="sm"
-                    />
-                    <p-toggle-button :value="state.proxyShowFavoriteOnly"
-                                     @change-toggle="handleFavoriteToggle"
-                    />
-                </div>
-                <div v-else-if="menuData.type === MENU_ITEM_TYPE.SLOT"
+                <div v-if="menuData.type === MENU_ITEM_TYPE.SLOT"
                      :key="`${idx}-${getRandomId()}`"
                      class="slot-menu-wrapper"
                 >
@@ -139,7 +114,7 @@ const handleSelect = (id: string, selected: string) => {
                 </l-s-b-menu-item>
             </template>
         </div>
-    </nav>
+    </aside>
 </template>
 
 <style lang="postcss" scoped>
