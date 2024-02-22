@@ -1083,7 +1083,6 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "",
 				"MANAGE_WORKSPACE": "",
-				"STARRED": "",
 				"WORKSPACES": ""
 			}
 		},
@@ -1217,6 +1216,7 @@
 			"VALIDATION": "아이디 또는 비밀번호를 확인해 주세요.",
 			"VERSION": "버전 "
 		},
+		"STARRED": "",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",

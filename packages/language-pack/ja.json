@@ -1083,7 +1083,6 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "",
 				"MANAGE_WORKSPACE": "",
-				"STARRED": "",
 				"WORKSPACES": ""
 			}
 		},
@@ -1217,6 +1216,7 @@
 			"VALIDATION": "ユーザー名、またはパスワードを確認してください。",
 			"VERSION": "バージョン"
 		},
+		"STARRED": "",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",

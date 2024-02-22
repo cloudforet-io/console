@@ -1083,7 +1083,6 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "Create New Workspace",
 				"MANAGE_WORKSPACE": "Manage Workspace",
-				"STARRED": "Starred",
 				"WORKSPACES": "Workspaces"
 			}
 		},
@@ -1217,6 +1216,7 @@
 			"VALIDATION": "Please, check your ID or Password.",
 			"VERSION": "Version"
 		},
+		"STARRED": "Starred",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",
