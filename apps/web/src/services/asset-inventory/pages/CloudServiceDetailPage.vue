@@ -205,7 +205,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         * Therefore, it is segmented as follows:
         * */
         const workspaceIndex = response.options.fields.findIndex((field) => field.name === 'Workspace');
-        if (!appContextGetters.isAdminMode) {
+        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
             response.options.fields.splice(workspaceIndex, 1);
         }
         return response;
