@@ -42,6 +42,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         initSearch: () => {
             state.inputText = '';
             state.activateTab = 'service';
+            state.selectedWorkspaces = [];
         },
         setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
             state.selectedWorkspaces = selectedWorkspaces;
