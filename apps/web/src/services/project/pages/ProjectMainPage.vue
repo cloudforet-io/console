@@ -13,12 +13,12 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -26,7 +26,6 @@ import ProjectMainCardList from '@/services/project/components/ProjectMainCardLi
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
-import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
@@ -84,9 +83,11 @@ const state = reactive({
         },
     ])),
     projectGroupModalVisible: false,
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.PROJECT_GROUP,
+        id: storeState.groupId,
+    })),
 });
-
-const { favoriteItems } = useProjectFavorite();
 
 const {
     visibleMenu,
@@ -143,6 +144,9 @@ watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
 watch(() => topBarHeaderGetters.selectedItem, (selectedItem) => {
     onProjectGroupNavClick(selectedItem);
 });
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
 
 onUnmounted(() => {
     projectPageStore.reset();
@@ -167,10 +171,6 @@ onUnmounted(() => {
                 <div v-if="storeState.groupId"
                      class="title-right-button-wrapper"
                 >
-                    <favorite-button :favorite-items="favoriteItems"
-                                     :item-id="storeState.groupId"
-                                     :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
-                    />
                     <template v-if="projectPageState.isWorkspaceOwner">
                         <p-icon-button name="ic_edit-text"
                                        style-type="transparent"

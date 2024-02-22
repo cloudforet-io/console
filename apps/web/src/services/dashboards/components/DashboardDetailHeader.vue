@@ -5,10 +5,6 @@ import {
     PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
@@ -57,11 +53,6 @@ const handleNameUpdate = (name: string) => {
                       #title-right-extra
             >
                 <div class="title-right-extra">
-                    <favorite-button :item-id="props.dashboardId"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.8"
-                                     class="favorite-button"
-                    />
                     <p-icon-button name="ic_edit-text"
                                    size="md"
                                    @click="handleVisibleNameEditModal"
