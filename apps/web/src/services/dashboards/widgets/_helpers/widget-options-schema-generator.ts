@@ -1,9 +1,9 @@
 import type { WidgetOptionKey, WidgetOptionsSchema, WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
 
 import {
-    WIDGET_FILTERS_SCHEMA_PROPERTIES,
-    WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-} from '@/services/dashboards/widgets/_constants/widget-managed-options-schema';
+    MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES,
+    MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+} from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
 
 type CustomOptionTuple = [WidgetOptionKey, Partial<WidgetOptionsSchemaProperty>];
 export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTuple)[]): WidgetOptionsSchema => {
@@ -13,10 +13,10 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
     options.forEach((option) => {
         const optionName = typeof option === 'string' ? option : option[0];
 
-        if (WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName]) {
-            properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName] as WidgetOptionsSchemaProperty;
-        } else if (WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
-            const filterProperty = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
+        if (MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName]) {
+            properties[optionName] = MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName] as WidgetOptionsSchemaProperty;
+        } else if (MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
+            const filterProperty = MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
             properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
         } else {
             console.error(new Error(`No matched option schema for ${optionName}`));
