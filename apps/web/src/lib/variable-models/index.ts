@@ -18,7 +18,7 @@ export class VariableModelFactory implements IBaseVariableModel {
 
     #model: IBaseVariableModel;
 
-    constructor(config: VariableModelFactoryConfig, modelConfig: VariableModelConstructorConfig, modelOptions: ResourceVariableModelConstructorOptions) {
+    constructor(config: VariableModelFactoryConfig, modelConfig?: VariableModelConstructorConfig, modelOptions?: ResourceVariableModelConstructorOptions) {
         if (config.type === 'MANAGED' && !config.managedModelKey) throw new Error('managedModelKey is required');
         const type = config.type;
 
