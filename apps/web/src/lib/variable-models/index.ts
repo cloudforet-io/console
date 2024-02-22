@@ -8,8 +8,9 @@ import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-mode
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
-interface VariableModelFactoryConfig {
-    type: 'ENUM'|'RESOURCE'|'MANAGED';
+export type VariableModelType = 'ENUM'|'RESOURCE'|'MANAGED';
+export interface VariableModelFactoryConfig {
+    type: VariableModelType;
     managedModelKey?: ManagedVariableModelKey;
 }
 
@@ -18,7 +19,7 @@ export class VariableModelFactory implements IBaseVariableModel {
 
     #model: IBaseVariableModel;
 
-    constructor(config: VariableModelFactoryConfig, modelConfig: VariableModelConstructorConfig, modelOptions: ResourceVariableModelConstructorOptions) {
+    constructor(config: VariableModelFactoryConfig, modelConfig?: VariableModelConstructorConfig, modelOptions?: ResourceVariableModelConstructorOptions) {
         if (config.type === 'MANAGED' && !config.managedModelKey) throw new Error('managedModelKey is required');
         const type = config.type;
 
