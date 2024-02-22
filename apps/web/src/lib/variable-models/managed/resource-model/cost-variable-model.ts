@@ -8,7 +8,7 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
 
     product = this.generateProperty({ key: 'product', name: 'Product' });
 
-    usage_type = this.generateProperty({ key: 'usage_type', name: 'Usage Type' });
+    usage_type = this.generateProperty({ key: 'usage_type', name: 'Usage Type (Cost)' });
 
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
