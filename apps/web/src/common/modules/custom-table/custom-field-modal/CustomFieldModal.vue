@@ -182,7 +182,7 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         * Therefore, it is segmented as follows:
         * */
         const workspaceIndex = res.options.fields.findIndex((field) => field.name === 'Workspace');
-        if (!appContextGetters.isAdminMode) {
+        if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
             res.options.fields.splice(workspaceIndex, 1);
         }
         schema = res;
