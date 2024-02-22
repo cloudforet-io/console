@@ -6,7 +6,6 @@ export interface IBaseVariableModel {
     dependencies?: {
         [variableModelKey: string]: string;
     }
-    // prefetch?: boolean; // whether to prefetch data on site init
     //
     // scope?: {
     //     resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
