@@ -18,7 +18,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default class ResourceVariableModel<T=any> implements IResourceVariableModel<T> {
-    meta: IResourceVariableModel['meta'] = {
+    _meta: IResourceVariableModel['_meta'] = {
         key: '',
         name: '',
         resourceType: '',
@@ -31,10 +31,10 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>;
 
     constructor(config: VariableModelConstructorConfig = {}, options?: ResourceVariableModelConstructorOptions) {
-        if (config.key) this.meta.key = config.key;
-        if (config.name) this.meta.name = config.name;
-        if (config.resource_type) this.meta.resourceType = config.resource_type;
-        if (config.id_key) this.meta.idKey = config.id_key;
+        if (config.key) this._meta.key = config.key;
+        if (config.name) this._meta.name = config.name;
+        if (config.resource_type) this._meta.resourceType = config.resource_type;
+        if (config.id_key) this._meta.idKey = config.id_key;
 
         this.#fetcher = this.#getFetcher();
 
@@ -45,10 +45,8 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         });
     }
 
-    _properties: string[] = [];
-
     nameFormatter(data: any): string {
-        return data[this.meta.nameKey];
+        return data[this._meta.nameKey];
     }
 
     protected generateProperty(options: PropertyOptions<T>): PropertyObject<T> {
@@ -66,22 +64,31 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         return propertyObject;
     }
 
-    get only(): string[] {
-        if (this.meta._only) return this.meta._only;
-        return [this.meta.idKey, this.meta.nameKey];
+    get #properties(): string[] {
+        const _results: string[] = [];
+        Object.getOwnPropertyNames(this).forEach((property) => {
+            if (property.startsWith('_')) return;
+            _results.push(property);
+        });
+        return _results;
     }
 
-    get searchTargets(): string[] {
-        if (this.meta._searchTargets) return this.meta._searchTargets;
-        return [this.meta.idKey, this.meta.nameKey];
+    get #only(): string[] {
+        if (this._meta._only) return this._meta._only;
+        return [this._meta.idKey, this._meta.nameKey];
+    }
+
+    get #searchTargets(): string[] {
+        if (this._meta._searchTargets) return this._meta._searchTargets;
+        return [this._meta.idKey, this._meta.nameKey];
     }
 
     #getFetcher(dataKey?: string): ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>|undefined {
-        if (!this.meta.resourceType) return undefined;
-        const apiPath = this.meta.resourceType.split('.').map((d) => camelCase(d));
+        if (!this._meta.resourceType) return undefined;
+        const apiPath = this._meta.resourceType.split('.').map((d) => camelCase(d));
 
         const api = get(SpaceConnector.clientV2, apiPath);
-        if (!api) throw new Error(`Invalid resourceType: ${this.meta.resourceType}`);
+        if (!api) throw new Error(`Invalid resourceType: ${this._meta.resourceType}`);
 
         if (dataKey) {
             return getCancellableFetcher(api.stat);
@@ -102,8 +109,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         if (query.filters) {
             apiQueryHelper.addFilter({ k: dataKey, v: query.filters, o: '=' });
         }
-
-        this._properties?.forEach((key) => {
+        this.#properties?.forEach((key) => {
             if (this[key]?.fixedValue) {
                 apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
             }
@@ -120,11 +126,11 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
     protected _getListParams(query: ListQuery = {}): Record<string, any> {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
-            { k: this.meta.idKey, v: [null, ''], o: '!=' },
+            { k: this._meta.idKey, v: [null, ''], o: '!=' },
         ]);
 
         if (query.search) {
-            const orFilters = this.searchTargets.map((key) => ({
+            const orFilters = this.#searchTargets.map((key) => ({
                 k: key,
                 v: query.search ?? '',
                 o: '',
@@ -135,7 +141,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             apiQueryHelper.setPage(query.start, query.limit);
         }
 
-        this._properties?.forEach((key) => {
+        this.#properties?.forEach((key) => {
             if (this[key]?.fixedValue) {
                 apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
             }
@@ -143,7 +149,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
 
         return {
             query: {
-                only: this.only,
+                only: this.#only,
                 ...apiQueryHelper.data,
             },
         };
@@ -164,7 +170,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     more = (query.start * query.limit) < response.total_count;
                 }
                 this.#response = {
-                    results: response.results ? response.results.map((d) => ({ key: d[this.meta.idKey], name: this.nameFormatter(d) })) : [],
+                    results: response.results ? response.results.map((d) => ({ key: d[this._meta.idKey], name: this.nameFormatter(d) })) : [],
                     more,
                 };
             }
