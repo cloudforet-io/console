@@ -14,8 +14,9 @@ export interface VariableModelFactoryConfig {
     managedModelKey?: ManagedVariableModelKey;
 }
 
+
 export class VariableModelFactory implements IBaseVariableModel {
-    meta: IBaseVariableModel['meta'];
+    _meta: IBaseVariableModel['_meta'];
 
     #model: IBaseVariableModel;
 
@@ -34,11 +35,9 @@ export class VariableModelFactory implements IBaseVariableModel {
             throw new Error(`Invalid config type for VariableModel: ${config.type}`);
         }
 
-
-        this.meta = this.#model.meta;
-        const _properties = this.#model._properties ?? [];
-
-        _properties.forEach((property) => {
+        this._meta = this.#model._meta;
+        Object.getOwnPropertyNames(this.#model).forEach((property) => {
+            if (property.startsWith('_')) return;
             Object.defineProperty(this, property, {
                 get: () => this.#model[property],
             });
