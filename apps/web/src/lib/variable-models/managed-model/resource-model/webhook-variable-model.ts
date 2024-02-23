@@ -4,7 +4,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class WebhookVariableModel extends ResourceVariableModel<WebhookModel> {
-    meta = {
+    static meta = {
         key: 'webhook',
         name: 'Webhook',
         resourceType: 'monitoring.Webhook',

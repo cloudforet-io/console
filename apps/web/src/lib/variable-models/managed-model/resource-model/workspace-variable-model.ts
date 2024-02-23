@@ -4,7 +4,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class WorkspaceVariableModel extends ResourceVariableModel<WorkspaceModel> {
-    meta = {
+    static meta = {
         key: 'workspace',
         name: 'Workspace',
         resourceType: 'identity.Workspace',

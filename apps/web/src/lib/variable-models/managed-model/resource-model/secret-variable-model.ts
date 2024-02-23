@@ -6,12 +6,15 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 export default class SecretVariableModel extends ResourceVariableModel<SecretModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    meta = {
+    static meta = {
         key: 'secret',
         name: 'Secret',
         resourceType: 'secret.Secret',
         idKey: 'secret_id',
         nameKey: 'name',
-        _properties: [this.provider.key],
     };
+
+    get properties() {
+        return [this.provider.key];
+    }
 }
