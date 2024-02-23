@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { useElementSize } from '@vueuse/core';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 import { useRouter } from 'vue-router/composables';
 import type { Location } from 'vue-router/types/router';
 
@@ -17,10 +20,11 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
-import GNBSearchWorkspaceFilter
+import TopBarSearchWorkspaceFilter
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+
 
 
 
@@ -47,8 +51,11 @@ const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number)
     (event: 'close'): void;
     (event: 'move-focus-end'): void;
     (event: 'update:isFocused', value: boolean): void;
+    (event: 'update:contents-size', value: number): void;
 }>();
 
+const contentsRef = ref<null | HTMLElement>(null);
+const contentsSize = useElementSize(contentsRef);
 
 const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
@@ -103,6 +110,10 @@ const getTargetWorkspaceRoute = (workspaceId: string): Location => {
     return { name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } };
 };
 
+watch(() => contentsSize.height.value, (height) => {
+    emit('update:contents-size', height);
+});
+
 // /* Watcher */
 // TODO: for focusing
 // watch(() => props.isFocused, (isFocused) => {
@@ -117,71 +128,73 @@ const getTargetWorkspaceRoute = (workspaceId: string): Location => {
 // });
 </script>
 <template>
-    <div class="g-n-b-search-service-tab">
+    <div class="top-bar-search-service-tab">
         <div v-if="state.inputText.length === 0"
              class="service-item-list"
         />
         <div v-else
              class="service-item-list"
         >
-            <div v-for="workspace in state.selectedWorkspaceList"
-                 :key="workspace.workspace_id"
-            >
-                <p-context-menu class="search-list-context"
-                                :menu="state.refinedSearchMenu[workspace.workspace_id]"
-                                no-select-indication
-                                @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'UPWARD')"
-                                @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'DOWNWARD')"
-                                @keyup:esc="emit('close')"
-                                @focus="emit('update:isFocused', true)"
-                                @blur="emit('update:isFocused', false)"
-                                @select="handleSelect"
+            <div ref="contentsRef">
+                <div v-for="workspace in state.selectedWorkspaceList"
+                     :key="workspace.workspace_id"
                 >
-                    <template #header>
-                        <div class="context-header">
-                            <div class="left-part">
-                                <workspace-logo-icon :text="workspace.name"
-                                                     :theme="workspace.tags?.theme"
-                                                     size="xs"
-                                /><span class="label"> {{ workspace.name }}</span>
+                    <p-context-menu class="search-list-context"
+                                    :menu="state.refinedSearchMenu[workspace.workspace_id]"
+                                    no-select-indication
+                                    @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'UPWARD')"
+                                    @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'DOWNWARD')"
+                                    @keyup:esc="emit('close')"
+                                    @focus="emit('update:isFocused', true)"
+                                    @blur="emit('update:isFocused', false)"
+                                    @select="handleSelect"
+                    >
+                        <template #header>
+                            <div class="context-header">
+                                <div class="left-part">
+                                    <workspace-logo-icon :text="workspace.name"
+                                                         :theme="workspace.tags?.theme"
+                                                         size="xs"
+                                    /><span class="label"> {{ workspace.name }}</span>
+                                </div>
+                                <p-link v-if="workspace.workspace_id !== state.currentWorkspaceId"
+                                        highlight
+                                        action-icon="internal-link"
+                                        size="sm"
+                                >
+                                    <span @click="handleClickLink(workspace.workspace_id)">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_SWITCH_LINK') }}</span>
+                                </p-link>
                             </div>
-                            <p-link v-if="workspace.workspace_id !== state.currentWorkspaceId"
-                                    highlight
-                                    action-icon="internal-link"
-                                    size="sm"
-                            >
-                                <span @click="handleClickLink(workspace.workspace_id)">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_SWITCH_LINK') }}</span>
-                            </p-link>
-                        </div>
-                    </template>
-                    <template #item--format="{ item }">
-                        <slot name="item-format"
-                              v-bind="item"
-                        />
-                    </template>
-                </p-context-menu>
-                <div v-if="state.inputText && state.serviceMenuCount > props.searchLimit"
-                     class="too-many-results-wrapper"
-                >
-                    <div class="dim-wrapper" />
-                    <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
+                        </template>
+                        <template #item--format="{ item }">
+                            <slot name="item-format"
+                                  v-bind="item"
+                            />
+                        </template>
+                    </p-context-menu>
+                    <div v-if="state.inputText && state.serviceMenuCount > props.searchLimit"
+                         class="too-many-results-wrapper"
+                    >
+                        <div class="dim-wrapper" />
+                        <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
+                    </div>
                 </div>
             </div>
         </div>
         <p-divider vertical />
-        <g-n-b-search-workspace-filter class="filter" />
+        <top-bar-search-workspace-filter class="filter" />
     </div>
 </template>
 
 <style scoped lang="postcss">
-.g-n-b-search-service-tab {
+.top-bar-search-service-tab {
     @apply flex gap-3 h-full;
     padding: 1rem 0;
     height: 100%;
 
     .service-item-list {
-        height: 100%;
         width: 100%;
+        height: 100%;
         overflow-y: auto;
 
         .search-list-context {
