@@ -28,7 +28,6 @@ import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/T
 
 interface Props {
     loading: boolean;
-    isRecent: boolean;
     searchLimit: number;
     isFocused: boolean;
     focusingDirection: string;
@@ -36,7 +35,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
-    isRecent: false,
     searchLimit: 15,
     isFocused: false,
     focusingDirection: 'DOWNWARD',

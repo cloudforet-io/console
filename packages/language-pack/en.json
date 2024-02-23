@@ -1136,7 +1136,8 @@
 		},
 		"NAVIGATIONS": {
 			"TOP_BAR": {
-				"ALL_WORKSPACE": "All Workspaces"
+				"ALL_WORKSPACE": "All Workspaces",
+				"WORKSPACE_SWITCH_LINK": "Switch to this workspace"
 			}
 		},
 		"NOTIFICATION_MODAL": {

@@ -16,12 +16,22 @@ const workspaceStoreState = userWorkspaceStore.$state;
 const topBarSearchStore = useTopBarSearchStore();
 
 const state = reactive({
+    currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
-    workspaces: computed(() => state.workspaceList.map((workspace) => ({
-        label: workspace.name,
-        value: workspace.workspace_id,
-        tags: workspace.tags,
-    } as { label: string, value: string, tags: { theme: string } | undefined }))),
+    workspaces: computed(() => {
+        const workspaceList = state.workspaceList.map((workspace) => ({
+            label: workspace.name,
+            value: workspace.workspace_id,
+            tags: workspace.tags,
+        } as { label: string, value: string, tags: { theme: string } | undefined }));
+        // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
+        const orderedWorkspaceList = workspaceList.sort((a, b) => {
+            if (a.value === state.currentWorkspaceId) return -1;
+            if (b.value === state.currentWorkspaceId) return 1;
+            return 0;
+        });
+        return orderedWorkspaceList;
+    }),
     selectedWorkspaces: computed(() => topBarSearchStore.state.selectedWorkspaces),
     isAllSelected: computed(() => state.selectedWorkspaces.length === state.workspaces.length),
     isIndeterminate: computed(() => state.selectedWorkspaces.length > 0 && state.selectedWorkspaces.length < state.workspaces.length),

@@ -1136,7 +1136,8 @@
 		},
 		"NAVIGATIONS": {
 			"TOP_BAR": {
-				"ALL_WORKSPACE": ""
+				"ALL_WORKSPACE": "",
+				"WORKSPACE_SWITCH_LINK": ""
 			}
 		},
 		"NOTIFICATION_MODAL": {

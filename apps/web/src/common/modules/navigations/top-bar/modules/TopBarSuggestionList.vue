@@ -7,7 +7,6 @@ import {
     PContextMenu, PI, PLazyImg, PTooltip, PTextHighlighting,
 } from '@spaceone/design-system';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
@@ -112,13 +111,6 @@ onUnmounted(() => {
                                          class="text-item"
                                          :term="props.inputText"
                                          :text="item.label"
-                    />
-                </span>
-                <span class="favorite-button">
-                    <favorite-button v-if="props.useFavorite"
-                                     :item-id="item.name"
-                                     :favorite-type="item.itemType"
-                                     scale="0.65"
                     />
                 </span>
             </p-tooltip>
