@@ -64,7 +64,7 @@ const init = async (store) => {
         initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);
-        prefetchResources();
+        prefetchResources(userId);
         initI18n(store);
         initDayjs();
         initQueryHelper(store);
