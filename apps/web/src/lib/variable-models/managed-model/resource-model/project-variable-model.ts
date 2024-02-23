@@ -62,7 +62,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.project.list);
 
             const { status, response } = await this.#fetcher(
-                this._getParams(query),
+                this._getListParams(query),
             );
             if (status === 'succeed') {
                 let more = false;

@@ -14,7 +14,5 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }

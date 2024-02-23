@@ -14,7 +14,5 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }

@@ -20,7 +20,5 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key];
-    }
+    _properties = [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key];
 }

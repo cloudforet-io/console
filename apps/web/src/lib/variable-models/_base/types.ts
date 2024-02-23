@@ -2,7 +2,7 @@
 export interface IBaseVariableModel {
     meta?: Record<string, any>;
     list(query?: ListQuery): Promise<ListResponse>;
-    properties?: string[];
+    _properties?: string[];
     nameFormatter?: (data: any) => string;
     dependencies?: {
         [variableModelKey: string]: string;
@@ -27,7 +27,6 @@ interface ResourceVariableMeta {
     resourceType: string;
     idKey: string;
     nameKey: string;
-    _properties?: string[];
     _only?: string[]; // protected
     _searchTargets?: string[]; // protected
 }

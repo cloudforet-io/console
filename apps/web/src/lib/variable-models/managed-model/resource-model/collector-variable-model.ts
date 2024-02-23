@@ -14,7 +14,5 @@ export default class CollectorVariableModel extends ResourceVariableModel<Collec
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }

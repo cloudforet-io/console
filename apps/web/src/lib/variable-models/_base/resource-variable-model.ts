@@ -45,12 +45,11 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         });
     }
 
+    _properties: string[] = [];
 
     nameFormatter(data: any): string {
         return data[this.meta.nameKey];
     }
-
-    #properties = [];
 
     protected generateProperty(options: PropertyOptions<T>): PropertyObject<T> {
         const {
@@ -95,7 +94,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         return getCancellableFetcher(api.list);
     }
 
-    protected getStatParams(query: ListQuery = {}, dataKey: string): Record<string, any> {
+    protected _getStatParams(query: ListQuery = {}, dataKey: string): Record<string, any> {
         const apiQueryHelper = new ApiQueryHelper();
 
         apiQueryHelper.setFilters([
@@ -109,7 +108,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             apiQueryHelper.addFilter({ k: dataKey, v: query.filters, o: '=' });
         }
 
-        this.meta._properties?.forEach((key) => {
+        this._properties?.forEach((key) => {
             if (this[key]?.fixedValue) {
                 apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
             }
@@ -123,7 +122,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         };
     }
 
-    protected _getParams(query: ListQuery = {}): Record<string, any> {
+    protected _getListParams(query: ListQuery = {}): Record<string, any> {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
             { k: this.meta.idKey, v: [null, ''], o: '!=' },
@@ -141,7 +140,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             apiQueryHelper.setPage(query.start, query.limit);
         }
 
-        this.meta._properties?.forEach((key) => {
+        this._properties?.forEach((key) => {
             if (this[key]?.fixedValue) {
                 apiQueryHelper.addFilter({ k: key, v: this[key].fixedValue, o: '=' });
             }
@@ -162,7 +161,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                 if (!this.#fetcher) return this.#response;
             }
             const { status, response } = await this.#fetcher(
-                this._getParams(query),
+                this._getListParams(query),
             );
             if (status === 'succeed') {
                 let more = false;
@@ -190,7 +189,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
                     if (!this.#fetcher) return this.#response;
                 }
                 const { status, response } = await this.#fetcher(
-                    this.getStatParams(query, _dataKey),
+                    this._getStatParams(query, _dataKey),
                 );
                 if (status === 'succeed') {
                     let more = false;

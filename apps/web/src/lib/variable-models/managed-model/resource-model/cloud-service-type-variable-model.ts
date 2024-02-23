@@ -15,9 +15,7 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
         _searchTargets: ['cloud_service_type_id', 'name', 'group'],
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 
     nameFormatter(data: any): string {
         return `${data.group} > ${data[this.meta.nameKey]}`;
