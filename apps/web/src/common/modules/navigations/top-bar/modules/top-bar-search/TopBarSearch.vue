@@ -163,6 +163,7 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .top-bar-search {
     @apply relative;
+    display: inline-block;
     box-shadow: 0 0 8px 0 #00000014;
     .menu-button {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
@@ -183,6 +184,12 @@ onUnmounted(() => {
         @apply fixed inset-0 bg-black;
         opacity: 30%;
         z-index: 999;
+    }
+}
+
+@screen mobile {
+    .top-bar-search {
+        box-shadow: unset;
     }
 }
 </style>

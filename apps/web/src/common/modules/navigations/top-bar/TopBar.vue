@@ -56,8 +56,14 @@ const handleOpenMenu = (menuId: MenuId) => {
         <top-bar-header ref="topBarHeaderRef"
                         :to="state.logoLink"
                         :is-admin-mode="state.isAdminMode"
+                        class="top-bar-header"
         />
-        <top-bar-search v-if="!state.isAdminMode" />
+        <div class="middle-section">
+            <top-bar-search v-if="!state.isAdminMode"
+                            class="top-bar-search"
+            />
+        </div>
+
         <top-bar-toolset ref="topBarToolsetRef"
                          class="toolset"
                          :opened-menu="state.openedMenu"
@@ -71,6 +77,7 @@ const handleOpenMenu = (menuId: MenuId) => {
 .top-bar {
     @apply bg-white items-center;
     display: flex !important;
+    width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     &.admin-top-bar {
@@ -79,10 +86,28 @@ const handleOpenMenu = (menuId: MenuId) => {
         box-shadow: 0 0.125rem 0.25rem 0 rgba(0, 0, 0, 0.12);
     }
 
+    .top-bar-header {
+        flex: 0 0;
+    }
+
+    .middle-section {
+        @apply flex justify-center;
+        flex: 1 1;
+    }
+
     .toolset {
-        @apply absolute inline-flex items-center;
+        @apply inline-flex items-center;
         right: 0;
         padding-right: 1.5rem;
+        flex: 0 0;
+    }
+}
+
+@screen mobile {
+    .top-bar {
+        .middle-section {
+            @apply justify-end;
+        }
     }
 }
 </style>
