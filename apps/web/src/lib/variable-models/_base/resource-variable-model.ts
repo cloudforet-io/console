@@ -52,19 +52,14 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
     }
 
     protected generateProperty(options: PropertyOptions<T>): PropertyObject<T> {
-        const {
-            key,
-            name,
-            isDataKey = false,
-            isFilter = false,
-        } = options;
-
+        const _isDataKey = typeof options.isDataKey === 'boolean' ? options.isDataKey : true;
+        const _isFilter = typeof options.isFilter === 'boolean' ? options.isFilter : true;
         const propertyObject: PropertyObject<T> = {
-            key,
-            name,
-            isDataKey,
-            isFilter,
-            values: options.isDataKey ? this.stat(key as string) : undefined,
+            key: options.key,
+            name: options.name,
+            isDataKey: _isDataKey,
+            isFilter: _isFilter,
+            values: _isDataKey ? this.stat(options.key as string) : undefined,
         };
 
         // TODO: keys method binding
