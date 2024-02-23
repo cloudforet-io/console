@@ -34,7 +34,7 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
 };
 
 export default class ProjectVariableModel extends ResourceVariableModel<ProjectModel> {
-    meta = {
+    static meta = {
         key: 'project',
         name: 'Project',
         resourceType: 'identity.Project',

@@ -78,9 +78,9 @@ export const useUserReferenceStore = defineStore('user-reference', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         userTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.user.prototype.meta.key,
-            key: MANAGED_VARIABLE_MODELS.user.prototype.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.user.prototype.meta.name,
+            type: MANAGED_VARIABLE_MODELS.user.meta.key,
+            key: MANAGED_VARIABLE_MODELS.user.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.user.meta.name,
             referenceMap: getters.userItems,
         })),
     });

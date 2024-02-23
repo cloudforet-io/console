@@ -4,7 +4,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class UserVariableModel extends ResourceVariableModel<UserModel> {
-    meta = {
+    static meta = {
         key: 'user',
         name: 'User',
         resourceType: 'identity.User',

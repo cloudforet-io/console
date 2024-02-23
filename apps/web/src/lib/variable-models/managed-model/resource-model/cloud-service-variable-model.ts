@@ -6,12 +6,15 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 export default class CloudServiceVariableModel extends ResourceVariableModel<CloudServiceModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    meta = {
+    static meta = {
         key: 'cloud_service',
         name: 'Cloud Service',
         resourceType: 'inventory.CloudService',
         idKey: 'cloud_service_id',
         nameKey: 'name',
-        _properties: [this.provider.key],
     };
+
+    get properties() {
+        return [this.provider.key];
+    }
 }

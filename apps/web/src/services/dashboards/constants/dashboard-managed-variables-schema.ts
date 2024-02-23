@@ -4,6 +4,7 @@ import {
     MANAGED_VARIABLE_MODEL_KEY_MAP,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
+// TODO: implement this with managed template
 export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
     workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
     project: { key: 'project', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project },

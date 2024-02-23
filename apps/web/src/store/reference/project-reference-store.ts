@@ -71,9 +71,9 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.project.prototype.meta.key,
-            key: MANAGED_VARIABLE_MODELS.project.prototype.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.project.prototype.meta.name,
+            type: MANAGED_VARIABLE_MODELS.project.meta.key,
+            key: MANAGED_VARIABLE_MODELS.project.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.project.meta.name,
             referenceMap: getters.projectItems,
         })),
     });

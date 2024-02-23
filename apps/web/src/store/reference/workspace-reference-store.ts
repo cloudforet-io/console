@@ -42,9 +42,9 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
             return state.items ?? {};
         }, {}, { lazy: true }),
         workspaceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.workspace.prototype.meta.key,
-            key: MANAGED_VARIABLE_MODELS.workspace.prototype.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.workspace.prototype.meta.name,
+            type: MANAGED_VARIABLE_MODELS.workspace.meta.key,
+            key: MANAGED_VARIABLE_MODELS.workspace.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.workspace.meta.name,
             referenceMap: getters.workspaceItems,
         })),
     });

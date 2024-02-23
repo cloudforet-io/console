@@ -11,7 +11,9 @@ const PREFETCH_MODEL_INFO_LIST: PrefetchModelInfo[] = [
     { key: 'cost', dataKey: 'usage_type' },
 ];
 
-export const prefetchResources = () => {
+export const prefetchResources = (userId: string|undefined) => {
+    if (!userId) return;
+
     PREFETCH_MODEL_INFO_LIST.forEach((info) => {
         const model = new VariableModelFactory({
             type: 'MANAGED',

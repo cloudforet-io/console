@@ -12,12 +12,15 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
 
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    meta = {
+    static meta = {
         key: 'cost',
         name: 'Cost',
         resourceType: 'cost_analysis.Cost',
         idKey: 'cost_id',
         nameKey: 'name',
-        _properties: [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key],
     };
+
+    get properties() {
+        return [this.cost_id.key, this.product.key, this.usage_type.key, this.provider.key];
+    }
 }
