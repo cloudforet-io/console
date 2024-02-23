@@ -131,6 +131,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             commit('error/setGrantAccessFailStatus', false, { root: true });
         }
     } catch (error) {
+        console.error(error);
         /*
         * Unlike other cases where the ErrorHandler is used for error handling,
         * in the grant logic scenario, there can be instances where the Router
