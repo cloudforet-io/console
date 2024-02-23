@@ -6,14 +6,12 @@ import type { Location } from 'vue-router/types/router';
 import { PDivider, PContextMenu, PLink } from '@spaceone/design-system';
 import { clone } from 'lodash';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import type { MenuInfo, MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
@@ -42,8 +40,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
-const appContextStore = useAppContextStore();
-const { getProperRouteLocation } = useProperRouteLocation();
 const topBarSearchStore = useTopBarSearchStore();
 const router = useRouter();
 
