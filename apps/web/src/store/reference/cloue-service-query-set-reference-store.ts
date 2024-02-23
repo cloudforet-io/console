@@ -43,9 +43,9 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
             return state.items ?? {};
         }, {}, { lazy: true }),
         cloudServiceQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.cloud_service_query_set.prototype.meta.key,
-            key: MANAGED_VARIABLE_MODELS.cloud_service_query_set.prototype.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.cloud_service_query_set.prototype.meta.name,
+            type: MANAGED_VARIABLE_MODELS.cloud_service_query_set.meta.key,
+            key: MANAGED_VARIABLE_MODELS.cloud_service_query_set.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.cloud_service_query_set.meta.name,
             referenceMap: getters.cloudServiceQuerySetItems,
         })),
     });

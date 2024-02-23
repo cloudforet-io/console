@@ -106,9 +106,9 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectGroupTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.project_group.prototype.meta.key,
-            key: MANAGED_VARIABLE_MODELS.project_group.prototype.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.project_group.prototype.meta.name,
+            type: MANAGED_VARIABLE_MODELS.project_group.meta.key,
+            key: MANAGED_VARIABLE_MODELS.project_group.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.project_group.meta.name,
             referenceMap: getters.projectGroupItems,
         })),
     });
