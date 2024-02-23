@@ -48,10 +48,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type {
     SuggestionItem,
     SuggestionType,
-} from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
+} from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     SUGGESTION_TYPE,
-} from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
+} from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';

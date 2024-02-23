@@ -15,13 +15,13 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/helper';
-import GNBSearchWorkspaceFilter
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
-import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
+import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import TopBarSearchWorkspaceFilter
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
 
@@ -122,7 +122,7 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 // });
 </script>
 <template>
-    <div class="g-n-b-search-service-tab">
+    <div class="top-bar-search-service-tab">
         <div class="service-item-list">
             <top-bar-suggestion-list v-show="!state.inputText.length"
                                      :items="state.defaultServiceMenuItems || []"
@@ -141,12 +141,12 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
             </div>
         </div>
         <p-divider vertical />
-        <g-n-b-search-workspace-filter class="filter" />
+        <top-bar-search-workspace-filter class="filter" />
     </div>
 </template>
 
 <style scoped lang="postcss">
-.g-n-b-search-service-tab {
+.top-bar-search-service-tab {
     @apply flex gap-3 h-full;
     padding: 1rem 0;
     height: 100%;
