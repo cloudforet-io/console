@@ -36,9 +36,9 @@ export class VariableModelFactory implements IBaseVariableModel {
 
 
         this.meta = this.#model.meta;
+        const _properties = this.#model.properties ?? [];
 
-        const modelProperties: string[] = this.#model.meta?._properties ?? [];
-        modelProperties.forEach((property) => {
+        _properties.forEach((property) => {
             Object.defineProperty(this, property, {
                 get: () => this.#model[property],
             });

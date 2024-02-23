@@ -2,6 +2,7 @@
 export interface IBaseVariableModel {
     meta?: Record<string, any>;
     list(query?: ListQuery): Promise<ListResponse>;
+    properties?: string[];
     nameFormatter?: (data: any) => string;
     dependencies?: {
         [variableModelKey: string]: string;
