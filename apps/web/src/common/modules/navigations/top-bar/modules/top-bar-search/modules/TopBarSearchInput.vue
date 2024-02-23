@@ -43,6 +43,12 @@ const handleUpdateInput = (event: InputEvent) => {
     });
 };
 
+const handleInitInput = () => {
+    topBarSearchStore.$patch((_state) => {
+        _state.state.inputText = '';
+    });
+};
+
 watch(() => props.isFocused, async (isFocused) => {
     await nextTick();
     if (isFocused) inputRef.value?.focus();
@@ -88,7 +94,7 @@ watch(() => props.isFocused, async (isFocused) => {
                  width="1rem"
                  color="inherit"
                  class="delete-button"
-                 @click.stop="$emit('input', '')"
+                 @click.stop="handleInitInput"
             />
             <div class="shortcut-wrapper">
                 <span class="tag-box">{{ state.metaName }}</span>
