@@ -5,7 +5,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 export default class CloudServiceTypeVariableModel extends ResourceVariableModel<CloudServiceTypeModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static meta = {
+    static _meta = {
         key: 'cloud_service_type',
         name: 'Cloud Service Type',
         resourceType: 'inventory.CloudServiceType',
@@ -15,9 +15,7 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
         _searchTargets: ['cloud_service_type_id', 'name', 'group'],
     };
 
-    _properties = [this.provider.key];
-
     nameFormatter(data: any): string {
-        return `${data.group} > ${data[this.meta.nameKey]}`;
+        return `${data.group} > ${data[this._meta.nameKey]}`;
     }
 }

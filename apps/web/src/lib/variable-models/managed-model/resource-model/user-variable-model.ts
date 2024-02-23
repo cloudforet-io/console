@@ -4,7 +4,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 
 
 export default class UserVariableModel extends ResourceVariableModel<UserModel> {
-    static meta = {
+    static _meta = {
         key: 'user',
         name: 'User',
         resourceType: 'identity.User',
@@ -13,6 +13,6 @@ export default class UserVariableModel extends ResourceVariableModel<UserModel> 
     };
 
     nameFormatter(): string {
-        return this.meta.nameKey || this.meta.idKey;
+        return this._meta.nameKey || this._meta.idKey;
     }
 }

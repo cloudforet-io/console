@@ -6,7 +6,7 @@ import type {
 } from '@/lib/variable-models/_base/types';
 
 export default class EnumVariableModel implements IEnumVariableModel {
-    meta = {
+    _meta = {
         key: '',
         name: '',
     };
@@ -18,8 +18,8 @@ export default class EnumVariableModel implements IEnumVariableModel {
     constructor(config?: VariableModelConstructorConfig) {
         if (!config) return;
         if (!config.values) throw new Error('values is required');
-        if (config.key) this.meta.key = config.key;
-        if (config.name) this.meta.name = config.name;
+        if (config.key) this._meta.key = config.key;
+        if (config.name) this._meta.name = config.name;
         this.values = config.values;
     }
 

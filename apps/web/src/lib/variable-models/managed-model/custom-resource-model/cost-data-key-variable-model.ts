@@ -14,12 +14,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class CostDataKeyVariableModel implements IBaseVariableModel {
-    meta = {
+    _meta = {
         key: 'cost_data_key',
         name: 'Data Key (Cost)',
     };
 
-    dependencies = {
+    _dependencies = {
         cost_data_source: 'data_source_id',
     };
 
@@ -31,7 +31,7 @@ export default class CostDataKeyVariableModel implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
+            const dependencyOptions = getRefinedDependencyOptions(this._dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
