@@ -14,7 +14,5 @@ export default class SecretVariableModel extends ResourceVariableModel<SecretMod
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }

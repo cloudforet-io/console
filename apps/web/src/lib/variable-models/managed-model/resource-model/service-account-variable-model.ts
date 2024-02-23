@@ -14,7 +14,5 @@ export default class ServiceAccountVariableModel extends ResourceVariableModel<S
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }

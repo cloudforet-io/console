@@ -14,7 +14,5 @@ export default class CloudServiceQuerySetVariableModel extends ResourceVariableM
         nameKey: 'name',
     };
 
-    get properties() {
-        return [this.provider.key];
-    }
+    _properties = [this.provider.key];
 }
