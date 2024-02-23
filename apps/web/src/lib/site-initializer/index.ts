@@ -20,6 +20,7 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
+import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
@@ -63,7 +64,7 @@ const init = async (store) => {
         initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);
-        // prefetchResources();
+        prefetchResources();
         initI18n(store);
         initDayjs();
         initQueryHelper(store);

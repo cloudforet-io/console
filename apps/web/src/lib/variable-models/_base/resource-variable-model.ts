@@ -56,8 +56,8 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         const {
             key,
             name,
-            isDataKey = true,
-            isFilter = true,
+            isDataKey = false,
+            isFilter = false,
         } = options;
 
         const propertyObject: PropertyObject<T> = {

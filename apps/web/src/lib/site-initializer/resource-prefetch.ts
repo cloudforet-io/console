@@ -1,14 +1,25 @@
-// import { VariableModelFactory } from '@/lib/variable-models';
-// import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { VariableModelFactory } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+interface PrefetchModelInfo {
+    key: ManagedVariableModelKey;
+    dataKey: string;
+}
+
+const PREFETCH_MODEL_INFO_LIST: PrefetchModelInfo[] = [
+    { key: 'cost', dataKey: 'product' },
+    { key: 'cost', dataKey: 'usage_type' },
+];
 
 export const prefetchResources = () => {
-    // Object.values(MANAGED_VARIABLE_MODELS).forEach((config) => {
-    //     if (config.prototype.meta.prefetch) {
-    //         const model = new VariableModelFactory({
-    //             type: 'MANAGED',
-    //             managedModelKey: config.prototype.meta.key,
-    //         });
-    //         model.list();
-    //     }
-    // });
+    PREFETCH_MODEL_INFO_LIST.forEach((info) => {
+        const model = new VariableModelFactory({
+            type: 'MANAGED',
+            managedModelKey: info.key,
+        });
+        if (info.dataKey) {
+            console.debug('Prefetching', model, info.dataKey);
+            model[info.dataKey].values();
+        } else model[info.dataKey].list();
+    });
 };
