@@ -34,17 +34,23 @@ const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
-const BOTTOM_MARGIN = 4.5 * 16;
+const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const searchInputRef = ref<null | HTMLElement>(null);
-const tabRef = ref<null | Vue>(null);
 const dropdownSize = useElementSize(dropdownRef);
 const searchInputSize = useElementSize(searchInputRef);
+const tabRef = ref<null | Vue>(null);
 
+
+const getTabHeaderHeight = () => {
+    const tabHeaderHeight = tabRef.value?.$el.firstElementChild?.clientHeight;
+    if (tabHeaderHeight) return (tabHeaderHeight + 4) ?? 0;
+    return 0;
+};
 
 const state = reactive({
     loading: true,
@@ -57,19 +63,13 @@ const state = reactive({
         { label: 'Cloud Service', name: 'cloud-service' },
         { label: 'User', name: 'user' },
     ],
-    isHeightOverflown: computed(() => dropdownSize.height.value >= (windowSize.height.value - (BOTTOM_MARGIN))),
+    contentsHeight: 0,
+    isHeightOverflown: computed(() => (state.contentsHeight + getTabHeaderHeight() + searchInputSize.height.value) >= (windowSize.height.value - (BOTTOM_MARGIN))),
     dropdownHeight: computed(() => (state.isHeightOverflown ? dropdownSize.height.value : undefined)),
     tabHeight: computed(() => (state.isHeightOverflown ? state.dropdownHeight - (searchInputSize.height.value) : undefined)),
-    tabHeaderHeight: computed(() => {
-        if (tabRef.value) {
-            const tabHeaderHeight = tabRef.value.$el.firstElementChild?.clientHeight;
-            if (tabHeaderHeight) return (tabHeaderHeight + 4) ?? 0;
-        }
-        return 0;
-    }),
     tabContextHeight: computed(() => {
         if (state.isHeightOverflown) {
-            return state.tabHeight - state.tabHeaderHeight;
+            return state.tabHeight - getTabHeaderHeight();
         }
         return undefined;
     }),
@@ -122,6 +122,10 @@ const handleUpdateActiveTab = (tab: string) => {
     });
 };
 
+const handleUpdateContentsSize = (height: number) => {
+    state.contentsHeight = height;
+};
+
 (async () => {
     await fetchSearchRecent(RECENT_TYPE.MENU);
 })();
@@ -131,7 +135,6 @@ const handleUpdateActiveTab = (tab: string) => {
 <template>
     <div ref="dropdownRef"
          class="top-bar-search-dropdown"
-         :style="{ height: state.dropdownHeight + 'px'}"
     >
         <div ref="searchInputRef">
             <slot name="search-input" />
@@ -139,7 +142,7 @@ const handleUpdateActiveTab = (tab: string) => {
         <p-tab ref="tabRef"
                :active-tab="state.activeTab"
                :tabs="state.tabs"
-               :style="{ height: state.tabHeight + 'px'}"
+               :style="{ height: state.tabHeight ? state.tabHeight + 'px': undefined}"
                @update:activeTab="handleUpdateActiveTab"
         >
             <template #service>
@@ -148,7 +151,7 @@ const handleUpdateActiveTab = (tab: string) => {
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
-                    :style="{ height: state.tabContextHeight + 'px'}"
+                    :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                 />
             </template>
@@ -158,7 +161,7 @@ const handleUpdateActiveTab = (tab: string) => {
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
-                    :style="{ height: state.tabContextHeight + 'px'}"
+                    :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                 />
             </template>
@@ -168,8 +171,9 @@ const handleUpdateActiveTab = (tab: string) => {
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
-                    :style="{ height: state.tabContextHeight + 'px'}"
+                    :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
+                    @update:contents-size="handleUpdateContentsSize"
                 >
                     <template #item-format="item">
                         <div>{{ item?.label }}</div>
