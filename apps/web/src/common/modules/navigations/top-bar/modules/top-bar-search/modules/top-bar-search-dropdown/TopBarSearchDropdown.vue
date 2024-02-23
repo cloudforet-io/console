@@ -11,14 +11,14 @@ import type { RecentConfig } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SuggestionType } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import GNBSearchServiceTab
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/GNBSearchServiceTab.vue';
+import type { SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import SearchTabContent
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/SearchTabContent.vue';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchServiceAccountTab
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
+import TopBarSearchServiceTab
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceTab.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
 
 interface Props {
@@ -130,7 +130,7 @@ const handleUpdateActiveTab = (tab: string) => {
 
 <template>
     <div ref="dropdownRef"
-         class="gnb-search-dropdown"
+         class="top-bar-search-dropdown"
          :style="{ height: state.dropdownHeight + 'px'}"
     >
         <div ref="searchInputRef">
@@ -143,7 +143,7 @@ const handleUpdateActiveTab = (tab: string) => {
                @update:activeTab="handleUpdateActiveTab"
         >
             <template #service>
-                <g-n-b-search-service-tab
+                <top-bar-search-service-tab
                     :search-limit="SEARCH_LIMIT"
                     :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
@@ -181,7 +181,7 @@ const handleUpdateActiveTab = (tab: string) => {
 </template>
 
 <style lang="postcss" scoped>
-.gnb-search-dropdown {
+.top-bar-search-dropdown {
     @apply fixed rounded-xs;
     display: flex;
     flex-direction: column;
@@ -205,7 +205,7 @@ const handleUpdateActiveTab = (tab: string) => {
 }
 
 @screen mobile {
-    .gnb-search-dropdown {
+    .top-bar-search-dropdown {
         @apply flex flex-col;
         position: fixed;
         top: $top-bar-height;

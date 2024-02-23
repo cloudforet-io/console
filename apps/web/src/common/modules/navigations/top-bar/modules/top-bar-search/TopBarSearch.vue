@@ -9,10 +9,10 @@ import { throttle } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import GNBSearchDropdown from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/GNBSearchDropdown.vue';
-import GNBSearchInput from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/GNBSearchInput.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
-import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
+import TopBarSearchDropdown from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/TopBarSearchDropdown.vue';
+import TopBarSearchInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchInput.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 
 const MOBILE_WINDOW_SIZE = screens.mobile.max;
@@ -107,15 +107,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="gnb-search"
+    <div class="top-bar-search"
          @click.stop
     >
-        <g-n-b-search-input v-if="state.isOverMobileSize"
-                            :is-focused.sync="state.isFocusOnInput"
-                            @click="showSearchMenu"
-                            @esc="handleHideSearchMenu"
-                            @arrow-up="moveFocusToSuggestion('UPWARD')"
-                            @arrow-down="moveFocusToSuggestion('DOWNWARD')"
+        <top-bar-search-input v-if="state.isOverMobileSize"
+                              :is-focused.sync="state.isFocusOnInput"
+                              @click="showSearchMenu"
+                              @esc="handleHideSearchMenu"
+                              @arrow-up="moveFocusToSuggestion('UPWARD')"
+                              @arrow-down="moveFocusToSuggestion('DOWNWARD')"
         />
 
         <p-tooltip v-else
@@ -137,22 +137,22 @@ onUnmounted(() => {
             </span>
         </p-tooltip>
 
-        <g-n-b-search-dropdown v-show="state.visible"
-                               :focusing-direction.sync="state.focusingDirection"
-                               :is-focused.sync="state.isFocusOnSuggestion"
-                               @move-focus-end="handleMoveFocusEnd"
-                               @close="handleHideSearchMenu"
+        <top-bar-search-dropdown v-show="state.visible"
+                                 :focusing-direction.sync="state.focusingDirection"
+                                 :is-focused.sync="state.isFocusOnSuggestion"
+                                 @move-focus-end="handleMoveFocusEnd"
+                                 @close="handleHideSearchMenu"
         >
             <template #search-input>
-                <g-n-b-search-input v-if="!state.isOverMobileSize"
-                                    :is-focused.sync="state.isFocusOnInput"
-                                    @click="showSearchMenu"
-                                    @esc="hideSearchMenu"
-                                    @arrow-up="moveFocusToSuggestion('UPWARD')"
-                                    @arrow-down="moveFocusToSuggestion('DOWNWARD')"
+                <top-bar-search-input v-if="!state.isOverMobileSize"
+                                      :is-focused.sync="state.isFocusOnInput"
+                                      @click="showSearchMenu"
+                                      @esc="hideSearchMenu"
+                                      @arrow-up="moveFocusToSuggestion('UPWARD')"
+                                      @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                 />
             </template>
-        </g-n-b-search-dropdown>
+        </top-bar-search-dropdown>
         <div v-if="state.visible"
              class="background-block"
              @click="handleHideSearchMenu"
@@ -161,7 +161,7 @@ onUnmounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.gnb-search {
+.top-bar-search {
     @apply relative;
     box-shadow: 0 0 8px 0 #00000014;
     .menu-button {

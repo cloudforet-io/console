@@ -8,8 +8,8 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;

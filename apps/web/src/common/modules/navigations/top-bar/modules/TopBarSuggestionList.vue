@@ -7,9 +7,9 @@ import {
     PContextMenu, PI, PLazyImg, PTooltip, PTextHighlighting,
 } from '@spaceone/design-system';
 
-import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
+import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 interface Props {
     items: SuggestionItem[];

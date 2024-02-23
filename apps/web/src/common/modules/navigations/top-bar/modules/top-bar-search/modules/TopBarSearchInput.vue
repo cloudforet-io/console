@@ -8,7 +8,7 @@ import { PI, screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
 interface Props {
     isFocused: boolean;
@@ -53,7 +53,7 @@ watch(() => props.isFocused, async (isFocused) => {
 </script>
 
 <template>
-    <div class="gnb-search-input"
+    <div class="top-bar-search-input"
          @click.stop="$emit('click')"
     >
         <div class="disabled-input">
@@ -99,7 +99,7 @@ watch(() => props.isFocused, async (isFocused) => {
 </template>
 
 <style lang="postcss" scoped>
-.gnb-search-input {
+.top-bar-search-input {
 
     .disabled-input {
         @apply flex items-center justify-center bg-gray-100 rounded-md text-gray-400;
@@ -166,7 +166,7 @@ watch(() => props.isFocused, async (isFocused) => {
 }
 
 @screen laptop {
-    .gnb-search-input {
+    .top-bar-search-input {
         .disabled-input {
             padding: 0 0.75rem;
         }

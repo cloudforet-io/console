@@ -13,14 +13,14 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/helper';
-import GNBSearchWorkspaceFilter
-    from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/modules/gnb-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
-import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import GNBSearchWorkspaceFilter
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 
 
