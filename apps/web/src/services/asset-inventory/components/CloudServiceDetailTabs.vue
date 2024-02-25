@@ -133,7 +133,7 @@ const monitoringState: MonitoringProps = reactive({
         <template #tag>
             <cloud-service-tags-panel v-if="tableState.selectedCloudServiceIds[0]"
                                       :resource-id="tableState.selectedCloudServiceIds[0]"
-                                      :disabled="!tableState.hasManagePermission"
+                                      :disabled="!tableState.hasAdminOrWorkspaceOwnerRole"
                                       :provider="tableState.selectedItems[0].provider ?? ''"
             />
         </template>
