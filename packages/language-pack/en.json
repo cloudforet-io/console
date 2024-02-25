@@ -612,6 +612,7 @@
 				},
 				"PRIVATE": "Private",
 				"PROJECT": "Project",
+				"PROVIDERS_TITLE": "Service Providers",
 				"PUBLIC": "Public",
 				"RELOCATE_DASHBOARD_LABEL": "Go to Dashboard",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "You can now create enhanced cost dashboards within the new Dashboards menu.",
@@ -1218,6 +1219,7 @@
 			"VERSION": "Version"
 		},
 		"STARRED": "Starred",
+		"STARRED_NO_DATA": "Your starred dashboard will appear here",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",

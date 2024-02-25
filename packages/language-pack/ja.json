@@ -612,6 +612,7 @@
 				},
 				"PRIVATE": "非公開",
 				"PROJECT": "プロジェクト",
+				"PROVIDERS_TITLE": "サービスプロバイダー",
 				"PUBLIC": "公開",
 				"RELOCATE_DASHBOARD_LABEL": "ダッシュボードに移動",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "新しいダッシュボードメニュー内で、より高度なコストダッシュボードを作成できます。",
@@ -1218,6 +1219,7 @@
 			"VERSION": "バージョン"
 		},
 		"STARRED": "",
+		"STARRED_NO_DATA": "",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",

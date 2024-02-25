@@ -83,7 +83,7 @@ const adminAssetInventoryRoute: RouteConfig = {
         {
             path: 'server',
             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVER._NAME),
-            meta: { lsbVisible: true, menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
+            meta: { menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
             component: ServerPage as any,
         },
         {
@@ -94,7 +94,6 @@ const adminAssetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME),
-                    meta: { lsbVisible: true },
                     props: true,
                     component: AdminCollectorMainPage as any,
                 },
@@ -112,13 +111,12 @@ const adminAssetInventoryRoute: RouteConfig = {
                         {
                             path: '/',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME),
-                            meta: { lsbVisible: true },
                             component: AdminCollectorHistoryPage as any,
                         },
                         {
                             path: ':jobId',
                             name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME),
-                            meta: { lsbVisible: true, label: ({ params }) => params.jobId, copiable: true },
+                            meta: { label: ({ params }) => params.jobId, copiable: true },
                             props: true,
                             component: AdminCollectHistoryJobPage as any,
                         },
@@ -128,7 +126,7 @@ const adminAssetInventoryRoute: RouteConfig = {
                     path: ':collectorId',
                     name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR.DETAIL._NAME),
                     props: true,
-                    meta: { lsbVisible: true, label: ({ params }) => params.collectorId, copiable: true },
+                    meta: { label: ({ params }) => params.collectorId, copiable: true },
                     component: AdminCollectorDetailPage as any,
                 },
             ],

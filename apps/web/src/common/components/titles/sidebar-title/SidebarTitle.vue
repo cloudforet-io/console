@@ -33,9 +33,9 @@ const props = withDefaults(defineProps<{
 
 <style lang="postcss" scoped>
 header {
-    @apply flex border-b border-gray-200 items-center;
-    padding: 2rem 0 0.75rem 1rem;
-    margin-bottom: 0.75rem;
+    @apply flex border-t border-gray-200 items-center;
+    margin-top: 0.25rem;
+    padding: 0.75rem 0 0.5rem 0.5rem;
     .title {
         @apply text-sm text-gray-900 font-semibold capitalize truncate;
         font-size: 0.875rem;

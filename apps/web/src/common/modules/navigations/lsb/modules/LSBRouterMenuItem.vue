@@ -98,7 +98,7 @@ const getIconName = (icon: LSBIcon): string => {
 
 <style lang="postcss" scoped>
 .l-s-b-router-menu-item {
-    @apply border border-transparent inline-flex items-center w-full h-full justify-between;
+    @apply border border-transparent inline-flex items-center w-full h-full justify-between text-gray-800;
     font-size: 0.875rem;
     line-height: 125%;
     border-radius: 4px;

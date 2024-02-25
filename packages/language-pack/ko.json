@@ -612,6 +612,7 @@
 				},
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",
+				"PROVIDERS_TITLE": "서비스 제공자",
 				"PUBLIC": "공개",
 				"RELOCATE_DASHBOARD_LABEL": "대시보드로 이동",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "새로운 대시보드 메뉴에서는 좀 더 향상된 방식으로 비용 대시보드를 만들 수 있습니다.",
@@ -1218,6 +1219,7 @@
 			"VERSION": "버전 "
 		},
 		"STARRED": "",
+		"STARRED_NO_DATA": "",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",

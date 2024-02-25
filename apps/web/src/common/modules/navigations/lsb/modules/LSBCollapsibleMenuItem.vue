@@ -23,7 +23,7 @@ const handleClickCollapsibleTitle = () => {
 </script>
 
 <template>
-    <div class="l-s-b-collapsible-menu-itm"
+    <div class="l-s-b-collapsible-menu-item"
          :class="{ 'is-collapsed': state.isCollapsed }"
     >
         <div class="collapsible-title"
@@ -38,13 +38,15 @@ const handleClickCollapsibleTitle = () => {
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">
-            <slot name="collapsible-contents" />
+            <slot name="collapsible-contents"
+                  v-bind="{...$props}"
+            />
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
-.l-s-b-collapsible-menu-itm {
+.l-s-b-collapsible-menu-item {
     @apply flex flex-col text-label-md;
     .collapsible-title {
         @apply flex items-center font-bold;

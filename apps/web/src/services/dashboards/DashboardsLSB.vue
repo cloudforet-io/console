@@ -14,8 +14,6 @@ import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { MENU_ID } from '@/lib/menu/config';
-
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -51,7 +49,7 @@ const state = reactive({
         return result;
     }),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
-        type: 'item',
+        type: MENU_ITEM_TYPE.ITEM,
         id: d.public_dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
@@ -66,7 +64,7 @@ const state = reactive({
         },
     }))),
     workspaceMenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
-        type: 'item',
+        type: MENU_ITEM_TYPE.ITEM,
         id: d.public_dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
@@ -82,7 +80,7 @@ const state = reactive({
     }))),
     projectMenuSet: computed<LSBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
     privateMenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
-        type: 'item',
+        type: MENU_ITEM_TYPE.ITEM,
         id: d.private_dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
@@ -99,16 +97,10 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet = [
             {
-                type: 'collapsible',
+                type: MENU_ITEM_TYPE.COLLAPSIBLE,
                 label: i18n.t('COMMON.STARRED'),
-                id: MENU_ID.DASHBOARDS,
-                foldable: false,
-                to: getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE._NAME,
-                }),
-                hideFavorite: true,
             },
-            { type: 'divider' },
+            { type: MENU_ITEM_TYPE.DIVIDER },
         ];
 
         if (isAdminMode.value) {
@@ -136,7 +128,7 @@ const filterLSBItemsByPagePermission = (scope: DashboardScope, items: LSBMenu[])
     if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
     else if (scope === 'PRIVATE') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
     const topTitle: LSBMenu = {
-        type: 'top-title',
+        type: MENU_ITEM_TYPE.TOP_TITLE,
         label,
     };
     if (scope === 'PRIVATE') {
@@ -225,18 +217,31 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 
 <template>
     <l-s-b class="dashboards-l-s-b"
-           :class="{'admin-mode': isAdminMode}"
            :menu-set="state.menuSet"
     >
         <template #collapsible-contents>
-            <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
-                                    :key="idx"
-                                    :item="item"
-                                    :is-admin-mode="state.isAdminMode"
-                                    :idx="idx"
-                                    :current-path="state.currentPath"
-                                    is-hide-favorite
-            />
+            <div v-if="state.starredMenuSet.length > 0">
+                <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+                                        :key="idx"
+                                        :item="item"
+                                        :idx="idx"
+                                        :current-path="state.currentPath"
+                                        is-hide-favorite
+                />
+            </div>
+            <span v-else
+                  class="no-data"
+            >
+                {{ $t('COMMON.STARRED_NO_DATA') }}
+            </span>
         </template>
     </l-s-b>
 </template>
+
+<style scoped lang="postcss">
+.dashboards-l-s-b {
+    .no-data {
+        @apply text-gray-500;
+    }
+}
+</style>
