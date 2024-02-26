@@ -96,7 +96,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
     const convertedVariables = order.map((d) => ({
         ...properties[d],
         propertyName: d,
-        manageable: properties[d].variable_type === 'MANAGED' ? d : undefined,
+        manageable: properties[d].variable_type === 'MANAGED' ? undefined : d,
     }));
     if (state.selectedVariableType === 'ALL') {
         state.orderedVariables = convertedVariables;
