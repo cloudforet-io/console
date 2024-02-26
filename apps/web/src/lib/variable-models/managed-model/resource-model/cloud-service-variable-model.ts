@@ -13,4 +13,9 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
         idKey: 'cloud_service_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = CloudServiceVariableModel._meta;
+    }
 }

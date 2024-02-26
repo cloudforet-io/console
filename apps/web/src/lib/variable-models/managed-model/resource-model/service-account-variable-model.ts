@@ -13,4 +13,9 @@ export default class ServiceAccountVariableModel extends ResourceVariableModel<S
         idKey: 'service_account_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = ServiceAccountVariableModel._meta;
+    }
 }

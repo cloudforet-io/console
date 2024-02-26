@@ -15,6 +15,11 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
         _searchTargets: ['cloud_service_type_id', 'name', 'group'],
     };
 
+    constructor() {
+        super();
+        this._meta = CloudServiceTypeVariableModel._meta;
+    }
+
     nameFormatter(data: any): string {
         return `${data.group} > ${data[this._meta.nameKey]}`;
     }
