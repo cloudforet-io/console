@@ -3,6 +3,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 import type {
     IBaseVariableModel, ListQuery, ResourceVariableModelConstructorOptions, VariableModelConstructorConfig,
     ListResponse,
+    PropertyObject, PropertyOptions,
 } from '@/lib/variable-models/_base/types';
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
@@ -46,5 +47,10 @@ export class VariableModelFactory implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         return this.#model.list(query);
+    }
+
+    generateProperty<T=any>(options: PropertyOptions<T>): PropertyObject<T> {
+        if (!this.#model.generateProperty) throw new Error('generateProperty method is not implemented');
+        return this.#model.generateProperty(options);
     }
 }
