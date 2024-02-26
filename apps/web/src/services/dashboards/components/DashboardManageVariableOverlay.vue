@@ -41,6 +41,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -53,7 +54,7 @@ const state = reactive({
         CLONE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
-    variableSchema: computed(() => dashboardDetailState.variablesSchema),
+    variableSchema: computed(() => dashboardDetailGetters.refinedVariablesSchema),
     selectedVariable: '' as string,
     variableNames: computed<string[]>(() => {
         const properties = state.variableSchema.properties;
@@ -132,7 +133,7 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
         const selectedProperty = state.selectedVariable;
         properties[selectedProperty] = variable;
         dashboardDetailStore.setVariablesSchema({
-            ...dashboardDetailState.variablesSchema,
+            ...dashboardDetailGetters.refinedVariablesSchema,
             properties,
         });
 

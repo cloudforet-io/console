@@ -249,7 +249,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-refresh-on-variable-change="widgetFullModeState.visibleFullMode"
                                :dashboard-settings="dashboardDetailState.settings"
-                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"
                                @mounted="handleWidgetMounted(widget.widget_key)"

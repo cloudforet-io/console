@@ -70,6 +70,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const appContextGetters = appContextStore.getters;
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.state;
+    const dashboardDetailGetters = dashboardDetailStore.getters;
     const {
         title, resetTitle, updateTitle, isTitleValid, titleInvalidText,
     } = useWidgetTitleInput();
@@ -111,7 +112,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             widgetOptions: dashboardWidgetInfo.value?.widget_options,
             widgetName: state.widgetConfigId,
             dashboardSettings: dashboardDetailState.settings,
-            dashboardVariablesSchema: dashboardDetailState.variablesSchema,
+            dashboardVariablesSchema: dashboardDetailGetters.refinedVariablesSchema,
             dashboardVariables: dashboardDetailState.variables,
             title: dashboardWidgetInfo.value?.title,
             schemaProperties: dashboardWidgetInfo.value?.schema_properties,

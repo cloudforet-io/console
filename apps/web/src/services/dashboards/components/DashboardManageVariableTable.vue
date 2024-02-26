@@ -34,6 +34,7 @@ const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -81,7 +82,7 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     state.orderedVariables[selectedIndex].use = !value;
 
     // change use in store
-    const _variablesSchema = cloneDeep(dashboardDetailState.variablesSchema);
+    const _variablesSchema = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
     _variablesSchema.properties[propertyName].use = !value;
     dashboardDetailStore.setVariablesSchema(_variablesSchema);
 };
@@ -92,7 +93,7 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
     return 'primary';
 };
 const convertAndUpdateVariablesForTable = (order: string[]) => {
-    const properties = dashboardDetailState.variablesSchema.properties;
+    const properties = dashboardDetailGetters.refinedVariablesSchema.properties;
     const convertedVariables = order.map((d) => {
         if (properties[d].variable_type === 'MANAGED') {
             return {

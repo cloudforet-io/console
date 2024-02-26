@@ -36,6 +36,7 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
@@ -44,7 +45,7 @@ const state = reactive({
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
         const nonInheritedWidgetOptions = getNonInheritedWidgetOptionNamesAmongUsedVariables(
-            dashboardDetailState.variablesSchema,
+            dashboardDetailGetters.refinedVariablesSchema,
             widgetFormState.inheritOptions,
             widgetFormState.schemaProperties,
         );
