@@ -13,4 +13,9 @@ export default class CloudServiceQuerySetVariableModel extends ResourceVariableM
         idKey: 'query_set_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = CloudServiceQuerySetVariableModel._meta;
+    }
 }

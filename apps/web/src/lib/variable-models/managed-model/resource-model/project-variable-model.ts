@@ -43,6 +43,11 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
         _only: ['project_id', 'name', 'project_group_id'],
     };
 
+    constructor() {
+        super();
+        this._meta = ProjectVariableModel._meta;
+    }
+
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: ProjectModel[]; total_count: number }>>;

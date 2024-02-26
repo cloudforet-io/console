@@ -12,6 +12,11 @@ export default class WebhookVariableModel extends ResourceVariableModel<WebhookM
         nameKey: 'name',
     };
 
+    constructor() {
+        super();
+        this._meta = WebhookVariableModel._meta;
+    }
+
     nameFormatter(): string {
         return this._meta.nameKey || this._meta.idKey;
     }

@@ -13,4 +13,9 @@ export default class CollectorVariableModel extends ResourceVariableModel<Collec
         idKey: 'collector_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = CollectorVariableModel._meta;
+    }
 }

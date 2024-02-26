@@ -13,4 +13,9 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
         idKey: 'data_source_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = CostDataSourceVariableModel._meta;
+    }
 }

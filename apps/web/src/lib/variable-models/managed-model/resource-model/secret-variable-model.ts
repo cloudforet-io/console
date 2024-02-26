@@ -13,4 +13,9 @@ export default class SecretVariableModel extends ResourceVariableModel<SecretMod
         idKey: 'secret_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = SecretVariableModel._meta;
+    }
 }

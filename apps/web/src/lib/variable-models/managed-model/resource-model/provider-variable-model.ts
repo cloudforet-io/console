@@ -13,4 +13,9 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
         idKey: 'provider_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = ProviderVariableModel._meta;
+    }
 }

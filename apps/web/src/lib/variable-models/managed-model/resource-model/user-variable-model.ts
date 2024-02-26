@@ -12,6 +12,11 @@ export default class UserVariableModel extends ResourceVariableModel<UserModel> 
         nameKey: 'name',
     };
 
+    constructor() {
+        super();
+        this._meta = UserVariableModel._meta;
+    }
+
     nameFormatter(): string {
         return this._meta.nameKey || this._meta.idKey;
     }

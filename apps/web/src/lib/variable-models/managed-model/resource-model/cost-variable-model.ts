@@ -19,4 +19,9 @@ export default class CostVariableModel extends ResourceVariableModel<CostModel> 
         idKey: 'cost_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = CostVariableModel._meta;
+    }
 }

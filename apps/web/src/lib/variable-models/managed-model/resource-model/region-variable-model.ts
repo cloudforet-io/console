@@ -15,6 +15,11 @@ export default class RegionVariableModel extends ResourceVariableModel<RegionMod
         _searchTargets: ['name', 'provider', 'region_code'],
     };
 
+    constructor() {
+        super();
+        this._meta = RegionVariableModel._meta;
+    }
+
     nameFormatter(data: any): string {
         return `${data[this._meta.nameKey]} | ${data[this._meta.idKey]}`;
     }

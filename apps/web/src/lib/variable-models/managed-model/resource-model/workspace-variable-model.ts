@@ -11,4 +11,9 @@ export default class WorkspaceVariableModel extends ResourceVariableModel<Worksp
         idKey: 'workspace_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = WorkspaceVariableModel._meta;
+    }
 }

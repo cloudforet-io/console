@@ -11,4 +11,9 @@ export default class ProjectGroupVariableModel extends ResourceVariableModel<Pro
         idKey: 'project_group_id',
         nameKey: 'name',
     };
+
+    constructor() {
+        super();
+        this._meta = ProjectGroupVariableModel._meta;
+    }
 }
