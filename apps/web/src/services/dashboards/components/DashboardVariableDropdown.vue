@@ -48,14 +48,6 @@ const state = reactive({
     variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailGetters.refinedVariablesSchema.properties[props.propertyName]),
     variableName: computed<string|undefined>(() => state.variableProperty?.name),
     selected: [] as MenuItem[],
-    // Options State
-    searchResourceOptions: []as {key: string; name: string}[],
-    autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
-        const api = (state.variableProperty?.options?.reference_key ?? state.variableProperty?.options?.resource_key) // NOTE: Compatibility code for version 1.12.
-            ? SpaceConnector.client.addOns.autocomplete.distinct
-            : SpaceConnector.client.addOns.autocomplete.resource;
-        return getCancellableFetcher(api);
-    }),
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
         if (!Array.isArray(options)) return undefined;
