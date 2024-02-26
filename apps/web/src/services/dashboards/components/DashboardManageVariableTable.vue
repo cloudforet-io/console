@@ -14,13 +14,12 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;
-    manageable?: string;
+    manageable?: boolean;
 }
 interface EmitFn {
     (e: 'delete', value: string): void;
@@ -94,20 +93,11 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
 };
 const convertAndUpdateVariablesForTable = (order: string[]) => {
     const properties = dashboardDetailGetters.refinedVariablesSchema.properties;
-    const convertedVariables = order.map((d) => {
-        if (properties[d].variable_type === 'MANAGED') {
-            return {
-                ...properties[d],
-                propertyName: d,
-                description: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[d]?.description ?? properties[d].description ?? '',
-            };
-        }
-        return {
-            ...properties[d],
-            propertyName: d,
-            manageable: d,
-        };
-    });
+    const convertedVariables = order.map((d) => ({
+        ...properties[d],
+        propertyName: d,
+        manageable: properties[d].variable_type !== 'MANAGED' ? true : undefined,
+    }));
     if (state.selectedVariableType === 'ALL') {
         state.orderedVariables = convertedVariables;
     } else if (state.selectedVariableType === 'MANAGED') {
@@ -173,19 +163,19 @@ const {
                     {{ $t(value) }}
                 </p-collapsible-panel>
             </template>
-            <template #col-manageable-format="{ value }">
+            <template #col-manageable-format="{ item, value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
                     <p-icon-button name="ic_duplicate"
-                                   @click="handleCloneVariable(value)"
+                                   @click="handleCloneVariable(item.percentage)"
                     />
                     <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(value)"
+                                   @click="handleEditVariable(item.percentage)"
                     />
                     <p-icon-button name="ic_delete"
                                    style-type="negative-transparent"
-                                   @click="handleDeleteVariable(value)"
+                                   @click="handleDeleteVariable(item.percentage)"
                     />
                 </div>
             </template>
