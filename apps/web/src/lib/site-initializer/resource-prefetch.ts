@@ -20,7 +20,6 @@ export const prefetchResources = (userId: string|undefined) => {
             managedModelKey: info.key,
         });
         if (info.dataKey) {
-            console.debug('Prefetching', model, info.dataKey);
             model[info.dataKey].values();
         } else model[info.dataKey].list();
     });
