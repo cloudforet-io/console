@@ -6,6 +6,8 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 export default class CloudServiceVariableModel extends ResourceVariableModel<CloudServiceModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
+    account = this.generateProperty({ key: 'account', name: 'Asset Account' });
+
     static _meta = {
         key: 'cloud_service',
         name: 'Cloud Service',

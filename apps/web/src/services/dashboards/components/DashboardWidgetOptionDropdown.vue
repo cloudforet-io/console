@@ -254,7 +254,7 @@ const getVariableModelMenuHandlerInfoList = (schema?: WidgetOptionsSchemaPropert
     const _results: VariableModelMenuHandlerInfo[] = [];
     schema.item_options?.forEach((conf) => {
         // TODO: set modelOptions after provider is ready
-        const variableModel = new VariableModelFactory(conf);
+        const variableModel = new VariableModelFactory({ type: conf.type, managedModelKey: conf.key });
         _results.push({
             variableModel,
             dataKey: conf.dataKey,

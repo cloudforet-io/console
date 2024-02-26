@@ -9,11 +9,12 @@ import type {
 } from '@/schema/dashboard/_constants/widget-constant';
 
 import type { VariableModelType } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 interface WidgetItemOptions {
     type: VariableModelType;
-    key: string;
+    key: ManagedVariableModelKey;
     dataKey?: string;
 }
 
