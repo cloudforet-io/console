@@ -96,8 +96,10 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
                 dataKey: _variableOption.dataKey,
             };
         } else {
+            const CostVariableModel = new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost });
+            CostVariableModel[groupBy] = CostVariableModel.generateProperty({ key: groupBy });
             variableModelInfo = {
-                variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.cost }),
+                variableModel: CostVariableModel,
                 dataKey: groupBy,
             };
         }
