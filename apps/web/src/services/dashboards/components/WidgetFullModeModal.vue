@@ -51,6 +51,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
@@ -75,7 +76,7 @@ const widgetRef = toRef(state, 'widgetRef');
 /* Util */
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
-    state.variableSchemaSnapshot = cloneDeep(dashboardDetailState.variablesSchema);
+    state.variableSchemaSnapshot = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
 
@@ -195,7 +196,7 @@ onBeforeUnmount(() => {
                                :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :dashboard-settings="dashboardDetailState.settings"
-                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="state.loadingWidget"
                                disable-full-mode

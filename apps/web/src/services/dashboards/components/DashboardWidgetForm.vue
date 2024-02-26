@@ -22,6 +22,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
 
@@ -76,7 +77,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
 
         <dashboard-widget-options-form :key="`${props.widgetConfigId}-${props.widgetKey}`"
                                        :project-id="dashboardDetailState.projectId"
-                                       :variables-schema="dashboardDetailState.variablesSchema"
+                                       :variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                        :variables="dashboardDetailState.variables"
         />
 

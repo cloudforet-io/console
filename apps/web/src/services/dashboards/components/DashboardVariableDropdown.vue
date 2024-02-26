@@ -45,7 +45,7 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any|null,
     searchText: '',
-    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
+    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailGetters.refinedVariablesSchema.properties[props.propertyName]),
     variableName: computed<string|undefined>(() => state.variableProperty?.name),
     selected: [] as MenuItem[],
     // Options State
