@@ -7,7 +7,7 @@ import type {
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-
+// Variable Model Type : if not MANAGED, then it is CUSTOM (ENUM or RESOURCE)
 export type VariableModelType = 'ENUM'|'RESOURCE'|'MANAGED';
 export interface VariableModelFactoryConfig {
     type: VariableModelType;

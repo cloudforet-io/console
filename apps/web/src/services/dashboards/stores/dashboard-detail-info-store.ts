@@ -348,9 +348,23 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetValidMap[widgetKey] = isValid;
     };
     //
+    const refineSchemaProperties = (properties: Record<string, DashboardVariableSchemaProperty>): Record<string, DashboardVariableSchemaProperty> => Object.entries(properties)
+        .reduce((acc, [property, propertyInfo]) => {
+            acc[property] = propertyInfo.variable_type === 'MANAGED'
+                ? { variable_type: 'MANAGED', use: propertyInfo.use }
+                : propertyInfo;
+            return acc;
+        }, {});
     const createDashboard = async (params: CreateDashboardParameters, dashboardType?: DashboardType): Promise<DashboardModel> => {
+        const _params = {
+            ...params,
+            variables_schema: {
+                order: params.variables_schema?.order ?? [],
+                properties: refineSchemaProperties(params.variables_schema?.properties ?? {}),
+            },
+        };
         const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
-        const res = await dashboardStore.createDashboard(_dashboardType, params);
+        const res = await dashboardStore.createDashboard(_dashboardType, _params);
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
@@ -359,6 +373,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ...params,
             [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
         };
+        if (params.variables_schema) {
+            _params.variables_schema = {
+                order: params.variables_schema.order,
+                properties: refineSchemaProperties(params.variables_schema.properties),
+            };
+        }
         const res = await dashboardStore.updateDashboard(dashboardId, _params);
         _setDashboardInfoStoreState(res);
     };
