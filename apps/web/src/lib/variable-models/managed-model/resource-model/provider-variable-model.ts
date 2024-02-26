@@ -10,7 +10,7 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
         key: 'provider',
         name: 'Provider',
         resourceType: 'identity.Provider',
-        idKey: 'provider_id',
+        idKey: 'provider',
         nameKey: 'name',
     };
 
