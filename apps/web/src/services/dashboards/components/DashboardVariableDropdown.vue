@@ -59,11 +59,11 @@ const state = reactive({
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
         if (!Array.isArray(options)) return undefined;
-        const variableModels = options.map((config) => ({
+        const variableModelInfoList = options.map((config) => ({
             variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }),
-            dataKey: config.data_key,
+            dataKey: config.dataKey,
         }));
-        return getVariableModelMenuHandler(variableModels);
+        return getVariableModelMenuHandler(variableModelInfoList);
     }),
 });
 
