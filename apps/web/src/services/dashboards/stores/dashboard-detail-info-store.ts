@@ -104,6 +104,24 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
+        refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
+            const _storedVariablesSchema = cloneDeep(state.variablesSchema);
+            const _refinedVariablesSchema: DashboardVariablesSchema = {
+                properties: {},
+                order: [..._storedVariablesSchema.order],
+            };
+            Object.entries<DashboardVariableSchemaProperty>(_storedVariablesSchema.properties).forEach(([propertyName, property]) => {
+                if (property.variable_type === 'MANAGED') {
+                    _refinedVariablesSchema.properties[propertyName] = {
+                        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[propertyName],
+                        use: property.use,
+                    };
+                } else {
+                    _refinedVariablesSchema.properties[propertyName] = property;
+                }
+            });
+            return _refinedVariablesSchema;
+        }),
     });
 
     /* Mutations */
