@@ -1,12 +1,11 @@
 // variable models
 export interface IBaseVariableModel {
-    meta?: Record<string, any>;
-    list(query?: ListQuery): Promise<ListResponse>;
-    _properties?: string[];
-    nameFormatter?: (data: any) => string;
-    dependencies?: {
+    _meta?: Record<string, any>;
+    _dependencies?: {
         [variableModelKey: string]: string;
     }
+    list(query?: ListQuery): Promise<ListResponse>;
+    nameFormatter?: (data: any) => string;
     //
     // scope?: {
     //     resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
@@ -14,7 +13,7 @@ export interface IBaseVariableModel {
     // };
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
-   meta: {
+    _meta: {
        key: string;
        name: string;
    };
@@ -32,9 +31,8 @@ interface ResourceVariableMeta {
 }
 
 export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
-    meta: ResourceVariableMeta;
+    _meta: ResourceVariableMeta;
     nameFormatter(data: any): string;
-    keys?(): string[];
     [propertyKey: string]: PropertyObject<T> | any;
 }
 
@@ -55,7 +53,6 @@ export interface PropertyObject<T> {
     isFilter?: boolean;
     fixedValue?: any;
     values?(query?: ListQuery): Promise<ListResponse>;
-    keys?(): any;
 }
 
 // variable model constructor configs

@@ -34,7 +34,7 @@ const listProjectGroup = async (projectGroupIdList: string[]) => {
 };
 
 export default class ProjectVariableModel extends ResourceVariableModel<ProjectModel> {
-    static meta = {
+    static _meta = {
         key: 'project',
         name: 'Project',
         resourceType: 'identity.Project',
@@ -54,7 +54,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
                 return `${targetProjectGroup.name} > ${data.name}`;
             }
         }
-        return data[this.meta.nameKey];
+        return data[this._meta.nameKey];
     }
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
@@ -76,7 +76,7 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
 
                 this.#response = {
                     results: response.results ? response.results.map((d) => ({
-                        key: d[this.meta.idKey], name: this.#nameFormatter(d, projectGroupList),
+                        key: d[this._meta.idKey], name: this.#nameFormatter(d, projectGroupList),
                     })) : [],
                     more,
                 };

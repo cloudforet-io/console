@@ -1,7 +1,7 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
 
 export default class AssetDefaultFieldVariableModel extends EnumVariableModel {
-    meta = {
+    _meta = {
         key: 'asset_default_field',
         name: 'Data Field (Cost)',
     };

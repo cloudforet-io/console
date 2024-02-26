@@ -12,7 +12,7 @@ export interface VariableModelMenuHandlerInfo {
 
 const _getTitle = (modelInfo: VariableModelMenuHandlerInfo) => {
     const _dataKey = modelInfo.dataKey;
-    return _dataKey ? modelInfo.variableModel[_dataKey].name : modelInfo.variableModel.meta?.name;
+    return _dataKey ? modelInfo.variableModel[_dataKey].name : modelInfo.variableModel._meta?.name;
 };
 
 export const getVariableModelMenuHandler = (variableModelInfoList: VariableModelMenuHandlerInfo[], options?: Record<string, any>): AutocompleteHandler => {

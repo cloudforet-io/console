@@ -49,9 +49,9 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             return state.items ?? {};
         }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODELS.cost_data_source.meta.key,
-            key: MANAGED_VARIABLE_MODELS.cost_data_source.meta.idKey,
-            name: MANAGED_VARIABLE_MODELS.cost_data_source.meta.name,
+            type: MANAGED_VARIABLE_MODELS.cost_data_source._meta.key,
+            key: MANAGED_VARIABLE_MODELS.cost_data_source._meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.cost_data_source._meta.name,
             referenceMap: getters.costDataSourceItems,
         })),
         hasLoaded: computed<boolean>(() => state.items !== null),

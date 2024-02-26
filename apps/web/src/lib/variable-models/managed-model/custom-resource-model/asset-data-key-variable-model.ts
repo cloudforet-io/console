@@ -14,12 +14,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const apiQueryHelper = new ApiQueryHelper();
 export default class AssetDataKeyVariableModel implements IBaseVariableModel {
-    meta = {
+    _meta = {
         key: 'asset_data_key',
         name: 'Data Type (Asset)',
     };
 
-    dependencies = {
+    _dependencies = {
         cloud_service_query_set: 'query_set_id',
     };
 
@@ -31,7 +31,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
+            const dependencyOptions = getRefinedDependencyOptions(this._dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 

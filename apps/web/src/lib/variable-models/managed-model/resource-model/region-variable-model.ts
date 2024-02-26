@@ -6,7 +6,7 @@ import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable
 export default class RegionVariableModel extends ResourceVariableModel<RegionModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static meta = {
+    static _meta = {
         key: 'region',
         name: 'Region',
         resourceType: 'inventory.Region',
@@ -15,9 +15,7 @@ export default class RegionVariableModel extends ResourceVariableModel<RegionMod
         _searchTargets: ['name', 'provider', 'region_code'],
     };
 
-    _properties = [this.provider.key];
-
     nameFormatter(data: any): string {
-        return `${data[this.meta.nameKey]} | ${data[this.meta.idKey]}`;
+        return `${data[this._meta.nameKey]} | ${data[this._meta.idKey]}`;
     }
 }
