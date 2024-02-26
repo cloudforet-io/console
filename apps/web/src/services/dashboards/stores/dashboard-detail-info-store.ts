@@ -369,19 +369,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
         const isPrivate = dashboardId?.startsWith('private');
-        let _params: UpdateDashboardParameters = {};
+        const _params: UpdateDashboardParameters = {
+            ...params,
+            [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
+        };
         if (params.variables_schema) {
-            _params = {
-                ...params,
-                variables_schema: {
-                    order: params.variables_schema.order,
-                    properties: refineSchemaProperties(params.variables_schema.properties),
-                },
-            };
-        } else {
-            _params = {
-                ...params,
-                [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
+            _params.variables_schema = {
+                order: params.variables_schema.order,
+                properties: refineSchemaProperties(params.variables_schema.properties),
             };
         }
         const res = await dashboardStore.updateDashboard(dashboardId, _params);
