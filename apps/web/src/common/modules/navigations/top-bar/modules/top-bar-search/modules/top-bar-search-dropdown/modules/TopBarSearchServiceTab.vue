@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex } from '@spaceone/design-system';
+import { getTextHighlightRegex, PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { store } from '@/store';
@@ -22,6 +22,8 @@ import type { RecentMenu } from '@/common/modules/navigations/stores/recent-stor
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import TopBarSearchEmpty
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
@@ -188,14 +190,23 @@ watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
                     @select="handleSelect"
                 />
             </div>
-            <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
-                                     :items="state.serviceMenuList || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
+            <p-data-loader :data="state.serviceMenuList ||[]"
+                           :loading="loading"
+            >
+                <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
+                                         :items="state.serviceMenuList || []"
+                                         :input-text="state.inputText"
+                                         :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                                         :focusing-direction="props.focusingDirection"
+                                         @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                                         @select="handleSelect"
+                />
+                <template #no-data>
+                    <top-bar-search-empty :input-text="state.inputText"
+                                          :is-recent="false"
+                    />
+                </template>
+            </p-data-loader>
         </div>
     </div>
 </template>

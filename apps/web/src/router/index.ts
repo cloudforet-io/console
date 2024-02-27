@@ -19,7 +19,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { pinia } from '@/store/pinia';
 
 import { calculateIsAccessibleRoute } from '@/lib/access-control';
-import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import { GTag } from '@/lib/site-analytics/gtag';
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
