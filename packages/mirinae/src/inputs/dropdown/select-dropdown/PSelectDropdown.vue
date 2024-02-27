@@ -97,6 +97,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
     (e: 'delete-tag', item: SelectDropdownMenuItem, index: number): void;
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
+    (e: 'click-done', selected: SelectDropdownMenuItem[]|string|number): void;
 }>();
 
 const slots = useSlots();
@@ -244,6 +245,10 @@ const updateSearchText = debounce(async (searchText: string) => {
         await reloadMenu();
     }
 }, 200);
+const handleClickDone = () => {
+    emit('click-done', state.selectedItems);
+    hideMenu();
+};
 
 /* ignore window arrow keydown event */
 useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
@@ -355,7 +360,7 @@ defineExpose({ reloadMenu });
                         :show-clear-selection="props.isFilterable"
                         :reset-selected-on-unmounted="props.resetSelectedOnUnmounted"
                         @select="handleSelectMenuItem"
-                        @click-done="hideMenu"
+                        @click-done="handleClickDone"
                         @click-show-more="handleClickShowMore"
                         @clear-selection="handleClearSelection"
                         @keyup:up:end="focusDropdownButton"
