@@ -14,6 +14,8 @@ import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { MENU_ID } from '@/lib/menu/config';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -96,6 +98,17 @@ const state = reactive({
     }))),
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet = [
+            {
+                type: MENU_ITEM_TYPE.ITEM,
+                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
+                id: MENU_ID.DASHBOARDS,
+                foldable: false,
+                to: getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE._NAME,
+                }),
+                hideFavorite: true,
+            },
+            { type: 'divider' },
             {
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
                 label: i18n.t('COMMON.STARRED'),
