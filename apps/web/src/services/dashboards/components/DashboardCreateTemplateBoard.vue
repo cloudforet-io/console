@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    PBoard, PButton, PLabel, PTextHighlighting,
+    PBoard, PButton, PLabel, PTextHighlighting, PLazyImg,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
@@ -47,20 +47,16 @@ const handleClickTemplate = (template: DashboardModel) => {
     >
         <template #item-content="{board}">
             <div class="board-item-wrapper">
-                <p class="board-item-title">
-                    <!--                    <p-lazy-img v-if="board.provider !== 'blank'"-->
-                    <!--                                :src="state.providers[board.provider]?.icon"-->
-                    <!--                                width="1rem"-->
-                    <!--                                height="1rem"-->
-                    <!--                    />-->
+                <div class="board-item-title">
+                    <p-lazy-img :src="board.description?.icon ?? 'ic_dashboard-template_blank'"
+                                width="1rem"
+                                height="1rem"
+                    />
                     <p-text-highlighting :text="board.name"
                                          :term="props.keyword"
                                          style-type="secondary"
                     />
-                </p>
-                <!--                <p class="board-item-description">-->
-                <!--                    {{ board.description }}-->
-                <!--                </p>-->
+                </div>
                 <div class="board-item-labels">
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${label}-${idx}`"
@@ -94,11 +90,9 @@ const handleClickTemplate = (template: DashboardModel) => {
 .dashboard-create-template-board {
 
     .board-item-title {
-        @apply text-label-md;
+        @apply text-label-md flex items-center;
         margin-bottom: 0.5rem;
-    }
-    .board-item-description {
-        @apply text-label-md text-gray-700;
+        gap: 0.375rem;
     }
     .overlay-wrapper {
         @apply h-full flex items-center gap-3;
