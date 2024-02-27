@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PSearch, PFieldTitle, PBoard, PLabel, PLazyImg, PButton,
+    PSearch, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -11,89 +11,96 @@ import { store } from '@/store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
+import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
 
 
-const emit = defineEmits<{(event: 'select-template'): void;
-}>();
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    outOfTheBoxTemplateSets: [
-        {
-            leftIcon: 'ic_dashboard-template_blank',
-            title: 'Blank',
-            description: 'Build your own from scratch.',
-            provider: 'blank',
-        },
-        {
-            title: 'AWS CDN & Traffic Cost',
-            labels: ['Cost'],
-            provider: 'aws',
-        },
-        {
-            title: 'AWS Compliance Overview',
-            labels: ['Asset', 'Compliance', 'Security'],
-            provider: 'aws',
-        },
-        {
-            title: 'Azure Monthly Cost Summary',
-            labels: ['Cost'],
-            provider: 'azure',
-        },
-        {
-            title: 'Azure CDN & Traffic Cost',
-            labels: ['Cost'],
-            provider: 'azure',
-        },
-        {
-            title: 'Google Cloud Monthly Cost Summary',
-            labels: ['Cost'],
-            provider: 'google_cloud',
-        },
-        {
-            title: 'Google Cloud CDN & Traffic Cost',
-            labels: ['Cost'],
-            provider: 'google_cloud',
-        },
-    ],
-    exstingTemplateSets: [
-        {
-            title: 'AWS Monthly Cost Summary',
-            labels: ['AWS', 'Cost', 'Summary'],
-            provider: 'aws',
-        },
-        {
-            title: 'AWS Cost Summary',
-            labels: ['Cost', 'Summary'],
-            provider: 'aws',
-        },
-        {
-            title: 'Cost Summary',
-            labels: ['Azure'],
-            provider: 'azure',
-        },
-        {
-            title: "Jenn's Cost Summary",
-            labels: ['Jenny'],
-            provider: 'azure',
-        },
-        {
-            title: 'Google Cloud',
-            labels: ['Azure'],
-            provider: 'azure',
-        },
-    ],
+    outOfTheBoxTemplateSets: computed(() => {
+        const templates = [
+            {
+                title: 'AWS CDN & Traffic Cost',
+                labels: ['Cost'],
+                provider: 'aws',
+            },
+            {
+                title: 'AWS Compliance Overview',
+                labels: ['Asset', 'Compliance', 'Security'],
+                provider: 'aws',
+            },
+            {
+                title: 'Azure Monthly Cost Summary',
+                labels: ['Cost'],
+                provider: 'azure',
+            },
+            {
+                title: 'Azure CDN & Traffic Cost',
+                labels: ['Cost'],
+                provider: 'azure',
+            },
+            {
+                title: 'Google Cloud Monthly Cost Summary',
+                labels: ['Cost'],
+                provider: 'google_cloud',
+            },
+            {
+                title: 'Google Cloud CDN & Traffic Cost',
+                labels: ['Cost'],
+                provider: 'google_cloud',
+            },
+        ];
+
+        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.includes(label)));
+    }),
+    exstingTemplateSets: computed(() => {
+        const templates = [
+            {
+                title: 'AWS Monthly Cost Summary',
+                labels: ['AWS', 'Cost', 'Summary'],
+                provider: 'aws',
+            },
+            {
+                title: 'AWS Cost Summary',
+                labels: ['Cost', 'Summary'],
+                provider: 'aws',
+            },
+            {
+                title: 'Cost Summary',
+                labels: ['Azure'],
+                provider: 'azure',
+            },
+            {
+                title: "Jenn's Cost Summary",
+                labels: ['Jenny'],
+                provider: 'azure',
+            },
+            {
+                title: 'Google Cloud',
+                labels: ['Azure'],
+                provider: 'azure',
+            },
+        ];
+
+        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.includes(label)));
+    }),
 });
 
-const handleClickCreateButton = () => {
-    emit('select-template');
+const filterState = reactive({
+    inputValue: '',
+    selectedLabels: [] as string[],
+});
+
+const handleSelectLabels = (labels: string[]) => {
+    filterState.selectedLabels = labels;
 };
+
 </script>
 
 <template>
     <div class="dashboard-create-step-1">
-        <p-search />
+        <p-search :value="filterState.inputValue" />
         <div class="contents-container">
-            <dashboard-create-step1-search-filter />
+            <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
             <div class="right-area">
                 <div class="out-of-the-box">
                     <p-field-title class="title">
@@ -101,47 +108,9 @@ const handleClickCreateButton = () => {
                     </p-field-title>
                     <!--                    TODO: request non-opacity color-->
                     <div class="out-of-the-box-contents">
-                        <p-board :board-sets="state.outOfTheBoxTemplateSets"
-                                 selectable
-                                 style-type="cards"
-                                 :style-options="{
-                                     column: 2,
-                                 }"
-                                 class="template-board"
-                        >
-                            <template #item-content="{board}">
-                                <div class="board-item-wrapper">
-                                    <p class="board-item-title">
-                                        <p-lazy-img v-if="board.provider !== 'blank'"
-                                                    :src="state.providers[board.provider]?.icon"
-                                                    width="1rem"
-                                                    height="1rem"
-                                        />
-                                        {{ board.title }}
-                                    </p>
-                                    <p class="board-item-description">
-                                        {{ board.description }}
-                                    </p>
-                                    <div class="board-item-labels">
-                                        <p-label v-for="(label, idx) in board.labels"
-                                                 :key="`${label}-${idx}`"
-                                                 :text="label"
-                                        />
-                                    </div>
-                                </div>
-                            </template>
-                            <template #item-overlay-content>
-                                <div class="overlay-wrapper">
-                                    <p-button size="md"
-                                              style-type="substitutive"
-                                              icon-right="ic_arrow-right"
-                                              @click="handleClickCreateButton"
-                                    >
-                                        Create
-                                    </p-button>
-                                </div>
-                            </template>
-                        </p-board>
+                        <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
+                                                         :column="2"
+                        />
                     </div>
                 </div>
                 <div class="existing">
@@ -149,39 +118,9 @@ const handleClickCreateButton = () => {
                         Exsting Dashboard
                     </p-field-title>
                     <div class="exsting-contents">
-                        <p-board :board-sets="state.exstingTemplateSets"
-                                 selectable
-                                 style-type="cards"
-                                 class="template-board"
-                        >
-                            <template #item-content="{board}">
-                                <div class="board-item-wrapper">
-                                    <p class="board-item-title">
-                                        <p-lazy-img :src="state.providers[board.provider]?.icon"
-                                                    width="1rem"
-                                                    height="1rem"
-                                        />
-                                        {{ board.title }}
-                                    </p>
-                                    <div class="board-item-labels">
-                                        <p-label v-for="(label, idx) in board.labels"
-                                                 :key="`${label}-${idx}`"
-                                                 :text="label"
-                                        />
-                                    </div>
-                                </div>
-                            </template>
-                            <template #item-overlay-content>
-                                <div class="overlay-wrapper">
-                                    <p-button size="md"
-                                              style-type="substitutive"
-                                              icon-right="ic_arrow-right"
-                                    >
-                                        Create
-                                    </p-button>
-                                </div>
-                            </template>
-                        </p-board>
+                        <dashboard-create-template-board :template-sets="state.exstingTemplateSets"
+                                                         show-view-link
+                        />
                     </div>
                 </div>
             </div>
