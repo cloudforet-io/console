@@ -118,7 +118,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-                    meta: { lsbVisible: true, menuId: MENU_ID.BUDGET },
+                    meta: { menuId: MENU_ID.BUDGET },
                     component: BudgetMainPage as any,
                 },
                 {
@@ -131,7 +131,7 @@ const costExplorerRoutes: RouteConfig = {
                     path: ':budgetId',
                     name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
                     props: true,
-                    meta: { lsbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    meta: { label: ({ params }) => params.budgetId, copiable: true },
                     component: BudgetDetailPage as any,
                 },
             ],
@@ -160,7 +160,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.COST_REPORT._NAME,
-                    meta: { lsbVisible: true, menuId: MENU_ID.COST_REPORT },
+                    meta: { menuId: MENU_ID.COST_REPORT },
                     component: CostReportPage as any,
                 },
             ],

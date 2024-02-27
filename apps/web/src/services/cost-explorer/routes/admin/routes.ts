@@ -113,7 +113,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME),
-                    meta: { lsbVisible: true, menuId: MENU_ID.BUDGET },
+                    meta: { menuId: MENU_ID.BUDGET },
                     component: AdminBudgetMainPage as any,
                 },
                 {
@@ -126,7 +126,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: ':budgetId',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
                     props: true,
-                    meta: { lsbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
+                    meta: { label: ({ params }) => params.budgetId, copiable: true },
                     component: AdminBudgetDetailPage as any,
                 },
             ],
@@ -155,7 +155,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
-                    meta: { lsbVisible: true },
+                    meta: { menuId: MENU_ID.COST_REPORT },
                     component: CostReportPage as any,
                 },
             ],
