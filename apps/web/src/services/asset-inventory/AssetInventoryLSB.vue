@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PRadioGroup, PRadio, PLazyImg,
 } from '@spaceone/design-system';
+import { get } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -20,7 +21,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
-    LSBItem, LSBMenu,
+    LSBItem, LSBMenu, TopTitle,
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
@@ -52,6 +53,10 @@ const state = reactive({
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
         if (state.isCloudServiceDetailPage) return route.params as unknown as CloudServiceDetailPageParams;
         return undefined;
+    }),
+    topTitle: computed<TopTitle|undefined>(() => {
+        if (!state.detailPageParams) return undefined;
+        return { label: state.detailPageParams.group, icon: get(cloudServiceDetailPageState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
     }),
     cloudServiceMainMenuSet: computed<LSBItem[]>(() => ([
         {
@@ -154,6 +159,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <template>
     <l-s-b :menu-set="state.menuSet"
+           :top-title="state.topTitle"
            class="asset-inventory-l-s-b"
     >
         <template #collapsible-contents>
