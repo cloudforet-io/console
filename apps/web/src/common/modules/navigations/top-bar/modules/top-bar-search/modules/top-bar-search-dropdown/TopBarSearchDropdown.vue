@@ -216,9 +216,10 @@ const handleUpdateContentsSize = (height: number) => {
         max-width: unset;
         width: 100vw;
         height: 100vh;
+
         /* custom design-system component - p-data-loader */
         :deep(.p-tab) {
-            border: 0px;
+            border: 0;
             height: 100%;
             border-radius: 0;
         }

@@ -112,7 +112,7 @@ const handleFocusInput = (focus: boolean) => {
 .top-bar-search-mobile-input {
     .input-box {
         @apply flex items-center bg-white text-gray-500 fixed;
-        top: 0rem;
+        top: 0;
         left: 0;
         right: 0;
         margin: 0 auto;
