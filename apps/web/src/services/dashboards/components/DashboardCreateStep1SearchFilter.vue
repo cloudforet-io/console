@@ -21,7 +21,7 @@ const state = reactive({
     providers: computed(() => store.getters['reference/providerItems']),
     providerList: computed(() => [
         ...Object.keys(state.providers).map((k) => ({
-            label: state.providers[k].name,
+            label: state.providers[k].label,
             name: state.providers[k].name,
             img: state.providers[k]?.icon,
         })),
