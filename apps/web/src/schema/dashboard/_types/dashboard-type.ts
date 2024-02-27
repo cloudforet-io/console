@@ -1,5 +1,5 @@
 import type {
-    REFRESH_INTERVAL_OPTIONS_MAP, DASHBOARD_LABEL,
+    REFRESH_INTERVAL_OPTIONS_MAP,
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
@@ -7,13 +7,10 @@ import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboa
 import type { VariableModelType } from '@/lib/variable-models';
 
 
-export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';
-
-export type VariableType = 'MANAGED' | 'CUSTOM';
 
 interface DashboardVariableOptions {
     type: VariableModelType;
@@ -70,7 +67,10 @@ export interface DashboardTemplate {
     variables: DashboardVariables;
     settings: DashboardSettings;
     variables_schema: DashboardVariablesSchema;
-    labels: (DashboardLabel|string)[];
+    labels: string[];
+    description?: {
+        icon?: string;
+    }
 }
 
 export interface DashboardLayoutWidgetInfo {
