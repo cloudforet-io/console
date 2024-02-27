@@ -2449,6 +2449,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
+				"ALL": "모두",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
 				"AUTO_PERIOD": "자동 (전체 기간)",
@@ -2477,7 +2478,7 @@
 				"SHOW_ALL": "모두 보기",
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
-				"TITLE": "{provider} 클라우드 서비스 ",
+				"TITLE": "클라우드 서비스 ",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},

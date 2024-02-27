@@ -2449,6 +2449,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
 				"AUTO_PERIOD": "Auto (Overall period)",
@@ -2470,14 +2471,14 @@
 					"SET_FILTER": "Set Filter"
 				},
 				"NO_REGION": "No Region",
-				"REGION": "Regions",
-				"SERVICE_CATEGORY": "Service Categories",
+				"REGION": "Region",
+				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Providers",
 				"SET": "Set",
 				"SHOW_ALL": "Show all",
 				"SHOW_CHARTS": "Show Charts",
 				"SHOW_MAJOR": "Show Major Services ",
-				"TITLE": "{provider} Cloud Service",
+				"TITLE": "Cloud Service",
 				"USAGE_OVERVIEW": "Usage Overview",
 				"USAGE_OVERVIEW_OF_RESOURCE": "Usage Overview of {resource}"
 			},

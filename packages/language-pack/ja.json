@@ -2449,6 +2449,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
+				"ALL": "すべて",
 				"ALT_E_CHECK_MODAL": "{action}失敗",
 				"ALT_S_CHECK_MODAL": "{action}完了",
 				"AUTO_PERIOD": "自動（全期間）",
@@ -2477,7 +2478,7 @@
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
-				"TITLE": "{provider} クラウドサービス",
+				"TITLE": "クラウドサービス",
 				"USAGE_OVERVIEW": "利用概要",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}の利用状況"
 			},

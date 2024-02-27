@@ -28,7 +28,8 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
         allFilters(state): ConsoleFilter[] {
             const filters: ConsoleFilter[] = [];
             if (state.selectedProvider !== 'all') {
-                filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
+                filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
+                // filters.push({ k: 'provider', v: , o: '=' });
             }
             if (this.selectedRegions.length) {
                 filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: this.selectedRegions, o: '=' });
