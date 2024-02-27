@@ -40,10 +40,8 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (currentPath.indexOf('?') > 0) {
         currentPath = currentPath.slice(0, currentPath.indexOf('?'));
     }
-    let resolvedHref = resolved.href;
-    if (!currentPath.endsWith('/')) currentPath += '/';
-    if (!resolvedHref.endsWith('/')) resolvedHref += '/';
-    return currentPath.startsWith(resolvedHref);
+    const resolvedHref = resolved.href;
+    return currentPath === resolvedHref;
 };
 const getIconName = (icon: LSBIcon): string => {
     if (typeof icon === 'string') return icon;

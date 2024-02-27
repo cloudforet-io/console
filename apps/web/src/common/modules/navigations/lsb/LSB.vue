@@ -113,7 +113,7 @@ const handleSelect = (id: string, selected: string) => {
 <style lang="postcss" scoped>
 .l-s-b {
     .menu-wrapper {
-        padding: 1rem 0.5rem 2rem;
+        padding: 1.25rem 0.5rem 2rem;
     }
     .back-link {
         @apply flex text-gray-500;
@@ -128,19 +128,16 @@ const handleSelect = (id: string, selected: string) => {
     }
     .slot-menu-wrapper {
         @apply flex items-center;
-        height: 2rem;
         margin-bottom: 0.5rem;
-        margin-left: 0.5rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;
         font-size: 0.75rem;
-        padding-top: 0.5rem;
         padding-bottom: 0.5rem;
         padding-left: 0.5rem;
         .icon-label-wrapper {
             @apply flex items-center;
-            height: 2rem;
+            height: 1.5rem;
             .icon {
                 @apply rounded flex-shrink-0;
                 margin-right: 0.375rem;
