@@ -1,29 +1,24 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { useWindowSize } from '@vueuse/core';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { screens } from '@spaceone/design-system';
 
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
 import GNBNavigationRail from '@/common/modules/navigations/gnb/GNBNavigationRail.vue';
 import GNBToolbox from '@/common/modules/navigations/gnb/GNBToolbox.vue';
 
-
 const route = useRoute();
+const { width } = useWindowSize();
 
 const state = reactive({
     isMinimizeGnb: false,
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
-// mobile
-window.addEventListener('resize', () => {
-    state.isMinimizeGnb = window.innerWidth < screens.mobile.max;
-});
-
-watch([() => isMobile(), () => route.path], ([isMobileState]) => {
-    if (!isMobileState) return;
-    state.isMinimizeGnb = isMobileState;
+watch([() => state.isMobileSize, () => route.path], ([isMobileSize]) => {
+    if (!isMobileSize) return;
+    state.isMinimizeGnb = isMobileSize;
 }, { immediate: true });
 </script>
 
@@ -38,7 +33,7 @@ watch([() => isMobile(), () => route.path], ([isMobileState]) => {
             />
         </nav>
         <main class="main"
-              :class="{'is-minimize': state.isMinimizeGnb, 'is-mobile': isMobile() }"
+              :class="{'is-mobile': state.isMobileSize, 'is-minimize': !state.isMobileSize && state.isMinimizeGnb}"
         >
             <slot name="main" />
         </main>
@@ -59,7 +54,11 @@ watch([() => isMobile(), () => route.path], ([isMobileState]) => {
     width: calc(100% - $gnb-navigation-rail-max-width);
     height: calc(100% - $top-bar-height - $gnb-toolbox-height);
     transition: left 0.3s ease, width 0.3s ease;
-    &.is-minimize, &.is-mobile {
+    &.is-mobile {
+        left: 0;
+        width: 100%;
+    }
+    &.is-minimize {
         left: $gnb-navigation-rail-min-width;
         width: calc(100% - $gnb-navigation-rail-min-width);
     }
