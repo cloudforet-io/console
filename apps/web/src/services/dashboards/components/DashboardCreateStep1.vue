@@ -10,6 +10,9 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
+import type {
+    TemplateLabelItem,
+} from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
 
@@ -50,7 +53,7 @@ const state = reactive({
             },
         ];
 
-        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.includes(label)));
+        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)));
     }),
     exstingTemplateSets: computed(() => {
         const templates = [
@@ -81,16 +84,16 @@ const state = reactive({
             },
         ];
 
-        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.includes(label)));
+        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)));
     }),
 });
 
 const filterState = reactive({
     inputValue: '',
-    selectedLabels: [] as string[],
+    selectedLabels: [] as TemplateLabelItem[],
 });
 
-const handleSelectLabels = (labels: string[]) => {
+const handleSelectLabels = (labels: TemplateLabelItem[]) => {
     filterState.selectedLabels = labels;
 };
 
@@ -101,7 +104,7 @@ const handleSelectLabels = (labels: string[]) => {
         <p-search :value="filterState.inputValue" />
         <div class="contents-container">
             <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
-            <div class="right-area">
+            <div class="template-contents-area">
                 <div class="out-of-the-box">
                     <p-field-title class="title">
                         Out-of-the-Box Dashboard
@@ -134,25 +137,15 @@ const handleSelectLabels = (labels: string[]) => {
     width: 100%;
     overflow: visible;
     .contents-container {
-        @apply flex justify-between gap-4;
+        @apply flex gap-4;
         margin-top: 1.5rem;
 
-        .right-area {
-            max-width: 44.375rem;
-            flex-grow: 1;
+        @screen tablet {
+            @apply flex-col;
+        }
 
-            .template-board {
-                .board-item-title {
-                    @apply text-label-md;
-                    margin-bottom: 0.5rem;
-                }
-                .board-item-description {
-                    @apply text-label-md text-gray-700;
-                }
-                .overlay-wrapper {
-                    @apply h-full flex items-center;
-                }
-            }
+        .template-contents-area {
+            flex-grow: 1;
 
             .out-of-the-box {
                 margin-bottom: 2rem;
