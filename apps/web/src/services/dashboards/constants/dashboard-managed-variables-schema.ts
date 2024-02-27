@@ -4,9 +4,9 @@ import {
     MANAGED_VARIABLE_MODEL_KEY_MAP,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-// TODO: implement this with managed template
+
 export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
-    workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    // workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
     project: { key: 'project', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
     provider: { key: 'provider', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
     service_account: { key: 'service_account', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
@@ -20,17 +20,17 @@ export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
 
 export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
     properties: {
-        [MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key]: {
-            name: 'Workspace',
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'MULTI',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
-            options: [{
-                type: 'MANAGED',
-                key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.modelKey,
-            }],
-        },
+        // [MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key]: {
+        //     name: 'Workspace',
+        //     variable_type: 'MANAGED',
+        //     use: true,
+        //     selection_type: 'MULTI',
+        //     description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
+        //     options: [{
+        //         type: 'MANAGED',
+        //         key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.modelKey,
+        //     }],
+        // },
         project: {
             name: 'Project',
             variable_type: 'MANAGED',
@@ -129,7 +129,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
     order: [
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key,
-        MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key,
+        // MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.provider.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key,
