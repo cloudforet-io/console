@@ -555,6 +555,7 @@
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
+				"DATA_SOURCE": "Data Source",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"

@@ -3,7 +3,7 @@ import { computed, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PCollapsibleToggle, PLazyImg, PRadio, PRadioGroup,
+    PCollapsibleToggle, PLazyImg, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -125,7 +125,7 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => [
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PROVIDERS_TITLE'),
+            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DATA_SOURCE'),
             id: DATA_SOURCE_MENU_ID,
         },
         {
@@ -197,8 +197,8 @@ onMounted(() => {
 <template>
     <aside class="sidebar-menu">
         <l-s-b :menu-set="state.menuSet">
-            <template #collapsible-contents="{item}">
-                <div v-if="item?.id === STARRED_MENU_ID">
+            <template #collapsible-contents="{item: collapsible_item}">
+                <div v-if="collapsible_item?.id === STARRED_MENU_ID">
                     <div v-if="state.starredMenuSet.length > 0">
                         <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
                                                 :key="idx"
@@ -214,38 +214,41 @@ onMounted(() => {
                         {{ $t('COMMON.STARRED_NO_DATA') }}
                     </span>
                 </div>
-                <p-radio-group v-else
-                               direction="vertical"
-                               class="provider-radio-group"
+                <p-select-dropdown v-else
+                                   class="select-options-dropdown"
+                                   :menu="dataSourceState.items"
+                                   :selected="dataSourceState.selected"
+                                   use-fixed-menu-style
+                                   is-fixed-width
+                                   @update:selected="handleSelectDataSource"
                 >
-                    <p-radio v-for="(datasource, idx) in dataSourceState.items"
-                             :key="idx"
-                             :selected="dataSourceState.selected"
-                             :value="datasource.name"
-                             class="provider-item"
-                             @change="handleSelectDataSource"
-                    >
-                        <span class="selected-wrapper">
-                            <p-lazy-img v-if="datasource && datasource.imageUrl"
+                    <template #dropdown-button="item">
+                        <div class="selected-wrapper">
+                            <p-lazy-img v-if="item && item.imageUrl"
                                         class="selected-icon"
-                                        :src="datasource.imageUrl"
+                                        :src="item.imageUrl"
                                         width="1rem"
                                         height="1rem"
                             />
                             <span class="selected-text">
-                                {{ datasource?.label }}
+                                {{ item?.label }}
                             </span>
+                        </div>
+                    </template>
+                    <template #menu-item--format="{item}">
+                        <div class="menu-item">
+                            <span>{{ item.label }}</span>
                             <span class="selected-item-postfix">
-                                (<span v-if="datasource.name === dataSourceState.selected">
-                                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:
-                                </span>{{ getCurrentCurrencySet(datasource.name) }})
+                                ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
                             </span>
-                        </span>
-                    </p-radio>
-                </p-radio-group>
+                        </div>
+                    </template>
+                </p-select-dropdown>
             </template>
             <template #slot-show-more>
-                <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus" />
+                <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus"
+                                      class="show-more"
+                />
             </template>
         </l-s-b>
         <cost-explorer-l-s-b-relocate-dashboard-modal
@@ -257,43 +260,19 @@ onMounted(() => {
 
 <style scoped lang="postcss">
 .sidebar-menu {
-    .provider-radio-group {
-        .provider-item {
-            @apply flex;
-            gap: 0.25rem;
-            width: 100%;
-            max-width: $lsb-width;
-            .selected-wrapper {
-                @apply flex items-center;
-                width: 100%;
-                line-height: 1.25rem;
-                .selected-icon {
-                    margin-right: 0.25rem;
-                    margin-top: 0.125rem;
-                    flex-shrink: 0;
-                }
-                .selected-text {
-                    flex: 1;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-                .selected-item-postfix {
-                    @apply relative inline-flex items-center text-gray-400;
-                    margin-left: 0.25rem;
-                }
-            }
-        }
-    }
     .no-data {
         @apply text-gray-500;
     }
+    .show-more {
+        margin-left: 0.5rem;
+    }
 }
 
-/* custom design-system component - p-radio */
-:deep(.p-radio) {
-    .text {
-        max-width: calc(100% - 2.25rem);
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .selected-wrapper {
+        @apply flex items-center;
+        gap: 0.25rem;
     }
 }
 </style>

@@ -555,6 +555,7 @@
 				"COST_ANALYSIS": "コスト分析",
 				"CURRENCY": "通貨",
 				"DAILY": "日別データ (累積データ)",
+				"DATA_SOURCE": "データソース",
 				"DEFAULT": "デフォルト",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "元の通貨"
