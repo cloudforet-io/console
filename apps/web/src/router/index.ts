@@ -276,22 +276,6 @@ export class SpaceRouter {
         SpaceRouter.router.afterEach((to) => {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
-
-            const store = SpaceRouter.router.app?.$store;
-            if (!store) return;
-            const isAdminMode = appContextStore.getters.isAdminMode;
-            const routeScope = getRouteScope(to);
-
-            if (!isAdminMode && routeScope === 'WORKSPACE') {
-                const recent = getRecentConfig(to);
-                if (recent) {
-                    store.dispatch('recent/addItem', {
-                        itemType: recent.itemType,
-                        workspaceId: recent.workspaceId,
-                        itemId: recent.itemId,
-                    });
-                }
-            }
         });
 
         return SpaceRouter.router;
