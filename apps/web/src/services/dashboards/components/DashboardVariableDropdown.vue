@@ -47,9 +47,12 @@ const state = reactive({
     selected: [] as MenuItem[],
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
+        const fixedOptions = dashboardDetailGetters.refinedVariablesSchema.fixed_options;
         if (!Array.isArray(options)) return undefined;
         const variableModelInfoList = options.map((config) => ({
-            variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }),
+            variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }, undefined, {
+                fixedOptions,
+            }),
             dataKey: config.dataKey,
         }));
         return getVariableModelMenuHandler(variableModelInfoList);
