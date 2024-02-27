@@ -113,7 +113,7 @@ const handleSelect = (id: string, selected: string) => {
 <style lang="postcss" scoped>
 .l-s-b {
     .menu-wrapper {
-        padding: 1rem 0.5rem 2rem;
+        padding: 1.25rem 0.5rem 2rem;
     }
     .back-link {
         @apply flex text-gray-500;
