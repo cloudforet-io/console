@@ -108,7 +108,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
             const _refinedVariablesSchema: DashboardVariablesSchema = {
                 properties: {},
-                order: [..._storedVariablesSchema.order],
+                order: _storedVariablesSchema.order,
+                fixed_options: _storedVariablesSchema.fixed_options,
             };
             Object.entries<DashboardVariableSchemaProperty>(_storedVariablesSchema.properties).forEach(([propertyName, property]) => {
                 if (property.variable_type === 'MANAGED') {
