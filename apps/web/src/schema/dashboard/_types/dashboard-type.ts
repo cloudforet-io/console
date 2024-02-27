@@ -35,6 +35,7 @@ type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaP
 export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;
     order: string[];
+    fixed_options?: Record<string, any>;
 }
 
 // dashboard variables types
@@ -70,6 +71,7 @@ export interface DashboardTemplate {
     labels: string[];
     description?: {
         icon?: string;
+        preview_image?: string;
     }
 }
 
