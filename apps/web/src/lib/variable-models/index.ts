@@ -29,7 +29,7 @@ export class VariableModelFactory implements IBaseVariableModel {
             const Model = MANAGED_VARIABLE_MODELS[config.managedModelKey as string];
             this.#model = new Model(modelConfig, modelOptions);
         } else if (type === 'RESOURCE') {
-            this.#model = new ResourceVariableModel(modelConfig, modelOptions);
+            this.#model = new ResourceVariableModel(modelConfig);
         } else if (type === 'ENUM') {
             this.#model = new EnumVariableModel(modelConfig);
         } else {
@@ -37,11 +37,18 @@ export class VariableModelFactory implements IBaseVariableModel {
         }
 
         this._meta = this.#model._meta;
+
+        /* set properties */
         Object.getOwnPropertyNames(this.#model).forEach((property) => {
             if (property.startsWith('_')) return;
             Object.defineProperty(this, property, {
                 get: () => this.#model[property],
             });
+        });
+
+        /* set fixed options */
+        Object.entries(modelOptions?.fixedOptions ?? {}).forEach(([key, value]) => {
+            if (this.#model[key]) this.#model[key].fixedValue = value;
         });
     }
 
