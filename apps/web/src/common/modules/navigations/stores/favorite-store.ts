@@ -12,17 +12,17 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type RecentType = 'service' | 'identity.ServiceAccount' | 'identity.Provider';
+type FavoriteType = 'MENU' | 'PROJECT' | 'DASHBOARD' | 'CLOUD_SERVICE' | 'COST_ANALYSIS' | 'PROJECT_GROUP';
 
-const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
+const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
-export interface RecentMenu {
+export interface FavoriteMenu {
     name: string;
     user_id: string;
     data: {
         id: string;
         label: string;
-        type: RecentType;
+        type: FavoriteType;
         workspace_id: string;
     };
     created_at: string;
@@ -31,12 +31,12 @@ export interface RecentMenu {
     domain_id: string;
 }
 
-interface RecentState {
-    recentMenuList: RecentMenu[];
-    totalCount: number;
+interface FavoriteState {
+    favoriteMenuList: FavoriteMenu[];
+    total_count: number;
 }
 
-export const useRecentStore = defineStore('recent', () => {
+export const useFavoriteStore = defineStore('favorite', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
 
     const _getters = reactive({
@@ -44,40 +44,40 @@ export const useRecentStore = defineStore('recent', () => {
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 
-    const state = reactive<RecentState>({
-        recentMenuList: [],
-        totalCount: 0,
+    const state = reactive<FavoriteState>({
+        favoriteMenuList: [],
+        total_count: 0,
     });
 
     const actions = {
-        fetchRecent: async ({
+        fetchFavorite: async ({
             type, workspaceIds = [], limit = 5, searchText,
-        }:{type: RecentType, workspaceIds:string[], limit?:number, searchText?:string}) => {
-            recentListApiQuery.setFilters([
-                { k: 'name', v: `console:recent:${type}:`, o: '' },
+        }:{type: FavoriteType, workspaceIds:string[], limit?:number, searchText?:string}) => {
+            favoriteListApiQuery.setFilters([
+                { k: 'name', v: `console:favorite:${type}:`, o: '' },
                 { k: 'data.workspace_id', v: workspaceIds, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
             ]).setPageLimit(limit);
-            if (searchText?.length) recentListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
+            if (searchText?.length) favoriteListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list({
-                    query: recentListApiQuery.data,
+                    query: favoriteListApiQuery.data,
                 });
-                state.recentMenuList = results ?? [];
-                state.totalCount = total_count ?? 0;
+                state.favoriteMenuList = results ?? [];
+                state.total_count = total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.recentMenuList = [];
+                state.favoriteMenuList = [];
                 return [];
             }
-            return state.recentMenuList;
+            return state.favoriteMenuList;
         },
-        createRecent: async ({
+        createFavorite: async ({
             type, workspaceId, id, label,
-        }:{type: RecentType, workspaceId:string, id:string, label:string}) => {
+        }:{type: FavoriteType, workspaceId:string, id:string, label:string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
-                    name: `console:recent:${type}:${workspaceId}:${id}`,
+                    name: `console:favorite:${type}:${workspaceId}:${id}`,
                     data: {
                         id,
                         workspace_id: workspaceId,
@@ -93,7 +93,7 @@ export const useRecentStore = defineStore('recent', () => {
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
         if (workspaceId) {
-            actions.fetchRecent({ type: 'service', workspaceIds: [workspaceId] });
+            actions.fetchFavorite({ type: 'service', workspaceIds: [workspaceId] });
         }
     });
 
