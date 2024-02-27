@@ -1,29 +1,30 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core/index';
 import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 
 import { PI, screens, PTooltip } from '@spaceone/design-system';
-import { throttle } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TopBarSearchDropdown from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/TopBarSearchDropdown.vue';
 import TopBarSearchInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchInput.vue';
+import TopBarSearchMobileInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchMobileInput.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
-
-const MOBILE_WINDOW_SIZE = screens.mobile.max;
-
 const topBarSearchStore = useTopBarSearchStore();
+const windowSize = useWindowSize();
+
 
 const state = reactive({
     isFocusOnInput: false,
     isFocusOnSuggestion: false,
     focusingDirection: 'DOWNWARD' as FocusingDirection|undefined,
-    isOverMobileSize: window.innerWidth > MOBILE_WINDOW_SIZE,
+    isOverMobileSize: computed(() => windowSize.width.value > screens.mobile.max),
+    isOverTabletSize: computed(() => windowSize.width.value > screens.tablet.max),
     tooltipTexts: computed<Record<string, string>>(() => ({
         search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
     })),
@@ -72,10 +73,6 @@ const handleMoveFocusEnd = () => {
     state.isFocusOnInput = true;
 };
 
-const onWindowResize = throttle(() => {
-    state.isOverMobileSize = window.innerWidth > MOBILE_WINDOW_SIZE;
-}, 500);
-
 // Keyboard Event: Meta([ctrl or cmd] + K
 const handleKeyDown = (e: KeyboardEvent) => {
     if (e.metaKey && e.code === 'KeyK') {
@@ -89,11 +86,9 @@ const handleKeyDown = (e: KeyboardEvent) => {
 const handleHideSearchMenu = () => { hideSearchMenu(); };
 
 onMounted(() => {
-    window.addEventListener('resize', onWindowResize);
     window.addEventListener('keydown', handleKeyDown);
 });
 onUnmounted(() => {
-    window.removeEventListener('resize', onWindowResize);
     window.removeEventListener('keydown', handleKeyDown);
 });
 
@@ -144,16 +139,14 @@ onUnmounted(() => {
                                  @close="handleHideSearchMenu"
         >
             <template #search-input>
-                <top-bar-search-input v-if="!state.isOverMobileSize"
-                                      :is-focused.sync="state.isFocusOnInput"
-                                      @click="showSearchMenu"
-                                      @esc="hideSearchMenu"
-                                      @arrow-up="moveFocusToSuggestion('UPWARD')"
-                                      @arrow-down="moveFocusToSuggestion('DOWNWARD')"
+                <top-bar-search-mobile-input v-if="!state.isOverTabletSize"
+                                             @esc="hideSearchMenu"
+                                             @arrow-up="moveFocusToSuggestion('UPWARD')"
+                                             @arrow-down="moveFocusToSuggestion('DOWNWARD')"
                 />
             </template>
         </top-bar-search-dropdown>
-        <div v-if="state.visible"
+        <div v-if="state.visible & state.isOverMobileSize"
              class="background-block"
              @click="handleHideSearchMenu"
         />

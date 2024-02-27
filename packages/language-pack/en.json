@@ -1060,8 +1060,8 @@
 				"NO_RESULT_2": "Try different keywords related to Cloud service or Menu.",
 				"RECENT_CLOUD_SERVICE": "RECENT SEARCHES [CLOUD SERVICE]",
 				"RECENT_MENU": "RECENT SEARCHES [MENU]",
-				"SERACH": "Search",
-				"SERACH_PLACEHOLDER": "Search menu, projects, dashboards, and more",
+				"SEARCH": "Search",
+				"SEARCH_PLACEHOLDER": "Search menu, projects, dashboards, and more",
 				"TOO_MANY_RESULTS": "Too many results for this search.",
 				"TRY_SEARCH_AGAIN": "Try your search again with more specific terms."
 			},
