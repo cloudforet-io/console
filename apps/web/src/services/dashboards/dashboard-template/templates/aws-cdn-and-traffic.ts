@@ -1,9 +1,9 @@
-import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
-import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
-import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-template/types/dashboard-template-type';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
+
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
@@ -12,7 +12,6 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_data_type: 'cost',
             cost_data_field: 'additional_info.Usage Type Details',
             filters: {
-                // TODO: must be updated to string[] type
                 cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
@@ -34,7 +33,6 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
         widget_options: {
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
-                // TODO: must be updated to string[] type
                 cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
@@ -48,7 +46,6 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
-                // TODO: must be updated to string[] type
                 cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
             },
         },
@@ -58,29 +55,39 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     }],
 ];
 
-export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewTemplate = {
-    name: 'CDN & Traffic Cost',
-    labels: [DASHBOARD_LABEL.COST],
+export const awsCdnAndTrafficDashboard: DashboardTemplate = {
+    name: 'AWS CDN & Traffic',
+    labels: ['AWS', 'CDN', 'Traffic', 'Cost'],
     version: '1',
     description: {
         icon: 'ic_dashboard-template_cdn-traffic-cost',
-        preview_image: 'cdnAndTrafficCost',
     },
-};
-
-const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
-    ...cdnAndTrafficCostDashboardPreview,
     settings: {
         date_range: {
             enabled: true,
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST, isAdminMode),
-    variables: {},
+    variables_schema: {
+        properties: {
+            cost_data_source: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cost_data_source,
+            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
+            service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.service_account,
+            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.region,
+            cost_product: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cost_product,
+        },
+        order: [
+            'cost_data_source',
+            'project',
+            'service_account',
+            'region',
+            'cost_product',
+        ],
+    },
+    variables: {
+        provider: 'AWS',
+    },
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],
-});
-export const cdnAndTrafficCostDashboard: DashboardTemplate = getDashboardTemplate(false);
-export const adminCdnAndTrafficCostDashboard: DashboardTemplate = getDashboardTemplate(true);
+};

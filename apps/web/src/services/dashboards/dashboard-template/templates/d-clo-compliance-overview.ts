@@ -1,9 +1,9 @@
-import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
 import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
-import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
-import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-template/types/dashboard-template-type';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
+
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['complianceStatus'],
@@ -30,30 +30,35 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['severityStatusByService'],
 ];
 
-export const complianceOverviewDashboardPreview: DefaultDashboardPreviewTemplate = {
-    name: 'Compliance Overview',
-    labels: [DASHBOARD_LABEL.ASSET, DASHBOARD_LABEL.COMPLIANCE, DASHBOARD_LABEL.SECURITY],
+export const dCloComplianceOverviewDashboard: DashboardTemplate = {
+    name: 'D-CLO Compliance Overview',
+    labels: ['AWS', 'Azure', 'Google', 'Prowler', 'Security', 'CSPM'],
     version: '1',
     description: {
         icon: 'ic_dashboard-template_compliance',
-        preview_image: 'complianceOverview',
     },
-};
-
-const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
-    ...complianceOverviewDashboardPreview,
     settings: {
         date_range: {
             enabled: true,
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.ASSET, isAdminMode),
+    variables_schema: {
+        properties: {
+            cloud_service_query_set: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cloud_service_query_set,
+            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
+            service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.service_account,
+            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.region,
+        },
+        order: [
+            'cloud_service_query_set',
+            'project',
+            'service_account',
+            'region',
+        ],
+    },
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],
-});
-
-export const complianceOverviewDashboard: DashboardTemplate = getDashboardTemplate(false);
-export const adminComplianceOverviewDashboard: DashboardTemplate = getDashboardTemplate(true);
+};

@@ -9,14 +9,6 @@ export const REFRESH_INTERVAL_OPTIONS_MAP = {
     '1h': 3600000,
 } as const;
 
-export const DASHBOARD_LABEL = {
-    COST: 'Cost',
-    ASSET: 'Asset',
-    COMPLIANCE: 'Compliance',
-    SECURITY: 'Security',
-    BLANK: 'Blank',
-} as const;
-
 export const DASHBOARD_TYPE = {
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',

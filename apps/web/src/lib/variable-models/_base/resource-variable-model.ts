@@ -2,6 +2,7 @@ import {
     camelCase, get,
 } from 'lodash';
 
+import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -14,7 +15,6 @@ import type {
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 
 export default class ResourceVariableModel<T=any> implements IResourceVariableModel<T> {
@@ -133,7 +133,7 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
             const orFilters = this.#searchTargets.map((key) => ({
                 k: key,
                 v: query.search ?? '',
-                o: '',
+                o: '' as ConsoleFilterOperator,
             }));
             apiQueryHelper.setOrFilters(orFilters);
         }
