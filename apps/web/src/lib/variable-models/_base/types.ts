@@ -5,7 +5,8 @@ export interface IBaseVariableModel {
         [variableModelKey: string]: string;
     }
     list(query?: ListQuery): Promise<ListResponse>;
-    nameFormatter?: (data: any) => string;
+    nameFormatter?(data: any): string;
+    generateProperty?(options: any): PropertyObject<any>;
     //
     // scope?: {
     //     resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
@@ -32,8 +33,9 @@ interface ResourceVariableMeta {
 
 export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
     _meta: ResourceVariableMeta;
-    nameFormatter(data: any): string;
     [propertyKey: string]: PropertyObject<T> | any;
+    nameFormatter(data: any): string;
+    generateProperty(options: PropertyOptions<T>): PropertyObject<T>;
 }
 
 export type VariableModel = IBaseVariableModel | IEnumVariableModel | IResourceVariableModel;
