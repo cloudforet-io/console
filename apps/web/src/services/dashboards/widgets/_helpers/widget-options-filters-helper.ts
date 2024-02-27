@@ -23,7 +23,7 @@ export const setFilterAndGetWidgetFiltersMap = (filtersMap: WidgetFiltersMap = {
 
     targetProperty.item_options?.forEach((itemOption) => {
         const dataKey = itemOption.dataKey;
-        const idKey = MANAGED_VARIABLE_MODELS[itemOption.key]._meta.idKey;
+        const idKey = MANAGED_VARIABLE_MODELS[itemOption.key]?._meta?.idKey;
         if (!idKey && !dataKey) {
             console.error(new Error(`Invalid referencing idKey|dataKey of variable model by options filter key: ${filterKey}`));
         } else {
