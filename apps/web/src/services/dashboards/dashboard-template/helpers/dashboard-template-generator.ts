@@ -1,9 +1,7 @@
 import { cloneDeep } from 'lodash';
 
-import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
-    DashboardLabel,
     DashboardLayoutWidgetInfo,
     DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
@@ -12,6 +10,7 @@ import getRandomId from '@/lib/random-id-generator';
 
 import { MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP, MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+
 
 
 const ERROR_CASE_WIDGET_INFO: Omit<DashboardLayoutWidgetInfo, 'version'|'widget_key'> = {
@@ -45,60 +44,21 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
     },
 );
 
-const ASSET_VARIABLE_KEYS: string[] = [
-    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key,
-    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.asset_account.key,
-];
-const COST_VARIABLE_KEYS: string[] = [
-    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key,
-    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_product.key,
-];
-export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode = false): DashboardVariablesSchema => {
-    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA);
 
-    if (!isAdminMode) {
-        delete _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
-        const workspaceIndex = _managedVariablesSchema.order.indexOf(MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key);
-        if (workspaceIndex !== -1) _managedVariablesSchema.order.splice(workspaceIndex, 1);
-    }
-
-    if (label === DASHBOARD_LABEL.ASSET) {
-        ASSET_VARIABLE_KEYS.forEach((key) => {
-            _managedVariablesSchema.properties[key].use = true;
-            if (key === MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key) {
-                _managedVariablesSchema.properties[key].fixed = true;
-            }
-        });
-        _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
-            if (COST_VARIABLE_KEYS.includes(a)) {
-                return COST_VARIABLE_KEYS.includes(b) ? 0 : 1;
-            }
-            return COST_VARIABLE_KEYS.includes(b) ? -1 : 0;
-        });
-        return _managedVariablesSchema;
-    }
-
-    if (label === DASHBOARD_LABEL.COST) {
-        COST_VARIABLE_KEYS.forEach((key) => {
-            _managedVariablesSchema.properties[key].use = true;
-            if (key === MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key) {
-                _managedVariablesSchema.properties[key].fixed = true;
-            }
-        });
-        _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
-            if (ASSET_VARIABLE_KEYS.includes(a)) {
-                return ASSET_VARIABLE_KEYS.includes(b) ? 0 : 1;
-            }
-            return ASSET_VARIABLE_KEYS.includes(b) ? -1 : 0;
-        });
-        return _managedVariablesSchema;
-    }
-
-    if (label === DASHBOARD_LABEL.BLANK) {
-        _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key].fixed = false;
-        _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key].fixed = false;
-        return _managedVariablesSchema;
-    }
-
-    return _managedVariablesSchema;
+export const getRefinedDashboardVariablesSchema = (fixedKeys: string[] = [], excludedKeys: string[] = []): DashboardVariablesSchema => {
+    const _refinedProperties: DashboardVariablesSchema['properties'] = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties);
+    excludedKeys.forEach((key) => {
+        delete _refinedProperties[key];
+    });
+    Object.entries(_refinedProperties).forEach(([key, value]) => {
+        _refinedProperties[key] = {
+            ...value,
+            fixed: fixedKeys.includes(key),
+            use: fixedKeys.includes(key),
+        };
+    });
+    return {
+        properties: _refinedProperties,
+        order: Object.values(MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP).filter((d) => !excludedKeys.includes(d.key)).map((info) => info.key),
+    };
 };
