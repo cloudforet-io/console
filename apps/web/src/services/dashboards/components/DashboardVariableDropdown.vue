@@ -16,9 +16,6 @@ import {
     cloneDeep, debounce, flattenDeep,
 } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-
 import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';

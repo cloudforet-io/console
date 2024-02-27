@@ -7,8 +7,8 @@ interface PrefetchModelInfo {
 }
 
 const PREFETCH_MODEL_INFO_LIST: PrefetchModelInfo[] = [
-    { key: 'cost', dataKey: 'product' },
-    { key: 'cost', dataKey: 'usage_type' },
+    // { key: 'cost', dataKey: 'product' },
+    // { key: 'cost', dataKey: 'usage_type' },
 ];
 
 export const prefetchResources = (userId: string|undefined) => {
