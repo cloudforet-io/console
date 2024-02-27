@@ -11,8 +11,6 @@ import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
-import type { VariableModelConfigType } from '@/lib/variable-models';
-import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -81,7 +79,7 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
-    optionsType: 'ENUM' as VariableModelConfigType,
+    optionsType: 'ENUM',
     options: [
         { draggableItemId: getRandomId(), key: '', label: '' },
     ] as ManageVariableFormOption[],
@@ -130,14 +128,16 @@ const handleSave = () => {
         options = {
             type: 'ENUM',
             values: state.options.map((d) => ({ key: d.key, name: d.label })).filter((v) => v.key !== '' && v.name !== ''),
-        } as EnumVariableModelConfig;
-    } else {
-        options = {
-            type: 'RESOURCE_VALUE',
-            reference_key: '',
-            resource_type: '',
-        } as ResourceValueVariableModelConfig;
+        };
     }
+    // else {
+    //     options = {
+    //         type: 'RESOURCE',
+    //         name: '',
+    //         resource_type: '',
+    //         id_key: state.resourceKey,
+    //     };
+    // }
     const variableToSave = {
         variable_type: 'CUSTOM',
         name: name.value,

@@ -2,25 +2,24 @@ import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import type {
     ListResponse, ListQuery, IEnumVariableModel,
-    EnumVariableModelConfig,
-    VariableModelLabel,
+    VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 
 export default class EnumVariableModel implements IEnumVariableModel {
-    key = '';
-
-    name = '';
-
-    labels: VariableModelLabel[] = [];
+    _meta = {
+        key: '',
+        name: '',
+    };
 
     values: IEnumVariableModel['values'] = [];
 
     #response: ListResponse = { results: [] };
 
-    constructor(config?: EnumVariableModelConfig) {
+    constructor(config?: VariableModelConstructorConfig) {
         if (!config) return;
         if (!config.values) throw new Error('values is required');
-        if (config.name) this.name = config.name;
+        if (config.key) this._meta.key = config.key;
+        if (config.name) this._meta.name = config.name;
         this.values = config.values;
     }
 

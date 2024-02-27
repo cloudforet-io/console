@@ -1,46 +1,77 @@
 // variable models
 export interface IBaseVariableModel {
-    key: string;
-    name: string;
-    labels: VariableModelLabel[];
-    list(query?: ListQuery): Promise<ListResponse>;
-    nameFormatter?: (data: any) => string;
-    dependencies?: {
+    _meta?: Record<string, any>;
+    _dependencies?: {
         [variableModelKey: string]: string;
     }
-    prefetch?: boolean; // whether to prefetch data on site init
+    list(query?: ListQuery): Promise<ListResponse>;
+    nameFormatter?(data: any): string;
+    generateProperty?(options: any): PropertyObject<any>;
+    //
+    // scope?: {
+    //     resourceGroup?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    //     value?: string;
+    // };
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
-    values: Value[];
+    _meta: {
+       key: string;
+       name: string;
+   };
+   values: Value[];
 }
-export interface IResourceNameVariableModel extends IBaseVariableModel {
+
+interface ResourceVariableMeta {
+    key: string;
+    name: string;
     resourceType: string;
     idKey: string;
     nameKey: string;
-    only: string[];
-    searchTargets: string[];
-    nameFormatter: (data: any) => string;
-}
-export interface IResourceValueVariableModel extends IBaseVariableModel {
-    resourceType: string;
-    referenceKey: string;
+    _only?: string[]; // protected
+    _searchTargets?: string[]; // protected
 }
 
-// variable model configs
-export interface EnumVariableModelConfig {
-    type: 'ENUM';
-    name?: string;
-    values: Value[];
+export interface IResourceVariableModel<T = any> extends IBaseVariableModel {
+    _meta: ResourceVariableMeta;
+    [propertyKey: string]: PropertyObject<T> | any;
+    nameFormatter(data: any): string;
+    generateProperty(options: PropertyOptions<T>): PropertyObject<T>;
 }
-export interface ResourceValueVariableModelConfig {
-    type: 'RESOURCE_VALUE',
+
+export type VariableModel = IBaseVariableModel | IEnumVariableModel | IResourceVariableModel;
+
+
+// property
+export interface PropertyOptions<T> {
+    key: keyof T;
     name?: string;
-    resource_type: string;
-    reference_key: string;
+    isDataKey?: boolean;
+    isFilter?: boolean;
+}
+export interface PropertyObject<T> {
+    key: keyof T;
+    name?: string;
+    isDataKey?: boolean;
+    isFilter?: boolean;
+    fixedValue?: any;
+    values?(query?: ListQuery): Promise<ListResponse>;
+}
+
+// variable model constructor configs
+export interface VariableModelConstructorConfig {
+    key?: string;
+    name?: string;
+    // resource model only
+    resource_type?: string;
+    id_key?: string;
+    // enum model only
+    values?: Value[];
+}
+export interface ResourceVariableModelConstructorOptions {
+    fixedOptions?: Record<string, any>;
 }
 
 // related types
-export type VariableModelLabel = 'cost'|'asset';
 export interface ListQuery {
     search?: string;
     start?: number;

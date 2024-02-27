@@ -9,9 +9,8 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import getRandomId from '@/lib/random-id-generator';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
+import { MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP, MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
@@ -47,26 +46,26 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
 );
 
 const ASSET_VARIABLE_KEYS: string[] = [
-    MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
-    MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key,
+    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.asset_account.key,
 ];
 const COST_VARIABLE_KEYS: string[] = [
-    MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
-    MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
+    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key,
+    MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_product.key,
 ];
 export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode = false): DashboardVariablesSchema => {
-    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
+    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA);
 
     if (!isAdminMode) {
-        delete _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key];
-        const workspaceIndex = _managedVariablesSchema.order.indexOf(MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key);
+        delete _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key];
+        const workspaceIndex = _managedVariablesSchema.order.indexOf(MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key);
         if (workspaceIndex !== -1) _managedVariablesSchema.order.splice(workspaceIndex, 1);
     }
 
     if (label === DASHBOARD_LABEL.ASSET) {
         ASSET_VARIABLE_KEYS.forEach((key) => {
             _managedVariablesSchema.properties[key].use = true;
-            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key) {
+            if (key === MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key) {
                 _managedVariablesSchema.properties[key].fixed = true;
             }
         });
@@ -82,7 +81,7 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode 
     if (label === DASHBOARD_LABEL.COST) {
         COST_VARIABLE_KEYS.forEach((key) => {
             _managedVariablesSchema.properties[key].use = true;
-            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key) {
+            if (key === MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key) {
                 _managedVariablesSchema.properties[key].fixed = true;
             }
         });
@@ -96,8 +95,8 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode 
     }
 
     if (label === DASHBOARD_LABEL.BLANK) {
-        _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = false;
-        _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = false;
+        _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cost_data_source.key].fixed = false;
+        _managedVariablesSchema.properties[MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key].fixed = false;
         return _managedVariablesSchema;
     }
 

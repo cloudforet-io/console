@@ -6,7 +6,7 @@ import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';

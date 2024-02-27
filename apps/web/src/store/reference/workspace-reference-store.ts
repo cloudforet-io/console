@@ -16,7 +16,7 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 type PickedWorkspaceModel = Pick<WorkspaceModel, 'state'>;
@@ -42,9 +42,9 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
             return state.items ?? {};
         }, {}, { lazy: true }),
         workspaceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
+            type: MANAGED_VARIABLE_MODELS.workspace._meta.key,
+            key: MANAGED_VARIABLE_MODELS.workspace._meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.workspace._meta.name,
             referenceMap: getters.workspaceItems,
         })),
     });

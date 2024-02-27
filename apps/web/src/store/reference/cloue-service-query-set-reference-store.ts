@@ -19,9 +19,10 @@ import type {
     ReferenceLoadOptions, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 type PickedQuerySetModel = Pick<CloudServiceQuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
 export type QuerySetItems = Required<Pick<ReferenceItem<PickedQuerySetModel>, 'key'|'label'|'name'|'data'>>;
@@ -42,9 +43,9 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
             return state.items ?? {};
         }, {}, { lazy: true }),
         cloudServiceQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.name,
+            type: MANAGED_VARIABLE_MODELS.cloud_service_query_set._meta.key,
+            key: MANAGED_VARIABLE_MODELS.cloud_service_query_set._meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.cloud_service_query_set._meta.name,
             referenceMap: getters.cloudServiceQuerySetItems,
         })),
     });

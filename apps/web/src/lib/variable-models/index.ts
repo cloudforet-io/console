@@ -1,58 +1,56 @@
-import EnumVariableModel from './_base/enum-variable-model';
-import ResourceValueVariableModel from './_base/resource-value-variable-model';
+import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type {
-    IBaseVariableModel, ListQuery, ListResponse, VariableModelLabel,
-    EnumVariableModelConfig, ResourceValueVariableModelConfig,
-} from './_base/types';
-import type { ManagedVariableModelKey } from './managed';
-import MANAGED_VARIABLE_MODELS from './managed';
+    IBaseVariableModel, ListQuery, ResourceVariableModelConstructorOptions, VariableModelConstructorConfig,
+    ListResponse,
+    PropertyObject, PropertyOptions,
+} from '@/lib/variable-models/_base/types';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
-// config
-export interface ManagedVariableModelConfig {
-    type: 'MANAGED';
-    key: ManagedVariableModelKey;
-    name?: string;
+// Variable Model Type : if not MANAGED, then it is CUSTOM (ENUM or RESOURCE)
+export type VariableModelType = 'ENUM'|'RESOURCE'|'MANAGED';
+export interface VariableModelFactoryConfig {
+    type: VariableModelType;
+    managedModelKey?: ManagedVariableModelKey;
 }
-export type CustomVariableModelConfig = EnumVariableModelConfig|ResourceValueVariableModelConfig;
-export type VariableModelConfig = ManagedVariableModelConfig|CustomVariableModelConfig;
-export type VariableModelConfigType = 'MANAGED'|'ENUM'|'RESOURCE_VALUE';
 
-export class VariableModel implements IBaseVariableModel {
-    key: string;
 
-    name: string;
-
-    labels: VariableModelLabel[];
+export class VariableModelFactory implements IBaseVariableModel {
+    _meta: IBaseVariableModel['_meta'];
 
     #model: IBaseVariableModel;
 
-    #type: VariableModelConfigType;
+    constructor(config: VariableModelFactoryConfig, modelConfig?: VariableModelConstructorConfig, modelOptions?: ResourceVariableModelConstructorOptions) {
+        if (config.type === 'MANAGED' && !config.managedModelKey) throw new Error('managedModelKey is required');
+        const type = config.type;
 
-    constructor(config: VariableModelConfig) {
-        if (config.type === 'MANAGED') {
-            if (!config.key) throw new Error('key is required');
-            const Model = MANAGED_VARIABLE_MODELS[config.key];
-            this.#model = new Model();
-        } else if (config.type === 'RESOURCE_VALUE') {
-            this.#model = new ResourceValueVariableModel(config);
-        } else if (config.type === 'ENUM') {
-            this.#model = new EnumVariableModel(config);
+        if (type === 'MANAGED') {
+            const Model = MANAGED_VARIABLE_MODELS[config.managedModelKey as string];
+            this.#model = new Model(modelConfig, modelOptions);
+        } else if (type === 'RESOURCE') {
+            this.#model = new ResourceVariableModel(modelConfig, modelOptions);
+        } else if (type === 'ENUM') {
+            this.#model = new EnumVariableModel(modelConfig);
         } else {
-            throw new Error(`Invalid config type for VariableModel: ${(config as any).type}`);
+            throw new Error(`Invalid config type for VariableModel: ${config.type}`);
         }
 
-        this.key = this.#model.key;
-        this.name = config.name ?? (this.#model.name || this.#model.key);
-        this.labels = this.#model.labels;
-        this.#type = config.type;
-    }
-
-    get type() {
-        return this.#type;
+        this._meta = this.#model._meta;
+        Object.getOwnPropertyNames(this.#model).forEach((property) => {
+            if (property.startsWith('_')) return;
+            Object.defineProperty(this, property, {
+                get: () => this.#model[property],
+            });
+        });
     }
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         return this.#model.list(query);
     }
-}
 
+    generateProperty<T=any>(options: PropertyOptions<T>): PropertyObject<T> {
+        if (!this.#model.generateProperty) throw new Error('generateProperty method is not implemented');
+        return this.#model.generateProperty(options);
+    }
+}

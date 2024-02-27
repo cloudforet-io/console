@@ -8,7 +8,15 @@ import type {
     WIDGET_SIZE,
 } from '@/schema/dashboard/_constants/widget-constant';
 
-import type { VariableModelConfig } from '@/lib/variable-models';
+import type { VariableModelType } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+
+
+interface WidgetItemOptions {
+    type: VariableModelType;
+    key: ManagedVariableModelKey;
+    dataKey?: string;
+}
 
 /*
  * inheritance_mode: how to inherit widget options from dashboard variables.
@@ -24,7 +32,7 @@ export interface WidgetOptionsSchemaProperty {
     readonly?: boolean;
     fixed?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
-    item_options?: Array<VariableModelConfig>;
+    item_options?: WidgetItemOptions[];
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
 }
 

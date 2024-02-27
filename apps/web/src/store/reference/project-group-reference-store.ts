@@ -15,10 +15,9 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 
 interface ProjectGroupResourceItemData {
@@ -107,9 +106,9 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectGroupTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
+            type: MANAGED_VARIABLE_MODELS.project_group._meta.key,
+            key: MANAGED_VARIABLE_MODELS.project_group._meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.project_group._meta.name,
             referenceMap: getters.projectGroupItems,
         })),
     });

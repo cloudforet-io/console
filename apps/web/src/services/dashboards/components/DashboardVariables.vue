@@ -31,6 +31,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
@@ -38,14 +39,14 @@ const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
-    order: computed(() => dashboardDetailState.variablesSchema.order),
+    variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
+    order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
         const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
-        const currUsedProperties = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, v]) => v.use);
+        const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {

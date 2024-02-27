@@ -21,7 +21,7 @@ import type {
     ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -49,9 +49,9 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
             return state.items ?? {};
         }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
+            type: MANAGED_VARIABLE_MODELS.cost_data_source._meta.key,
+            key: MANAGED_VARIABLE_MODELS.cost_data_source._meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.cost_data_source._meta.name,
             referenceMap: getters.costDataSourceItems,
         })),
         hasLoaded: computed<boolean>(() => state.items !== null),

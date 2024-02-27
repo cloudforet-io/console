@@ -4,25 +4,28 @@ import type {
 } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import type { ManagedVariableModelConfig } from '@/lib/variable-models';
-import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
+import type { VariableModelType } from '@/lib/variable-models';
 
 
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 
 // dashboard variable schema types
-export type VariableSelectionType = 'SINGLE' | 'MULTI';
+type VariableSelectionType = 'SINGLE' | 'MULTI';
 
 export type VariableType = 'MANAGED' | 'CUSTOM';
 
-export type DashboardVariableOptions = ManagedVariableModelConfig|EnumVariableModelConfig|ResourceValueVariableModelConfig;
+interface DashboardVariableOptions {
+    type: VariableModelType;
+    key: string;
+    dataKey?: string;
+}
 
 export interface DashboardVariableSchemaProperty {
-    name: string;
-    variable_type: VariableType;
+    name?: string;
+    variable_type: VariableModelType;
     use: boolean;
-    selection_type: VariableSelectionType;
+    selection_type?: VariableSelectionType;
     description?: string;
     readonly?: boolean; // can not edit value
     options?: DashboardVariableOptions[];
@@ -30,7 +33,7 @@ export interface DashboardVariableSchemaProperty {
     required?: boolean; // value is required
 }
 
-export type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
+type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
 
 export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;

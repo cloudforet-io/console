@@ -51,6 +51,7 @@ interface Step {
 }
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const {
     forms: { dashboardTemplate },
     setForm,
@@ -94,7 +95,7 @@ const createDashboard = async () => {
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
             variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
+            variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
             resource_group: RESOURCE_GROUP.DOMAIN,
         };

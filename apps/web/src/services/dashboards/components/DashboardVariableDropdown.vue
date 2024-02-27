@@ -23,7 +23,7 @@ import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
-import { VariableModel } from '@/lib/variable-models';
+import { VariableModelFactory } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -45,22 +45,17 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any|null,
     searchText: '',
-    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
+    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailGetters.refinedVariablesSchema.properties[props.propertyName]),
     variableName: computed<string|undefined>(() => state.variableProperty?.name),
     selected: [] as MenuItem[],
-    // Options State
-    searchResourceOptions: []as {key: string; name: string}[],
-    autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
-        const api = (state.variableProperty?.options?.reference_key ?? state.variableProperty?.options?.resource_key) // NOTE: Compatibility code for version 1.12.
-            ? SpaceConnector.client.addOns.autocomplete.distinct
-            : SpaceConnector.client.addOns.autocomplete.resource;
-        return getCancellableFetcher(api);
-    }),
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
         if (!Array.isArray(options)) return undefined;
-        const variableModels = options.map((config) => new VariableModel(config));
-        return getVariableModelMenuHandler(variableModels);
+        const variableModelInfoList = options.map((config) => ({
+            variableModel: new VariableModelFactory({ type: config.type, managedModelKey: config.key }),
+            dataKey: config.dataKey,
+        }));
+        return getVariableModelMenuHandler(variableModelInfoList);
     }),
 });
 

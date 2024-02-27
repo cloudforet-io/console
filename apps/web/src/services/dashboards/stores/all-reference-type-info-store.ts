@@ -12,8 +12,8 @@ import { useProjectReferenceStore } from '@/store/reference/project-reference-st
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'protocol'
@@ -56,39 +56,39 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 referenceMap: store.getters['reference/pluginItems'],
             },
             cloud_service_type: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.name,
+                type: MANAGED_VARIABLE_MODELS.cloud_service_type._meta.key,
+                key: MANAGED_VARIABLE_MODELS.cloud_service_type._meta.idKey,
+                name: MANAGED_VARIABLE_MODELS.cloud_service_type._meta.name,
                 referenceMap: store.getters['reference/cloudServiceTypeItems'],
             },
             provider: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
+                type: MANAGED_VARIABLE_MODELS.provider._meta.key,
+                key: MANAGED_VARIABLE_MODELS.provider._meta.idKey as string,
+                name: MANAGED_VARIABLE_MODELS.provider._meta.name,
                 referenceMap: store.getters['reference/providerItems'],
             },
             region: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.region.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
+                type: MANAGED_VARIABLE_MODELS.region._meta.key,
+                key: MANAGED_VARIABLE_MODELS.region._meta.idKey as string,
+                name: MANAGED_VARIABLE_MODELS.region._meta.name,
                 referenceMap: store.getters['reference/regionItems'],
             },
             secret: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.secret.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.secret.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.secret.name,
+                type: MANAGED_VARIABLE_MODELS.secret._meta.key,
+                key: MANAGED_VARIABLE_MODELS.secret._meta.idKey as string,
+                name: MANAGED_VARIABLE_MODELS.secret._meta.name,
                 referenceMap: store.getters['reference/secretItems'],
             },
             service_account: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
+                type: MANAGED_VARIABLE_MODELS.service_account._meta.key,
+                key: MANAGED_VARIABLE_MODELS.service_account._meta.idKey as string,
+                name: MANAGED_VARIABLE_MODELS.service_account._meta.name,
                 referenceMap: store.getters['reference/serviceAccountItems'],
             },
             webhook: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.name,
+                type: MANAGED_VARIABLE_MODELS.webhook._meta.key,
+                key: MANAGED_VARIABLE_MODELS.webhook._meta.idKey as string,
+                name: MANAGED_VARIABLE_MODELS.webhook._meta.name,
                 referenceMap: store.getters['reference/webhookItems'],
             },
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
