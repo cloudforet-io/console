@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus, useWindowSize } from '@vueuse/core';
-import {
-    computed, nextTick, reactive, ref, watch,
-} from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 import { PI, screens, PIconButton } from '@spaceone/design-system';
 
