@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PBoard, PButton, PLazyImg, PLabel,
+    PBoard, PButton, PLazyImg, PLabel, PTextHighlighting,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
@@ -14,12 +14,14 @@ interface Props {
     templateSets: BoardSet[];
     column?: number;
     showViewLink?: boolean;
+    keyword: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     templateSets: () => [],
     column: 1,
     showViewLink: false,
+    keyword: '',
 });
 
 const state = reactive({
@@ -45,7 +47,10 @@ const state = reactive({
                                 width="1rem"
                                 height="1rem"
                     />
-                    {{ board.title }}
+                    <p-text-highlighting :text="board.title"
+                                         :term="props.keyword"
+                                         style-type="secondary"
+                    />
                 </p>
                 <p class="board-item-description">
                     {{ board.description }}

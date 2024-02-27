@@ -53,7 +53,8 @@ const state = reactive({
             },
         ];
 
-        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)));
+        return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
+            && (filterState.inputValue === '' || template.title.includes(filterState.inputValue)));
     }),
     exstingTemplateSets: computed(() => {
         const templates = [
@@ -84,7 +85,8 @@ const state = reactive({
             },
         ];
 
-        return templates.filter((template) => filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)));
+        return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
+            && (filterState.inputValue === '' || template.title.includes(filterState.inputValue)));
     }),
 });
 
@@ -101,7 +103,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
 
 <template>
     <div class="dashboard-create-step-1">
-        <p-search :value="filterState.inputValue" />
+        <p-search :value.sync="filterState.inputValue" />
         <div class="contents-container">
             <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
             <div class="template-contents-area">
@@ -113,6 +115,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
                     <div class="out-of-the-box-contents">
                         <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
                                                          :column="2"
+                                                         :keyword="filterState.inputValue"
                         />
                     </div>
                 </div>
@@ -123,6 +126,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
                     <div class="exsting-contents">
                         <dashboard-create-template-board :template-sets="state.exstingTemplateSets"
                                                          show-view-link
+                                                         :keyword="filterState.inputValue"
                         />
                     </div>
                 </div>
@@ -133,7 +137,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
 
 <style lang="postcss" scoped>
 .dashboard-create-step-1 {
-    @apply flex flex-col;
+    @apply flex flex-col h-full;
     width: 100%;
     overflow: visible;
     .contents-container {
