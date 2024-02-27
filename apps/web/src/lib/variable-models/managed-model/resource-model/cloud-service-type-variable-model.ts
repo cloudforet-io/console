@@ -1,6 +1,8 @@
 import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
+
 
 export default class CloudServiceTypeVariableModel extends ResourceVariableModel<CloudServiceTypeModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
@@ -15,8 +17,8 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
         _searchTargets: ['cloud_service_type_id', 'name', 'group'],
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = CloudServiceTypeVariableModel._meta;
     }
 

@@ -1,6 +1,7 @@
 import type { ProviderModel } from '@/schema/identity/provider/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class ProviderVariableModel extends ResourceVariableModel<ProviderModel> {
@@ -14,8 +15,8 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = ProviderVariableModel._meta;
     }
 }

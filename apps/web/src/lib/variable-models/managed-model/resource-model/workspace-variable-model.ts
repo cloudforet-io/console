@@ -1,6 +1,7 @@
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class WorkspaceVariableModel extends ResourceVariableModel<WorkspaceModel> {
@@ -12,8 +13,8 @@ export default class WorkspaceVariableModel extends ResourceVariableModel<Worksp
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = WorkspaceVariableModel._meta;
     }
 }

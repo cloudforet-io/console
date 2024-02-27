@@ -1,6 +1,7 @@
 import type { RegionModel } from '@/schema/inventory/region/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class RegionVariableModel extends ResourceVariableModel<RegionModel> {
@@ -15,8 +16,8 @@ export default class RegionVariableModel extends ResourceVariableModel<RegionMod
         _searchTargets: ['name', 'provider', 'region_code'],
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = RegionVariableModel._meta;
     }
 

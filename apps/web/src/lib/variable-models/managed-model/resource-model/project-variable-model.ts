@@ -7,7 +7,7 @@ import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
-import type { ListQuery, ListResponse } from '@/lib/variable-models/_base/types';
+import type { ListQuery, ListResponse, VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -43,8 +43,8 @@ export default class ProjectVariableModel extends ResourceVariableModel<ProjectM
         _only: ['project_id', 'name', 'project_group_id'],
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = ProjectVariableModel._meta;
     }
 

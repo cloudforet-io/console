@@ -1,6 +1,7 @@
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class CollectorVariableModel extends ResourceVariableModel<CollectorModel> {
@@ -14,8 +15,8 @@ export default class CollectorVariableModel extends ResourceVariableModel<Collec
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = CollectorVariableModel._meta;
     }
 }

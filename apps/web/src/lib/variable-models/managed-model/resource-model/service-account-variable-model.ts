@@ -1,6 +1,7 @@
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class ServiceAccountVariableModel extends ResourceVariableModel<ServiceAccountModel> {
@@ -14,8 +15,8 @@ export default class ServiceAccountVariableModel extends ResourceVariableModel<S
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = ServiceAccountVariableModel._meta;
     }
 }

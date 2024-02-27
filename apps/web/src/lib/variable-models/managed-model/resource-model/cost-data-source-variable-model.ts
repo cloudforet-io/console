@@ -1,6 +1,7 @@
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class CostDataSourceVariableModel extends ResourceVariableModel<CostDataSourceModel> {
@@ -14,8 +15,8 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = CostDataSourceVariableModel._meta;
     }
 }
