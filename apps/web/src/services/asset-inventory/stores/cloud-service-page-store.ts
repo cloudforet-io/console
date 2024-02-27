@@ -9,13 +9,10 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
-import type { Period } from '@/services/asset-inventory/types/type';
-
 
 export const useCloudServicePageStore = defineStore('cloud-service-page', {
     state: () => ({
         selectedProvider: 'all',
-        period: undefined as undefined | Period,
         additionalFilters: {
             [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: [],
             [CLOUD_SERVICE_FILTER_KEY.REGION]: [],
@@ -29,7 +26,6 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
             const filters: ConsoleFilter[] = [];
             if (state.selectedProvider !== 'all') {
                 filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
-                // filters.push({ k: 'provider', v: , o: '=' });
             }
             if (this.selectedRegions.length) {
                 filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: this.selectedRegions, o: '=' });
