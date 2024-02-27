@@ -1,8 +1,7 @@
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
-import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
-import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
+import { getDashboardLayoutWidgetInfoList, getRefinedDashboardVariablesSchema } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
 
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
@@ -69,23 +68,13 @@ export const awsCdnAndTrafficDashboard: DashboardTemplate = {
         refresh_interval_option: '5m',
     },
     variables_schema: {
-        properties: {
-            cost_data_source: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cost_data_source,
-            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
-            service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.service_account,
-            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.region,
-            cost_product: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cost_product,
+        ...getRefinedDashboardVariablesSchema(['cost_data_source', 'project', 'service_account', 'region', 'cost_product'], ['provider']),
+        fixed_options: {
+            provider: 'aws',
         },
-        order: [
-            'cost_data_source',
-            'project',
-            'service_account',
-            'region',
-            'cost_product',
-        ],
     },
     variables: {
-        provider: 'AWS',
+        provider: 'aws',
     },
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
