@@ -31,7 +31,7 @@ interface BoardSet {
     description: TranslateResult;
     iconButtonSets?: IconSet[];
 }
-const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): void;
+const emit = defineEmits<{(event: 'select-project', project: ProjectTreeNodeData): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -100,7 +100,7 @@ const handleSelectProject = (selectedProjects: ProjectTreeNodeData[]) => {
 };
 const handleConfirmProject = () => {
     if (!state.selectedProject) return;
-    emit('set-project', state.selectedProject);
+    emit('select-project', state.selectedProject);
     dashboardDetailStore.setDashboardScope('PROJECT');
     dashboardDetailStore.setDashboardType('PUBLIC');
     state.projectModalVisible = false;

@@ -138,6 +138,10 @@ const handleSelectTemplate = (template: DashboardModel) => {
     goStep('next');
 };
 
+const handleSelectProject = (project: ProjectTreeNodeData) => {
+    setForm('dashboardProject', project);
+};
+
 const { setPathFrom, handleClickBackButton } = useGoBack({
     name: DASHBOARDS_ROUTE.ALL._NAME,
 });
@@ -161,7 +165,9 @@ defineExpose({ setPathFrom });
                                 @select-template="handleSelectTemplate"
         />
         <template v-else-if="state.currentStep === 2">
-            <dashboard-create-step2 :selected-template="dashboardTemplate" />
+            <dashboard-create-step2 :selected-template="dashboardTemplate"
+                                    @select-project="handleSelectProject"
+            />
             <div class="button-area">
                 <p-button style-type="transparent"
                           size="lg"
