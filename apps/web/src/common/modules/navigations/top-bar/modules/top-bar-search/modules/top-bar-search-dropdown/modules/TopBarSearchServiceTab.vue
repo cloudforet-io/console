@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex } from '@spaceone/design-system';
+import { getTextHighlightRegex, PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { store } from '@/store';
@@ -18,9 +18,12 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import type { RecentMenu } from '@/common/modules/navigations/stores/recent-store';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
-import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import TopBarSearchEmpty
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
@@ -42,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const topBarSearchStore = useTopBarSearchStore();
+const recentStore = useRecentStore();
 const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
@@ -55,6 +59,17 @@ const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
+    allMenuMap: computed(() => {
+        const allMenuMap = new Map<string, SuggestionMenu>();
+        state.allMenuList.forEach((menu) => {
+            allMenuMap.set(menu.id, {
+                ...menu,
+                icon: menu.parents?.[0]?.icon ?? menu.icon,
+                fullLabel: menu.parents ? `${menu.parents.map((p) => p.label).join(' > ')} > ${menu.label}` : menu.label,
+            });
+        });
+        return allMenuMap;
+    }),
     serviceMenuList: [] as SuggestionMenu[],
     serviceMenuCount: computed(() => state.serviceMenuList.length),
     defaultServiceMenuList: computed(() => state.allMenuList.filter((menu) => MAIN_SERVICE_ID_LIST.includes(menu.id) && !menu.parents)),
@@ -63,6 +78,19 @@ const state = reactive({
         if (state.defaultServiceMenuList.length) {
             results.push({ name: 'title', label: 'Site Navigation', type: 'header' });
             results = results.concat(state.defaultServiceMenuList);
+        }
+        return results;
+    }),
+    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentMenu) => ({
+        id: r.data.id,
+        label: state.allMenuMap.get(r.data.id)?.fullLabel ?? r.data.label,
+        icon: state.allMenuMap.get(r.data.id)?.icon,
+    }))),
+    recentMenuItems: computed(() => {
+        let results: SuggestionItem[] = [];
+        if (state.recentMenuList?.length) {
+            results.push({ name: 'title', label: 'Last Viewed', type: 'header' });
+            results = results.concat(state.recentMenuList);
         }
         return results;
     }),
@@ -104,7 +132,9 @@ const handleSelect = (item) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
     if (menuInfo && router.currentRoute.name !== menuId) {
         router.push({ name: menuInfo.routeName }).catch(() => {});
-        if (!state.showRecent) createSearchRecent(SUGGESTION_TYPE.MENU, menuId, state.currentWorkspaceId);
+        recentStore.createRecent({
+            type: 'service', workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
+        });
     }
     topBarSearchStore.setIsActivated(false);
 };
@@ -118,6 +148,10 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 }, 300, {
     leading: true,
 }));
+
+watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
+    if (state.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: 'service', workspaceIds: [state.currentWorkspaceId] });
+}, { immediate: true });
 
 // /* Watcher */
 // TODO: for focusing
@@ -137,22 +171,42 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
          class="g-n-b-search-service-tab"
     >
         <div class="service-item-list">
-            <top-bar-suggestion-list v-show="!state.inputText.length"
-                                     :items="state.defaultServiceMenuItems || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
-            <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
-                                     :items="state.serviceMenuList || []"
-                                     :input-text="state.inputText"
-                                     :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
-                                     :focusing-direction="props.focusingDirection"
-                                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
-                                     @select="handleSelect"
-            />
+            <div v-show="!state.inputText.length">
+                <top-bar-suggestion-list
+                    :items="state.defaultServiceMenuItems || []"
+                    :input-text="state.inputText"
+                    :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                    :focusing-direction="props.focusingDirection"
+                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                    @select="handleSelect"
+                />
+                <top-bar-suggestion-list
+                    v-if="state.recentMenuList.length"
+                    :items="state.recentMenuItems || []"
+                    :input-text="state.inputText"
+                    :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                    :focusing-direction="props.focusingDirection"
+                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                    @select="handleSelect"
+                />
+            </div>
+            <p-data-loader :data="state.serviceMenuList ||[]"
+                           :loading="loading"
+            >
+                <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
+                                         :items="state.serviceMenuList || []"
+                                         :input-text="state.inputText"
+                                         :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                                         :focusing-direction="props.focusingDirection"
+                                         @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                                         @select="handleSelect"
+                />
+                <template #no-data>
+                    <top-bar-search-empty :input-text="state.inputText"
+                                          :is-recent="false"
+                    />
+                </template>
+            </p-data-loader>
         </div>
     </div>
 </template>
