@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
 
 import {
-    PBoard, PButton, PLazyImg, PLabel, PTextHighlighting,
+    PBoard, PButton, PLabel, PTextHighlighting,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+// import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 interface Props {
     templateSets: BoardSet[];
@@ -24,9 +24,15 @@ const props = withDefaults(defineProps<Props>(), {
     keyword: '',
 });
 
-const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-});
+const emit = defineEmits<{(e: 'select-template', value: any)}>();
+//
+// const state = reactive({
+//     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+// });
+
+const handleClickTemplate = (template: DashboardModel) => {
+    emit('select-template', template);
+};
 
 </script>
 
@@ -42,19 +48,19 @@ const state = reactive({
         <template #item-content="{board}">
             <div class="board-item-wrapper">
                 <p class="board-item-title">
-                    <p-lazy-img v-if="board.provider !== 'blank'"
-                                :src="state.providers[board.provider]?.icon"
-                                width="1rem"
-                                height="1rem"
-                    />
-                    <p-text-highlighting :text="board.title"
+                    <!--                    <p-lazy-img v-if="board.provider !== 'blank'"-->
+                    <!--                                :src="state.providers[board.provider]?.icon"-->
+                    <!--                                width="1rem"-->
+                    <!--                                height="1rem"-->
+                    <!--                    />-->
+                    <p-text-highlighting :text="board.name"
                                          :term="props.keyword"
                                          style-type="secondary"
                     />
                 </p>
-                <p class="board-item-description">
-                    {{ board.description }}
-                </p>
+                <!--                <p class="board-item-description">-->
+                <!--                    {{ board.description }}-->
+                <!--                </p>-->
                 <div class="board-item-labels">
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${label}-${idx}`"
@@ -63,7 +69,7 @@ const state = reactive({
                 </div>
             </div>
         </template>
-        <template #item-custom-right-content>
+        <template #item-custom-right-content="{ board }">
             <div class="overlay-wrapper">
                 <p-button v-if="props.showViewLink"
                           size="md"
@@ -75,6 +81,7 @@ const state = reactive({
                 <p-button size="md"
                           style-type="substitutive"
                           icon-right="ic_arrow-right"
+                          @click="handleClickTemplate(board)"
                 >
                     Create
                 </p-button>

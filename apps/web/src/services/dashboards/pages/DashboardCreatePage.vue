@@ -52,7 +52,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const {
     forms: { dashboardTemplate, dashboardProject },
-    // setForm,
+    setForm,
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,
@@ -133,8 +133,8 @@ const createDashboard = async () => {
 const handleClickClose = () => {
     state.closeConfirmModalVisible = true;
 };
-const handleSelectTemplate = () => {
-    // TODO: set template
+const handleSelectTemplate = (template: DashboardModel) => {
+    setForm('dashboardTemplate', template);
     goStep('next');
 };
 
@@ -161,21 +161,19 @@ defineExpose({ setPathFrom });
                                 @select-template="handleSelectTemplate"
         />
         <template v-else-if="state.currentStep === 2">
-            <dashboard-create-step2 />
+            <dashboard-create-step2 :selected-template="dashboardTemplate" />
             <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    icon-left="ic_arrow-left"
-                    @click="goStep('prev')"
+                <p-button style-type="transparent"
+                          size="lg"
+                          icon-left="ic_arrow-left"
+                          @click="goStep('prev')"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!isAllValid"
-                    @click="goStep('next')"
+                <p-button style-type="primary"
+                          size="lg"
+                          :disabled="!isAllValid"
+                          @click="goStep('next')"
                 >
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>

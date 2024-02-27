@@ -8,6 +8,7 @@ import {
 
 import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import type {
@@ -15,78 +16,24 @@ import type {
 } from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
+const emit = defineEmits<{(e: 'select-template', value: DashboardModel)}>();
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     outOfTheBoxTemplateSets: computed(() => {
-        const templates = [
-            {
-                title: 'AWS CDN & Traffic Cost',
-                labels: ['Cost'],
-                provider: 'aws',
-            },
-            {
-                title: 'AWS Compliance Overview',
-                labels: ['Asset', 'Compliance', 'Security'],
-                provider: 'aws',
-            },
-            {
-                title: 'Azure Monthly Cost Summary',
-                labels: ['Cost'],
-                provider: 'azure',
-            },
-            {
-                title: 'Azure CDN & Traffic Cost',
-                labels: ['Cost'],
-                provider: 'azure',
-            },
-            {
-                title: 'Google Cloud Monthly Cost Summary',
-                labels: ['Cost'],
-                provider: 'google_cloud',
-            },
-            {
-                title: 'Google Cloud CDN & Traffic Cost',
-                labels: ['Cost'],
-                provider: 'google_cloud',
-            },
-        ];
-
+        const templates = Object.values(DASHBOARD_TEMPLATES);
         return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
-            && (filterState.inputValue === '' || template.title.includes(filterState.inputValue)));
+            && (filterState.inputValue === '' || template.name.includes(filterState.inputValue)));
     }),
     exstingTemplateSets: computed(() => {
-        const templates = [
-            {
-                title: 'AWS Monthly Cost Summary',
-                labels: ['AWS', 'Cost', 'Summary'],
-                provider: 'aws',
-            },
-            {
-                title: 'AWS Cost Summary',
-                labels: ['Cost', 'Summary'],
-                provider: 'aws',
-            },
-            {
-                title: 'Cost Summary',
-                labels: ['Azure'],
-                provider: 'azure',
-            },
-            {
-                title: "Jenn's Cost Summary",
-                labels: ['Jenny'],
-                provider: 'azure',
-            },
-            {
-                title: 'Google Cloud',
-                labels: ['Azure'],
-                provider: 'azure',
-            },
-        ];
-
+        const templates = dashboardGetters.allItems;
         return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
-            && (filterState.inputValue === '' || template.title.includes(filterState.inputValue)));
+            && (filterState.inputValue === '' || template.name.includes(filterState.inputValue)));
     }),
 });
 
@@ -97,6 +44,10 @@ const filterState = reactive({
 
 const handleSelectLabels = (labels: TemplateLabelItem[]) => {
     filterState.selectedLabels = labels;
+};
+
+const handleClickCreateTemplate = (template: DashboardModel) => {
+    emit('select-template', template);
 };
 
 </script>
@@ -116,6 +67,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
                         <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
                                                          :column="2"
                                                          :keyword="filterState.inputValue"
+                                                         @select-template="handleClickCreateTemplate"
                         />
                     </div>
                 </div>
@@ -127,6 +79,7 @@ const handleSelectLabels = (labels: TemplateLabelItem[]) => {
                         <dashboard-create-template-board :template-sets="state.exstingTemplateSets"
                                                          show-view-link
                                                          :keyword="filterState.inputValue"
+                                                         @select-template="handleClickCreateTemplate"
                         />
                     </div>
                 </div>
