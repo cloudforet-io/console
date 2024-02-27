@@ -3,7 +3,7 @@ import { useElementSize, useWindowSize } from '@vueuse/core';
 import type Vue from 'vue';
 import { computed, reactive, ref } from 'vue';
 
-import { PTab } from '@spaceone/design-system';
+import { PTab, screens } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -40,9 +40,7 @@ const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
 
 const dropdownRef = ref<null | HTMLElement>(null);
-const searchInputRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
-const searchInputSize = useElementSize(searchInputRef);
 const tabRef = ref<null | Vue>(null);
 
 
@@ -64,9 +62,11 @@ const state = reactive({
         { label: 'User', name: 'user' },
     ],
     contentsHeight: 0,
-    isHeightOverflown: computed(() => (state.contentsHeight + getTabHeaderHeight() + searchInputSize.height.value) >= (windowSize.height.value - (BOTTOM_MARGIN))),
+    searchInputHeight: computed(() => (state.isTabletSize ? 60 : 0)),
+    isTabletSize: computed(() => windowSize.width.value < screens.tablet.max),
+    isHeightOverflown: computed(() => (state.contentsHeight + getTabHeaderHeight() + state.searchInputHeight) >= (windowSize.height.value - (BOTTOM_MARGIN))),
     dropdownHeight: computed(() => (state.isHeightOverflown ? dropdownSize.height.value : undefined)),
-    tabHeight: computed(() => (state.isHeightOverflown ? state.dropdownHeight - (searchInputSize.height.value) : undefined)),
+    tabHeight: computed(() => ((state.isHeightOverflown) ? state.dropdownHeight - (state.searchInputHeight) : undefined)),
     tabContextHeight: computed(() => {
         if (state.isHeightOverflown) {
             return state.tabHeight - getTabHeaderHeight();
@@ -190,7 +190,9 @@ const handleUpdateContentsSize = (height: number) => {
     display: flex;
     flex-direction: column;
     max-width: 47.5rem;
+    min-height: 30rem;
     width: 100%;
+    height: 100%;
     max-height: calc(100vh - 4.5rem);
     top: 3.125rem;
     left: 0;
@@ -208,24 +210,17 @@ const handleUpdateContentsSize = (height: number) => {
     }
 }
 
-@screen mobile {
+@screen tablet {
     .top-bar-search-dropdown {
-        @apply flex flex-col;
-        position: fixed;
-        top: $top-bar-height;
+        max-height: unset;
+        max-width: unset;
         width: 100vw;
-        height: calc(100vh - $top-bar-height - 0.5rem);
-        margin-top: -0.5rem;
-
+        height: 100vh;
         /* custom design-system component - p-data-loader */
-        :deep(.p-data-loader) {
-            @apply flex-grow;
-            .data-loader-container {
-                @apply flex items-center;
-                .data-wrapper {
-                    width: 100%;
-                }
-            }
+        :deep(.p-tab) {
+            border: 0px;
+            height: 100%;
+            border-radius: 0;
         }
     }
 }

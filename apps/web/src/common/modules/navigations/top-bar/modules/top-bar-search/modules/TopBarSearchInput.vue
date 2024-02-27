@@ -25,9 +25,11 @@ const topBarSearchStore = useTopBarSearchStore();
 const inputRef = ref<null|HTMLInputElement>(null);
 
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
+    isOverTabletSize: computed(() => width.value > screens.tablet.max),
     placeholder: computed(() => {
-        if (width.value < screens.tablet.max) return i18n.t('COMMON.GNB.SEARCH.SERACH');
-        return i18n.t('COMMON.GNB.SEARCH.SERACH_PLACEHOLDER');
+        if (state.isMobileSize) return i18n.t('COMMON.GNB.SEARCH.SEARCH');
+        return i18n.t('COMMON.GNB.SEARCH.SEARCH_PLACEHOLDER');
     }),
     metaName: computed(() => {
         const userAgent = window.navigator.userAgent;
@@ -70,7 +72,7 @@ watch(() => props.isFocused, async (isFocused) => {
             />
             <span>{{ state.placeholder }}</span>
         </div>
-        <div v-if="topBarSearchStore.getters.isActivated"
+        <div v-if="topBarSearchStore.getters.isActivated && state.isOverTabletSize"
              class="enabled-input"
         >
             <p-i name="ic_search"
@@ -109,8 +111,8 @@ watch(() => props.isFocused, async (isFocused) => {
 
     .disabled-input {
         @apply flex items-center justify-center bg-gray-100 rounded-md text-gray-400;
-        max-width: 30rem;
         height: 1.75rem;
+        width: 30rem;
         padding: 0 0.75rem;
         font-size: 0.875rem;
         cursor: pointer;
