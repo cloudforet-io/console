@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import { useRouter } from 'vue-router/composables';
+
 import {
     PBoard, PButton, PLabel, PTextHighlighting, PLazyImg,
 } from '@spaceone/design-system';
@@ -8,6 +10,7 @@ import type { BoardSet } from '@spaceone/design-system/src/data-display/board/ty
 
 // import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 interface Props {
@@ -25,12 +28,21 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'select-template', value: any)}>();
+const router = useRouter();
 //
 // const state = reactive({
 //     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 // });
 
-const handleClickTemplate = (template: DashboardModel) => {
+
+const handleClickView = (template: DashboardModel) => {
+    const dahsboardId = template.private_dashboard_id || template.public_dashboard_id;
+    if (!dahsboardId) return;
+    const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: dahsboardId } });
+    window.open(routeData.href, '_blank');
+};
+
+const handleClickCreate = (template: DashboardModel) => {
     emit('select-template', template);
 };
 
@@ -71,13 +83,14 @@ const handleClickTemplate = (template: DashboardModel) => {
                           size="md"
                           style-type="tertiary"
                           icon-right="ic_arrow-right-up"
+                          @click="handleClickView(board)"
                 >
                     View
                 </p-button>
                 <p-button size="md"
                           style-type="substitutive"
                           icon-right="ic_arrow-right"
-                          @click="handleClickTemplate(board)"
+                          @click="handleClickCreate(board)"
                 >
                     Create
                 </p-button>
