@@ -345,7 +345,6 @@ defineExpose({ reloadMenu });
                         :readonly="props.readonly"
                         :style="contextMenuStyle"
                         :item-height-fixed="!props.isFilterable"
-                        :no-select-indication="!props.isFilterable"
                         :selected="state.selectedItems"
                         :multi-selectable="props.multiSelectable"
                         :search-text="state.proxySearchText"

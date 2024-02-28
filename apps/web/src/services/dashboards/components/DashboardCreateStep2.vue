@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 
 import {
-    PLabel, PLazyImg,
+    PLabel, PI,
 } from '@spaceone/design-system';
 
 import DashboardCreateScopeForm from '@/services/dashboards/components/DashboardCreateScopeForm.vue';
@@ -26,9 +26,14 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
 <template>
     <div class="dashboard-create-step2">
         <div class="selected-ootb-wrapper">
-            <p-lazy-img :src="props.selectedTemplate?.description?.icon ?? 'ic_dashboard-template_blank'"
-                        width="3.5rem"
-                        height="3.5rem"
+            <!--            <p-lazy-img v-if="props.selectedTemplate?.description?.icon"-->
+            <!--                        :src="props.selectedTemplate?.description?.icon"-->
+            <!--                        width="3.5rem"-->
+            <!--                        height="3.5rem"-->
+            <!--            />-->
+            <p-i :name="props.selectedTemplate?.display_info?.icon ?? 'ic_dashboard-template_others'"
+                 width="3.5rem"
+                 height="3.5rem"
             />
             <div class="description-wrapper">
                 <p class="description-title">

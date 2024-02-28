@@ -1,13 +1,16 @@
 <script setup lang="ts">
 
+import { useRouter } from 'vue-router/composables';
+
 import {
-    PBoard, PButton, PLabel, PTextHighlighting, PLazyImg,
+    PBoard, PButton, PLabel, PTextHighlighting, PI,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
 
 // import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 interface Props {
@@ -25,12 +28,21 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'select-template', value: any)}>();
+const router = useRouter();
 //
 // const state = reactive({
 //     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 // });
 
-const handleClickTemplate = (template: DashboardModel) => {
+
+const handleClickView = (template: DashboardModel) => {
+    const dahsboardId = template.private_dashboard_id || template.public_dashboard_id;
+    if (!dahsboardId) return;
+    const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: dahsboardId } });
+    window.open(routeData.href, '_blank');
+};
+
+const handleClickCreate = (template: DashboardModel) => {
     emit('select-template', template);
 };
 
@@ -48,9 +60,14 @@ const handleClickTemplate = (template: DashboardModel) => {
         <template #item-content="{board}">
             <div class="board-item-wrapper">
                 <div class="board-item-title">
-                    <p-lazy-img :src="board.description?.icon ?? 'ic_dashboard-template_blank'"
-                                width="1rem"
-                                height="1rem"
+                    <!--                    <p-lazy-img v-if="board.description?.icon"-->
+                    <!--                                :src="board.description?.icon"-->
+                    <!--                                width="1rem"-->
+                    <!--                                height="1rem"-->
+                    <!--                    />-->
+                    <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
+                         width="1rem"
+                         height="1rem"
                     />
                     <p-text-highlighting :text="board.name"
                                          :term="props.keyword"
@@ -71,13 +88,14 @@ const handleClickTemplate = (template: DashboardModel) => {
                           size="md"
                           style-type="tertiary"
                           icon-right="ic_arrow-right-up"
+                          @click="handleClickView(board)"
                 >
                     View
                 </p-button>
                 <p-button size="md"
                           style-type="substitutive"
                           icon-right="ic_arrow-right"
-                          @click="handleClickTemplate(board)"
+                          @click="handleClickCreate(board)"
                 >
                     Create
                 </p-button>
