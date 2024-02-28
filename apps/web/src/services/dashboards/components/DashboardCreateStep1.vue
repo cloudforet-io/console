@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PSearch, PFieldTitle,
+    PSearch, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -58,7 +58,21 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
         <div class="contents-container">
             <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
             <div class="template-contents-area">
-                <div class="out-of-the-box">
+                <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.exstingTemplateSets.length"
+                         show-image
+                         class="empty-template"
+                >
+                    <template #image>
+                        <img alt="empty-image"
+                             class="empty-image"
+                             src="@/assets/images/img_ghost.png"
+                        >
+                    </template>
+                    No Data
+                </p-empty>
+                <div v-if="state.outOfTheBoxTemplateSets.length"
+                     class="out-of-the-box"
+                >
                     <p-field-title class="title">
                         Out-of-the-Box Dashboard
                     </p-field-title>
@@ -71,7 +85,9 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
                         />
                     </div>
                 </div>
-                <div class="existing">
+                <div v-if="state.exstingTemplateSets.length"
+                     class="existing"
+                >
                     <p-field-title class="title">
                         Exsting Dashboard
                     </p-field-title>
@@ -103,6 +119,14 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
 
         .template-contents-area {
             flex-grow: 1;
+
+            .empty-template {
+                padding-top: 3rem;
+                .empty-image {
+                    width: 5rem;
+                    height: 5rem;
+                }
+            }
 
             .out-of-the-box {
                 margin-bottom: 2rem;
