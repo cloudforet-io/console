@@ -1,4 +1,4 @@
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
@@ -21,6 +21,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
         schema_properties: [
             'cost_data_source',
             'cost_data_field',
+            'granularity',
             'cost_data_type',
             'filters.cost_product',
             'filters.project',
@@ -43,7 +44,8 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costSummaryMultiFields', {
         title: 'AWS CloudFront Cost',
         widget_options: {
-            cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+            cost_data_field: 'project',
+            granularity: GRANULARITY.YEARLY,
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
                 cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
