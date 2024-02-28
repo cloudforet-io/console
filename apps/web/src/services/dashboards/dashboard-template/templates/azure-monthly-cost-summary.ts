@@ -30,7 +30,7 @@ export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Azure Monthly Cost Summary',
     labels: ['Azure', 'Cost'],
     version: '1',
-    description: {
+    display_info: {
         icon: 'ic_dashboard-template_monthly-cost-summary',
     },
     settings: {
