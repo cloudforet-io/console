@@ -34,6 +34,7 @@ export interface WidgetOptionsSchemaProperty {
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: WidgetItemOptions[];
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
+    hidden?: boolean;
 }
 
 export type WidgetFilterKey = keyof typeof WIDGET_OPTION_FILTER_KEY_MAP;
