@@ -13,16 +13,15 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { violet } from '@/styles/colors';
@@ -40,8 +39,8 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
+
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
@@ -50,25 +49,33 @@ const state = reactive({
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
         const menuList: SelectDropdownMenuItem[] = [
-            { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') } as SelectDropdownMenuItem,
-            { type: 'header', name: 'workspace_header', label: i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES') } as SelectDropdownMenuItem,
+            // TODO: will be applied after API completion
+            // { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') } as SelectDropdownMenuItem,
+            { type: 'header', name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${state.workspaceList.length})` } as SelectDropdownMenuItem,
         ];
         state.workspaceList.forEach((_workspace) => {
-            if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
-                menuList.push({
-                    name: _workspace.workspace_id,
-                    label: _workspace.name,
-                    headerName: 'starred_header',
-                    tags: _workspace.tags,
-                } as SelectDropdownMenuItem);
-            } else {
-                menuList.push({
-                    name: _workspace.workspace_id,
-                    label: _workspace.name,
-                    headerName: 'workspace_header',
-                    tags: _workspace.tags,
-                } as SelectDropdownMenuItem);
-            }
+            // TODO: will be applied after API completion
+            // if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
+            //     menuList.push({
+            //         name: _workspace.workspace_id,
+            //         label: _workspace.name,
+            //         headerName: 'starred_header',
+            //         tags: _workspace.tags,
+            //     } as SelectDropdownMenuItem);
+            // } else {
+            //     menuList.push({
+            //         name: _workspace.workspace_id,
+            //         label: _workspace.name,
+            //         headerName: 'workspace_header',
+            //         tags: _workspace.tags,
+            //     } as SelectDropdownMenuItem);
+            // }
+            menuList.push({
+                name: _workspace.workspace_id,
+                label: _workspace.name,
+                headerName: 'workspace_header',
+                tags: _workspace.tags,
+            } as SelectDropdownMenuItem);
             return menuList;
         });
         return [...menuList];
@@ -81,23 +88,27 @@ const selectWorkspace = (name: string): void => {
     if (!workspaceId || workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
-    if (name === 'all_workspaces') {
-        appContextStore.enterAdminMode();
-        router.push(getProperRouteLocation({ name: PREFERENCE_ROUTE.WORKSPACES._NAME }));
-        Vue.notify({
-            group: 'toastTopCenter',
-            type: 'info',
-            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
-            duration: 2000,
-            speed: 1,
-        });
-        return;
-    }
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
+};
+const handleClickButton = (hasNoWorkspace?: string) => {
+    appContextStore.enterAdminMode();
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        query: {
+            hasNoWorkpspace: hasNoWorkspace,
+        },
+    });
+    Vue.notify({
+        group: 'toastTopCenter',
+        type: 'info',
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+        duration: 2000,
+        speed: 1,
+    });
 };
 </script>
 
@@ -172,11 +183,13 @@ const selectWorkspace = (name: string): void => {
                         />
                         <span>{{ item.label }}</span>
                     </div>
-                    <favorite-button :item-id="item.name"
-                                     :favorite-type="FAVORITE_TYPE.MENU"
-                                     scale="0.875"
-                                     class="favorite-button"
-                    />
+
+                    <!--                    TODO: will be applied after API completion-->
+                    <!--                    <favorite-button :item-id="item.name"-->
+                    <!--                                     :favorite-type="FAVORITE_TYPE.MENU"-->
+                    <!--                                     scale="0.875"-->
+                    <!--                                     class="favorite-button"-->
+                    <!--                    />-->
                 </div>
             </template>
             <template v-if="state.isDomainAdmin"
@@ -189,6 +202,7 @@ const selectWorkspace = (name: string): void => {
                                   size="sm"
                                   class="create-new-button tool"
                                   icon-left="ic_plus_bold"
+                                  @click="handleClickButton('true')"
                         >
                             {{ $t("COMMON.GNB.WORKSPACE.CREATE_WORKSPACE") }}
                         </p-button>
@@ -196,6 +210,7 @@ const selectWorkspace = (name: string): void => {
                                   size="sm"
                                   class="manage-button tool"
                                   icon-left="ic_settings"
+                                  @click="handleClickButton()"
                         >
                             {{ $t("COMMON.GNB.WORKSPACE.MANAGE_WORKSPACE") }}
                         </p-button>
@@ -215,7 +230,8 @@ const selectWorkspace = (name: string): void => {
     box-shadow: 0.1875rem 0 0.1875rem 0 rgba(81, 83, 100, 0.15);
 
     &.admin-mode {
-        box-shadow: 0.1875rem 0 0.25rem 0 rgba(255, 255, 255, 0.3);
+        width: 100%;
+        max-width: initial;
 
         @screen mobile {
             box-shadow: none;
@@ -244,15 +260,12 @@ const selectWorkspace = (name: string): void => {
             }
 
             .admin-title {
-                @apply text-label-xl text-violet-100 w-full;
+                @apply flex text-label-xl text-violet-100 w-full;
+                gap: 0.25rem;
 
                 .omitable-text {
-                    @screen tablet {
-                        @apply hidden;
-                    }
-
                     @screen mobile {
-                        @apply inline-block;
+                        @apply hidden;
                     }
                 }
             }
