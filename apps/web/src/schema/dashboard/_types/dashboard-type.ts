@@ -30,7 +30,6 @@ export interface DashboardVariableSchemaProperty {
     options?: DashboardVariableOptions[];
     fixed?: boolean; // can not delete this variable from dashboard
     required?: boolean; // value is required
-    hidden?: boolean;
 }
 
 type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
