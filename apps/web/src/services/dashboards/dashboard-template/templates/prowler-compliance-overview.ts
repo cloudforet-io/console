@@ -75,11 +75,11 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
             'provider',
         ],
         fixed_options: {
-            cloud_service_query_set: 'Prowler',
+            cloud_service_group: 'Prowler',
         },
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList, { cloud_service_query_set: 'Prowler' }),
+        getDashboardLayoutWidgetInfoList(widgetList, { cloud_service_group: 'Prowler' }),
     ],
 };

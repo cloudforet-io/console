@@ -75,11 +75,11 @@ export const dCloComplianceOverviewDashboard: DashboardTemplate = {
             'provider',
         ],
         fixed_options: {
-            cloud_service_query_set: 'D-Clo',
+            cloud_service_group: 'D-Clo',
         },
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList, { cloud_service_query_set: 'D-Clo' }),
+        getDashboardLayoutWidgetInfoList(widgetList, { cloud_service_group: 'D-Clo' }),
     ],
 };
