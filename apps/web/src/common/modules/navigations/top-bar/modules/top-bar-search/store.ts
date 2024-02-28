@@ -7,9 +7,12 @@ interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activateTab: string;
-    selectedWorkspaces: string[]; // Workspace Filter(TopBarSearchWorkspaceFilter)
     recentMenuList: any[]; // TODO: check type
     searchMenuMap: any; // TODO: check type
+    // workspace filter
+    recentAccessedWorkspaces: string[];
+    stagedWorkspaces: string[];
+    selectedWorkspaces: string[]; // Workspace Filter(TopBarSearchWorkspaceFilter)
 }
 
 export const useTopBarSearchStore = defineStore('top-bar-search', () => {
@@ -17,9 +20,12 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         isActivated: false,
         inputText: '',
         activateTab: 'service',
-        selectedWorkspaces: [],
         recentMenuList: [],
         searchMenuMap: {},
+        // workspace filter
+        recentAccessedWorkspaces: [],
+        stagedWorkspaces: [],
+        selectedWorkspaces: [],
     });
 
     const getters = reactive({
