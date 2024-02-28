@@ -34,7 +34,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         project: {
             name: 'Project',
             variable_type: 'MANAGED',
-            use: true,
+            use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT',
             options: [{
@@ -56,7 +56,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         service_account: {
             name: 'Service Account',
             variable_type: 'MANAGED',
-            use: true,
+            use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_SERVICE_ACCOUNT',
             options: [{
@@ -67,7 +67,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         region: {
             name: 'Region',
             variable_type: 'MANAGED',
-            use: true,
+            use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_REGION',
             options: [{
