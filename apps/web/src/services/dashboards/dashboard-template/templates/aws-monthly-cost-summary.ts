@@ -71,7 +71,7 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
         },
         order: ['cost_data_source', 'project', 'service_account', 'region', 'cost_product', 'provider'],
         fixed_options: {
-            cloud_service_group: 'AWS',
+            provider: 'aws',
         },
     },
     variables: {},

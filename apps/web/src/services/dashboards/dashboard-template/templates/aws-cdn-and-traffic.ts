@@ -101,9 +101,7 @@ export const awsCdnAndTrafficDashboard: DashboardTemplate = {
             provider: 'aws',
         },
     },
-    variables: {
-        provider: 'aws',
-    },
+    variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList, { provider: 'aws' }),
     ],

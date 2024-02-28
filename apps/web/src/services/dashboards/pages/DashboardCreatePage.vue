@@ -121,7 +121,7 @@ const createDashboard = async () => {
             params: {
                 dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
             },
-        });
+        }).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     } finally {
