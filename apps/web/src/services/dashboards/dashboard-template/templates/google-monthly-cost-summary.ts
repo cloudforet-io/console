@@ -1,4 +1,3 @@
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
