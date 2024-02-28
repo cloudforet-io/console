@@ -5,13 +5,6 @@ import { computed, reactive, ref } from 'vue';
 
 import { PTab, screens } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { RecentConfig } from '@/store/modules/recent/type';
-import { RECENT_TYPE } from '@/store/modules/recent/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchServiceAccountTab
@@ -32,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
-const RECENT_LIMIT = 5;
+
 const SEARCH_LIMIT = 15;
 const BOTTOM_MARGIN = 5.5 * 16;
 
@@ -51,7 +44,6 @@ const getTabHeaderHeight = () => {
 };
 
 const state = reactive({
-    loading: true,
     activeTab: computed(() => topBarSearchStore.state.activateTab),
     tabs: [
         { label: 'Service', name: 'service' },
@@ -75,11 +67,6 @@ const state = reactive({
     }),
 });
 
-const dataState = reactive({
-    recentMenuList: [] as RecentConfig[]|null,
-    searchMenuList: [],
-});
-
 
 // const createSearchRecent = async (type: SuggestionType, id: string) => {
 //     try {
@@ -92,25 +79,6 @@ const dataState = reactive({
 //     }
 // };
 
-const fetchSearchRecent = async (type: SuggestionType) => {
-    try {
-        state.loading = true;
-        const { results } = await SpaceConnector.client.addOns.recent.search.list({
-            type,
-            limit: RECENT_LIMIT,
-        });
-        dataState.recentMenuList = results.map((d) => ({
-            itemType: d.data.type,
-            itemId: d.data.id,
-            updatedAt: d.updated_at,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        dataState.recentMenuList = [];
-    } finally {
-        state.loading = false;
-    }
-};
 
 const handleMoveFocusEnd = () => {
     emit('move-focus-end');
@@ -126,9 +94,6 @@ const handleUpdateContentsSize = (height: number) => {
     state.contentsHeight = height;
 };
 
-(async () => {
-    await fetchSearchRecent(RECENT_TYPE.MENU);
-})();
 
 </script>
 
@@ -148,7 +113,6 @@ const handleUpdateContentsSize = (height: number) => {
             <template #service>
                 <top-bar-search-service-tab
                     :search-limit="SEARCH_LIMIT"
-                    :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
@@ -158,7 +122,6 @@ const handleUpdateContentsSize = (height: number) => {
             <template #service-account>
                 <top-bar-search-service-account-tab
                     :search-limit="SEARCH_LIMIT"
-                    :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
@@ -168,7 +131,6 @@ const handleUpdateContentsSize = (height: number) => {
             <template #project>
                 <search-tab-content
                     :search-limit="SEARCH_LIMIT"
-                    :loading="state.loading"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"

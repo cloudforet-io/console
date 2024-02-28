@@ -30,14 +30,12 @@ import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/T
 
 
 interface Props {
-    loading: boolean;
     searchLimit: number;
     isFocused: boolean;
     focusingDirection: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: true,
     searchLimit: 15,
     isFocused: false,
     focusingDirection: 'DOWNWARD',
@@ -122,7 +120,7 @@ const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string
 
 const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     if (type === SUGGESTION_TYPE.DEFAULT_SERVICE) {
-        if (direction === 'DOWNWARD') {
+        if (direction === 'DOWNWARD' && state.recentMenuList.length) {
             state.proxyFocusingDirection = direction;
             state.focusingType = SUGGESTION_TYPE.SERVICE;
         } else {
@@ -169,11 +167,11 @@ watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
 watch(() => props.isFocused, (isFocused) => {
     if (isFocused) {
         if (props.focusingDirection === 'DOWNWARD') {
-            if (state.inputText.length === 0) {
-                state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
-            }
-        } else {
-            state.focusingType = SUGGESTION_TYPE.SERVICE;
+            state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+        } else if (props.focusingDirection === 'UPWARD') {
+            if (state.inputText.length) state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+            else if (state.recentMenuList.length) state.focusingType = SUGGESTION_TYPE.SERVICE;
+            else state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
         }
     }
 });
@@ -203,7 +201,7 @@ watch(() => props.isFocused, (isFocused) => {
                 />
             </div>
             <p-data-loader :data="state.serviceMenuList ||[]"
-                           :loading="loading"
+                           :loading="false"
             >
                 <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
                                          :items="state.serviceMenuList || []"

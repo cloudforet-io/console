@@ -75,6 +75,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     if (e.metaKey && e.code === 'KeyK') {
         topBarSearchStore.setIsActivated(!state.visible);
         state.isFocusOnInput = state.visible;
+        state.isFocusOnSuggestion = false;
     } else if (e.code === 'Escape') {
         topBarSearchStore.setIsActivated(false);
     }
