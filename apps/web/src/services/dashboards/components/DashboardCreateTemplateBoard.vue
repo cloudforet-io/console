@@ -65,7 +65,7 @@ const handleClickCreate = (template: DashboardModel) => {
                     <!--                                width="1rem"-->
                     <!--                                height="1rem"-->
                     <!--                    />-->
-                    <p-i :name="board.description?.icon ?? 'ic_dashboard-template_others'"
+                    <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
                          width="1rem"
                          height="1rem"
                     />

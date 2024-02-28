@@ -70,7 +70,7 @@ export interface DashboardTemplate {
     settings: DashboardSettings;
     variables_schema: DashboardVariablesSchema;
     labels: string[];
-    description?: {
+    display_info?: {
         icon?: string;
         preview_image?: string;
     }

@@ -31,7 +31,7 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
             <!--                        width="3.5rem"-->
             <!--                        height="3.5rem"-->
             <!--            />-->
-            <p-i :name="props.selectedTemplate?.description?.icon ?? 'ic_dashboard-template_others'"
+            <p-i :name="props.selectedTemplate?.display_info?.icon ?? 'ic_dashboard-template_others'"
                  width="3.5rem"
                  height="3.5rem"
             />
