@@ -22,7 +22,7 @@ const ERROR_CASE_WIDGET_INFO: Omit<DashboardLayoutWidgetInfo, 'version'|'widget_
 };
 
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
-export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
+export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[], fixedOptions: Record<string, any> = {}): DashboardLayoutWidgetInfo[] => widgetList.map(
     ([widgetId, customInfo]) => {
         try {
             const widgetConfig = getWidgetConfig(widgetId);
@@ -30,6 +30,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
                 widget_key: getRandomId(),
                 widget_name: widgetConfig.widget_config_id,
                 version: '1',
+                fixed_options: fixedOptions,
                 ...customInfo,
             };
             return widgetInfo;
@@ -45,7 +46,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
 );
 
 
-export const getRefinedDashboardVariablesSchema = (fixedKeys: string[] = [], excludedKeys: string[] = []): DashboardVariablesSchema => {
+export const getRefinedDashboardVariablesSchema = (fixedKeys: string[] = [], hiddenKeys: string[] = [], excludedKeys: string[] = []): DashboardVariablesSchema => {
     const _refinedProperties: DashboardVariablesSchema['properties'] = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties);
     excludedKeys.forEach((key) => {
         delete _refinedProperties[key];
@@ -55,6 +56,7 @@ export const getRefinedDashboardVariablesSchema = (fixedKeys: string[] = [], exc
             ...value,
             fixed: fixedKeys.includes(key),
             use: fixedKeys.includes(key),
+            hidden: hiddenKeys.includes(key),
         };
     });
     return {

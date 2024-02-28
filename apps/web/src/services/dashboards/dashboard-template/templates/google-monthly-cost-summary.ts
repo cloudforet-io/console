@@ -39,7 +39,10 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
         refresh_interval_option: '5m',
     },
     variables_schema: {
-        ...getRefinedDashboardVariablesSchema(['cost_data_source', 'project', 'service_account', 'region', 'cost_product'], ['provider']),
+        ...getRefinedDashboardVariablesSchema(
+            ['cost_data_source', 'project', 'service_account', 'region', 'cost_product', 'provider'],
+            ['provider'],
+        ),
         fixed_options: {
             provider: 'google_cloud',
         },
@@ -48,6 +51,6 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
         provider: 'google_cloud',
     },
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList),
+        getDashboardLayoutWidgetInfoList(widgetList, { provider: 'google_cloud' }),
     ],
 };
