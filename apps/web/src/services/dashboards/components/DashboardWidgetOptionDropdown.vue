@@ -58,6 +58,7 @@ const state = reactive({
     // property schema
     schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormGetters.widgetConfig?.options_schema?.properties?.[props.propertyName]),
     fixedOptions: computed(() => widgetFormGetters.mergedWidgetInfo?.fixed_options),
+    hidden: computed<boolean>(() => state.schemaProperty?.hidden),
     readonly: computed<boolean>(() => state.schemaProperty?.readonly),
     label: computed(() => state.schemaProperty?.name ?? props.propertyName),
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => {
@@ -391,7 +392,8 @@ watch(() => state.errorMessage, (errorMessage) => {
 
 <template>
     <div class="dashboard-widget-option-dropdown">
-        <p-field-group :label="state.label"
+        <p-field-group v-if="!state.hidden"
+                       :label="state.label"
                        :invalid="!!state.errorMessage"
                        :invalid-text="state.errorMessage"
                        required
