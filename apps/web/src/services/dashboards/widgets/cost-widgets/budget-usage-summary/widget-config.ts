@@ -21,8 +21,9 @@ const budgetUsageSummaryConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: getWidgetOptionsSchema([
-        'cost_data_source',
-        'filters.project',
+        ['cost_data_source', { fixed: true, hidden: true }],
+        ['filters.project', { fixed: true }],
+        'filters.provider',
     ]),
 };
 

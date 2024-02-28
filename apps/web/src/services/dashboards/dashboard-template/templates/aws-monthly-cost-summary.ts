@@ -1,4 +1,3 @@
-import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
@@ -12,16 +11,21 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
         title: 'Cost Trend By Project',
         widget_options: {
-            cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+            cost_data_field: 'project',
         },
     }],
     ['costTrendStacked', {
         title: 'Cost Trend By Product',
         widget_options: {
-            cost_data_field: COST_DATA_FIELD_MAP.PRODUCT.name,
+            cost_data_field: 'product',
         },
     }],
-    ['costDonut', { title: 'Cost By Provider' }],
+    ['costDonut', {
+        title: 'Cost By Provider',
+        widget_options: {
+            cost_data_field: 'provider',
+        },
+    }],
     ['budgetStatus'],
     ['costByRegion'],
     ['budgetUsageByTarget'],
