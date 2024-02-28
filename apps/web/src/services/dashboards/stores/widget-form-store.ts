@@ -310,16 +310,16 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
 
 const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: DashboardScope): WidgetConfig => {
-    if (dashboardScope === 'DOMAIN') {
-        const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
-        return {
-            ...config,
-            options_schema: {
-                properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
-                order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
-            },
-        };
-    }
+    // if (dashboardScope === 'DOMAIN') {
+    //     const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
+    //     return {
+    //         ...config,
+    //         options_schema: {
+    //             properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
+    //             order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
+    //         },
+    //     };
+    // }
     if (dashboardScope === 'PROJECT') {
         const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, readonly: true }]]);
         return {
@@ -333,9 +333,9 @@ const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: D
     return config;
 };
 const getInheritOptionsByDashboardScope = (inheritOptions: InheritOptions, dashboardScope: DashboardScope): InheritOptions => {
-    if (dashboardScope === 'DOMAIN') {
-        return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
-    }
+    // if (dashboardScope === 'DOMAIN') {
+    //     return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
+    // }
     if (dashboardScope === 'PROJECT') {
         return { ...inheritOptions, 'filters.project': { enabled: true, variable_key: 'project' } };
     }
