@@ -1,9 +1,11 @@
-import { chain, get, union, } from 'lodash';
+import { chain, get, union } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
-import type { InheritOptions, WidgetConfig, WidgetFilterOptionKey, WidgetOptions, WidgetOptionsSchema, } from '@/schema/dashboard/_types/widget-type';
+import type {
+    InheritOptions, WidgetConfig, WidgetFilterOptionKey, WidgetOptions, WidgetOptionsSchema,
+} from '@/schema/dashboard/_types/widget-type';
 
-import { MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES, MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES, } from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
+import { MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES, MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES } from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
 
 const VAR_KEY_TO_OPTION_KEY_MAP = {};
 Object.entries(MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES).forEach(([optionKey, property]) => {
