@@ -5,6 +5,7 @@ import type {
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import type { VariableModelType } from '@/lib/variable-models';
+import type { Value } from '@/lib/variable-models/_base/types';
 
 
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
@@ -16,6 +17,7 @@ interface DashboardVariableOptions {
     type: VariableModelType;
     key: string;
     dataKey?: string;
+    values?: Value[];
 }
 
 export interface DashboardVariableSchemaProperty {
