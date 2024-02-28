@@ -64,7 +64,7 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
     if (Array.isArray(subject)) {
         subject.forEach((d) => {
             if (d.type === 'ENUM') {
-                values = values.concat(d.values.map((v) => ({ key: v.key, label: v.name })));
+                values = values.concat(d.values?.map((v) => ({ key: v.key, label: v.name })) ?? []);
             }
         });
     }
@@ -139,7 +139,7 @@ const handleSave = () => {
     //     };
     // }
     const variableToSave = {
-        variable_type: 'CUSTOM',
+        variable_type: state.optionsType,
         name: name.value,
         use: true,
         selection_type: state.selectionType,
@@ -158,8 +158,8 @@ onMounted(() => {
         if (Array.isArray(props.selectedVariable?.options)) {
             props.selectedVariable?.options.forEach((option) => {
                 if (option.type === 'ENUM') {
-                    if (option.values.length) {
-                        state.options = option.values.map((v) => ({ draggableItemId: getRandomId(), key: v.key, label: v.name }));
+                    if (option.values?.length) {
+                        state.options = option.values?.map((v) => ({ draggableItemId: getRandomId(), key: v.key, label: v.name }));
                     } else {
                         state.options = [{ draggableItemId: getRandomId(), key: '', label: '' }];
                     }
