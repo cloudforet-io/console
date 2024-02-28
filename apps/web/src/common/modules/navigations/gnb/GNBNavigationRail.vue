@@ -169,7 +169,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         }
         &.is-only-label {
             @apply items-end text-gray-500;
-            height: 2.875rem;
+            height: 2.625rem;
             padding-bottom: 0.5rem;
         }
         &.is-selected {
