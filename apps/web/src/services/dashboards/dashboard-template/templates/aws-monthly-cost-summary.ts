@@ -1,5 +1,6 @@
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
+import { DASHBOARD_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
 
@@ -34,7 +35,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'AWS Monthly Cost Summary',
-    labels: ['AWS', 'Cost'],
+    labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
         icon: 'ic_dashboard-template_monthly-cost-summary',

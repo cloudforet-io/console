@@ -7,6 +7,9 @@ import {
 
 import { store } from '@/store';
 
+import { DASHBOARD_SERVICE_LABELS } from '@/services/dashboards/constants/dashboard-labels';
+
+
 export interface TemplateLabelItem {
     label: string;
     name: string;
@@ -19,15 +22,7 @@ const emit = defineEmits<{(e:'select-label', labels: TemplateLabelItem[]):void;
 
 const state = reactive({
     providers: computed(() => store.getters['reference/providerItems']),
-    providerList: computed(() => [
-        ...Object.keys(state.providers).map((k) => ({
-            label: state.providers[k].label,
-            name: state.providers[k].name,
-            img: state.providers[k]?.icon,
-        })),
-        { name: 'etc', label: 'ETC', img: undefined },
-    ]),
-    services: computed(() => ['Cost', 'Asset', 'Compliance', 'Security']),
+    services: computed(() => Object.values(DASHBOARD_SERVICE_LABELS)),
     serviceList: computed(() => state.services.map((service) => ({
         label: service,
         name: service,
@@ -54,7 +49,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                     Provider
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="provider in state.providerList"
+                    <p-checkbox v-for="provider in Object.values(state.providers)"
                                 :key="provider.name"
                                 class="label-item"
                                 :selected="state.selectedProviders"
@@ -66,7 +61,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                         width="1.25rem"
                                         height="1.25rem"
                                         error-icon="ic_cloud-filled"
-                                        :src="provider.img"
+                                        :src="provider.icon"
                                         class="mr-1"
                             />{{ provider.label }}
                         </div>
@@ -99,7 +94,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                selection-label="Provider"
                                show-select-marker
                                :show-delete-all-button="false"
-                               :menu="state.providerList"
+                               :menu="Object.values(state.providers)"
                                :selected="state.selectedProviders"
                                @update:selected="handleChangeLabelFilter('Provider', $event)"
             >
@@ -107,7 +102,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                     <p-lazy-img width="1rem"
                                 height="1rem"
                                 error-icon="ic_cloud-filled"
-                                :src="item.img"
+                                :src="item.icon"
                                 class="mr-1"
                     />{{ item.label }}
                 </template>
