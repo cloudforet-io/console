@@ -73,6 +73,7 @@ export const getInitialSchemaProperties = (
         .map((key) => variableKeyToOptionNameMap[key]) // convert variable key to option name
         .intersection(allOptionProperties) // intersect with all possible properties from widget options schema
         .union(fixedProperties) // union with fixed properties
+        .filter((key) => widgetOptionsSchema?.properties?.[key]?.fixed) // filter only fixed properties
         .sortBy((key) => {
             const idx = order.indexOf(key);
             if (idx < 0) return 9999;
