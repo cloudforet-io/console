@@ -34,7 +34,7 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     name: 'Prowler Compliance Overview',
     labels: ['AWS', 'Azure', 'Google', 'Prowler', 'Security', 'CSPM'],
     version: '1',
-    description: {
+    display_info: {
         icon: 'ic_dashboard-template_compliance',
     },
     settings: {
@@ -45,20 +45,41 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     },
     variables_schema: {
         properties: {
-            cloud_service_query_set: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cloud_service_query_set,
-            project: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
-            service_account: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.service_account,
-            region: MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.region,
+            cloud_service_query_set: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.cloud_service_query_set,
+                use: true,
+                fixed: true,
+            },
+            project: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
+                use: true,
+            },
+            service_account: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.service_account,
+                use: true,
+            },
+            region: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.region,
+                use: true,
+            },
+            provider: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.provider,
+                use: false,
+            },
         },
         order: [
             'cloud_service_query_set',
             'project',
             'service_account',
             'region',
+            'provider',
         ],
+        fixed_options: {
+            cloud_service_query_set: 'Prowler',
+        },
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList),
+        getDashboardLayoutWidgetInfoList(widgetList, { cloud_service_query_set: 'Prowler' }),
     ],
 };
