@@ -12,7 +12,9 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { clone, isEmpty } from 'lodash';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteOptions } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -25,6 +27,8 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+
 interface Props {
     isMinimizeGnb?: boolean;
 }
@@ -33,6 +37,8 @@ const props = withDefaults(defineProps<Props>(), {
     isMinimizeGnb: false,
 });
 
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 const topBarHeaderStore = useTopBarHeaderStore();
 const topBarHeaderGetters = topBarHeaderStore.getters;
 
@@ -85,9 +91,20 @@ watch(() => state.selectedMenuId, async () => {
     await topBarHeaderStore.initState();
     await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
 });
-watch(() => state.currentMenuId, async () => {
+watch(() => state.currentMenuId, async (currentMenuId) => {
     await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
-});
+    if (currentMenuId === MENU_ID.HOME_DASHBOARD) {
+        topBarHeaderStore.setBreadcrumbs([{
+            name: i18n.t('MENU.HOME_DASHBOARD'),
+            to: {
+                name: HOME_DASHBOARD_ROUTE._NAME,
+                params: {
+                    workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
+                },
+            },
+        }]);
+    }
+}, { immediate: true });
 
 (async () => {
     await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
