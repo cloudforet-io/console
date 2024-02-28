@@ -72,9 +72,7 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
             provider: 'google_cloud',
         },
     },
-    variables: {
-        provider: 'google_cloud',
-    },
+    variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList, { provider: 'google_cloud' }),
     ],

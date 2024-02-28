@@ -72,9 +72,7 @@ export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
             provider: 'azure',
         },
     },
-    variables: {
-        provider: 'azure',
-    },
+    variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList, { provider: 'azure' }),
     ],
