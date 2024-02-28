@@ -1,14 +1,10 @@
-import { cloneDeep } from 'lodash';
-
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import getRandomId from '@/lib/random-id-generator';
 
-import { MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP, MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
@@ -44,23 +40,3 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[], fixe
         }
     },
 );
-
-
-export const getRefinedDashboardVariablesSchema = (fixedKeys: string[] = [], hiddenKeys: string[] = [], excludedKeys: string[] = []): DashboardVariablesSchema => {
-    const _refinedProperties: DashboardVariablesSchema['properties'] = cloneDeep(MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties);
-    excludedKeys.forEach((key) => {
-        delete _refinedProperties[key];
-    });
-    Object.entries(_refinedProperties).forEach(([key, value]) => {
-        _refinedProperties[key] = {
-            ...value,
-            fixed: fixedKeys.includes(key),
-            use: fixedKeys.includes(key),
-            hidden: hiddenKeys.includes(key),
-        };
-    });
-    return {
-        properties: _refinedProperties,
-        order: Object.values(MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP).filter((d) => !excludedKeys.includes(d.key)).map((info) => info.key),
-    };
-};
