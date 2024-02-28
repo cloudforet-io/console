@@ -5,6 +5,7 @@ import type {
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import type { VariableModelType } from '@/lib/variable-models';
+import type { Value } from '@/lib/variable-models/_base/types';
 
 
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
@@ -16,6 +17,7 @@ interface DashboardVariableOptions {
     type: VariableModelType;
     key: string;
     dataKey?: string;
+    values?: Value[];
 }
 
 export interface DashboardVariableSchemaProperty {
@@ -28,7 +30,6 @@ export interface DashboardVariableSchemaProperty {
     options?: DashboardVariableOptions[];
     fixed?: boolean; // can not delete this variable from dashboard
     required?: boolean; // value is required
-    hidden?: boolean;
 }
 
 type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
