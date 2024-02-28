@@ -19,6 +19,8 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
+
 // import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
@@ -60,6 +62,9 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return MENU_ID.COST_ANALYSIS;
+        }
         const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
         return targetMenuId;
     }),
