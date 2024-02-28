@@ -57,6 +57,7 @@ const widgetFormGetters = widgetFormStore.getters;
 const state = reactive({
     // property schema
     schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormGetters.widgetConfig?.options_schema?.properties?.[props.propertyName]),
+    fixedOptions: computed(() => widgetFormGetters.mergedWidgetInfo?.fixed_options),
     readonly: computed<boolean>(() => state.schemaProperty?.readonly),
     label: computed(() => state.schemaProperty?.name ?? props.propertyName),
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => {
@@ -253,8 +254,11 @@ const getVariableModelMenuHandlerInfoList = (schema?: WidgetOptionsSchemaPropert
 
     const _results: VariableModelMenuHandlerInfo[] = [];
     schema.item_options?.forEach((conf) => {
-        // TODO: set modelOptions after provider is ready
-        const variableModel = new VariableModelFactory({ type: conf.type, managedModelKey: conf.key });
+        const variableModel = new VariableModelFactory(
+            { type: conf.type, managedModelKey: conf.key },
+            undefined,
+            { fixedOptions: state.fixedOptions },
+        );
         _results.push({
             variableModel,
             dataKey: conf.dataKey,
