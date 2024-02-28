@@ -69,19 +69,22 @@ describe('[Widget Schema Helper]', () => {
 
     describe('getInitialSchemaProperties', () => {
     // used variables
-        it('should include used variables only', () => {
-            const widgetConfig = {
+        it('should include fixed variables only', () => {
+            const widgetConfig: WidgetConfig = {
                 ...DEFAULT_WIDGET_CONFIG,
                 options_schema: {
                     properties: {
                         'filters.provider': {
                             key: 'provider',
+                            fixed: true,
                         },
                         'filters.service_account': {
                             key: 'service_account',
+                            fixed: true,
                         },
                         'filters.region': {
                             key: 'region',
+                            fixed: false,
                         },
                     },
                     order: [],
@@ -91,7 +94,7 @@ describe('[Widget Schema Helper]', () => {
                 properties: {
                     provider: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
                     service_account: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
-                    region: { ...DEFAULT_VARIABLE_PROPERTY, use: false },
+                    region: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
                 },
                 order: [],
             };
@@ -106,6 +109,7 @@ describe('[Widget Schema Helper]', () => {
                     properties: {
                         'filters.provider': {
                             key: 'provider',
+                            fixed: true,
                         },
                     },
                     order: [],
@@ -120,6 +124,7 @@ describe('[Widget Schema Helper]', () => {
             };
 
             const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+            expect(refined).toEqual(expect.arrayContaining(['filters.provider']));
             expect(refined).not.toEqual(expect.arrayContaining(['filters.service_account']));
         });
         // fixed properties
@@ -146,19 +151,22 @@ describe('[Widget Schema Helper]', () => {
             expect(refined).toEqual(expect.arrayContaining(['filters.provider']));
         });
         // // ordering
-        it('should be ordered by order if there is no fixed property', () => {
+        it('should be ordered by order if there is no fixed dashboard variable', () => {
             const widgetConfig = {
                 ...DEFAULT_WIDGET_CONFIG,
                 options_schema: {
                     properties: {
                         'filters.provider': {
                             key: 'provider',
+                            fixed: true,
                         },
                         'filters.service_account': {
                             key: 'service_account',
+                            fixed: true,
                         },
                         'filters.region': {
                             key: 'region',
+                            fixed: true,
                         },
                     },
                     order: ['filters.service_account', 'filters.provider', 'filters.region'],
@@ -203,7 +211,7 @@ describe('[Widget Schema Helper]', () => {
                 order: [],
             };
             const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
-            expect(refined).toEqual(['filters.region', 'filters.service_account', 'filters.provider']);
+            expect(refined).toEqual(['filters.region']);
         });
     });
 
