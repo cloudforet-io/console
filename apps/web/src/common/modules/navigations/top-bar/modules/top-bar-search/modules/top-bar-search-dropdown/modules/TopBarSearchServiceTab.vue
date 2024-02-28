@@ -19,7 +19,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { RecentMenu } from '@/common/modules/navigations/stores/recent-store';
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { RECENT_TYPE, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
@@ -96,7 +96,7 @@ const state = reactive({
     }),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
-    focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
+    focusingType: SUGGESTION_TYPE.DEFAULT_SERVICE as SuggestionType,
     tabHeaderHeight: computed(() => {
         if (parentEl.value) {
             const tabHeaderHeight = parentEl.value.previousElementSibling?.clientHeight;
@@ -121,10 +121,22 @@ const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string
 };
 
 const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
-    if (type === SUGGESTION_TYPE.MENU && direction === 'DOWNWARD') {
-        state.proxyFocusingDirection = direction;
+    if (type === SUGGESTION_TYPE.DEFAULT_SERVICE) {
+        if (direction === 'DOWNWARD') {
+            state.proxyFocusingDirection = direction;
+            state.focusingType = SUGGESTION_TYPE.SERVICE;
+        } else {
+            emit('move-focus-end');
+        }
+    } else if (type === SUGGESTION_TYPE.SERVICE) {
+        if (direction === 'DOWNWARD') {
+            state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+            emit('move-focus-end');
+        } else {
+            state.proxyFocusingDirection = direction;
+            state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+        }
     }
-    emit('move-focus-end');
 };
 
 const handleSelect = (item) => {
@@ -133,7 +145,7 @@ const handleSelect = (item) => {
     if (menuInfo && router.currentRoute.name !== menuId) {
         router.push({ name: menuInfo.routeName }).catch(() => {});
         recentStore.createRecent({
-            type: 'service', workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
+            type: RECENT_TYPE.SERVICE, workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
         });
     }
     topBarSearchStore.setIsActivated(false);
@@ -150,21 +162,21 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 }));
 
 watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
-    if (state.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: 'service', workspaceIds: [state.currentWorkspaceId] });
+    if (state.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [state.currentWorkspaceId] });
 }, { immediate: true });
 
 // /* Watcher */
-// TODO: for focusing
-// watch(() => props.isFocused, (isFocused) => {
-//     if (isFocused) {
-//         if (props.focusingDirection === 'DOWNWARD') {
-//             if (state.inputText.length === 0) {
-//                 state.focusingType = SUGGESTION_TYPE.MENU;
-//         } else {
-//             state.focusingType = props.items[props.items.length - 1].itemType;
-//         }
-//     }
-// });
+watch(() => props.isFocused, (isFocused) => {
+    if (isFocused) {
+        if (props.focusingDirection === 'DOWNWARD') {
+            if (state.inputText.length === 0) {
+                state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+            }
+        } else {
+            state.focusingType = SUGGESTION_TYPE.SERVICE;
+        }
+    }
+});
 </script>
 <template>
     <div ref="contentRef"
@@ -175,18 +187,18 @@ watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
                 <top-bar-suggestion-list
                     :items="state.defaultServiceMenuItems || []"
                     :input-text="state.inputText"
-                    :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                    :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
                     :focusing-direction="props.focusingDirection"
-                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, ...arguments)"
                     @select="handleSelect"
                 />
                 <top-bar-suggestion-list
                     v-if="state.recentMenuList.length"
                     :items="state.recentMenuItems || []"
                     :input-text="state.inputText"
-                    :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                    :is-focused="state.focusingType === SUGGESTION_TYPE.SERVICE ? props.isFocused : false"
                     :focusing-direction="props.focusingDirection"
-                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.SERVICE, ...arguments)"
                     @select="handleSelect"
                 />
             </div>
@@ -196,9 +208,9 @@ watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
                 <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
                                          :items="state.serviceMenuList || []"
                                          :input-text="state.inputText"
-                                         :is-focused="state.focusingType === SUGGESTION_TYPE.MENU ? props.isFocused : false"
+                                         :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
                                          :focusing-direction="props.focusingDirection"
-                                         @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.MENU, ...arguments)"
+                                         @move-focus-end="() => emit('move-focus-end')"
                                          @select="handleSelect"
                 />
                 <template #no-data>

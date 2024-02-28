@@ -12,7 +12,15 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type RecentType = 'service' | 'identity.ServiceAccount' | 'identity.Provider';
+export const RECENT_TYPE = {
+    SERVICE: 'SERVICE',
+    SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
+    PROJECT: 'PROJECT',
+    DASHBOARD: 'DASHBOARD',
+    CLOUD_SERVICE: 'CLOUD_SERVICE',
+} as const;
+
+export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 
 const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
@@ -93,7 +101,7 @@ export const useRecentStore = defineStore('recent', () => {
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
         if (workspaceId) {
-            actions.fetchRecent({ type: 'service', workspaceIds: [workspaceId] });
+            actions.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [workspaceId] });
         }
     });
 

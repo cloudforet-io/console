@@ -93,7 +93,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
         if (workspaceId) {
-            actions.fetchFavorite({ type: 'service', workspaceIds: [workspaceId] });
+            actions.fetchFavorite({ type: 'MENU', workspaceIds: [workspaceId] });
         }
     });
 
