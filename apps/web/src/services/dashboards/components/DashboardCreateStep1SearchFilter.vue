@@ -97,6 +97,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                style-type="rounded"
                                appearance-type="badge"
                                selection-label="Provider"
+                               show-select-marker
                                :show-delete-all-button="false"
                                :menu="state.providerList"
                                :selected="state.selectedProviders"
@@ -106,6 +107,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                style-type="rounded"
                                appearance-type="badge"
                                selection-label="Service"
+                               show-select-marker
                                :show-delete-all-button="false"
                                :menu="state.serviceList"
                                :selected="state.selectedServices"
