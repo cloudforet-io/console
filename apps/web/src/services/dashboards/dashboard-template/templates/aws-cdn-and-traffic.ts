@@ -59,7 +59,7 @@ export const awsCdnAndTrafficDashboard: DashboardTemplate = {
     name: 'AWS CDN & Traffic',
     labels: ['AWS', 'CDN', 'Traffic', 'Cost'],
     version: '1',
-    description: {
+    display_info: {
         icon: 'ic_dashboard-template_cdn-traffic-cost',
     },
     settings: {

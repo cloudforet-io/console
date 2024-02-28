@@ -30,7 +30,7 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Google Monthly Cost Summary',
     labels: ['Google', 'Cost'],
     version: '1',
-    description: {
+    display_info: {
         icon: 'ic_dashboard-template_monthly-cost-summary',
     },
     settings: {

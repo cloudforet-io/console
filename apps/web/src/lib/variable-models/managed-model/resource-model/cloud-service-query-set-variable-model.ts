@@ -7,6 +7,8 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class CloudServiceQuerySetVariableModel extends ResourceVariableModel<CloudServiceQuerySetModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
+    cloud_service_group = this.generateProperty({ key: 'cloud_service_group', name: 'Cloud Service Group' });
+
     static _meta = {
         key: 'cloud_service_query_set',
         name: 'Compliance Framework',

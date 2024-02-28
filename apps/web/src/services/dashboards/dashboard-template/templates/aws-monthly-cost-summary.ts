@@ -32,7 +32,7 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'AWS Monthly Cost Summary',
     labels: ['AWS', 'Cost'],
     version: '1',
-    description: {
+    display_info: {
         icon: 'ic_dashboard-template_monthly-cost-summary',
     },
     settings: {
