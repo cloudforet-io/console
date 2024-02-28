@@ -55,9 +55,9 @@ const handleBackToWorkspace = () => {
                                     :to="state.workspaceLink"
             />
             <p-button v-if="state.hasRole"
-                      style-type="transparent"
+                      style-type="secondary"
                       class="back-to-workspace-button"
-                      icon-left="ic_arrow-left"
+                      size="sm"
                       @click="handleBackToWorkspace"
             >
                 <span class="link-text">{{ state.backLinkText }}</span>
@@ -73,15 +73,16 @@ const handleBackToWorkspace = () => {
 .my-page-top-bar {
     @apply bg-white items-center;
     display: flex !important;
+    height: $top-bar-height;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     .left-part {
         @apply h-full w-full flex items-center;
 
         .back-to-workspace-button {
-            @apply flex items-center text-gray-900 text-label-md font-bold gap-1;
-            padding: 0 0.75rem;
-            margin-left: 0.75rem;
+            @apply flex items-center text-violet-600 text-label-sm font-bold;
+            padding: 0.25rem 0.5rem;
+            margin-left: 1.5rem;
 
             .link-text-mobile {
                 display: none;

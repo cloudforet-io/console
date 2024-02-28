@@ -51,46 +51,26 @@ const handleClickLogo = () => {
 
 <style scoped lang="postcss">
 .my-page-top-bar-header {
-    @apply inline-flex items-center w-full;
-    max-width: 16.25rem;
-    width: 16.25rem;
-    padding: 0.625rem 1rem 0.625rem 1.25rem;
-    box-shadow: 0.1875rem 0 0.1875rem 0 rgba(81, 83, 100, 0.15);
-
-    @screen tablet {
-        width: 3.25rem;
-        box-shadow: none;
-    }
+    @apply inline-flex items-center;
+    padding-left: 0.875rem;
+    gap: 0.75rem;
 
     .title-wrapper {
         @apply inline-block;
 
         .logo-wrapper {
-            width: 2rem;
-            height: 2rem;
+            width: 1.75rem;
+            height: 1.75rem;
             .logo-character {
                 display: inline-block;
-                width: 2rem;
-                height: 2rem;
+                width: 1.75rem;
+                height: 1.75rem;
             }
         }
     }
-
-    .logo-divider {
-        margin: 0 0.75rem;
-        height: 2rem;
-
-        @screen tablet {
-            display: none;
-        }
-    }
     .my-page-text-title {
-        @apply text-label-lg font-bold text-gray-900;
-        padding-left: 0.75rem;
-
-        @screen tablet {
-            display: none;
-        }
+        @apply text-label-lg font-medium text-gray-900;
+        flex: 1;
     }
 }
 </style>
