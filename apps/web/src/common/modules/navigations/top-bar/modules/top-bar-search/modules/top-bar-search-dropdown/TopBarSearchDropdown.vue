@@ -7,8 +7,6 @@ import { PTab, screens } from '@spaceone/design-system';
 
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
-import TopBarSearchServiceAccountTab
-    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceAccountTab.vue';
 import TopBarSearchServiceTab
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceTab.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -120,15 +118,6 @@ const handleUpdateContentsSize = (height: number) => {
                 />
             </template>
             <template #service-account>
-                <top-bar-search-service-account-tab
-                    :search-limit="SEARCH_LIMIT"
-                    :focusing-direction="props.focusingDirection"
-                    :is-focused="props.isFocused"
-                    :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
-                    @move-focus-end="handleMoveFocusEnd"
-                />
-            </template>
-            <template #project>
                 <search-tab-content
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"

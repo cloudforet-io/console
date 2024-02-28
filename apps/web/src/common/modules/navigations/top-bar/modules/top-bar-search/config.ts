@@ -2,11 +2,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { RECENT_TYPE } from '@/common/modules/navigations/stores/recent-store';
-
 export const SUGGESTION_TYPE = Object.freeze({
     DEFAULT_SERVICE: 'DEFAULT_SERVICE',
-    ...RECENT_TYPE,
+    RECENT: 'RECENT',
 } as const);
 export type SuggestionType = typeof SUGGESTION_TYPE[keyof typeof SUGGESTION_TYPE];
 

@@ -122,11 +122,11 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     if (type === SUGGESTION_TYPE.DEFAULT_SERVICE) {
         if (direction === 'DOWNWARD' && state.recentMenuList.length) {
             state.proxyFocusingDirection = direction;
-            state.focusingType = SUGGESTION_TYPE.SERVICE;
+            state.focusingType = SUGGESTION_TYPE.RECENT;
         } else {
             emit('move-focus-end');
         }
-    } else if (type === SUGGESTION_TYPE.SERVICE) {
+    } else if (type === SUGGESTION_TYPE.RECENT) {
         if (direction === 'DOWNWARD') {
             state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
             emit('move-focus-end');
@@ -170,7 +170,7 @@ watch(() => props.isFocused, (isFocused) => {
             state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
         } else if (props.focusingDirection === 'UPWARD') {
             if (state.inputText.length) state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
-            else if (state.recentMenuList.length) state.focusingType = SUGGESTION_TYPE.SERVICE;
+            else if (state.recentMenuList.length) state.focusingType = SUGGESTION_TYPE.RECENT;
             else state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
         }
     }
@@ -194,9 +194,9 @@ watch(() => props.isFocused, (isFocused) => {
                     v-if="state.recentMenuList.length"
                     :items="state.recentMenuItems || []"
                     :input-text="state.inputText"
-                    :is-focused="state.focusingType === SUGGESTION_TYPE.SERVICE ? props.isFocused : false"
+                    :is-focused="state.focusingType === SUGGESTION_TYPE.RECENT ? props.isFocused : false"
                     :focusing-direction="props.focusingDirection"
-                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.SERVICE, ...arguments)"
+                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.RECENT, ...arguments)"
                     @select="handleSelect"
                 />
             </div>
