@@ -1,6 +1,7 @@
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class ProjectGroupVariableModel extends ResourceVariableModel<ProjectGroupModel> {
@@ -12,8 +13,8 @@ export default class ProjectGroupVariableModel extends ResourceVariableModel<Pro
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = ProjectGroupVariableModel._meta;
     }
 }

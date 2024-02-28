@@ -1,6 +1,7 @@
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class WebhookVariableModel extends ResourceVariableModel<WebhookModel> {
@@ -12,8 +13,8 @@ export default class WebhookVariableModel extends ResourceVariableModel<WebhookM
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = WebhookVariableModel._meta;
     }
 

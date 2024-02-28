@@ -1,4 +1,6 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
+
 
 export default class AssetDefaultFieldVariableModel extends EnumVariableModel {
     static _meta = {
@@ -15,8 +17,8 @@ export default class AssetDefaultFieldVariableModel extends EnumVariableModel {
         { key: 'asset_account', name: 'AWS Account ID' },
     ];
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = AssetDefaultFieldVariableModel._meta;
     }
 }

@@ -11,7 +11,7 @@ import type {
     PropertyObject,
     ListResponse, ListQuery, IResourceVariableModel,
     PropertyOptions,
-    ResourceVariableModelConstructorOptions, VariableModelConstructorConfig,
+    VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,19 +30,13 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results?: string[]; total_count?: number }>>;
 
-    constructor(config: VariableModelConstructorConfig = {}, options?: ResourceVariableModelConstructorOptions) {
+    constructor(config: VariableModelConstructorConfig = {}) {
         if (config.key) this._meta.key = config.key;
         if (config.name) this._meta.name = config.name;
         if (config.resource_type) this._meta.resourceType = config.resource_type;
         if (config.id_key) this._meta.idKey = config.id_key;
 
         this.#fetcher = this.#getFetcher();
-
-        if (!options) return;
-        Object.entries(options.fixedOptions ?? {}).forEach(([key, value]) => {
-            if (!this[key]) return;
-            this[key].fixedValue = value;
-        });
     }
 
     nameFormatter(data: any): string {

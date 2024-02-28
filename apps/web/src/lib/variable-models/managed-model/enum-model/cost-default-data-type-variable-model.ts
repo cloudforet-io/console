@@ -1,4 +1,6 @@
 import EnumVariableModel from '@/lib/variable-models/_base/enum-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
+
 
 export default class CostDefaultDataTypeVariableModel extends EnumVariableModel {
     static _meta = {
@@ -11,8 +13,8 @@ export default class CostDefaultDataTypeVariableModel extends EnumVariableModel 
         { key: 'usage_quantity', name: 'Usage' },
     ];
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = CostDefaultDataTypeVariableModel._meta;
     }
 }

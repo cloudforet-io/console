@@ -1,6 +1,7 @@
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 
 import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
+import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base/types';
 
 
 export default class CloudServiceVariableModel extends ResourceVariableModel<CloudServiceModel> {
@@ -16,8 +17,8 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
         nameKey: 'name',
     };
 
-    constructor() {
-        super();
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
         this._meta = CloudServiceVariableModel._meta;
     }
 }

@@ -17,7 +17,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
@@ -47,7 +47,7 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 const state = reactive({
-    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
+    selectedTemplateName: '',
     searchValue: '',
 });
 
@@ -56,8 +56,7 @@ const defaultTemplateState = reactive({
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
     boardSets: computed<DashboardTemplateBoardSet[]>(() => {
         const regex = getTextHighlightRegex(state.searchValue);
-        const templates = storeState.isAdminMode ? ADMIN_DASHBOARD_TEMPLATES : DASHBOARD_TEMPLATES;
-        return Object.values(templates)
+        return Object.values(DASHBOARD_TEMPLATES)
             .map((d: DashboardTemplate) => ({
                 ...d,
                 // below values are used only for render

@@ -28,6 +28,7 @@ export interface DashboardVariableSchemaProperty {
     options?: DashboardVariableOptions[];
     fixed?: boolean; // can not delete this variable from dashboard
     required?: boolean; // value is required
+    hidden?: boolean;
 }
 
 type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
@@ -35,6 +36,7 @@ type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaP
 export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;
     order: string[];
+    fixed_options?: Record<string, any>;
 }
 
 // dashboard variables types
@@ -70,6 +72,7 @@ export interface DashboardTemplate {
     labels: string[];
     description?: {
         icon?: string;
+        preview_image?: string;
     }
 }
 
@@ -82,6 +85,7 @@ export interface DashboardLayoutWidgetInfo {
     version: string; // widget config version
     inherit_options?: InheritOptions; // inherit information for the widget option
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
+    fixed_options?: Record<string, any>; // fixed options for the widget
 }
 
 
