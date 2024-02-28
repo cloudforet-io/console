@@ -6,27 +6,17 @@ import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    InheritOption,
-    InheritOptions,
-    WidgetConfig,
-    WidgetOptions,
-    WidgetOptionsSchemaProperty,
+    InheritOption, InheritOptions, WidgetConfig, WidgetOptions, WidgetOptionsSchemaProperty,
 } from '@/schema/dashboard/_types/widget-type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import {
-    useWidgetTitleInput,
-} from '@/services/dashboards/composables/use-widget-title-input';
+import { useWidgetTitleInput } from '@/services/dashboards/composables/use-widget-title-input';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import type {
-    MergedBaseWidgetState,
-} from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import {
-    mergeBaseWidgetState,
-} from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
+import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
+import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
@@ -141,6 +131,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 inherit_options: mergedWidgetState.value?.inheritOptions,
                 widget_options: mergedWidgetState.value?.options,
                 schema_properties: mergedWidgetState.value?.schemaProperties,
+                fixed_options: dashboardWidgetInfo.value?.fixed_options,
             };
         }),
         updatedWidgetInfo: computed<UpdatableWidgetInfo|undefined>(() => {
@@ -319,16 +310,16 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
 
 const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: DashboardScope): WidgetConfig => {
-    if (dashboardScope === 'DOMAIN') {
-        const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
-        return {
-            ...config,
-            options_schema: {
-                properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
-                order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
-            },
-        };
-    }
+    // if (dashboardScope === 'DOMAIN') {
+    //     const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
+    //     return {
+    //         ...config,
+    //         options_schema: {
+    //             properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
+    //             order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
+    //         },
+    //     };
+    // }
     if (dashboardScope === 'PROJECT') {
         const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, readonly: true }]]);
         return {
@@ -342,9 +333,9 @@ const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: D
     return config;
 };
 const getInheritOptionsByDashboardScope = (inheritOptions: InheritOptions, dashboardScope: DashboardScope): InheritOptions => {
-    if (dashboardScope === 'DOMAIN') {
-        return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
-    }
+    // if (dashboardScope === 'DOMAIN') {
+    //     return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
+    // }
     if (dashboardScope === 'PROJECT') {
         return { ...inheritOptions, 'filters.project': { enabled: true, variable_key: 'project' } };
     }

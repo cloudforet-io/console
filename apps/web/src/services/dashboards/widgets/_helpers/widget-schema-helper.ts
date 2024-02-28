@@ -1,19 +1,11 @@
-import {
-    chain, get, union,
-} from 'lodash';
+import { chain, get, union } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    InheritOptions,
-    WidgetConfig,
-    WidgetFilterOptionKey, WidgetOptions,
-    WidgetOptionsSchema,
+    InheritOptions, WidgetConfig, WidgetFilterOptionKey, WidgetOptions, WidgetOptionsSchema,
 } from '@/schema/dashboard/_types/widget-type';
 
-import {
-    MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES,
-    MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-} from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
+import { MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES, MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES } from '@/services/dashboards/widgets/_constants/managed-widget-options-schema';
 
 const VAR_KEY_TO_OPTION_KEY_MAP = {};
 Object.entries(MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES).forEach(([optionKey, property]) => {
@@ -70,6 +62,7 @@ export const getInitialSchemaProperties = (
 
     return chain(allVariableProperties) // get all possible properties from variables schema
         .filter((key) => !!variablesSchema?.properties?.[key]?.use) // get only used variables
+        .filter((key) => fixedProperties.map((k) => k.replace('filters.', '')).includes(key)) // filter only fixed widget properties
         .map((key) => variableKeyToOptionNameMap[key]) // convert variable key to option name
         .intersection(allOptionProperties) // intersect with all possible properties from widget options schema
         .union(fixedProperties) // union with fixed properties

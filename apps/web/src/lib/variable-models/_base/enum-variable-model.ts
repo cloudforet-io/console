@@ -17,10 +17,9 @@ export default class EnumVariableModel implements IEnumVariableModel {
 
     constructor(config?: VariableModelConstructorConfig) {
         if (!config) return;
-        if (!config.values) throw new Error('values is required');
+        if (config.values) this.values = config.values;
         if (config.key) this._meta.key = config.key;
         if (config.name) this._meta.name = config.name;
-        this.values = config.values;
     }
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
