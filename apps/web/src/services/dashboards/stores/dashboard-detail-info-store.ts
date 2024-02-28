@@ -64,6 +64,7 @@ const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVar
     return {
         properties,
         order,
+        fixed_options: variablesSchemaInfo.fixed_options,
     };
 };
 const refineProjectDashboardVariables = (variables: DashboardVariables, projectId: string): DashboardVariables => {
@@ -245,9 +246,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setProjectId(_projectId);
 
         // variables, variables schema
-        let _variablesSchema = {
+        let _variablesSchema: DashboardVariablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order,
+            fixed_options: _dashboardInfo.variables_schema?.fixed_options,
         };
         let _variables = _dashboardInfo.variables ?? {};
         if (_projectId) {
@@ -380,6 +382,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             variables_schema: {
                 order: params.variables_schema?.order ?? [],
                 properties: refineSchemaProperties(params.variables_schema?.properties ?? {}),
+                fixed_options: params.variables_schema?.fixed_options,
             },
         };
         const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
