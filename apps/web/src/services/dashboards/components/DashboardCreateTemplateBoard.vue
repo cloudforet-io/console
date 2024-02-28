@@ -3,7 +3,7 @@
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PBoard, PButton, PLabel, PTextHighlighting, PLazyImg,
+    PBoard, PButton, PLabel, PTextHighlighting, PI,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
@@ -60,9 +60,14 @@ const handleClickCreate = (template: DashboardModel) => {
         <template #item-content="{board}">
             <div class="board-item-wrapper">
                 <div class="board-item-title">
-                    <p-lazy-img :src="board.description?.icon ?? 'ic_dashboard-template_blank'"
-                                width="1rem"
-                                height="1rem"
+                    <!--                    <p-lazy-img v-if="board.description?.icon"-->
+                    <!--                                :src="board.description?.icon"-->
+                    <!--                                width="1rem"-->
+                    <!--                                height="1rem"-->
+                    <!--                    />-->
+                    <p-i :name="board.description?.icon ?? 'ic_dashboard-template_others'"
+                         width="1rem"
+                         height="1rem"
                     />
                     <p-text-highlighting :text="board.name"
                                          :term="props.keyword"
