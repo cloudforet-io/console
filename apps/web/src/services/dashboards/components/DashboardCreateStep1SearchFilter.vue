@@ -102,7 +102,16 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                :menu="state.providerList"
                                :selected="state.selectedProviders"
                                @update:selected="handleChangeLabelFilter('Provider', $event)"
-            />
+            >
+                <template #menu-item--format="{item}">
+                    <p-lazy-img width="1rem"
+                                height="1rem"
+                                error-icon="ic_cloud-filled"
+                                :src="item.img"
+                                class="mr-1"
+                    />{{ item.label }}
+                </template>
+            </p-select-dropdown>
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
