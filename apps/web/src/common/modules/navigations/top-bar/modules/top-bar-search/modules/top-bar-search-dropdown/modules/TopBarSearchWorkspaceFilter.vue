@@ -2,7 +2,9 @@
 
 import { computed, reactive } from 'vue';
 
-import { PCheckboxGroup, PCheckbox, PTooltip } from '@spaceone/design-system';
+import {
+    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton,
+} from '@spaceone/design-system';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -15,81 +17,107 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
 const topBarSearchStore = useTopBarSearchStore();
 
-const state = reactive({
+const storeState = reactive({
     currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
+});
+
+const state = reactive({
     workspaces: computed(() => {
-        const workspaceList = state.workspaceList.map((workspace) => ({
+        const workspaceList = storeState.workspaceList.map((workspace) => ({
             label: workspace.name,
             value: workspace.workspace_id,
             tags: workspace.tags,
         } as { label: string, value: string, tags: { theme: string } | undefined }));
         // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
         const orderedWorkspaceList = workspaceList.sort((a, b) => {
-            if (a.value === state.currentWorkspaceId) return -1;
-            if (b.value === state.currentWorkspaceId) return 1;
+            if (a.value === storeState.currentWorkspaceId) return -1;
+            if (b.value === storeState.currentWorkspaceId) return 1;
             return 0;
         });
-        return orderedWorkspaceList;
+        return orderedWorkspaceList.slice(0, 3);
     }),
     selectedWorkspaces: computed(() => topBarSearchStore.state.selectedWorkspaces),
-    isAllSelected: computed(() => state.selectedWorkspaces.length === state.workspaces.length),
+    isAllSelected: false,
     isIndeterminate: computed(() => state.selectedWorkspaces.length > 0 && state.selectedWorkspaces.length < state.workspaces.length),
 });
 
 const handleSelected = (selected: string[]) => { topBarSearchStore.setSelectedWorkspaces(selected); };
 
 const handleCheckAll = (val:boolean) => {
-    topBarSearchStore.setSelectedWorkspaces(val ? state.workspaces.map((w) => w.value) : []);
+    state.isAllSelected = val;
 };
 
 </script>
 
 <template>
-    <p-checkbox-group class="top-bar-search-workspace-filter"
-                      direction="vertical"
-    >
-        <p-checkbox :value="true"
-                    :indeterminate="state.isIndeterminate"
-                    :selected="state.isAllSelected"
-                    @change="handleCheckAll"
-        >
-            {{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}
-        </p-checkbox>
-        <p-tooltip v-for="workspace in state.workspaces"
-                   :key="workspace.value"
-                   :contents="workspace.label"
-                   position="bottom"
-        >
-            <p-checkbox
-                :selected="state.selectedWorkspaces"
-                :value="workspace.value"
-                @change="handleSelected"
+    <div class="top-bar-search-workspace-filter">
+        <div class="all-workspace-toggle">
+            <p-toggle-button :value="state.isAllSelected"
+                             @change-toggle="handleCheckAll"
+            /><span>{{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}</span>
+        </div>
+        <div class="workspace-filter-wrapper">
+            <p class="filter-list-header">
+                {{ $t('Filter by Workspace') }}
+            </p>
+            <p-checkbox-group class="checkbox-group"
+                              direction="vertical"
             >
-                <span class="workspace-item">
-                    <workspace-logo-icon :text="workspace.label"
-                                         :theme="workspace.tags?.theme"
-                                         size="xs"
-                    /> <span class="label">{{ workspace.label }}</span>
-                </span>
-            </p-checkbox>
-        </p-tooltip>
-    </p-checkbox-group>
+                <p-tooltip v-for="workspace in state.workspaces"
+                           :key="workspace.value"
+                           :contents="workspace.label"
+                           position="bottom"
+                >
+                    <p-checkbox
+                        :selected="state.selectedWorkspaces"
+                        :value="workspace.value"
+                        @change="handleSelected"
+                    >
+                        <span class="workspace-item">
+                            <workspace-logo-icon :text="workspace.label"
+                                                 :theme="workspace.tags?.theme"
+                                                 size="xs"
+                            /> <span class="label">{{ workspace.label }}</span>
+                        </span>
+                    </p-checkbox>
+                </p-tooltip>
+            </p-checkbox-group>
+        </div>
+    </div>
 </template>
 
 <style scoped lang="scss">
 .top-bar-search-workspace-filter {
-    @apply pr-3;
-    flex: 1 0 13.25rem;
-    overflow-y: auto;
+    flex-basis: 14.25rem;
+    flex-shrink: 0;
 
-    .workspace-item {
-        @apply inline-flex items-center gap-1;
-        margin-left: 0.125rem;
+    .all-workspace-toggle {
+        @apply flex items-center gap-1 mb-3;
+        span {
+            @apply text-gray-900 text-label-md;
+        }
+    }
 
-        .label {
-            @apply truncate;
-            width: 9.625rem;
+    .workspace-filter-wrapper {
+        .filter-list-header {
+            @apply text-gray-500 text-label-sm font-bold mb-2;
+        }
+
+        .checkbox-group {
+            @apply pr-3;
+            flex: 1 0 13.25rem;
+            overflow-y: auto;
+
+            .workspace-item {
+                @apply inline-flex items-center gap-1;
+                margin-left: 0.125rem;
+
+                .label {
+                    @apply truncate;
+                    width: 10.5rem;
+                }
+            }
         }
     }
 }
