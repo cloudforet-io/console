@@ -21,10 +21,17 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
     },
     options_schema: getWidgetOptionsSchema([
-        'cost_data_source',
-        'cost_data_field',
+        ['cost_data_source', { fixed: true, hidden: true }],
+        ['cost_data_field', { fixed: true, hidden: true }],
         ['granularity', { fixed: true, readonly: true }],
-        'filters.project',
+        ['filters.project', { fixed: true }],
+        ['filters.service_account', { fixed: true }],
+        ['filters.region', { fixed: true }],
+        ['filters.cost_product', { fixed: true }],
+        'filters.provider',
+        'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
     ]),
 };
 
