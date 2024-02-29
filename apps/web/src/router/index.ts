@@ -19,7 +19,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { pinia } from '@/store/pinia';
 
 import { calculateIsAccessibleRoute } from '@/lib/access-control';
-import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 import { GTag } from '@/lib/site-analytics/gtag';
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -276,22 +275,6 @@ export class SpaceRouter {
         SpaceRouter.router.afterEach((to) => {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
-
-            const store = SpaceRouter.router.app?.$store;
-            if (!store) return;
-            const isAdminMode = appContextStore.getters.isAdminMode;
-            const routeScope = getRouteScope(to);
-
-            if (!isAdminMode && routeScope === 'WORKSPACE') {
-                const recent = getRecentConfig(to);
-                if (recent) {
-                    store.dispatch('recent/addItem', {
-                        itemType: recent.itemType,
-                        workspaceId: recent.workspaceId,
-                        itemId: recent.itemId,
-                    });
-                }
-            }
         });
 
         return SpaceRouter.router;

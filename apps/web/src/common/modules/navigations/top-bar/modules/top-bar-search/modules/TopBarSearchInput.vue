@@ -8,7 +8,7 @@ import { PI, screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/store';
+import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
 interface Props {
     isFocused: boolean;
@@ -25,9 +25,11 @@ const topBarSearchStore = useTopBarSearchStore();
 const inputRef = ref<null|HTMLInputElement>(null);
 
 const state = reactive({
+    isMobileSize: computed(() => width.value < screens.mobile.max),
+    isOverTabletSize: computed(() => width.value > screens.tablet.max),
     placeholder: computed(() => {
-        if (width.value < screens.tablet.max) return i18n.t('COMMON.GNB.SEARCH.SERACH');
-        return i18n.t('COMMON.GNB.SEARCH.SERACH_PLACEHOLDER');
+        if (state.isMobileSize) return i18n.t('COMMON.GNB.SEARCH.SEARCH');
+        return i18n.t('COMMON.GNB.SEARCH.SEARCH_PLACEHOLDER');
     }),
     metaName: computed(() => {
         const userAgent = window.navigator.userAgent;
@@ -43,6 +45,12 @@ const handleUpdateInput = (event: InputEvent) => {
     });
 };
 
+const handleInitInput = () => {
+    topBarSearchStore.$patch((_state) => {
+        _state.state.inputText = '';
+    });
+};
+
 watch(() => props.isFocused, async (isFocused) => {
     await nextTick();
     if (isFocused) inputRef.value?.focus();
@@ -53,7 +61,7 @@ watch(() => props.isFocused, async (isFocused) => {
 </script>
 
 <template>
-    <div class="gnb-search-input"
+    <div class="top-bar-search-input"
          @click.stop="$emit('click')"
     >
         <div class="disabled-input">
@@ -64,7 +72,7 @@ watch(() => props.isFocused, async (isFocused) => {
             />
             <span>{{ state.placeholder }}</span>
         </div>
-        <div v-if="topBarSearchStore.getters.isActivated"
+        <div v-if="topBarSearchStore.getters.isActivated && state.isOverTabletSize"
              class="enabled-input"
         >
             <p-i name="ic_search"
@@ -88,7 +96,7 @@ watch(() => props.isFocused, async (isFocused) => {
                  width="1rem"
                  color="inherit"
                  class="delete-button"
-                 @click.stop="$emit('input', '')"
+                 @click.stop="handleInitInput"
             />
             <div class="shortcut-wrapper">
                 <span class="tag-box">{{ state.metaName }}</span>
@@ -99,12 +107,12 @@ watch(() => props.isFocused, async (isFocused) => {
 </template>
 
 <style lang="postcss" scoped>
-.gnb-search-input {
+.top-bar-search-input {
 
     .disabled-input {
         @apply flex items-center justify-center bg-gray-100 rounded-md text-gray-400;
-        max-width: 30rem;
         height: 1.75rem;
+        width: 30rem;
         padding: 0 0.75rem;
         font-size: 0.875rem;
         cursor: pointer;
@@ -166,7 +174,7 @@ watch(() => props.isFocused, async (isFocused) => {
 }
 
 @screen laptop {
-    .gnb-search-input {
+    .top-bar-search-input {
         .disabled-input {
             padding: 0 0.75rem;
         }

@@ -555,6 +555,7 @@
 				"COST_ANALYSIS": "비용 분석",
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
+				"DATA_SOURCE": "데이터 소스",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
@@ -612,6 +613,7 @@
 				},
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",
+				"PROVIDERS_TITLE": "서비스 제공자",
 				"PUBLIC": "공개",
 				"RELOCATE_DASHBOARD_LABEL": "대시보드로 이동",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "새로운 대시보드 메뉴에서는 좀 더 향상된 방식으로 비용 대시보드를 만들 수 있습니다.",
@@ -1059,8 +1061,8 @@
 				"NO_RESULT_2": "클라우드 서비스 또는 메인 메뉴와 관련된 검색어를 입력해주세요.",
 				"RECENT_CLOUD_SERVICE": "최근 검색 [클라우드 서비스]",
 				"RECENT_MENU": "최근 검색 [메뉴]",
-				"SERACH": "검색",
-				"SERACH_PLACEHOLDER": "",
+				"SEARCH": "검색",
+				"SEARCH_PLACEHOLDER": "",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다.",
 				"TRY_SEARCH_AGAIN": "보다 자세하게 검색해주세요."
 			},
@@ -1083,7 +1085,6 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "",
 				"MANAGE_WORKSPACE": "",
-				"STARRED": "",
 				"WORKSPACES": ""
 			}
 		},
@@ -1137,7 +1138,8 @@
 		},
 		"NAVIGATIONS": {
 			"TOP_BAR": {
-				"ALL_WORKSPACE": ""
+				"ALL_WORKSPACE": "",
+				"WORKSPACE_SWITCH_LINK": ""
 			}
 		},
 		"NOTIFICATION_MODAL": {
@@ -1217,6 +1219,8 @@
 			"VALIDATION": "아이디 또는 비밀번호를 확인해 주세요.",
 			"VERSION": "버전 "
 		},
+		"STARRED": "",
+		"STARRED_NO_DATA": "",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",
@@ -2445,6 +2449,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
+				"ALL": "모두",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
 				"AUTO_PERIOD": "자동 (전체 기간)",
@@ -2473,7 +2478,7 @@
 				"SHOW_ALL": "모두 보기",
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
-				"TITLE": "{provider} 클라우드 서비스 ",
+				"TITLE": "클라우드 서비스 ",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},

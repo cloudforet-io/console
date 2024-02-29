@@ -4,13 +4,11 @@ import {
 } from 'vue';
 
 import {
-    PContextMenu, PI, PLazyImg, PTooltip, PTextHighlighting,
+    PContextMenu, PI, PTooltip, PTextHighlighting,
 } from '@spaceone/design-system';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/config';
-import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/gnb-search-clone/type';
+import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 interface Props {
     items: SuggestionItem[];
@@ -81,13 +79,7 @@ onUnmounted(() => {
                        position="bottom"
             >
                 <span class="image">
-                    <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
-                                :src="item.itemIcon || ''"
-                                width="1rem"
-                                height="1rem"
-                    />
-                    <p-i v-else
-                         :name="item.itemIcon"
+                    <p-i :name="item.itemIcon"
                          width="1rem"
                          height="1rem"
                     />
@@ -112,13 +104,6 @@ onUnmounted(() => {
                                          class="text-item"
                                          :term="props.inputText"
                                          :text="item.label"
-                    />
-                </span>
-                <span class="favorite-button">
-                    <favorite-button v-if="props.useFavorite"
-                                     :item-id="item.name"
-                                     :favorite-type="item.itemType"
-                                     scale="0.65"
                     />
                 </span>
             </p-tooltip>

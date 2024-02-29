@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PI, screens } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { clone } from 'lodash';
 
@@ -11,13 +12,14 @@ import { store } from '@/store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 // import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 // import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
@@ -34,9 +36,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const route = useRoute();
+const { width } = useWindowSize();
 
 const state = reactive({
     isHovered: false,
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList']]),
     visibleGnbMenuList: computed<GNBMenuType[]>(() => {
         let result = [] as GNBMenuType[];
@@ -58,13 +62,16 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+        if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
+            return MENU_ID.COST_ANALYSIS;
+        }
         const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
         return targetMenuId;
     }),
 });
 
 const handleMouseEvent = (value: boolean) => {
-    if (isMobile()) return;
+    if (state.isMobileSize) return;
     state.isHovered = value;
 };
 const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.map((menu) => ({
@@ -76,7 +83,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
 
 <template>
     <div class="g-n-b-navigation-rail"
-         :class="{'is-minimize': props.isMinimizeGnb, 'is-mobile': isMobile()}"
+         :class="{'is-minimize': props.isMinimizeGnb, 'is-mobile': state.isMobileSize}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
     >
@@ -162,7 +169,7 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
         }
         &.is-only-label {
             @apply items-end text-gray-500;
-            height: 2.875rem;
+            height: 2.625rem;
             padding-bottom: 0.5rem;
         }
         &.is-selected {
@@ -181,6 +188,14 @@ const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenu
     }
     &.is-mobile {
         transition: width 0.3s ease;
+        &.is-minimize {
+            width: 0;
+            padding: 0;
+            .service-menu, .menu-wrapper {
+                width: 0;
+                padding: 0;
+            }
+        }
     }
     &.is-minimize {
         @apply bg-gray-100 cursor-pointer;

@@ -209,7 +209,7 @@ window.addEventListener('resize', detectWindowResizing);
             @apply absolute flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-600 cursor-pointer;
             width: 1.5rem;
             height: 1.5rem;
-            margin-top: 1rem;
+            margin-top: 1.25rem;
             font-size: 1.5rem;
             font-weight: 600;
             z-index: 1;

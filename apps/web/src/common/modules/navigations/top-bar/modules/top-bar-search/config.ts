@@ -1,14 +1,11 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import { RECENT_TYPE } from '@/store/modules/recent/type';
-
-export const SUGGESTION_TYPE = Object.freeze({
-    ...FAVORITE_TYPE,
-    ...RECENT_TYPE,
-} as const);
+export const SUGGESTION_TYPE = {
+    DEFAULT_SERVICE: 'DEFAULT_SERVICE',
+    RECENT: 'RECENT',
+} as const;
 export type SuggestionType = typeof SUGGESTION_TYPE[keyof typeof SUGGESTION_TYPE];
 
 export interface SuggestionItem extends MenuItem {
@@ -17,7 +14,7 @@ export interface SuggestionItem extends MenuItem {
     icon?: string;
     defaultIcon?: string;
     provider?: string;
-    type?: string;
+    type?: ContextMenuType;
     name?: string;
     label?: string|TranslateResult;
 }

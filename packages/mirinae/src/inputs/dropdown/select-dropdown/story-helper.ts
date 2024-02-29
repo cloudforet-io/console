@@ -647,6 +647,19 @@ const extraArgTypes: ArgTypes = {
             category: 'events',
         },
     },
+    onClickDone: {
+        name: 'click-done',
+        description: 'Event emitted when \'done\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
 
 const initContextMenuArgTypes = (): ArgTypes => {

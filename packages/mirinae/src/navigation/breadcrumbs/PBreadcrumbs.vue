@@ -66,7 +66,8 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
         <span v-if="state.isEllipsisShown"
               class="breadcrumb-container"
         >
-            <breadcrumbs-ellipsis-item :menu="state.slicedMenu.hidden"
+            <breadcrumbs-ellipsis-item v-if="props.routes.length > 1"
+                                       :menu="state.slicedMenu.hidden"
                                        @click-menu="handleClickDropdownItem"
             />
             <span v-for="(route, idx) in state.slicedMenu.visible"

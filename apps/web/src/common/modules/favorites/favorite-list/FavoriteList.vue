@@ -141,9 +141,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.favorite-list {
-    @apply px-3;
-}
 .empty {
     @apply pt-2 text-gray-400;
     font-size: 0.875rem;
@@ -155,8 +152,9 @@ export default {
     }
 }
 .item {
-    @apply pl-1 flex items-center rounded;
+    @apply flex items-center rounded;
     height: 2rem;
+    padding-left: 0.5rem;
     cursor: pointer;
     &.hovered {
         @apply bg-secondary2 text-secondary;

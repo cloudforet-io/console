@@ -21,6 +21,7 @@ interface Props {
     idx?: number | string;
     currentPath?: string;
     openNewTab?: boolean;
+    isHideFavorite?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -39,10 +40,8 @@ const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
     if (currentPath.indexOf('?') > 0) {
         currentPath = currentPath.slice(0, currentPath.indexOf('?'));
     }
-    let resolvedHref = resolved.href;
-    if (!currentPath.endsWith('/')) currentPath += '/';
-    if (!resolvedHref.endsWith('/')) resolvedHref += '/';
-    return currentPath.startsWith(resolvedHref);
+    const resolvedHref = resolved.href;
+    return currentPath === resolvedHref;
 };
 const getIconName = (icon: LSBIcon): string => {
     if (typeof icon === 'string') return icon;
@@ -52,8 +51,8 @@ const getIconName = (icon: LSBIcon): string => {
 </script>
 
 <template>
-    <router-link class="l-s-b-router-menu-item"
-                 :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+    <router-link class="l-s-b-router-menu-item "
+                 :class="[{'second-depth': depth === 2, 'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
                  :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click.native="$event.stopImmediatePropagation()"
@@ -97,7 +96,7 @@ const getIconName = (icon: LSBIcon): string => {
 
 <style lang="postcss" scoped>
 .l-s-b-router-menu-item {
-    @apply border border-transparent inline-flex items-center w-full h-full justify-between;
+    @apply border border-transparent inline-flex items-center w-full h-full justify-between text-gray-800;
     font-size: 0.875rem;
     line-height: 125%;
     border-radius: 4px;
@@ -116,6 +115,16 @@ const getIconName = (icon: LSBIcon): string => {
     }
     &.selected {
         @apply bg-blue-200;
+    }
+    &.is-hide-favorite {
+        .favorite-button {
+            @apply hidden;
+        }
+        &:hover {
+            .favorite-button {
+                @apply block;
+            }
+        }
     }
     &:hover {
         @apply bg-blue-100 cursor-pointer;

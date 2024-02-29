@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<CheckboxGroupProps>(), {
         }
     }
     &.vertical {
-        @apply flex flex-col row-gap-1;
+        @apply flex flex-col row-gap-2;
     }
 }
 </style>

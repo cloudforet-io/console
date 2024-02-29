@@ -1,5 +1,7 @@
 <template>
-    <div class="p-radio-group" :class="direction">
+    <div class="p-radio-group"
+         :class="direction"
+    >
         <slot name="default" />
     </div>
 </template>
@@ -40,7 +42,7 @@ export default defineComponent<RadioGroupProps>({
         }
     }
     &.vertical {
-        @apply flex flex-col row-gap-1;
+        @apply flex flex-col row-gap-2;
     }
 }
 </style>

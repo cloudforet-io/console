@@ -13,6 +13,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -43,6 +45,9 @@ const props = withDefaults(defineProps<{
 });
 const emit = defineEmits<{(e: 'tags-updated'): void;
 }>();
+
+const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const apiKeys = computed(() => props.resourceType.split('.').map((d) => camelCase(d)));
 const api = computed(() => {
@@ -138,7 +143,8 @@ watch(
                    :title="$t('COMMON.TAGS.TITLE')"
         >
             <template #extra>
-                <p-button style-type="secondary"
+                <p-button v-if="!appContextGetters.isAdminMode"
+                          style-type="secondary"
                           icon-left="ic_edit"
                           :disabled="props.disabled"
                           @click="editTag"

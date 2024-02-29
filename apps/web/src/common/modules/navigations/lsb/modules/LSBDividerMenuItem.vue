@@ -10,8 +10,8 @@ import { PDivider } from '@spaceone/design-system';
 
 <style lang="postcss" scoped>
 .l-s-b-divider-menu-item {
-    margin-top: 1.25rem;
-    margin-bottom: 1.25rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
     height: 0;
 }
 </style>

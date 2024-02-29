@@ -1,14 +1,8 @@
 <template>
     <div class="page-wrapper">
-        <p-heading :title="title"
+        <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.TITLE')"
                    class="page-title"
-        >
-            <template #title-right-extra>
-                <service-provider-dropdown class="provider-dropdown"
-                                           :has-all="true"
-                />
-            </template>
-        </p-heading>
+        />
         <p-divider class="cloud-service-divider" />
         <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
@@ -107,7 +101,6 @@ import {
 } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -134,7 +127,6 @@ export default {
     components: {
         CloudServiceListCard,
         CloudServiceToolbox,
-        ServiceProviderDropdown,
         PDivider,
         PButton,
         PHeading,
