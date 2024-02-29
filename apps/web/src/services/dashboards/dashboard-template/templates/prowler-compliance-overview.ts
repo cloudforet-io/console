@@ -22,13 +22,13 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
-    ['trendOfPassAndFailFindings', {
-        title: 'Trend of Pass and Fail Findings by Service',
-        widget_options: {
-            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
-        },
-    }],
-    ['severityStatusByService'],
+    // ['trendOfPassAndFailFindings', {
+    //     title: 'Trend of Pass and Fail Findings by Service',
+    //     widget_options: {
+    //         asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
+    //     },
+    // }],
+    // ['severityStatusByService'],
 ];
 
 export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
