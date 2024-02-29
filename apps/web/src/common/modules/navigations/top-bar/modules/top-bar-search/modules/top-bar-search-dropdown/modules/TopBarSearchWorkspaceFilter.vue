@@ -1,6 +1,10 @@
 <script setup lang="ts">
 
-import { computed, reactive, watch } from 'vue';
+import { vOnClickOutside } from '@vueuse/components';
+import { useElementBounding, useWindowSize } from '@vueuse/core';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
 import {
     PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu,
@@ -9,45 +13,30 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
 import type { ResourceModel } from '@/schema/search/resource/model';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
-const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreState = userWorkspaceStore.$state;
-const topBarSearchStore = useTopBarSearchStore();
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
+const topBarSearchStore = useTopBarSearchStore();
 
 const storeState = reactive({
-    currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
-    workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     workspaceMap: computed(() => allReferenceGetters.workspace),
+    stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
+    selectedWorkspaces: computed(() => topBarSearchStore.getters.selectedWorkspaces),
 });
 
+const searchContextMenuRef = ref<null | HTMLElement>(null);
+const searchContextMenuElementBounding = useElementBounding(searchContextMenuRef);
+const windowSize = useWindowSize();
+
 const state = reactive({
-    workspaces: computed(() => {
-        const workspaceList = storeState.workspaceList.map((workspace) => ({
-            label: workspace.name,
-            value: workspace.workspace_id,
-            tags: workspace.tags,
-        } as { label: string, value: string, tags: { theme: string } | undefined }));
-        // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
-        const orderedWorkspaceList = workspaceList.sort((a, b) => {
-            if (a.value === storeState.currentWorkspaceId) return -1;
-            if (b.value === storeState.currentWorkspaceId) return 1;
-            return 0;
-        });
-        return orderedWorkspaceList.slice(0, 3);
-    }),
-    selectedWorkspaces: computed(() => topBarSearchStore.state.selectedWorkspaces),
     isAllSelected: false,
     // workspace search menu
     isActivatedSearchMenu: false,
@@ -55,7 +44,8 @@ const state = reactive({
     nextToken: undefined as string | undefined,
     searchResult: [] as ResourceModel[],
     searchResultMenu: computed<MenuItem[]>(() => {
-        const workspaceMenuItems:MenuItem[] = state.searchResult.map((workspace:ResourceModel) => ({
+        const filteredResults = state.searchResult?.filter((workspace) => !storeState.stagedWorkspaces.some((stagedWorkspace) => stagedWorkspace.name === workspace.workspace_id));
+        const workspaceMenuItems:MenuItem[] = filteredResults.map((workspace:ResourceModel) => ({
             type: 'item',
             label: workspace.name,
             name: workspace.workspace_id,
@@ -69,6 +59,7 @@ const state = reactive({
         }
         return workspaceMenuItems;
     }),
+    searchContextMenuMaxHeight: computed(() => `${windowSize.height.value - (searchContextMenuElementBounding.top.value + 16)}px`),
 });
 
 const fetchSearchResult = async (searchText: string) => {
@@ -101,7 +92,19 @@ const fetchMoreSearchResult = async () => {
     }
 };
 
-const handleSelected = (selected: string[]) => { topBarSearchStore.setSelectedWorkspaces(selected); };
+const handleSelected = (selected: string[]) => {
+    topBarSearchStore.setSelectedWorkspaces(selected);
+};
+
+const handleSelectItem = (item) => {
+    topBarSearchStore.addStagedWorkspaces({
+        name: item.name,
+        label: item.label,
+        theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
+        isSelected: true,
+    });
+    state.isActivatedSearchMenu = false;
+};
 
 const handleCheckAll = (val:boolean) => {
     state.isAllSelected = val;
@@ -110,6 +113,10 @@ const handleCheckAll = (val:boolean) => {
 const handleUpdateSearchText = (val: string) => {
     state.searchText = val;
 };
+
+(() => {
+    topBarSearchStore.initWorkspaces();
+})();
 
 watch(() => state.searchText, (val) => {
     fetchSearchResult(val);
@@ -131,19 +138,19 @@ watch(() => state.searchText, (val) => {
             <p-checkbox-group class="checkbox-group"
                               direction="vertical"
             >
-                <p-tooltip v-for="workspace in state.workspaces"
-                           :key="workspace.value"
+                <p-tooltip v-for="workspace in storeState.stagedWorkspaces"
+                           :key="workspace.name"
                            :contents="workspace.label"
                            position="bottom"
                 >
                     <p-checkbox
-                        :selected="state.selectedWorkspaces"
-                        :value="workspace.value"
+                        :selected="storeState.selectedWorkspaces"
+                        :value="workspace.name"
                         @change="handleSelected"
                     >
                         <span class="workspace-item">
                             <workspace-logo-icon :text="workspace.label"
-                                                 :theme="workspace.tags?.theme"
+                                                 :theme="workspace.theme"
                                                  size="xs"
                             /> <span class="label">{{ workspace.label }}</span>
                         </span>
@@ -157,12 +164,16 @@ watch(() => state.searchText, (val) => {
                 {{ $t('Show more') }}
             </p-text-button>
             <p-context-menu v-if="state.isActivatedSearchMenu"
+                            ref="searchContextMenuRef"
+                            v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
                             :search-text="state.searchText"
                             :menu="state.searchResultMenu"
+                            :style="{ maxHeight: state.searchContextMenuMaxHeight}"
                             searchable
                             class="search-context-menu"
                             @update:search-text="handleUpdateSearchText"
                             @click-show-more="fetchMoreSearchResult"
+                            @select="handleSelectItem"
             >
                 <template #item--format="{ item }">
                     <span class="search-workspace-item">
@@ -208,7 +219,7 @@ watch(() => state.searchText, (val) => {
 
                 .label {
                     @apply truncate;
-                    width: 10.5rem;
+                    width: 8.5rem;
                 }
             }
         }
@@ -220,8 +231,6 @@ watch(() => state.searchText, (val) => {
         .search-context-menu {
             @apply absolute;
             width: 100%;
-            max-height: 200%;
-            overflow-y: auto;
 
             .search-workspace-item {
                 @apply inline-flex items-center gap-1;
