@@ -18,6 +18,7 @@ import type { ResourceModel } from '@/schema/search/resource/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import type { StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -38,6 +39,8 @@ const storeState = reactive({
 const searchContextMenuRef = ref<null | HTMLElement>(null);
 const searchContextMenuElementBounding = useElementBounding(searchContextMenuRef);
 const windowSize = useWindowSize();
+
+const STAGED_WORKSPACE_LIMIT = 5;
 
 const state = reactive({
     isAllSelected: false,
@@ -170,33 +173,48 @@ watch(() => state.searchText, (val) => {
                     </p-checkbox>
                 </p-tooltip>
             </p-checkbox-group>
-            <p-text-button style-type="highlight"
-                           class="show-more"
-                           @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
+            <div v-if="storeState.stagedWorkspaces.length < 5">
+                <p-text-button style-type="highlight"
+                               class="show-more"
+                               @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
+                >
+                    {{ $t('Show more') }}
+                </p-text-button>
+                <p-context-menu v-if="state.isActivatedSearchMenu"
+                                ref="searchContextMenuRef"
+                                v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
+                                :search-text="state.searchText"
+                                :menu="state.searchResultMenu"
+                                :style="{ maxHeight: state.searchContextMenuMaxHeight}"
+                                searchable
+                                class="search-context-menu"
+                                @update:search-text="handleUpdateSearchText"
+                                @click-show-more="fetchMoreSearchResult"
+                                @select="handleSelectItem"
+                >
+                    <template #item--format="{ item }">
+                        <span class="search-workspace-item">
+                            <workspace-logo-icon :text="item.label"
+                                                 :theme="storeState.workspaceMap[item?.name]?.data?.tags?.theme"
+                                                 size="xs"
+                            /> <span class="label">{{ item.label }}</span>
+                        </span>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div v-else
+                 class="limit-description-card"
             >
-                {{ $t('Show more') }}
-            </p-text-button>
-            <p-context-menu v-if="state.isActivatedSearchMenu"
-                            ref="searchContextMenuRef"
-                            v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
-                            :search-text="state.searchText"
-                            :menu="state.searchResultMenu"
-                            :style="{ maxHeight: state.searchContextMenuMaxHeight}"
-                            searchable
-                            class="search-context-menu"
-                            @update:search-text="handleUpdateSearchText"
-                            @click-show-more="fetchMoreSearchResult"
-                            @select="handleSelectItem"
-            >
-                <template #item--format="{ item }">
-                    <span class="search-workspace-item">
-                        <workspace-logo-icon :text="item.label"
-                                             :theme="storeState.workspaceMap[item?.name]?.data?.tags?.theme"
-                                             size="xs"
-                        /> <span class="label">{{ item.label }}</span>
-                    </span>
-                </template>
-            </p-context-menu>
+                <scoped-notification type="warning"
+                                     :title="$t('You can filter by a maximum of 5 workspaces.')"
+                                     title-icon="ic_warning-filled"
+                                     :visible="true"
+                                     layout="insection"
+                                     hide-header-close-button
+                >
+                    <span class="text">{{ $t('Please unselect at least one workspace before making a new selection.') }}</span>
+                </scoped-notification>
+            </div>
         </div>
     </div>
 </template>
@@ -207,6 +225,7 @@ watch(() => state.searchText, (val) => {
     flex-basis: 14.25rem;
     flex-shrink: 0;
     min-height: 25rem;
+    max-width: 14.875rem;
 
     .all-workspace-toggle {
         @apply flex items-center gap-1 mb-3;
@@ -256,6 +275,14 @@ watch(() => state.searchText, (val) => {
                     @apply truncate;
                     width: 10.5rem;
                 }
+            }
+        }
+
+        .limit-description-card {
+            width: 100%;
+
+            .text {
+                @apply text-paragraph-md;
             }
         }
     }
