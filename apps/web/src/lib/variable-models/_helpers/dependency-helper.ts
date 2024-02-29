@@ -4,7 +4,7 @@ import type { IBaseVariableModel, ListQuery } from '@/lib/variable-models/_base/
 * e.g. ({ cost_data_source: 'data_source_id' }, { cost_data_source: '123' }) => { data_source_id: '123' }
 */
 export const getRefinedDependencyOptions = (
-    dependencies: IBaseVariableModel['dependencies'],
+    dependencies: IBaseVariableModel['_dependencies'],
     options: ListQuery['options'],
 ): Record<string, string> => {
     if (!dependencies) return {};
