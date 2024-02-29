@@ -5,26 +5,32 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-
 
 const projectGroupStore = useProjectGroupReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const favoriteStore = useFavoriteStore();
+
 const state = reactive({
     proxyVisible: computed({
         get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
         set(val) { projectPageStore.setProjectGroupDeleteCheckModalVisible(val); },
     }),
     groupId: computed((() => projectPageGetters.actionTargetNodeData?.id)),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 const deleteProjectGroup = async () => {
@@ -32,6 +38,11 @@ const deleteProjectGroup = async () => {
         await projectPageStore.deleteProjectGroup();
         await projectGroupStore.load({ force: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
+        await favoriteStore.deleteFavorite({
+            type: FAVORITE_TYPE.PROJECT_GROUP,
+            workspaceId: state.currentWorkspaceId || '',
+            id: state.groupId,
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
     } finally {

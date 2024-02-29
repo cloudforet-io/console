@@ -17,14 +17,14 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import type {
     CreateDashboardParameters, DashboardModel, ListDashboardParameters, UpdateDashboardParameters,
     DeleteDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-
-
 
 // const getItems = (items: DashboardModel[], filters: ConsoleFilter[]): DashboardModel[] => {
 //     let result = items;
@@ -48,10 +48,12 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
+    const favoriteStore = useFavoriteStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
+        currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
@@ -217,6 +219,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
+
+            await favoriteStore.deleteFavorite({
+                type: FAVORITE_TYPE.DASHBOARD,
+                workspaceId: _state.currentWorkspaceId || '',
+                id: dashboardId,
+            });
         } catch (e) {
             ErrorHandler.handleError(e);
             throw e;
