@@ -95,6 +95,6 @@ export const fillEmptyDateToObjectArray = <Data extends RawData = RawData>(field
 
 export const getReferenceTypeOfDataField = (allReferenceTypeInfo: AllReferenceTypeInfo, dataField?: string): ManagedVariableModelKey | undefined => {
     const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
-    if (referenceTypeInfo) return referenceTypeInfo.type;
+    if (referenceTypeInfo) return referenceTypeInfo.type as ManagedVariableModelKey;
     return undefined;
 };
