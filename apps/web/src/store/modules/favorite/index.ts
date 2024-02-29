@@ -1,5 +1,5 @@
-import type { FavoriteState } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { FavoriteState } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import * as actions from './actions';
 import * as getters from './getters';

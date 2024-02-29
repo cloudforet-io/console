@@ -1,7 +1,7 @@
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { FavoriteModel } from '@/schema/add-ons/favorite/model';
 
-import type { FavoriteType } from '@/store/modules/favorite/type';
+import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 
 export interface FavoriteListParameters {
     type: FavoriteType;

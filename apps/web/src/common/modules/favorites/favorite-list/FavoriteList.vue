@@ -69,10 +69,12 @@ import type { Vue } from 'vue/types/vue';
 import { PI, PIconButton } from '@spaceone/design-system';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+
 
 const LIMIT_COUNT = 5;
 export default {

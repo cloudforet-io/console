@@ -3,8 +3,6 @@ import { find } from 'lodash';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -12,6 +10,9 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
+
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 

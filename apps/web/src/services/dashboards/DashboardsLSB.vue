@@ -10,13 +10,13 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';

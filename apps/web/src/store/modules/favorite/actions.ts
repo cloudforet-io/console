@@ -4,12 +4,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { FavoriteListParameters, FavoriteListResponse } from '@/schema/add-ons/favorite/list';
 
-import type { FavoriteConfig, FavoriteState, FavoriteType } from '@/store/modules/favorite/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { FavoriteConfig, FavoriteState, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import {
     FAVORITE_TYPE,
-} from '@/store/modules/favorite/type';
+} from '@/common/modules/favorites/favorite-button/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const createFavorite = async (itemType: FavoriteType, workspaceId: string, itemId: string) => {
     try {

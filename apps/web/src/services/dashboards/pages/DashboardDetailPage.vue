@@ -10,10 +10,9 @@ import {
 
 import { SpaceRouter } from '@/router';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';

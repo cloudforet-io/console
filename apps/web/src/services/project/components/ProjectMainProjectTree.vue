@@ -15,13 +15,13 @@ import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-gro
 import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';

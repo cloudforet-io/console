@@ -4,10 +4,9 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
 import { queryStringToString } from '@/lib/router-query-string';
 
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';

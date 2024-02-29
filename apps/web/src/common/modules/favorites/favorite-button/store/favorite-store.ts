@@ -5,34 +5,23 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
-type FavoriteType = 'MENU' | 'PROJECT' | 'DASHBOARD' | 'CLOUD_SERVICE' | 'COST_ANALYSIS' | 'PROJECT_GROUP';
+import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
-export interface FavoriteMenu {
-    name: string;
-    user_id: string;
-    data: {
-        id: string;
-        label: string;
-        type: FavoriteType;
-        workspace_id: string;
-    };
-    created_at: string;
-    updated_at: string;
-    tags: {[key:string]: any};
-    domain_id: string;
-}
-
 interface FavoriteState {
-    favoriteMenuList: FavoriteMenu[];
+    favoriteMenuList: UserConfigModel[];
     total_count: number;
 }
 
@@ -45,7 +34,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
     });
 
     const state = reactive<FavoriteState>({
-        favoriteMenuList: [],
+        favoriteMenuList: [] as UserConfigModel[],
         total_count: 0,
     });
 
@@ -60,11 +49,11 @@ export const useFavoriteStore = defineStore('favorite', () => {
             ]).setPageLimit(limit);
             if (searchText?.length) favoriteListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list({
+                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: favoriteListApiQuery.data,
                 });
                 state.favoriteMenuList = results ?? [];
-                state.total_count = total_count;
+                state.total_count = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.favoriteMenuList = [];
@@ -73,17 +62,27 @@ export const useFavoriteStore = defineStore('favorite', () => {
             return state.favoriteMenuList;
         },
         createFavorite: async ({
-            type, workspaceId, id, label,
-        }:{type: FavoriteType, workspaceId:string, id:string, label:string}) => {
+            type, workspaceId, id,
+        }:{type: FavoriteType, workspaceId:string, id:string}) => {
             try {
-                await SpaceConnector.clientV2.config.userConfig.set({
+                await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:favorite:${type}:${workspaceId}:${id}`,
                     data: {
                         id,
                         workspace_id: workspaceId,
                         type,
-                        label,
                     },
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        deleteFavorite: async ({
+            type, workspaceId, id,
+        }:{type: FavoriteType, workspaceId:string, id:string}) => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
+                    name: `console:favorite:${type}:${workspaceId}:${id}`,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -93,7 +92,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
         if (workspaceId) {
-            actions.fetchFavorite({ type: 'MENU', workspaceIds: [workspaceId] });
+            actions.fetchFavorite({ type: FAVORITE_TYPE.MENU, workspaceIds: [workspaceId] });
         }
     });
 

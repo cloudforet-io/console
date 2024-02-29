@@ -111,7 +111,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -123,6 +122,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 
 const EVENT_PERIOD = 7;

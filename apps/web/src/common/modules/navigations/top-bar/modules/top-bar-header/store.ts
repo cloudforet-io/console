@@ -2,8 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 interface TopBarHeaderStoreState {

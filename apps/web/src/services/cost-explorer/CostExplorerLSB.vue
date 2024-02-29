@@ -11,8 +11,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,6 +19,8 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';

@@ -21,7 +21,6 @@ import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-ser
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap, ProviderReferenceItem } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -30,6 +29,7 @@ import { arrayToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
