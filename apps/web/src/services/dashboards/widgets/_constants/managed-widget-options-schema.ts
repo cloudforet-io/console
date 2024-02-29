@@ -116,7 +116,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Granularity',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.granularity },
         ],
@@ -126,7 +125,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Source',
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
-        fixed: true,
         scope: 'GLOBAL',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_source },
@@ -137,7 +135,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Type',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_data_type },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_data_key },
@@ -148,7 +145,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Field (Cost)',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_field },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
@@ -160,7 +156,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Field (Cost)',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_default_field },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
@@ -172,7 +167,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Compliance Framework',
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
-        fixed: true,
         scope: 'GLOBAL',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cloud_service_query_set },
@@ -184,7 +178,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Type',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_data_key },
         ],
@@ -194,7 +187,6 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         name: 'Data Field (Asset)',
         selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_default_field },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_additional_info_key },
@@ -204,9 +196,7 @@ export const MANAGED_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionK
         key: 'asset_secondary_data_field',
         name: 'Data Field (Asset)',
         selection_type: 'SINGLE',
-        readonly: true,
         inheritance_mode: 'NONE',
-        fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_default_field },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.asset_additional_info_key },
