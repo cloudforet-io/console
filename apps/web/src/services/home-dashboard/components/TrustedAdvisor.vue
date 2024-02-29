@@ -280,7 +280,6 @@ export default {
                         }
                         counts.splice(CATEGORY[category], 1, [type, count]);
                     });
-                    console.log(projectId);
                     projectSummaryData.push({
                         projectId,
                         projectName: projects[projectId]?.name,
