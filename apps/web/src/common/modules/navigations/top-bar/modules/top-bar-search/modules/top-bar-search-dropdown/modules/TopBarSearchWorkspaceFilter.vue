@@ -279,8 +279,6 @@ watch(() => state.searchText, (val) => {
                     }
                 }
             }
-
-
         }
 
         .show-more {

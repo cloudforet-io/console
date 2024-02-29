@@ -121,8 +121,6 @@ const handleCloseClick = () => {
         }
     }
 
-
-    // layout
     &.insection {
         @apply rounded gap-1;
         padding: 0.5rem 1rem;
@@ -130,11 +128,10 @@ const handleCloseClick = () => {
         .content-wrapper {
             @apply flex flex-grow mt-1;
             justify-content: space-between;
+
             .left-part {
                 .title-wrapper {
-                    @apply text-label-md;
-
-                    @apply font-bold;
+                    @apply text-label-md font-bold;
                 }
             }
         }
