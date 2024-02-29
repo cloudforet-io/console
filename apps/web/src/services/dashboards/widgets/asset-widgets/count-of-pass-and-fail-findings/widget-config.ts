@@ -26,13 +26,13 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: getWidgetOptionsSchema([
-        'cloud_service_query_set',
-        'asset_data_field',
-        'filters.project',
-        // 'filters.service_account', HACK: Re-enable it after backend is ready
+        ['cloud_service_query_set', { fixed: true, hidden: true }],
+        ['asset_data_field', { fixed: true }],
+        // HACK: add Legend
+        ['filters.project', { fixed: true }],
+        ['filters.service_account', { fixed: true }],
+        ['filters.region', { fixed: true }],
         'filters.provider',
-        'filters.region',
-        'filters.asset_account',
     ]),
 };
 

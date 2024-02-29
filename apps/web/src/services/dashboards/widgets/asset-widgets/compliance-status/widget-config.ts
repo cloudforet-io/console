@@ -19,12 +19,11 @@ const complianceStatusWidgetConfig: WidgetConfig = {
         data_criteria: 'realtime',
     },
     options_schema: getWidgetOptionsSchema([
-        'cloud_service_query_set',
-        'filters.project',
-        // 'filters.service_account', HACK: Re-enable it after backend is ready
+        ['cloud_service_query_set', { fixed: true, hidden: true }],
+        ['filters.project', { fixed: true }],
+        ['filters.service_account', { fixed: true }],
+        ['filters.region', { fixed: true }],
         'filters.provider',
-        'filters.region',
-        'filters.asset_account',
     ]),
 };
 
