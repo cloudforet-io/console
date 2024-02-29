@@ -6,14 +6,17 @@ import { PIconButton, PI } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { gray, indigo, red } from '@/styles/colors';
+import {
+    gray, indigo, red, yellow,
+} from '@/styles/colors';
 
 interface Props {
     titleIcon?: string;
     title?: string|TranslateResult;
-    type?: 'info' | 'danger';
+    type?: 'info' | 'danger' | 'warning';
     hideHeaderCloseButton?: boolean;
     visible?: boolean;
+    layout: 'insection' | 'full-width';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     type: 'info',
     hideHeaderCloseButton: false,
     visible: true,
+    layout: 'full-width',
 });
 
 const emit = defineEmits<{(e: 'close'): void;
@@ -31,6 +35,7 @@ const emit = defineEmits<{(e: 'close'): void;
 const iconColorMap = {
     info: indigo[500],
     danger: red[400],
+    warning: yellow[500],
 };
 
 const state = reactive({
@@ -45,7 +50,7 @@ const handleCloseClick = () => {
 
 <template>
     <div class="scoped-notification"
-         :class="{'info': props.type}"
+         :class="{'info': props.type==='info', 'waring': props.type ==='warning', 'insection': props.layout === 'insection'}"
     >
         <p-i v-if="props.titleIcon"
              class="left-icon"
@@ -83,17 +88,18 @@ const handleCloseClick = () => {
 
     .left-icon {
         margin: 0.125rem 0;
+        flex-shrink: 0;
     }
 
     .content-wrapper {
-        @apply flex flex-grow;
+        @apply flex flex-grow mt-1;
         justify-content: space-between;
         .left-part {
             .title-wrapper {
-                height: 1.5rem;
+                min-height: 1.5rem;
 
                 @apply text-label-lg font-bold;
-                line-height: 1.5rem;
+                line-height: 1.25rem;
             }
         }
         .right-part {
@@ -105,6 +111,32 @@ const handleCloseClick = () => {
         @apply bg-indigo-100;
         .title-wrapper {
             @apply text-indigo-600;
+        }
+    }
+
+    &.waring {
+        @apply bg-yellow-100;
+        .title-wrapper {
+            @apply text-yellow-700;
+        }
+    }
+
+
+    // layout
+    &.insection {
+        @apply rounded gap-1;
+        padding: 0.5rem 1rem;
+
+        .content-wrapper {
+            @apply flex flex-grow mt-1;
+            justify-content: space-between;
+            .left-part {
+                .title-wrapper {
+                    @apply text-label-md;
+
+                    @apply font-bold;
+                }
+            }
         }
     }
 }
