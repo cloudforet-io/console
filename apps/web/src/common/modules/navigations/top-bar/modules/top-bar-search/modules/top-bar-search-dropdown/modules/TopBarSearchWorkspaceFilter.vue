@@ -152,10 +152,12 @@ watch(() => state.searchText, (val) => {
                            :key="workspace.name"
                            :contents="workspace.label"
                            position="bottom"
+                           class="workspace-item-tooltip"
                 >
                     <p-checkbox
                         :selected="storeState.selectedWorkspaces"
                         :value="workspace.name"
+                        :disabled="state.isAllSelected"
                         @change="handleSelected"
                     >
                         <div class="workspace-item-wrapper">
@@ -163,9 +165,12 @@ watch(() => state.searchText, (val) => {
                                 <workspace-logo-icon :text="workspace.label"
                                                      :theme="workspace.theme"
                                                      size="xs"
+                                                     :class="{'opacity-70': state.isAllSelected}"
                                 /> <span class="label">{{ workspace.label }}</span>
                             </span>
-                            <p-icon-button name="ic_close"
+                            <p-icon-button v-if="!state.isAllSelected"
+                                           class="remove-button"
+                                           name="ic_close"
                                            size="sm"
                                            @click="() => handleRemoveItem(workspace)"
                             />
@@ -173,13 +178,14 @@ watch(() => state.searchText, (val) => {
                     </p-checkbox>
                 </p-tooltip>
             </p-checkbox-group>
-            <div v-if="storeState.stagedWorkspaces.length < 5">
-                <p-text-button style-type="highlight"
-                               class="show-more"
-                               @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
-                >
-                    {{ $t('Show more') }}
-                </p-text-button>
+            <p-text-button style-type="highlight"
+                           class="show-more"
+                           :disabled="storeState.stagedWorkspaces.length >= STAGED_WORKSPACE_LIMIT || state.isAllSelected"
+                           @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
+            >
+                {{ $t('Show more') }}
+            </p-text-button>
+            <div v-if="storeState.stagedWorkspaces.length < STAGED_WORKSPACE_LIMIT">
                 <p-context-menu v-if="state.isActivatedSearchMenu"
                                 ref="searchContextMenuRef"
                                 v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
@@ -245,18 +251,36 @@ watch(() => state.searchText, (val) => {
             flex: 1 0 13.25rem;
             overflow-y: auto;
 
-            .workspace-item-wrapper {
-                @apply inline-flex items-center justify-between;
-                .workspace-item {
-                    @apply inline-flex items-center gap-1;
-                    margin-left: 0.125rem;
+            .workspace-item-tooltip {
+                .workspace-item-wrapper {
+                    @apply inline-flex items-center justify-between;
+                    height: 1.5rem;
+                    .workspace-item {
+                        @apply inline-flex items-center gap-1;
+                        margin-left: 0.125rem;
 
-                    .label {
-                        @apply truncate;
-                        width: 9rem;
+                        .opacity-70 {
+                            opacity: 0.7;
+                        }
+
+                        .label {
+                            @apply truncate;
+                            width: 9rem;
+                        }
+                    }
+                    .remove-button {
+                        visibility: hidden;
+                    }
+
+                    &:hover {
+                        .remove-button {
+                            visibility: unset;
+                        }
                     }
                 }
             }
+
+
         }
 
         .show-more {
