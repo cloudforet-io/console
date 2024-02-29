@@ -8,7 +8,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-interface StageWorkspace {name: string, label: string, theme?:string, isSelected: boolean}
+export interface StageWorkspace {name: string, label: string, theme?:string, isSelected: boolean}
 interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
@@ -97,11 +97,15 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 isSelected: selectedWorkspaces.includes(workspace.name),
             }));
         },
-        addStagedWorkspaces: (workspace: StageWorkspace) => {
+        addStagedWorkspace: (workspace: StageWorkspace) => {
             if (state.stagedWorkspaces.length >= 5) return;
             state.stagedWorkspaces.push(workspace);
             state.stagedWorkspaces = orderWorkspaceList(state.stagedWorkspaces);
         },
+        removeStagedWorkspace: (workspace: StageWorkspace) => {
+            state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.name !== workspace.name);
+        },
+
     };
 
     watch(() => getters.trimmedInputText, debounce(async (trimmedText) => {

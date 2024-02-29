@@ -7,7 +7,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu,
+    PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -20,7 +20,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
-import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import {
+    useTopBarSearchStore,
+} from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -97,13 +100,17 @@ const handleSelected = (selected: string[]) => {
 };
 
 const handleSelectItem = (item) => {
-    topBarSearchStore.addStagedWorkspaces({
+    topBarSearchStore.addStagedWorkspace({
         name: item.name,
         label: item.label,
         theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
         isSelected: true,
     });
     state.isActivatedSearchMenu = false;
+};
+
+const handleRemoveItem = (workspace: StageWorkspace) => {
+    topBarSearchStore.removeStagedWorkspace(workspace);
 };
 
 const handleCheckAll = (val:boolean) => {
@@ -148,12 +155,18 @@ watch(() => state.searchText, (val) => {
                         :value="workspace.name"
                         @change="handleSelected"
                     >
-                        <span class="workspace-item">
-                            <workspace-logo-icon :text="workspace.label"
-                                                 :theme="workspace.theme"
-                                                 size="xs"
-                            /> <span class="label">{{ workspace.label }}</span>
-                        </span>
+                        <div class="workspace-item-wrapper">
+                            <span class="workspace-item">
+                                <workspace-logo-icon :text="workspace.label"
+                                                     :theme="workspace.theme"
+                                                     size="xs"
+                                /> <span class="label">{{ workspace.label }}</span>
+                            </span>
+                            <p-icon-button name="ic_close"
+                                           size="sm"
+                                           @click="() => handleRemoveItem(workspace)"
+                            />
+                        </div>
                     </p-checkbox>
                 </p-tooltip>
             </p-checkbox-group>
@@ -213,13 +226,16 @@ watch(() => state.searchText, (val) => {
             flex: 1 0 13.25rem;
             overflow-y: auto;
 
-            .workspace-item {
-                @apply inline-flex items-center gap-1;
-                margin-left: 0.125rem;
+            .workspace-item-wrapper {
+                @apply inline-flex items-center justify-between;
+                .workspace-item {
+                    @apply inline-flex items-center gap-1;
+                    margin-left: 0.125rem;
 
-                .label {
-                    @apply truncate;
-                    width: 8.5rem;
+                    .label {
+                        @apply truncate;
+                        width: 9rem;
+                    }
                 }
             }
         }
