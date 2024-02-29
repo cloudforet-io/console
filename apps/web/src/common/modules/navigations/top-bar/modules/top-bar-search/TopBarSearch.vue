@@ -54,9 +54,6 @@ const hideSearchMenu = () => {
 };
 
 const moveFocusToSuggestion = (focusingDirection: FocusingDirection) => {
-    if (!state.visible) {
-        topBarSearchStore.setIsActivated(true);
-    }
     state.focusingDirection = focusingDirection;
     state.isFocusOnInput = false;
     state.isFocusOnSuggestion = true;
@@ -78,6 +75,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     if (e.metaKey && e.code === 'KeyK') {
         topBarSearchStore.setIsActivated(!state.visible);
         state.isFocusOnInput = state.visible;
+        state.isFocusOnSuggestion = false;
     } else if (e.code === 'Escape') {
         topBarSearchStore.setIsActivated(false);
     }
@@ -134,7 +132,7 @@ onUnmounted(() => {
 
         <top-bar-search-dropdown v-show="state.visible"
                                  :focusing-direction.sync="state.focusingDirection"
-                                 :is-focused.sync="state.isFocusOnSuggestion"
+                                 :is-focused="state.isFocusOnSuggestion"
                                  @move-focus-end="handleMoveFocusEnd"
                                  @close="handleHideSearchMenu"
         >

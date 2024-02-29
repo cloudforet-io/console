@@ -4,11 +4,10 @@ import {
 } from 'vue';
 
 import {
-    PContextMenu, PI, PLazyImg, PTooltip, PTextHighlighting,
+    PContextMenu, PI, PTooltip, PTextHighlighting,
 } from '@spaceone/design-system';
 
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
-import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 interface Props {
@@ -80,13 +79,7 @@ onUnmounted(() => {
                        position="bottom"
             >
                 <span class="image">
-                    <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
-                                :src="item.itemIcon || ''"
-                                width="1rem"
-                                height="1rem"
-                    />
-                    <p-i v-else
-                         :name="item.itemIcon"
+                    <p-i :name="item.itemIcon"
                          width="1rem"
                          height="1rem"
                     />

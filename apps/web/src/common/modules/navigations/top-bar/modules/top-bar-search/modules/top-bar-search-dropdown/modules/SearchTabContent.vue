@@ -29,14 +29,12 @@ import type { FocusingDirection } from '@/common/modules/navigations/top-bar/mod
 
 
 interface Props {
-    loading: boolean;
     searchLimit: number;
     isFocused: boolean;
     focusingDirection: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: true,
     searchLimit: 15,
     isFocused: false,
     focusingDirection: 'DOWNWARD',
@@ -77,11 +75,11 @@ const state = reactive({
     }),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
-    focusingType: SUGGESTION_TYPE.MENU as SuggestionType,
+    focusingType: SUGGESTION_TYPE.DEFAULT_SERVICE as SuggestionType,
 });
 
 const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
-    if (type === SUGGESTION_TYPE.MENU && direction === 'DOWNWARD') {
+    if (type === SUGGESTION_TYPE.DEFAULT_SERVICE && direction === 'DOWNWARD') {
         state.proxyFocusingDirection = direction;
     }
     // TODO: need UPWARD case
@@ -93,7 +91,7 @@ const handleSelect = (item) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
     if (menuInfo && router.currentRoute.name !== menuId) {
         router.push({ name: menuInfo.routeName }).catch(() => {});
-        if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.MENU, menuId, workspaceStoreGetter.currentWorkspaceId);
+        if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.DEFAULT_SERVICE, menuId, workspaceStoreGetter.currentWorkspaceId);
     }
     topBarSearchStore.setIsActivated(false);
 };
@@ -142,8 +140,8 @@ watch(() => contentsSize.height.value, (height) => {
                     <p-context-menu class="search-list-context"
                                     :menu="state.refinedSearchMenu[workspace.workspace_id]"
                                     no-select-indication
-                                    @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'UPWARD')"
-                                    @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.MENU, 'DOWNWARD')"
+                                    @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'UPWARD')"
+                                    @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'DOWNWARD')"
                                     @keyup:esc="emit('close')"
                                     @focus="emit('update:isFocused', true)"
                                     @blur="emit('update:isFocused', false)"
