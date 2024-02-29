@@ -118,6 +118,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                         ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[propertyName],
                         use: property.use,
                     };
+                    if (typeof property.fixed === 'boolean') {
+                        _refinedVariablesSchema.properties[propertyName].fixed = property.fixed;
+                    }
                 } else {
                     _refinedVariablesSchema.properties[propertyName] = property;
                 }
@@ -372,7 +375,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const refineSchemaProperties = (properties: Record<string, DashboardVariableSchemaProperty>): Record<string, DashboardVariableSchemaProperty> => Object.entries(properties)
         .reduce((acc, [property, propertyInfo]) => {
             acc[property] = propertyInfo.variable_type === 'MANAGED'
-                ? { variable_type: 'MANAGED', use: propertyInfo.use }
+                ? { variable_type: 'MANAGED', use: propertyInfo.use, fixed: !!propertyInfo.fixed }
                 : propertyInfo;
             return acc;
         }, {});
