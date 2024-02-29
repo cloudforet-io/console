@@ -33,8 +33,8 @@ const costSummaryMultiFieldsWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         ['cost_data_source', { fixed: true, hidden: true }],
-        ['cost_data_field', { name: 'Row Field' }],
-        ['cost_secondary_data_field', { name: 'Column Field' }],
+        ['cost_data_field', { name: 'Row Field', fixed: true }],
+        ['cost_secondary_data_field', { name: 'Column Field', fixed: true }],
         ['cost_data_type', { fixed: true }],
         ['granularity', { fixed: true, readonly: true }],
         ['filters.cost_product', { fixed: true }],

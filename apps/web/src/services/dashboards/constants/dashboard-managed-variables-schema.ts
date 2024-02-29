@@ -80,6 +80,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
             name: 'Data Source',
             variable_type: 'MANAGED',
             use: false,
+            fixed: true, // NOTE: this field is necessary for dashboard before v2.0.0
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
             required: true,
@@ -117,6 +118,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
             name: 'Compliance Framework',
             variable_type: 'MANAGED',
             use: false,
+            fixed: true, // NOTE: this field is necessary for dashboard before v2.0.0
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK',
             required: true,

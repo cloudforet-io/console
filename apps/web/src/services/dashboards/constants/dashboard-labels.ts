@@ -8,9 +8,9 @@ export const DASHBOARD_SERVICE_LABELS = {
     COST: 'Cost',
     CDN: 'CDN',
     TRAFFIC: 'Traffic',
-    PROWLER: 'Prowler',
     SECURITY: 'Security',
-    CSPM: 'CSPM',
+    // PROWLER: 'Prowler',
+    // CSPM: 'CSPM',
 };
 
 export const DASHBOARD_LABELS = {
