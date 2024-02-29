@@ -5,30 +5,21 @@
         <template v-if="loading" />
         <i18n v-else-if="items.length === 0"
               class="empty"
-              path="COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM"
+              path="COMMON.STARRED_NO_DATA"
               tag="p"
-        >
-            <template #icon>
-                <p-i name="ic_favorite-filled"
-                     width="0.875rem"
-                     height="0.875rem"
-                     color="inherit"
-                     class="favorite-btn"
-                />
-            </template>
-        </i18n>
+        />
         <template v-else>
             <div v-for="item in displayItems"
-                 :key="item.itemId"
+                 :key="item.id"
                  class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem.itemId === item.itemId : false}"
+                 :class="{hovered: hoveredItem ? hoveredItem?.id === item.id : false}"
                  @click="handleClickItem(item, $event)"
                  @mouseenter="hoveredItem = item"
                  @mouseleave="hoveredItem = null"
             >
                 <router-link :to="referenceRouter(
-                                 item.itemId, {
-                                     resource_type: getResourceType(item.itemType),
+                                 item.id, {
+                                     resource_type: getResourceType(item.type),
                                      workspace_id: currentWorkspaceId,
                                  })"
                              class="item-link"
@@ -38,7 +29,7 @@
                     /></span>
                     <span class="name">{{ item.label }}</span>
                 </router-link>
-                <p-icon-button v-if="hoveredItem && hoveredItem.itemId === item.itemId"
+                <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id"
                                name="ic_close"
                                size="sm"
                                class="delete-btn"
@@ -69,10 +60,12 @@ import type { Vue } from 'vue/types/vue';
 import { PI, PIconButton } from '@spaceone/design-system';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+
 
 const LIMIT_COUNT = 5;
 export default {
@@ -142,7 +135,7 @@ export default {
 
 <style lang="postcss" scoped>
 .empty {
-    @apply pt-2 text-gray-400;
+    @apply text-gray-400;
     font-size: 0.875rem;
     line-height: 1.2;
     white-space: break-spaces;

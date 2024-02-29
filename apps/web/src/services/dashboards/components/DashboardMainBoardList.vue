@@ -15,11 +15,11 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';

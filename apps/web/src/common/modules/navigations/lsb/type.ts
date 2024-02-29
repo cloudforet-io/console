@@ -4,9 +4,10 @@ import type { Location } from 'vue-router';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-
 import type { MenuId } from '@/lib/menu/config';
+
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+
 
 export const MENU_ITEM_TYPE = {
     TITLE: 'title',

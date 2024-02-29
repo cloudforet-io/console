@@ -14,11 +14,11 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
     LSBItem, LSBMenu, TopTitle,

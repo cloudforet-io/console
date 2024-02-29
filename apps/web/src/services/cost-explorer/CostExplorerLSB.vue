@@ -11,8 +11,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,6 +19,9 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
@@ -46,6 +47,8 @@ const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -56,6 +59,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
 });
 const state = reactive({
     loading: true,
@@ -112,13 +116,10 @@ const state = reactive({
         ];
     }),
     favoriteItemMap: computed(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.COST_ANALYSIS];
         const result: Record<string, FavoriteConfig> = {};
-        if (stateName) {
-            store.state.favorite[stateName]?.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.id] = d;
+        });
         return result;
     }),
     starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.showMoreQuerySetStatus ? state.currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : state.currentQueryMenuList)),

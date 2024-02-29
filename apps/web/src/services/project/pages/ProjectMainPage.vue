@@ -10,15 +10,14 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -151,14 +150,6 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 onUnmounted(() => {
     projectPageStore.reset();
 });
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-    ]);
-})();
 </script>
 
 <template>

@@ -11,12 +11,10 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone, isEmpty } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -24,6 +22,9 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -41,6 +42,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const topBarHeaderStore = useTopBarHeaderStore();
 const topBarHeaderGetters = topBarHeaderStore.getters;
+const favoriteStore = useFavoriteStore();
 
 const route = useRoute();
 const { width } = useWindowSize();
@@ -89,8 +91,9 @@ const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
 
 watch(() => state.selectedMenuId, async () => {
     await topBarHeaderStore.initState();
+    await favoriteStore.fetchFavorite();
     await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
-});
+}, { immediate: true });
 watch(() => state.currentMenuId, async (currentMenuId) => {
     await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
     if (currentMenuId === MENU_ID.HOME_DASHBOARD) {
@@ -105,10 +108,6 @@ watch(() => state.currentMenuId, async (currentMenuId) => {
         }]);
     }
 }, { immediate: true });
-
-(async () => {
-    await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
-})();
 </script>
 
 <template>
@@ -166,6 +165,7 @@ watch(() => state.currentMenuId, async (currentMenuId) => {
             }
         }
         .favorite-button {
+            margin-top: -0.125rem;
             margin-left: -0.25rem;
         }
     }
