@@ -15,7 +15,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -28,6 +29,8 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
@@ -36,18 +39,16 @@ const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     projects: computed(() => allReferenceStore.getters.project),
+    favoriteItems: computed(() => favoriteGetters.dashboardItems),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
     favoriteItemMap: computed(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.DASHBOARD];
         const result: Record<string, FavoriteConfig> = {};
-        if (stateName) {
-            store.state.favorite[stateName]?.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.id] = d;
+        });
         return result;
     }),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({

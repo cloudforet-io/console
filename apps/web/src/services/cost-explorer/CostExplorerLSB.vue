@@ -19,7 +19,8 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -46,6 +47,8 @@ const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -56,6 +59,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
 });
 const state = reactive({
     loading: true,
@@ -112,13 +116,10 @@ const state = reactive({
         ];
     }),
     favoriteItemMap: computed(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.COST_ANALYSIS];
         const result: Record<string, FavoriteConfig> = {};
-        if (stateName) {
-            store.state.favorite[stateName]?.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.id] = d;
+        });
         return result;
     }),
     starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.showMoreQuerySetStatus ? state.currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : state.currentQueryMenuList)),

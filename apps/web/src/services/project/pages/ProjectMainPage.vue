@@ -10,7 +10,6 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -151,14 +150,6 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 onUnmounted(() => {
     projectPageStore.reset();
 });
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-    ]);
-})();
 </script>
 
 <template>

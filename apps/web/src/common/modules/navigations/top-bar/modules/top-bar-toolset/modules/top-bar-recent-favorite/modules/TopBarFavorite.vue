@@ -308,22 +308,6 @@ const fetchCostQuerySet = async () => {
     state.costQuerySets = costQuerySets;
 };
 
-/* Init */
-(async () => {
-    state.loading = true;
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-        store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
-        store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-        store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
-        dashboardStore.load(),
-        // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
-    ]);
-    state.loading = false;
-})();
-
 watch([
     () => costDataSourceReferenceStore.getters.hasLoaded,
     () => appContextStore.getters.globalGrantLoading,

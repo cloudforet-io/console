@@ -57,12 +57,12 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: ProjectReferenceItem = projectReference[d.itemId];
+        const resource: ProjectReferenceItem = projectReference[d.id];
         if (resource) {
             const result: ReferenceData = {
                 ...d,
-                name: d.itemId,
-                label: resource.name || d.itemId,
+                name: d.id,
+                label: resource.name || d.id,
                 icon: 'ic_document-filled',
                 updatedAt: d?.updatedAt,
             };
@@ -83,14 +83,13 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
+        const resource: ProjectGroupReferenceItem = projectGroupReference[d.id];
         if (resource) {
             const result: ReferenceData = {
                 ...d,
-                name: d.itemId,
-                label: resource?.name || d.itemId,
+                name: d.id,
+                label: resource?.name || d.id,
                 icon: 'ic_folder-filled',
-                updatedAt: d?.updatedAt,
             };
             if (resource?.data?.parentGroupInfo?.id) {
                 result.parents = [{

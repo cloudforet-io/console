@@ -1,10 +1,6 @@
 import type { FavoriteState } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import * as actions from './actions';
-import * as getters from './getters';
-import * as mutations from './mutations';
-
 const state: FavoriteState = {
     menuItems: null,
     projectItems: null,
@@ -25,7 +21,4 @@ const state: FavoriteState = {
 export default {
     namespaced: true,
     state,
-    getters,
-    actions,
-    mutations,
 };

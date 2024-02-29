@@ -16,9 +16,9 @@ export interface FavoriteOptions {
 }
 
 export interface FavoriteConfig {
-    itemType: FavoriteType;
+    type: FavoriteType;
     workspaceId: string;
-    itemId: string;
+    id: string;
 }
 
 export interface FavoriteItem extends FavoriteConfig {
