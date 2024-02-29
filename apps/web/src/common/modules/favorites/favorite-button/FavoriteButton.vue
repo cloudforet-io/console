@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import type { WatchStopHandle } from 'vue';
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
+
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 
 interface Props {
     itemId: string;
-    favoriteType: string;
+    favoriteType: FavoriteType;
     scale?: string;
     readOnly?: boolean;
     visibleActiveCaseOnly?: boolean;
@@ -29,66 +27,46 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
+const favoriteStore = useFavoriteStore();
+const favoriteStoreGetters = favoriteStore.getters;
 
-const state = reactive({
+const storeState = reactive({
+    favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-    isLoading: computed(() => store.state.favorite.isLoading[props.favoriteType]),
-    hasLoaded: computed(() => Array.isArray(state.favoriteItems)),
-    favoriteItems: computed<FavoriteConfig[]|null>(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[props.favoriteType];
-        if (!stateName) return [];
-        const items = store.state.favorite[stateName];
-        return items ? store.state.favorite[stateName].filter((item) => item.workspaceId === state.currentWorkspaceId) : null;
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId as string),
+});
+const state = reactive({
+    active: computed(() => {
+        const favoriteItem = storeState.favoriteMenuList.findIndex((d) => (d.workspace_id === storeState.currentWorkspaceId)
+            && (d.id === props.itemId
+            && (d.type === props.favoriteType)));
+        return favoriteItem > -1;
     }),
-    favoriteItemMap: computed<Record<string, FavoriteConfig>>(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        if (Array.isArray(state.favoriteItems)) {
-            state.favoriteItems.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
-        return result;
-    }),
-    active: computed(() => !!state.favoriteItemMap[props.itemId]),
 });
 
 const handleClickFavoriteButton = async (event: MouseEvent) => {
-    if (state.isAdminMode) return;
+    if (storeState.isAdminMode) return;
     event.stopPropagation();
     if (props.readOnly) return;
-    if (state.favoriteItemMap[props.itemId]) {
-        await store.dispatch('favorite/removeItem', {
-            workspaceId: state.currentWorkspaceId,
-            itemId: props.itemId,
-            itemType: props.favoriteType,
+    if (state.active) {
+        await favoriteStore.deleteFavorite({
+            type: props.favoriteType,
+            workspaceId: storeState.currentWorkspaceId,
+            id: props.itemId,
         });
     } else {
-        await store.dispatch('favorite/addItem', {
-            workspaceId: state.currentWorkspaceId,
-            itemId: props.itemId,
-            itemType: props.favoriteType,
+        await favoriteStore.createFavorite({
+            type: props.favoriteType,
+            workspaceId: storeState.currentWorkspaceId,
+            id: props.itemId,
         });
     }
 };
-
-let stopWatch: WatchStopHandle;
-// eslint-disable-next-line prefer-const
-stopWatch = watch([() => state.hasLoaded, () => state.isLoading], async ([hasLoaded, isLoading]) => {
-    if (hasLoaded) {
-        if (stopWatch) stopWatch();
-        return;
-    }
-
-    if (!isLoading) {
-        await store.dispatch('favorite/load', props.favoriteType);
-    }
-}, { immediate: true });
 </script>
 
 <template>
     <p-i
-        v-if="!state.isAdminMode"
+        v-if="!storeState.isAdminMode"
         v-show="(props.visibleActiveCaseOnly || props.readOnly) ? state.active : true"
         :name="state.active ? 'ic_favorite-filled': 'ic_favorite'"
         width="1rem"

@@ -38,16 +38,23 @@ export const useFavoriteStore = defineStore('favorite', () => {
         total_count: 0,
     });
 
+    const getters = reactive({
+        favoriteMenuList: computed(() => state.favoriteMenuList.map((item) => item.data)),
+        menuItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.MENU)),
+        projectItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.PROJECT)),
+        projectGroupItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.PROJECT_GROUP)),
+        cloudServiceItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.CLOUD_SERVICE)),
+        dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.DASHBOARD)),
+        costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.COST_ANALYSIS)),
+    });
+
     const actions = {
-        fetchFavorite: async ({
-            type, workspaceIds = [], limit = 5, searchText,
-        }:{type: FavoriteType, workspaceIds:string[], limit?:number, searchText?:string}) => {
+        fetchFavorite: async () => {
             favoriteListApiQuery.setFilters([
-                { k: 'name', v: `console:favorite:${type}:`, o: '' },
-                { k: 'data.workspace_id', v: workspaceIds, o: '=' },
+                { k: 'name', v: 'console:favorite:', o: '' },
+                { k: 'data.workspace_id', v: _getters.currentWorkspaceId, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
-            ]).setPageLimit(limit);
-            if (searchText?.length) favoriteListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
+            ]);
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: favoriteListApiQuery.data,
@@ -73,6 +80,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
                         type,
                     },
                 });
+                await actions.fetchFavorite();
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -84,20 +92,22 @@ export const useFavoriteStore = defineStore('favorite', () => {
                 await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
                     name: `console:favorite:${type}:${workspaceId}:${id}`,
                 });
+                await actions.fetchFavorite();
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
     };
 
-    watch(() => _getters.currentWorkspaceId, (workspaceId) => {
+    watch(() => _getters.currentWorkspaceId, async (workspaceId) => {
         if (workspaceId) {
-            actions.fetchFavorite({ type: FAVORITE_TYPE.MENU, workspaceIds: [workspaceId] });
+            await actions.fetchFavorite();
         }
-    });
+    }, { immediate: true });
 
     return {
         state,
+        getters,
         ...actions,
     };
 });
