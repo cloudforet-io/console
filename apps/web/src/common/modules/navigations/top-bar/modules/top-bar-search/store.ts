@@ -3,23 +3,54 @@ import { computed, reactive, watch } from 'vue';
 import { debounce } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+export interface StageWorkspace {name: string, label: string, theme?:string, isSelected: boolean}
 interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activateTab: string;
-    selectedWorkspaces: string[]; // Workspace Filter(TopBarSearchWorkspaceFilter)
     recentMenuList: any[]; // TODO: check type
     searchMenuMap: any; // TODO: check type
+    // workspace filter
+    recentAccessedWorkspaces: string[];
+    stagedWorkspaces: StageWorkspace[];
 }
 
 export const useTopBarSearchStore = defineStore('top-bar-search', () => {
+    const userWorkspaceStore = useUserWorkspaceStore();
+    const workspaceStoreState = userWorkspaceStore.$state;
+    const allReferenceStore = useAllReferenceStore();
+    const allReferenceGetters = allReferenceStore.getters;
+
+    const orderWorkspaceList = (workspaceList: any[]) => {
+        if (!storeState.currentWorkspaceId) return workspaceList;
+        const orderedWorkspaceList = workspaceList.sort((a, b) => {
+            if (a.value === storeState.currentWorkspaceId) return -1;
+            if (b.value === storeState.currentWorkspaceId) return 1;
+            return 0;
+        });
+        return orderedWorkspaceList;
+    };
+
+    const storeState = reactive({
+        currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
+        workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
+        workspaceMap: computed(() => allReferenceGetters.workspace),
+    });
+
     const state = reactive<TopBarSearchStoreState>({
         isActivated: false,
         inputText: '',
         activateTab: 'service',
-        selectedWorkspaces: [],
         recentMenuList: [],
         searchMenuMap: {},
+        // workspace filter
+        recentAccessedWorkspaces: [],
+        stagedWorkspaces: [],
     });
 
     const getters = reactive({
@@ -30,6 +61,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             return '';
         }),
         isRecentEmpty: computed<boolean>(() => state.recentMenuList.length === 0),
+        selectedWorkspaces: computed<string[]>(() => state.stagedWorkspaces.filter((workspace) => workspace.isSelected).map((workspace) => workspace.name)),
     });
 
     const actions = {
@@ -39,14 +71,41 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 actions.initSearch();
             }
         },
+        initWorkspaces: () => {
+            const workspaceList = storeState.workspaceList.map((workspace) => ({
+                label: workspace.name,
+                value: workspace.workspace_id,
+                tags: workspace.tags,
+            } as { label: string, value: string, tags: { theme: string } | undefined }));
+            // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
+            const orderedWorkspaceList = orderWorkspaceList(workspaceList);
+            state.stagedWorkspaces = orderedWorkspaceList.slice(0, 3).map((workspace) => ({
+                name: workspace.value,
+                label: workspace.label,
+                theme: workspace.tags?.theme,
+                isSelected: workspace.value === storeState.currentWorkspaceId,
+            }));
+        },
         initSearch: () => {
             state.inputText = '';
             state.activateTab = 'service';
-            state.selectedWorkspaces = [];
+            actions.initWorkspaces();
         },
         setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
-            state.selectedWorkspaces = selectedWorkspaces;
+            state.stagedWorkspaces = state.stagedWorkspaces.map((workspace) => ({
+                ...workspace,
+                isSelected: selectedWorkspaces.includes(workspace.name),
+            }));
         },
+        addStagedWorkspace: (workspace: StageWorkspace) => {
+            if (state.stagedWorkspaces.length >= 5) return;
+            state.stagedWorkspaces.push(workspace);
+            state.stagedWorkspaces = orderWorkspaceList(state.stagedWorkspaces);
+        },
+        removeStagedWorkspace: (workspace: StageWorkspace) => {
+            state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.name !== workspace.name);
+        },
+
     };
 
     watch(() => getters.trimmedInputText, debounce(async (trimmedText) => {
@@ -109,6 +168,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
 
 
     return {
+        storeState,
         state,
         getters,
         ...actions,

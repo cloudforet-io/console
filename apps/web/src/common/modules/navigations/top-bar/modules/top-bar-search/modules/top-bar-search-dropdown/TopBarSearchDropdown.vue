@@ -149,11 +149,11 @@ const handleUpdateContentsSize = (height: number) => {
     left: 0;
     right: 0;
     margin: 0 auto;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
     z-index: 1000;
 
     /* custom design-system component - p-data-loader */
     :deep(.p-tab) {
+        box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
         .tab-pane {
             height: 100%;
             padding-bottom: 0;

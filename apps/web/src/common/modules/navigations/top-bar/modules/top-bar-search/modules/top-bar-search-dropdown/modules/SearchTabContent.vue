@@ -126,7 +126,7 @@ watch(() => contentsSize.height.value, (height) => {
 // });
 </script>
 <template>
-    <div class="top-bar-search-service-tab">
+    <div class="search-tab-content">
         <div v-if="state.inputText.length === 0"
              class="service-item-list"
         />
@@ -180,12 +180,12 @@ watch(() => contentsSize.height.value, (height) => {
             </div>
         </div>
         <p-divider vertical />
-        <top-bar-search-workspace-filter class="filter" />
+        <top-bar-search-workspace-filter />
     </div>
 </template>
 
 <style scoped lang="postcss">
-.top-bar-search-service-tab {
+.search-tab-content {
     @apply flex gap-3 h-full;
     padding: 1rem 0;
     height: 100%;
@@ -264,10 +264,6 @@ watch(() => contentsSize.height.value, (height) => {
             margin-top: -3rem;
             margin-bottom: 1rem;
         }
-    }
-
-    .filter {
-        width: 13.25rem;
     }
 }
 </style>
