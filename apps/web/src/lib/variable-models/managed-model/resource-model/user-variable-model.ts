@@ -5,7 +5,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class UserVariableModel extends ResourceVariableModel<UserModel> {
-    static _meta = {
+    static meta = {
         key: 'user',
         name: 'User',
         resourceType: 'identity.User',
@@ -15,7 +15,7 @@ export default class UserVariableModel extends ResourceVariableModel<UserModel> 
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = UserVariableModel._meta;
+        this._meta = UserVariableModel.meta;
     }
 
     nameFormatter(): string {

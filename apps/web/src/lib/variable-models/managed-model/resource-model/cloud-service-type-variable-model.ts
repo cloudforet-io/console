@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class CloudServiceTypeVariableModel extends ResourceVariableModel<CloudServiceTypeModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'cloud_service_type',
         name: 'Cloud Service Type',
         resourceType: 'inventory.CloudServiceType',
@@ -19,7 +19,7 @@ export default class CloudServiceTypeVariableModel extends ResourceVariableModel
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = CloudServiceTypeVariableModel._meta;
+        this._meta = CloudServiceTypeVariableModel.meta;
     }
 
     nameFormatter(data: any): string {

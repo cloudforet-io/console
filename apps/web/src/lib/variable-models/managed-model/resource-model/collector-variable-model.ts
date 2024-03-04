@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class CollectorVariableModel extends ResourceVariableModel<CollectorModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'collector',
         name: 'Collector',
         resourceType: 'inventory.Collector',
@@ -17,6 +17,6 @@ export default class CollectorVariableModel extends ResourceVariableModel<Collec
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = CollectorVariableModel._meta;
+        this._meta = CollectorVariableModel.meta;
     }
 }

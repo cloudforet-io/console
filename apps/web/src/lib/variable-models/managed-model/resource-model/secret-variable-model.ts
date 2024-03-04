@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class SecretVariableModel extends ResourceVariableModel<SecretModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'secret',
         name: 'Secret',
         resourceType: 'secret.Secret',
@@ -17,6 +17,6 @@ export default class SecretVariableModel extends ResourceVariableModel<SecretMod
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = SecretVariableModel._meta;
+        this._meta = SecretVariableModel.meta;
     }
 }

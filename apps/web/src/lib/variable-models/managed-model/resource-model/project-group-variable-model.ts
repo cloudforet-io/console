@@ -5,7 +5,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class ProjectGroupVariableModel extends ResourceVariableModel<ProjectGroupModel> {
-    static _meta = {
+    static meta = {
         key: 'project_group',
         name: 'Project Group',
         resourceType: 'identity.ProjectGroup',
@@ -15,6 +15,6 @@ export default class ProjectGroupVariableModel extends ResourceVariableModel<Pro
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = ProjectGroupVariableModel._meta;
+        this._meta = ProjectGroupVariableModel.meta;
     }
 }

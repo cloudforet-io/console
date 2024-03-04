@@ -9,7 +9,7 @@ export default class CloudServiceQuerySetVariableModel extends ResourceVariableM
 
     cloud_service_group = this.generateProperty({ key: 'cloud_service_group', name: 'Cloud Service Group' });
 
-    static _meta = {
+    static meta = {
         key: 'cloud_service_query_set',
         name: 'Compliance Framework',
         resourceType: 'inventory.CloudServiceQuerySet',
@@ -19,6 +19,6 @@ export default class CloudServiceQuerySetVariableModel extends ResourceVariableM
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = CloudServiceQuerySetVariableModel._meta;
+        this._meta = CloudServiceQuerySetVariableModel.meta;
     }
 }

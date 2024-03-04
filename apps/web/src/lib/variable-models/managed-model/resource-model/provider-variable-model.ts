@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class ProviderVariableModel extends ResourceVariableModel<ProviderModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'provider',
         name: 'Provider',
         resourceType: 'identity.Provider',
@@ -17,6 +17,6 @@ export default class ProviderVariableModel extends ResourceVariableModel<Provide
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = ProviderVariableModel._meta;
+        this._meta = ProviderVariableModel.meta;
     }
 }

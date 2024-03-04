@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class RegionVariableModel extends ResourceVariableModel<RegionModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'region',
         name: 'Region',
         resourceType: 'inventory.Region',
@@ -18,7 +18,7 @@ export default class RegionVariableModel extends ResourceVariableModel<RegionMod
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = RegionVariableModel._meta;
+        this._meta = RegionVariableModel.meta;
     }
 
     nameFormatter(data: any): string {

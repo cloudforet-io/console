@@ -3,7 +3,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class GranularityVariableModel extends EnumVariableModel {
-    static _meta = {
+    static meta = {
         key: 'granularity',
         name: 'Granularity',
     };
@@ -16,6 +16,6 @@ export default class GranularityVariableModel extends EnumVariableModel {
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = GranularityVariableModel._meta;
+        this._meta = GranularityVariableModel.meta;
     }
 }
