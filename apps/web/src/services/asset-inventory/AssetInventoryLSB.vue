@@ -24,7 +24,7 @@ import type {
     LSBItem, LSBMenu, TopTitle,
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import AssetInventoryLSBToggleMenuItem from '@/services/asset-inventory/components/AssetInventoryLSBToggleMenuItem.vue';
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
@@ -38,7 +38,7 @@ const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
@@ -153,7 +153,7 @@ watch(() => state.detailPageParams, async (params) => {
     if (!params.name) await routeToFirstCloudServiceType(params);
 }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 </script>
 
@@ -199,11 +199,14 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <style lang="postcss" scoped>
 .asset-inventory-l-s-b {
-    .provider-item {
-        @apply flex items-center;
-        gap: 0.25rem;
-        .selected-wrapper {
-            @apply block;
+    .provider-radio-group {
+        .provider-item {
+            @apply flex items-center;
+            gap: 0.25rem;
+            padding-left: 0.25rem;
+            .selected-wrapper {
+                @apply block;
+            }
         }
     }
 }

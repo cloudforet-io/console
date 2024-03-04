@@ -34,7 +34,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -52,7 +52,7 @@ const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
@@ -213,13 +213,13 @@ watch([
 }, { immediate: true });
 
 watch([() => singleItemTabState.activeTab, () => state.item], () => {
-    topBarHeaderStore.setBreadcrumbs(state.pageNavigation);
+    gnbStore.setBreadcrumbs(state.pageNavigation);
 });
 watch(() => projectDetailPageState.projectId, (projectId) => {
-    topBarHeaderStore.setId(projectId);
+    gnbStore.setId(projectId);
 }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
