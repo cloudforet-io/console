@@ -4,9 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type {
     ListQuery, ListResponse,
-    IBaseVariableModel,
+    VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -14,13 +15,16 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariableModel {
-    _meta = {
+export default class AssetAdditionalInfoKeyVariableModel extends ResourceVariableModel {
+    static meta = {
         key: 'asset_additional_info_key',
         name: 'Asset Additional Info',
+        resourceType: 'inventory.CloudServiceQuerySet',
+        idKey: 'query_set_id',
+        nameKey: 'name',
     };
 
-    _dependencies = {
+    private dependencies = {
         cloud_service_query_set: 'query_set_id',
     };
 
@@ -30,9 +34,14 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
         results: { additional_info_keys: string[] }[];
     }>>;
 
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
+        this._meta = AssetAdditionalInfoKeyVariableModel.meta;
+    }
+
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            const dependencyOptions = getRefinedDependencyOptions(this._dependencies, query.options);
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 
