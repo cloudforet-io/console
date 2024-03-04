@@ -439,7 +439,6 @@ watch(() => state.currentDate, () => {
     }
 }
 
-
 /* custom design-system component - p-date-pagination */
 :deep(.p-date-pagination) {
     .date-text {
