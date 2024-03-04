@@ -47,7 +47,7 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
                 </div>
             </div>
         </div>
-        <dashboard-create-scope-form @set-project="handleSelectProject" />
+        <dashboard-create-scope-form @select-project="handleSelectProject" />
     </div>
 </template>
 
