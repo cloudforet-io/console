@@ -272,7 +272,7 @@ const getTargetWorkspaceRoute = (workspaceId: string): Location => {
 
         .main-box {
             @apply flex flex-col;
-                line-height: 1.125rem;
+            line-height: 1.125rem;
 
             .context-lower {
                 @apply flex justify-between;
@@ -284,6 +284,7 @@ const getTargetWorkspaceRoute = (workspaceId: string): Location => {
                     .label {
                         @apply text-label-sm text-gray-500;
                     }
+
                     /* custom design-system component - p-link */
                     :deep(.p-link) {
                         @apply text-gray-500;
