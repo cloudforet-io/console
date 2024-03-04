@@ -8,7 +8,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-export interface StageWorkspace {name: string, label: string, theme?:string, isSelected: boolean}
+export interface StageWorkspace {workspaceId: string, label: string, theme?:string, isSelected: boolean}
 interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
@@ -41,7 +41,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
         workspaceMap: computed(() => allReferenceGetters.workspace),
     });
-
     const state = reactive<TopBarSearchStoreState>({
         isActivated: false,
         inputText: '',
@@ -61,7 +60,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             return '';
         }),
         isRecentEmpty: computed<boolean>(() => state.recentMenuList.length === 0),
-        selectedWorkspaces: computed<string[]>(() => state.stagedWorkspaces.filter((workspace) => workspace.isSelected).map((workspace) => workspace.name)),
+        selectedWorkspaces: computed<string[]>(() => state.stagedWorkspaces.filter((workspace) => workspace.isSelected).map((workspace) => workspace.workspaceId)),
     });
 
     const actions = {
@@ -80,7 +79,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
             const orderedWorkspaceList = orderWorkspaceList(workspaceList);
             state.stagedWorkspaces = orderedWorkspaceList.slice(0, 3).map((workspace) => ({
-                name: workspace.value,
+                workspaceId: workspace.value,
                 label: workspace.label,
                 theme: workspace.tags?.theme,
                 isSelected: workspace.value === storeState.currentWorkspaceId,
@@ -94,7 +93,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
             state.stagedWorkspaces = state.stagedWorkspaces.map((workspace) => ({
                 ...workspace,
-                isSelected: selectedWorkspaces.includes(workspace.name),
+                isSelected: selectedWorkspaces.includes(workspace.workspaceId),
             }));
         },
         addStagedWorkspace: (workspace: StageWorkspace) => {
@@ -103,7 +102,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             state.stagedWorkspaces = orderWorkspaceList(state.stagedWorkspaces);
         },
         removeStagedWorkspace: (workspace: StageWorkspace) => {
-            state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.name !== workspace.name);
+            state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.workspaceId !== workspace.workspaceId);
         },
 
     };

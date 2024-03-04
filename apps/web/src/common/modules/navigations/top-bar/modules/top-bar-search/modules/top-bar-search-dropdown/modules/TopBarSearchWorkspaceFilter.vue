@@ -9,7 +9,7 @@ import {
 import {
     PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -50,12 +50,11 @@ const state = reactive({
     nextToken: undefined as string | undefined,
     searchResult: [] as ResourceModel[],
     searchResultMenu: computed<MenuItem[]>(() => {
-        const filteredResults = state.searchResult?.filter((workspace) => !storeState.stagedWorkspaces.some((stagedWorkspace) => stagedWorkspace.name === workspace.workspace_id));
+        const filteredResults = state.searchResult?.filter((workspace) => !storeState.stagedWorkspaces.some((stagedWorkspace) => stagedWorkspace.workspaceId === workspace.workspace_id));
         const workspaceMenuItems:MenuItem[] = filteredResults.map((workspace:ResourceModel) => ({
             type: 'item',
             label: workspace.name,
             name: workspace.workspace_id,
-
         }));
         if (state.nextToken?.length) {
             workspaceMenuItems.push({
@@ -102,13 +101,15 @@ const handleSelected = (selected: string[]) => {
     topBarSearchStore.setSelectedWorkspaces(selected);
 };
 
-const handleSelectItem = (item) => {
-    topBarSearchStore.addStagedWorkspace({
-        name: item.name,
-        label: item.label,
-        theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
-        isSelected: true,
-    });
+const handleSelectItem = (item:MenuItem) => {
+    if (item.name && typeof item.label === 'string') {
+        topBarSearchStore.addStagedWorkspace({
+            workspaceId: item.name,
+            label: item.label,
+            theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
+            isSelected: true,
+        });
+    }
     state.isActivatedSearchMenu = false;
 };
 
@@ -149,14 +150,14 @@ watch(() => state.searchText, (val) => {
                               direction="vertical"
             >
                 <p-tooltip v-for="workspace in storeState.stagedWorkspaces"
-                           :key="workspace.name"
+                           :key="workspace.workspaceId"
                            :contents="workspace.label"
                            position="bottom"
                            class="workspace-item-tooltip"
                 >
                     <p-checkbox
                         :selected="storeState.selectedWorkspaces"
-                        :value="workspace.name"
+                        :value="workspace.workspaceId"
                         :disabled="state.isAllSelected"
                         @change="handleSelected"
                     >
