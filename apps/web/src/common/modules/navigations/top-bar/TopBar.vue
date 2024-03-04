@@ -11,9 +11,7 @@ import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 
 import TopBarHeader from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarHeader.vue';
 import TopBarSearch from '@/common/modules/navigations/top-bar/modules/top-bar-search/TopBarSearch.vue';
@@ -29,7 +27,7 @@ const state = reactive({
     hasPermission: computed((() => store.getters['user/hasPermission'])),
     logoLink: computed(() => {
         if (state.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
-        return (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pageAccessPermissionList']) ? { name: ROOT_ROUTE._NAME } : null);
+        return null;
     }),
 });
 
@@ -75,10 +73,9 @@ const handleOpenMenu = (menuId: MenuId) => {
 
 <style lang="postcss" scoped>
 .top-bar {
-    @apply bg-white items-center;
+    @apply bg-white items-center border-b border-gray-200;
     display: flex !important;
     width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     &.admin-top-bar {
         @apply bg-violet-900;
