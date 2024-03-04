@@ -65,7 +65,7 @@ const state = reactive({
     tags: {},
     isTagsValid: true,
     projectForm: {} as ProjectForm,
-    isProjectFormValid: true,
+    isProjectFormValid: false,
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
