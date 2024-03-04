@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PDivider, PContextMenu } from '@spaceone/design-system';
+import { PDivider, PContextMenu, PDataLoader } from '@spaceone/design-system';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -16,6 +16,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import TopBarSearchEmpty
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
 import TopBarSearchWorkspaceFilter
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -55,9 +57,8 @@ const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     searchMenuList: computed(() => topBarSearchStore.state.searchMenuList),
-    refinedSearchMenu: computed(() => state.searchMenuList),
     recentMenuList: computed(() => topBarSearchStore.state.recentMenuList),
-    serviceMenuCount: computed(() => state.searchMenuList.length),
+    serviceMenuCount: computed(() => state.searchMenuList?.length ?? 0),
     currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     // focus
@@ -111,28 +112,37 @@ watch(() => contentsSize.height.value, (height) => {
              class="service-item-list"
         >
             <div ref="contentsRef">
-                <p-context-menu class="search-list-context"
-                                :menu="state.searchMenuList"
-                                no-select-indication
-                                @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'UPWARD')"
-                                @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'DOWNWARD')"
-                                @keyup:esc="emit('close')"
-                                @focus="emit('update:isFocused', true)"
-                                @blur="emit('update:isFocused', false)"
-                                @select="handleSelect"
+                <p-data-loader :loading="topBarSearchStore.state.loading"
+                               :data="state.searchMenuList"
                 >
-                    <template #item--format="{ item }">
-                        <slot name="item-format"
-                              v-bind="{item}"
+                    <p-context-menu class="search-list-context"
+                                    :menu="state.searchMenuList"
+                                    no-select-indication
+                                    @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'UPWARD')"
+                                    @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, 'DOWNWARD')"
+                                    @keyup:esc="emit('close')"
+                                    @focus="emit('update:isFocused', true)"
+                                    @blur="emit('update:isFocused', false)"
+                                    @select="handleSelect"
+                    >
+                        <template #item--format="{ item }">
+                            <slot name="item-format"
+                                  v-bind="{item}"
+                            />
+                        </template>
+                    </p-context-menu>
+                    <div v-if="state.inputText && state.serviceMenuCount >= props.searchLimit"
+                         class="too-many-results-wrapper"
+                    >
+                        <div class="dim-wrapper" />
+                        <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
+                    </div>
+                    <template #no-data>
+                        <top-bar-search-empty :input-text="state.inputText"
+                                              :is-recent="false"
                         />
                     </template>
-                </p-context-menu>
-                <div v-if="state.inputText && state.serviceMenuCount >= props.searchLimit"
-                     class="too-many-results-wrapper"
-                >
-                    <div class="dim-wrapper" />
-                    <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
-                </div>
+                </p-data-loader>
             </div>
         </div>
         <p-divider vertical />

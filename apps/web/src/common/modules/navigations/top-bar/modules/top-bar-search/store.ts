@@ -14,7 +14,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export interface StageWorkspace {workspaceId: string, label: string, theme?:string, isSelected: boolean}
-// activateTab과 resourceType의 맵
+
 export const tabResourceTypeMap = {
     serviceAccount: 'identity.ServiceAccount',
     project: 'identity.Project',
@@ -24,6 +24,7 @@ export const tabResourceTypeMap = {
 export type SearchTab = keyof typeof tabResourceTypeMap | 'service';
 
 interface TopBarSearchStoreState {
+    loading: boolean;
     isActivated: boolean;
     inputText: string;
     activateTab: SearchTab;
@@ -55,6 +56,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         workspaceMap: computed(() => allReferenceGetters.workspace),
     });
     const state = reactive<TopBarSearchStoreState>({
+        loading: false,
         isActivated: false,
         inputText: '',
         activateTab: 'service',
@@ -119,6 +121,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         },
         fetchSearchList: async (searchText: string, activateTab: SearchTab, workspaces) => {
             try {
+                state.loading = true;
                 const { results } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
                     resource_type: tabResourceTypeMap[activateTab],
                     keyword: searchText,
@@ -138,6 +141,8 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 state.searchMenuList = orderedResults ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
             }
         },
 
@@ -149,12 +154,12 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         () => getters.selectedWorkspaces,
     ], debounce(async ([trimmedText, activateTab, workspaces]) => {
         if (trimmedText) {
-            state.searchMenuList = actions.fetchSearchList(trimmedText, activateTab, workspaces);
+            await actions.fetchSearchList(trimmedText, activateTab, workspaces);
             // state.recentMenuList = fetchRecentList(trimmedText);
         } else {
             state.searchMenuList = [];
         }
-    }, 300, {
+    }, 500, {
         leading: true,
     }));
 
