@@ -9,7 +9,7 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
 
     account = this.generateProperty({ key: 'account', name: 'Asset Account' });
 
-    static _meta = {
+    static meta = {
         key: 'cloud_service',
         name: 'Cloud Service',
         resourceType: 'inventory.CloudService',
@@ -19,6 +19,6 @@ export default class CloudServiceVariableModel extends ResourceVariableModel<Clo
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = CloudServiceVariableModel._meta;
+        this._meta = CloudServiceVariableModel.meta;
     }
 }

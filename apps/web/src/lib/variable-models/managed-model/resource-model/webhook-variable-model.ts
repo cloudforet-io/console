@@ -5,7 +5,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class WebhookVariableModel extends ResourceVariableModel<WebhookModel> {
-    static _meta = {
+    static meta = {
         key: 'webhook',
         name: 'Webhook',
         resourceType: 'monitoring.Webhook',
@@ -15,7 +15,7 @@ export default class WebhookVariableModel extends ResourceVariableModel<WebhookM
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = WebhookVariableModel._meta;
+        this._meta = WebhookVariableModel.meta;
     }
 
     nameFormatter(): string {

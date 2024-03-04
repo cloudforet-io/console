@@ -4,8 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type {
-    ListQuery, ListResponse, IBaseVariableModel,
+    ListQuery, ListResponse,
+    VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -13,15 +15,23 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class AssetDataKeyVariableModel implements IBaseVariableModel {
-    _meta = {
+export default class AssetDataKeyVariableModel extends ResourceVariableModel {
+    static meta = {
         key: 'asset_data_key',
         name: 'Data Type (Asset)',
+        resourceType: 'inventory.CloudServiceQuerySet',
+        idKey: 'query_set_id',
+        nameKey: 'name',
     };
 
-    _dependencies = {
+    private dependencies = {
         cloud_service_query_set: 'query_set_id',
     };
+
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
+        this._meta = AssetDataKeyVariableModel.meta;
+    }
 
     #response: ListResponse = { results: [] };
 
@@ -31,7 +41,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            const dependencyOptions = getRefinedDependencyOptions(this._dependencies, query.options);
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 

@@ -7,7 +7,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 export default class CostDataSourceVariableModel extends ResourceVariableModel<CostDataSourceModel> {
     provider = this.generateProperty({ key: 'provider', name: 'Provider' });
 
-    static _meta = {
+    static meta = {
         key: 'cost_data_source',
         name: 'Data Source',
         resourceType: 'cost_analysis.DataSource',
@@ -17,6 +17,6 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = CostDataSourceVariableModel._meta;
+        this._meta = CostDataSourceVariableModel.meta;
     }
 }

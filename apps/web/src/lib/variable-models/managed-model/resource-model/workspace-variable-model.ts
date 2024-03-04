@@ -5,7 +5,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class WorkspaceVariableModel extends ResourceVariableModel<WorkspaceModel> {
-    static _meta = {
+    static meta = {
         key: 'workspace',
         name: 'Workspace',
         resourceType: 'identity.Workspace',
@@ -15,6 +15,6 @@ export default class WorkspaceVariableModel extends ResourceVariableModel<Worksp
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = WorkspaceVariableModel._meta;
+        this._meta = WorkspaceVariableModel.meta;
     }
 }

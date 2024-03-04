@@ -4,8 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import ResourceVariableModel from '@/lib/variable-models/_base/resource-variable-model';
 import type {
-    ListQuery, ListResponse, IBaseVariableModel,
+    ListQuery, ListResponse,
+    VariableModelConstructorConfig,
 } from '@/lib/variable-models/_base/types';
 import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
@@ -13,15 +15,23 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class CostAdditionalInfoKeyVariableModel implements IBaseVariableModel {
-    _meta = {
+export default class CostAdditionalInfoKeyVariableModel extends ResourceVariableModel {
+    static meta = {
         key: 'cost_additional_info_key',
         name: 'Cost Additional Info',
+        resourceType: 'cost_analysis.DataSource',
+        idKey: 'data_source_id',
+        nameKey: 'name',
     };
 
-    _dependencies = {
+    private dependencies = {
         cost_data_source: 'data_source_id',
     };
+
+    constructor(config: VariableModelConstructorConfig = {}) {
+        super(config);
+        this._meta = CostAdditionalInfoKeyVariableModel.meta;
+    }
 
     #response: ListResponse = { results: [] };
 
@@ -31,7 +41,7 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            const dependencyOptions = getRefinedDependencyOptions(this._dependencies, query.options);
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 

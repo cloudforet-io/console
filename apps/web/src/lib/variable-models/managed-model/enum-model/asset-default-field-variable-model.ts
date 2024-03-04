@@ -3,7 +3,7 @@ import type { VariableModelConstructorConfig } from '@/lib/variable-models/_base
 
 
 export default class AssetDefaultFieldVariableModel extends EnumVariableModel {
-    static _meta = {
+    static meta = {
         key: 'asset_default_field',
         name: 'Data Field (Cost)',
     };
@@ -19,6 +19,6 @@ export default class AssetDefaultFieldVariableModel extends EnumVariableModel {
 
     constructor(config: VariableModelConstructorConfig = {}) {
         super(config);
-        this._meta = AssetDefaultFieldVariableModel._meta;
+        this._meta = AssetDefaultFieldVariableModel.meta;
     }
 }
