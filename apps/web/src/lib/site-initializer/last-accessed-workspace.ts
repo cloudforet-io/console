@@ -6,7 +6,7 @@ import type { UserConfigModel } from '@/schema/config/user-config/model';
 
 const LAST_ACCESSED_WORKSPACE_KEY = 'console:last-accessed-workspace';
 
-export const setCurrentAccessedWorkspaceId = async (workspaceId: string): Promise<void> => {
+export const setCurrentAccessedWorkspaceId = async (workspaceId?: string): Promise<void> => {
     try {
         await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
             name: LAST_ACCESSED_WORKSPACE_KEY,

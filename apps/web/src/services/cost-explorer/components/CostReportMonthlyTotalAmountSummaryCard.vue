@@ -6,8 +6,9 @@ import {
 import { Root } from '@amcharts/amcharts5';
 import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import {
-    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI,
+    PSelectButton, PDatePagination, PDataTable, PSkeleton, PTextButton, PI, PTooltip,
 } from '@spaceone/design-system';
+import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -40,7 +41,6 @@ import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
 interface ChartData {
@@ -86,7 +86,7 @@ const state = reactive({
     ] as SelectButtonType[])),
     selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
-    currentDate: undefined as string | undefined,
+    currentDate: undefined as Dayjs | undefined,
     currentDateRangeText: computed<string>(() => {
         if (!state.currentDate) return '';
         return `${state.currentDate.startOf('month').format('YYYY-MM-DD')} ~ ${state.currentDate.endOf('month').format('YYYY-MM-DD')}`;
@@ -109,7 +109,7 @@ const state = reactive({
             },
         };
     })),
-    tableFields: computed<Field[]>(() => ([
+    tableFields: computed<DataTableFieldType[]>(() => ([
         { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
         { name: 'value_sum', label: 'Amount', textAlign: 'right' },
     ])),
@@ -320,21 +320,33 @@ watch(() => state.currentDate, () => {
                                 <span class="toggle-button"
                                       :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
                                 />
-                                {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                                <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
+                                           position="bottom"
+                                >
+                                    {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                                </p-tooltip>
                             </span>
                             <span v-else-if="field.name === GROUP_BY.PROVIDER">
                                 <span class="toggle-button"
                                       :style="{ 'background-color': storeState.providers[value]?.color ?? DEFAULT_CHART_COLORS[rowIndex] }"
                                 />
-                                {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                                <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
+                                           position="bottom"
+                                >
+                                    {{ storeState.providers[value] ? storeState.providers[value].name : value }}
+                                </p-tooltip>
                             </span>
                         </template>
                         <template #col-value_sum-format="{ value }">
-                            <span v-if="costReportPageGetters.currency"
-                                  class="amount-col"
+                            <p-tooltip :contents="currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) ?? ''"
+                                       position="bottom"
                             >
-                                {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
-                            </span>
+                                <span v-if="costReportPageGetters.currency"
+                                      class="amount-col"
+                                >
+                                    {{ currencyMoneyFormatter(value, { currency: costReportPageGetters.currency }) }}
+                                </span>
+                            </p-tooltip>
                         </template>
                     </p-data-table>
                 </div>
@@ -413,6 +425,17 @@ watch(() => state.currentDate, () => {
     }
     .summary-data-table {
         max-height: 19rem;
+    }
+}
+
+/* custom design-system component - p-data-table */
+:deep(.summary-data-table) {
+    table {
+        width: 100%;
+    }
+    td {
+        @apply truncate;
+        width: 100%;
     }
 }
 
