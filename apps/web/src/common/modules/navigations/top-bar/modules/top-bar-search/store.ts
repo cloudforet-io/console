@@ -25,6 +25,7 @@ export type SearchTab = keyof typeof tabResourceTypeMap | 'service';
 
 interface TopBarSearchStoreState {
     loading: boolean;
+    allWorkspacesChecked: boolean;
     isActivated: boolean;
     inputText: string;
     activateTab: SearchTab;
@@ -57,6 +58,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     });
     const state = reactive<TopBarSearchStoreState>({
         loading: false,
+        allWorkspacesChecked: false,
         isActivated: false,
         inputText: '',
         activateTab: 'service',
@@ -127,7 +129,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                     keyword: searchText,
                     workspaces,
                     limit: 15,
-                    all_workspaces: false,
+                    all_workspaces: state.allWorkspacesChecked,
                 });
                 let orderedResults = results;
                 if (storeState.currentWorkspaceId !== undefined) {
@@ -152,6 +154,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         () => getters.trimmedInputText,
         () => state.activateTab,
         () => getters.selectedWorkspaces,
+        () => state.isActivated,
     ], debounce(async ([trimmedText, activateTab, workspaces]) => {
         if (trimmedText) {
             await actions.fetchSearchList(trimmedText, activateTab, workspaces);
