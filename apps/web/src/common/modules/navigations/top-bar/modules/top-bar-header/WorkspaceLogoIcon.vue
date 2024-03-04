@@ -7,7 +7,7 @@ import type { TopBarLogoIconTheme } from '@/common/modules/navigations/top-bar/t
 interface Props {
     theme?: TopBarLogoIconTheme;
     text: string;
-    size?: 'xs'|'sm'|'md';
+    size?: 'xxs'|'xs'|'sm'|'md';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,8 +32,18 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .workspace-logo-icon {
-    @apply flex items-center justify-center text-white  font-bold;
+    @apply flex items-center justify-center text-white font-bold;
     border-radius: 0.375rem;
+    &.xxs {
+        @apply text-label-sm rounded-xs;
+        line-height: 0.9375rem;
+        width: 0.875rem;
+        height: 0.875rem;
+        &.english-logo {
+            font-size: 0.625rem;
+            line-height: 0.78125rem;
+        }
+    }
     &.xs {
         @apply text-label-sm;
         width: 1.25rem;
