@@ -4,14 +4,18 @@ import {
 } from 'vue';
 
 import {
-    PContextMenu, PI, PTooltip, PTextHighlighting,
+    PContextMenu, PI, PTooltip, PTextHighlighting, PLazyImg,
 } from '@spaceone/design-system';
 
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+import type {
+    FavoriteMenuItem,
+} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavorite.vue';
 
 interface Props {
-    items: SuggestionItem[];
+    items: SuggestionItem[] | FavoriteMenuItem [];
     inputText?: string;
     isFocused?: boolean;
     focusingDirection?: FocusingDirection;
@@ -79,7 +83,13 @@ onUnmounted(() => {
                        position="bottom"
             >
                 <span class="image">
-                    <p-i :name="item.itemIcon"
+                    <p-lazy-img v-if="item.itemType === FAVORITE_TYPE.CLOUD_SERVICE"
+                                :src="item.itemIcon || ''"
+                                width="1rem"
+                                height="1rem"
+                    />
+                    <p-i v-else
+                         :name="item.itemIcon"
                          width="1rem"
                          height="1rem"
                     />

@@ -9,10 +9,10 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import TopBarAdminToggleButton from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-admin-toggle-button/TopBarAdminToggleButton.vue';
+import TopBarFavorite
+    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/TopBarFavorite.vue';
 import TopBarNoti from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-noti/TopBarNoti.vue';
 import TopBarProfile from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
-import TopBarRecentFavorite
-    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-recent-favorite/TopBarRecentFavorite.vue';
 
 const props = withDefaults(defineProps<{
     openedMenu?: string|null;
@@ -55,9 +55,9 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
         <p-tooltip :contents="state.tooltipTexts.recentFavorite"
                    position="bottom"
         >
-            <top-bar-recent-favorite v-if="!state.isAdminMode && !state.isGrantLoading"
-                                     :visible="props.openedMenu === 'recentFavorite'"
-                                     @update:visible="updateOpenedMenu('recentFavorite', $event)"
+            <top-bar-favorite v-if="!state.isAdminMode && !state.isGrantLoading"
+                              :visible="props.openedMenu === 'recentFavorite'"
+                              @update:visible="updateOpenedMenu('recentFavorite', $event)"
             />
         </p-tooltip>
         <p-tooltip :contents="state.tooltipTexts.notifications"
