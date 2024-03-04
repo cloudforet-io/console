@@ -14,7 +14,10 @@ import type { CostReportListParameters } from '@/schema/cost-analysis/cost-repor
 import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
 import type { RoleType } from '@/schema/identity/role/type';
 
+import type { Currency } from '@/store/modules/settings/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface CostReportItem extends CostReportModel {
     recipients?: {
@@ -44,7 +47,7 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         reportItem: {} as CostReportItem,
     });
     const getters = reactive({
-        currency: computed<string|undefined>(() => state.costReportConfig?.currency),
+        currency: computed<Currency|undefined>(() => state.costReportConfig?.currency),
         language: computed<string|undefined>(() => state.costReportConfig?.language),
         issueDay: computed<number>(() => state.costReportConfig?.issue_day ?? 10),
         reportItemData: computed<CostReportItem>(() => ({
