@@ -1,20 +1,17 @@
 <script lang="ts" setup>
+import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, reactive, defineEmits,
+    defineEmits,
 } from 'vue';
 
 import {
-    PI, PTab,
+    PI,
 } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import TopBarFavorite
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavorite.vue';
-import TopBarRecent
-    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarRecent.vue';
 
 interface Props {
     visible: boolean
@@ -25,14 +22,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
-
-const state = reactive({
-    tabs: computed(() => ([
-        { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
-        { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
-    ] as TabItem[])),
-    activeTab: 'recent',
-});
 
 const setVisible = (visible: boolean) => {
     emit('update:visible', visible);
@@ -58,7 +47,7 @@ const handleRecentFavoriteButtonClick = () => {
 </script>
 
 <template>
-    <div v-click-outside="hideRecentFavoriteMenu"
+    <div v-on-click-outside="hideRecentFavoriteMenu"
          class="top-bar-recent-favorite"
          @click.stop
          @keydown.esc="hideRecentFavoriteMenu"
@@ -70,25 +59,17 @@ const handleRecentFavoriteButtonClick = () => {
               @click.stop="handleRecentFavoriteButtonClick"
         >
             <p-i class="menu-icon"
-                 name="ic_gnb_recent-favorite"
+                 name="ic_star"
                  height="1.375rem"
                  width="1.375rem"
                  color="inherit"
             />
         </span>
-        <p-tab v-show="visible"
-               :tabs="state.tabs"
-               :active-tab.sync="state.activeTab"
+        <div v-show="visible"
+             class="favorite-content"
         >
-            <template #recent>
-                <top-bar-recent :visible="props.visible && state.activeTab === 'recent'"
-                                @close="hideRecentFavoriteMenu"
-                />
-            </template>
-            <template #favorite>
-                <top-bar-favorite @close="hideRecentFavoriteMenu" />
-            </template>
-        </p-tab>
+            <top-bar-favorite @close="hideRecentFavoriteMenu" />
+        </div>
     </div>
 </template>
 
@@ -112,8 +93,7 @@ const handleRecentFavoriteButtonClick = () => {
         }
     }
 
-    /* custom design-system component - p-tab */
-    :deep(.p-tab) {
+    .favorite-content {
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;
@@ -124,9 +104,6 @@ const handleRecentFavoriteButtonClick = () => {
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
         margin-right: -0.5rem;
         z-index: 1000;
-        .tab-pane {
-            padding-bottom: 0;
-        }
     }
 }
 </style>

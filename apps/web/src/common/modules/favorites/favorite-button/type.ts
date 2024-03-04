@@ -17,7 +17,7 @@ export interface FavoriteOptions {
 
 export interface FavoriteConfig {
     type: FavoriteType;
-    workspaceId: string;
+    workspace_id: string;
     id: string;
 }
 
