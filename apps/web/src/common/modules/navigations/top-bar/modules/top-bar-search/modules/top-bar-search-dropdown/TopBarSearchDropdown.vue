@@ -4,8 +4,10 @@ import type Vue from 'vue';
 import { computed, reactive, ref } from 'vue';
 
 import {
-    PTab, screens,
+    PTab, screens, PLazyImg,
 } from '@spaceone/design-system';
+
+import { store } from '@/store';
 
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
@@ -48,8 +50,12 @@ const getTabHeaderHeight = () => {
     return 0;
 };
 
+const storeState = reactive({
+    activeTab: computed(() => topBarSearchStore.state.activeTab),
+    cloudServiceTypeMap: computed(() => store.state.reference.cloudServiceType.items),
+});
+
 const state = reactive({
-    activeTab: computed(() => topBarSearchStore.state.activateTab),
     tabs: [
         { label: 'Service', name: 'service' },
         { label: 'Service Account', name: 'serviceAccount' },
@@ -90,7 +96,7 @@ const handleMoveFocusEnd = () => {
 
 const handleUpdateActiveTab = (tab: SearchTab) => {
     topBarSearchStore.$patch((_state) => {
-        _state.state.activateTab = tab;
+        _state.state.activeTab = tab;
     });
 };
 
@@ -108,7 +114,7 @@ const handleUpdateContentsSize = (height: number) => {
             <slot name="search-input" />
         </div>
         <p-tab ref="tabRef"
-               :active-tab="state.activeTab"
+               :active-tab="storeState.activeTab"
                :tabs="state.tabs"
                :style="{ height: state.tabHeight ? state.tabHeight + 'px': undefined}"
                @update:activeTab="handleUpdateActiveTab"
@@ -198,7 +204,15 @@ const handleUpdateContentsSize = (height: number) => {
                                                   icon-name="ic_service_service-account"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
-                        />
+                        >
+                            <template #icon>
+                                <p-lazy-img :src="item?.resource_id ? storeState.cloudServiceTypeMap[item?.resource_id]?.icon : ''"
+                                            width="1.25rem"
+                                            height="1.25rem"
+                                            style="margin-right: 0.375rem"
+                                />
+                            </template>
+                        </top-bar-search-list-item>
                     </template>
                 </search-tab-content>
             </template>
