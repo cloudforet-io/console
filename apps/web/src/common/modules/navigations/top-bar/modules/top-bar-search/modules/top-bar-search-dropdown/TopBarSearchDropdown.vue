@@ -124,6 +124,7 @@ const handleUpdateContentsSize = (height: number) => {
             </template>
             <template #serviceAccount>
                 <search-tab-content
+                    key="serviceAccount"
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
@@ -132,7 +133,8 @@ const handleUpdateContentsSize = (height: number) => {
                     @update:contents-size="handleUpdateContentsSize"
                 >
                     <template #item-format="{item}">
-                        <top-bar-search-list-item :label="item?.name"
+                        <top-bar-search-list-item key="serviceAccount"
+                                                  :label="item?.name"
                                                   icon-name="ic_service_service-account"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
@@ -142,6 +144,7 @@ const handleUpdateContentsSize = (height: number) => {
             </template>
             <template #project>
                 <search-tab-content
+                    key="project"
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
@@ -150,12 +153,18 @@ const handleUpdateContentsSize = (height: number) => {
                     @update:contents-size="handleUpdateContentsSize"
                 >
                     <template #item-format="{item}">
-                        <div>{{ item?.name }}</div>
+                        <top-bar-search-list-item key="project"
+                                                  :label="item?.name"
+                                                  icon-name="ic_service_service-account"
+                                                  :workspace-id="item?.workspace_id"
+                                                  :description="item?.description"
+                        />
                     </template>
                 </search-tab-content>
             </template>
             <template #dashboard>
                 <search-tab-content
+                    key="dashboard"
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
@@ -164,12 +173,18 @@ const handleUpdateContentsSize = (height: number) => {
                     @update:contents-size="handleUpdateContentsSize"
                 >
                     <template #item-format="{item}">
-                        <div>{{ item?.name }}</div>
+                        <top-bar-search-list-item key="dashboard"
+                                                  :label="item?.name"
+                                                  icon-name="ic_service_service-account"
+                                                  :workspace-id="item?.workspace_id"
+                                                  :description="item?.description"
+                        />
                     </template>
                 </search-tab-content>
             </template>
             <template #cloudService>
                 <search-tab-content
+                    key="cloudService"
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
@@ -178,7 +193,12 @@ const handleUpdateContentsSize = (height: number) => {
                     @update:contents-size="handleUpdateContentsSize"
                 >
                     <template #item-format="{item}">
-                        <div>{{ item?.name }}</div>
+                        <top-bar-search-list-item key="cloudService"
+                                                  :label="item?.name"
+                                                  icon-name="ic_service_service-account"
+                                                  :workspace-id="item?.workspace_id"
+                                                  :description="item?.description"
+                        />
                     </template>
                 </search-tab-content>
             </template>

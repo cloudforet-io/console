@@ -81,7 +81,10 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     });
 
     const actions = {
-        setIsActivated: (isActivated: boolean, initSearch = true) => {
+        setIsActivated: (isActivated: boolean, options?:{
+            initSearch?: boolean,
+        }) => {
+            const { initSearch = true } = options || {};
             state.isActivated = isActivated;
             if (initSearch) {
                 actions.initSearch();
@@ -155,16 +158,14 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         () => state.activateTab,
         () => getters.selectedWorkspaces,
         () => state.isActivated,
-    ], debounce(async ([trimmedText, activateTab, workspaces]) => {
+    ], debounce(async ([trimmedText, activateTab, workspaces, active]) => {
         if (trimmedText) {
             await actions.fetchSearchList(trimmedText, activateTab, workspaces);
             // state.recentMenuList = fetchRecentList(trimmedText);
         } else {
             state.searchMenuList = [];
         }
-    }, 500, {
-        leading: true,
-    }));
+    }, 500));
 
 
     return {
