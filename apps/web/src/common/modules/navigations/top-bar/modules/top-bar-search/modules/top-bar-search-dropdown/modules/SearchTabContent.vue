@@ -6,6 +6,8 @@ import {
 
 import { PDivider, PContextMenu, PDataLoader } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -53,7 +55,9 @@ const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     searchMenuList: computed(() => topBarSearchStore.state.searchMenuList),
-    recentMenuList: computed(() => topBarSearchStore.state.recentMenuList),
+    recentMenuList: computed(() => [
+        { name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.RECENTLY_VIEWED'), type: 'header' },
+        ...topBarSearchStore.state.recentMenuList]),
     serviceMenuCount: computed(() => state.searchMenuList?.length ?? 0),
     currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),

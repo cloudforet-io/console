@@ -146,7 +146,7 @@ watch(() => state.searchText, (val) => {
         </div>
         <div class="workspace-filter-wrapper">
             <p class="filter-list-header">
-                {{ $t('Filter by Workspace') }}
+                {{ $t('COMMON.NAVIGATIONS.TOP_BAR.FILTER_BY_WORKSPACE') }}
             </p>
             <p-checkbox-group class="checkbox-group"
                               direction="vertical"
@@ -186,7 +186,7 @@ watch(() => state.searchText, (val) => {
                            :disabled="storeState.stagedWorkspaces.length >= STAGED_WORKSPACE_LIMIT || storeState.isAllSelected"
                            @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
             >
-                {{ $t('Show more') }}
+                {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
             </p-text-button>
             <div v-if="storeState.stagedWorkspaces.length < STAGED_WORKSPACE_LIMIT">
                 <p-context-menu v-if="state.isActivatedSearchMenu"
@@ -215,13 +215,13 @@ watch(() => state.searchText, (val) => {
                  class="limit-description-card"
             >
                 <scoped-notification type="warning"
-                                     :title="$t('You can filter by a maximum of 5 workspaces.')"
+                                     :title="$t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_TITLE')"
                                      title-icon="ic_warning-filled"
                                      :visible="true"
                                      layout="insection"
                                      hide-header-close-button
                 >
-                    <span class="text">{{ $t('Please unselect at least one workspace before making a new selection.') }}</span>
+                    <span class="text">{{ $t('COMMON.NAVIGATIONS.TOP_BAR.WORKSPACE_FILTER_WARNING_DESC') }}</span>
                 </scoped-notification>
             </div>
         </div>
