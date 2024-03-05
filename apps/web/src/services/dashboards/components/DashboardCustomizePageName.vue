@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
