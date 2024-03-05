@@ -14,7 +14,7 @@ export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 type VariableSelectionType = 'SINGLE' | 'MULTI';
 
 // NOTE: add addtional types (custom, extension)
-type TemplateType = 'MANAGED';
+export type TemplateType = 'MANAGED';
 
 interface DashboardVariableOptions {
     type: VariableModelType;
@@ -74,8 +74,8 @@ export interface DashboardTemplate {
     settings: DashboardSettings;
     variables_schema: DashboardVariablesSchema;
     labels: string[];
-    template_id?: string;
-    template_type?: TemplateType;
+    template_id: string;
+    template_type: TemplateType;
     display_info?: {
         icon?: string;
         preview_image?: string;
