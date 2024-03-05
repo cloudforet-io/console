@@ -221,6 +221,7 @@ watch(() => props.dashboardList, () => {
 .dashboard-board-list {
     @apply w-full flex-grow;
     margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
 
     .p-field-title {
         margin-bottom: 0.5rem;
