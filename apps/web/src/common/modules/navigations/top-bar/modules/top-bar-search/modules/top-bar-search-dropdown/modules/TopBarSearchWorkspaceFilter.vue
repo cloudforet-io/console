@@ -21,10 +21,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
-import type { StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import {
     useTopBarSearchStore,
 } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;

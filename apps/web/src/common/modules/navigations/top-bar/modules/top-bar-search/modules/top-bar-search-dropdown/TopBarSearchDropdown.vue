@@ -2,6 +2,7 @@
 import { useElementSize, useWindowSize } from '@vueuse/core';
 import type Vue from 'vue';
 import { computed, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PTab, screens, PLazyImg,
@@ -9,14 +10,15 @@ import {
 
 import { store } from '@/store';
 
+import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchListItem
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchListItem.vue';
 import TopBarSearchServiceTab
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceTab.vue';
-import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
+import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 
 
@@ -32,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(event: 'move-focus-end'): void;
 }>();
+const router = useRouter();
 
 const SEARCH_LIMIT = 15;
 const BOTTOM_MARGIN = 5.5 * 16;
@@ -104,6 +107,16 @@ const handleUpdateContentsSize = (height: number) => {
     state.contentsHeight = height;
 };
 
+const handleSelect = (item) => {
+    if (topBarSearchStore.state.activeTab === 'cloudService') {
+        router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
+    } else if (topBarSearchStore.state.activeTab !== 'service') router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+
+    // if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.DEFAULT_SERVICE, menuId, workspaceStoreGetter.currentWorkspaceId);
+
+    topBarSearchStore.setIsActivated(false);
+};
+
 </script>
 
 <template>
@@ -126,6 +139,7 @@ const handleUpdateContentsSize = (height: number) => {
                     :is-focused="props.isFocused"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
+                    @select="handleSelect"
                 />
             </template>
             <template #serviceAccount>
@@ -137,6 +151,7 @@ const handleUpdateContentsSize = (height: number) => {
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                     @update:contents-size="handleUpdateContentsSize"
+                    @select="handleSelect"
                 >
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="serviceAccount"
@@ -157,6 +172,7 @@ const handleUpdateContentsSize = (height: number) => {
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                     @update:contents-size="handleUpdateContentsSize"
+                    @select="handleSelect"
                 >
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="project"
@@ -177,6 +193,7 @@ const handleUpdateContentsSize = (height: number) => {
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                     @update:contents-size="handleUpdateContentsSize"
+                    @select="handleSelect"
                 >
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="dashboard"
@@ -197,6 +214,7 @@ const handleUpdateContentsSize = (height: number) => {
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                     @update:contents-size="handleUpdateContentsSize"
+                    @select="handleSelect"
                 >
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="cloudService"
