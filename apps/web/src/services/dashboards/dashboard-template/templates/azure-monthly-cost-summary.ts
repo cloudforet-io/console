@@ -34,6 +34,8 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Azure Monthly Cost Summary',
+    template_id: 'azureMonthlyCostSummary',
+    template_type: 'MANAGED',
     labels: [DASHBOARD_LABELS.AZURE, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {

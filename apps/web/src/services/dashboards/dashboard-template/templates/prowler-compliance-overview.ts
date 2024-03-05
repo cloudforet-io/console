@@ -33,7 +33,16 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     name: 'Prowler Compliance Overview',
-    labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.AZURE, DASHBOARD_LABELS.GOOGLE, DASHBOARD_LABELS.PROWLER, DASHBOARD_LABELS.SECURITY, DASHBOARD_LABELS.CSPM],
+    template_id: 'prowlerComplianceOverview',
+    template_type: 'MANAGED',
+    labels: [
+        DASHBOARD_LABELS.AWS,
+        DASHBOARD_LABELS.AZURE,
+        DASHBOARD_LABELS.GOOGLE,
+        // DASHBOARD_LABELS.PROWLER,
+        DASHBOARD_LABELS.SECURITY,
+        // DASHBOARD_LABELS.CSPM
+    ],
     version: '1',
     display_info: {
         icon: 'ic_dashboard-template_compliance',
