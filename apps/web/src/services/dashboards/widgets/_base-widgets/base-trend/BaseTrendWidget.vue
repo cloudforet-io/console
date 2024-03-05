@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 import type { Location } from 'vue-router/types/router';
 
 import type { Series } from '@amcharts/amcharts5';
@@ -21,7 +22,11 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import {
+    arrayToQueryString,
+    objectToQueryString,
+    primitiveToQueryString,
+} from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -40,12 +45,15 @@ import {
     getDateAxisSettings,
     getXYChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
+import {
+    getWidgetDataTableRowLocation,
+    getWidgetLocationFilters,
+} from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
@@ -68,6 +76,7 @@ type Response = CostAnalyzeResponse<Data>;
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
+const router = useRouter();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -341,6 +350,11 @@ const handleUpdateThisPage = (_thisPage: number) => {
     state.data = undefined; // to disable next page button before fetching data
     refreshWidget(_thisPage);
 };
+const handleClickRow = (rowData: WidgetTableData) => {
+    if (!widgetState.dataField) return;
+    const _rowLocation = getWidgetDataTableRowLocation(rowData, widgetState.widgetLocation, [widgetState.dataField]);
+    if (_rowLocation) window.open(router.resolve(_rowLocation).href, '_blank');
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -398,6 +412,7 @@ defineExpose<WidgetExpose<Response>>({
                                :show-legend="state.showLegendsOnTable"
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"
+                               @click-row="handleClickRow"
             />
         </div>
     </widget-frame>

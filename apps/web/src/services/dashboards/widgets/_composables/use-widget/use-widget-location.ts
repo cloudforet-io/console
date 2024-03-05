@@ -5,10 +5,8 @@ import type { Location } from 'vue-router/types/router';
 import { flattenDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -19,6 +17,7 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constant
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -93,19 +92,4 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
     });
 
     return Object.hasOwn(overrides, 'widgetLocation') ? overrides.widgetLocation : widgetLocation;
-};
-
-
-/**
- * @name getWidgetLocationFilters
- * @param widgetFilters
- * @example { provider: [{k: 'provider', v: ['aws', 'google'], o: '='}] }
- * => [{k: 'provider', v: ['aws', 'google'], o: '='}, {k: 'product', v: ['AWSELB'], o: '='}]
- */
-export const getWidgetLocationFilters = (widgetFilters?: WidgetFiltersMap): ConsoleFilter[] => {
-    const consoleFilters: ConsoleFilter[] = [];
-    Object.values(widgetFilters ?? {}).forEach((filterItems) => {
-        consoleFilters.push(...filterItems);
-    });
-    return consoleFilters;
 };

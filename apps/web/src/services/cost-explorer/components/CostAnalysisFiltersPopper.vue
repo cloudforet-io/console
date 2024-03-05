@@ -71,6 +71,7 @@ const state = reactive({
     }),
 });
 
+/* Util */
 const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
         let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -102,7 +103,22 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
         return async () => ({ results: [] });
     }
 };
+const initSelectedFilters = () => {
+    const _filters = costAnalysisPageState.filters;
+    const _selectedItemsMap = {};
+    Object.keys(_filters ?? {}).forEach((groupBy) => {
+        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d })) ?? [];
+        if (costAnalysisPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
+            costAnalysisPageStore.setEnabledFiltersProperties([
+                ...(costAnalysisPageState.enabledFiltersProperties ?? []),
+                groupBy,
+            ]);
+        }
+    });
+    state.selectedItemsMap = _selectedItemsMap;
+};
 
+/* Event */
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
     selectedItemsMap[groupBy] = selectedItems;
@@ -138,12 +154,7 @@ const handleClickResetFilters = () => {
 
 watch(() => props.visible, (visible) => {
     if (!visible) return;
-    const filters = costAnalysisPageState.filters;
-    const selectedItemsMap = {};
-    Object.keys(filters ?? {}).forEach((groupBy) => {
-        selectedItemsMap[groupBy] = filters?.[groupBy].map((d) => ({ name: d })) ?? [];
-    });
-    state.selectedItemsMap = selectedItemsMap;
+    initSelectedFilters();
 }, { immediate: true });
 
 </script>
