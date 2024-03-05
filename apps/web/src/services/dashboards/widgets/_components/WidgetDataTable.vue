@@ -48,7 +48,8 @@ interface Props {
     allReferenceTypeInfo?: AllReferenceTypeInfo;
     colorSet?: string[];
     disableToggle?: boolean;
-    disableEllipsis?: boolean
+    disableEllipsis?: boolean;
+    disableRowClick?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -257,6 +258,7 @@ watch(() => props.legends, () => {
                             <tr v-for="(item, rowIndex) in props.items"
                                 :key="`tr-${props.widgetKey}-${rowIndex}`"
                                 :data-index="rowIndex"
+                                :class="{'cursor-pointer': !props.disableRowClick}"
                                 @click="handleClickRow({rowIndex, item})"
                             >
                                 <td v-for="(field, colIndex) in props.fields"
