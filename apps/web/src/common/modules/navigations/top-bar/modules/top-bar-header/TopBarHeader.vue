@@ -142,32 +142,33 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                 <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
                                      :theme="state.selectedWorkspace?.tags?.theme"
                 />
-                <p-tooltip position="bottom"
-                           :contents="state.selectedWorkspace?.name ?? ''"
-                >
+                <div>
                     <span class="selected-workspace">
                         {{ state.selectedWorkspace?.name }}
                     </span>
                     <span class="tablet-selected">
                         ...
                     </span>
-                </p-tooltip>
+                </div>
             </template>
             <template #menu-header>
-                <div class="menu-header-selected-workspace">
+                <p-tooltip class="menu-header-selected-workspace"
+                           position="bottom"
+                           :contents="state.selectedWorkspace?.name || ''"
+                >
                     <div class="workspace-wrapper">
                         <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
                                              :theme="state.selectedWorkspace?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ state.selectedWorkspace?.name }}</span>
+                        <span class="workspace-name">{{ state.selectedWorkspace?.name }}</span>
                     </div>
                     <p-i name="ic_check"
                          :color="violet[600]"
                          width="1rem"
                          height="1rem"
                     />
-                </div>
+                </p-tooltip>
             </template>
             <template #menu-item--format="{item}">
                 <div class="menu-item-wrapper">
@@ -219,10 +220,10 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 <style scoped lang="postcss">
 .top-bar-header {
     @apply inline-flex items-center w-full h-full;
-    max-width: 16.25rem;
-    width: 16.25rem;
+    max-width: 20rem;
+    width: 20rem;
     height: 1.75rem;
-    padding-left: 1.25rem;
+    margin-left: 1.25rem;
 
     &.admin-mode {
         width: 100%;
@@ -269,12 +270,29 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         }
 
         .menu-header-selected-workspace {
-            @apply flex items-center justify-between text-label-md font-medium;
-            padding: 0.875rem 1rem;
-            border-bottom: 3px solid #dddddf;
+            @apply relative flex items-center justify-between text-label-md font-medium;
+            margin: 0.875rem 1rem;
             .workspace-wrapper {
                 @apply flex items-center;
+                flex: 1;
                 gap: 0.75rem;
+                .workspace-name {
+                    flex: 1;
+                    max-width: 13.25rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+            }
+            &::before {
+                @apply absolute;
+                content: "";
+                width: calc(100% + 2rem);
+                bottom: -0.875rem;
+                left: -1rem;
+                border-bottom: 3px solid #dddddf;
             }
         }
 
@@ -322,6 +340,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
             margin-top: -0.125rem;
             margin-left: 0;
             .menu-container {
+                max-height: calc(85vh - 3.125rem) !important;
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
             }
@@ -352,7 +371,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
         .selected-workspace {
             @apply text-label-lg text-gray-800 inline-block font-medium;
-            max-width: 9.1875rem;
+            max-width: 16rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
