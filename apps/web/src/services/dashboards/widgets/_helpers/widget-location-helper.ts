@@ -1,6 +1,14 @@
+import type { Location } from 'vue-router/types/router';
+
+import { cloneDeep } from 'lodash';
+
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+
+import { arrayToQueryString, queryStringToArray } from '@/lib/router-query-string';
+
+import type { WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 
 
@@ -16,4 +24,23 @@ export const getWidgetLocationFilters = (widgetFilters?: WidgetFiltersMap): Cons
         consoleFilters.push(...filterItems);
     });
     return consoleFilters;
+};
+
+
+export const getWidgetDataTableRowLocation = (rowData?: WidgetTableData, widgetLocation?: Location, targetFields?: string[]): Location|undefined => {
+    if (!rowData?.item || !widgetLocation || !targetFields?.length) return undefined;
+    const _widgetLocation = cloneDeep(widgetLocation);
+    const _queryFilters = queryStringToArray(_widgetLocation.query?.filters) ?? [];
+    targetFields.forEach((field) => {
+        if (rowData?.item[field]) {
+            _queryFilters.push({ k: field, v: [rowData.item[field]], o: '=' });
+        }
+    });
+    return {
+        ..._widgetLocation,
+        query: {
+            ..._widgetLocation.query,
+            filters: arrayToQueryString(_queryFilters),
+        },
+    };
 };
