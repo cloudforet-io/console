@@ -174,9 +174,6 @@ watch(() => contentsSize.height.value, (height) => {
                     justify-content: flex-start;
                     line-height: 1.75;
                     padding: 0.25rem 0.5rem;
-                    .label-wrapper {
-                        overflow: visible;
-                    }
 
                     &:focus {
                         @apply border border-blue-400 rounded-xs;
