@@ -155,7 +155,7 @@ const handleUpdateContentsSize = (height: number) => {
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="project"
                                                   :label="item?.name"
-                                                  icon-name="ic_service_service-account"
+                                                  icon-name="ic_document-filled"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
                         />
@@ -175,7 +175,7 @@ const handleUpdateContentsSize = (height: number) => {
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="dashboard"
                                                   :label="item?.name"
-                                                  icon-name="ic_service_service-account"
+                                                  icon-name="ic_service_dashboard"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
                         />

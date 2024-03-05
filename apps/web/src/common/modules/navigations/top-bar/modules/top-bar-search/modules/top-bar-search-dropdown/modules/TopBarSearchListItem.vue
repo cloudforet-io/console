@@ -61,7 +61,7 @@ const handleClickLink = (workspaceId:string) => {
             <div v-if="props.iconName"
                  class="icon-background"
             >
-                <p-i name="ic_service_service-account"
+                <p-i :name="props.iconName"
                      width="1.25rem"
                      height="1.25rem"
                 />
