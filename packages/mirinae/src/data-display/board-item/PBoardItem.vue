@@ -165,10 +165,17 @@ export default defineComponent<BoardItemProps>({
             border-radius: inherit;
             content: '';
         }
+        .overlay-icon-button {
+            @apply bg-blue-200;
+        }
     }
 
     &:hover {
         @apply bg-blue-100;
+
+        .overlay-icon-button {
+            @apply bg-blue-100;
+        }
     }
 
     .content-area {
