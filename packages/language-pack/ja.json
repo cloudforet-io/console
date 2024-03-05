@@ -2137,6 +2137,7 @@
 			"ACTION": "作業",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "",
 			"DELETE": "削除",
 			"DELETE_WORKSPACE": "削除",
 			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
