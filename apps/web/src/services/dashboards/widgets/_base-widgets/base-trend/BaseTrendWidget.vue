@@ -25,14 +25,13 @@ import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import {
     arrayToQueryString,
     objectToQueryString,
-    primitiveToQueryString, queryStringToArray, queryStringToObject,
+    primitiveToQueryString,
 } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -48,7 +47,7 @@ import {
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
     getWidgetDataTableRowLocation,
-    getWidgetLocationFilters
+    getWidgetLocationFilters,
 } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     getRefinedDateTableData, getWidgetTableDateFields,
