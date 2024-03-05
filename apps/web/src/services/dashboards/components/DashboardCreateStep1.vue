@@ -1,11 +1,11 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
     PSearch, PFieldTitle, PEmpty,
 } from '@spaceone/design-system';
 
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -19,21 +19,20 @@ import DashboardCreateTemplateBoard from '@/services/dashboards/components/Dashb
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
+
 const emit = defineEmits<{(e: 'select-template', value: DashboardModel)}>();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    outOfTheBoxTemplateSets: computed(() => {
-        const templates = Object.values(DASHBOARD_TEMPLATES);
-        return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
-            && (filterState.inputValue === '' || template.name.includes(filterState.inputValue)));
+    outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
+        const _templates = Object.values(DASHBOARD_TEMPLATES);
+        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels);
     }),
-    exstingTemplateSets: computed(() => {
-        const templates = dashboardGetters.allItems;
-        return templates.filter((template) => (filterState.selectedLabels.length === 0 || template.labels.some((label) => filterState.selectedLabels.map((sel) => sel.label).includes(label)))
-            && (filterState.inputValue === '' || template.name.includes(filterState.inputValue)));
+    existingTemplateSets: computed<DashboardTemplate[]>(() => {
+        const _templates = dashboardGetters.allItems;
+        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels);
     }),
 });
 
@@ -42,6 +41,14 @@ const filterState = reactive({
     selectedLabels: [] as TemplateLabelItem[],
 });
 
+/* Util */
+const getFilteredTemplates = (templates: DashboardTemplate[], inputValue: string, selectedLabels: TemplateLabelItem[]): DashboardTemplate[] => {
+    const _inputValue = inputValue.toLowerCase();
+    return templates.filter((template) => (selectedLabels.length === 0 || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
+        && (_inputValue === '' || template.name.toLowerCase().includes(_inputValue)));
+};
+
+/* Event */
 const handleSelectLabels = (labels: TemplateLabelItem[]) => {
     filterState.selectedLabels = labels;
 };
@@ -58,7 +65,7 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
         <div class="contents-container">
             <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
             <div class="template-contents-area">
-                <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.exstingTemplateSets.length"
+                <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.existingTemplateSets.length"
                          show-image
                          class="empty-template"
                 >
@@ -85,14 +92,14 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
                         />
                     </div>
                 </div>
-                <div v-if="state.exstingTemplateSets.length"
+                <div v-if="state.existingTemplateSets.length"
                      class="existing"
                 >
                     <p-field-title class="title">
-                        Exsting Dashboard
+                        Existing Dashboard
                     </p-field-title>
-                    <div class="exsting-contents">
-                        <dashboard-create-template-board :template-sets="state.exstingTemplateSets"
+                    <div class="existing-contents">
+                        <dashboard-create-template-board :template-sets="state.existingTemplateSets"
                                                          show-view-link
                                                          :keyword="filterState.inputValue"
                                                          @select-template="handleClickCreateTemplate"
@@ -141,7 +148,7 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
 
             .existing {
 
-                .exsting-contents {
+                .existing-contents {
                     margin-top: 0.5rem;
                 }
             }
