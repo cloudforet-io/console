@@ -63,7 +63,6 @@ const state = reactive({
                 ...d,
                 iconButtonSets: convertBoardItemButtonSet(d),
             };
-            console.debug('dashboardWithBoardSet', dashboardWithBoardSet);
             if (d.project_id) {
                 return (
                     {
