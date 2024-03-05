@@ -168,12 +168,10 @@ const getTooltipContents = (item: any, field: Field): string => {
 
 /* event */
 const handleClickLegend = (index: number) => {
-    // if (props.printMode) return;
     state.disabledLegends = { ...state.disabledLegends, [index]: !state.disabledLegends[index] };
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
-    // if (props.printMode) return;
     emit('click-row', rowData);
 };
 watch(() => props.legends, () => {
@@ -522,18 +520,6 @@ watch(() => props.legends, () => {
         text-align: center;
     }
 
-    &.print-mode {
-        .table-container {
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-        }
-        .status-wrapper {
-            min-width: 2rem;
-            padding: 0.125rem 0;
-        }
-    }
     .ellipsis-box {
         @apply truncate;
         width: 100%;
