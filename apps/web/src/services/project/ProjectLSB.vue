@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { reactive, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
@@ -11,11 +11,16 @@ import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.
 
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
 import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
+const router = useRouter();
+
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
+
 const state = reactive({
     initGroupId: queryStringToString(route.query.select_pg) as string|undefined,
     isCollapsed: false,
@@ -26,6 +31,15 @@ const { favoriteItems, beforeFavoriteRoute, handleDeleteFavorite } = useProjectF
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
+
+watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
+    router.push({
+        name: PROJECT_ROUTE._NAME,
+        query: {
+            select_pg: selectedItem.node?.data.id || null,
+        },
+    }).catch(() => {});
+});
 </script>
 
 <template>

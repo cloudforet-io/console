@@ -129,7 +129,10 @@ const onClickChangeEscalationPolicy = () => {
     state.changeEscalationPolicyModalVisible = true;
 };
 const onClickEditEventRule = () => {
-    router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.id ?? '' } });
+    router.push({
+        name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
+        params: { projectId: props.id ?? '' },
+    }).catch(() => {});
 };
 
 watch(() => state.escalationPolicyId, async () => {

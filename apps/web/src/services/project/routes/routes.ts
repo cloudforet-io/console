@@ -120,11 +120,13 @@ export default {
                     path: 'event-rule',
                     name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
                     props: (route) => ({ projectId: route.params.id }),
+                    meta: { lsbVisible: true },
                     component: ProjectAlertEventRulePage,
                 },
                 {
                     path: 'notification/:protocolId',
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+                    meta: { lsbVisible: true },
                     component: ProjectNotificationAddPage,
                     props: true,
                 },

@@ -75,7 +75,7 @@ const handleActivateAlert = async () => {
 /* event */
 const handleChangeTab = async (activeTab: string) => {
     if (activeTab === route.name) return;
-    await router.replace({ name: activeTab });
+    await router.replace({ name: activeTab }).catch(() => {});
 };
 
 /* init */
