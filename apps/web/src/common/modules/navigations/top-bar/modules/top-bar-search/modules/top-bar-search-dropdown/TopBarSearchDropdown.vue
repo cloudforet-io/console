@@ -10,7 +10,12 @@ import {
 
 import { store } from '@/store';
 
-import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import {
+    topBarSearchReferenceRouter,
+} from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchListItem
@@ -41,6 +46,9 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetter = userWorkspaceStore.getters;
+const recentStore = useRecentStore();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
@@ -80,19 +88,6 @@ const state = reactive({
     }),
 });
 
-
-// const createSearchRecent = async (type: SuggestionType, id: string) => {
-//     try {
-//         await SpaceConnector.client.addOns.recent.search.create({
-//             type,
-//             id,
-//         });
-//     } catch (e) {
-//         ErrorHandler.handleError(e);
-//     }
-// };
-
-
 const handleMoveFocusEnd = () => {
     emit('move-focus-end');
 };
@@ -112,7 +107,11 @@ const handleSelect = (item) => {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
     } else if (topBarSearchStore.state.activeTab !== 'service') router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
 
-    // if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.DEFAULT_SERVICE, menuId, workspaceStoreGetter.currentWorkspaceId);
+    if (workspaceStoreGetter.currentWorkspaceId === item.workspace_id && workspaceStoreGetter.currentWorkspaceId) {
+        recentStore.createRecent({
+            type: recentNSearchTabMap[topBarSearchStore.state.activeTab], workspaceId: workspaceStoreGetter.currentWorkspaceId, id: item.resource_id, label: item.label,
+        });
+    }
 
     topBarSearchStore.setIsActivated(false);
 };

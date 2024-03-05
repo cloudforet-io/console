@@ -2,7 +2,7 @@
 import { PEmpty } from '@spaceone/design-system';
 
 interface Props {
-    inputText: string;
+    inputText?: string;
     isRecent: boolean;
 }
 
