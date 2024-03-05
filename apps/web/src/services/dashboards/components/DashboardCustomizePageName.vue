@@ -34,6 +34,7 @@ const state = reactive({
     }),
     placeHolder: dashboardDetailState.placeholder,
     dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
+    isTextInputFocused: false,
 });
 const {
     forms: {
@@ -55,8 +56,15 @@ const {
     },
 });
 
-const isTextInputFocused = ref(false);
-
+const getDashboardNamePlaceholder = (): string => {
+    let _placeholder = dashboardDetailState.placeholder;
+    const _dashboardNameList = dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType);
+    let _count = 0;
+    while (_dashboardNameList.includes(_placeholder)) {
+        _placeholder = `${dashboardDetailState.placeholder} (${++_count})`; // e.g. AWS Monthly Cost Summary (1)
+    }
+    return _placeholder;
+};
 const updateName = (name: string) => {
     setForm('nameInput', name);
     emit('update:name', name);
@@ -80,8 +88,12 @@ watch(() => invalidState.nameInput, (invalid) => {
 });
 
 onMounted(() => {
-    if (nameInput.value?.length) dashboardDetailStore.setIsNameValid(true);
-    else dashboardDetailStore.setIsNameValid(false);
+    if (nameInput.value?.length) {
+        dashboardDetailStore.setIsNameValid(true);
+    } else {
+        dashboardDetailStore.setIsNameValid(false);
+        setForm('nameInput', getDashboardNamePlaceholder());
+    }
 });
 </script>
 
@@ -101,7 +113,7 @@ onMounted(() => {
                 <p-text-input :value="nameInput"
                               :invalid="invalid"
                               :placeholder="state.placeHolder"
-                              :is-focused.sync="isTextInputFocused"
+                              :is-focused.sync="state.isTextInputFocused"
                               @update:value="handleInput"
                 />
             </template>
