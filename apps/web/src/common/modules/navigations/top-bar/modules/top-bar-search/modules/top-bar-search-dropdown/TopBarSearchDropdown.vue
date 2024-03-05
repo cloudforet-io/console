@@ -209,7 +209,7 @@ const handleUpdateContentsSize = (height: number) => {
                                 <p-lazy-img :src="item?.resource_id ? storeState.cloudServiceTypeMap[item?.resource_id]?.icon : ''"
                                             width="1.25rem"
                                             height="1.25rem"
-                                            style="margin-right: 0.375rem"
+                                            style="margin-right: 0.375rem;"
                                 />
                             </template>
                         </top-bar-search-list-item>
