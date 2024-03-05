@@ -32,8 +32,10 @@ export const getWidgetDataTableRowLocation = (rowData?: WidgetTableData, widgetL
     const _widgetLocation = cloneDeep(widgetLocation);
     const _queryFilters = queryStringToArray(_widgetLocation.query?.filters) ?? [];
     targetFields.forEach((field) => {
-        if (rowData?.item[field]) {
-            _queryFilters.push({ k: field, v: [rowData.item[field]], o: '=' });
+        const split = field.split('.');
+        const parsedField = split.length > 0 ? (split.pop() ?? '') : (field ?? '');
+        if (rowData?.item[parsedField]) {
+            _queryFilters.push({ k: field, v: [rowData.item[parsedField]], o: '=' });
         }
     });
     return {
