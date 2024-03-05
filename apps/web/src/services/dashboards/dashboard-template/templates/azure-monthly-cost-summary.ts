@@ -29,6 +29,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     }],
     ['budgetStatus'],
     ['costByRegion'],
+    ['budgetUsageByTarget'],
 ];
 
 export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
