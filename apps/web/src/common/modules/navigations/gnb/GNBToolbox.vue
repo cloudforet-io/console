@@ -13,6 +13,7 @@ import { clone, isEmpty } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
@@ -34,18 +35,35 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const favoriteStore = useFavoriteStore();
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 const { width } = useWindowSize();
 const { breadcrumbs } = useBreadcrumbs();
 
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     routes: computed(() => {
-        if (gnbGetters.breadcrumbs.length === 0) {
-            return breadcrumbs.value;
+        let routes: Breadcrumb[] = [];
+        if (!storeState.isAdminMode) {
+            routes.push({
+                name: i18n.t('MENU.HOME_DASHBOARD'),
+                to: {
+                    name: HOME_DASHBOARD_ROUTE._NAME,
+                    params: {
+                        workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
+                    },
+                },
+            });
         }
-        return gnbGetters.breadcrumbs;
+        if (gnbGetters.breadcrumbs.length === 0) {
+            routes = [...routes, ...breadcrumbs.value];
+        }
+        routes = [...routes, ...gnbGetters.breadcrumbs];
+        return routes;
     }),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -81,19 +99,8 @@ watch(() => state.selectedMenuId, async () => {
     await favoriteStore.fetchFavorite();
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
-watch(() => state.currentMenuId, async (currentMenuId) => {
+watch(() => state.currentMenuId, async () => {
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
-    if (currentMenuId === MENU_ID.HOME_DASHBOARD) {
-        gnbStore.setBreadcrumbs([{
-            name: i18n.t('MENU.HOME_DASHBOARD'),
-            to: {
-                name: HOME_DASHBOARD_ROUTE._NAME,
-                params: {
-                    workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
-                },
-            },
-        }]);
-    }
 }, { immediate: true });
 </script>
 
@@ -141,7 +148,7 @@ watch(() => state.currentMenuId, async (currentMenuId) => {
     width: 100%;
     height: $gnb-toolbox-height;
     padding-right: 1rem;
-    z-index: 100;
+    z-index: 50;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     .navigation-section {
         @apply flex items-center;

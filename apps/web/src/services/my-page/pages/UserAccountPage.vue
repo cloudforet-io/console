@@ -68,7 +68,6 @@ const state = reactive({
 <style lang="postcss" scoped>
 .user-account-page {
     @apply flex flex-col;
-    gap: 1.5rem;
     .contents-wrapper {
         @apply flex;
         gap: 1rem;

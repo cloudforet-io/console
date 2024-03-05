@@ -214,7 +214,7 @@ watch(() => state.userId, (userId) => {
     .console-loading-wrapper {
         position: absolute;
         height: 100%;
-        z-index: 101;
+        z-index: 10;
         & > .data-loader-container > .loader-wrapper > .loader.spinner {
             max-height: unset;
         }

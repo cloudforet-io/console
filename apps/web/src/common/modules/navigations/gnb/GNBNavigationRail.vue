@@ -230,6 +230,7 @@ const refinedMenuList = (list, value) => {
     height: calc(100% - $top-bar-height);
     padding: 1rem 0.75rem;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+    z-index: 51;
     .navigation-rail-wrapper {
         width: 100%;
         .service-menu {
@@ -298,6 +299,7 @@ const refinedMenuList = (list, value) => {
         @apply bg-gray-100 cursor-pointer;
         width: $gnb-navigation-rail-min-width;
         box-shadow: unset;
+        z-index: 49;
         .service-menu {
             width: 2.25rem;
             &:hover:not(.is-only-label) {
@@ -322,6 +324,9 @@ const refinedMenuList = (list, value) => {
                     }
                 }
             }
+        }
+        &:hover {
+            z-index: 51;
         }
     }
     .menu-description {

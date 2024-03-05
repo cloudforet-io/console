@@ -217,6 +217,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 .top-button-box {
     display: inline-block;
     float: right;
+    margin-left: auto;
     .create-context-menu {
         z-index: 10;
     }
