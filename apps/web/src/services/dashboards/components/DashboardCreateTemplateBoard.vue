@@ -59,25 +59,29 @@ const handleClickCreate = (template: DashboardModel) => {
     >
         <template #item-content="{board}">
             <div class="board-item-wrapper">
-                <div class="board-item-title">
-                    <!--                    <p-lazy-img v-if="board.description?.icon"-->
-                    <!--                                :src="board.description?.icon"-->
-                    <!--                                width="1rem"-->
-                    <!--                                height="1rem"-->
-                    <!--                    />-->
-                    <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
-                         width="1rem"
-                         height="1rem"
-                    />
-                    <p-text-highlighting :text="board.name"
-                                         :term="props.keyword"
-                                         style-type="secondary"
-                    />
+                <div class="left-part">
+                    <div class="board-item-title">
+                        <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <p-text-highlighting :text="board.name"
+                                             :term="props.keyword"
+                                             style-type="secondary"
+                        />
+                    </div>
+                    <div class="board-item-labels">
+                        <p-label v-for="(label, idx) in board.labels"
+                                 :key="`${label}-${idx}`"
+                                 :text="label"
+                        />
+                    </div>
                 </div>
-                <div class="board-item-labels">
-                    <p-label v-for="(label, idx) in board.labels"
-                             :key="`${label}-${idx}`"
-                             :text="label"
+                <div class="right-part">
+                    <p-i name="ic_chevron-right"
+                         width="1.5rem"
+                         height="1.5rem"
+                         class="arrow-icon"
                     />
                 </div>
             </div>
@@ -90,14 +94,14 @@ const handleClickCreate = (template: DashboardModel) => {
                           icon-right="ic_arrow-right-up"
                           @click="handleClickView(board)"
                 >
-                    View
+                    {{ $t('DASHBOARDS.CREATE.VIEW') }}
                 </p-button>
                 <p-button size="md"
                           style-type="substitutive"
                           icon-right="ic_arrow-right"
                           @click="handleClickCreate(board)"
                 >
-                    Create
+                    {{ $t('DASHBOARDS.CREATE.CREATE') }}
                 </p-button>
             </div>
         </template>
@@ -106,6 +110,18 @@ const handleClickCreate = (template: DashboardModel) => {
 
 <style lang="postcss" scoped>
 .dashboard-create-template-board {
+    .board-item-wrapper {
+        display: flex;
+        gap: 0.25rem;
+        .left-part {
+            flex-grow: 1;
+        }
+        .right-part {
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+    }
 
     .board-item-title {
         @apply text-label-md flex items-center;
@@ -118,10 +134,32 @@ const handleClickCreate = (template: DashboardModel) => {
 
     /* custom p-board-item */
     &:deep(.p-board-item) {
+        cursor: default;
         .content-area {
             .right-overlay-wrapper {
                 top: calc(50% - 1rem);
             }
+        }
+    }
+
+    .arrow-icon {
+        display: none;
+    }
+}
+
+@screen mobile {
+    .dashboard-create-template-board {
+        .overlay-wrapper {
+            display: none;
+        }
+
+        /* custom p-board-item */
+        &:deep(.p-board-item) {
+            cursor: pointer;
+        }
+
+        .arrow-icon {
+            display: block;
         }
     }
 }
