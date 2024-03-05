@@ -273,6 +273,9 @@ onMounted(() => {
         padding-right: 0.5rem;
         padding-left: 0.5rem;
     }
+    .selected-item-postfix {
+        @apply text-gray-500;
+    }
 }
 
 /* custom design-system component - p-select-dropdown */
