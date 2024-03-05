@@ -64,7 +64,7 @@ watch(() => storeState.visibleSidebar, (visibleSidebar) => {
     left: $gnb-navigation-rail-max-width;
     width: calc(100% - $gnb-navigation-rail-max-width);
     max-width: 1920px;
-    height: calc(100% - $top-bar-height);
+    height: calc(100% - $gnb-toolbox-height);
     margin: auto;
     transition: left 0.3s ease, width 0.3s ease;
     &.is-mobile {

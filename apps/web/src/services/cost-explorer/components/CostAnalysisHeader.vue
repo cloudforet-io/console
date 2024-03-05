@@ -189,6 +189,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             @apply justify-end text-gray-800;
             font-size: 0.875rem;
             float: right;
+            margin-left: auto;
             .label {
                 font-weight: 700;
                 padding-right: 0.25rem;

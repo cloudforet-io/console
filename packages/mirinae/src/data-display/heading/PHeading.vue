@@ -15,7 +15,9 @@
                 <slot>
                     <slot name="title">
                         <!--&zwnj: Added to prevent style bugs if title does not exist-->
-                        <span class="title">{{ title.length ? title : '&zwnj;' }}</span>
+                        <p class="title">
+                            {{ title.length ? title : '&zwnj;' }}
+                        </p>
                     </slot>
                 </slot>
             </h2>
@@ -134,6 +136,7 @@ export default defineComponent<Props>({
         }
     }
     > .heading-wrapper {
+        @apply flex items-center;
         line-height: 2rem;
         vertical-align: middle;
         flex-grow: 99;
