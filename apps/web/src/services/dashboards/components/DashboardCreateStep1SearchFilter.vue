@@ -7,6 +7,8 @@ import {
 
 import { store } from '@/store';
 
+import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import { DASHBOARD_SERVICE_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 
 
@@ -21,7 +23,12 @@ const emit = defineEmits<{(e:'select-label', labels: TemplateLabelItem[]):void;
 
 
 const state = reactive({
-    providers: computed(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providerList: computed(() => (Object.values(state.providers) as ProviderReferenceItem[]).map((provider) => ({
+        label: provider.name,
+        name: provider.name,
+        image: provider.icon,
+    }))),
     services: computed(() => Object.values(DASHBOARD_SERVICE_LABELS)),
     serviceList: computed(() => state.services.map((service) => ({
         label: service,
@@ -94,7 +101,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                selection-label="Provider"
                                show-select-marker
                                :show-delete-all-button="false"
-                               :menu="Object.values(state.providers)"
+                               :menu="state.providerList"
                                :selected="state.selectedProviders"
                                @update:selected="handleChangeLabelFilter('Provider', $event)"
             >
@@ -102,7 +109,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                     <p-lazy-img width="1rem"
                                 height="1rem"
                                 error-icon="ic_cloud-filled"
-                                :src="item.icon"
+                                :src="item.image"
                                 class="mr-1"
                     />{{ item.label }}
                 </template>
