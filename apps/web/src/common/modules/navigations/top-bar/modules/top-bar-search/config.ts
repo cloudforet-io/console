@@ -18,3 +18,11 @@ export interface SuggestionItem extends MenuItem {
     name?: string;
     label?: string|TranslateResult;
 }
+
+export const SEARCH_TAB = {
+    SERVICE: 'service',
+    SERVICE_ACCOUNT: 'serviceAccount',
+    PROJECT: 'project',
+    DASHBOARD: 'dashboard',
+    CLOUD_SERVICE: 'cloudService',
+} as const;

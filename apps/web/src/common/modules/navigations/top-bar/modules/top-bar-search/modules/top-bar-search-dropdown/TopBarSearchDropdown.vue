@@ -13,6 +13,7 @@ import { store } from '@/store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     topBarSearchReferenceRouter,
 } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
@@ -68,11 +69,11 @@ const storeState = reactive({
 
 const state = reactive({
     tabs: [
-        { label: 'Service', name: 'service' },
-        { label: 'Service Account', name: 'serviceAccount' },
-        { label: 'Project', name: 'project' },
-        { label: 'Dashboard', name: 'dashboard' },
-        { label: 'Cloud Service', name: 'cloudService' },
+        { label: 'Service', name: SEARCH_TAB.SERVICE },
+        { label: 'Service Account', name: SEARCH_TAB.SERVICE_ACCOUNT },
+        { label: 'Project', name: SEARCH_TAB.PROJECT },
+        { label: 'Dashboard', name: SEARCH_TAB.DASHBOARD },
+        { label: 'Cloud Service', name: SEARCH_TAB.CLOUD_SERVICE },
     ],
     contentsHeight: 0,
     searchInputHeight: computed(() => (state.isTabletSize ? 60 : 0)),
@@ -103,9 +104,9 @@ const handleUpdateContentsSize = (height: number) => {
 };
 
 const handleSelect = (item) => {
-    if (topBarSearchStore.state.activeTab === 'cloudService') {
+    if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
-    } else if (topBarSearchStore.state.activeTab !== 'service') router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
 
     if (workspaceStoreGetter.currentWorkspaceId === item.workspace_id && workspaceStoreGetter.currentWorkspaceId) {
         recentStore.createRecent({

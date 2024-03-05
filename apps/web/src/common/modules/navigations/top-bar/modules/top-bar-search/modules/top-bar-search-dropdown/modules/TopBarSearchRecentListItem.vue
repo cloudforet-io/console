@@ -11,6 +11,7 @@ import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
@@ -41,11 +42,11 @@ const state = reactive({
     tooltipText: computed(() => `${props.resourceId}${props.resourceId ? ` ∙ ${props.resourceId}` : ''}`),
     iconName: computed(() => {
         switch (storeState.activeTab) {
-        case 'serviceAccount':
+        case SEARCH_TAB.SERVICE_ACCOUNT:
             return 'ic_service_service-account';
-        case 'project':
+        case SEARCH_TAB.PROJECT:
             return 'ic_document-filled';
-        case 'dashboard':
+        case SEARCH_TAB.DASHBOARD:
             return 'ic_service_dashboard';
         default:
             return '';
@@ -54,13 +55,13 @@ const state = reactive({
 });
 
 const getLabelByResourceId = (resourceId: string, activeTab: SearchTab) => {
-    if (activeTab === 'serviceAccount') {
+    if (activeTab === SEARCH_TAB.SERVICE_ACCOUNT) {
         return `${storeState.serviceAccountMap[resourceId]?.key} (${storeState.serviceAccountMap[resourceId]?.label})`;
-    } if (activeTab === 'project') {
+    } if (activeTab === SEARCH_TAB.PROJECT) {
         return storeState.projectMap[resourceId]?.label;
-    } if (activeTab === 'dashboard') {
+    } if (activeTab === SEARCH_TAB.DASHBOARD) {
         return storeState.publicDashboardMap[resourceId]?.label;
-    } if (activeTab === 'cloudService') {
+    } if (activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         return storeState.cloudServiceTypeMap[resourceId]?.label;
     }
     return '';
@@ -79,9 +80,9 @@ const getDescriptionByResourceId = (resourceId: string, activeTab: SearchTab) =>
 
 const handleClick = () => {
     if (!storeState.currentWorkspaceId) return;
-    if (topBarSearchStore.state.activeTab === 'cloudService') {
+    if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, props.resourceId, storeState.currentWorkspaceId, storeState.cloudServiceTypeMap[props.resourceId]));
-    } else if (topBarSearchStore.state.activeTab !== 'service') router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, props.resourceId, storeState.currentWorkspaceId));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, props.resourceId, storeState.currentWorkspaceId));
     topBarSearchStore.setIsActivated(false);
 };
 </script>

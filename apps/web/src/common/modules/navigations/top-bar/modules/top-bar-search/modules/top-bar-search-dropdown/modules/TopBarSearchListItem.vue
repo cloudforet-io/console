@@ -19,7 +19,7 @@ import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modul
 
 
 interface Props {
-    iconName: string;
+    iconName?: string;
     label: string;
     description?: string;
     workspaceId?: string;
