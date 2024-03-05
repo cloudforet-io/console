@@ -33,6 +33,8 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 
 export const dCloComplianceOverviewDashboard: DashboardTemplate = {
     name: 'D-CLO Compliance Overview',
+    template_id: 'dCloComplianceOverview',
+    template_type: 'MANAGED',
     labels: [
         DASHBOARD_LABELS.AWS,
         DASHBOARD_LABELS.AZURE,
