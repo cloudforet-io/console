@@ -149,9 +149,6 @@ onUnmounted(() => {
             justify-content: flex-start;
             line-height: 1.75;
             padding: 0.25rem 0.5rem;
-            .label-wrapper {
-                overflow: visible;
-            }
 
             &:focus {
                 @apply border border-blue-400 rounded-xs;
@@ -185,11 +182,12 @@ onUnmounted(() => {
         .texts {
             display: flex;
             flex-grow: 1;
+            width: 100%;
             .text-item {
-                max-width: 10rem;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                width: calc(100% - 2rem);
             }
         }
         .favorite-button {

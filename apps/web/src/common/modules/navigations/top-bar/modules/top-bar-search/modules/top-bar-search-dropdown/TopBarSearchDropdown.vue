@@ -218,7 +218,6 @@ const handleSelect = (item) => {
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="cloudService"
                                                   :label="item?.name"
-                                                  icon-name="ic_service_service-account"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
                         >
