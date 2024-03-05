@@ -7,6 +7,8 @@ import type {
 
 export interface PublicDashboardCreateParameters {
     name: string;
+    template_id: string;
+    template_type: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
     settings?: DashboardSettings;

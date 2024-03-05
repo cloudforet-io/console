@@ -90,6 +90,9 @@ const createDashboard = async () => {
 
         const apiParam: PublicDashboardCreateParameters = {
             name: dashboardDetailState.name,
+            // HACK: get dynamic template_id, template_type after implementing template feature
+            template_id: 'blank',
+            template_type: 'MANAGED',
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
