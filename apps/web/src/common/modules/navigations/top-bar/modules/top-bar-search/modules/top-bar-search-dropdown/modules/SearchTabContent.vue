@@ -3,19 +3,14 @@ import { useElementSize } from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import { PDivider, PContextMenu, PDataLoader } from '@spaceone/design-system';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import type { MenuInfo } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type { SuggestionType, SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
-import { createSearchRecent } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import TopBarSearchEmpty
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
 import TopBarSearchWorkspaceFilter
@@ -41,9 +36,8 @@ const props = withDefaults(defineProps<Props>(), {
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
 const topBarSearchStore = useTopBarSearchStore();
-const router = useRouter();
 
-const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number): void;
+const emit = defineEmits<{(event: 'select', item: SuggestionItem): void;
     (event: 'close'): void;
     (event: 'move-focus-end'): void;
     (event: 'update:isFocused', value: boolean): void;
@@ -75,13 +69,7 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
 };
 
 const handleSelect = (item) => {
-    const menuId = item.id;
-    const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
-    if (menuInfo && router.currentRoute.name !== menuId) {
-        router.push({ name: menuInfo.routeName }).catch(() => {});
-        if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.DEFAULT_SERVICE, menuId, workspaceStoreGetter.currentWorkspaceId);
-    }
-    topBarSearchStore.setIsActivated(false);
+    emit('select', item);
 };
 
 watch(() => contentsSize.height.value, (height) => {

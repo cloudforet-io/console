@@ -8,3 +8,18 @@ export interface DropdownItem {
 
 export const focusingDirection = ['UPWARD', 'DOWNWARD'] as const;
 export type FocusingDirection = typeof focusingDirection[number];
+
+export interface StageWorkspace {
+    workspaceId: string,
+    label: string,
+    theme?: string,
+    isSelected: boolean
+}
+
+export const tabResourceTypeMap = {
+    serviceAccount: 'identity.ServiceAccount',
+    project: 'identity.Project',
+    dashboard: 'dashboard.PublicDashboard',
+    cloudService: 'inventory.CloudServiceType',
+};
+export type SearchTab = keyof typeof tabResourceTypeMap | 'service';

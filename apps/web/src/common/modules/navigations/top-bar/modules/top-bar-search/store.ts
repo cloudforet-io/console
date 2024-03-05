@@ -12,16 +12,8 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-export interface StageWorkspace {workspaceId: string, label: string, theme?:string, isSelected: boolean}
-
-export const tabResourceTypeMap = {
-    serviceAccount: 'identity.ServiceAccount',
-    project: 'identity.Project',
-    dashboard: 'dashboard.PublicDashboard',
-    cloudService: 'inventory.CloudServiceType',
-};
-export type SearchTab = keyof typeof tabResourceTypeMap | 'service';
+import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 interface TopBarSearchStoreState {
     loading: boolean;
