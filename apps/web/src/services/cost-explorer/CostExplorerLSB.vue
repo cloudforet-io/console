@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
@@ -29,12 +29,8 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray } from '@/styles/colors';
 
-import CostExplorerLSBRelocateDashboardModal
-    from '@/services/cost-explorer/components/CostExplorerLSBRelocateDashboardModal.vue';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import type { RelocateDashboardStatus } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
-import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
@@ -45,7 +41,6 @@ const SHOW_MORE_MENU_ID = 'show-more';
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
-const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -157,9 +152,6 @@ const dataSourceState = reactive({
     }),
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
 });
-const relocateNotificationState = reactive({
-    isModalVisible: false,
-});
 
 const filterMenuItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
         || menu.type !== MENU_ITEM_TYPE.ITEM);
@@ -186,13 +178,6 @@ const handleSelectDataSource = (selected: string) => {
         },
     })).catch(() => {});
 };
-
-onMounted(() => {
-    // Relocate dashboard notification
-    const relocateDashboardStatus: RelocateDashboardStatus|undefined = costExplorerSettingsStore.getRelocateDashboardStatus;
-    relocateNotificationState.isModalVisible = !relocateDashboardStatus?.hideModal;
-});
-
 </script>
 
 <template>
@@ -252,10 +237,6 @@ onMounted(() => {
                 />
             </template>
         </l-s-b>
-        <cost-explorer-l-s-b-relocate-dashboard-modal
-            v-if="!storeState.isAdminMode"
-            :visible.sync="relocateNotificationState.isModalVisible"
-        />
     </aside>
 </template>
 
