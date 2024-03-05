@@ -163,8 +163,8 @@ watch(() => contentsSize.height.value, (height) => {
 
         .search-list-context {
             @apply bg-white border-none;
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
             padding-bottom: 0.125rem;
             max-height: unset;
 
@@ -174,9 +174,6 @@ watch(() => contentsSize.height.value, (height) => {
                     justify-content: flex-start;
                     line-height: 1.75;
                     padding: 0.25rem 0.5rem;
-                    .label-wrapper {
-                        overflow: visible;
-                    }
 
                     &:focus {
                         @apply border border-blue-400 rounded-xs;

@@ -28,7 +28,7 @@ interface TopBarSearchStoreState {
     allWorkspacesChecked: boolean;
     isActivated: boolean;
     inputText: string;
-    activateTab: SearchTab;
+    activeTab: SearchTab;
     recentMenuList: any[]; // TODO: check type
     searchMenuList: any; // TODO: check type
     // workspace filter
@@ -61,7 +61,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         allWorkspacesChecked: false,
         isActivated: false,
         inputText: '',
-        activateTab: 'service',
+        activeTab: 'service',
         recentMenuList: [],
         searchMenuList: [],
         // workspace filter
@@ -81,7 +81,10 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     });
 
     const actions = {
-        setIsActivated: (isActivated: boolean, initSearch = true) => {
+        setIsActivated: (isActivated: boolean, options?:{
+            initSearch?: boolean,
+        }) => {
+            const { initSearch = true } = options || {};
             state.isActivated = isActivated;
             if (initSearch) {
                 actions.initSearch();
@@ -104,7 +107,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         },
         initSearch: () => {
             state.inputText = '';
-            state.activateTab = 'service';
+            state.activeTab = 'service';
             actions.initWorkspaces();
         },
         setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
@@ -121,11 +124,11 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         removeStagedWorkspace: (workspace: StageWorkspace) => {
             state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.workspaceId !== workspace.workspaceId);
         },
-        fetchSearchList: async (searchText: string, activateTab: SearchTab, workspaces) => {
+        fetchSearchList: async (searchText: string, activeTab: SearchTab, workspaces:string[]) => {
             try {
                 state.loading = true;
                 const { results } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
-                    resource_type: tabResourceTypeMap[activateTab],
+                    resource_type: tabResourceTypeMap[activeTab],
                     keyword: searchText,
                     workspaces,
                     limit: 15,
@@ -152,19 +155,17 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
 
     watch([
         () => getters.trimmedInputText,
-        () => state.activateTab,
+        () => state.activeTab,
         () => getters.selectedWorkspaces,
         () => state.isActivated,
-    ], debounce(async ([trimmedText, activateTab, workspaces]) => {
+    ], debounce(async ([trimmedText, activeTab, workspaces]) => {
         if (trimmedText) {
-            await actions.fetchSearchList(trimmedText, activateTab, workspaces);
+            await actions.fetchSearchList(trimmedText, activeTab, workspaces);
             // state.recentMenuList = fetchRecentList(trimmedText);
         } else {
             state.searchMenuList = [];
         }
-    }, 500, {
-        leading: true,
-    }));
+    }, 500));
 
 
     return {

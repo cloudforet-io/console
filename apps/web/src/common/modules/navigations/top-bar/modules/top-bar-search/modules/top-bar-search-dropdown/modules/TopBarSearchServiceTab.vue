@@ -146,7 +146,9 @@ const handleSelect = (item) => {
             type: RECENT_TYPE.SERVICE, workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
         });
     }
-    topBarSearchStore.setIsActivated(false);
+    topBarSearchStore.setIsActivated(false, {
+        initSearch: false,
+    });
 };
 
 watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
