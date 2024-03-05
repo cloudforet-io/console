@@ -44,7 +44,7 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
-const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
@@ -85,33 +85,36 @@ const cloneModalState = reactive({
     dashboardConfig: {} as Partial<DashboardModel>,
 });
 
-const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
-    {
-        iconName: 'ic_edit',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-        eventAction: () => {
-            router.push(getProperRouteLocation({
-                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                params: {
-                    dashboardId: dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '',
-                },
-            }));
+const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
+    const dahsboardId = dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '';
+    return [
+        {
+            iconName: 'ic_edit',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
+            eventAction: () => {
+                router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                    params: {
+                        dashboardId: dahsboardId,
+                    },
+                }));
+            },
         },
-    },
-    {
-        iconName: 'ic_duplicate',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-        eventAction: () => {
-            cloneModalState.dashboardConfig = { ...dashboardItem };
-            cloneModalState.visible = true;
+        {
+            iconName: 'ic_duplicate',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
+            eventAction: () => {
+                cloneModalState.dashboardConfig = { ...dashboardItem };
+                cloneModalState.visible = true;
+            },
         },
-    },
-    {
-        iconName: 'ic_delete',
-        tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-        eventAction: () => handleClickDeleteDashboard(dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || ''),
-    },
-];
+        {
+            iconName: 'ic_delete',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
+            eventAction: () => handleClickDeleteDashboard(dahsboardId),
+        },
+    ];
+};
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
@@ -163,14 +166,16 @@ watch(() => props.dashboardList, () => {
                  @item-click="handleClickBoardItem"
         >
             <template #item-content="{board}">
-                <div class="board-item-title-wrapper">
-                    <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.666"
-                                     class="favorite-button"
-                    />
-                    <p class="board-item-title">
-                        {{ board.name }}
+                <div class="content-wrapper">
+                    <div class="board-item-title-wrapper">
+                        <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
+                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                         scale="0.8"
+                                         class="favorite-button"
+                        />
+                        <span class="board-item-title">
+                            {{ board.name }}
+                        </span>
                         <p-i v-if="scopeType === 'PRIVATE'"
                              name="ic_lock-filled"
                              width="0.75rem"
@@ -178,34 +183,16 @@ watch(() => props.dashboardList, () => {
                              color="gray900"
                              class="private-icon"
                         />
-                    </p>
-                </div>
-                <div class="board-item-description">
-                    <template v-if="board.tags.created_by">
-                        <span>{{ board.tags.created_by }}</span>
-                    </template>
-                    <template v-if="!isAdminMode">
-                        <p-i name="ic_dot"
-                             width="0.125rem"
-                             height="0.125rem"
+                        <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : storeState.currentWorkspace?.name }}</span>
+                    </div>
+                    <div class="labels-wrapper">
+                        <p-label v-for="(label, idx) in board.labels"
+                                 :key="`${board.name}-label-${idx}`"
+                                 :text="label"
+                                 clickable
+                                 @item-click="handleSetQuery(label)"
                         />
-                        <span v-if="props.scopeType !== 'PROJECT'">{{ storeState.currentWorkspace?.name }}</span>
-                        <span v-else>{{ board.label }}</span>
-                    </template>
-                </div>
-                <div class="label-wrapper">
-                    <p-label v-if="!isAdminMode"
-                             :class="{'item-label': true, 'viewers-label': true, 'private-label': !!board.private_dashboard_id}"
-                             :text="!!board.private_dashboard_id ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC')"
-                             :left-icon="!!board.private_dashboard_id ? 'ic_lock-filled' : 'ic_globe-filled'"
-                    />
-                    <p-label v-for="(label, idx) in board.labels"
-                             :key="`${board.name}-label-${idx}`"
-                             class="item-label"
-                             :text="label"
-                             clickable
-                             @item-click="handleSetQuery(label)"
-                    />
+                    </div>
                 </div>
             </template>
         </p-board>
@@ -233,6 +220,7 @@ watch(() => props.dashboardList, () => {
 .dashboard-board-list {
     @apply w-full flex-grow;
     margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
 
     .p-field-title {
         margin-bottom: 0.5rem;
@@ -242,42 +230,32 @@ watch(() => props.dashboardList, () => {
         margin-left: 0.5rem;
     }
     .board {
-        .board-item-title-wrapper {
-            @apply flex w-full;
-            align-items: center;
-            min-height: 1.25rem;
-            .favorite-button {
-                margin-right: 0.25rem;
+        /* custom p-board-item */
+        &:deep(.p-board-item) {
+            .content-area {
+                overflow: unset;
+                .right-overlay-wrapper {
+                    top: calc(50% - 1rem);
+                }
             }
-            .board-item-title {
-                @apply flex-grow w-full;
-                margin-left: 0.125rem;
-                font-size: 1rem;
-                font-weight: bold;
-                line-height: 1.25;
-                word-break: break-all;
-            }
-        }
-        .board-item-description {
-            @apply flex items-center flex-wrap;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            line-height: 1.25;
-            color: gray;
-            margin: 0.25rem 0 0.75rem;
         }
 
-        .label-wrapper {
-            @apply flex items-center flex-wrap;
-            row-gap: 0.375rem;
-        }
-
-        .item-label {
-            &.viewers-label {
-                @apply border-0 bg-violet-200;
+        .content-wrapper {
+            @apply flex flex-col gap-2;
+            .board-item-title-wrapper {
+                @apply flex w-full items-center;
+                gap: 0.375rem;
+                .board-item-title {
+                    @apply text-label-md text-gray-900;
+                }
+                .board-item-title-sub-text {
+                    @apply text-label-sm text-gray-500;
+                }
             }
-            &.private-label {
-                @apply bg-gray-200;
+
+            .labels-wrapper {
+                @apply flex items-center flex-wrap;
+                row-gap: 0.375rem;
             }
         }
     }
