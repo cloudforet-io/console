@@ -78,6 +78,16 @@ const getAfterCallApiMap = (store) => ({
     },
     '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
     '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
+    '/dashboard/public-dashboard/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_dashboard', data);
+    },
+    '/dashboard/public-dashboard/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('public_dashboard', data);
+    },
 });
 
 const getSessionTimeoutCallback = (store) => () => {
