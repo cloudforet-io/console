@@ -9,7 +9,7 @@ import {
 import {
     PCheckboxGroup, PCheckbox, PTooltip, PToggleButton, PTextButton, PContextMenu, PIconButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -34,6 +34,7 @@ const storeState = reactive({
     workspaceMap: computed(() => allReferenceGetters.workspace),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     selectedWorkspaces: computed(() => topBarSearchStore.getters.selectedWorkspaces),
+    isAllSelected: computed(() => topBarSearchStore.state.allWorkspacesChecked),
 });
 
 const searchContextMenuRef = ref<null | HTMLElement>(null);
@@ -43,19 +44,17 @@ const windowSize = useWindowSize();
 const STAGED_WORKSPACE_LIMIT = 5;
 
 const state = reactive({
-    isAllSelected: false,
     // workspace search menu
     isActivatedSearchMenu: false,
     searchText: '',
     nextToken: undefined as string | undefined,
     searchResult: [] as ResourceModel[],
     searchResultMenu: computed<MenuItem[]>(() => {
-        const filteredResults = state.searchResult?.filter((workspace) => !storeState.stagedWorkspaces.some((stagedWorkspace) => stagedWorkspace.name === workspace.workspace_id));
+        const filteredResults = state.searchResult?.filter((workspace) => !storeState.stagedWorkspaces.some((stagedWorkspace) => stagedWorkspace.workspaceId === workspace.workspace_id));
         const workspaceMenuItems:MenuItem[] = filteredResults.map((workspace:ResourceModel) => ({
             type: 'item',
             label: workspace.name,
             name: workspace.workspace_id,
-
         }));
         if (state.nextToken?.length) {
             workspaceMenuItems.push({
@@ -102,13 +101,15 @@ const handleSelected = (selected: string[]) => {
     topBarSearchStore.setSelectedWorkspaces(selected);
 };
 
-const handleSelectItem = (item) => {
-    topBarSearchStore.addStagedWorkspace({
-        name: item.name,
-        label: item.label,
-        theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
-        isSelected: true,
-    });
+const handleSelectItem = (item:MenuItem) => {
+    if (item.name && typeof item.label === 'string') {
+        topBarSearchStore.addStagedWorkspace({
+            workspaceId: item.name,
+            label: item.label,
+            theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
+            isSelected: true,
+        });
+    }
     state.isActivatedSearchMenu = false;
 };
 
@@ -117,7 +118,9 @@ const handleRemoveItem = (workspace: StageWorkspace) => {
 };
 
 const handleCheckAll = (val:boolean) => {
-    state.isAllSelected = val;
+    topBarSearchStore.$patch((_state) => {
+        _state.state.allWorkspacesChecked = val;
+    });
 };
 
 const handleUpdateSearchText = (val: string) => {
@@ -137,7 +140,7 @@ watch(() => state.searchText, (val) => {
 <template>
     <div class="top-bar-search-workspace-filter">
         <div class="all-workspace-toggle">
-            <p-toggle-button :value="state.isAllSelected"
+            <p-toggle-button :value="storeState.isAllSelected"
                              @change-toggle="handleCheckAll"
             /><span>{{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}</span>
         </div>
@@ -149,15 +152,15 @@ watch(() => state.searchText, (val) => {
                               direction="vertical"
             >
                 <p-tooltip v-for="workspace in storeState.stagedWorkspaces"
-                           :key="workspace.name"
+                           :key="workspace.workspaceId"
                            :contents="workspace.label"
                            position="bottom"
                            class="workspace-item-tooltip"
                 >
                     <p-checkbox
                         :selected="storeState.selectedWorkspaces"
-                        :value="workspace.name"
-                        :disabled="state.isAllSelected"
+                        :value="workspace.workspaceId"
+                        :disabled="storeState.isAllSelected"
                         @change="handleSelected"
                     >
                         <div class="workspace-item-wrapper">
@@ -165,10 +168,10 @@ watch(() => state.searchText, (val) => {
                                 <workspace-logo-icon :text="workspace.label"
                                                      :theme="workspace.theme"
                                                      size="xs"
-                                                     :class="{'opacity-70': state.isAllSelected}"
+                                                     :class="{'opacity-70': storeState.isAllSelected}"
                                 /> <span class="label">{{ workspace.label }}</span>
                             </span>
-                            <p-icon-button v-if="!state.isAllSelected"
+                            <p-icon-button v-if="!storeState.isAllSelected"
                                            class="remove-button"
                                            name="ic_close"
                                            size="sm"
@@ -180,7 +183,7 @@ watch(() => state.searchText, (val) => {
             </p-checkbox-group>
             <p-text-button style-type="highlight"
                            class="show-more"
-                           :disabled="storeState.stagedWorkspaces.length >= STAGED_WORKSPACE_LIMIT || state.isAllSelected"
+                           :disabled="storeState.stagedWorkspaces.length >= STAGED_WORKSPACE_LIMIT || storeState.isAllSelected"
                            @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
             >
                 {{ $t('Show more') }}
