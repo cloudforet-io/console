@@ -14,6 +14,7 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     DashboardTemplate,
+    TemplateType,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -94,6 +95,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         labels: [] as string[],
         dashboardType: 'PUBLIC' as DashboardType,
         dashboardScope: 'WORKSPACE' as DashboardScope,
+        // template info
+        templateId: 'blank',
+        templateType: 'MANAGED' as TemplateType,
         // widget info states
         dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
         loadingWidgets: false,
@@ -167,7 +171,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardScope = dashboardScope;
     };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
-
+    const setTemplateId = (templateId: string) => { state.templateId = templateId; };
+    const setTemplateType = (templateType: string) => { state.templateType = templateType; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -221,6 +226,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        setTemplateId(_template.template_id);
+        setTemplateType(_template.template_type);
     };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
@@ -273,6 +280,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        setTemplateId(_dashboardInfo.template_id);
+        setTemplateType(_dashboardInfo.template_type);
     };
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;

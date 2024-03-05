@@ -101,6 +101,8 @@ const createDashboard = async () => {
 
         const apiParam: CreateDashboardParameters = {
             name: dashboardDetailState.name,
+            template_id: dashboardDetailState.templateId,
+            template_type: dashboardDetailState.templateType,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
