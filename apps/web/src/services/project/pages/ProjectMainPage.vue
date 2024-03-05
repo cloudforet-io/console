@@ -18,7 +18,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
@@ -31,8 +31,8 @@ import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree
 const route = useRoute();
 const router = useRouter();
 
-const topBarHeaderStore = useTopBarHeaderStore();
-const topBarHeaderGetters = topBarHeaderStore.getters;
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
@@ -138,13 +138,13 @@ watch(() => route.query, async (after, before) => {
     }
 });
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-    topBarHeaderStore.setBreadcrumbs(projectGroupNavigation);
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
-watch(() => topBarHeaderGetters.selectedItem, (selectedItem) => {
+watch(() => gnbGetters.selectedItem, (selectedItem) => {
     onProjectGroupNavClick(selectedItem);
 });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

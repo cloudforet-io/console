@@ -24,7 +24,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray } from '@/styles/colors';
 
@@ -39,7 +39,7 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const favoriteStore = useFavoriteStore();
@@ -104,7 +104,7 @@ const handleDeleteQueryConfirm = async () => {
 };
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 });
 </script>
 

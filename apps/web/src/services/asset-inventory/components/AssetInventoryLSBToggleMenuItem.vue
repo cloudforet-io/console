@@ -71,6 +71,8 @@ const handleChangeToggle = (value: boolean) => {
     }
     .toggle-contents {
         margin-top: 0.5rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
 }
 </style>

@@ -262,10 +262,16 @@ onMounted(() => {
 <style scoped lang="postcss">
 .sidebar-menu {
     .no-data {
-        @apply text-gray-500;
+        @apply block text-gray-500;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
     }
     .show-more {
         margin-left: 0.5rem;
+    }
+    .select-options-dropdown {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
     }
 }
 

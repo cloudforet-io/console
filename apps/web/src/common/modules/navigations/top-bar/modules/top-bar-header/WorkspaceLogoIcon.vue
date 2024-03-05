@@ -44,8 +44,8 @@ const state = reactive({
     }
     &.sm {
         @apply text-label-xl;
-        width: 2rem;
-        height: 2rem;
+        width: 1.75rem;
+        height: 1.75rem;
     }
     &.english-logo {
         @apply text-display-md;

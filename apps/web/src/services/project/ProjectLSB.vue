@@ -50,7 +50,7 @@ const handleClickCollapsibleTitle = () => {
                                @delete="handleDeleteFavorite"
                 >
                     <template #icon="{item}">
-                        <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
+                        <p-i :name="item.type === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
                              width="1rem"
                              height="1rem"
                              color="inherit inherit"

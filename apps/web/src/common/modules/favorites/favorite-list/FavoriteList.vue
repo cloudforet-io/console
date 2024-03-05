@@ -29,11 +29,11 @@
                     /></span>
                     <span class="name">{{ item.label }}</span>
                 </router-link>
-                <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id"
-                               name="ic_close"
-                               size="sm"
-                               class="delete-btn"
-                               @click.prevent.stop="handleClickDelete(item)"
+                <favorite-button v-if="hoveredItem && hoveredItem.id === item.id"
+                                 :item-id="item.id"
+                                 :favorite-type="item.type"
+                                 scale="0.8"
+                                 class="favorite-button"
                 />
             </div>
             <summary v-if="items.length > LIMIT_COUNT"
@@ -57,12 +57,13 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PI, PIconButton } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
@@ -70,7 +71,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 const LIMIT_COUNT = 5;
 export default {
     name: 'FavoriteList',
-    components: { PI, PIconButton },
+    components: { FavoriteButton, PI },
     props: {
         items: {
             type: Array,
@@ -139,6 +140,8 @@ export default {
     font-size: 0.875rem;
     line-height: 1.2;
     white-space: break-spaces;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
     .favorite-btn {
         @apply text-yellow-400;
         vertical-align: top;

@@ -13,7 +13,7 @@ import { SpaceRouter } from '@/router';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
@@ -30,7 +30,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -77,7 +77,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     await getDashboardData(dashboardId);
 }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

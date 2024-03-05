@@ -255,7 +255,9 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 <style scoped lang="postcss">
 .dashboards-l-s-b {
     .no-data {
-        @apply text-gray-500;
+        @apply block text-gray-500;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
     }
 }
 </style>

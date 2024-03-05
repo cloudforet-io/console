@@ -23,6 +23,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
@@ -33,18 +34,18 @@ interface GNBMenuType extends DisplayMenu {
     name?: string;
     disabled?: boolean;
 }
-interface Props {
-    isMinimizeGnb?: boolean;
-}
 
-const props = withDefaults(defineProps<Props>(), {
-    isMinimizeGnb: false,
-});
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
 
+
+const storeState = reactive({
+    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+});
 const state = reactive({
     isHovered: false,
     dataSource: [] as CostDataSourceModel[],
@@ -132,7 +133,7 @@ const refinedMenuList = (list, value) => {
 
 <template>
     <div class="g-n-b-navigation-rail"
-         :class="{'is-minimize': props.isMinimizeGnb, 'is-mobile': state.isMobileSize}"
+         :class="{'is-minimize': storeState.isMinimizeGnb, 'is-mobile': state.isMobileSize}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
     >
@@ -157,12 +158,12 @@ const refinedMenuList = (list, value) => {
                          color="inherit"
                     />
                     <div class="menu-container">
-                        <span v-if="!props.isMinimizeGnb || state.isHovered"
+                        <span v-if="!storeState.isMinimizeGnb || state.isHovered"
                               class="menu-title"
                         >
                             {{ item.label }}
                         </span>
-                        <p-button v-if="item.disabled && !state.isMenuDescription && !props.isMinimizeGnb"
+                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeGnb"
                                   icon-right="ic_arrow-right"
                                   style-type="tertiary"
                                   size="sm"
@@ -171,7 +172,7 @@ const refinedMenuList = (list, value) => {
                         >
                             {{ $t('MENU.LEARN_MORE') }}
                         </p-button>
-                        <span v-if="item.highlightTag && (!props.isMinimizeGnb || state.isHovered)"
+                        <span v-if="item.highlightTag && (!storeState.isMinimizeGnb || state.isHovered)"
                               class="mark"
                         >
                             <new-mark v-if="item.highlightTag === 'new'"
@@ -223,17 +224,18 @@ const refinedMenuList = (list, value) => {
 
 <style scoped lang="postcss">
 .g-n-b-navigation-rail {
-    @apply flex-col items-start bg-white border-r;
+    @apply flex-col items-start bg-white border-r overflow-y-scroll;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
-    height: 100%;
+    height: calc(100% - $top-bar-height);
     padding: 1rem 0.75rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     .navigation-rail-wrapper {
         width: 100%;
         .service-menu {
             @apply flex items-center justify-between text-label-md;
             width: 100%;
-            height: 2.125rem;
+            height: 2rem;
             padding-right: 0.5rem;
             padding-left: 0.5rem;
             gap: 0.75rem;
@@ -271,12 +273,12 @@ const refinedMenuList = (list, value) => {
                 &::before {
                     @apply absolute bg-violet;
                     content: '';
-                    top: 0;
+                    top: 0.125rem;
                     left: -0.75rem;
                     width: 0.25rem;
-                    height: 100%;
-                    border-top-right-radius: 0.125rem;
-                    border-bottom-right-radius: 0.125rem;
+                    height: 1.75rem;
+                    border-top-right-radius: 0.25rem;
+                    border-bottom-right-radius: 0.25rem;
                 }
             }
         }
@@ -295,6 +297,7 @@ const refinedMenuList = (list, value) => {
     &.is-minimize {
         @apply bg-gray-100 cursor-pointer;
         width: $gnb-navigation-rail-min-width;
+        box-shadow: unset;
         .service-menu {
             width: 2.25rem;
             &:hover:not(.is-only-label) {
@@ -308,6 +311,7 @@ const refinedMenuList = (list, value) => {
             &:hover {
                 @apply bg-white;
                 width: $gnb-navigation-rail-max-width;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
                 .service-menu {
                     width: 100%;
                     &:hover:not(.is-only-label) {

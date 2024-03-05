@@ -170,8 +170,7 @@ window.addEventListener('resize', detectWindowResizing);
     margin: unset;
 
     > .sidebar-container {
-        @apply bg-white;
-        box-shadow: 1px 0 0.25rem rgba(0, 0, 0, 0.12);
+        @apply bg-white border-r border-gray-200;
         &.transition {
             transition: width 0.2s;
         }

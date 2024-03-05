@@ -71,10 +71,9 @@ const handleBackToWorkspace = () => {
 
 <style lang="postcss" scoped>
 .my-page-top-bar {
-    @apply bg-white items-center;
+    @apply bg-white items-center border-b border-gray-200;
     display: flex !important;
     height: $top-bar-height;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     .left-part {
         @apply h-full w-full flex items-center;
