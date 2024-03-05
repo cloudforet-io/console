@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckbox, PIconButton, PI,
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckbox, PIconButton,
 } from '@spaceone/design-system';
 import { find, sum } from 'lodash';
 
@@ -299,9 +299,6 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                     </template>
                     <template #no-data>
                         <div>
-                            <p-i name="ic_error-filled"
-                                 :color="red[400]"
-                            />
                             <p class="text">
                                 {{ $t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
                             </p>

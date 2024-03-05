@@ -176,7 +176,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                                              :theme="item?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ item.label }}</span>
+                        <span class="label-text">{{ item.label }}</span>
                     </div>
 
                     <!--                    TODO: will be applied after API completion-->
@@ -280,9 +280,14 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
         .menu-item-wrapper {
             @apply flex justify-between;
+            max-width: 18rem;
 
             .label {
                 @apply flex items-center gap-2;
+            }
+            .label-text {
+                @apply truncate;
+                max-width: 16.25rem;
             }
         }
 
@@ -312,9 +317,14 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
-            min-width: 20rem !important;
+            width: 20rem;
+            max-height: 85vh !important;
             margin-top: -0.125rem;
             margin-left: 0;
+            .menu-container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
             .p-context-menu-item {
                 .favorite-button {
                     &:not(.active) {

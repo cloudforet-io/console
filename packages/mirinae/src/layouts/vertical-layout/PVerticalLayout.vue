@@ -154,6 +154,7 @@ window.addEventListener('resize', detectWindowResizing);
             </p-tooltip>
         </div>
         <div class="main"
+             :class="{transition: state.transition}"
              :style="state.mainStyle"
         >
             <slot />
@@ -183,6 +184,9 @@ window.addEventListener('resize', detectWindowResizing);
         /* flex-grow: 1; */
         overflow-x: hidden;
         overflow-y: auto;
+        &.transition {
+            transition: width 0.2s;
+        }
     }
     > .resizer-container {
         display: flex;

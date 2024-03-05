@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
@@ -26,10 +26,8 @@ import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/componen
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
-const router = useRouter();
 
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
@@ -37,15 +35,6 @@ const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
-
-/* Query String */
-watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
-    router.replace({
-        query: {
-            select_pg: selectedItem.node?.data.id || null,
-        },
-    }).catch(() => {});
-});
 
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -146,10 +135,6 @@ watch(() => gnbGetters.selectedItem, (selectedItem) => {
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
-
-onUnmounted(() => {
-    projectPageStore.reset();
-});
 </script>
 
 <template>

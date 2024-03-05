@@ -238,6 +238,7 @@ watch(() => projectPageGetters.groupId, (data) => {
     if (!state.allProjectRoot) return;
     if (data) {
         state.allProjectRoot.resetSelect();
+        projectPageStore.selectNode(data);
     } else {
         state.allProjectRoot.changeSelectState(state.allProjectNode, [0]);
     }
@@ -335,6 +336,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         :data-setter="dataSetter"
                         :data-getter="dataGetter"
                         :data-fetcher="dataFetcher"
+                        fetch-on-init
                         @init="handleTreeInit"
                         @finish-edit="handleFinishEdit"
                         @drop="handleDrop"

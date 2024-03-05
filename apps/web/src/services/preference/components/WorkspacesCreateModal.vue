@@ -86,6 +86,7 @@ const validationState = reactive({
         }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
+        if (state.name?.trim().length >= 80) return i18n.t('IAM.WORKSPACES.CREATE_WORKSPACE_TEXT_LENGTH');
         return undefined;
     }),
     nameInvalid: computed(() => state.name !== undefined && !!validationState.nameInvalidText),
@@ -184,6 +185,9 @@ watch(() => props.visible, (visible) => {
                     </button>
                 </div>
             </p-field-group>
+        </template>
+        <template #confirm-button>
+            <span>{{ $t('IAM.WORKSPACES.CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

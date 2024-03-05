@@ -2137,6 +2137,7 @@
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "워크스페이스 생성",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "",
 			"DELETE": "삭제",
 			"DELETE_WORKSPACE": "삭제",
 			"DELETE_WORKSPACE_DESC": "이 작업은 취소 할 수 없습니다.",

@@ -224,7 +224,7 @@ const refinedMenuList = (list, value) => {
 
 <style scoped lang="postcss">
 .g-n-b-navigation-rail {
-    @apply flex-col items-start bg-white border-r overflow-y-scroll;
+    @apply flex-col items-start bg-white border-r overflow-y-auto;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
     height: calc(100% - $top-bar-height);
