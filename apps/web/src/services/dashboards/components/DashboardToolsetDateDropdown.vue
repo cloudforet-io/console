@@ -49,7 +49,7 @@ const state = reactive({
             {
                 type: 'item',
                 name: 'custom',
-                label: i18n.t('DASHBOARDS.DETAIL.CUSTOM'),
+                label: i18n.t('DASHBOARDS.DETAIL.OTHER_MONTHS'),
             },
         ];
     }),
@@ -133,7 +133,7 @@ watch(() => props.dateRange, () => {
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
             :menu="state.monthMenuItems"
-            :selection-label="$t('DASHBOARDS.DETAIL.PERIOD')"
+            :selection-label="$t('DASHBOARDS.DETAIL.BASED_ON')"
             style-type="rounded"
             :selected="state.selectedMonthLabel"
             menu-position="right"

@@ -1528,6 +1528,7 @@
 		"DETAIL": {
 			"APPLY": "확인",
 			"AUTO": "자동",
+			"BASED_ON": "기준월",
 			"CLONE": "복제",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
@@ -1537,6 +1538,7 @@
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
 			"EXPORT": "파일 저장",
+			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
 			},
@@ -1549,6 +1551,7 @@
 			"PERIOD_LAST_MONTH": "지난달",
 			"PERIOD_THIS_MONTH": "이번 달",
 			"REFRESH": "자동 새로고침",
+			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정"
 		},
 		"FORM": {

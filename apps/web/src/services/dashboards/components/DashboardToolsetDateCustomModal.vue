@@ -71,7 +71,7 @@ watch(() => props.visible, (visible) => {
 </script>
 
 <template>
-    <p-button-modal :header-title="$t('DASHBOARDS.DETAIL.CUSTOM_DATE_MODAL_TITLE')"
+    <p-button-modal :header-title="$t('DASHBOARDS.DETAIL.SELECT_MONTH')"
                     centered
                     size="sm"
                     fade
