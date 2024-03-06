@@ -120,7 +120,7 @@ watch(() => state.currentMenuId, async () => {
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem)"
+            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.HOME_DASHBOARD"
                              :item-id="gnbGetters.favoriteItem.id || ''"
                              :favorite-type="gnbGetters.favoriteItem.type || ''"
                              scale="0.8"

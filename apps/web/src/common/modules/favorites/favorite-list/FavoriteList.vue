@@ -3,11 +3,17 @@
          @mouseleave="hoveredItem = null"
     >
         <template v-if="loading" />
-        <i18n v-else-if="items.length === 0"
-              class="empty"
-              path="COMMON.STARRED_NO_DATA"
-              tag="p"
-        />
+        <span v-else-if="items.length === 0"
+              class="no-data"
+        >
+            <p-i class="menu-icon"
+                 name="ic_star-filled"
+                 height="1rem"
+                 width="1rem"
+                 :color="yellow[500]"
+            />
+            {{ $t('COMMON.STARRED_NO_DATA') }}
+        </span>
         <template v-else>
             <div v-for="item in displayItems"
                  :key="item.id"
@@ -67,6 +73,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
+import { yellow } from '@/styles/colors';
 
 const LIMIT_COUNT = 5;
 export default {
@@ -129,59 +136,53 @@ export default {
             getResourceType,
             referenceRouter,
             LIMIT_COUNT,
+            yellow,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.empty {
-    @apply text-gray-400;
-    font-size: 0.875rem;
-    line-height: 1.2;
-    white-space: break-spaces;
-    padding-right: 0.5rem;
-    padding-left: 0.5rem;
-    .favorite-btn {
-        @apply text-yellow-400;
-        vertical-align: top;
+.favorite-list {
+    .item {
+        @apply flex items-center rounded;
+        height: 2rem;
+        padding-left: 0.5rem;
+        cursor: pointer;
+        &.hovered {
+            @apply bg-secondary2 text-secondary;
+        }
+        .item-link {
+            @apply flex flex-grow items-center;
+            line-height: 1.5;
+            max-width: calc(100% - 1.75rem);
+        }
+        .icon {
+            @apply flex-shrink-0 flex overflow-hidden rounded-sm;
+            width: 1rem;
+            height: 1rem;
+        }
+        .name {
+            @apply ml-1 flex-grow truncate;
+            font-size: 0.875rem;
+        }
     }
-}
-.item {
-    @apply flex items-center rounded;
-    height: 2rem;
-    padding-left: 0.5rem;
-    cursor: pointer;
-    &.hovered {
-        @apply bg-secondary2 text-secondary;
+    .toggle-btn {
+        @apply mt-3 text-blue-700;
+        cursor: pointer;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 1;
+        font-size: 0.75rem;
+        &:hover {
+            text-decoration: underline;
+        }
     }
-    .item-link {
-        @apply flex flex-grow items-center;
-        line-height: 1.5;
-        max-width: calc(100% - 1.75rem);
-    }
-    .icon {
-        @apply flex-shrink-0 flex overflow-hidden rounded-sm;
-        width: 1rem;
-        height: 1rem;
-    }
-    .name {
-        @apply ml-1 flex-grow truncate;
-        font-size: 0.875rem;
-    }
-    .delete-btn {
-        @apply float-right mr-1;
-    }
-}
-.toggle-btn {
-    @apply mt-3 text-blue-700;
-    cursor: pointer;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 1;
-    font-size: 0.75rem;
-    &:hover {
-        text-decoration: underline;
+    .no-data {
+        @apply flex items-center text-gray-500;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+        gap: 0.125rem;
     }
 }
 </style>
