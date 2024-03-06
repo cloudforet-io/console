@@ -168,6 +168,10 @@ watch(() => props.dashboardList, () => {
                                          scale="0.8"
                                          class="favorite-button"
                         />
+                        <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
+                             width="1rem"
+                             height="1rem"
+                        />
                         <span class="board-item-title">
                             {{ board.name }}
                         </span>
