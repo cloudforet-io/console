@@ -81,11 +81,11 @@ const queryState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
-            { name: 'label', label: 'Label' },
+            { name: 'labels', label: 'Label' },
         ],
     }]),
     valueHandlerMap: computed(() => ({
-        label: getDashboardValueHandler(),
+        labels: getDashboardValueHandler(),
     })),
     queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
