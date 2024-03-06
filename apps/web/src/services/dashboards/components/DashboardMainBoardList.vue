@@ -133,7 +133,7 @@ const handleClickDeleteDashboard = (dashboardId: string) => {
 const labelQueryHelper = new QueryHelper();
 const handleSetQuery = (selectedLabel: string | string[]) => {
     labelQueryHelper.setFilters(dashboardState.searchFilters)
-        .addFilter({ k: 'label', o: '=', v: selectedLabel });
+        .addFilter({ k: 'labels', o: '=', v: selectedLabel });
     dashboardStore.setSearchFilters(labelQueryHelper.filters);
 };
 const handlePage = (page: number) => {
