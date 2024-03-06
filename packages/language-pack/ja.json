@@ -2805,7 +2805,7 @@
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
-		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
+		"ALERT_MANAGER_DASHBOARD": "",
 		"ALERT_MANAGER_ESCALATION_POLICY": "エスカレーションポリシー",
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
