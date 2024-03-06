@@ -110,25 +110,15 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
 watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVariableType], ([_order]) => {
     convertAndUpdateVariablesForTable(_order);
 }, { immediate: true });
-
-const {
-    orderedVariables,
-    variableFilterList,
-    selectedVariableType,
-    variableFields,
-    selectionType,
-    variableType,
-} = toRefs(state);
-
 </script>
 
 <template>
     <div class="list-wrapper">
         <div class="variable-select-filter">
             <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-            <p-select-status v-for="(type, idx) in variableFilterList"
+            <p-select-status v-for="(type, idx) in state.variableFilterList"
                              :key="`variable-type-${idx}`"
-                             :selected="selectedVariableType"
+                             :selected="state.selectedVariableType"
                              :value="type.name"
                              @change="handleSelectType"
             >
@@ -136,17 +126,17 @@ const {
             </p-select-status>
         </div>
         <p-data-table class="variable-table"
-                      :items="orderedVariables"
-                      :fields="variableFields"
+                      :items="state.orderedVariables"
+                      :fields="state.variableFields"
         >
             <template #col-selection_type-format="{ value }">
-                <span>{{ selectionType[value] }}</span>
+                <span>{{ state.selectionType[value] }}</span>
             </template>
             <template #col-variable_type-format="{ value }">
                 <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
                          badge-type="solid-outline"
                 >
-                    {{ variableType[value] }}
+                    {{ state.variableType[value] ? state.variableType[value] : state.variableType.CUSTOM }}
                 </p-badge>
             </template>
             <template #col-use-format="{ value, item }">
