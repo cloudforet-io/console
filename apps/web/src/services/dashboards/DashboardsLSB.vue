@@ -4,6 +4,8 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { PI } from '@spaceone/design-system';
+
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -22,6 +24,8 @@ import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
+
+import { yellow } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
@@ -246,6 +250,12 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
             <span v-else
                   class="no-data"
             >
+                <p-i class="menu-icon"
+                     name="ic_star-filled"
+                     height="1rem"
+                     width="1rem"
+                     :color="yellow[500]"
+                />
                 {{ $t('COMMON.STARRED_NO_DATA') }}
             </span>
         </template>
@@ -255,9 +265,10 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 <style scoped lang="postcss">
 .dashboards-l-s-b {
     .no-data {
-        @apply block text-gray-500;
+        @apply flex items-center text-gray-500;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
+        gap: 0.125rem;
     }
 }
 </style>

@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "管理者モードに切り替える",
 				"EXIT_ADMIN_MODE": "管理者モードを終了する",
+				"FAVORITE": "お気に入り",
+				"NOTICE": "お知らせ",
 				"NOTIFICATIONS": "通知",
 				"PROFILE": "マイページ",
-				"RECENT_FAVORITE": "最近のアクセス / お気に入り",
 				"SEARCH": "検索"
 			},
 			"WORKSPACE": {
@@ -2804,7 +2805,7 @@
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
-		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
+		"ALERT_MANAGER_DASHBOARD": "",
 		"ALERT_MANAGER_ESCALATION_POLICY": "エスカレーションポリシー",
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",

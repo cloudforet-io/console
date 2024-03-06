@@ -12,7 +12,7 @@ import type { SuggestionItem } from '@/common/modules/navigations/top-bar/module
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import type {
     FavoriteMenuItem,
-} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavorite.vue';
+} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
 
 interface Props {
     items: SuggestionItem[] | FavoriteMenuItem [];

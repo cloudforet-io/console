@@ -341,7 +341,7 @@ watch([
 </script>
 
 <template>
-    <div class="top-bar-favorite">
+    <div class="top-bar-favorite-context-menu">
         <p-data-loader :data="state.items"
                        :loading="state.loading"
                        :class="{ loading: state.loading }"
@@ -411,7 +411,7 @@ watch([
 </template>
 
 <style lang="postcss" scoped>
-.top-bar-favorite {
+.top-bar-favorite-context-menu {
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
         &.loading {
@@ -451,6 +451,16 @@ watch([
             font-size: 0.875rem;
             font-weight: 700;
             padding-bottom: 0.5rem;
+        }
+        .suggestion-item {
+            justify-content: unset;
+            .texts {
+                flex: unset;
+                width: auto;
+                .text-item {
+                    width: auto;
+                }
+            }
         }
     }
 }

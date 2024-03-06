@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"FAVORITE": "즐겨찾기 ",
+				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
 				"PROFILE": "마이페이지",
-				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
@@ -2804,7 +2805,7 @@
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
 		"ALERT_MANAGER": "얼럿 매니저",
 		"ALERT_MANAGER_ALERT": "얼럿",
-		"ALERT_MANAGER_DASHBOARD": "대시보드",
+		"ALERT_MANAGER_DASHBOARD": "",
 		"ALERT_MANAGER_ESCALATION_POLICY": "에스컬레이션 정책",
 		"ASSET_INVENTORY": "에셋 인벤토리",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",

@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     }
 
     .header {
-        @apply flex justify-between;
+        @apply flex;
         padding: 1.5rem 1.5rem 0.25rem 1.5rem;
         &.without-breadcrumbs {
             padding: 0;

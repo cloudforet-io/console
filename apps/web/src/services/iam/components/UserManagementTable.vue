@@ -102,7 +102,7 @@ const tableState = reactive({
         const resourceType = userPageState.isAdminMode ? 'identity.User' : 'identity.WorkspaceUser';
         return {
             user_id: makeDistinctValueHandler(resourceType, 'user_id'),
-            name: makeDistinctValueHandler(resourceType, 'name'),
+            name: makeDistinctValueHandler(resourceType, 'name', 'string', [{ k: 'name', v: '', o: 'not' }]),
             state: makeEnumValueHandler(USER_STATE),
             email: makeDistinctValueHandler(resourceType, 'email'),
             auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
