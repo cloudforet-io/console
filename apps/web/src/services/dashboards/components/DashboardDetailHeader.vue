@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 import {
-    PIconButton, PHeading, PSkeleton,
+    PIconButton, PHeading, PSkeleton, PI,
 } from '@spaceone/design-system';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -18,6 +18,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 interface Props {
     dashboardId: string;
+    templateName?: string;
 }
 const props = defineProps<Props>();
 
@@ -47,12 +48,20 @@ const handleNameUpdate = (name: string) => {
 </script>
 
 <template>
-    <div>
+    <div class="dashboard-detail-header">
         <p-heading :title="dashboardDetailState.name">
             <p-skeleton v-if="!dashboardDetailState.name"
                         width="20rem"
                         height="1.5rem"
             />
+            <template v-if="dashboardDetailStore.getters.displayInfo?.icon"
+                      #title-left-extra
+            >
+                <p-i width="2rem"
+                     height="2rem"
+                     :name="dashboardDetailStore.getters.displayInfo?.icon"
+                />
+            </template>
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
@@ -80,6 +89,11 @@ const handleNameUpdate = (name: string) => {
                 />
             </template>
         </p-heading>
+        <p v-if="props.templateName"
+           class="template-name"
+        >
+            {{ props.templateName }}
+        </p>
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
                                    :name="dashboardDetailState.name"
@@ -95,15 +109,22 @@ const handleNameUpdate = (name: string) => {
 </template>
 
 <style lang="postcss" scoped>
-.p-heading {
+.dashboard-detail-header {
     margin-bottom: 0.75rem;
-}
-.title-right-extra {
-    @apply flex-shrink-0 inline-flex items-center;
-    margin-bottom: -0.25rem;
-    gap: 0.5rem;
-    .favorite-button {
-        margin: 0 0.25rem;
+    .p-heading {
+        margin-bottom: 0;
+    }
+    .title-right-extra {
+        @apply flex-shrink-0 inline-flex items-center;
+        margin-bottom: -0.25rem;
+        gap: 0.5rem;
+        .favorite-button {
+            margin: 0 0.25rem;
+        }
+    }
+    .template-name {
+        @apply text-paragraph-sm text-gray-500;
+        margin-left: 2.5rem;
     }
 }
 </style>

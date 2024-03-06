@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-    onUnmounted, ref, watch,
+    computed,
+    onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -17,6 +18,7 @@ import DashboardRefreshDropdown from '@/services/dashboards/components/Dashboard
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -28,6 +30,10 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+
+const state = reactive({
+    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
+});
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
@@ -72,7 +78,9 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <dashboard-detail-header :dashboard-id="props.dashboardId" />
+        <dashboard-detail-header :dashboard-id="props.dashboardId"
+                                 :template-name="state.templateName"
+        />
         <div class="filter-box">
             <dashboard-labels editable
                               @update-labels="handleUpdateLabels"
@@ -98,6 +106,7 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-detail-page {
+
     .divider {
         @apply mb-6;
     }
