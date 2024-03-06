@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
     <div class="general-page-layout"
          :class="props.overflow"
     >
+        <portal-target name="page-top-notification" />
         <div class="header">
             <slot name="handbook" />
         </div>
