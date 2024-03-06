@@ -22,6 +22,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import getRandomId from '@/lib/random-id-generator';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -130,6 +131,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 }
             });
             return _refinedVariablesSchema;
+        }),
+        displayInfo: computed<DashboardTemplate['display_info']>(() => {
+            if (!state.templateId || state.templateId === 'blank') return {};
+            const _template = DASHBOARD_TEMPLATES[state.templateId];
+            return {
+                icon: state.dashboardInfo?.display_info?.icon ?? _template.displayInfo.icon ?? '',
+                previewImage: state.dashboardInfo?.display_info?.preview_image ?? _template.displayInfo.previewImage ?? '',
+            };
         }),
     });
 
