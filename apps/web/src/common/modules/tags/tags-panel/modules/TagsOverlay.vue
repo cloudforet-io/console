@@ -122,6 +122,7 @@ onMounted(() => {
         max-height: 100%;
         min-height: 100%;
         border: none;
+        max-width: 1920px;
         .page-nav {
             @apply mt-6 ml-8;
             flex-shrink: 0;

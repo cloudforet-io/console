@@ -110,6 +110,16 @@ const state = reactive({
             ...(state.currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
     }),
+    adminMenuSet: computed<LSBMenu>(() => (!storeState.isAdminMode ? [
+        {
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: i18n.t('COMMON.STARRED'),
+            id: STARRED_MENU_ID,
+        },
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+    ] : [])),
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
@@ -127,14 +137,7 @@ const state = reactive({
         {
             type: MENU_ITEM_TYPE.DIVIDER,
         },
-        {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('COMMON.STARRED'),
-            id: STARRED_MENU_ID,
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
+        ...state.adminMenuSet,
         ...state.queryMenuSet,
     ]),
 });

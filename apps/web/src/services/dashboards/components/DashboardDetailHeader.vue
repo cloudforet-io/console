@@ -92,7 +92,6 @@ const handleNameUpdate = (name: string) => {
 .title-right-extra {
     @apply flex-shrink-0 inline-flex items-center;
     margin-bottom: -0.25rem;
-    gap: 0.5rem;
     .favorite-button {
         margin: 0 0.25rem;
     }

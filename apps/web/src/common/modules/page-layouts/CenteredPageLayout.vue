@@ -1,18 +1,3 @@
-<template>
-    <p-centered-layout class="centered-page-layout">
-        <template v-if="!props.hasNavBar"
-                  #top-contents
-        >
-            <top-bar-logo class="top-bar-logo"
-                          :to="{ name: ROOT_ROUTE._NAME }"
-            />
-        </template>
-        <template #default>
-            <slot />
-        </template>
-    </p-centered-layout>
-</template>
-
 <script setup lang="ts">
 import { PCenteredLayout } from '@spaceone/design-system';
 
@@ -27,3 +12,18 @@ const props = withDefaults(defineProps<Props>(), {
     hasNavBar: false,
 });
 </script>
+
+<template>
+    <p-centered-layout class="centered-page-layout">
+        <template v-if="!props.hasNavBar"
+                  #top-contents
+        >
+            <top-bar-logo class="top-bar-logo"
+                          :to="{ name: ROOT_ROUTE._NAME }"
+            />
+        </template>
+        <template #default>
+            <slot />
+        </template>
+    </p-centered-layout>
+</template>

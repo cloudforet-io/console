@@ -227,7 +227,7 @@ const refinedMenuList = (list, value) => {
     @apply flex-col items-start bg-white border-r overflow-y-auto;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
-    height: calc(100% - $top-bar-height);
+    height: calc(100% - $gnb-toolbox-height);
     padding: 1rem 0.75rem;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     z-index: 51;
