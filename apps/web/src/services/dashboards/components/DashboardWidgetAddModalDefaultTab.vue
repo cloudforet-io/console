@@ -3,13 +3,20 @@ import { computed, reactive } from 'vue';
 
 import { PButtonTab, PLazyImg } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { flattenDeep } from 'lodash';
 
+import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidgetForm.vue';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),
     selectedWidgetConfigId: undefined as string | undefined,
@@ -21,18 +28,27 @@ const tabState = reactive({
         { name: 'Asset', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ASSET')} (${getWidgetConfigsByLabel('Asset').length})` },
         { name: 'Alert', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALERT')} (${getWidgetConfigsByLabel('Alert').length})` },
     ]),
-    activeTab: 'all',
+    activeTab: 'all' as string,
 });
 
 /* Util */
 const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> => {
-    const allConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
-    if (label === 'all') return allConfigs;
-    return allConfigs.filter((config) => config.labels?.includes(label));
+    const _allWidgetConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
+    const _templateId = dashboardDetailState.templateId;
+    if (_templateId === 'blank') {
+        if (label === 'all') return _allWidgetConfigs;
+        return _allWidgetConfigs.filter((config) => config.labels?.includes(label));
+    }
+
+    const _templateWidgets: DashboardLayoutWidgetInfo[] = flattenDeep(DASHBOARD_TEMPLATES[_templateId].layouts);
+    const _templateWidgetConfigNames: string[] = _templateWidgets.map((widget) => widget.widget_name);
+    const _templateWidgetConfigs = _allWidgetConfigs.filter((config) => config.widget_config_id && _templateWidgetConfigNames.includes(config.widget_config_id));
+    if (label === 'all') return _templateWidgetConfigs;
+    return _templateWidgetConfigs.filter((config) => config.labels?.includes(label));
 };
 
 /* Event */
-const handleChangeTab = (selectedTab) => {
+const handleChangeTab = (selectedTab: string) => {
     tabState.activeTab = selectedTab;
     state.selectedWidgetConfigId = undefined;
 };
