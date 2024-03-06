@@ -109,6 +109,7 @@ const createDashboard = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
+            display_info: dashboardDetailGetters.displayInfo,
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
             (apiParam as PublicDashboardCreateParameters).resource_group = dashboardDetailState.dashboardScope;

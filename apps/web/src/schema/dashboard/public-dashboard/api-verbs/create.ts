@@ -14,6 +14,10 @@ export interface PublicDashboardCreateParameters {
     variables?: DashboardVariables;
     settings?: DashboardSettings;
     variables_schema?: DashboardVariablesSchema;
+    display_info?: {
+        icon?: string;
+        preview_image?: string;
+    };
     labels?: string[];
     tags?: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;

@@ -91,6 +91,8 @@ const createDashboard = async () => {
 
         const apiParam: PublicDashboardCreateParameters = {
             name: dashboardDetailState.name,
+            template_id: dashboardDetailState.templateId,
+            template_type: dashboardDetailState.templateType,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
@@ -98,6 +100,7 @@ const createDashboard = async () => {
             variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
             resource_group: RESOURCE_GROUP.DOMAIN,
+            display_info: dashboardDetailGetters.displayInfo,
         };
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam) as PublicDashboardModel;

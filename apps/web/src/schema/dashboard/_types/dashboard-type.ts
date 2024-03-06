@@ -13,8 +13,7 @@ export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 // dashboard variable schema types
 type VariableSelectionType = 'SINGLE' | 'MULTI';
 
-// NOTE: add addtional types (custom, extension)
-export type TemplateType = 'MANAGED';
+export type TemplateType = 'MANAGED'|'EXTENSION';
 
 interface DashboardVariableOptions {
     type: VariableModelType;
