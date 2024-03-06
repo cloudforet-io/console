@@ -1,17 +1,14 @@
 <script setup lang="ts">
-
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PBoard, PButton, PLabel, PTextHighlighting, PI,
+    PBoard, PButton, PLabel, PTextHighlighting, PI, screens,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
 
-
-// import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+
 
 interface Props {
     templateSets: BoardSet[];
@@ -20,30 +17,31 @@ interface Props {
     keyword: string;
 }
 
+const MOBILE_WINDOW_SIZE = screens.mobile.max;
+
 const props = withDefaults(defineProps<Props>(), {
     templateSets: () => [],
     column: 1,
     showViewLink: false,
     keyword: '',
 });
-
 const emit = defineEmits<{(e: 'select-template', value: any)}>();
 const router = useRouter();
-//
-// const state = reactive({
-//     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-// });
 
-
+/* Event */
 const handleClickView = (template: DashboardModel) => {
-    const dahsboardId = template.private_dashboard_id || template.public_dashboard_id;
-    if (!dahsboardId) return;
+    const dashboardId = template.private_dashboard_id || template.public_dashboard_id;
+    if (!dashboardId) return;
     const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: dahsboardId } });
     window.open(routeData.href, '_blank');
 };
-
 const handleClickCreate = (template: DashboardModel) => {
     emit('select-template', template);
+};
+const handleClickBoardItem = (template: DashboardModel) => {
+    if (window.innerWidth <= MOBILE_WINDOW_SIZE) {
+        emit('select-template', template);
+    }
 };
 
 </script>
@@ -56,6 +54,7 @@ const handleClickCreate = (template: DashboardModel) => {
              :style-options="{
                  column: props.column,
              }"
+             @item-click="handleClickBoardItem"
     >
         <template #item-content="{board}">
             <div class="board-item-wrapper">
