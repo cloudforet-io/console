@@ -178,6 +178,12 @@ watch(() => props.dashboardList, () => {
                              color="gray900"
                              class="private-icon"
                         />
+                        <span v-if="board.tags.created_by"
+                              class="board-item-title-sub-text"
+                        >{{ board.tags.created_by }}</span>
+                        <span v-if="board.tags.created_by && props.scopeType === 'PROJECT'"
+                              class="board-item-title-sub-text"
+                        >•</span>
                         <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
                     </div>
                     <div class="labels-wrapper">
