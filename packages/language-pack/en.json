@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Switch to Admin Mode",
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
+				"FAVORITE": "Favorites",
+				"NOTICE": "Notice",
 				"NOTIFICATIONS": "Notifications",
 				"PROFILE": "My Page",
-				"RECENT_FAVORITE": "Recent Visits / Favorites",
 				"SEARCH": "Search"
 			},
 			"WORKSPACE": {

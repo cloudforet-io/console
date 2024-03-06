@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"FAVORITE": "즐겨찾기 ",
+				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
 				"PROFILE": "마이페이지",
-				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
