@@ -13,7 +13,7 @@ import { store } from '@/store';
 
 import {
     NOTIFICATION_TYPE_ICONS,
-} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-noti/type';
+} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/type';
 
 import { green, red, yellow } from '@/styles/colors';
 

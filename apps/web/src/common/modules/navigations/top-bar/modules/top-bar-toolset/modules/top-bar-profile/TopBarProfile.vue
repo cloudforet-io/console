@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, reactive, ref,
@@ -8,7 +7,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PDivider, PButton, PCopyButton,
+    PI, PDivider, PButton, PCopyButton, PTooltip,
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 
@@ -162,18 +161,22 @@ const handleClickSignOut = async () => {
          class="top-bar-profile"
          @keydown.esc="hideProfileMenu"
     >
-        <span :class="{'menu-button': true, 'opened': visible}"
-              role="button"
-              tabindex="0"
-              @click.stop="handleProfileButtonClick"
-              @keydown.enter="openProfileMenu"
+        <p-tooltip :contents="$t('COMMON.GNB.TOOLTIP.PROFILE')"
+                   position="bottom"
         >
-            <p-i :name="state.userIcon"
-                 class="menu-icon"
-                 width="1.75rem"
-                 height="1.75rem"
-            />
-        </span>
+            <span :class="{'menu-button': true, 'opened': visible}"
+                  role="button"
+                  tabindex="0"
+                  @click.stop="handleProfileButtonClick"
+                  @keydown.enter="openProfileMenu"
+            >
+                <p-i :name="state.userIcon"
+                     class="menu-icon"
+                     width="1.75rem"
+                     height="1.75rem"
+                />
+            </span>
+        </p-tooltip>
         <div v-if="visible"
              class="profile-menu-wrapper"
         >

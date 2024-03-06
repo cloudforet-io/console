@@ -5,13 +5,13 @@ import {
 } from 'vue';
 
 import {
-    PI,
+    PI, PTooltip,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import TopBarFavorite
-    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavorite.vue';
+import TopBarFavoriteContextMenu
+    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
 
 interface Props {
     visible: boolean
@@ -52,23 +52,27 @@ const handleRecentFavoriteButtonClick = () => {
          @click.stop
          @keydown.esc="hideRecentFavoriteMenu"
     >
-        <span :class="{'menu-button': true, 'opened': props.visible}"
-              tabindex="0"
-              role="button"
-              @keydown.enter="showRecentFavoriteMenu"
-              @click.stop="handleRecentFavoriteButtonClick"
+        <p-tooltip :contents="$t('COMMON.GNB.TOOLTIP.FAVORITE')"
+                   position="bottom"
         >
-            <p-i class="menu-icon"
-                 name="ic_star"
-                 height="1.375rem"
-                 width="1.375rem"
-                 color="inherit"
-            />
-        </span>
+            <span :class="{'menu-button': true, 'opened': props.visible}"
+                  tabindex="0"
+                  role="button"
+                  @keydown.enter="showRecentFavoriteMenu"
+                  @click.stop="handleRecentFavoriteButtonClick"
+            >
+                <p-i class="menu-icon"
+                     name="ic_star"
+                     height="1.375rem"
+                     width="1.375rem"
+                     color="inherit"
+                />
+            </span>
+        </p-tooltip>
         <div v-show="visible"
              class="favorite-content"
         >
-            <top-bar-favorite @close="hideRecentFavoriteMenu" />
+            <top-bar-favorite-context-menu @close="hideRecentFavoriteMenu" />
         </div>
     </div>
 </template>
@@ -97,7 +101,7 @@ const handleRecentFavoriteButtonClick = () => {
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;
-        width: 27.5rem;
+        width: 22.5rem;
         min-height: auto;
         top: 100%;
         right: 0;

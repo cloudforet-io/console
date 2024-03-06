@@ -21,7 +21,7 @@ import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
-import TopBarNotiItem from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-noti/modules/TopBarNotiItem.vue';
+import TopBarNotiItem from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notice/modules/TopBarNotiItem.vue';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
@@ -108,7 +108,7 @@ callApiWithGrantGuard();
 </script>
 
 <template>
-    <div class="top-bar-notice-tab">
+    <div class="top-bar-notice-context-menu">
         <p-data-loader :data="state.items"
                        :loading="state.loading"
                        :class="{ loading: state.loading && !state.items.length }"
@@ -167,7 +167,7 @@ callApiWithGrantGuard();
 </template>
 
 <style lang="postcss" scoped>
-.top-bar-notice-tab {
+.top-bar-notice-context-menu {
     @apply bg-white;
     display: flex;
     flex-direction: column;
