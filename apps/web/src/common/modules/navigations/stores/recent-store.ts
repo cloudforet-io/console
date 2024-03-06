@@ -22,6 +22,14 @@ export const RECENT_TYPE = {
 
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 
+export const recentNSearchTabMap = {
+    service: RECENT_TYPE.SERVICE,
+    serviceAccount: RECENT_TYPE.SERVICE_ACCOUNT,
+    project: RECENT_TYPE.PROJECT,
+    dashboard: RECENT_TYPE.DASHBOARD,
+    cloudService: RECENT_TYPE.CLOUD_SERVICE,
+} as const;
+
 const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
 export interface RecentMenu {
@@ -59,7 +67,7 @@ export const useRecentStore = defineStore('recent', () => {
 
     const actions = {
         fetchRecent: async ({
-            type, workspaceIds = [], limit = 5, searchText,
+            type, workspaceIds = [], limit = 15, searchText,
         }:{type: RecentType, workspaceIds:string[], limit?:number, searchText?:string}) => {
             recentListApiQuery.setFilters([
                 { k: 'name', v: `console:recent:${type}:`, o: '' },

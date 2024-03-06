@@ -1139,6 +1139,14 @@
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "",
+				"FILTER_BY_WORKSPACE": "",
+				"HELP_TEXT": "",
+				"NO_RESULT_1": "\"{inputText}\"에 대한 검색결과가 없습니다.",
+				"NO_RESULT_2": "",
+				"RECENTLY_VIEWED": "",
+				"SITE_NAVIGATION": "",
+				"WORKSPACE_FILTER_WARNING_DESC": "",
+				"WORKSPACE_FILTER_WARNING_TITLE": "",
 				"WORKSPACE_SWITCH_LINK": ""
 			}
 		},

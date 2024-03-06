@@ -6,6 +6,8 @@ import {
 
 import { PDivider, PContextMenu, PDataLoader } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -13,6 +15,8 @@ import type { SuggestionType, SuggestionItem } from '@/common/modules/navigation
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import TopBarSearchEmpty
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchEmpty.vue';
+import TopBarSearchRecentListItem
+    from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchRecentListItem.vue';
 import TopBarSearchWorkspaceFilter
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchWorkspaceFilter.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -51,10 +55,13 @@ const state = reactive({
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
     searchMenuList: computed(() => topBarSearchStore.state.searchMenuList),
-    recentMenuList: computed(() => topBarSearchStore.state.recentMenuList),
+    recentMenuList: computed(() => [
+        { name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.RECENTLY_VIEWED'), type: 'header' },
+        ...topBarSearchStore.state.recentMenuList]),
     serviceMenuCount: computed(() => state.searchMenuList?.length ?? 0),
     currentWorkspaceId: computed(() => workspaceStoreGetter.currentWorkspaceId),
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
+    recentMode: computed(() => state.inputText.length === 0),
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
     focusingType: SUGGESTION_TYPE.DEFAULT_SERVICE as SuggestionType,
@@ -91,10 +98,33 @@ watch(() => contentsSize.height.value, (height) => {
 </script>
 <template>
     <div class="search-tab-content">
-        <div v-if="state.inputText.length === 0"
+        <div v-if="state.recentMode"
              class="service-item-list"
         >
-            <div ref="contentsRef" />
+            <div ref="contentsRef">
+                <p-data-loader key="recent-menu-list"
+                               :loading="topBarSearchStore.state.loading"
+                               :data="state.recentMenuList"
+                >
+                    <p-context-menu class="search-list-context"
+                                    :menu="state.recentMenuList"
+                                    no-select-indication
+                                    @keyup:up:end="handleFocusEnd(SUGGESTION_TYPE.RECENT, 'UPWARD')"
+                                    @keyup:down:end="handleFocusEnd(SUGGESTION_TYPE.RECENT, 'DOWNWARD')"
+                                    @keyup:esc="emit('close')"
+                                    @focus="emit('update:isFocused', true)"
+                                    @blur="emit('update:isFocused', false)"
+                                    @select="handleSelect"
+                    >
+                        <template #item--format="{ item }">
+                            <top-bar-search-recent-list-item :resource-id="item?.data?.id" />
+                        </template>
+                    </p-context-menu>
+                    <template #no-data>
+                        <top-bar-search-empty :is-recent="true" />
+                    </template>
+                </p-data-loader>
+            </div>
         </div>
         <div v-else
              class="service-item-list"
@@ -133,8 +163,10 @@ watch(() => contentsSize.height.value, (height) => {
                 </p-data-loader>
             </div>
         </div>
-        <p-divider vertical />
-        <top-bar-search-workspace-filter />
+        <p-divider v-if="!state.recentMode"
+                   vertical
+        />
+        <top-bar-search-workspace-filter v-if="!state.recentMode" />
     </div>
 </template>
 

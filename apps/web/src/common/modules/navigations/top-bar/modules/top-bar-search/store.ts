@@ -12,6 +12,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
@@ -31,6 +32,7 @@ interface TopBarSearchStoreState {
 export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const workspaceStoreState = userWorkspaceStore.$state;
+    const recentStore = useRecentStore();
     const allReferenceStore = useAllReferenceStore();
     const allReferenceGetters = allReferenceStore.getters;
 
@@ -147,17 +149,25 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
 
     watch([
         () => getters.trimmedInputText,
-        () => state.activeTab,
         () => getters.selectedWorkspaces,
         () => state.isActivated,
-    ], debounce(async ([trimmedText, activeTab, workspaces]) => {
+    ], debounce(async ([trimmedText, workspaces]) => {
         if (trimmedText) {
-            await actions.fetchSearchList(trimmedText, activeTab, workspaces);
-            // state.recentMenuList = fetchRecentList(trimmedText);
+            await actions.fetchSearchList(trimmedText, state.activeTab, workspaces);
         } else {
             state.searchMenuList = [];
         }
     }, 500));
+
+    watch(() => state.activeTab, async (tab) => {
+        await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
+        if (storeState.currentWorkspaceId) {
+            state.recentMenuList = await recentStore.fetchRecent({
+                type: recentNSearchTabMap[tab],
+                workspaceIds: [storeState.currentWorkspaceId],
+            });
+        }
+    });
 
 
     return {

@@ -10,7 +10,13 @@ import {
 
 import { store } from '@/store';
 
-import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import {
+    topBarSearchReferenceRouter,
+} from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import SearchTabContent
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/SearchTabContent.vue';
 import TopBarSearchListItem
@@ -41,6 +47,9 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetter = userWorkspaceStore.getters;
+const recentStore = useRecentStore();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
@@ -60,11 +69,11 @@ const storeState = reactive({
 
 const state = reactive({
     tabs: [
-        { label: 'Service', name: 'service' },
-        { label: 'Service Account', name: 'serviceAccount' },
-        { label: 'Project', name: 'project' },
-        { label: 'Dashboard', name: 'dashboard' },
-        { label: 'Cloud Service', name: 'cloudService' },
+        { label: 'Service', name: SEARCH_TAB.SERVICE },
+        { label: 'Service Account', name: SEARCH_TAB.SERVICE_ACCOUNT },
+        { label: 'Project', name: SEARCH_TAB.PROJECT },
+        { label: 'Dashboard', name: SEARCH_TAB.DASHBOARD },
+        { label: 'Cloud Service', name: SEARCH_TAB.CLOUD_SERVICE },
     ],
     contentsHeight: 0,
     searchInputHeight: computed(() => (state.isTabletSize ? 60 : 0)),
@@ -79,19 +88,6 @@ const state = reactive({
         return undefined;
     }),
 });
-
-
-// const createSearchRecent = async (type: SuggestionType, id: string) => {
-//     try {
-//         await SpaceConnector.client.addOns.recent.search.create({
-//             type,
-//             id,
-//         });
-//     } catch (e) {
-//         ErrorHandler.handleError(e);
-//     }
-// };
-
 
 const handleMoveFocusEnd = () => {
     emit('move-focus-end');
@@ -108,11 +104,15 @@ const handleUpdateContentsSize = (height: number) => {
 };
 
 const handleSelect = (item) => {
-    if (topBarSearchStore.state.activeTab === 'cloudService') {
+    if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
-    } else if (topBarSearchStore.state.activeTab !== 'service') router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
 
-    // if (!state.showRecent && workspaceStoreGetter.currentWorkspaceId) createSearchRecent(SUGGESTION_TYPE.DEFAULT_SERVICE, menuId, workspaceStoreGetter.currentWorkspaceId);
+    if (workspaceStoreGetter.currentWorkspaceId === item.workspace_id && workspaceStoreGetter.currentWorkspaceId) {
+        recentStore.createRecent({
+            type: recentNSearchTabMap[topBarSearchStore.state.activeTab], workspaceId: workspaceStoreGetter.currentWorkspaceId, id: item.resource_id, label: item.label,
+        });
+    }
 
     topBarSearchStore.setIsActivated(false);
 };
@@ -219,7 +219,6 @@ const handleSelect = (item) => {
                     <template #item-format="{item}">
                         <top-bar-search-list-item key="cloudService"
                                                   :label="item?.name"
-                                                  icon-name="ic_service_service-account"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
                         >
