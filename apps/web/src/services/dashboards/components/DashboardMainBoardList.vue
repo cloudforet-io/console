@@ -81,7 +81,7 @@ const cloneModalState = reactive({
 });
 
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
-    const dahsboardId = dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '';
+    const dashboardId = dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '';
     return [
         {
             iconName: 'ic_edit',
@@ -90,7 +90,7 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
                 router.push(getProperRouteLocation({
                     name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                     params: {
-                        dashboardId: dahsboardId,
+                        dashboardId,
                     },
                 }));
             },
@@ -106,19 +106,19 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
         {
             iconName: 'ic_delete',
             tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-            eventAction: () => handleClickDeleteDashboard(dahsboardId),
+            eventAction: () => handleClickDeleteDashboard(dashboardId),
         },
     ];
 };
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    router.push(getProperRouteLocation(getProperRouteLocation({
+    router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
-    })));
+    }));
 };
 const handleUpdateCloneModal = (visible: boolean) => {
     if (visible) return;
