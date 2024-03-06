@@ -1,6 +1,28 @@
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+interface Props {
+    visible: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
+
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
+
+const storeState = reactive({
+    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+});
+</script>
+
 <template>
     <transition name="slide-up">
-        <general-page-layout v-if="visible"
+        <general-page-layout v-if="props.visible"
                              class="overlay-page-layout"
                              :class="{'is-minimize': storeState.isMinimizeGnb}"
         >
@@ -8,36 +30,6 @@
         </general-page-layout>
     </transition>
 </template>
-
-<script lang="ts">
-import { computed, reactive } from 'vue';
-
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-
-export default {
-    name: 'OverlayPageLayout',
-    components: { GeneralPageLayout },
-    props: {
-        visible: {
-            type: Boolean,
-            required: true,
-        },
-    },
-    setup() {
-        const gnbStore = useGnbStore();
-        const gnbGetters = gnbStore.getters;
-
-        const storeState = reactive({
-            isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
-        });
-
-        return {
-            storeState,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .overlay-page-layout {

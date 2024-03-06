@@ -1,6 +1,18 @@
+<script lang="ts" setup>
+import FNB from '@/common/modules/navigations/FNB.vue';
+
+interface Props {
+    overflow: 'auto'|'scroll';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    overflow: 'auto',
+});
+</script>
+
 <template>
     <div class="general-page-layout"
-         :class="overflow"
+         :class="props.overflow"
     >
         <div class="header">
             <slot name="handbook" />
@@ -14,23 +26,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
-
-export default {
-    name: 'GeneralPageLayout',
-    components: { FNB },
-    props: {
-        overflow: {
-            type: String as PropType<'auto'|'scroll'>,
-            default: 'auto',
-        },
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .general-page-layout {
