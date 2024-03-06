@@ -13,7 +13,6 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -46,12 +45,8 @@ const router = useRouter();
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
-const storeState = reactive({
-    currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
-});
 const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
@@ -183,7 +178,7 @@ watch(() => props.dashboardList, () => {
                              color="gray900"
                              class="private-icon"
                         />
-                        <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : storeState.currentWorkspace?.name }}</span>
+                        <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
                     </div>
                     <div class="labels-wrapper">
                         <p-label v-for="(label, idx) in board.labels"
