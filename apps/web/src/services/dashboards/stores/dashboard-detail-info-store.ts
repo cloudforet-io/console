@@ -136,8 +136,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             if (!state.templateId || state.templateId === 'blank') return {};
             const _template = DASHBOARD_TEMPLATES[state.templateId];
             return {
-                icon: state.dashboardInfo?.display_info?.icon ?? _template.displayInfo.icon ?? '',
-                previewImage: state.dashboardInfo?.display_info?.preview_image ?? _template.displayInfo.previewImage ?? '',
+                icon: state.dashboardInfo?.display_info?.icon ?? _template.display_info?.icon ?? '',
+                preview_image: state.dashboardInfo?.display_info?.preview_image ?? _template.display_info?.preview_image ?? '',
             };
         }),
     });
