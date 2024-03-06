@@ -45,7 +45,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costSummaryMultiFields', {
         title: 'AWS CloudFront Cost',
         widget_options: {
-            cost_data_field: 'project',
+            cost_data_field: 'project_id',
             granularity: GRANULARITY.YEARLY,
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
