@@ -333,11 +333,11 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .project-detail-page {
     height: 100%;
+    margin-top: -0.25rem;
 }
 .page-inner {
     height: 100%;
     max-width: 1368px;
-    margin: 0 auto;
 }
 .p-heading {
     margin-top: 0.25rem;

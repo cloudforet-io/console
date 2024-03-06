@@ -418,7 +418,7 @@ watch([
             height: 15rem;
         }
         .data-loader-container {
-            max-height: calc(100vh - $top-bar-height - 3.75rem);
+            max-height: calc(100vh - $top-bar-height - 1.5rem);
             overflow-y: auto;
             padding: 1rem 0.5rem;
         }

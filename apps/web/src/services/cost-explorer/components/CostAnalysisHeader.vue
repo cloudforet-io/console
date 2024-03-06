@@ -182,9 +182,6 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
         margin-bottom: -0.25rem;
-        &.icon-wrapper {
-            gap: 0.5rem;
-        }
         &.currency-wrapper {
             @apply justify-end text-gray-800;
             font-size: 0.875rem;

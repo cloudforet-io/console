@@ -336,13 +336,12 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
             width: 20rem;
-            max-height: 85vh !important;
             margin-top: -0.125rem;
             margin-left: 0;
             .menu-container {
-                max-height: calc(85vh - 3.125rem) !important;
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
+                max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
             }
             .p-context-menu-item {
                 .favorite-button {
