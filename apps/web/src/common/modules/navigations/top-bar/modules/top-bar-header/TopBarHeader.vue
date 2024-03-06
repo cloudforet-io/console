@@ -380,10 +380,6 @@ const handleClickButton = (hasNoWorkspace?: string) => {
             @screen tablet {
                 @apply hidden;
             }
-
-            @screen mobile {
-                @apply inline-block;
-            }
         }
         .tablet-selected {
             @apply hidden text-label-lg text-gray-800;
@@ -391,10 +387,6 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
             @screen tablet {
                 @apply inline-block;
-            }
-
-            @screen mobile {
-                @apply hidden;
             }
         }
     }
