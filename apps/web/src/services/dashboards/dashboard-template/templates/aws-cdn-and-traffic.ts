@@ -65,7 +65,7 @@ export const awsCdnAndTrafficDashboard: DashboardTemplate = {
     labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.CDN, DASHBOARD_LABELS.TRAFFIC, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
-        icon: 'ic_dashboard-template_cdn-traffic-cost',
+        icon: 'ic_provider-aws',
     },
     settings: {
         date_range: {

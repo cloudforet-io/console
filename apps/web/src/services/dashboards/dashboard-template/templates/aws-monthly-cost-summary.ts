@@ -40,7 +40,7 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
     labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
-        icon: 'ic_dashboard-template_monthly-cost-summary',
+        icon: 'ic_provider-aws',
     },
     settings: {
         date_range: {

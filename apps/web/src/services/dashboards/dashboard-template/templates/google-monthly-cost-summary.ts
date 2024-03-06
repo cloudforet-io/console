@@ -39,7 +39,7 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
     labels: [DASHBOARD_LABELS.GOOGLE, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
-        icon: 'ic_dashboard-template_monthly-cost-summary',
+        icon: 'ic_provider-gcp',
     },
     settings: {
         date_range: {
