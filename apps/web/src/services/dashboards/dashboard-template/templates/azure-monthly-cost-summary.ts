@@ -36,7 +36,7 @@ export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Azure Monthly Cost Summary',
     template_id: 'azureMonthlyCostSummary',
     template_type: 'EXTENSION',
-    labels: [DASHBOARD_LABELS.AZURE, DASHBOARD_LABELS.COST],
+    labels: [DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
         icon: 'ic_provider-azure',

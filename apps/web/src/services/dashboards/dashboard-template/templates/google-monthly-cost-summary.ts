@@ -36,7 +36,7 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Google Monthly Cost Summary',
     template_id: 'googleMonthlyCostSummary',
     template_type: 'EXTENSION',
-    labels: [DASHBOARD_LABELS.GOOGLE, DASHBOARD_LABELS.COST],
+    labels: [DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
         icon: 'ic_provider-gcp',
