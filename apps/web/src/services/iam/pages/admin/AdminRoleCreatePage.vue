@@ -77,5 +77,6 @@ const handleUpdateForm = (data: RoleCreateParameters) => {
 .role-create-page {
     @apply mx-0;
     max-width: 100%;
+    margin-top: -1.875rem;
 }
 </style>

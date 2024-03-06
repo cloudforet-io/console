@@ -1229,7 +1229,7 @@
 			"VERSION": "Version"
 		},
 		"STARRED": "Starred",
-		"STARRED_NO_DATA": "Starred items will be displayed here",
+		"STARRED_NO_DATA": "Items will be displayed here",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",

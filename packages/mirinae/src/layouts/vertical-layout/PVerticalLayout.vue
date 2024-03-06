@@ -37,6 +37,7 @@ const state = reactive({
         height: '100%',
         'overflow-y': 'auto',
         'overflow-x': 'hidden',
+        'border-right-width': state.hide ? 0 : '1px',
     })),
     sidebarStyle: computed(() => ({
         width: 'auto',
@@ -171,7 +172,7 @@ window.addEventListener('resize', detectWindowResizing);
     margin: unset;
 
     > .sidebar-container {
-        @apply bg-white border-r border-gray-200;
+        @apply bg-white border-gray-200;
         &.transition {
             transition: width 0.2s;
         }

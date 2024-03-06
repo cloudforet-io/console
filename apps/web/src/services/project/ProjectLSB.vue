@@ -97,7 +97,7 @@ watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) 
         }
         .collapsible-contents {
             margin-top: 0.5rem;
-            padding-bottom: 0.25rem;
+            padding-bottom: 0.5rem;
             opacity: 1;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }

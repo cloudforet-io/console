@@ -4,7 +4,7 @@
             <template v-if="handbookState.isVisible"
                       #handbook
             >
-                <div class="flex">
+                <div class="handbook-button-wrapper">
                     <handbook-button type="iam/role/create-edit"
                                      class="flex-shrink-0"
                     >
@@ -56,3 +56,11 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.handbook-button-wrapper {
+    @apply flex justify-end;
+    flex: 1;
+    max-width: 116.75rem;
+}
+</style>
