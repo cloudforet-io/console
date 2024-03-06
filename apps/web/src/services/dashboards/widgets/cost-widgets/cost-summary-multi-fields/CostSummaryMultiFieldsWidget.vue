@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
@@ -31,6 +32,7 @@ import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getWidgetDataTableRowLocation } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
@@ -38,6 +40,7 @@ import type {
     WidgetEmit, WidgetExpose, WidgetProps,
     CostAnalyzeResponse, Legend,
 } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 interface SubData {
     value: number;
@@ -58,7 +61,7 @@ interface ChartData {
     [key: string]: number | any; // // project_id: 'project-1', HTTP Requests: 0.0, HTTPS Requests: 0.0, TransferOut: 0, ...
 }
 
-
+const router = useRouter();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
@@ -280,6 +283,11 @@ const handleUpdateThisPage = (_thisPage: number) => {
     state.data = undefined;
     refreshWidget(_thisPage);
 };
+const handleClickRow = (rowData: WidgetTableData) => {
+    if (!widgetState.dataField) return;
+    const _rowLocation = getWidgetDataTableRowLocation(rowData, widgetState.widgetLocation, [widgetState.dataField]);
+    if (_rowLocation) window.open(router.resolve(_rowLocation).href, '_blank');
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -334,6 +342,7 @@ defineExpose<WidgetExpose<Response>>({
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                @update:this-page="handleUpdateThisPage"
+                               @click-row="handleClickRow"
             />
         </div>
     </widget-frame>

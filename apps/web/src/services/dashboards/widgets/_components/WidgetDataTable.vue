@@ -48,7 +48,8 @@ interface Props {
     allReferenceTypeInfo?: AllReferenceTypeInfo;
     colorSet?: string[];
     disableToggle?: boolean;
-    disableEllipsis?: boolean
+    disableEllipsis?: boolean;
+    disableRowClick?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -168,12 +169,10 @@ const getTooltipContents = (item: any, field: Field): string => {
 
 /* event */
 const handleClickLegend = (index: number) => {
-    // if (props.printMode) return;
     state.disabledLegends = { ...state.disabledLegends, [index]: !state.disabledLegends[index] };
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
-    // if (props.printMode) return;
     emit('click-row', rowData);
 };
 watch(() => props.legends, () => {
@@ -259,6 +258,7 @@ watch(() => props.legends, () => {
                             <tr v-for="(item, rowIndex) in props.items"
                                 :key="`tr-${props.widgetKey}-${rowIndex}`"
                                 :data-index="rowIndex"
+                                :class="{'cursor-pointer': !props.disableRowClick}"
                                 @click="handleClickRow({rowIndex, item})"
                             >
                                 <td v-for="(field, colIndex) in props.fields"
@@ -522,18 +522,6 @@ watch(() => props.legends, () => {
         text-align: center;
     }
 
-    &.print-mode {
-        .table-container {
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-        }
-        .status-wrapper {
-            min-width: 2rem;
-            padding: 0.125rem 0;
-        }
-    }
     .ellipsis-box {
         @apply truncate;
         width: 100%;

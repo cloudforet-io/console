@@ -183,6 +183,7 @@ defineExpose<WidgetExpose<Response>>({
                            :fields="state.tableFields"
                            :items="state.tableItems"
                            :currency="widgetState.currency"
+                           disable-row-click
                            @update:thisPage="handleUpdateThisPage"
         >
             <template #col-target="{value}">
