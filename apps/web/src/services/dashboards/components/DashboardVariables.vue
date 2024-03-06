@@ -15,8 +15,10 @@ import DashboardVariableDropdown from '@/services/dashboards/components/Dashboar
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface Props {
     isManageable?: boolean;
@@ -77,10 +79,9 @@ const handleClickSaveButton = () => {
     updateDashboardVariables();
 };
 const handleResetVariables = () => {
-    dashboardDetailStore.resetVariables(
-        props.originVariables ?? dashboardDetailState.dashboardInfo?.variables,
-        props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema,
-    );
+    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables_schema;
+    dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 
 </script>

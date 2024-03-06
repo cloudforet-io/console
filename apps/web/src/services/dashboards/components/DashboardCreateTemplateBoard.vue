@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router/composables';
+import type { Location } from 'vue-router';
 
 import {
-    PBoard, PButton, PLabel, PTextHighlighting, PI, screens,
+    PBoard, PLabel, PTextHighlighting, PI, PLink,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/src/data-display/board/type';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -17,8 +20,7 @@ interface Props {
     keyword: string;
 }
 
-const MOBILE_WINDOW_SIZE = screens.mobile.max;
-
+const { getProperRouteLocation } = useProperRouteLocation();
 const props = withDefaults(defineProps<Props>(), {
     templateSets: () => [],
     column: 1,
@@ -26,24 +28,16 @@ const props = withDefaults(defineProps<Props>(), {
     keyword: '',
 });
 const emit = defineEmits<{(e: 'select-template', value: any)}>();
-const router = useRouter();
 
 /* Event */
-const handleClickView = (template: DashboardModel) => {
+const getDashboardViewLink = (template: DashboardModel): Location|undefined => {
     const dashboardId = template.private_dashboard_id || template.public_dashboard_id;
-    if (!dashboardId) return;
-    const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
-    window.open(routeData.href, '_blank');
-};
-const handleClickCreate = (template: DashboardModel) => {
-    emit('select-template', template);
+    if (!dashboardId) return undefined;
+    return getProperRouteLocation({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
 };
 const handleClickBoardItem = (template: DashboardModel) => {
-    if (window.innerWidth <= MOBILE_WINDOW_SIZE) {
-        emit('select-template', template);
-    }
+    emit('select-template', template);
 };
-
 </script>
 
 <template>
@@ -69,12 +63,21 @@ const handleClickBoardItem = (template: DashboardModel) => {
                                              style-type="secondary"
                         />
                     </div>
-                    <div class="board-item-labels">
+                    <div class="label-wrapper">
                         <p-label v-for="(label, idx) in board.labels"
                                  :key="`${label}-${idx}`"
                                  :text="label"
                         />
                     </div>
+                    <p-link v-if="props.showViewLink"
+                            :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            new-tab
+                            highlight
+                            size="sm"
+                            :to="getDashboardViewLink(board)"
+                    >
+                        {{ $t('DASHBOARDS.CREATE.VIEW_THIS_DASHBOARD') }}
+                    </p-link>
                 </div>
                 <div class="right-part">
                     <p-i name="ic_chevron-right"
@@ -83,25 +86,6 @@ const handleClickBoardItem = (template: DashboardModel) => {
                          class="arrow-icon"
                     />
                 </div>
-            </div>
-        </template>
-        <template #item-custom-right-content="{ board }">
-            <div class="overlay-wrapper">
-                <p-button v-if="props.showViewLink"
-                          size="md"
-                          style-type="tertiary"
-                          icon-right="ic_arrow-right-up"
-                          @click="handleClickView(board)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.VIEW') }}
-                </p-button>
-                <p-button size="md"
-                          style-type="substitutive"
-                          icon-right="ic_arrow-right"
-                          @click="handleClickCreate(board)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CREATE') }}
-                </p-button>
             </div>
         </template>
     </p-board>
@@ -120,46 +104,15 @@ const handleClickBoardItem = (template: DashboardModel) => {
             justify-content: center;
             display: flex;
         }
+        .label-wrapper {
+            padding-bottom: 0.5rem;
+        }
     }
 
     .board-item-title {
         @apply text-label-md flex items-center;
         margin-bottom: 0.5rem;
         gap: 0.375rem;
-    }
-    .overlay-wrapper {
-        @apply h-full flex items-center gap-3;
-    }
-
-    /* custom p-board-item */
-    &:deep(.p-board-item) {
-        cursor: default;
-        .content-area {
-            .right-overlay-wrapper {
-                top: calc(50% - 1rem);
-            }
-        }
-    }
-
-    .arrow-icon {
-        display: none;
-    }
-}
-
-@screen mobile {
-    .dashboard-create-template-board {
-        .overlay-wrapper {
-            display: none;
-        }
-
-        /* custom p-board-item */
-        &:deep(.p-board-item) {
-            cursor: pointer;
-        }
-
-        .arrow-icon {
-            display: block;
-        }
     }
 }
 </style>

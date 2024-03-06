@@ -1445,6 +1445,7 @@
 			"VALIDATION_PROJECT": "프로젝트를 선택해주세요.",
 			"VALIDATION_TEMPLATE": "템플릿을 선택하세요.",
 			"VIEW": "보기",
+			"VIEW_THIS_DASHBOARD": "",
 			"WORKSPACE": "워크스페이스"
 		},
 		"CUSTOMIZE": {

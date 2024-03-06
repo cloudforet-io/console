@@ -73,7 +73,7 @@ const state = reactive({
         if (storeState.isWorkspaceOwner) {
             boardSets.unshift({
                 value: 'WORKSPACE',
-                title: i18n.t('DASHBOARDS.CREATE.CURRENT_WORKSPACE'),
+                title: i18n.t('DASHBOARDS.CREATE.WORKSPACE'),
                 description: storeState.selectedWorkspace?.name || '',
                 leftIcon: 'ic_dashboard-template_blank',
             });
