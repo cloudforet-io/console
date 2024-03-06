@@ -32,7 +32,7 @@ const router = useRouter();
 const handleClickView = (template: DashboardModel) => {
     const dashboardId = template.private_dashboard_id || template.public_dashboard_id;
     if (!dashboardId) return;
-    const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: dahsboardId } });
+    const routeData = router.resolve({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
     window.open(routeData.href, '_blank');
 };
 const handleClickCreate = (template: DashboardModel) => {
