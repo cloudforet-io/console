@@ -36,7 +36,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'AWS Monthly Cost Summary',
     template_id: 'awsMonthlyCostSummary',
-    template_type: 'MANAGED',
+    template_type: 'EXTENSION',
     labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {

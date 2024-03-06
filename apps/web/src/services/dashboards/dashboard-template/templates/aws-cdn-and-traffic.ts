@@ -61,7 +61,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 export const awsCdnAndTrafficDashboard: DashboardTemplate = {
     name: 'AWS CDN & Traffic',
     template_id: 'awsCdnAndTraffic',
-    template_type: 'MANAGED',
+    template_type: 'EXTENSION',
     labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.CDN, DASHBOARD_LABELS.TRAFFIC, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {

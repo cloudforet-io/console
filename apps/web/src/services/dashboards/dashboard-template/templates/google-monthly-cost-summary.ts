@@ -35,7 +35,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'Google Monthly Cost Summary',
     template_id: 'googleMonthlyCostSummary',
-    template_type: 'MANAGED',
+    template_type: 'EXTENSION',
     labels: [DASHBOARD_LABELS.GOOGLE, DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {

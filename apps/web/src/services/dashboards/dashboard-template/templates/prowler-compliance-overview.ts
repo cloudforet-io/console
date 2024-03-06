@@ -34,7 +34,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
 export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     name: 'Prowler Compliance Overview',
     template_id: 'prowlerComplianceOverview',
-    template_type: 'MANAGED',
+    template_type: 'EXTENSION',
     labels: [
         DASHBOARD_LABELS.AWS,
         DASHBOARD_LABELS.AZURE,
