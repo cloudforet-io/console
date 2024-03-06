@@ -1528,6 +1528,7 @@
 		"DETAIL": {
 			"APPLY": "確認",
 			"AUTO": "自動",
+			"BASED_ON": "基準月",
 			"CLONE": "複製",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
@@ -1537,6 +1538,7 @@
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"EXPORT": "エクスポート",
+			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
 			},
@@ -1549,6 +1551,7 @@
 			"PERIOD_LAST_MONTH": "前月",
 			"PERIOD_THIS_MONTH": "今月",
 			"REFRESH": "自動更新",
+			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定"
 		},
 		"FORM": {
