@@ -26,11 +26,6 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
 <template>
     <div class="dashboard-create-step2">
         <div class="selected-ootb-wrapper">
-            <!--            <p-lazy-img v-if="props.selectedTemplate?.description?.icon"-->
-            <!--                        :src="props.selectedTemplate?.description?.icon"-->
-            <!--                        width="3.5rem"-->
-            <!--                        height="3.5rem"-->
-            <!--            />-->
             <p-i :name="props.selectedTemplate?.display_info?.icon ?? 'ic_dashboard-template_others'"
                  width="3.5rem"
                  height="3.5rem"

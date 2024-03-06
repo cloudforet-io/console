@@ -1445,6 +1445,7 @@
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
 			"VIEW": "ビュー",
+			"VIEW_THIS_DASHBOARD": "",
 			"WORKSPACE": "ワークスペース"
 		},
 		"CUSTOMIZE": {
