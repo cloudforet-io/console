@@ -173,6 +173,25 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
+                               selection-label="Plugin"
+                               show-select-marker
+                               :show-delete-all-button="false"
+                               :menu="pluginState.pluginList"
+                               :selected="pluginState.selectedPlugins"
+                               @update:selected="handleChangePluginFilter"
+            >
+                <template #menu-item--format="{item}">
+                    <p-lazy-img width="1rem"
+                                height="1rem"
+                                error-icon="ic_cloud-filled"
+                                :src="item.image"
+                                class="mr-1"
+                    />{{ item.label }}
+                </template>
+            </p-select-dropdown>
+            <p-select-dropdown multi-selectable
+                               style-type="rounded"
+                               appearance-type="badge"
                                selection-label="Provider"
                                show-select-marker
                                :show-delete-all-button="false"
