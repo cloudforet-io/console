@@ -12,7 +12,7 @@ import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/module
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import { DASHBOARD_SERVICE_LABELS } from '@/services/dashboards/constants/dashboard-labels';
+import { DASHBOARD_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 
 
 export interface FilterLabelItem {
@@ -36,14 +36,14 @@ const state = reactive({
         name: provider.key,
         image: provider.icon,
     }))),
-    services: computed(() => Object.values(DASHBOARD_SERVICE_LABELS)),
-    serviceList: computed(() => state.services.map((service) => ({
-        label: service,
-        name: service,
+    labels: computed(() => Object.values(DASHBOARD_LABELS)),
+    labelList: computed(() => state.labels.map((label) => ({
+        label,
+        name: label,
         image: null,
     }))),
     selectedProviders: [],
-    selectedServices: [],
+    selectedLabels: [],
 });
 
 const pluginState = reactive({
@@ -84,7 +84,7 @@ const pluginState = reactive({
 });
 
 const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
-    state.selectedServices = selected;
+    state.selectedLabels = selected;
     emit('select-label', selected);
 };
 
@@ -152,13 +152,13 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             </div>
             <div class="label">
                 <p-field-title class="title">
-                    Serivce
+                    Label
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="service in state.serviceList"
+                    <p-checkbox v-for="service in state.labelList"
                                 :key="service.name"
                                 class="label-item"
-                                :selected="state.selectedServices"
+                                :selected="state.selectedLabels"
                                 :value="service"
                                 @change="handleChangeLabelFilter"
                     >
@@ -211,11 +211,11 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
-                               selection-label="Service"
+                               selection-label="Label"
                                show-select-marker
                                :show-delete-all-button="false"
-                               :menu="state.serviceList"
-                               :selected="state.selectedServices"
+                               :menu="state.labelList"
+                               :selected="state.selectedLabels"
                                @update:selected="handleChangeLabelFilter"
             />
         </div>
