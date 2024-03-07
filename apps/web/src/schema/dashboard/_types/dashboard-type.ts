@@ -75,6 +75,7 @@ export interface DashboardTemplate {
     labels: string[];
     template_id: string;
     template_type: TemplateType;
+    pluginIds?: string[];
     display_info?: {
         icon?: string;
         preview_image?: string;
