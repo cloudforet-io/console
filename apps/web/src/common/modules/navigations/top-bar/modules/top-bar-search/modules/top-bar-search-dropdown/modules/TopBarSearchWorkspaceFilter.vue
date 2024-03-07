@@ -35,6 +35,7 @@ const storeState = reactive({
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     selectedWorkspaces: computed(() => topBarSearchStore.getters.selectedWorkspaces),
     isAllSelected: computed(() => topBarSearchStore.state.allWorkspacesChecked),
+    currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
 });
 
 const searchContextMenuRef = ref<null | HTMLElement>(null);
@@ -98,6 +99,7 @@ const fetchMoreSearchResult = async () => {
 };
 
 const handleSelected = (selected: string[]) => {
+    if (selected.length > STAGED_WORKSPACE_LIMIT) return;
     topBarSearchStore.setSelectedWorkspaces(selected);
 };
 
@@ -107,7 +109,7 @@ const handleSelectItem = (item:MenuItem) => {
             workspaceId: item.name,
             label: item.label,
             theme: storeState.workspaceMap[item.name]?.data?.tags?.theme,
-            isSelected: true,
+            isSelected: false,
         });
     }
     state.isActivatedSearchMenu = false;
@@ -144,7 +146,9 @@ watch(() => state.searchText, (val) => {
                              @change-toggle="handleCheckAll"
             /><span>{{ $t('COMMON.NAVIGATIONS.TOP_BAR.ALL_WORKSPACE') }}</span>
         </div>
-        <div class="workspace-filter-wrapper">
+        <div v-if="!storeState.isAllSelected"
+             class="workspace-filter-wrapper"
+        >
             <p class="filter-list-header">
                 {{ $t('COMMON.NAVIGATIONS.TOP_BAR.FILTER_BY_WORKSPACE') }}
             </p>
@@ -171,7 +175,7 @@ watch(() => state.searchText, (val) => {
                                                      :class="{'opacity-70': storeState.isAllSelected}"
                                 /> <span class="label">{{ workspace.label }}</span>
                             </span>
-                            <p-icon-button v-if="!storeState.isAllSelected"
+                            <p-icon-button v-if="workspace.workspaceId !== storeState.currentWorkspaceId"
                                            class="remove-button"
                                            name="ic_close"
                                            size="sm"
@@ -183,35 +187,32 @@ watch(() => state.searchText, (val) => {
             </p-checkbox-group>
             <p-text-button style-type="highlight"
                            class="show-more"
-                           :disabled="storeState.stagedWorkspaces.length >= STAGED_WORKSPACE_LIMIT || storeState.isAllSelected"
                            @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
             >
                 {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
             </p-text-button>
-            <div v-if="storeState.stagedWorkspaces.length < STAGED_WORKSPACE_LIMIT">
-                <p-context-menu v-if="state.isActivatedSearchMenu"
-                                ref="searchContextMenuRef"
-                                v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
-                                :search-text="state.searchText"
-                                :menu="state.searchResultMenu"
-                                :style="{ maxHeight: state.searchContextMenuMaxHeight}"
-                                searchable
-                                class="search-context-menu"
-                                @update:search-text="handleUpdateSearchText"
-                                @click-show-more="fetchMoreSearchResult"
-                                @select="handleSelectItem"
-                >
-                    <template #item--format="{ item }">
-                        <span class="search-workspace-item">
-                            <workspace-logo-icon :text="item.label"
-                                                 :theme="storeState.workspaceMap[item?.name]?.data?.tags?.theme"
-                                                 size="xs"
-                            /> <span class="label">{{ item.label }}</span>
-                        </span>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div v-else
+            <p-context-menu v-if="state.isActivatedSearchMenu"
+                            ref="searchContextMenuRef"
+                            v-on-click-outside="() => { state.isActivatedSearchMenu = false; }"
+                            :search-text="state.searchText"
+                            :menu="state.searchResultMenu"
+                            :style="{ maxHeight: state.searchContextMenuMaxHeight}"
+                            searchable
+                            class="search-context-menu"
+                            @update:search-text="handleUpdateSearchText"
+                            @click-show-more="fetchMoreSearchResult"
+                            @select="handleSelectItem"
+            >
+                <template #item--format="{ item }">
+                    <span class="search-workspace-item">
+                        <workspace-logo-icon :text="item.label"
+                                             :theme="storeState.workspaceMap[item?.name]?.data?.tags?.theme"
+                                             size="xs"
+                        /> <span class="label">{{ item.label }}</span>
+                    </span>
+                </template>
+            </p-context-menu>
+            <div v-if="storeState.selectedWorkspaces.length >= STAGED_WORKSPACE_LIMIT"
                  class="limit-description-card"
             >
                 <scoped-notification type="warning"

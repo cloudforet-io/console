@@ -111,7 +111,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             }));
         },
         addStagedWorkspace: (workspace: StageWorkspace) => {
-            if (state.stagedWorkspaces.length >= 5) return;
             state.stagedWorkspaces.push(workspace);
             state.stagedWorkspaces = orderWorkspaceList(state.stagedWorkspaces);
         },
@@ -151,6 +150,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         () => getters.trimmedInputText,
         () => getters.selectedWorkspaces,
         () => state.isActivated,
+        () => state.allWorkspacesChecked,
     ], debounce(async ([trimmedText, workspaces]) => {
         if (trimmedText) {
             await actions.fetchSearchList(trimmedText, state.activeTab, workspaces);

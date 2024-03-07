@@ -1141,7 +1141,7 @@
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "All Workspaces",
 				"FILTER_BY_WORKSPACE": "Filter by Workspace",
-				"HELP_TEXT": "Search for navigation service",
+				"HELP_TEXT": "Search for what you need",
 				"NO_RESULT_1": "No result found for \"{inputText}\"",
 				"NO_RESULT_2": "Try again with different term.",
 				"RECENTLY_VIEWED": "Recently Viewed",

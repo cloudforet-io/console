@@ -39,7 +39,12 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    tooltipText: computed(() => `${props.resourceId}${props.resourceId ? ` ∙ ${props.resourceId}` : ''}`),
+    tooltipText: computed(() => {
+        const mainLabel = getLabelByResourceId(props.resourceId, storeState.activeTab);
+        const isDescriptionExist = props.resourceId && (storeState.activeTab === SEARCH_TAB.DASHBOARD);
+        const description = getDescriptionByResourceId(props.resourceId, storeState.activeTab);
+        return `${mainLabel}${isDescriptionExist ? ` ∙ ${description}` : ''}`;
+    }),
     iconName: computed(() => {
         switch (storeState.activeTab) {
         case SEARCH_TAB.SERVICE_ACCOUNT:
