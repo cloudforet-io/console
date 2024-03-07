@@ -115,9 +115,8 @@ listTemplates();
                      class="out-of-the-box"
                 >
                     <p-field-title class="title">
-                        Out-of-the-Box Dashboard
+                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_OOTB_TEMPLATE') }}
                     </p-field-title>
-                    <!--                    TODO: request non-opacity color-->
                     <div class="out-of-the-box-contents">
                         <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
                                                          :column="2"
@@ -130,7 +129,7 @@ listTemplates();
                      class="existing"
                 >
                     <p-field-title class="title">
-                        Existing Dashboard
+                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_EXISTING_TEMPLATE') }}
                     </p-field-title>
                     <div class="existing-contents">
                         <dashboard-create-template-board :template-sets="state.existingTemplateSets"

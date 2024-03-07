@@ -109,7 +109,7 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
         <div class="label-container">
             <div class="label">
                 <p-field-title class="title">
-                    Plugin
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PLUGIN') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
                     <p-checkbox v-for="plugin in pluginState.pluginList"
@@ -133,7 +133,7 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             </div>
             <div class="label">
                 <p-field-title class="title">
-                    Provider
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PROVIDER') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
                     <p-checkbox v-for="provider in state.providerList"
@@ -157,7 +157,7 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             </div>
             <div class="label">
                 <p-field-title class="title">
-                    Label
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_LABEL') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
                     <p-checkbox v-for="service in state.labelList"
