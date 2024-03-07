@@ -50,19 +50,24 @@ const pluginState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     pluginList: computed(() => {
+        // Cost Plugin
         const costDataSourceList: CostDataSourceItems[] = Object.values(pluginState.costDataSources) as CostDataSourceItems[];
         const costPluginList = costDataSourceList.reduce((acc, current) => {
             if (!acc.find((pluginInfo) => pluginInfo.name === current.data.plugin_info.plugin_id)) {
                 const pluginId = current.data.plugin_info.plugin_id;
                 const plugin = pluginState.plugins[pluginId];
-                acc.push({
-                    name: pluginId,
-                    label: plugin.name,
-                    image: plugin.icon,
-                });
+                if (plugin) {
+                    acc.push({
+                        name: pluginId,
+                        label: plugin.name,
+                        image: plugin.icon,
+                    });
+                }
             }
             return acc;
         }, [] as FilterLabelItem[]);
+
+        // Asset Plugin
         const assetPluginIdList = [
             'plugin-prowler-inven-collector',
             'plugin-dclo-inven-collector',
