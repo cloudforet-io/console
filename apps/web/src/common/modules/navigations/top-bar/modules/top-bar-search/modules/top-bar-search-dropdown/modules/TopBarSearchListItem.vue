@@ -107,22 +107,28 @@ const handleClickLink = (workspaceId:string) => {
 .top-bar-search-list-item {
     display: flex;
     align-items: center;
-    height: 2rem;
     cursor: pointer;
+    padding: 0.125rem 0;
     .icon-background {
         @apply flex items-center justify-center bg-gray-100 rounded-md;
         margin-right: 0.375rem;
+        height: 1.5rem;
+        width: 1.5rem;
     }
 
     .main-box {
         @apply flex flex-col;
-        line-height: 1.125rem;
         width: calc(100% - 1.625rem);
+        line-height: 0.9375rem;
 
         .upper-part {
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+
+            .text-item {
+                line-height: 1.03125rem;
+            }
 
             .desc {
                 @apply text-label-sm text-gray-500;
