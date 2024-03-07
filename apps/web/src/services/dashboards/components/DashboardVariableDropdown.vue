@@ -78,6 +78,7 @@ const {
     selected: toRef(state, 'selected'),
     handler: toRef(state, 'menuHandler'),
     pageSize: 10,
+    useFixedStyle: true,
 });
 
 const toggleMenu = () => {
