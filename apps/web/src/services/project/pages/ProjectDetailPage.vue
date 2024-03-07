@@ -359,4 +359,11 @@ onUnmounted(() => {
 .p-tab {
     @apply rounded-lg;
 }
+
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .data-wrapper {
+        overflow-y: unset;
+    }
+}
 </style>
