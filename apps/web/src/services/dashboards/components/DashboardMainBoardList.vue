@@ -163,32 +163,36 @@ watch(() => props.dashboardList, () => {
             <template #item-content="{board}">
                 <div class="content-wrapper">
                     <div class="board-item-title-wrapper">
-                        <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.8"
-                                         class="favorite-button"
-                        />
-                        <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
-                             width="1rem"
-                             height="1rem"
-                        />
-                        <span class="board-item-title">
-                            {{ board.name }}
-                        </span>
-                        <p-i v-if="scopeType === 'PRIVATE'"
-                             name="ic_lock-filled"
-                             width="0.75rem"
-                             height="0.75rem"
-                             color="gray900"
-                             class="private-icon"
-                        />
-                        <span v-if="board.tags.created_by"
-                              class="board-item-title-sub-text"
-                        >{{ board.tags.created_by }}</span>
-                        <span v-if="board.tags.created_by && props.scopeType === 'PROJECT'"
-                              class="board-item-title-sub-text"
-                        >•</span>
-                        <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
+                        <div class="left-part">
+                            <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
+                                             :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                             scale="0.8"
+                                             class="favorite-button"
+                            />
+                            <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <span class="board-item-title">
+                                {{ board.name }}
+                            </span>
+                        </div>
+                        <div class="right-part">
+                            <p-i v-if="scopeType === 'PRIVATE'"
+                                 name="ic_lock-filled"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 color="gray900"
+                                 class="private-icon"
+                            />
+                            <span v-if="board.tags.created_by"
+                                  class="board-item-title-sub-text"
+                            >{{ board.tags.created_by }}</span>
+                            <span v-if="board.tags.created_by && props.scopeType === 'PROJECT'"
+                                  class="board-item-title-sub-text"
+                            >•</span>
+                            <span class="board-item-title-sub-text">{{ props.scopeType === 'PROJECT' ? board.label : '' }}</span>
+                        </div>
                     </div>
                     <div class="labels-wrapper">
                         <p-label v-for="(label, idx) in board.labels"
@@ -250,11 +254,26 @@ watch(() => props.dashboardList, () => {
             .board-item-title-wrapper {
                 @apply flex w-full items-center;
                 gap: 0.375rem;
+                .left-part, .right-part {
+                    @apply flex items-center;
+                    gap: 0.375rem;
+                }
                 .board-item-title {
                     @apply text-label-md text-gray-900;
                 }
                 .board-item-title-sub-text {
                     @apply text-label-sm text-gray-500;
+                }
+            }
+
+            @screen tablet {
+                .board-item-title-wrapper {
+                    display: block;
+                    .right-part {
+                        @apply text-gray-500 flex items-center;
+                        gap: 0.25rem;
+                        padding-top: 0.25rem;
+                    }
                 }
             }
 

@@ -7,7 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type {
     DashboardVariableSchemaProperty,
@@ -37,6 +37,14 @@ const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
+    filteredVariables: computed<VariablesPropertiesForManage[]>(() => {
+        if (state.selectedVariableType === 'ALL') {
+            return state.orderedVariables;
+        } if (state.selectedVariableType === 'MANAGED') {
+            return state.orderedVariables.filter((d) => d.variable_type === 'MANAGED');
+        }
+        return state.orderedVariables.filter((d) => d.variable_type !== 'MANAGED');
+    }),
     variableFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
@@ -93,22 +101,16 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
 };
 const convertAndUpdateVariablesForTable = (order: string[]) => {
     const properties = dashboardDetailGetters.refinedVariablesSchema.properties;
-    const convertedVariables = order.map((d) => ({
+    state.orderedVariables = order.map((d) => ({
         ...properties[d],
         propertyName: d,
         manageable: properties[d].variable_type !== 'MANAGED' ? true : undefined,
     }));
-    if (state.selectedVariableType === 'ALL') {
-        state.orderedVariables = convertedVariables;
-    } else if (state.selectedVariableType === 'MANAGED') {
-        state.orderedVariables = convertedVariables.filter((d) => d.variable_type === 'MANAGED');
-    } else {
-        state.orderedVariables = convertedVariables.filter((d) => d.variable_type !== 'MANAGED');
-    }
 };
 
-watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVariableType], ([_order]) => {
-    convertAndUpdateVariablesForTable(_order);
+watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
+    if (isEqual(after, before)) return;
+    convertAndUpdateVariablesForTable(after);
 }, { immediate: true });
 </script>
 
@@ -126,7 +128,7 @@ watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVar
             </p-select-status>
         </div>
         <p-data-table class="variable-table"
-                      :items="state.orderedVariables"
+                      :items="state.filteredVariables"
                       :fields="state.variableFields"
         >
             <template #col-selection_type-format="{ value }">
