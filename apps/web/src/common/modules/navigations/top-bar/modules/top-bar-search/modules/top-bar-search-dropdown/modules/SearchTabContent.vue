@@ -104,7 +104,7 @@ watch(() => contentsSize.height.value, (height) => {
             <div ref="contentsRef">
                 <p-data-loader key="recent-menu-list"
                                :loading="topBarSearchStore.state.loading"
-                               :data="state.recentMenuList"
+                               :data="topBarSearchStore.state.recentMenuList"
                 >
                     <p-context-menu class="search-list-context"
                                     :menu="state.recentMenuList"
