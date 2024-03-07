@@ -954,6 +954,7 @@
 			"TAG_COL": "Tag columns",
 			"TITLE": "Set columns"
 		},
+		"DELETED": "Deleted",
 		"EDITOR": {
 			"ALIGN_CENTER": "Center",
 			"ALIGN_JUSTIFY": "Justify",

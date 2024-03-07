@@ -954,6 +954,7 @@
 			"TAG_COL": "태그 필드",
 			"TITLE": "필드 변경하기"
 		},
+		"DELETED": "삭제",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",

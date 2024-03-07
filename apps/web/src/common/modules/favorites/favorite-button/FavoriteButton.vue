@@ -37,9 +37,8 @@ const storeState = reactive({
 });
 const state = reactive({
     active: computed(() => {
-        const favoriteItem = storeState.favoriteMenuList.findIndex((d) => (d.workspace_id === storeState.currentWorkspaceId)
-            && (d.id === props.itemId
-            && (d.type === props.favoriteType)));
+        const favoriteItem = storeState.favoriteMenuList.findIndex((d) => (d.itemId === props.itemId
+            && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
 });
@@ -50,15 +49,15 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
     if (props.readOnly) return;
     if (state.active) {
         await favoriteStore.deleteFavorite({
-            type: props.favoriteType,
+            itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            id: props.itemId,
+            itemId: props.itemId,
         });
     } else {
         await favoriteStore.createFavorite({
-            type: props.favoriteType,
+            itemType: props.favoriteType,
             workspaceId: storeState.currentWorkspaceId,
-            id: props.itemId,
+            itemId: props.itemId,
         });
     }
 };

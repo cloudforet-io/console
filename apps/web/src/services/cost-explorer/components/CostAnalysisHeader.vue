@@ -94,9 +94,9 @@ const handleDeleteQueryConfirm = async () => {
             },
         }));
         await favoriteStore.deleteFavorite({
-            type: FAVORITE_TYPE.COST_ANALYSIS,
+            itemType: FAVORITE_TYPE.COST_ANALYSIS,
             workspaceId: state.currentWorkspaceId || '',
-            id: state.itemIdForDeleteQuery,
+            itemId: state.itemIdForDeleteQuery,
         });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
