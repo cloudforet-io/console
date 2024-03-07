@@ -119,8 +119,9 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
                                         height="1.25rem"
                                         error-icon="ic_cloud-filled"
                                         :src="plugin.image"
-                                        class="mr-1"
-                            />{{ plugin.label }}
+                                        class="content-icon"
+                            />
+                            <span class="content-plugin-text">{{ plugin.label }}</span>
                         </div>
                     </p-checkbox>
                 </p-checkbox-group>
@@ -142,8 +143,9 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
                                         height="1.25rem"
                                         error-icon="ic_cloud-filled"
                                         :src="provider.image"
-                                        class="mr-1"
-                            />{{ provider.label }}
+                                        class="content-icon"
+                            />
+                            {{ provider.label }}
                         </div>
                     </p-checkbox>
                 </p-checkbox-group>
@@ -210,11 +212,30 @@ const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
             @apply flex flex-col;
             gap: 0.75rem;
             margin-bottom: 1.625rem;
+
+            /* custom design-system component - p-checkbox */
+            :deep(.p-checkbox) {
+                @apply flex;
+                .check-icon {
+                    min-width: 1.25rem;
+                }
+                .text {
+                    @apply flex-grow;
+                }
+            }
+
             .label-item {
                 margin-bottom: 0.5rem;
                 .content-menu-item {
-                    @apply inline-flex items-center text-label-md;
+                    @apply inline-flex text-label-md;
                     margin-left: 0.25rem;
+                    .content-icon {
+                        min-width: 1.25rem;
+                        margin-right: 0.25rem;
+                    }
+                    .content-plugin-text {
+                        @apply flex-grow text-paragraph-md;
+                    }
                 }
             }
         }
