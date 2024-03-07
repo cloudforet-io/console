@@ -1551,6 +1551,7 @@
 		"DETAIL": {
 			"APPLY": "Confirm",
 			"AUTO": "Auto",
+			"BASED_ON": "Based on",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
@@ -1560,6 +1561,7 @@
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"EXPORT": "Export",
+			"OTHER_MONTHS": "Other Months",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "Applied Filters"
 			},
@@ -1572,6 +1574,7 @@
 			"PERIOD_LAST_MONTH": "Last month",
 			"PERIOD_THIS_MONTH": "This month",
 			"REFRESH": "Auto Refresh",
+			"SELECT_MONTH": "Select Month",
 			"SET_HOME": "Set as Home Dashboard"
 		},
 		"FORM": {

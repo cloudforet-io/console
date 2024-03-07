@@ -349,6 +349,7 @@ defineExpose<WidgetExpose<FullData>>({
                                :color-set="colorSet"
                                :this-page="thisPage"
                                :show-next-page="state.tableData.more"
+                               disable-row-click
                                @update:thisPage="handleUpdateThisPage"
             />
         </div>
