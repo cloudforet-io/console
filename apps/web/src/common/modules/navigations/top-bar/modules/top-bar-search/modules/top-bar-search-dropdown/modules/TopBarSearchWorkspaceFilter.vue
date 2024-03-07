@@ -35,6 +35,7 @@ const storeState = reactive({
     stagedWorkspaces: computed(() => topBarSearchStore.state.stagedWorkspaces),
     selectedWorkspaces: computed(() => topBarSearchStore.getters.selectedWorkspaces),
     isAllSelected: computed(() => topBarSearchStore.state.allWorkspacesChecked),
+    currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
 });
 
 const searchContextMenuRef = ref<null | HTMLElement>(null);
@@ -174,7 +175,7 @@ watch(() => state.searchText, (val) => {
                                                      :class="{'opacity-70': storeState.isAllSelected}"
                                 /> <span class="label">{{ workspace.label }}</span>
                             </span>
-                            <p-icon-button v-if="!storeState.isAllSelected"
+                            <p-icon-button v-if="workspace.workspaceId !== storeState.currentWorkspaceId"
                                            class="remove-button"
                                            name="ic_close"
                                            size="sm"
