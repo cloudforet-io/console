@@ -45,6 +45,7 @@
                                        style-type="icon-button"
                                        button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
+                                       @click.native="handleClickStopNativeEvent"
                     >
                         <template #menu-menu>
                             <div class="custom-button-menu">
@@ -133,8 +134,13 @@ export default defineComponent<BoardItemProps>({
             predicate: () => !!(props.selected && props.value && props.selected === props.value),
         });
 
+        const handleClickStopNativeEvent = (event) => {
+            event.stopPropagation();
+        };
+
         return {
             isSelected,
+            handleClickStopNativeEvent,
             ...toRefs(state),
         };
     },
