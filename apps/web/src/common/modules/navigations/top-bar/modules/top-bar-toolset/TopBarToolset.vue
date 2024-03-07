@@ -54,13 +54,13 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
                           :visible="props.openedMenu === 'favorite'"
                           @update:visible="updateOpenedMenu('favorite', $event)"
         />
-        <top-bar-notice v-if="!state.isAdminMode && !state.isGrantLoading"
-                        :visible="props.openedMenu === 'notice'"
-                        @update:visible="updateOpenedMenu('notice', $event)"
-        />
         <top-bar-notifications v-if="!state.isAdminMode && !state.isGrantLoading"
                                :visible="props.openedMenu === 'notifications'"
                                @update:visible="updateOpenedMenu('notifications', $event)"
+        />
+        <top-bar-notice v-if="!state.isAdminMode && !state.isGrantLoading"
+                        :visible="props.openedMenu === 'notice'"
+                        @update:visible="updateOpenedMenu('notice', $event)"
         />
         <p-tooltip :contents="state.tooltipTexts.adminToggle"
                    position="bottom"

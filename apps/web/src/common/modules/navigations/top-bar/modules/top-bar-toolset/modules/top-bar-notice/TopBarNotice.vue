@@ -83,7 +83,7 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
             >
                 <p-i class="menu-icon"
                      :class="{ disabled: state.isNoRoleUser }"
-                     :name="state.hasNotice ? 'ic_gnb_notification-unread' : 'ic_gnb_notification'"
+                     :name="state.hasNotice ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
                      :color="state.hasNotice ? undefined : 'inherit'"
                      width="1.375rem"
                      height="1.375rem"
