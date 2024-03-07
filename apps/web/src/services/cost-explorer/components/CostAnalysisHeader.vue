@@ -60,7 +60,9 @@ const state = reactive({
     isEditableQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.COST_ANALYSIS,
-        id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || ''),
+        id: state.isManagedCostQuerySet
+            ? getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || '')
+            : costAnalysisPageGetters.selectedQueryId || '',
     })),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
@@ -103,9 +105,9 @@ const handleDeleteQueryConfirm = async () => {
     }
 };
 
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
-});
+watch(() => state.favoriteOptions, async (favoriteOptions) => {
+    await gnbStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
 </script>
 
 <template>

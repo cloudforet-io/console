@@ -4,9 +4,12 @@ import {
 } from 'vue';
 
 import {
-    PContextMenu, PI, PTooltip, PTextHighlighting, PLazyImg,
+    PContextMenu, PI, PTooltip, PTextHighlighting, PLazyImg, PIconButton,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
@@ -34,11 +37,14 @@ const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number)
     (event: 'close'): void;
     (event: 'move-focus-end', direction: FocusingDirection): void;
     (event: 'update:isFocused', value: boolean): void;
+    (event: 'delete', item: SuggestionItem): void;
 }>();
 
 const contextMenuRef = ref<any|null>(null);
 const state = reactive({
-    refinedItems: computed(() => props.items.map((d) => ({ ...d, icon: undefined, itemIcon: d.icon }))),
+    refinedItems: computed(() => props.items.map((d) => ({
+        ...d, icon: undefined, itemIcon: d.icon, disabled: d.isDeleted,
+    }))),
 });
 
 const handleSelect = (item, index) => {
@@ -79,7 +85,8 @@ onUnmounted(() => {
         </template>
         <template #item--format="{ item }">
             <p-tooltip class="suggestion-item"
-                       :contents="`${item.parents ? item.parents.map(d => `${d.label} > `).join('') : ''}${item.label}`"
+                       :class="{'use-favorite': props.useFavorite, 'is-deleted': item.isDeleted}"
+                       :contents="`${item.isDeleted ? `[${i18n.t('COMMON.DELETED')}] ` : ''}${item.parents ? item.parents.map(d => `${d.label} > `).join('') : ''}${item.label}`"
                        position="bottom"
             >
                 <span class="image">
@@ -116,6 +123,19 @@ onUnmounted(() => {
                                          :text="item.label"
                     />
                 </span>
+                <favorite-button
+                    v-if="props.useFavorite && !item.isDeleted"
+                    :item-id="item.itemId"
+                    :favorite-type="item.itemType"
+                    scale="0.8"
+                    class="favorite-button"
+                />
+                <p-icon-button v-if="item.isDeleted"
+                               class="delete-button"
+                               name="ic_close"
+                               size="sm"
+                               @click="$emit('delete', item)"
+                />
             </p-tooltip>
         </template>
         <template v-for="(_, slot) of $scopedSlots"
@@ -190,8 +210,31 @@ onUnmounted(() => {
                 width: calc(100% - 2rem);
             }
         }
-        .favorite-button {
-            flex-shrink: 0;
+        &.use-favorite {
+            .texts {
+                @apply truncate;
+                max-width: calc(100% - 2.75rem);
+            }
+            .favorite-button {
+                @apply block;
+                margin-right: 0.125rem;
+                margin-left: auto;
+                &:hover {
+                    transform: scale(1.3);
+                }
+            }
+        }
+        &.is-deleted {
+            svg {
+                opacity: 40%;
+            }
+            .texts {
+                @apply truncate;
+                max-width: calc(100% - 2.75rem);
+            }
+            .delete-button {
+                margin-left: auto;
+            }
         }
     }
 }
