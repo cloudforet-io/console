@@ -175,7 +175,7 @@ const {
 
 <template>
     <overlay-page-layout :visible="visible"
-                         class="dashboard-manage-variable-overay"
+                         class="dashboard-manage-variable-overlay"
     >
         <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
                    show-back-button
@@ -228,7 +228,7 @@ const {
 </template>
 
 <style lang="postcss" scoped>
-.dashboard-manage-variable-overay {
+.dashboard-manage-variable-overlay {
     @apply bg-gray-100;
 
     .content-wrapper {
@@ -236,20 +236,6 @@ const {
 
         .add-button-wrapper {
             @apply flex;
-        }
-        .list-wrapper {
-            .variable-select-filter {
-                @apply flex items-center;
-                height: 2.875rem;
-                gap: 1rem;
-                padding: 0.75rem 1rem;
-
-                .filter-header {
-                    @apply text-gray-500;
-                    font-size: 0.875rem;
-                    line-height: 1.25;
-                }
-            }
         }
     }
 }
