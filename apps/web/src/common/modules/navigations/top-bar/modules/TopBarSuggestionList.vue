@@ -73,7 +73,7 @@ onUnmounted(() => {
                     @select="handleSelect"
     >
         <template #header-title="{ item }">
-            <div class="context-header">
+            <div class="header-label">
                 {{ item.label }}
             </div>
         </template>
@@ -131,20 +131,23 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .top-bar-suggestion-list {
     @apply bg-white border-none;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     padding-bottom: 0.125rem;
     max-height: unset;
 
-    /* custom design-system component - p-context-menu */
-    :deep() {
-        .context-header {
-            margin-top: 0;
-            margin-bottom: 0.25rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
+    .header-label {
+        @apply text-gray-500;
+        margin-bottom: 0.25rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        font-weight: bold;
+        font-size: 0.75rem;
+        line-height: 1.5;
+    }
 
+    /* custom design-system component - p-context-menu */
+    :deep(.p-context-menu) {
         .p-context-menu-item {
             justify-content: flex-start;
             line-height: 1.75;
