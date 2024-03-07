@@ -9,14 +9,17 @@ import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type
 import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import type {
-    TemplateLabelItem,
+    FilterLabelItem,
 } from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateStep1SearchFilter from '@/services/dashboards/components/DashboardCreateStep1SearchFilter.vue';
 import DashboardCreateTemplateBoard from '@/services/dashboards/components/DashboardCreateTemplateBoard.vue';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import {
+    generateDashboardTemplateList,
+} from '@/services/dashboards/dashboard-template/template-list';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
@@ -26,36 +29,64 @@ const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    managedTemplates: [] as DashboardTemplate[],
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
-        const _templates = Object.values(DASHBOARD_TEMPLATES);
-        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels);
+        const _templates = state.managedTemplates;
+        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
     existingTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = dashboardGetters.allItems;
-        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels);
+        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
 const filterState = reactive({
     inputValue: '',
-    selectedLabels: [] as TemplateLabelItem[],
+    selectedLabels: [] as FilterLabelItem[],
+    selectedProviders: [] as FilterLabelItem[],
+    selectedPlugins: [] as PluginReferenceItem[],
 });
 
 /* Util */
-const getFilteredTemplates = (templates: DashboardTemplate[], inputValue: string, selectedLabels: TemplateLabelItem[]): DashboardTemplate[] => {
+const getFilteredTemplates = (
+    templates: DashboardTemplate[],
+    inputValue: string,
+    selectedLabels: FilterLabelItem[],
+    selectedProviders: FilterLabelItem[],
+    selectedPlugins: PluginReferenceItem[],
+): DashboardTemplate[] => {
     const _inputValue = inputValue.toLowerCase();
-    return templates.filter((template) => (selectedLabels.length === 0 || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
+    return templates.filter((template) => (!selectedPlugins.length || (template.plugin_ids ?? []).some((pluginId) => selectedPlugins.map((sel) => sel.name).includes(pluginId)))
+        && (!selectedLabels.length || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
+        && (!selectedProviders.length || selectedProviders.some((provider) => template.variables_schema.fixed_options?.provider === provider.name))
         && (_inputValue === '' || template.name.toLowerCase().includes(_inputValue)));
 };
 
 /* Event */
-const handleSelectLabels = (labels: TemplateLabelItem[]) => {
+const handleSelectLabels = (labels: FilterLabelItem[]) => {
     filterState.selectedLabels = labels;
+};
+
+const handleSelectPlugins = (plugins: PluginReferenceItem[]) => {
+    filterState.selectedPlugins = plugins;
+};
+
+const handleSelectProvider = (providers: FilterLabelItem[]) => {
+    filterState.selectedProviders = providers;
 };
 
 const handleClickCreateTemplate = (template: DashboardModel) => {
     emit('select-template', template);
 };
+
+const listTemplates = async () => {
+    state.managedTemplates = await generateDashboardTemplateList(state.plugins);
+};
+
+listTemplates();
+
+
 
 </script>
 
@@ -63,7 +94,10 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
     <div class="dashboard-create-step-1">
         <p-search :value.sync="filterState.inputValue" />
         <div class="contents-container">
-            <dashboard-create-step1-search-filter @select-label="handleSelectLabels" />
+            <dashboard-create-step1-search-filter @select-label="handleSelectLabels"
+                                                  @select-provider="handleSelectProvider"
+                                                  @select-plugin="handleSelectPlugins"
+            />
             <div class="template-contents-area">
                 <p-empty v-if="!state.outOfTheBoxTemplateSets.length && !state.existingTemplateSets.length"
                          show-image
@@ -81,9 +115,8 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
                      class="out-of-the-box"
                 >
                     <p-field-title class="title">
-                        Out-of-the-Box Dashboard
+                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_OOTB_TEMPLATE') }}
                     </p-field-title>
-                    <!--                    TODO: request non-opacity color-->
                     <div class="out-of-the-box-contents">
                         <dashboard-create-template-board :template-sets="state.outOfTheBoxTemplateSets"
                                                          :column="2"
@@ -96,7 +129,7 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
                      class="existing"
                 >
                     <p-field-title class="title">
-                        Existing Dashboard
+                        {{ $t('DASHBOARDS.CREATE.TEMPLATE.FIELD_EXISTING_TEMPLATE') }}
                     </p-field-title>
                     <div class="existing-contents">
                         <dashboard-create-template-board :template-sets="state.existingTemplateSets"

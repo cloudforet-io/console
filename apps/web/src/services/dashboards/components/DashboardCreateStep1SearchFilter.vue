@@ -7,44 +7,100 @@ import {
 
 import { store } from '@/store';
 
+import type { PluginReferenceMap, PluginReferenceItem } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import { DASHBOARD_SERVICE_LABELS } from '@/services/dashboards/constants/dashboard-labels';
+import { DASHBOARD_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 
 
-export interface TemplateLabelItem {
+export interface FilterLabelItem {
     label: string;
     name: string;
-    img?: string;
+    image?: string;
 }
 
-const emit = defineEmits<{(e:'select-label', labels: TemplateLabelItem[]):void;
+const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
+    (e:'select-provider', plugins: FilterLabelItem[]):void;
+    (e:'select-plugin', plugins: PluginReferenceItem[]):void;
 }>();
+
+const allReferenceStore = useAllReferenceStore();
 
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     providerList: computed(() => (Object.values(state.providers) as ProviderReferenceItem[]).map((provider) => ({
         label: provider.name,
-        name: provider.name,
+        name: provider.key,
         image: provider.icon,
     }))),
-    services: computed(() => Object.values(DASHBOARD_SERVICE_LABELS)),
-    serviceList: computed(() => state.services.map((service) => ({
-        label: service,
-        name: service,
-        icon: null,
-        color: null,
+    labels: computed(() => Object.values(DASHBOARD_LABELS)),
+    labelList: computed(() => state.labels.map((label) => ({
+        label,
+        name: label,
+        image: null,
     }))),
     selectedProviders: [],
-    selectedServices: [],
+    selectedLabels: [],
 });
 
-const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateLabelItem[]) => {
-    if (type === 'Provider') state.selectedProviders = selected;
-    if (type === 'Service') state.selectedServices = selected;
-    const mergedSelected = [...state.selectedProviders, ...state.selectedServices];
-    emit('select-label', mergedSelected);
+const pluginState = reactive({
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    pluginList: computed(() => {
+        // Cost Plugin
+        const costDataSourceList: CostDataSourceItems[] = Object.values(pluginState.costDataSources) as CostDataSourceItems[];
+        const costPluginList = costDataSourceList.reduce((acc, current) => {
+            if (!acc.find((pluginInfo) => pluginInfo.name === current.data.plugin_info.plugin_id)) {
+                const pluginId = current.data.plugin_info.plugin_id;
+                const plugin = pluginState.plugins[pluginId];
+                if (plugin) {
+                    acc.push({
+                        name: pluginId,
+                        label: plugin.name,
+                        image: plugin.icon,
+                    });
+                }
+            }
+            return acc;
+        }, [] as FilterLabelItem[]);
+
+        // Asset Plugin
+        const assetPluginIdList = [
+            'plugin-prowler-inven-collector',
+            'plugin-dclo-inven-collector',
+        ];
+        const assetPluginList = [] as FilterLabelItem[];
+        assetPluginIdList.forEach((pluginId) => {
+            const plugin = pluginState.plugins[pluginId];
+            if (!plugin) return;
+            assetPluginList.push({
+                name: pluginId,
+                label: plugin.name,
+                image: plugin.icon,
+            });
+        });
+
+        return [...costPluginList, ...assetPluginList];
+    }),
+    selectedPlugins: [] as PluginReferenceItem[],
+});
+
+const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
+    state.selectedLabels = selected;
+    emit('select-label', selected);
+};
+
+const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
+    state.selectedProviders = selected;
+    emit('select-provider', selected);
+};
+
+const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
+    pluginState.selectedPlugins = selected;
+    emit('select-plugin', selected);
 };
 
 </script>
@@ -53,39 +109,63 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
         <div class="label-container">
             <div class="label">
                 <p-field-title class="title">
-                    Provider
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PLUGIN') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="provider in Object.values(state.providers)"
-                                :key="provider.name"
+                    <p-checkbox v-for="plugin in pluginState.pluginList"
+                                :key="plugin.name"
                                 class="label-item"
-                                :selected="state.selectedProviders"
-                                :value="provider"
-                                @change="handleChangeLabelFilter('Provider', $event)"
+                                :selected="pluginState.selectedPlugins"
+                                :value="plugin"
+                                @change="handleChangePluginFilter"
                     >
                         <div class="content-menu-item">
-                            <p-lazy-img v-if="provider.name !== 'all'"
-                                        width="1.25rem"
+                            <p-lazy-img width="1.25rem"
                                         height="1.25rem"
                                         error-icon="ic_cloud-filled"
-                                        :src="provider.icon"
-                                        class="mr-1"
-                            />{{ provider.label }}
+                                        :src="plugin.image"
+                                        class="content-icon"
+                            />
+                            <span class="content-plugin-text">{{ plugin.label }}</span>
                         </div>
                     </p-checkbox>
                 </p-checkbox-group>
             </div>
             <div class="label">
                 <p-field-title class="title">
-                    Serivce
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_PROVIDER') }}
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="service in state.serviceList"
+                    <p-checkbox v-for="provider in state.providerList"
+                                :key="provider.name"
+                                class="label-item"
+                                :selected="state.selectedProviders"
+                                :value="provider"
+                                @change="handleChangeProviderFilter"
+                    >
+                        <div class="content-menu-item">
+                            <p-lazy-img width="1.25rem"
+                                        height="1.25rem"
+                                        error-icon="ic_cloud-filled"
+                                        :src="provider.image"
+                                        class="content-icon"
+                            />
+                            {{ provider.label }}
+                        </div>
+                    </p-checkbox>
+                </p-checkbox-group>
+            </div>
+            <div class="label">
+                <p-field-title class="title">
+                    {{ $t('DASHBOARDS.CREATE.TEMPLATE.FILTER_LABEL') }}
+                </p-field-title>
+                <p-checkbox-group direction="vertical">
+                    <p-checkbox v-for="service in state.labelList"
                                 :key="service.name"
                                 class="label-item"
-                                :selected="state.selectedServices"
+                                :selected="state.selectedLabels"
                                 :value="service"
-                                @change="handleChangeLabelFilter('Service', $event)"
+                                @change="handleChangeLabelFilter"
                     >
                         <div class="content-menu-item">
                             {{ service.label }}
@@ -98,12 +178,12 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
-                               selection-label="Provider"
+                               selection-label="Plugin"
                                show-select-marker
                                :show-delete-all-button="false"
-                               :menu="state.providerList"
-                               :selected="state.selectedProviders"
-                               @update:selected="handleChangeLabelFilter('Provider', $event)"
+                               :menu="pluginState.pluginList"
+                               :selected="pluginState.selectedPlugins"
+                               @update:selected="handleChangePluginFilter"
             >
                 <template #menu-item--format="{item}">
                     <p-lazy-img width="1rem"
@@ -117,12 +197,31 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
             <p-select-dropdown multi-selectable
                                style-type="rounded"
                                appearance-type="badge"
-                               selection-label="Service"
+                               selection-label="Provider"
                                show-select-marker
                                :show-delete-all-button="false"
-                               :menu="state.serviceList"
-                               :selected="state.selectedServices"
-                               @update:selected="handleChangeLabelFilter('Service', $event)"
+                               :menu="state.providerList"
+                               :selected="state.selectedProviders"
+                               @update:selected="handleChangeProviderFilter"
+            >
+                <template #menu-item--format="{item}">
+                    <p-lazy-img width="1rem"
+                                height="1rem"
+                                error-icon="ic_cloud-filled"
+                                :src="item.image"
+                                class="mr-1"
+                    />{{ item.label }}
+                </template>
+            </p-select-dropdown>
+            <p-select-dropdown multi-selectable
+                               style-type="rounded"
+                               appearance-type="badge"
+                               selection-label="Label"
+                               show-select-marker
+                               :show-delete-all-button="false"
+                               :menu="state.labelList"
+                               :selected="state.selectedLabels"
+                               @update:selected="handleChangeLabelFilter"
             />
         </div>
     </div>
@@ -133,17 +232,34 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
 
     .label-container {
         width: 14.125rem;
-        height: calc(100vh - 17rem);
-        overflow-y: auto;
         .label {
             @apply flex flex-col;
             gap: 0.75rem;
             margin-bottom: 1.625rem;
+
+            /* custom design-system component - p-checkbox */
+            :deep(.p-checkbox) {
+                @apply flex;
+                .check-icon {
+                    min-width: 1.25rem;
+                }
+                .text {
+                    @apply flex-grow;
+                }
+            }
+
             .label-item {
                 margin-bottom: 0.5rem;
                 .content-menu-item {
-                    @apply inline-flex items-center text-label-md;
+                    @apply inline-flex text-label-md;
                     margin-left: 0.25rem;
+                    .content-icon {
+                        min-width: 1.25rem;
+                        margin-right: 0.25rem;
+                    }
+                    .content-plugin-text {
+                        @apply flex-grow text-paragraph-md;
+                    }
                 }
             }
         }

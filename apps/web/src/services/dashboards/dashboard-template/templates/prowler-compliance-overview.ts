@@ -36,9 +36,6 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     template_id: 'prowlerComplianceOverview',
     template_type: 'EXTENSION',
     labels: [
-        DASHBOARD_LABELS.AWS,
-        DASHBOARD_LABELS.AZURE,
-        DASHBOARD_LABELS.GOOGLE,
         // DASHBOARD_LABELS.PROWLER,
         DASHBOARD_LABELS.SECURITY,
         // DASHBOARD_LABELS.CSPM

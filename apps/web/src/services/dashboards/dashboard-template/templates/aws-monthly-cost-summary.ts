@@ -37,7 +37,7 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
     name: 'AWS Monthly Cost Summary',
     template_id: 'awsMonthlyCostSummary',
     template_type: 'EXTENSION',
-    labels: [DASHBOARD_LABELS.AWS, DASHBOARD_LABELS.COST],
+    labels: [DASHBOARD_LABELS.COST],
     version: '1',
     display_info: {
         icon: 'ic_provider-aws',

@@ -1441,6 +1441,13 @@
 			"STEP": "Step",
 			"STEP1_DESC": "Get started quickly with templates or existing dashboards.",
 			"STEP2_DESC": "Choose dashboard scope and access.",
+			"TEMPLATE": {
+				"FIELD_EXISTING_TEMPLATE": "Existing Dashboard",
+				"FIELD_OOTB_TEMPLATE": "Out-of-the-Box Dashboard",
+				"FILTER_LABEL": "Label",
+				"FILTER_PLUGIN": "Plugin",
+				"FILTER_PROVIDER": "Provider"
+			},
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
 			"VALIDATION_TEMPLATE": "Please Select Template.",

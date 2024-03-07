@@ -36,9 +36,6 @@ export const dCloComplianceOverviewDashboard: DashboardTemplate = {
     template_id: 'dCloComplianceOverview',
     template_type: 'EXTENSION',
     labels: [
-        DASHBOARD_LABELS.AWS,
-        DASHBOARD_LABELS.AZURE,
-        DASHBOARD_LABELS.GOOGLE,
         // DASHBOARD_LABELS.PROWLER,
         DASHBOARD_LABELS.SECURITY,
         // DASHBOARD_LABELS.CSPM
