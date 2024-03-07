@@ -29,7 +29,7 @@ const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    managedTemplates: [] as any[],
+    managedTemplates: [] as DashboardTemplate[],
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = state.managedTemplates;
         return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
@@ -38,6 +38,7 @@ const state = reactive({
         const _templates = dashboardGetters.allItems;
         return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
 const filterState = reactive({
@@ -56,9 +57,9 @@ const getFilteredTemplates = (
     selectedPlugins: PluginReferenceItem[],
 ): DashboardTemplate[] => {
     const _inputValue = inputValue.toLowerCase();
-    return templates.filter((template) => (selectedPlugins.length === 0 || (template.pluginIds ?? []).some((pluginId) => selectedPlugins.map((sel) => sel.name).includes(pluginId)))
-        && (selectedLabels.length === 0 || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
-        && (selectedProviders.length === 0 || selectedProviders.some((provider) => template.variables_schema.fixed_options?.provider === provider.name))
+    return templates.filter((template) => (!selectedPlugins.length || (template.plugin_ids ?? []).some((pluginId) => selectedPlugins.map((sel) => sel.name).includes(pluginId)))
+        && (!selectedLabels.length || template.labels.some((label) => selectedLabels.map((sel) => sel.label).includes(label)))
+        && (!selectedProviders.length || selectedProviders.some((provider) => template.variables_schema.fixed_options?.provider === provider.name))
         && (_inputValue === '' || template.name.toLowerCase().includes(_inputValue)));
 };
 
@@ -79,12 +80,11 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
     emit('select-template', template);
 };
 
-const listTempates = async () => {
-    const availablePlugins: PluginReferenceMap = store.getters['reference/pluginItems'];
-    state.managedTemplates = await generateDashboardTemplateList(availablePlugins);
+const listTemplates = async () => {
+    state.managedTemplates = await generateDashboardTemplateList(state.plugins);
 };
 
-listTempates();
+listTemplates();
 
 
 

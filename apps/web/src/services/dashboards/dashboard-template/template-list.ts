@@ -28,6 +28,10 @@ export const DASHBOARD_TEMPLATES = {
     dCloComplianceOverview: dCloComplianceOverviewDashboard,
 };
 
+const getPluginIdList = (results: CostDataSourceModel[]|undefined, provider: string): string[] => (results ?? [])
+    .filter((item) => item.provider === provider)
+    .map((item) => item.plugin_info.plugin_id);
+
 export const generateDashboardTemplateList = async (availablePlugins: PluginReferenceMap): Promise<DashboardTemplate[]> => {
     try {
         const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>({
@@ -39,45 +43,45 @@ export const generateDashboardTemplateList = async (availablePlugins: PluginRefe
         // aws
             awsMonthlyCostSummary: {
                 ...DASHBOARD_TEMPLATES.awsMonthlyCostSummary,
-                pluginIds: [
-                    ...(results ?? []).filter((item) => item.provider === 'aws').map((item) => item.plugin_info.plugin_id),
+                plugin_ids: [
+                    ...getPluginIdList(results, 'aws'),
                 ],
             },
             awsCdnAndTraffic: {
                 ...DASHBOARD_TEMPLATES.awsCdnAndTraffic,
-                pluginIds: [
-                    ...(results ?? []).filter((item) => item.provider === 'aws').map((item) => item.plugin_info.plugin_id),
+                plugin_ids: [
+                    ...getPluginIdList(results, 'aws'),
                 ],
             },
             // azure
             azureMonthlyCostSummary: {
                 ...DASHBOARD_TEMPLATES.azureMonthlyCostSummary,
-                pluginIds: [
-                    ...(results ?? []).filter((item) => item.provider === 'azure').map((item) => item.plugin_info.plugin_id),
+                plugin_ids: [
+                    ...getPluginIdList(results, 'azure'),
                 ],
             },
             // google
             googleMonthlyCostSummary: {
                 ...DASHBOARD_TEMPLATES.googleMonthlyCostSummary,
-                pluginIds: [
-                    ...(results ?? []).filter((item) => item.provider === 'google_cloud').map((item) => item.plugin_info.plugin_id),
+                plugin_ids: [
+                    ...getPluginIdList(results, 'google_cloud'),
                 ],
             },
             // etc
             prowlerComplianceOverview: {
                 ...DASHBOARD_TEMPLATES.prowlerComplianceOverview,
-                pluginIds: ['plugin-prowler-inven-collector'],
+                plugin_ids: ['plugin-prowler-inven-collector'],
             },
             dCloComplianceOverview: {
                 ...DASHBOARD_TEMPLATES.dCloComplianceOverview,
-                pluginIds: ['plugin-dclo-inven-collector'],
+                plugin_ids: ['plugin-dclo-inven-collector'],
             },
         };
 
         const result: Record<string, DashboardTemplate> = {};
         Object.entries(templateMap).forEach(([key, value]) => {
-            const isAvailable = value.pluginIds?.every((pluginId) => availablePlugins[pluginId]);
-            if ((value.pluginIds ?? []).length > 0 && isAvailable) result[key] = value;
+            const isAvailable = value.plugin_ids?.every((pluginId) => availablePlugins[pluginId]);
+            if ((value.plugin_ids ?? []).length > 0 && isAvailable) result[key] = value;
         });
 
         return Object.values(result);
