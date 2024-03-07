@@ -101,6 +101,7 @@ onUnmounted(() => {
 
 <template>
     <div class="top-bar-search"
+         :class="{ 'bg-shadow': state.visible}"
          @click.stop
     >
         <top-bar-search-input v-if="state.isOverMobileSize"
@@ -155,7 +156,7 @@ onUnmounted(() => {
 .top-bar-search {
     @apply relative;
     display: inline-block;
-    box-shadow: 0 0 8px 0 #00000014;
+
     .menu-button {
         @apply inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
@@ -176,6 +177,10 @@ onUnmounted(() => {
         opacity: 30%;
         z-index: 999;
     }
+}
+
+.bg-shadow {
+    box-shadow: 0 0 8px 0 #00000014;
 }
 
 @screen mobile {

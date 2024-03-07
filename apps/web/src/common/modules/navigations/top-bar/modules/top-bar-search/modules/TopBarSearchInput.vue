@@ -110,15 +110,15 @@ watch(() => props.isFocused, async (isFocused) => {
 .top-bar-search-input {
 
     .disabled-input {
-        @apply flex items-center justify-center bg-gray-100 rounded-md text-gray-400;
+        @apply flex items-center justify-center bg-gray-200 rounded-md text-gray-600;
         height: 1.75rem;
         width: 30rem;
-        padding: 0 0.75rem;
+        padding: 0.125rem 0.75rem;
         font-size: 0.875rem;
         cursor: pointer;
 
         &:hover {
-            @apply bg-secondary-2;
+            @apply bg-blue-200;
         }
     }
 
@@ -169,14 +169,6 @@ watch(() => props.isFocused, async (isFocused) => {
                 padding: 0.125rem 0.375rem;
                 margin-right: 0.25rem;
             }
-        }
-    }
-}
-
-@screen laptop {
-    .top-bar-search-input {
-        .disabled-input {
-            padding: 0 0.75rem;
         }
     }
 }
