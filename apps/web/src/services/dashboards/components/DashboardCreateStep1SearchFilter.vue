@@ -7,44 +7,95 @@ import {
 
 import { store } from '@/store';
 
+import type { PluginReferenceMap, PluginReferenceItem } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { DASHBOARD_SERVICE_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 
 
-export interface TemplateLabelItem {
+export interface FilterLabelItem {
     label: string;
     name: string;
-    img?: string;
+    image?: string;
 }
 
-const emit = defineEmits<{(e:'select-label', labels: TemplateLabelItem[]):void;
+const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
+    (e:'select-provider', plugins: FilterLabelItem[]):void;
+    (e:'select-plugin', plugins: PluginReferenceItem[]):void;
 }>();
+
+const allReferenceStore = useAllReferenceStore();
 
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     providerList: computed(() => (Object.values(state.providers) as ProviderReferenceItem[]).map((provider) => ({
         label: provider.name,
-        name: provider.name,
+        name: provider.key,
         image: provider.icon,
     }))),
     services: computed(() => Object.values(DASHBOARD_SERVICE_LABELS)),
     serviceList: computed(() => state.services.map((service) => ({
         label: service,
         name: service,
-        icon: null,
-        color: null,
+        image: null,
     }))),
     selectedProviders: [],
     selectedServices: [],
 });
 
-const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateLabelItem[]) => {
-    if (type === 'Provider') state.selectedProviders = selected;
-    if (type === 'Service') state.selectedServices = selected;
-    const mergedSelected = [...state.selectedProviders, ...state.selectedServices];
-    emit('select-label', mergedSelected);
+const pluginState = reactive({
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    pluginList: computed(() => {
+        const costDataSourceList: CostDataSourceItems[] = Object.values(pluginState.costDataSources) as CostDataSourceItems[];
+        const costPluginList = costDataSourceList.reduce((acc, current) => {
+            if (!acc.find((pluginInfo) => pluginInfo.name === current.data.plugin_info.plugin_id)) {
+                const pluginId = current.data.plugin_info.plugin_id;
+                const plugin = pluginState.plugins[pluginId];
+                acc.push({
+                    name: pluginId,
+                    label: plugin.name,
+                    image: plugin.icon,
+                });
+            }
+            return acc;
+        }, [] as FilterLabelItem[]);
+        const assetPluginIdList = [
+            'plugin-prowler-inven-collector',
+            'plugin-dclo-inven-collector',
+        ];
+        const assetPluginList = [] as FilterLabelItem[];
+        assetPluginIdList.forEach((pluginId) => {
+            const plugin = pluginState.plugins[pluginId];
+            if (!plugin) return;
+            assetPluginList.push({
+                name: pluginId,
+                label: plugin.name,
+                image: plugin.icon,
+            });
+        });
+
+        return [...costPluginList, ...assetPluginList];
+    }),
+    selectedPlugins: [] as PluginReferenceItem[],
+});
+
+const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
+    state.selectedServices = selected;
+    emit('select-label', selected);
+};
+
+const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
+    state.selectedProviders = selected;
+    emit('select-provider', selected);
+};
+
+const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
+    pluginState.selectedPlugins = selected;
+    emit('select-plugin', selected);
 };
 
 </script>
@@ -53,22 +104,44 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
         <div class="label-container">
             <div class="label">
                 <p-field-title class="title">
+                    Plugin
+                </p-field-title>
+                <p-checkbox-group direction="vertical">
+                    <p-checkbox v-for="plugin in pluginState.pluginList"
+                                :key="plugin.name"
+                                class="label-item"
+                                :selected="pluginState.selectedPlugins"
+                                :value="plugin"
+                                @change="handleChangePluginFilter"
+                    >
+                        <div class="content-menu-item">
+                            <p-lazy-img width="1.25rem"
+                                        height="1.25rem"
+                                        error-icon="ic_cloud-filled"
+                                        :src="plugin.image"
+                                        class="mr-1"
+                            />{{ plugin.label }}
+                        </div>
+                    </p-checkbox>
+                </p-checkbox-group>
+            </div>
+            <div class="label">
+                <p-field-title class="title">
                     Provider
                 </p-field-title>
                 <p-checkbox-group direction="vertical">
-                    <p-checkbox v-for="provider in Object.values(state.providers)"
+                    <p-checkbox v-for="provider in state.providerList"
                                 :key="provider.name"
                                 class="label-item"
                                 :selected="state.selectedProviders"
                                 :value="provider"
-                                @change="handleChangeLabelFilter('Provider', $event)"
+                                @change="handleChangeProviderFilter"
                     >
                         <div class="content-menu-item">
-                            <p-lazy-img v-if="provider.name !== 'all'"
-                                        width="1.25rem"
+                            <p-lazy-img width="1.25rem"
                                         height="1.25rem"
                                         error-icon="ic_cloud-filled"
-                                        :src="provider.icon"
+                                        :src="provider.image"
                                         class="mr-1"
                             />{{ provider.label }}
                         </div>
@@ -85,7 +158,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                 class="label-item"
                                 :selected="state.selectedServices"
                                 :value="service"
-                                @change="handleChangeLabelFilter('Service', $event)"
+                                @change="handleChangeLabelFilter"
                     >
                         <div class="content-menu-item">
                             {{ service.label }}
@@ -103,7 +176,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                :show-delete-all-button="false"
                                :menu="state.providerList"
                                :selected="state.selectedProviders"
-                               @update:selected="handleChangeLabelFilter('Provider', $event)"
+                               @update:selected="handleChangeProviderFilter"
             >
                 <template #menu-item--format="{item}">
                     <p-lazy-img width="1rem"
@@ -122,7 +195,7 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
                                :show-delete-all-button="false"
                                :menu="state.serviceList"
                                :selected="state.selectedServices"
-                               @update:selected="handleChangeLabelFilter('Service', $event)"
+                               @update:selected="handleChangeLabelFilter"
             />
         </div>
     </div>
@@ -133,8 +206,6 @@ const handleChangeLabelFilter = (type: 'Provider'|'Service', selected: TemplateL
 
     .label-container {
         width: 14.125rem;
-        height: calc(100vh - 17rem);
-        overflow-y: auto;
         .label {
             @apply flex flex-col;
             gap: 0.75rem;
