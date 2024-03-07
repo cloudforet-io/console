@@ -9,7 +9,7 @@ import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type
 import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { PluginReferenceItem } from '@/store/modules/reference/plugin/type';
+import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import type {
@@ -29,9 +29,9 @@ const dashboardGetters = dashboardStore.getters;
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    ootbTemplates: [] as any[],
+    managedTemplates: [] as any[],
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
-        const _templates = state.ootbTemplates;
+        const _templates = state.managedTemplates;
         return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
     existingTemplateSets: computed<DashboardTemplate[]>(() => {
@@ -80,8 +80,8 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
 };
 
 const listTempates = async () => {
-    const templateSets = await generateDashboardTemplateList();
-    state.ootbTemplates = Object.values(templateSets);
+    const availablePlugins: PluginReferenceMap = store.getters['reference/pluginItems'];
+    state.managedTemplates = await generateDashboardTemplateList(availablePlugins);
 };
 
 listTempates();
