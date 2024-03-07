@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"FAVORITE": "즐겨찾기 ",
+				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
 				"PROFILE": "마이페이지",
-				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
@@ -1139,6 +1140,14 @@
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "",
+				"FILTER_BY_WORKSPACE": "",
+				"HELP_TEXT": "",
+				"NO_RESULT_1": "\"{inputText}\"에 대한 검색결과가 없습니다.",
+				"NO_RESULT_2": "",
+				"RECENTLY_VIEWED": "",
+				"SITE_NAVIGATION": "",
+				"WORKSPACE_FILTER_WARNING_DESC": "",
+				"WORKSPACE_FILTER_WARNING_TITLE": "",
 				"WORKSPACE_SWITCH_LINK": ""
 			}
 		},
@@ -1542,6 +1551,7 @@
 		"DETAIL": {
 			"APPLY": "확인",
 			"AUTO": "자동",
+			"BASED_ON": "기준월",
 			"CLONE": "복제",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
@@ -1551,6 +1561,7 @@
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
 			"EXPORT": "파일 저장",
+			"OTHER_MONTHS": "다른 월 선택",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "적용된 필터"
 			},
@@ -1563,6 +1574,7 @@
 			"PERIOD_LAST_MONTH": "지난달",
 			"PERIOD_THIS_MONTH": "이번 달",
 			"REFRESH": "자동 새로고침",
+			"SELECT_MONTH": "월 선택",
 			"SET_HOME": "홈 대시보드로 설정"
 		},
 		"FORM": {
@@ -2137,6 +2149,7 @@
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "워크스페이스 생성",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "",
 			"DELETE": "삭제",
 			"DELETE_WORKSPACE": "삭제",
 			"DELETE_WORKSPACE_DESC": "이 작업은 취소 할 수 없습니다.",
@@ -2795,7 +2808,7 @@
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
 		"ALERT_MANAGER": "얼럿 매니저",
 		"ALERT_MANAGER_ALERT": "얼럿",
-		"ALERT_MANAGER_DASHBOARD": "대시보드",
+		"ALERT_MANAGER_DASHBOARD": "",
 		"ALERT_MANAGER_ESCALATION_POLICY": "에스컬레이션 정책",
 		"ASSET_INVENTORY": "에셋 인벤토리",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",
@@ -2806,13 +2819,17 @@
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
+		"COST_EXPLORER_DESC": "",
 		"COST_EXPLORER_REPORT": "비용 리포트",
+		"COST_EXPLORER_TITLE": "",
 		"DASHBOARDS": "대시보드",
 		"DASHBOARDS_PROJECT": "프로젝트 대시보드",
 		"DASHBOARDS_WORKSPACE": "워크스페이스 대시보드",
+		"DISMISS": "닫기",
 		"HOME_DASHBOARD": "홈",
 		"INFO": "정보",
 		"INFO_NOTICE": "공지사항 ",
+		"LEARN_MORE": "더보기",
 		"MY_PAGE": "마이페이지",
 		"MY_PAGE_ACCOUNT": "내 계정",
 		"MY_PAGE_ACCOUNT_PROFILE": "계정 & 프로필",

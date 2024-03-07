@@ -97,6 +97,9 @@ const createDashboard = async () => {
     try {
         const params: CreateDashboardParameters = {
             name: name.value,
+            // HACK: get dynamic template_id, template_type after implementing template feature
+            template_id: 'blank',
+            template_type: 'MANAGED',
             layouts: props.dashboard?.layouts,
             labels: props.dashboard?.labels,
             settings: props.dashboard?.settings,

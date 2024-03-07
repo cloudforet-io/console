@@ -1,7 +1,20 @@
+<script lang="ts" setup>
+import FNB from '@/common/modules/navigations/FNB.vue';
+
+interface Props {
+    overflow: 'auto'|'scroll';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    overflow: 'auto',
+});
+</script>
+
 <template>
     <div class="general-page-layout"
-         :class="overflow"
+         :class="props.overflow"
     >
+        <portal-target name="page-top-notification" />
         <div class="header">
             <slot name="handbook" />
         </div>
@@ -14,23 +27,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
-
-export default {
-    name: 'GeneralPageLayout',
-    components: { FNB },
-    props: {
-        overflow: {
-            type: String as PropType<'auto'|'scroll'>,
-            default: 'auto',
-        },
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .general-page-layout {
@@ -46,7 +42,7 @@ export default {
     }
 
     .header {
-        @apply flex justify-between;
+        @apply flex;
         padding: 1.5rem 1.5rem 0.25rem 1.5rem;
         &.without-breadcrumbs {
             padding: 0;
@@ -56,6 +52,8 @@ export default {
         width: 100%;
         flex-grow: 1;
         padding: 0 1.5rem 2rem 1.5rem;
+        max-width: 1920px;
+
         &.without-breadcrumbs {
             padding: 1.5rem 1.5rem 2rem 1.5rem;
         }

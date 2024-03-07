@@ -3,23 +3,64 @@ import { computed, reactive, watch } from 'vue';
 import { debounce } from 'lodash';
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+
 interface TopBarSearchStoreState {
+    loading: boolean;
+    allWorkspacesChecked: boolean;
     isActivated: boolean;
     inputText: string;
-    activateTab: string;
-    selectedWorkspaces: string[]; // Workspace Filter(TopBarSearchWorkspaceFilter)
+    activeTab: SearchTab;
     recentMenuList: any[]; // TODO: check type
-    searchMenuMap: any; // TODO: check type
+    searchMenuList: any; // TODO: check type
+    // workspace filter
+    recentAccessedWorkspaces: string[];
+    stagedWorkspaces: StageWorkspace[];
 }
 
 export const useTopBarSearchStore = defineStore('top-bar-search', () => {
+    const userWorkspaceStore = useUserWorkspaceStore();
+    const workspaceStoreState = userWorkspaceStore.$state;
+    const recentStore = useRecentStore();
+    const allReferenceStore = useAllReferenceStore();
+    const allReferenceGetters = allReferenceStore.getters;
+
+    const orderWorkspaceList = (workspaceList: any[]) => {
+        if (!storeState.currentWorkspaceId) return workspaceList;
+        return workspaceList.sort((a, b) => {
+            if (a.value === storeState.currentWorkspaceId) return -1;
+            if (b.value === storeState.currentWorkspaceId) return 1;
+            return 0;
+        });
+    };
+
+    const storeState = reactive({
+        currentWorkspaceId: computed(() => workspaceStoreState.getters.currentWorkspaceId),
+        workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
+        workspaceMap: computed(() => allReferenceGetters.workspace),
+    });
     const state = reactive<TopBarSearchStoreState>({
+        loading: false,
+        allWorkspacesChecked: false,
         isActivated: false,
         inputText: '',
-        activateTab: 'service',
-        selectedWorkspaces: [],
+        activeTab: 'service',
         recentMenuList: [],
-        searchMenuMap: {},
+        searchMenuList: [],
+        // workspace filter
+        recentAccessedWorkspaces: [],
+        stagedWorkspaces: [],
     });
 
     const getters = reactive({
@@ -30,85 +71,107 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
             return '';
         }),
         isRecentEmpty: computed<boolean>(() => state.recentMenuList.length === 0),
+        selectedWorkspaces: computed<string[]>(() => state.stagedWorkspaces.filter((workspace) => workspace.isSelected).map((workspace) => workspace.workspaceId)),
     });
 
     const actions = {
-        setIsActivated: (isActivated: boolean, initSearch = true) => {
+        setIsActivated: (isActivated: boolean, options?:{
+            initSearch?: boolean,
+        }) => {
+            const { initSearch = true } = options || {};
             state.isActivated = isActivated;
             if (initSearch) {
                 actions.initSearch();
             }
         },
+        initWorkspaces: () => {
+            const workspaceList = storeState.workspaceList.map((workspace) => ({
+                label: workspace.name,
+                value: workspace.workspace_id,
+                tags: workspace.tags,
+            } as { label: string, value: string, tags: { theme: string } | undefined }));
+            // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
+            const orderedWorkspaceList = orderWorkspaceList(workspaceList);
+            state.stagedWorkspaces = orderedWorkspaceList.slice(0, 3).map((workspace) => ({
+                workspaceId: workspace.value,
+                label: workspace.label,
+                theme: workspace.tags?.theme,
+                isSelected: workspace.value === storeState.currentWorkspaceId,
+            }));
+        },
         initSearch: () => {
             state.inputText = '';
-            state.activateTab = 'service';
-            state.selectedWorkspaces = [];
+            state.activeTab = 'service';
+            actions.initWorkspaces();
         },
         setSelectedWorkspaces: (selectedWorkspaces: string[]) => {
-            state.selectedWorkspaces = selectedWorkspaces;
+            state.stagedWorkspaces = state.stagedWorkspaces.map((workspace) => ({
+                ...workspace,
+                isSelected: selectedWorkspaces.includes(workspace.workspaceId),
+            }));
         },
+        addStagedWorkspace: (workspace: StageWorkspace) => {
+            if (state.stagedWorkspaces.length >= 5) return;
+            state.stagedWorkspaces.push(workspace);
+            state.stagedWorkspaces = orderWorkspaceList(state.stagedWorkspaces);
+        },
+        removeStagedWorkspace: (workspace: StageWorkspace) => {
+            state.stagedWorkspaces = state.stagedWorkspaces.filter((stagedWorkspace) => stagedWorkspace.workspaceId !== workspace.workspaceId);
+        },
+        fetchSearchList: async (searchText: string, activeTab: SearchTab, workspaces:string[]) => {
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
+                    resource_type: tabResourceTypeMap[activeTab],
+                    keyword: searchText,
+                    workspaces,
+                    limit: 15,
+                    all_workspaces: state.allWorkspacesChecked,
+                });
+                let orderedResults = results;
+                if (storeState.currentWorkspaceId !== undefined) {
+                    orderedResults = results?.sort((a, b) => {
+                        if (a.workspace_id === storeState.currentWorkspaceId) return -1;
+                        if (b.workspace_id === storeState.currentWorkspaceId) return 1;
+                        return 0;
+                    });
+                }
+
+                state.searchMenuList = orderedResults ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        },
+
     };
 
-    watch(() => getters.trimmedInputText, debounce(async (trimmedText) => {
+    watch([
+        () => getters.trimmedInputText,
+        () => getters.selectedWorkspaces,
+        () => state.isActivated,
+    ], debounce(async ([trimmedText, workspaces]) => {
         if (trimmedText) {
-            // state.searchMenuList = fetchSearchList(trimmedText);
-            // state.recentMenuList = fetchRecentList(trimmedText);
-            state.searchMenuMap = {
-                'workspace-c0aa5bc7f065': [
-                    { id: 1, label: "이거슨 B's Workspace의 project", icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_folder-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-06250ad7066d': [
-                    { id: 1, label: '크리수마수', icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_folder-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-fa3255244984': [
-                    { id: 1, label: '바뤼스타', icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_folder-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-1dbbf68c80f3': [
-                    { id: 1, label: 'EKS', icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_folder-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-fdf1974e2b21': [
-                    { id: 1, label: 'GCP', icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_folder-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-5fe20947c13e': [
-                    { id: 1, label: 'GCP W', icon: 'ic_document-filled' },
-                    { id: 2, label: 'ic_folder-filled', icon: 'ic_document-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-53590feed87e': [
-                    { id: 1, label: 'JSA', icon: 'ic_document-filled' },
-                    { id: 2, label: 'ic_document-filled', icon: 'ic_document-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-                'workspace-7a0aebcf4eb2': [
-                    { id: 1, label: 'SpaceONE', icon: 'ic_document-filled' },
-                    { id: 2, label: 'test2', icon: 'ic_document-filled' },
-                    { id: 3, label: 'test3', icon: 'ic_favorite-filled' },
-                ],
-            };
-            state.recentMenuList = [
-                { id: 1, label: 'recent > test', icon: 'ic_document-filled' },
-                { id: 2, label: 'recent > test2', icon: 'ic_document-filled' },
-                { id: 3, label: 'recent > test3', icon: 'ic_favorite-filled' },
-            ];
+            await actions.fetchSearchList(trimmedText, state.activeTab, workspaces);
         } else {
-            state.searchMenuMap = [];
+            state.searchMenuList = [];
         }
-    }, 300, {
-        leading: true,
-    }));
+    }, 500));
+
+    watch(() => state.activeTab, async (tab) => {
+        await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
+        if (storeState.currentWorkspaceId) {
+            state.recentMenuList = await recentStore.fetchRecent({
+                type: recentNSearchTabMap[tab],
+                workspaceIds: [storeState.currentWorkspaceId],
+            });
+        }
+    });
 
 
     return {
+        storeState,
         state,
         getters,
         ...actions,

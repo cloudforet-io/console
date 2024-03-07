@@ -19,7 +19,7 @@ import type {
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 
-type PickedWorkspaceModel = Pick<WorkspaceModel, 'state'>;
+type PickedWorkspaceModel = Pick<WorkspaceModel, 'state' | 'tags'>;
 export type WorkspaceItem = Required<Pick<ReferenceItem<PickedWorkspaceModel>, 'key'|'label'|'name'|'data'>>;
 export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItem>;
 
@@ -60,7 +60,7 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
 
         const params: WorkspaceListParameters = {
             query: {
-                only: ['name', 'workspace_id', 'state'],
+                only: ['name', 'workspace_id', 'state', 'tags'],
             },
         };
 
@@ -82,6 +82,7 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
                 name: workspace.name,
                 data: {
                     state: workspace.state,
+                    tags: workspace.tags,
                 },
             };
         });
@@ -99,6 +100,7 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
                 name: workspace.name,
                 data: {
                     state: workspace.state,
+                    tags: workspace.tags,
                 },
             },
         };

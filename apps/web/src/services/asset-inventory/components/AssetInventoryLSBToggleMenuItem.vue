@@ -64,7 +64,9 @@ const handleChangeToggle = (value: boolean) => {
 <style scoped lang="postcss">
 .asset-inventory-l-s-b-toggle-menu-item {
     @apply flex flex-col text-label-md;
+    padding-right: 0.5rem;
     padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
     flex: 1;
     .toggle-title {
         @apply flex justify-between font-bold;

@@ -21,8 +21,7 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
@@ -32,7 +31,10 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -42,7 +44,6 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
-
 interface Props {
     id?: string;
 }
@@ -51,7 +52,7 @@ const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
@@ -59,8 +60,12 @@ const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
+const favoriteStore = useFavoriteStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
@@ -157,7 +162,11 @@ const projectDeleteFormConfirm = async () => {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             project_id: projectDetailPageState.projectId as string,
         });
-        // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
+        await favoriteStore.deleteFavorite({
+            type: FAVORITE_TYPE.PROJECT,
+            workspaceId: storeState.currentWorkspaceId || '',
+            id: projectDetailPageState.projectId as string,
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
     } catch (e) {
@@ -204,13 +213,13 @@ watch([
 }, { immediate: true });
 
 watch([() => singleItemTabState.activeTab, () => state.item], () => {
-    topBarHeaderStore.setBreadcrumbs(state.pageNavigation);
+    gnbStore.setBreadcrumbs(state.pageNavigation);
 });
 watch(() => projectDetailPageState.projectId, (projectId) => {
-    topBarHeaderStore.setId(projectId);
+    gnbStore.setId(projectId);
 }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
@@ -324,11 +333,11 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .project-detail-page {
     height: 100%;
+    margin-top: -0.25rem;
 }
 .page-inner {
     height: 100%;
     max-width: 1368px;
-    margin: 0 auto;
 }
 .p-heading {
     margin-top: 0.25rem;

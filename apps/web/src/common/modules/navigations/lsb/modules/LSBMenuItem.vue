@@ -131,6 +131,7 @@ const handleSelect = (id: string, selected: string) => {
         font-size: 0.75rem;
         line-height: 125%;
         padding-top: 0.25rem;
+        padding-right: 0.25rem;
         padding-left: 0.25rem;
         .toggle-button {
             @apply text-gray-600 cursor-pointer;
@@ -149,8 +150,9 @@ const handleSelect = (id: string, selected: string) => {
         @apply text-label-md font-bold inline-flex items-center;
         height: 2rem;
         margin-top: 0.25rem;
-        padding-left: 0.5rem;
+        padding-right: 0.5rem;
         padding-bottom: 0.5rem;
+        padding-left: 0.5rem;
         .top-title-icon {
             margin-left: 0.25rem;
         }

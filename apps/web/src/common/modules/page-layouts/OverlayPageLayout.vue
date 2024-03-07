@@ -1,47 +1,57 @@
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+
+interface Props {
+    visible: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
+
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
+
+const storeState = reactive({
+    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+});
+</script>
+
 <template>
     <transition name="slide-up">
-        <general-page-layout v-if="visible"
+        <general-page-layout v-if="props.visible"
                              class="overlay-page-layout"
+                             :class="{'is-minimize': storeState.isMinimizeGnb}"
         >
             <slot />
         </general-page-layout>
     </transition>
 </template>
 
-<script lang="ts">
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-
-export default {
-    name: 'OverlayPageLayout',
-    components: { GeneralPageLayout },
-    props: {
-        visible: {
-            type: Boolean,
-            required: true,
-        },
-    },
-    setup() {
-        return {
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 .overlay-page-layout {
     @apply bg-white;
     position: fixed;
     display: flex;
-    width: 100%;
+    width: calc(100% - $gnb-navigation-rail-max-width);
     height: calc(100vh - $(top-bar-height));
-    top: $top-bar-height;
-    left: 0;
+    top: calc($top-bar-height + $gnb-toolbox-height);
+    left: $gnb-navigation-rail-max-width;
     flex-direction: column;
     z-index: 99;
     overflow: auto;
+    transition: left 0.3s ease, width 0.3s ease;
 
     /* transition: opacity 0.3s ease; */
     max-width: 100vw;
+
+    &.is-minimize {
+        left: $gnb-navigation-rail-min-width;
+        width: calc(100% - $gnb-navigation-rail-min-width);
+    }
 }
 
 /* transition */

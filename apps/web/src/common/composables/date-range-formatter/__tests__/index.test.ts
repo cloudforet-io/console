@@ -45,29 +45,31 @@ describe('Date Range Formatter Composable', () => {
     const wrapper = shallowMount(mockComponent as any, { localVue });
 
     // HACK: This test is not working.
-    // it('Should be displayed in the format of "Jan, 2023" when the start and end dates are in the same year and month.', async () => {
-    //     await wrapper.setProps({
-    //         dateRange: {
-    //             start: '2023-01-01',
-    //             end: '2023-01-31',
-    //         },
-    //     });
-    //     const dateEl = wrapper.find('#date');
-    //     expect(dateEl.text()).toBe('Jan, 2023');
-    // });
+    it('Should be displayed in the format of "Jan, 2023" when the start and end dates are in the same year and month.', async () => {
+        await wrapper.setProps({
+            dateRange: {
+                start: '2023-01-01',
+                end: '2023-01-31',
+            },
+        });
+        const dateEl = wrapper.find('#date');
+        expect(dateEl.text()).toBe('Jan, 2023');
+    });
 
-    // it('Should be displayed in the format of "Jan 11, 2023" when the start and end dates are in the same year and month, and end month is this month.', async () => {
-    //     await wrapper.setProps({
-    //         dateRange: {
-    //             start: '2023-09',
-    //             end: '2023-09',
-    //         },
-    //     });
-    //     const dateEl = wrapper.find('#date');
-    //     expect(dateEl.text()).toBe('Sep 11, 2023');
-    // });
+    it('Should be displayed in the format of "Sep 11, YYYY" when the start and end dates are in the same year and month, and end month is this month.', async () => {
+        const _currentDate = dayjs.utc().set('date', 11);
+        console.log(_currentDate.format('YYYY-MM-DD'));
+        await wrapper.setProps({
+            dateRange: {
+                start: _currentDate.format('YYYY-MM-DD'),
+                end: _currentDate.format('YYYY-MM-DD'),
+            },
+        });
+        const dateEl = wrapper.find('#date');
+        expect(dateEl.text()).toBe(`${_currentDate.format('MMM')} 11, ${_currentDate.format('YYYY')}`);
+    });
 
-    it('Should be displayed in the format of "Jan ~ Feb 28, 2023" when the start and end dates are in the same year but different months.', async () => {
+    it('Should be displayed in the format of "Jan ~ Feb, 2023" when the start and end dates are in the same year but different months.', async () => {
         await wrapper.setProps({
             dateRange: {
                 start: '2023-01-01',
@@ -75,17 +77,18 @@ describe('Date Range Formatter Composable', () => {
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan ~ Feb 28, 2023');
+        expect(dateEl.text()).toBe('Jan ~ Feb, 2023');
     });
 
-    it('Should be displayed in the format of "Jan 2023 ~ Feb 28, 2024" when the start and end dates are in different years.', async () => {
+    it('Should be displayed in the format of "Jan 2023 ~ Feb 28, YYYY" when the start and end dates are in different years.', async () => {
+        const _currentMonthEndDate = dayjs.utc().endOf('month');
         await wrapper.setProps({
             dateRange: {
-                start: '2023-01-01',
-                end: '2024-02-28',
+                start: '2022-01-01',
+                end: _currentMonthEndDate.format('YYYY-MM-DD'),
             },
         });
         const dateEl = wrapper.find('#date');
-        expect(dateEl.text()).toBe('Jan 2023 ~ Feb 28, 2024');
+        expect(dateEl.text()).toBe(`Jan 2022 ~ ${_currentMonthEndDate.format('MMM D, YYYY')}`);
     });
 });

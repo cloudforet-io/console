@@ -4,6 +4,7 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
@@ -31,8 +32,9 @@ import { getRefinedPieChartData } from '@/services/dashboards/widgets/_helpers/w
 import {
     getPieChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getWidgetDataTableRowLocation } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 import type {
     WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
 } from '@/services/dashboards/widgets/_types/widget-type';
@@ -56,6 +58,7 @@ interface ChartData {
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const router = useRouter();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -199,6 +202,11 @@ const handleUpdateThisPage = (_thisPage: number) => {
     state.data = undefined;
     refreshWidget(_thisPage);
 };
+const handleClickRow = (rowData: WidgetTableData) => {
+    if (!widgetState.dataField) return;
+    const _rowLocation = getWidgetDataTableRowLocation(rowData, widgetState.widgetLocation, [widgetState.dataField]);
+    if (_rowLocation) window.open(router.resolve(_rowLocation).href, '_blank');
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -258,6 +266,7 @@ defineExpose<WidgetExpose<FullData>>({
                                show-legend
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"
+                               @click-row="handleClickRow"
             />
         </div>
     </widget-frame>

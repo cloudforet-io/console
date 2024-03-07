@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
@@ -27,26 +26,15 @@ import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/componen
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
-const router = useRouter();
 
-const topBarHeaderStore = useTopBarHeaderStore();
-const topBarHeaderGetters = topBarHeaderStore.getters;
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
-
-/* Query String */
-watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
-    router.replace({
-        query: {
-            select_pg: selectedItem.node?.data.id || null,
-        },
-    }).catch(() => {});
-});
 
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -139,26 +127,14 @@ watch(() => route.query, async (after, before) => {
     }
 });
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-    topBarHeaderStore.setBreadcrumbs(projectGroupNavigation);
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
-watch(() => topBarHeaderGetters.selectedItem, (selectedItem) => {
+watch(() => gnbGetters.selectedItem, (selectedItem) => {
     onProjectGroupNavClick(selectedItem);
 });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
-
-onUnmounted(() => {
-    projectPageStore.reset();
-});
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-    ]);
-})();
 </script>
 
 <template>
@@ -241,6 +217,7 @@ onUnmounted(() => {
 .top-button-box {
     display: inline-block;
     float: right;
+    margin-left: auto;
     .create-context-menu {
         z-index: 10;
     }

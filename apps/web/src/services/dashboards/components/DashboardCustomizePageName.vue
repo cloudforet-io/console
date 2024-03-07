@@ -133,7 +133,7 @@ onMounted(() => {
             margin-bottom: 0.75rem;
         }
         .back-button {
-            margin-top: 0.1875rem;
+            margin-bottom: 0.75rem;
         }
     }
 }

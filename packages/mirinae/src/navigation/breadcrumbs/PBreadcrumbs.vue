@@ -114,6 +114,11 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
             margin-right: 0.375rem;
             word-break: break-all;
         }
+        &:last-child {
+            .breadcrumb-wrapper {
+                margin-right: 0.25rem;
+            }
+        }
     }
 }
 </style>

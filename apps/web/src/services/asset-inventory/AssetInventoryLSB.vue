@@ -14,17 +14,17 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type {
     LSBItem, LSBMenu, TopTitle,
 } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import AssetInventoryLSBToggleMenuItem from '@/services/asset-inventory/components/AssetInventoryLSBToggleMenuItem.vue';
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
@@ -38,7 +38,7 @@ const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
@@ -153,7 +153,7 @@ watch(() => state.detailPageParams, async (params) => {
     if (!params.name) await routeToFirstCloudServiceType(params);
 }, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 </script>
 
@@ -199,11 +199,14 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <style lang="postcss" scoped>
 .asset-inventory-l-s-b {
-    .provider-item {
-        @apply flex items-center;
-        gap: 0.25rem;
-        .selected-wrapper {
-            @apply block;
+    .provider-radio-group {
+        .provider-item {
+            @apply flex items-center;
+            gap: 0.25rem;
+            padding-left: 0.25rem;
+            .selected-wrapper {
+                @apply block;
+            }
         }
     }
 }

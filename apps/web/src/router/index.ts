@@ -20,7 +20,7 @@ import { pinia } from '@/store/pinia';
 
 import { calculateIsAccessibleRoute } from '@/lib/access-control';
 import { GTag } from '@/lib/site-analytics/gtag';
-import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
+import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
@@ -179,9 +179,9 @@ export class SpaceRouter {
                         }
 
                         const workspaceIdFromParams = to.params.workspaceId;
-                        let targetWorkspaceId = workspaceIdFromParams;
+                        let targetWorkspaceId = getValidWorkspaceId(workspaceIdFromParams, workspaceList);
 
-                        if (workspaceIdFromParams) {
+                        if (targetWorkspaceId) {
                             if (prevWorkspaceId === workspaceIdFromParams && !grantFailStatus) {
                                 next();
                                 return;
@@ -201,44 +201,40 @@ export class SpaceRouter {
                             }
 
                             const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
-                            if (lastAccessedWorkspaceId) {
+                            if (getValidWorkspaceId(lastAccessedWorkspaceId, workspaceList)) {
                                 targetWorkspaceId = lastAccessedWorkspaceId;
-                            } else targetWorkspaceId = workspaceList[0].workspace_id;
+                            } else {
+                                await setCurrentAccessedWorkspaceId(undefined);
+                                targetWorkspaceId = workspaceList[0].workspace_id;
+                            }
                         }
 
-                        if (!getValidWorkspaceId(targetWorkspaceId, workspaceList)) {
+                        const { failStatus } = await grantAndLoadByCurrentScope('WORKSPACE', targetWorkspaceId);
+
+                        if (failStatus) {
+                            await userWorkspaceStore.load();
                             next({
                                 name: ERROR_ROUTE._NAME,
                                 params: { statusCode: '404' },
                             });
                         } else {
-                            const { failStatus } = await grantAndLoadByCurrentScope('WORKSPACE', targetWorkspaceId);
-
-                            if (failStatus) {
-                                await userWorkspaceStore.load();
+                            const pageAccessPermissionList = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
+                            const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
+                            if (isAccessibleRoute) {
                                 next({
-                                    name: ERROR_ROUTE._NAME,
-                                    params: { statusCode: '404' },
+                                    ...to,
+                                    name: to.name as string,
+                                    params: {
+                                        ...to.params,
+                                        workspaceId: targetWorkspaceId as string,
+                                    },
+                                    query: to.query,
                                 });
                             } else {
-                                const pageAccessPermissionList = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
-                                const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
-                                if (isAccessibleRoute) {
-                                    next({
-                                        ...to,
-                                        name: to.name as string,
-                                        params: {
-                                            ...to.params,
-                                            workspaceId: targetWorkspaceId,
-                                        },
-                                        query: to.query,
-                                    });
-                                } else {
-                                    next({
-                                        name: HOME_DASHBOARD_ROUTE._NAME,
-                                        params: { workspaceId: targetWorkspaceId },
-                                    });
-                                }
+                                next({
+                                    name: HOME_DASHBOARD_ROUTE._NAME,
+                                    params: { workspaceId: targetWorkspaceId as string },
+                                });
                             }
                         }
 

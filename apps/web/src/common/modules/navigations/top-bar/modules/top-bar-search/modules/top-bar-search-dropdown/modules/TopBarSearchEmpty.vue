@@ -2,7 +2,7 @@
 import { PEmpty } from '@spaceone/design-system';
 
 interface Props {
-    inputText: string;
+    inputText?: string;
     isRecent: boolean;
 }
 
@@ -23,12 +23,12 @@ const props = withDefaults(defineProps<Props>(), {
             >
         </template>
         <p class="no-data-text">
-            <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
+            <i18n path="COMMON.NAVIGATIONS.TOP_BAR.NO_RESULT_1">
                 <template #inputText>
                     <em>{{ props.inputText }}</em>
                 </template>
             </i18n>
-            <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
+            <br>{{ $t('COMMON.NAVIGATIONS.TOP_BAR.NO_RESULT_2') }}
         </p>
     </p-empty>
     <p-empty
@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
                  alt="empty-image"
             >
         </template>
-        {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
+        {{ $t('COMMON.NAVIGATIONS.TOP_BAR.HELP_TEXT') }}
     </p-empty>
 </template>
+Search for navigation service account

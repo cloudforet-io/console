@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,
 } from '@spaceone/design-system';
+import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -20,8 +21,6 @@ import { i18n } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -45,13 +44,9 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type {
-    SuggestionItem,
-    SuggestionType,
-} from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
-import {
-    SUGGESTION_TYPE,
-} from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -59,8 +54,18 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
 const FAVORITE_LIMIT = 5;
+
+export interface FavoriteMenuItem extends MenuItem {
+    itemType?: FavoriteType;
+    parents?: FavoriteMenuItem[];
+    icon?: string;
+    defaultIcon?: string;
+    provider?: string;
+    type?: ContextMenuType;
+    name?: string;
+    label?: string|TranslateResult;
+}
 
 const emit = defineEmits<{(e: 'close'): void;
 }>();
@@ -71,6 +76,8 @@ const dashboardGetters = dashboardStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
 const appContextStore = useAppContextStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const router = useRouter();
 
 const storeState = reactive({
@@ -83,65 +90,65 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     showAll: false,
-    showAllType: undefined as undefined|SuggestionType,
-    items: computed<SuggestionItem[]>(() => {
-        const results: SuggestionItem[] = [];
+    showAllType: undefined as undefined|FavoriteType,
+    items: computed<FavoriteMenuItem[]>(() => {
+        const results: FavoriteMenuItem[] = [];
         if (state.favoriteMenuItems.length) {
             results.push({
-                name: 'title', label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'header', itemType: SUGGESTION_TYPE.MENU,
+                name: 'title', label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'header', itemType: FAVORITE_TYPE.MENU,
             });
             results.push(...state.favoriteMenuItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteDashboardItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
-                name: 'title', label: i18n.t('MENU.DASHBOARDS'), type: 'header', itemType: SUGGESTION_TYPE.DASHBOARD,
+                name: 'title', label: i18n.t('MENU.DASHBOARDS'), type: 'header', itemType: FAVORITE_TYPE.DASHBOARD,
             });
             results.push(...state.favoriteDashboardItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteProjects.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
-                name: 'title', label: i18n.t('MENU.PROJECT'), type: 'header', itemType: SUGGESTION_TYPE.PROJECT,
+                name: 'title', label: i18n.t('MENU.PROJECT'), type: 'header', itemType: FAVORITE_TYPE.PROJECT,
             });
             results.push(...state.favoriteProjects.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteCloudServiceItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
-                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
+                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: FAVORITE_TYPE.CLOUD_SERVICE,
             });
             results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteCostAnalysisItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
-                name: 'title', label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: 'header', itemType: SUGGESTION_TYPE.COST_ANALYSIS,
+                name: 'title', label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: 'header', itemType: FAVORITE_TYPE.COST_ANALYSIS,
             });
             results.push(...state.favoriteCostAnalysisItems.slice(0, FAVORITE_LIMIT));
         }
         return results;
     }),
-    allItems: computed<SuggestionItem[]>(() => {
-        let items: FavoriteItem[] = [];
+    allItems: computed<FavoriteMenuItem[]>(() => {
+        let items: FavoriteMenuItem[] = [];
         let label: TranslateResult = '';
-        if (state.showAllType === SUGGESTION_TYPE.MENU) {
+        if (state.showAllType === FAVORITE_TYPE.MENU) {
             items = state.favoriteMenuItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_MENU');
         }
-        if (state.showAllType === SUGGESTION_TYPE.DASHBOARD) {
+        if (state.showAllType === FAVORITE_TYPE.DASHBOARD) {
             items = state.favoriteDashboardItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_DASHBOARDS');
         }
-        if (state.showAllType === SUGGESTION_TYPE.PROJECT) {
+        if (state.showAllType === FAVORITE_TYPE.PROJECT) {
             items = state.favoriteProjects;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_PROJECTS');
         }
-        if (state.showAllType === SUGGESTION_TYPE.CLOUD_SERVICE) {
+        if (state.showAllType === FAVORITE_TYPE.CLOUD_SERVICE) {
             items = state.favoriteCloudServiceItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_CLOUD_SERVICES');
         }
-        if (state.showAllType === SUGGESTION_TYPE.COST_ANALYSIS) {
+        if (state.showAllType === FAVORITE_TYPE.COST_ANALYSIS) {
             items = state.favoriteCostAnalysisItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_COST_ANALYSIS');
         }
@@ -156,12 +163,12 @@ const state = reactive({
     costQuerySets: [] as CostQuerySetModel[],
     //
     favoriteItemsMapFilterByWorkspaceId: computed(() => ({
-        [FAVORITE_TYPE.MENU]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.PROJECT]: (store.state.favorite.projectItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.projectGroupItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.cloudServiceItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.dashboardItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
-        [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.costAnalysisItems ?? []).filter((item) => item.workspaceId === storeState.currentWorkspaceId),
+        [FAVORITE_TYPE.MENU]: filterFavoriteItemsByWorkspace(favoriteGetters.menuItems ?? []),
+        [FAVORITE_TYPE.PROJECT]: filterFavoriteItemsByWorkspace(favoriteGetters.projectItems ?? []),
+        [FAVORITE_TYPE.PROJECT_GROUP]: filterFavoriteItemsByWorkspace(favoriteGetters.projectGroupItems ?? []),
+        [FAVORITE_TYPE.CLOUD_SERVICE]: filterFavoriteItemsByWorkspace(favoriteGetters.cloudServiceItems ?? []),
+        [FAVORITE_TYPE.DASHBOARD]: filterFavoriteItemsByWorkspace(favoriteGetters.dashboardItems ?? []),
+        [FAVORITE_TYPE.COST_ANALYSIS]: filterFavoriteItemsByWorkspace(favoriteGetters.costAnalysisItems ?? []),
     })),
     favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
         state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU],
@@ -202,30 +209,35 @@ const state = reactive({
 });
 
 /* Util */
-const getItemLength = (type: SuggestionType): number => {
-    if (type === SUGGESTION_TYPE.MENU) return state.favoriteMenuItems.length;
-    if (type === SUGGESTION_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
-    if (type === SUGGESTION_TYPE.PROJECT) return state.favoriteProjects.length;
-    if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
-    if (type === SUGGESTION_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
+const getItemLength = (type: FavoriteType): number => {
+    if (type === FAVORITE_TYPE.MENU) return state.favoriteMenuItems.length;
+    if (type === FAVORITE_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
+    if (type === FAVORITE_TYPE.PROJECT) return state.favoriteProjects.length;
+    if (type === FAVORITE_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
+    if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     return 0;
 };
 
+const filterFavoriteItemsByWorkspace = (items: FavoriteItem[]): FavoriteMenuItem[] => items.filter((item) => item.workspace_id === storeState.currentWorkspaceId)
+    .map((i) => ({
+        ...i, itemType: i.type, itemId: i.id, type: 'item',
+    }));
+
 /* Event */
-const handleClickMenuButton = (type: SuggestionType) => {
+const handleClickMenuButton = (type: FavoriteType) => {
     // Dashboard and Cost Analysis are added after (Planning).
-    if (type === SUGGESTION_TYPE.PROJECT) {
+    if (type === FAVORITE_TYPE.PROJECT) {
         router.replace({
             name: PROJECT_ROUTE._NAME,
         });
-    } else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) {
+    } else if (type === FAVORITE_TYPE.CLOUD_SERVICE) {
         router.replace({
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         });
     }
     emit('close');
 };
-const handleClickShowAll = (type: SuggestionType) => {
+const handleClickShowAll = (type: FavoriteType) => {
     state.showAll = true;
     state.showAllType = type;
 };
@@ -233,25 +245,25 @@ const handleGoBack = () => {
     state.showAll = false;
     state.showAllType = undefined;
 };
-const handleSelect = (item: SuggestionItem) => {
+const handleSelect = (item: FavoriteMenuItem) => {
     const itemName = item.name as string;
-    if (item.itemType === SUGGESTION_TYPE.MENU) {
+    if (item.itemType === FAVORITE_TYPE.MENU) {
         const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
         if (menuInfo && router.currentRoute.name !== itemName) {
             router.push({ name: menuInfo.routeName }).catch(() => {});
         }
-    } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
+    } else if (item.itemType === FAVORITE_TYPE.DASHBOARD) {
         router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: itemName,
             },
         }).catch(() => {});
-    } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
+    } else if (item.itemType === FAVORITE_TYPE.PROJECT) {
         router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
-    } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
+    } else if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
         router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
-    } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
+    } else if (item.itemType === FAVORITE_TYPE.CLOUD_SERVICE) {
         const itemInfo: string[] = itemName.split('.');
         router.push({
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
@@ -261,7 +273,7 @@ const handleSelect = (item: SuggestionItem) => {
                 name: itemInfo[2],
             },
         }).catch(() => {});
-    } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
+    } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
         router.push({
@@ -308,22 +320,6 @@ const fetchCostQuerySet = async () => {
     state.costQuerySets = costQuerySets;
 };
 
-/* Init */
-(async () => {
-    state.loading = true;
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-        store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
-        store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-        store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
-        dashboardStore.load(),
-        // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
-    ]);
-    state.loading = false;
-})();
-
 watch([
     () => costDataSourceReferenceStore.getters.hasLoaded,
     () => appContextStore.getters.globalGrantLoading,
@@ -331,10 +327,21 @@ watch([
 ], ([hasLoaded, loading, grantInfo]) => {
     if (hasLoaded && !loading && grantInfo === 'WORKSPACE') fetchCostQuerySet();
 }, { immediate: true });
+
+/* Init */
+(async () => {
+    state.loading = true;
+    await Promise.allSettled([
+        favoriteStore.fetchFavorite(),
+        dashboardStore.load(),
+        // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
+    ]);
+    state.loading = false;
+})();
 </script>
 
 <template>
-    <div class="top-bar-favorite">
+    <div class="top-bar-favorite-context-menu">
         <p-data-loader :data="state.items"
                        :loading="state.loading"
                        :class="{ loading: state.loading }"
@@ -404,24 +411,26 @@ watch([
 </template>
 
 <style lang="postcss" scoped>
-.top-bar-favorite {
+.top-bar-favorite-context-menu {
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
         &.loading {
             height: 15rem;
         }
         .data-loader-container {
-            max-height: calc(100vh - $top-bar-height - 3.75rem);
+            max-height: calc(100vh - $top-bar-height - 1.5rem);
             overflow-y: auto;
-            padding: 1rem 0;
+            padding: 1rem 0.5rem;
         }
     }
 
     /* custom gnb-suggestion-list */
-    :deep(.top-bar-search-suggestion-list) {
+    :deep(.top-bar-suggestion-list) {
+        padding: 0;
         .context-header {
-            display: flex;
-            justify-content: space-between;
+            @apply flex justify-between items-center;
+            height: 1.25rem;
+            margin: 0;
             .show-all-button {
                 @apply text-blue-700;
                 font-size: 0.75rem;
@@ -442,6 +451,16 @@ watch([
             font-size: 0.875rem;
             font-weight: 700;
             padding-bottom: 0.5rem;
+        }
+        .suggestion-item {
+            justify-content: unset;
+            .texts {
+                flex: unset;
+                width: auto;
+                .text-item {
+                    width: auto;
+                }
+            }
         }
     }
 }

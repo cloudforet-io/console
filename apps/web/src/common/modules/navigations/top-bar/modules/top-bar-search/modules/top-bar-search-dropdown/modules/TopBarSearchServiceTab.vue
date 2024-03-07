@@ -9,6 +9,7 @@ import { getTextHighlightRegex, PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -74,7 +75,7 @@ const state = reactive({
     defaultServiceMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
         if (state.defaultServiceMenuList.length) {
-            results.push({ name: 'title', label: 'Site Navigation', type: 'header' });
+            results.push({ name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.SITE_NAVIGATION'), type: 'header' });
             results = results.concat(state.defaultServiceMenuList);
         }
         return results;
@@ -87,7 +88,7 @@ const state = reactive({
     recentMenuItems: computed(() => {
         let results: SuggestionItem[] = [];
         if (state.recentMenuList?.length) {
-            results.push({ name: 'title', label: 'Last Viewed', type: 'header' });
+            results.push({ name: 'title', label: i18n.t('COMMON.NAVIGATIONS.TOP_BAR.RECENTLY_VIEWED'), type: 'header' });
             results = results.concat(state.recentMenuList);
         }
         return results;
@@ -146,7 +147,9 @@ const handleSelect = (item) => {
             type: RECENT_TYPE.SERVICE, workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
         });
     }
-    topBarSearchStore.setIsActivated(false);
+    topBarSearchStore.setIsActivated(false, {
+        initSearch: false,
+    });
 };
 
 watch(() => state.trimmedInputText, debounce(async (trimmedText) => {

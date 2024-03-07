@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import ProjectLSB from '@/services/project/ProjectLSB.vue';
 
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 
 onUnmounted(() => {
-    topBarHeaderStore.initState();
+    gnbStore.initState();
 });
 </script>
 

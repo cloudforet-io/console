@@ -69,7 +69,8 @@ const storeState = reactive({
         grid-auto-flow: row;
         max-width: 1368px;
         grid-gap: 1.25rem;
-        padding: 1.5rem;
+        padding-right: 1.5rem;
+        padding-left: 1.5rem;
         margin: 0 auto;
     }
 }

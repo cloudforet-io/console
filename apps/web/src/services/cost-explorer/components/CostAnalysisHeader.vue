@@ -13,8 +13,7 @@ import { SpaceRouter } from '@/router';
 import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { i18n } from '@/translations';
 
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
@@ -22,7 +21,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray } from '@/styles/colors';
 
@@ -37,9 +39,11 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const topBarHeaderStore = useTopBarHeaderStore();
+const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const favoriteStore = useFavoriteStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
@@ -58,6 +62,7 @@ const state = reactive({
         type: FAVORITE_TYPE.COST_ANALYSIS,
         id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || ''),
     })),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 /* Event Handlers */
@@ -88,13 +93,18 @@ const handleDeleteQueryConfirm = async () => {
                 costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
             },
         }));
+        await favoriteStore.deleteFavorite({
+            type: FAVORITE_TYPE.COST_ANALYSIS,
+            workspaceId: state.currentWorkspaceId || '',
+            id: state.itemIdForDeleteQuery,
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }
 };
 
 watch(() => state.favoriteOptions, (favoriteOptions) => {
-    topBarHeaderStore.setFavoriteItemId(favoriteOptions);
+    gnbStore.setFavoriteItemId(favoriteOptions);
 });
 </script>
 
@@ -172,13 +182,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
         margin-bottom: -0.25rem;
-        &.icon-wrapper {
-            gap: 0.5rem;
-        }
         &.currency-wrapper {
             @apply justify-end text-gray-800;
             font-size: 0.875rem;
             float: right;
+            margin-left: auto;
             .label {
                 font-weight: 700;
                 padding-right: 0.25rem;

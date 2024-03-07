@@ -265,6 +265,7 @@ export default defineComponent<Props>({
         width: 100%;
         border: none;
         flex-grow: 1;
+        max-width: 1920px;
 
         /* custom design-system component - p-heading */
         :deep(.p-heading) {

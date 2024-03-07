@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@spaceone/design-system';
 import {
@@ -28,7 +29,8 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import { getWidgetDataTableRowLocation } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 import type {
     WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
 } from '@/services/dashboards/widgets/_types/widget-type';
@@ -43,7 +45,7 @@ import {
 
 type FullData = CostAnalyzeResponse<Data>;
 
-
+const router = useRouter();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -177,6 +179,11 @@ const handleUpdateThisPage = (_thisPage: number) => {
     state.data = null;
     refreshWidget(_thisPage);
 };
+const handleClickRow = (rowData: WidgetTableData) => {
+    if (!widgetState.dataField) return;
+    const _rowLocation = getWidgetDataTableRowLocation(rowData, widgetState.widgetLocation, [widgetState.dataField, COST_DATA_FIELD_MAP.PROVIDER.name]);
+    if (_rowLocation) window.open(router.resolve(_rowLocation).href, '_blank');
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -236,6 +243,7 @@ defineExpose<WidgetExpose<FullData>>({
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                @update:thisPage="handleUpdateThisPage"
+                               @click-row="handleClickRow"
             />
         </div>
     </widget-frame>

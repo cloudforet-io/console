@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PCollapsibleToggle, PLazyImg, PSelectDropdown,
+    PCollapsibleToggle, PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -11,8 +11,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,19 +19,18 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { gray } from '@/styles/colors';
+import { gray, yellow } from '@/styles/colors';
 
-import CostExplorerLSBRelocateDashboardModal
-    from '@/services/cost-explorer/components/CostExplorerLSBRelocateDashboardModal.vue';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-import type { RelocateDashboardStatus } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
-import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
@@ -44,8 +41,9 @@ const SHOW_MORE_MENU_ID = 'show-more';
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetGetters = costQuerySetStore.getters;
 const costQuerySetState = costQuerySetStore.state;
-const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const router = useRouter();
 const route = useRoute();
@@ -56,6 +54,7 @@ const appContextStore = useAppContextStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
 });
 const state = reactive({
     loading: true,
@@ -111,14 +110,21 @@ const state = reactive({
             ...(state.currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
         ];
     }),
+    adminMenuSet: computed<LSBMenu>(() => (!storeState.isAdminMode ? [
+        {
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: i18n.t('COMMON.STARRED'),
+            id: STARRED_MENU_ID,
+        },
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+    ] : [])),
     favoriteItemMap: computed(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.COST_ANALYSIS];
         const result: Record<string, FavoriteConfig> = {};
-        if (stateName) {
-            store.state.favorite[stateName]?.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.id] = d;
+        });
         return result;
     }),
     starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.showMoreQuerySetStatus ? state.currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : state.currentQueryMenuList)),
@@ -131,14 +137,7 @@ const state = reactive({
         {
             type: MENU_ITEM_TYPE.DIVIDER,
         },
-        {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('COMMON.STARRED'),
-            id: STARRED_MENU_ID,
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
+        ...state.adminMenuSet,
         ...state.queryMenuSet,
     ]),
 });
@@ -155,9 +154,6 @@ const dataSourceState = reactive({
         }));
     }),
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
-});
-const relocateNotificationState = reactive({
-    isModalVisible: false,
 });
 
 const filterMenuItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
@@ -185,13 +181,6 @@ const handleSelectDataSource = (selected: string) => {
         },
     })).catch(() => {});
 };
-
-onMounted(() => {
-    // Relocate dashboard notification
-    const relocateDashboardStatus: RelocateDashboardStatus|undefined = costExplorerSettingsStore.getRelocateDashboardStatus;
-    relocateNotificationState.isModalVisible = !relocateDashboardStatus?.hideModal;
-});
-
 </script>
 
 <template>
@@ -211,6 +200,12 @@ onMounted(() => {
                     <span v-else
                           class="no-data"
                     >
+                        <p-i class="menu-icon"
+                             name="ic_star-filled"
+                             height="1rem"
+                             width="1rem"
+                             :color="yellow[500]"
+                        />
                         {{ $t('COMMON.STARRED_NO_DATA') }}
                     </span>
                 </div>
@@ -251,20 +246,26 @@ onMounted(() => {
                 />
             </template>
         </l-s-b>
-        <cost-explorer-l-s-b-relocate-dashboard-modal
-            v-if="!storeState.isAdminMode"
-            :visible.sync="relocateNotificationState.isModalVisible"
-        />
     </aside>
 </template>
 
 <style scoped lang="postcss">
 .sidebar-menu {
     .no-data {
-        @apply text-gray-500;
+        @apply flex items-center text-gray-500;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+        gap: 0.125rem;
     }
     .show-more {
         margin-left: 0.5rem;
+    }
+    .select-options-dropdown {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    .selected-item-postfix {
+        @apply text-gray-500;
     }
 }
 

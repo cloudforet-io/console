@@ -29,10 +29,10 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import TopBarNotiItem from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-noti/modules/TopBarNotiItem.vue';
+import TopBarNotiItem from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notice/modules/TopBarNotiItem.vue';
 import {
     NOTIFICATION_TYPE_ICONS,
-} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-noti/type';
+} from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/type';
 
 import { safe } from '@/styles/colors';
 
@@ -239,7 +239,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="top-bar-notifications-tab">
+    <div class="top-bar-notifications-context-menu">
         <p-data-loader :data="state.items"
                        :loading="state.loading"
                        :disable-empty-case="state.loading"
@@ -338,7 +338,7 @@ onMounted(() => {
 </template>
 
 <style lang="postcss" scoped>
-.top-bar-notifications-tab {
+.top-bar-notifications-context-menu {
     @apply bg-white;
     display: flex;
     flex-direction: column;

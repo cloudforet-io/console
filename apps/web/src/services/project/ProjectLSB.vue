@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { reactive, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
 import { queryStringToString } from '@/lib/router-query-string';
 
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
 import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
+const router = useRouter();
+
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
+
 const state = reactive({
     initGroupId: queryStringToString(route.query.select_pg) as string|undefined,
     isCollapsed: false,
@@ -27,6 +31,15 @@ const { favoriteItems, beforeFavoriteRoute, handleDeleteFavorite } = useProjectF
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
+
+watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
+    router.push({
+        name: PROJECT_ROUTE._NAME,
+        query: {
+            select_pg: selectedItem.node?.data.id || null,
+        },
+    }).catch(() => {});
+});
 </script>
 
 <template>
@@ -51,7 +64,7 @@ const handleClickCollapsibleTitle = () => {
                                @delete="handleDeleteFavorite"
                 >
                     <template #icon="{item}">
-                        <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
+                        <p-i :name="item.type === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
                              width="1rem"
                              height="1rem"
                              color="inherit inherit"
@@ -84,7 +97,7 @@ const handleClickCollapsibleTitle = () => {
         }
         .collapsible-contents {
             margin-top: 0.5rem;
-            padding-bottom: 0.25rem;
+            padding-bottom: 0.5rem;
             opacity: 1;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }

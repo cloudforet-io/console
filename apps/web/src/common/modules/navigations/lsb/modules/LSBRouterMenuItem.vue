@@ -6,12 +6,12 @@ import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { LSBMenu, LSBIcon } from '@/common/modules/navigations/lsb/type';
 
 interface Props {

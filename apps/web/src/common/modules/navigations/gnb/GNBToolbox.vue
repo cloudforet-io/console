@@ -11,52 +11,59 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone, isEmpty } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteOptions } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { useTopBarHeaderStore } from '@/common/modules/navigations/top-bar/modules/top-bar-header/store';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
-interface Props {
-    isMinimizeGnb?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    isMinimizeGnb: false,
-});
-
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
-const topBarHeaderStore = useTopBarHeaderStore();
-const topBarHeaderGetters = topBarHeaderStore.getters;
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
+const favoriteStore = useFavoriteStore();
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 const { width } = useWindowSize();
 const { breadcrumbs } = useBreadcrumbs();
 
-const emit = defineEmits<{(event: 'update:is-minimize-gnb'): void;
-}>();
-
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
-    proxyIsMinimizeGnb: useProxyValue('isMinimizeGnb', props, emit),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     routes: computed(() => {
-        if (topBarHeaderGetters.breadcrumbs.length === 0) {
-            return breadcrumbs.value;
+        let routes: Breadcrumb[] = [];
+        if (!storeState.isAdminMode) {
+            routes.push({
+                name: i18n.t('MENU.HOME_DASHBOARD'),
+                to: {
+                    name: HOME_DASHBOARD_ROUTE._NAME,
+                    params: {
+                        workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
+                    },
+                },
+            });
         }
-        return topBarHeaderGetters.breadcrumbs;
+        if (gnbGetters.breadcrumbs.length === 0) {
+            routes = [...routes, ...breadcrumbs.value];
+        }
+        routes = [...routes, ...gnbGetters.breadcrumbs];
+        return routes;
     }),
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
@@ -75,72 +82,60 @@ const state = reactive({
 });
 
 const handleClickMenuButton = () => {
-    state.proxyIsMinimizeGnb = !state.proxyIsMinimizeGnb;
+    gnbStore.setMinimizeGnb(!gnbGetters.isMinimizeGnb);
 };
 const handleClickBreadcrumbsItem = (item: Breadcrumb) => {
-    if (item) topBarHeaderStore.setSelectedItem(item);
+    if (item) gnbStore.setSelectedItem(item);
 };
 const handleClickBreadcrumbsDropdownItem = (item: MenuItem) => {
     if (item) {
-        const selectedItem = topBarHeaderGetters.breadcrumbs.find((breadcrumb) => breadcrumb.name === item.name);
-        if (selectedItem) topBarHeaderStore.setSelectedItem(selectedItem);
+        const selectedItem = gnbGetters.breadcrumbs.find((breadcrumb) => breadcrumb.name === item.name);
+        if (selectedItem) gnbStore.setSelectedItem(selectedItem);
     }
 };
 
 watch(() => state.selectedMenuId, async () => {
-    await topBarHeaderStore.initState();
-    await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
-});
-watch(() => state.currentMenuId, async (currentMenuId) => {
-    await topBarHeaderStore.setFavoriteItemId(state.favoriteOptions);
-    if (currentMenuId === MENU_ID.HOME_DASHBOARD) {
-        topBarHeaderStore.setBreadcrumbs([{
-            name: i18n.t('MENU.HOME_DASHBOARD'),
-            to: {
-                name: HOME_DASHBOARD_ROUTE._NAME,
-                params: {
-                    workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
-                },
-            },
-        }]);
-    }
+    await gnbStore.initState();
+    await favoriteStore.fetchFavorite();
+    await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
-
-(async () => {
-    await store.dispatch('favorite/load', FAVORITE_TYPE.MENU);
-})();
+watch(() => state.currentMenuId, async () => {
+    await gnbStore.setFavoriteItemId(state.favoriteOptions);
+}, { immediate: true });
 </script>
 
 <template>
     <div class="g-n-b-toolbox">
         <div class="navigation-section">
-            <p-icon-button name="ic_gnb_menu"
-                           style-type="transparent"
-                           class="menu-button"
-                           shape="square"
-                           size="md"
-                           @click="handleClickMenuButton"
-            />
+            <div class="menu-button-wrapper">
+                <p-icon-button name="ic_gnb_menu"
+                               style-type="transparent"
+                               class="menu-button"
+                               shape="square"
+                               size="md"
+                               @click="handleClickMenuButton"
+                />
+            </div>
             <p-breadcrumbs :routes="state.routes"
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button v-if="state.routes.length > 0 && !isEmpty(topBarHeaderGetters.favoriteItem)"
-                             :item-id="topBarHeaderGetters.favoriteItem.id || ''"
-                             :favorite-type="topBarHeaderGetters.favoriteItem.type || ''"
+            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.HOME_DASHBOARD"
+                             :item-id="gnbGetters.favoriteItem.id || ''"
+                             :favorite-type="gnbGetters.favoriteItem.type || ''"
                              scale="0.8"
                              class="favorite-button"
             />
         </div>
-        <div v-if="topBarHeaderGetters.id"
+        <div v-if="gnbGetters.id"
              class="extra-section"
         >
             <b>{{ $t('COMMON.GNB.TOOLBOX.ID') }}: </b>
             <p-copy-button class="copy-button"
                            size="sm"
-                           :value="topBarHeaderGetters.id"
+                           :value="gnbGetters.id"
             >
-                {{ state.isMobileSize ? '' : topBarHeaderGetters.id }}
+                {{ state.isMobileSize ? '' : gnbGetters.id }}
             </p-copy-button>
         </div>
     </div>
@@ -153,20 +148,20 @@ watch(() => state.currentMenuId, async (currentMenuId) => {
     width: 100%;
     height: $gnb-toolbox-height;
     padding-right: 1rem;
-    padding-left: 0.625rem;
-    z-index: 100;
+    z-index: 50;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     .navigation-section {
         @apply flex items-center;
-        gap: 0.625rem;
-        .menu-button {
-            @apply border-none text-gray-900;
-            margin-bottom: -0.025rem;
-            &:hover {
-                @apply text-blue-600;
+        .menu-button-wrapper {
+            @apply flex items-center justify-center;
+            width: $gnb-navigation-rail-min-width;
+            .menu-button {
+                @apply border-none text-gray-900;
+                margin-bottom: -0.025rem;
+                &:hover {
+                    @apply text-blue-600;
+                }
             }
-        }
-        .favorite-button {
-            margin-left: -0.25rem;
         }
     }
     .extra-section {

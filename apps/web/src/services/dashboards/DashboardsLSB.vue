@@ -4,23 +4,28 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { PI } from '@spaceone/design-system';
+
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
+
+import { yellow } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
@@ -28,6 +33,8 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
@@ -36,18 +43,16 @@ const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 const storeState = reactive({
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     projects: computed(() => allReferenceStore.getters.project),
+    favoriteItems: computed(() => favoriteGetters.dashboardItems),
 });
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
     favoriteItemMap: computed(() => {
-        const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.DASHBOARD];
         const result: Record<string, FavoriteConfig> = {};
-        if (stateName) {
-            store.state.favorite[stateName]?.forEach((d) => {
-                result[d.itemId] = d;
-            });
-        }
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.id] = d;
+        });
         return result;
     }),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
@@ -245,6 +250,12 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
             <span v-else
                   class="no-data"
             >
+                <p-i class="menu-icon"
+                     name="ic_star-filled"
+                     height="1rem"
+                     width="1rem"
+                     :color="yellow[500]"
+                />
                 {{ $t('COMMON.STARRED_NO_DATA') }}
             </span>
         </template>
@@ -254,7 +265,10 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
 <style scoped lang="postcss">
 .dashboards-l-s-b {
     .no-data {
-        @apply text-gray-500;
+        @apply flex items-center text-gray-500;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+        gap: 0.125rem;
     }
 }
 </style>

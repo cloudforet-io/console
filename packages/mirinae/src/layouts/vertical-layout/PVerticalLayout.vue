@@ -37,6 +37,7 @@ const state = reactive({
         height: '100%',
         'overflow-y': 'auto',
         'overflow-x': 'hidden',
+        'border-right-width': state.hide ? 0 : '1px',
     })),
     sidebarStyle: computed(() => ({
         width: 'auto',
@@ -154,6 +155,7 @@ window.addEventListener('resize', detectWindowResizing);
             </p-tooltip>
         </div>
         <div class="main"
+             :class="{transition: state.transition}"
              :style="state.mainStyle"
         >
             <slot />
@@ -170,8 +172,7 @@ window.addEventListener('resize', detectWindowResizing);
     margin: unset;
 
     > .sidebar-container {
-        @apply bg-white;
-        box-shadow: 1px 0 0.25rem rgba(0, 0, 0, 0.12);
+        @apply bg-white border-gray-200;
         &.transition {
             transition: width 0.2s;
         }
@@ -184,6 +185,9 @@ window.addEventListener('resize', detectWindowResizing);
         /* flex-grow: 1; */
         overflow-x: hidden;
         overflow-y: auto;
+        &.transition {
+            transition: width 0.2s;
+        }
     }
     > .resizer-container {
         display: flex;

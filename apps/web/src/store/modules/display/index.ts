@@ -11,6 +11,7 @@ const state: DisplayState = {
     sidebarType: SIDEBAR_TYPE.info,
     isInitialized: false,
     uncheckedNotificationCount: 0,
+    uncheckedNoticeCount: 0,
     isSignInFailed: false,
     visibleMobileGuideModal: false,
 };

@@ -1077,9 +1077,10 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "管理者モードに切り替える",
 				"EXIT_ADMIN_MODE": "管理者モードを終了する",
+				"FAVORITE": "お気に入り",
+				"NOTICE": "お知らせ",
 				"NOTIFICATIONS": "通知",
 				"PROFILE": "マイページ",
-				"RECENT_FAVORITE": "最近のアクセス / お気に入り",
 				"SEARCH": "検索"
 			},
 			"WORKSPACE": {
@@ -1139,6 +1140,14 @@
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "",
+				"FILTER_BY_WORKSPACE": "",
+				"HELP_TEXT": "",
+				"NO_RESULT_1": "\"{inputText}\"の検索結果が見つかりませんでした。",
+				"NO_RESULT_2": "",
+				"RECENTLY_VIEWED": "",
+				"SITE_NAVIGATION": "",
+				"WORKSPACE_FILTER_WARNING_DESC": "",
+				"WORKSPACE_FILTER_WARNING_TITLE": "",
 				"WORKSPACE_SWITCH_LINK": ""
 			}
 		},
@@ -1542,6 +1551,7 @@
 		"DETAIL": {
 			"APPLY": "確認",
 			"AUTO": "自動",
+			"BASED_ON": "基準月",
 			"CLONE": "複製",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
@@ -1551,6 +1561,7 @@
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"EXPORT": "エクスポート",
+			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
 			},
@@ -1563,6 +1574,7 @@
 			"PERIOD_LAST_MONTH": "前月",
 			"PERIOD_THIS_MONTH": "今月",
 			"REFRESH": "自動更新",
+			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定"
 		},
 		"FORM": {
@@ -2137,6 +2149,7 @@
 			"ACTION": "作業",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "",
 			"DELETE": "削除",
 			"DELETE_WORKSPACE": "削除",
 			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
@@ -2795,7 +2808,7 @@
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
-		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
+		"ALERT_MANAGER_DASHBOARD": "",
 		"ALERT_MANAGER_ESCALATION_POLICY": "エスカレーションポリシー",
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
@@ -2806,13 +2819,17 @@
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
+		"COST_EXPLORER_DESC": "",
 		"COST_EXPLORER_REPORT": "コストレポート",
+		"COST_EXPLORER_TITLE": "",
 		"DASHBOARDS": "ダッシュボード",
 		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
 		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",
+		"DISMISS": "閉じる",
 		"HOME_DASHBOARD": "ホーム",
 		"INFO": "情報",
 		"INFO_NOTICE": "お知らせ",
+		"LEARN_MORE": "詳細はこちら",
 		"MY_PAGE": "マイページ",
 		"MY_PAGE_ACCOUNT": "マイアカウント",
 		"MY_PAGE_ACCOUNT_PROFILE": "アカウント&プロフィール",

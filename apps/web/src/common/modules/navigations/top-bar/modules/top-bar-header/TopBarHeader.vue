@@ -43,6 +43,7 @@ const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
 
 const state = reactive({
+    visibleDropdown: false,
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
@@ -116,28 +117,19 @@ const handleClickButton = (hasNoWorkspace?: string) => {
     <div :class="{'top-bar-header': true, 'admin-mode': props.isAdminMode}"
          data-gtm="gtm-top-bar-logo"
     >
-        <component :is="props.to ? 'router-link' : 'div'"
-                   class="title-wrapper"
-                   :to="props.to"
+        <div v-if="props.isAdminMode"
+             class="admin-header"
         >
-            <div v-if="props.isAdminMode"
-                 class="admin-header"
-            >
-                <div class="admin-icon">
-                    <p-i name="ic_admin-icon"
-                         width="2rem"
-                         height="2rem"
-                    />
-                </div>
-                <span class="admin-title">
-                    Admin <span class="omitable-text">Center</span>
-                </span>
+            <div class="admin-icon">
+                <p-i name="ic_admin-icon"
+                     width="1.75rem"
+                     height="1.75rem"
+                />
             </div>
-            <workspace-logo-icon v-else
-                                 :text="state.selectedWorkspace?.name || ''"
-                                 :theme="state.selectedWorkspace?.tags?.theme"
-            />
-        </component>
+            <span class="admin-title">
+                Admin <span class="omitable-text">Center</span>
+            </span>
+        </div>
         <p-select-dropdown v-if="!props.isAdminMode"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
                            style-type="transparent"
@@ -147,32 +139,36 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                            @select="selectWorkspace"
         >
             <template #dropdown-button>
-                <p-tooltip position="bottom"
-                           :contents="state.selectedWorkspace?.name ?? ''"
-                >
+                <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
+                                     :theme="state.selectedWorkspace?.tags?.theme"
+                />
+                <div>
                     <span class="selected-workspace">
                         {{ state.selectedWorkspace?.name }}
                     </span>
                     <span class="tablet-selected">
                         ...
                     </span>
-                </p-tooltip>
+                </div>
             </template>
             <template #menu-header>
-                <div class="menu-header-selected-workspace">
+                <p-tooltip class="menu-header-selected-workspace"
+                           position="bottom"
+                           :contents="state.selectedWorkspace?.name || ''"
+                >
                     <div class="workspace-wrapper">
                         <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
                                              :theme="state.selectedWorkspace?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ state.selectedWorkspace?.name }}</span>
+                        <span class="workspace-name">{{ state.selectedWorkspace?.name }}</span>
                     </div>
                     <p-i name="ic_check"
                          :color="violet[600]"
                          width="1rem"
                          height="1rem"
                     />
-                </div>
+                </p-tooltip>
             </template>
             <template #menu-item--format="{item}">
                 <div class="menu-item-wrapper">
@@ -181,7 +177,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                                              :theme="item?.tags?.theme"
                                              size="xs"
                         />
-                        <span>{{ item.label }}</span>
+                        <span class="label-text">{{ item.label }}</span>
                     </div>
 
                     <!--                    TODO: will be applied after API completion-->
@@ -224,10 +220,10 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 <style scoped lang="postcss">
 .top-bar-header {
     @apply inline-flex items-center w-full h-full;
-    max-width: 16.25rem;
-    width: 16.25rem;
-    padding: 0.625rem 1rem 0.625rem 1.25rem;
-    box-shadow: 0.1875rem 0 0.1875rem 0 rgba(81, 83, 100, 0.15);
+    max-width: 20rem;
+    width: 20rem;
+    height: 1.75rem;
+    margin-left: 1.25rem;
 
     &.admin-mode {
         width: 100%;
@@ -247,32 +243,23 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         box-shadow: none;
     }
 
-    .title-wrapper {
-        @apply inline-block;
+    .admin-header {
+        @apply flex items-center;
+        gap: 0.75rem;
 
-        .admin-header {
-            @apply flex items-center;
-            gap: 0.75rem;
+        .admin-title {
+            @apply flex text-label-lg text-violet-100 w-full;
+            gap: 0.25rem;
 
-            .admin-icon {
-                width: 2rem;
-                height: 2rem;
-            }
-
-            .admin-title {
-                @apply flex text-label-xl text-violet-100 w-full;
-                gap: 0.25rem;
-
-                .omitable-text {
-                    @screen mobile {
-                        @apply hidden;
-                    }
+            .omitable-text {
+                @screen mobile {
+                    @apply hidden;
                 }
             }
+        }
 
-            @screen tablet {
-                gap: 0.5rem;
-            }
+        @screen tablet {
+            gap: 0.5rem;
         }
     }
     .workspace-dropdown {
@@ -283,20 +270,42 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         }
 
         .menu-header-selected-workspace {
-            @apply flex items-center justify-between text-label-md font-medium;
-            padding: 0.875rem 1rem;
-            border-bottom: 3px solid #dddddf;
+            @apply relative flex items-center justify-between text-label-md font-medium;
+            margin: 0.875rem 1rem;
             .workspace-wrapper {
                 @apply flex items-center;
+                flex: 1;
                 gap: 0.75rem;
+                .workspace-name {
+                    flex: 1;
+                    max-width: 13.25rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+            }
+            &::before {
+                @apply absolute;
+                content: "";
+                width: calc(100% + 2rem);
+                bottom: -0.875rem;
+                left: -1rem;
+                border-bottom: 3px solid #dddddf;
             }
         }
 
         .menu-item-wrapper {
             @apply flex justify-between;
+            max-width: 18rem;
 
             .label {
-                @apply flex items-center gap-1;
+                @apply flex items-center gap-2;
+            }
+            .label-text {
+                @apply truncate;
+                max-width: 16.25rem;
             }
         }
 
@@ -326,8 +335,14 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
         /* custom design-system component - p-context-menu */
         :deep(.p-context-menu) {
-            min-width: 20rem !important;
-            margin-left: -2rem;
+            width: 20rem;
+            margin-top: -0.125rem;
+            margin-left: 0;
+            .menu-container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
+            }
             .p-context-menu-item {
                 .favorite-button {
                     &:not(.active) {
@@ -355,19 +370,15 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
         .selected-workspace {
             @apply text-label-lg text-gray-800 inline-block font-medium;
-            max-width: 9.1875rem;
+            max-width: 16rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             vertical-align: bottom;
-            padding-left: 0.75rem;
+            padding-left: 0.5rem;
 
             @screen tablet {
                 @apply hidden;
-            }
-
-            @screen mobile {
-                @apply inline-block;
             }
         }
         .tablet-selected {
@@ -376,10 +387,6 @@ const handleClickButton = (hasNoWorkspace?: string) => {
 
             @screen tablet {
                 @apply inline-block;
-            }
-
-            @screen mobile {
-                @apply hidden;
             }
         }
     }
