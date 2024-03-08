@@ -5,6 +5,9 @@ import type {
     Value,
     IResourceValueVariableModel,
 } from '@/lib/variable-models/_base/types';
+import PluginVariableModel from '@/lib/variable-models/managed-model/resource-model/plugin-variable-model';
+import ProtocolVariableModel from '@/lib/variable-models/managed-model/resource-model/protocol-variable-model';
+import TrustedAccountVariableModel from '@/lib/variable-models/managed-model/resource-model/trusted-account-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
 import AssetAdditionalInfoKeyVariableModel from './asset-additional-info-key-variable-model';
@@ -32,6 +35,7 @@ import UserVariableModel from './user-variable-model';
 import WebhookVariableModel from './webhook-variable-model';
 import WorkspaceVariableModel from './workspace-variable-model';
 
+
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
     granularity: GranularityVariableModel,
@@ -47,7 +51,10 @@ const MANAGED_VARIABLE_MODELS = {
     project_group: ProjectGroupVariableModel,
     project: ProjectVariableModel,
     region: RegionVariableModel,
+    plugin: PluginVariableModel,
+    protocol: ProtocolVariableModel,
     secret: SecretVariableModel,
+    trusted_account: TrustedAccountVariableModel,
     service_account: ServiceAccountVariableModel,
     user: UserVariableModel,
     webhook: WebhookVariableModel,
