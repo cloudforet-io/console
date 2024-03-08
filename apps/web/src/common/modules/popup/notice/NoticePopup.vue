@@ -36,7 +36,7 @@ const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
     o: '',
 }, {
     k: 'data.show_popup',
-    v: true,
+    v: false,
     o: '!=',
 }]).data;
 const postListQueryHelper = new ApiQueryHelper()
