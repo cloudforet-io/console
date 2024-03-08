@@ -273,6 +273,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                      :widget-config-id="widgetEditState.targetWidget.widget_name"
                                      :visible="widgetEditState.visibleModal"
                                      :widget-key="widgetEditState.targetWidget.widget_key"
+                                     :template-widget-id="widgetEditState.targetWidget.template_widget_id"
                                      @cancel="handleWidgetEditModalCancel"
                                      @confirm="handleWidgetEditModalConfirm"
         />
