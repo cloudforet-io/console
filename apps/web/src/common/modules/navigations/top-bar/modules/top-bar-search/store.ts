@@ -162,7 +162,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     watch(() => state.activeTab, async (tab) => {
         state.loading = true;
         state.recentMenuList = [];
-        await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
+        if (getters.trimmedInputText) await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
         if (storeState.currentWorkspaceId) {
             state.recentMenuList = await recentStore.fetchRecent({
                 type: recentNSearchTabMap[tab],
