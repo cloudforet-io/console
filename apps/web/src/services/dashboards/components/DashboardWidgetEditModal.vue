@@ -15,7 +15,7 @@ interface Props {
     visible: boolean;
     widgetKey: string;
     widgetConfigId: string;
-    templateWidgetId: string;
+    templateWidgetId?: string;
 }
 interface EmitFn {
     (e: 'cancel'): void;
