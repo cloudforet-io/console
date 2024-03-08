@@ -111,6 +111,7 @@ watch(() => props.isFocused, async (isFocused) => {
 
     .disabled-input {
         @apply flex items-center justify-center bg-gray-200 rounded-md text-gray-600;
+        background-color: rgba(221, 221, 223, 0.4);
         height: 1.75rem;
         width: 30rem;
         padding: 0.125rem 0.75rem;
@@ -119,6 +120,7 @@ watch(() => props.isFocused, async (isFocused) => {
 
         &:hover {
             @apply bg-blue-200;
+            opacity: unset;
         }
     }
 

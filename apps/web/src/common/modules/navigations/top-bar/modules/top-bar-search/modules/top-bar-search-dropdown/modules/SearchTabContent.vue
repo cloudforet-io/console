@@ -31,6 +31,8 @@ interface Props {
     focusingDirection: string;
 }
 
+type MenuType = 'search' | 'recent';
+
 const props = withDefaults(defineProps<Props>(), {
     searchLimit: 15,
     isFocused: false,
@@ -41,7 +43,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
 const topBarSearchStore = useTopBarSearchStore();
 
-const emit = defineEmits<{(event: 'select', item: SuggestionItem): void;
+const emit = defineEmits<{(event: 'select', menuType: MenuType, item: SuggestionItem): void;
     (event: 'close'): void;
     (event: 'move-focus-end'): void;
     (event: 'update:isFocused', value: boolean): void;
@@ -75,8 +77,8 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     emit('move-focus-end');
 };
 
-const handleSelect = (item) => {
-    emit('select', item);
+const handleSelect = (menuType: MenuType, item) => {
+    emit('select', menuType, item);
 };
 
 watch(() => contentsSize.height.value, (height) => {
@@ -114,7 +116,7 @@ watch(() => contentsSize.height.value, (height) => {
                                     @keyup:esc="emit('close')"
                                     @focus="emit('update:isFocused', true)"
                                     @blur="emit('update:isFocused', false)"
-                                    @select="handleSelect"
+                                    @select="(item) => handleSelect('recent', item)"
                     >
                         <template #item--format="{ item }">
                             <top-bar-search-recent-list-item :resource-id="item?.data?.id" />
@@ -141,7 +143,7 @@ watch(() => contentsSize.height.value, (height) => {
                                     @keyup:esc="emit('close')"
                                     @focus="emit('update:isFocused', true)"
                                     @blur="emit('update:isFocused', false)"
-                                    @select="handleSelect"
+                                    @select="(item) => handleSelect('search', item)"
                     >
                         <template #item--format="{ item }">
                             <slot name="item-format"
@@ -190,6 +192,10 @@ watch(() => contentsSize.height.value, (height) => {
 
             /* custom design-system component - p-context-menu */
             :deep() {
+                .context-header {
+                    margin-top: unset;
+                }
+
                 .p-context-menu-item {
                     justify-content: flex-start;
                     line-height: 1.75;

@@ -160,13 +160,16 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     }, 500));
 
     watch(() => state.activeTab, async (tab) => {
-        await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
+        state.loading = true;
+        state.recentMenuList = [];
+        if (getters.trimmedInputText) await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
         if (storeState.currentWorkspaceId) {
             state.recentMenuList = await recentStore.fetchRecent({
                 type: recentNSearchTabMap[tab],
                 workspaceIds: [storeState.currentWorkspaceId],
             });
         }
+        state.loading = false;
     });
 
 

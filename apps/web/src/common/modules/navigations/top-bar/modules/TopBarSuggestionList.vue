@@ -90,16 +90,21 @@ onUnmounted(() => {
                        position="bottom"
             >
                 <span class="image">
+
                     <p-lazy-img v-if="item.itemType === FAVORITE_TYPE.CLOUD_SERVICE"
                                 :src="item.itemIcon || ''"
                                 width="1rem"
                                 height="1rem"
                     />
-                    <p-i v-else
-                         :name="item.itemIcon"
-                         width="1rem"
-                         height="1rem"
-                    />
+                    <div v-else
+                         class="icon-background"
+                    >
+                        <p-i
+                            :name="item.itemIcon"
+                            width="1.25rem"
+                            height="1.25rem"
+                        />
+                    </div>
                 </span>
                 <span class="texts">
                     <template v-if="item.parents">
@@ -153,7 +158,7 @@ onUnmounted(() => {
     @apply bg-white border-none;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-bottom: 0.125rem;
+    padding-bottom: 0.5rem;
     max-height: unset;
 
     .header-label {
@@ -201,9 +206,15 @@ onUnmounted(() => {
         .image {
             margin-right: 0.25rem;
             flex-shrink: 0;
+
+            .icon-background {
+                @apply flex items-center justify-center bg-gray-100 rounded-md;
+                margin-right: 0.375rem;
+                height: 1.5rem;
+                width: 1.5rem;
+            }
         }
         .texts {
-            display: flex;
             flex-grow: 1;
             width: 100%;
             .text-item {

@@ -26,6 +26,8 @@ import TopBarSearchServiceTab
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 
 
@@ -103,9 +105,16 @@ const handleUpdateContentsSize = (height: number) => {
     state.contentsHeight = height;
 };
 
-const handleSelect = (item) => {
+const handleSelect = (menuType: 'search'|'recent', item) => {
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
-        router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
+        if (menuType === 'search') {
+            router.push({
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    name: item?.tags?.name, workspaceId: item?.workspace_id, group: item?.tags?.group, provider: item?.tags?.provider,
+                },
+            });
+        } else router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
 
     if (workspaceStoreGetter.currentWorkspaceId === item.workspace_id && workspaceStoreGetter.currentWorkspaceId) {
@@ -223,7 +232,7 @@ const handleSelect = (item) => {
                                                   :description="item?.description"
                         >
                             <template #icon>
-                                <p-lazy-img :src="item?.resource_id ? storeState.cloudServiceTypeMap[item?.resource_id]?.icon : ''"
+                                <p-lazy-img :src="item?.tags?.icon"
                                             width="1.25rem"
                                             height="1.25rem"
                                             style="margin-right: 0.375rem;"
