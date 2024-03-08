@@ -15,7 +15,7 @@ import { googleMonthlyCostSummaryDashboard } from '@/services/dashboards/dashboa
 import { prowlerComplianceOverviewDashboard } from '@/services/dashboards/dashboard-template/templates/prowler-compliance-overview';
 
 
-export const DASHBOARD_TEMPLATES = {
+export const DASHBOARD_TEMPLATES: Record<string, DashboardTemplate> = {
     // aws
     awsMonthlyCostSummary: awsMonthlyCostSummaryDashboard,
     awsCdnAndTraffic: awsCdnAndTrafficDashboard,
