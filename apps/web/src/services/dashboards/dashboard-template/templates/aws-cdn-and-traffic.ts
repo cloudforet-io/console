@@ -9,7 +9,7 @@ import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboar
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
         title: 'AWS Data-Transfer Cost Trend',
-        template_widget_id: 'template_aws_data-transfer_cost_trend',
+        template_widget_id: 'template_aws_data_transfer_cost_trend',
         widget_options: {
             cost_data_type: 'cost',
             cost_data_field: 'additional_info.Usage Type Details',
@@ -33,7 +33,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     }],
     ['costByRegionMultiFields', {
         title: 'AWS Data-Transfer by Region',
-        template_widget_id: 'template_aws_data-transfer_by_region',
+        template_widget_id: 'template_aws_data_transfer_by_region',
         widget_options: {
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
@@ -46,7 +46,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     }],
     ['costSummaryMultiFields', {
         title: 'AWS CloudFront Cost',
-        template_widget_id: 'template_aws_cloud-front_cost',
+        template_widget_id: 'template_aws_cloud_front_cost',
         widget_options: {
             cost_data_field: 'project_id',
             granularity: GRANULARITY.YEARLY,
