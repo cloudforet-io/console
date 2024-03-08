@@ -141,7 +141,7 @@ watch(() => props.dateRange, () => {
             style-type="rounded"
             :selected="state.selectedMonthMenuItem.name"
             menu-position="right"
-            disable-proxy
+            reset-selection-on-menu-close
             @select="handleSelectMonthMenuItem"
         >
             <template #menu-item--format="{ item }">
