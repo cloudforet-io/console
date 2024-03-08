@@ -7,28 +7,31 @@ import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboar
 
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
-    ['complianceStatus'],
-    ['totalFailFindingsStatus'],
-    ['totalFailFindingsHistory'],
+    ['complianceStatus', { template_widget_id: 'template_compliance_status' }],
+    ['totalFailFindingsStatus', { template_widget_id: 'template_total_fail_findings_status' }],
+    ['totalFailFindingsHistory', { template_widget_id: 'template_total_fail_findings_history' }],
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
+        template_widget_id: 'template_count_of_pass_and_fail_findings_by_region',
         widget_options: {
             asset_data_field: ASSET_DATA_FIELD_MAP.REGION.name,
         },
     }],
     ['countOfFailFindings', {
         title: 'Count of Fail Findings by Service',
+        template_widget_id: 'template_count_of_fail_findings_by_service',
         widget_options: {
             asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
-    // ['trendOfPassAndFailFindings', {
-    //     title: 'Trend of Pass and Fail Findings by Service',
-    //     widget_options: {
-    //         asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
-    //     },
-    // }],
-    // ['severityStatusByService'],
+    ['trendOfPassAndFailFindings', {
+        title: 'Trend of Pass and Fail Findings by Service',
+        template_widget_id: 'template_trend_of_pass_and_fail_findings_by_service',
+        widget_options: {
+            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
+        },
+    }],
+    ['severityStatusByService', { template_widget_id: 'template_severity_status_by_service' }],
 ];
 
 export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
@@ -36,9 +39,9 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     template_id: 'prowlerComplianceOverview',
     template_type: 'EXTENSION',
     labels: [
-        // DASHBOARD_LABELS.PROWLER,
+        DASHBOARD_LABELS.PROWLER,
         DASHBOARD_LABELS.SECURITY,
-        // DASHBOARD_LABELS.CSPM
+        DASHBOARD_LABELS.CSPM,
     ],
     version: '1',
     display_info: {

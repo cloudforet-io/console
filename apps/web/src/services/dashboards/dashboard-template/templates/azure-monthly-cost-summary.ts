@@ -6,30 +6,33 @@ import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/dashboar
 
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
-    ['monthlyCost', { title: 'Monthly Cost Overview' }],
-    ['budgetUsageSummary'],
-    ['costMap', { title: 'Cost By Project' }],
+    ['monthlyCost', { title: 'Monthly Cost Overview', template_widget_id: 'template_monthly_cost_overview' }],
+    ['budgetUsageSummary', { template_widget_id: 'template_budget_usage_summary' }],
+    ['costMap', { title: 'Cost By Project', template_widget_id: 'template_cost_by_project' }],
     ['costTrend', {
         title: 'Cost Trend By Project',
+        template_widget_id: 'template_cost_trend_by_project',
         widget_options: {
             cost_data_field: 'project',
         },
     }],
     ['costTrendStacked', {
         title: 'Cost Trend By Product',
+        template_widget_id: 'template_cost_trend_by_product',
         widget_options: {
             cost_data_field: 'product',
         },
     }],
     ['costDonut', {
         title: 'Cost By Provider',
+        template_widget_id: 'template_cost_by_provider',
         widget_options: {
             cost_data_field: 'provider',
         },
     }],
-    ['budgetStatus'],
-    ['costByRegion'],
-    ['budgetUsageByTarget'],
+    ['budgetStatus', { template_widget_id: 'template_budget_status' }],
+    ['costByRegion', { template_widget_id: 'template_cost_by_region' }],
+    ['budgetUsageByTarget', { template_widget_id: 'template_budget_usage_by_target' }],
 ];
 
 export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
