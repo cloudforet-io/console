@@ -3,8 +3,8 @@ export const DASHBOARD_SERVICE_LABELS = {
     CDN: 'CDN',
     TRAFFIC: 'Traffic',
     SECURITY: 'Security',
-    // PROWLER: 'Prowler',
-    // CSPM: 'CSPM',
+    PROWLER: 'Prowler',
+    CSPM: 'CSPM',
 };
 
 export const DASHBOARD_LABELS = {
