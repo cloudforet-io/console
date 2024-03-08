@@ -1141,11 +1141,11 @@
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "All Workspaces",
 				"FILTER_BY_WORKSPACE": "Filter by Workspace",
-				"HELP_TEXT": "Search for what you need",
+				"HELP_TEXT": "Type in what you're looking for.",
 				"NO_RESULT_1": "No result found for \"{inputText}\"",
 				"NO_RESULT_2": "Try again with different term.",
 				"RECENTLY_VIEWED": "Recently Viewed",
-				"SITE_NAVIGATION": "Site Navigation",
+				"SITE_NAVIGATION": "Menu Navigation",
 				"WORKSPACE_FILTER_WARNING_DESC": "Please unselect at least one workspace before making a new selection.",
 				"WORKSPACE_FILTER_WARNING_TITLE": "You can filter by a maximum of 5 workspaces.",
 				"WORKSPACE_SWITCH_LINK": "Switch to this workspace"
@@ -1229,7 +1229,7 @@
 			"VERSION": "Version"
 		},
 		"STARRED": "Starred",
-		"STARRED_NO_DATA": "Items will be displayed here",
+		"STARRED_NO_DATA": "Items will be displayed here.",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",

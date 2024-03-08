@@ -1062,7 +1062,7 @@
 				"RECENT_CLOUD_SERVICE": "最近の検索[クラウドサービス]",
 				"RECENT_MENU": "最近の検索[メニュー]",
 				"SEARCH": "検索",
-				"SEARCH_PLACEHOLDER": "",
+				"SEARCH_PLACEHOLDER": "メニュー、プロジェクト、ダッシュボードなどを検索",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。",
 				"TRY_SEARCH_AGAIN": "より詳しく検索してください。"
 			},
@@ -1084,9 +1084,9 @@
 				"SEARCH": "検索"
 			},
 			"WORKSPACE": {
-				"CREATE_WORKSPACE": "",
-				"MANAGE_WORKSPACE": "",
-				"WORKSPACES": ""
+				"CREATE_WORKSPACE": "ワークスペースの作成",
+				"MANAGE_WORKSPACE": "ワークスペースの管理",
+				"WORKSPACES": "ワークスペース"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1139,16 +1139,16 @@
 		},
 		"NAVIGATIONS": {
 			"TOP_BAR": {
-				"ALL_WORKSPACE": "",
-				"FILTER_BY_WORKSPACE": "",
-				"HELP_TEXT": "",
+				"ALL_WORKSPACE": "すべてのワークスペース",
+				"FILTER_BY_WORKSPACE": "ワークスペースでフィルター",
+				"HELP_TEXT": "探しているものを入力してください。",
 				"NO_RESULT_1": "\"{inputText}\"の検索結果が見つかりませんでした。",
-				"NO_RESULT_2": "",
-				"RECENTLY_VIEWED": "",
-				"SITE_NAVIGATION": "",
-				"WORKSPACE_FILTER_WARNING_DESC": "",
-				"WORKSPACE_FILTER_WARNING_TITLE": "",
-				"WORKSPACE_SWITCH_LINK": ""
+				"NO_RESULT_2": "別の用語で再試行してください。",
+				"RECENTLY_VIEWED": "最近のアクセス",
+				"SITE_NAVIGATION": "メニューナビゲーション",
+				"WORKSPACE_FILTER_WARNING_DESC": "新しい選択をする前に少なくとも1つのワークスペースの選択を解除してください。",
+				"WORKSPACE_FILTER_WARNING_TITLE": "最大5つのワークスペースでフィルターできます。",
+				"WORKSPACE_SWITCH_LINK": "このワークスペースに切り替え"
 			}
 		},
 		"NOTIFICATION_MODAL": {
@@ -1228,8 +1228,8 @@
 			"VALIDATION": "ユーザー名、またはパスワードを確認してください。",
 			"VERSION": "バージョン"
 		},
-		"STARRED": "",
-		"STARRED_NO_DATA": "",
+		"STARRED": "お気に入り",
+		"STARRED_NO_DATA": "アイテムはここに表示されます。",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
@@ -2149,7 +2149,7 @@
 			"ACTION": "作業",
 			"CREATE": "作成",
 			"CREATE_WORKSPACE": "ワークスペースの作成",
-			"CREATE_WORKSPACE_TEXT_LENGTH": "",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",
 			"DELETE": "削除",
 			"DELETE_WORKSPACE": "削除",
 			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
@@ -2808,7 +2808,7 @@
 		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
-		"ALERT_MANAGER_DASHBOARD": "",
+		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
 		"ALERT_MANAGER_ESCALATION_POLICY": "エスカレーションポリシー",
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
@@ -2819,9 +2819,9 @@
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
-		"COST_EXPLORER_DESC": "",
+		"COST_EXPLORER_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",
 		"COST_EXPLORER_REPORT": "コストレポート",
-		"COST_EXPLORER_TITLE": "",
+		"COST_EXPLORER_TITLE": "アクティベーションが必要です。",
 		"DASHBOARDS": "ダッシュボード",
 		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
 		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",

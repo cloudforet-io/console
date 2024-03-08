@@ -1062,7 +1062,7 @@
 				"RECENT_CLOUD_SERVICE": "최근 검색 [클라우드 서비스]",
 				"RECENT_MENU": "최근 검색 [메뉴]",
 				"SEARCH": "검색",
-				"SEARCH_PLACEHOLDER": "",
+				"SEARCH_PLACEHOLDER": "메뉴, 프로젝트, 대시보드 등 검색",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다.",
 				"TRY_SEARCH_AGAIN": "보다 자세하게 검색해주세요."
 			},
@@ -1084,9 +1084,9 @@
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
-				"CREATE_WORKSPACE": "",
-				"MANAGE_WORKSPACE": "",
-				"WORKSPACES": ""
+				"CREATE_WORKSPACE": "새 워크스페이스 생성",
+				"MANAGE_WORKSPACE": "워크스페이스 관리",
+				"WORKSPACES": "워크스페이스"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1139,16 +1139,16 @@
 		},
 		"NAVIGATIONS": {
 			"TOP_BAR": {
-				"ALL_WORKSPACE": "",
-				"FILTER_BY_WORKSPACE": "",
-				"HELP_TEXT": "",
+				"ALL_WORKSPACE": "전체 워크스페이스",
+				"FILTER_BY_WORKSPACE": "워크스페이스 필터",
+				"HELP_TEXT": "찾고 싶은 내용을 입력하세요.",
 				"NO_RESULT_1": "\"{inputText}\"에 대한 검색결과가 없습니다.",
-				"NO_RESULT_2": "",
-				"RECENTLY_VIEWED": "",
-				"SITE_NAVIGATION": "",
-				"WORKSPACE_FILTER_WARNING_DESC": "",
-				"WORKSPACE_FILTER_WARNING_TITLE": "",
-				"WORKSPACE_SWITCH_LINK": ""
+				"NO_RESULT_2": "검색어를 다시 입력해주세요.",
+				"RECENTLY_VIEWED": "최근 방문",
+				"SITE_NAVIGATION": "메뉴 네비게이션",
+				"WORKSPACE_FILTER_WARNING_DESC": "이전 워크스페이스 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
+				"WORKSPACE_FILTER_WARNING_TITLE": "최대 5개의 워크스페이스로 필터할 수 있습니다. ",
+				"WORKSPACE_SWITCH_LINK": "이 워크스페이스로 이동하기"
 			}
 		},
 		"NOTIFICATION_MODAL": {
@@ -1228,8 +1228,8 @@
 			"VALIDATION": "아이디 또는 비밀번호를 확인해 주세요.",
 			"VERSION": "버전 "
 		},
-		"STARRED": "",
-		"STARRED_NO_DATA": "",
+		"STARRED": "즐겨찾기",
+		"STARRED_NO_DATA": "로 추가한 목록이 이곳에 표시됩니다.",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",
@@ -2149,7 +2149,7 @@
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "워크스페이스 생성",
-			"CREATE_WORKSPACE_TEXT_LENGTH": "",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "워크스페이스명은 최대 80글자까지 입력 가능합니다. ",
 			"DELETE": "삭제",
 			"DELETE_WORKSPACE": "삭제",
 			"DELETE_WORKSPACE_DESC": "이 작업은 취소 할 수 없습니다.",
@@ -2808,7 +2808,7 @@
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
 		"ALERT_MANAGER": "얼럿 매니저",
 		"ALERT_MANAGER_ALERT": "얼럿",
-		"ALERT_MANAGER_DASHBOARD": "",
+		"ALERT_MANAGER_DASHBOARD": "얼럿 대시보드",
 		"ALERT_MANAGER_ESCALATION_POLICY": "에스컬레이션 정책",
 		"ASSET_INVENTORY": "에셋 인벤토리",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",
@@ -2819,9 +2819,9 @@
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
-		"COST_EXPLORER_DESC": "",
+		"COST_EXPLORER_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",
 		"COST_EXPLORER_REPORT": "비용 리포트",
-		"COST_EXPLORER_TITLE": "",
+		"COST_EXPLORER_TITLE": "기능 활성화 필요",
 		"DASHBOARDS": "대시보드",
 		"DASHBOARDS_PROJECT": "프로젝트 대시보드",
 		"DASHBOARDS_WORKSPACE": "워크스페이스 대시보드",
