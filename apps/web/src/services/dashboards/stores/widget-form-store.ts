@@ -12,12 +12,17 @@ import type {
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { useWidgetTitleInput } from '@/services/dashboards/composables/use-widget-title-input';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import { getRefinedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-options-helper';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
+import { getInitialSchemaProperties, getRefinedSchemaProperties } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -36,6 +41,7 @@ export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetI
 
 interface Getters {
     widgetConfig: ComputedRef<WidgetConfig|undefined>;
+    templateWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     mergedWidgetInfo: ComputedRef<PartialDashboardLayoutWidgetInfo|undefined>;
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
     title: ComputedRef<string>;
@@ -68,6 +74,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const initialState = {
         widgetConfigId: undefined as string|undefined, // widget config name that is used to get widget config
         widgetKey: undefined as string|undefined, // widget key to find widget in dashboard layout
+        templateWidgetId: undefined as string|undefined,
         //
         inheritOptions: {} as InheritOptions,
         widgetOptions: {} as WidgetOptions,
@@ -95,6 +102,14 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         // create case
         return dashboardDetailState.dashboardScope;
     });
+    const defaultTemplateWidgetInfo = computed(() => {
+        if (!state.widgetKey) return undefined;
+        const template = DASHBOARD_TEMPLATES[dashboardDetailState.templateId];
+        if (!template) return undefined;
+        const templateWidgetInfoList = flattenDeep(template.layouts ?? []);
+        return templateWidgetInfoList.find((widget) => widget.template_widget_id === state.templateWidgetId);
+    });
+
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
         if (!state.widgetConfigId) return undefined;
         const merged = mergeBaseWidgetState({
@@ -119,6 +134,35 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const getters: UnwrapRef<Getters> = reactive({
         widgetConfig: computed<WidgetConfig|undefined>(() => mergedWidgetState.value?.widgetConfig),
         //
+        templateWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
+            const templateWidgetInfo = defaultTemplateWidgetInfo.value;
+            if (!templateWidgetInfo) return undefined;
+            const _variableSchema = dashboardDetailState.variablesSchema;
+            const _widgetConfig = getWidgetConfig(templateWidgetInfo.widget_name);
+            const initialSchemaProperties = getInitialSchemaProperties(_widgetConfig, _variableSchema);
+            const _inheritOptions = getInitialWidgetInheritOptions(
+                _widgetConfig,
+                defaultTemplateWidgetInfo.value?.inherit_options,
+                _variableSchema,
+            );
+
+            return {
+                ...templateWidgetInfo,
+                widget_options: getRefinedWidgetOptions(
+                    _widgetConfig,
+                    templateWidgetInfo.widget_options,
+                    _inheritOptions,
+                    dashboardDetailState.variables,
+                ),
+                inherit_options: _inheritOptions,
+                schema_properties: getRefinedSchemaProperties(
+                    templateWidgetInfo.schema_properties ?? [],
+                    initialSchemaProperties,
+                    templateWidgetInfo.widget_options,
+                    templateWidgetInfo.inherit_options,
+                ),
+            };
+        }),
         mergedWidgetInfo: computed<PartialDashboardLayoutWidgetInfo|undefined>(() => {
             if (!state.widgetConfigId) return undefined;
 
@@ -241,9 +285,10 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             });
             resetTitle();
         },
-        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string) {
+        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string, templateWidgetId?: string) {
             state.widgetKey = widgetKey;
             state.widgetConfigId = widgetConfigId;
+            state.templateWidgetId = templateWidgetId;
             const widgetInfo = getters.mergedWidgetInfo;
 
             updateTitle(widgetInfo?.title ?? '');
@@ -289,10 +334,10 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             initOptionsInitMap();
         },
         returnToInitialSettings() {
-            updateTitle(getters.mergedWidgetInfo?.title ?? '');
-            state.widgetOptions = getters.mergedWidgetInfo?.widget_options ?? {};
-            state.schemaProperties = getters.mergedWidgetInfo?.schema_properties ?? [];
-            state.inheritOptions = getters.mergedWidgetInfo?.inherit_options ?? {};
+            updateTitle(getters.templateWidgetInfo?.title ?? '');
+            state.widgetOptions = getters.templateWidgetInfo?.widget_options ?? {};
+            state.schemaProperties = getters.templateWidgetInfo?.schema_properties ?? [];
+            state.inheritOptions = getters.templateWidgetInfo?.inherit_options ?? {};
 
             initOptionsValidMap();
             initOptionsInitMap();

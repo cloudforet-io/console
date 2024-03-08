@@ -17,6 +17,7 @@ import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-sto
 interface Props {
     widgetConfigId?: string;
     widgetKey?: string;
+    templateWidgetId?: string;
 }
 const props = defineProps<Props>();
 
@@ -38,14 +39,14 @@ const handleUpdateTitle = (value: string) => {
 };
 
 /* states init */
-watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
+watch([() => props.widgetConfigId, () => props.widgetKey, () => props.templateWidgetId], ([widgetConfigId, widgetKey, templateWidgetId]) => {
     // do nothing if still loading
     if (!widgetConfigId) return;
 
     // reset states
     widgetFormStore.resetAll();
 
-    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
+    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, templateWidgetId);
 
     // set focus on text input
     state.isFocused = true;

@@ -15,6 +15,7 @@ interface Props {
     visible: boolean;
     widgetKey: string;
     widgetConfigId: string;
+    templateWidgetId: string;
 }
 interface EmitFn {
     (e: 'cancel'): void;
@@ -46,6 +47,7 @@ const handleEditModalConfirm = () => {
         <template #body>
             <dashboard-widget-form :widget-config-id="props.widgetConfigId"
                                    :widget-key="props.widgetKey"
+                                   :template-widget-id="props.templateWidgetId"
             />
         </template>
     </p-button-modal>
