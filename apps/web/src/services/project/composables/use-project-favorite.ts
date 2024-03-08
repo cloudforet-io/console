@@ -38,7 +38,7 @@ export const useProjectFavorite = () => {
         favoriteItems: computed<FavoriteItem[]>(() => [
             ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
             ...convertProjectConfigToReferenceData(storeState.favoriteProjects, storeState.projects),
-        ]),
+        ].filter((i) => !i.isDeleted)),
     });
 
     const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {

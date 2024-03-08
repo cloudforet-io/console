@@ -47,6 +47,11 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
                 parents: menu.parents,
                 updatedAt: d?.updatedAt,
             });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !menu,
+            });
         }
     });
     return results;
@@ -73,6 +78,11 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
                 }];
             }
             results.push(result);
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -98,6 +108,11 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
                 }];
             }
             results.push(result);
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -122,6 +137,11 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
                     label: resource.data?.group,
                 }],
                 updatedAt: d.updatedAt,
+            });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
             });
         }
     });
@@ -163,6 +183,11 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     label: dataSourceMap[dataSourceId].label,
                 }],
             });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -183,6 +208,11 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
                 updatedAt: d.updatedAt,
                 icon: 'ic_service_dashboard',
             });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -193,101 +223,4 @@ export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySet
     if (!managedCostQuerySetId?.startsWith('managed_')) return undefined;
     const [, dataSourceId, costQuerySetId] = managedCostQuerySetId.split('_');
     return [dataSourceId, costQuerySetId];
-};
-
-export const convertDeletedMenuConfig = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
-    const allMenuList = getAllSuggestionMenuList(menuList);
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const menu = find(allMenuList, { id: d.itemId });
-        results.push({
-            ...d,
-            isDeleted: !menu,
-        });
-    });
-    return results;
-};
-
-export const convertDeletedProjectConfig = (config: ConfigData[]|null, projectReference: ProjectReferenceMap): ReferenceData[] => {
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const resource: ProjectReferenceItem = projectReference[d.itemId];
-        results.push({
-            ...d,
-            isDeleted: !resource,
-        });
-    });
-    return results;
-};
-
-export const convertDeletedProjectGroupConfig = (config: ConfigData[]|null, projectGroupReference: ProjectGroupReferenceMap): ReferenceData[] => {
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
-        results.push({
-            ...d,
-            isDeleted: !resource,
-        });
-    });
-    return results;
-};
-
-export const convertDeletedCloudServiceConfig = (config: ConfigData[]|null, cloudServiceReference: CloudServiceTypeReferenceMap) => {
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const resource = Object.values(cloudServiceReference)
-            .find((c) => c.data.cloudServiceTypeKey === d.itemId);
-        results.push({
-            ...d,
-            isDeleted: !resource,
-        });
-    });
-    return results;
-};
-
-export const convertDeletedCostAnalysisConfig = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[], dataSourceMap: CostDataSourceReferenceMap): ReferenceData[] => {
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
-        const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(d.itemId);
-        if (resource) {
-            results.push({
-                ...d,
-                isDeleted: false,
-            });
-        } else if (parsedKeys) { // managed cost query set
-            const [dataSourceId] = parsedKeys;
-            if (!dataSourceMap[dataSourceId]) return;
-            results.push({
-                ...d,
-                isDeleted: false,
-            });
-        }
-    });
-    return results;
-};
-
-export const convertDeletedDashboardConfig = (config: ConfigData[]|null, dashboardList: DashboardModel[]): ReferenceData[] => {
-    const results: ReferenceData[] = [];
-    if (!config) return results;
-
-    config.forEach((d) => {
-        const resource: DashboardModel|undefined = find(dashboardList, { public_dashboard_id: d.itemId })
-            || find(dashboardList, { private_dashboard_id: d.itemId });
-        results.push({
-            ...d,
-            isDeleted: !resource,
-        });
-    });
-    return results;
 };

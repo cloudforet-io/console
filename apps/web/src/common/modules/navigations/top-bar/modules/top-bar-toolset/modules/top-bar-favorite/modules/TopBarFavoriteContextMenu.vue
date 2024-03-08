@@ -30,12 +30,12 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
-    convertDeletedCloudServiceConfig,
-    convertDeletedCostAnalysisConfig,
-    convertDeletedDashboardConfig,
-    convertDeletedMenuConfig,
-    convertDeletedProjectConfig,
-    convertDeletedProjectGroupConfig,
+    convertCloudServiceConfigToReferenceData,
+    convertCostAnalysisConfigToReferenceData,
+    convertDashboardConfigToReferenceData,
+    convertMenuConfigToReferenceData,
+    convertProjectConfigToReferenceData,
+    convertProjectGroupConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
@@ -162,14 +162,14 @@ const state = reactive({
     //
     costQuerySets: [] as CostQuerySetModel[],
     //
-    favoriteMenuItems: computed<FavoriteItem[]>(() => convertDeletedMenuConfig(
+    favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
         favoriteGetters.menuItems ?? [],
         store.getters['display/allMenuList'],
     )),
     favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
         return isUserAccessible
-            ? convertDeletedCostAnalysisConfig(
+            ? convertCostAnalysisConfigToReferenceData(
                 favoriteGetters.costAnalysisItems ?? [],
                 state.costQuerySets,
                 storeState.costDataSource,
@@ -179,14 +179,14 @@ const state = reactive({
     favoriteDashboardItems: computed<FavoriteItem[]>(() => {
         const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessibleToDashboards) return [];
-        return convertDeletedDashboardConfig(
+        return convertDashboardConfigToReferenceData(
             favoriteGetters.dashboardItems ?? [],
             dashboardGetters.allItems,
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
-        return isUserAccessible ? convertDeletedCloudServiceConfig(
+        return isUserAccessible ? convertCloudServiceConfigToReferenceData(
             favoriteGetters.cloudServiceItems ?? [],
             storeState.cloudServiceTypes,
         ) : [];
@@ -194,8 +194,8 @@ const state = reactive({
     favoriteProjects: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
-        const favoriteProjectItems = convertDeletedProjectConfig(favoriteGetters.projectItems ?? [], storeState.projects);
-        const favoriteProjectGroupItems = convertDeletedProjectGroupConfig(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
+        const favoriteProjectItems = convertProjectConfigToReferenceData(favoriteGetters.projectItems ?? [], storeState.projects);
+        const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
 });
@@ -439,6 +439,10 @@ watch([
                     }
                 }
             }
+        }
+        .context-divider {
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
         }
         .all-items-header {
             display: flex;
