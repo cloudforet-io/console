@@ -167,17 +167,19 @@ const init = (querySet?: CostQuerySetModel) => {
 
 /* Event */
 const handleSelectPeriod = (periodMenuName: string) => {
-    if (periodMenuName === 'custom') state.customRangeModalVisible = true;
-    else {
-        state.selectedPeriod = periodMenuName;
-        const selectedPeriodItem: PeriodItem = state.allPeriodItems.find((d) => d.name === periodMenuName);
-        state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod({
-            relativePeriod: selectedPeriodItem.relativePeriod,
-            granularity: costAnalysisPageState.granularity,
-        }) : selectedPeriodItem.period;
-        costAnalysisPageStore.setPeriod(state.period);
-        costAnalysisPageStore.setRelativePeriod(selectedPeriodItem.relativePeriod);
+    if (periodMenuName === 'custom') {
+        state.customRangeModalVisible = true;
+        return;
     }
+
+    state.selectedPeriod = periodMenuName;
+    const selectedPeriodItem: PeriodItem = state.allPeriodItems.find((d) => d.name === periodMenuName);
+    state.period = selectedPeriodItem.relativePeriod ? convertRelativePeriodToPeriod({
+        relativePeriod: selectedPeriodItem.relativePeriod,
+        granularity: costAnalysisPageState.granularity,
+    }) : selectedPeriodItem.period;
+    costAnalysisPageStore.setPeriod(state.period);
+    costAnalysisPageStore.setRelativePeriod(selectedPeriodItem.relativePeriod);
 };
 const handleCustomRangeModalConfirm = (period: Period) => {
     state.period = period;
@@ -206,6 +208,7 @@ watch(() => costAnalysisPageState.granularity, (granularity) => {
     <div class="cost-analysis-period-select-dropdown">
         <p-select-dropdown :menu="state.periodMenuItems"
                            :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.PERIOD')"
+                           disable-proxy
                            style-type="rounded"
                            :selected="state.selectedPeriod"
                            :invalid="state.isPeriodInvalid"
