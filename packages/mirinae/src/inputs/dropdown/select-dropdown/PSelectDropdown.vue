@@ -39,6 +39,7 @@ interface SelectDropdownProps {
     buttonIcon?: string;
     isFixedWidth?: boolean;
     resetSelectionOnMenuClose?: boolean;
+    disableProxy?: boolean;
 
     /* context menu props */
     isFilterable?: boolean;
@@ -230,6 +231,7 @@ const handleEnterKey = () => {
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
     if (props.resetSelectionOnMenuClose) return;
+    if (props.disableProxy) return;
     if (props.multiSelectable) {
         state.proxySelectedItem = selected;
     } else if (Array.isArray(state.proxySelectedItem)) {
