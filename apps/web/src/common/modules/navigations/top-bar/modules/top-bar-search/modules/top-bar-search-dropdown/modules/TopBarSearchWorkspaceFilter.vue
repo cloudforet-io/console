@@ -129,13 +129,19 @@ const handleUpdateSearchText = (val: string) => {
     state.searchText = val;
 };
 
+const handleClickShowMoreButton = () => {
+    state.searchText = '';
+    if (!state.isActivatedSearchMenu) fetchSearchResult(state.searchText);
+    state.isActivatedSearchMenu = !state.isActivatedSearchMenu;
+};
+
 (() => {
     topBarSearchStore.initWorkspaces();
 })();
 
 watch(() => state.searchText, (val) => {
     fetchSearchResult(val);
-}, { immediate: true });
+});
 
 </script>
 
@@ -187,7 +193,7 @@ watch(() => state.searchText, (val) => {
             </p-checkbox-group>
             <p-text-button style-type="highlight"
                            class="show-more"
-                           @click="state.isActivatedSearchMenu = !state.isActivatedSearchMenu"
+                           @click="handleClickShowMoreButton"
             >
                 {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
             </p-text-button>

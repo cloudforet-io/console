@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useParentElement } from '@vueuse/core';
 import {
-    computed, reactive, ref, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -53,10 +53,13 @@ const contentRef = ref<null | HTMLElement>(null);
 const parentEl = useParentElement(contentRef);
 const MAIN_SERVICE_ID_LIST = ['dashboards', 'project', 'asset_inventory', 'cost_explorer', 'alert_manager'];
 
-const state = reactive({
+const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     inputText: computed(() => topBarSearchStore.getters.inputText),
     trimmedInputText: computed(() => topBarSearchStore.getters.trimmedInputText),
+});
+
+const state = reactive({
     allMenuList: computed<SuggestionMenu[]>(() => getAllSuggestionMenuList(store.getters['display/allMenuList'])),
     allMenuMap: computed(() => {
         const allMenuMap = new Map<string, SuggestionMenu>();
@@ -144,7 +147,7 @@ const handleSelect = (item) => {
     if (menuInfo && router.currentRoute.name !== menuId) {
         router.push({ name: menuInfo.routeName }).catch(() => {});
         recentStore.createRecent({
-            type: RECENT_TYPE.SERVICE, workspaceId: state.currentWorkspaceId, id: menuId, label: item.label,
+            type: RECENT_TYPE.SERVICE, workspaceId: storeState.currentWorkspaceId ?? '', id: menuId, label: item.label,
         });
     }
     topBarSearchStore.setIsActivated(false, {
@@ -152,7 +155,15 @@ const handleSelect = (item) => {
     });
 };
 
-watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
+onMounted(() => {
+    if (storeState.trimmedInputText) {
+        state.serviceMenuList = filterMenuItemsBySearchTerm(state.allMenuList, storeState.trimmedInputText);
+    } else {
+        state.serviceMenuList = [];
+    }
+});
+
+watch(() => storeState.trimmedInputText, debounce(async (trimmedText) => {
     if (trimmedText) {
         state.serviceMenuList = filterMenuItemsBySearchTerm(state.allMenuList, trimmedText);
     } else {
@@ -163,7 +174,7 @@ watch(() => state.trimmedInputText, debounce(async (trimmedText) => {
 }));
 
 watch(() => topBarSearchStore.getters.isActivated, async (isActivated) => {
-    if (state.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [state.currentWorkspaceId] });
+    if (storeState.currentWorkspaceId && !isActivated) await recentStore.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [storeState.currentWorkspaceId] });
 }, { immediate: true });
 
 // /* Watcher */
@@ -172,7 +183,7 @@ watch(() => props.isFocused, (isFocused) => {
         if (props.focusingDirection === 'DOWNWARD') {
             state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
         } else if (props.focusingDirection === 'UPWARD') {
-            if (state.inputText.length) state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
+            if (storeState.inputText.length) state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
             else if (state.recentMenuList.length) state.focusingType = SUGGESTION_TYPE.RECENT;
             else state.focusingType = SUGGESTION_TYPE.DEFAULT_SERVICE;
         }
@@ -184,10 +195,10 @@ watch(() => props.isFocused, (isFocused) => {
          class="g-n-b-search-service-tab"
     >
         <div class="service-item-list">
-            <div v-show="!state.inputText.length">
+            <div v-show="!storeState.inputText.length">
                 <top-bar-suggestion-list
                     :items="state.defaultServiceMenuItems || []"
-                    :input-text="state.inputText"
+                    :input-text="storeState.inputText"
                     :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
                     :focusing-direction="props.focusingDirection"
                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, ...arguments)"
@@ -199,7 +210,7 @@ watch(() => props.isFocused, (isFocused) => {
                 <top-bar-suggestion-list
                     v-if="state.recentMenuList.length"
                     :items="state.recentMenuItems || []"
-                    :input-text="state.inputText"
+                    :input-text="storeState.inputText"
                     :is-focused="state.focusingType === SUGGESTION_TYPE.RECENT ? props.isFocused : false"
                     :focusing-direction="props.focusingDirection"
                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.RECENT, ...arguments)"
@@ -211,14 +222,14 @@ watch(() => props.isFocused, (isFocused) => {
             >
                 <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
                                          :items="state.serviceMenuList || []"
-                                         :input-text="state.inputText"
+                                         :input-text="storeState.inputText"
                                          :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
                                          :focusing-direction="props.focusingDirection"
                                          @move-focus-end="() => emit('move-focus-end')"
                                          @select="handleSelect"
                 />
                 <template #no-data>
-                    <top-bar-search-empty :input-text="state.inputText"
+                    <top-bar-search-empty :input-text="storeState.inputText"
                                           :is-recent="false"
                     />
                 </template>
