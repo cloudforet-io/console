@@ -123,7 +123,7 @@ const state = reactive({
     favoriteItemMap: computed(() => {
         const result: Record<string, FavoriteConfig> = {};
         storeState.favoriteItems?.forEach((d) => {
-            result[d.id] = d;
+            result[d.itemId] = d;
         });
         return result;
     }),

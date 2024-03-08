@@ -39,9 +39,9 @@ const deleteProjectGroup = async () => {
         await projectGroupStore.load({ force: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
         await favoriteStore.deleteFavorite({
-            type: FAVORITE_TYPE.PROJECT_GROUP,
+            itemType: FAVORITE_TYPE.PROJECT_GROUP,
             workspaceId: state.currentWorkspaceId || '',
-            id: state.groupId,
+            itemId: state.groupId,
         });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));

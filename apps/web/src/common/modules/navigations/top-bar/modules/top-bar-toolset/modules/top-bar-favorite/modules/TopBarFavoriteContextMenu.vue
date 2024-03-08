@@ -30,12 +30,12 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
-    convertCloudServiceConfigToReferenceData,
-    convertCostAnalysisConfigToReferenceData,
-    convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData,
-    convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData,
+    convertDeletedCloudServiceConfig,
+    convertDeletedCostAnalysisConfig,
+    convertDeletedDashboardConfig,
+    convertDeletedMenuConfig,
+    convertDeletedProjectConfig,
+    convertDeletedProjectGroupConfig,
     getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
@@ -162,23 +162,15 @@ const state = reactive({
     //
     costQuerySets: [] as CostQuerySetModel[],
     //
-    favoriteItemsMapFilterByWorkspaceId: computed(() => ({
-        [FAVORITE_TYPE.MENU]: filterFavoriteItemsByWorkspace(favoriteGetters.menuItems ?? []),
-        [FAVORITE_TYPE.PROJECT]: filterFavoriteItemsByWorkspace(favoriteGetters.projectItems ?? []),
-        [FAVORITE_TYPE.PROJECT_GROUP]: filterFavoriteItemsByWorkspace(favoriteGetters.projectGroupItems ?? []),
-        [FAVORITE_TYPE.CLOUD_SERVICE]: filterFavoriteItemsByWorkspace(favoriteGetters.cloudServiceItems ?? []),
-        [FAVORITE_TYPE.DASHBOARD]: filterFavoriteItemsByWorkspace(favoriteGetters.dashboardItems ?? []),
-        [FAVORITE_TYPE.COST_ANALYSIS]: filterFavoriteItemsByWorkspace(favoriteGetters.costAnalysisItems ?? []),
-    })),
-    favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
-        state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU],
+    favoriteMenuItems: computed<FavoriteItem[]>(() => convertDeletedMenuConfig(
+        favoriteGetters.menuItems ?? [],
         store.getters['display/allMenuList'],
     )),
     favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
         return isUserAccessible
-            ? convertCostAnalysisConfigToReferenceData(
-                state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.COST_ANALYSIS],
+            ? convertDeletedCostAnalysisConfig(
+                favoriteGetters.costAnalysisItems ?? [],
                 state.costQuerySets,
                 storeState.costDataSource,
             )
@@ -187,23 +179,23 @@ const state = reactive({
     favoriteDashboardItems: computed<FavoriteItem[]>(() => {
         const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessibleToDashboards) return [];
-        return convertDashboardConfigToReferenceData(
-            state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.DASHBOARD],
+        return convertDeletedDashboardConfig(
+            favoriteGetters.dashboardItems ?? [],
             dashboardGetters.allItems,
         );
     }),
     favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
-        return isUserAccessible ? convertCloudServiceConfigToReferenceData(
-            state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.CLOUD_SERVICE],
+        return isUserAccessible ? convertDeletedCloudServiceConfig(
+            favoriteGetters.cloudServiceItems ?? [],
             storeState.cloudServiceTypes,
         ) : [];
     }),
     favoriteProjects: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
-        const favoriteProjectItems = convertProjectConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT], storeState.projects);
-        const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT_GROUP], storeState.projectGroups);
+        const favoriteProjectItems = convertDeletedProjectConfig(favoriteGetters.projectItems ?? [], storeState.projects);
+        const favoriteProjectGroupItems = convertDeletedProjectGroupConfig(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
 });
@@ -217,11 +209,6 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     return 0;
 };
-
-const filterFavoriteItemsByWorkspace = (items: FavoriteItem[]): FavoriteMenuItem[] => items.filter((item) => item.workspace_id === storeState.currentWorkspaceId)
-    .map((i) => ({
-        ...i, itemType: i.type, itemId: i.id, type: 'item',
-    }));
 
 /* Event */
 const handleClickMenuButton = (type: FavoriteType) => {
@@ -319,13 +306,20 @@ const fetchCostQuerySet = async () => {
     });
     state.costQuerySets = costQuerySets;
 };
+const handleDeleteItem = (item: FavoriteItem) => {
+    favoriteStore.deleteFavorite({
+        itemType: item.itemType,
+        workspaceId: storeState.currentWorkspaceId || '',
+        itemId: item.itemId,
+    });
+};
 
 watch([
     () => costDataSourceReferenceStore.getters.hasLoaded,
     () => appContextStore.getters.globalGrantLoading,
     () => store.getters['user/getCurrentGrantInfo'],
 ], ([hasLoaded, loading, grantInfo]) => {
-    if (hasLoaded && !loading && grantInfo === 'WORKSPACE') fetchCostQuerySet();
+    if (hasLoaded && !loading && grantInfo.scope === 'WORKSPACE') fetchCostQuerySet();
 }, { immediate: true });
 
 /* Init */
@@ -350,6 +344,7 @@ watch([
                                      use-favorite
                                      @close="$emit('close')"
                                      @select="handleSelect"
+                                     @delete="handleDeleteItem"
             >
                 <template #header-title="{ item }">
                     <template v-if="!state.showAll">

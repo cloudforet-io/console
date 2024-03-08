@@ -14,6 +14,8 @@ import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { ReferenceData } from '@/lib/helper/config-data-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -40,19 +42,19 @@ export const useFavoriteStore = defineStore('favorite', () => {
 
     const getters = reactive({
         favoriteMenuList: computed(() => state.favoriteMenuList.map((item) => item.data)),
-        menuItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.MENU)),
-        projectItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.PROJECT)),
-        projectGroupItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.PROJECT_GROUP)),
-        cloudServiceItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.CLOUD_SERVICE)),
-        dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.DASHBOARD)),
-        costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.type === FAVORITE_TYPE.COST_ANALYSIS)),
+        menuItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.MENU)),
+        projectItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT)),
+        projectGroupItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT_GROUP)),
+        cloudServiceItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.CLOUD_SERVICE)),
+        dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.DASHBOARD)),
+        costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.COST_ANALYSIS)),
     });
 
     const actions = {
         fetchFavorite: async () => {
             favoriteListApiQuery.setFilters([
                 { k: 'name', v: 'console:favorite:', o: '' },
-                { k: 'data.workspace_id', v: _getters.currentWorkspaceId, o: '=' },
+                { k: 'data.workspaceId', v: _getters.currentWorkspaceId, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
             ]);
             try {
@@ -68,16 +70,14 @@ export const useFavoriteStore = defineStore('favorite', () => {
             }
             return state.favoriteMenuList;
         },
-        createFavorite: async ({
-            type, workspaceId, id,
-        }:{type: FavoriteType, workspaceId:string, id:string}) => {
+        createFavorite: async (param: ReferenceData) => {
+            const { itemType, workspaceId, itemId } = param;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
-                    name: `console:favorite:${type}:${workspaceId}:${id}`,
+                    name: `console:favorite:${itemType}:${workspaceId}:${itemId}`,
                     data: {
-                        id,
-                        workspace_id: workspaceId,
-                        type,
+                        ...param,
+                        type: 'item',
                     },
                 });
                 await actions.fetchFavorite();
@@ -86,11 +86,11 @@ export const useFavoriteStore = defineStore('favorite', () => {
             }
         },
         deleteFavorite: async ({
-            type, workspaceId, id,
-        }:{type: FavoriteType, workspaceId:string, id:string}) => {
+            itemType, workspaceId, itemId,
+        }:{itemType: FavoriteType, workspaceId:string, itemId:string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
-                    name: `console:favorite:${type}:${workspaceId}:${id}`,
+                    name: `console:favorite:${itemType}:${workspaceId}:${itemId}`,
                 });
                 await actions.fetchFavorite();
             } catch (e) {

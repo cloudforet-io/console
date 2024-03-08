@@ -19,13 +19,13 @@ import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-s
 
 type Config = FavoriteConfig & RecentConfig;
 
-interface ConfigData extends Config {
+export interface ConfigData extends Config {
     [key: string]: any;
 }
 
 type ReferenceItem = FavoriteItem & RecentItem;
 
-interface ReferenceData extends ReferenceItem {
+export interface ReferenceData extends ReferenceItem {
     [key: string]: any;
 }
 
@@ -57,12 +57,12 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: ProjectReferenceItem = projectReference[d.id];
+        const resource: ProjectReferenceItem = projectReference[d.itemId];
         if (resource) {
             const result: ReferenceData = {
                 ...d,
-                name: d.id,
-                label: resource.name || d.id,
+                name: d.itemId,
+                label: resource.name || d.itemId,
                 icon: 'ic_document-filled',
                 updatedAt: d?.updatedAt,
             };
@@ -83,12 +83,12 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: ProjectGroupReferenceItem = projectGroupReference[d.id];
+        const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
         if (resource) {
             const result: ReferenceData = {
                 ...d,
-                name: d.id,
-                label: resource?.name || d.id,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
                 icon: 'ic_folder-filled',
             };
             if (resource?.data?.parentGroupInfo?.id) {
@@ -193,4 +193,101 @@ export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySet
     if (!managedCostQuerySetId?.startsWith('managed_')) return undefined;
     const [, dataSourceId, costQuerySetId] = managedCostQuerySetId.split('_');
     return [dataSourceId, costQuerySetId];
+};
+
+export const convertDeletedMenuConfig = (config: ConfigData[]|null, menuList: DisplayMenu[]): ReferenceData[] => {
+    const allMenuList = getAllSuggestionMenuList(menuList);
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const menu = find(allMenuList, { id: d.itemId });
+        results.push({
+            ...d,
+            isDeleted: !menu,
+        });
+    });
+    return results;
+};
+
+export const convertDeletedProjectConfig = (config: ConfigData[]|null, projectReference: ProjectReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: ProjectReferenceItem = projectReference[d.itemId];
+        results.push({
+            ...d,
+            isDeleted: !resource,
+        });
+    });
+    return results;
+};
+
+export const convertDeletedProjectGroupConfig = (config: ConfigData[]|null, projectGroupReference: ProjectGroupReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: ProjectGroupReferenceItem = projectGroupReference[d.itemId];
+        results.push({
+            ...d,
+            isDeleted: !resource,
+        });
+    });
+    return results;
+};
+
+export const convertDeletedCloudServiceConfig = (config: ConfigData[]|null, cloudServiceReference: CloudServiceTypeReferenceMap) => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource = Object.values(cloudServiceReference)
+            .find((c) => c.data.cloudServiceTypeKey === d.itemId);
+        results.push({
+            ...d,
+            isDeleted: !resource,
+        });
+    });
+    return results;
+};
+
+export const convertDeletedCostAnalysisConfig = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[], dataSourceMap: CostDataSourceReferenceMap): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
+        const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(d.itemId);
+        if (resource) {
+            results.push({
+                ...d,
+                isDeleted: false,
+            });
+        } else if (parsedKeys) { // managed cost query set
+            const [dataSourceId] = parsedKeys;
+            if (!dataSourceMap[dataSourceId]) return;
+            results.push({
+                ...d,
+                isDeleted: false,
+            });
+        }
+    });
+    return results;
+};
+
+export const convertDeletedDashboardConfig = (config: ConfigData[]|null, dashboardList: DashboardModel[]): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: DashboardModel|undefined = find(dashboardList, { public_dashboard_id: d.itemId })
+            || find(dashboardList, { private_dashboard_id: d.itemId });
+        results.push({
+            ...d,
+            isDeleted: !resource,
+        });
+    });
+    return results;
 };

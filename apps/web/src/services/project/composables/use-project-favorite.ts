@@ -42,18 +42,18 @@ export const useProjectFavorite = () => {
     });
 
     const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
-        if (item.type === FAVORITE_TYPE.PROJECT_GROUP) {
+        if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
             e.preventDefault();
-            if (storeState.groupId !== item.id) {
-                await projectPageStore.selectNode(item.id);
+            if (storeState.groupId !== item.itemId) {
+                await projectPageStore.selectNode(item.itemId);
             }
         }
     };
     const handleDeleteFavorite = (item: FavoriteItem) => {
         favoriteStore.deleteFavorite({
-            type: item.type,
+            itemType: item.itemType,
             workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
-            id: item.id,
+            itemId: item.itemId,
         });
     };
 

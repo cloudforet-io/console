@@ -185,8 +185,8 @@ callApiWithGrantGuard();
         }
     }
     .content-wrapper {
-        max-height: calc(100vh - $top-bar-height - 1.5rem - 2.75rem);
-        overflow-y: scroll;
+        max-height: calc(100vh - $top-bar-height - 1.5rem);
+        overflow-y: auto;
         padding: 0.25rem 0.5rem 3.5rem 0.5rem;
         .pinned-header-wrapper {
             @apply text-gray-500 flex items-center;

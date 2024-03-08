@@ -221,9 +221,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
             }
 
             await favoriteStore.deleteFavorite({
-                type: FAVORITE_TYPE.DASHBOARD,
+                itemType: FAVORITE_TYPE.DASHBOARD,
                 workspaceId: _state.currentWorkspaceId || '',
-                id: dashboardId,
+                itemId: dashboardId,
             });
         } catch (e) {
             ErrorHandler.handleError(e);

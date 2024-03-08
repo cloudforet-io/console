@@ -954,6 +954,7 @@
 			"TAG_COL": "タグフィールド",
 			"TITLE": "フィールドを変更する"
 		},
+		"DELETED": "削除",
 		"EDITOR": {
 			"ALIGN_CENTER": "中央寄せ",
 			"ALIGN_JUSTIFY": "両端揃え",

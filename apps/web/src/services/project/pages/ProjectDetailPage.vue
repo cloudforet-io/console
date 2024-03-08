@@ -163,9 +163,9 @@ const projectDeleteFormConfirm = async () => {
             project_id: projectDetailPageState.projectId as string,
         });
         await favoriteStore.deleteFavorite({
-            type: FAVORITE_TYPE.PROJECT,
+            itemType: FAVORITE_TYPE.PROJECT,
             workspaceId: storeState.currentWorkspaceId || '',
-            id: projectDetailPageState.projectId as string,
+            itemId: projectDetailPageState.projectId as string,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
@@ -358,5 +358,12 @@ onUnmounted(() => {
 
 .p-tab {
     @apply rounded-lg;
+}
+
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .data-wrapper {
+        overflow-y: unset;
+    }
 }
 </style>

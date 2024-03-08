@@ -16,16 +16,16 @@
         </span>
         <template v-else>
             <div v-for="item in displayItems"
-                 :key="item.id"
+                 :key="item.itemId"
                  class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem?.id === item.id : false}"
+                 :class="{hovered: hoveredItem ? hoveredItem?.itemId === item.itemId : false}"
                  @click="handleClickItem(item, $event)"
                  @mouseenter="hoveredItem = item"
                  @mouseleave="hoveredItem = null"
             >
                 <router-link :to="referenceRouter(
-                                 item.id, {
-                                     resource_type: getResourceType(item.type),
+                                 item.itemId, {
+                                     resource_type: getResourceType(item.itemType),
                                      workspace_id: currentWorkspaceId,
                                  })"
                              class="item-link"
@@ -35,9 +35,9 @@
                     /></span>
                     <span class="name">{{ item.label }}</span>
                 </router-link>
-                <favorite-button v-if="hoveredItem && hoveredItem.id === item.id"
-                                 :item-id="item.id"
-                                 :favorite-type="item.type"
+                <favorite-button v-if="hoveredItem && hoveredItem?.itemId === item.itemId"
+                                 :item-id="item.itemId"
+                                 :favorite-type="item.itemType"
                                  scale="0.8"
                                  class="favorite-button"
                 />
