@@ -85,6 +85,7 @@ export interface DashboardTemplate {
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
     widget_key: string; // widget unique key. used for layout key binding.
+    template_widget_id?: string; // widget id included in template. used to find widget settings to refer to when resetting widgets.
     title?: string; // widget title
     widget_options?: WidgetOptions;
     size?: WidgetSize;

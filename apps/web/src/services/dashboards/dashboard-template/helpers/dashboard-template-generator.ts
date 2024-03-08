@@ -17,7 +17,10 @@ const ERROR_CASE_WIDGET_INFO: Omit<DashboardLayoutWidgetInfo, 'version'|'widget_
     inherit_options: {},
 };
 
-type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
+type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<
+    DashboardLayoutWidgetInfo,
+    'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'|'template_widget_id'
+>>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[], fixedOptions: Record<string, any> = {}): DashboardLayoutWidgetInfo[] => widgetList.map(
     ([widgetId, customInfo]) => {
         try {
