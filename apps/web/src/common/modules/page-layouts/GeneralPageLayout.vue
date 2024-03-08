@@ -1,19 +1,9 @@
 <script lang="ts" setup>
 import FNB from '@/common/modules/navigations/FNB.vue';
-
-interface Props {
-    overflow: 'auto'|'scroll';
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    overflow: 'auto',
-});
 </script>
 
 <template>
-    <div class="general-page-layout"
-         :class="props.overflow"
-    >
+    <div class="general-page-layout">
         <portal-target name="page-top-notification" />
         <div class="header">
             <slot name="handbook" />
@@ -34,12 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
     flex-direction: column;
     height: 100%;
     justify-content: stretch;
-    &.auto {
-        overflow: auto;
-    }
-    &.scroll {
-        overflow: scroll;
-    }
+    overflow: auto;
 
     .header {
         @apply flex;
