@@ -238,7 +238,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
                 This code is designed to set the select dropdown menu item type accordingly.
             */
             if (selected.includes('.')) {
-                results = [{ name: selected.split('.')[1], label: selected.split('.')[1] }];
+                results = [{ name: selected, label: selected.split('.')[1] }];
             } else {
                 results = await initSelectedInStoredOptionPrimitiveTypeCase(selected);
             }
