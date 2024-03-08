@@ -190,6 +190,10 @@ watch(() => contentsSize.height.value, (height) => {
 
             /* custom design-system component - p-context-menu */
             :deep() {
+                .context-header {
+                    margin-top: unset;
+                }
+
                 .p-context-menu-item {
                     justify-content: flex-start;
                     line-height: 1.75;

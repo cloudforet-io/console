@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { getTextHighlightRegex, PDataLoader } from '@spaceone/design-system';
+import { getTextHighlightRegex, PDataLoader, PDivider } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { store } from '@/store';
@@ -193,6 +193,9 @@ watch(() => props.isFocused, (isFocused) => {
                     @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, ...arguments)"
                     @select="handleSelect"
                 />
+                <p-divider v-if="state.recentMenuList.length"
+                           class="divider"
+                />
                 <top-bar-suggestion-list
                     v-if="state.recentMenuList.length"
                     :items="state.recentMenuItems || []"
@@ -231,6 +234,10 @@ watch(() => props.isFocused, (isFocused) => {
     .service-item-list {
         height: 100%;
         overflow-y: auto;
+        .divider {
+            margin: 0 1.25rem 0.75rem 1.25rem;
+            width: unset;
+        }
     }
 }
 </style>

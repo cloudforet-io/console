@@ -153,7 +153,7 @@ onUnmounted(() => {
     @apply bg-white border-none;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    padding-bottom: 0.125rem;
+    padding-bottom: 0.5rem;
     max-height: unset;
 
     .header-label {
