@@ -102,6 +102,7 @@ const {
 
     /* custom design-system component - p-tab */
     :deep(.p-tab) {
+        border: unset;
         min-height: unset;
         .tab-pane {
             padding-bottom: 0;
