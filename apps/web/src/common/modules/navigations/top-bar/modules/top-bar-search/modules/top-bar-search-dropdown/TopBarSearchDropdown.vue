@@ -146,6 +146,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     :search-limit="SEARCH_LIMIT"
                     :focusing-direction="props.focusingDirection"
                     :is-focused="props.isFocused"
+                    :active-tab="storeState.activeTab"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @move-focus-end="handleMoveFocusEnd"
                     @select="handleSelect"

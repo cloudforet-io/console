@@ -105,6 +105,7 @@ watch(() => contentsSize.height.value, (height) => {
         >
             <div ref="contentsRef">
                 <p-data-loader key="recent-menu-list"
+                               class="data-loader-wrapper"
                                :loading="topBarSearchStore.state.loading"
                                :data="topBarSearchStore.state.recentMenuList"
                 >
@@ -133,6 +134,7 @@ watch(() => contentsSize.height.value, (height) => {
         >
             <div ref="contentsRef">
                 <p-data-loader :loading="topBarSearchStore.state.loading"
+                               class="data-loader-wrapper"
                                :data="state.searchMenuList"
                 >
                     <p-context-menu class="search-list-context"
@@ -182,6 +184,10 @@ watch(() => contentsSize.height.value, (height) => {
         width: 100%;
         height: 100%;
         overflow-y: auto;
+
+        .data-loader-wrapper {
+            min-height: 26.875rem;
+        }
 
         .search-list-context {
             @apply bg-white border-none;

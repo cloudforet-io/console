@@ -1,18 +1,9 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
-import { useRouter } from 'vue-router/composables';
-import type { Location } from 'vue-router/types/router';
 
 import {
     PI, PTextHighlighting, PLink, PTooltip,
 } from '@spaceone/design-system';
-import { clone } from 'lodash';
-
-
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -32,7 +23,6 @@ const props = withDefaults(defineProps<Props>(), {
     workspaceId: '',
 });
 const topBarSearchStore = useTopBarSearchStore();
-const router = useRouter();
 
 const storeState = reactive({
     workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
@@ -42,17 +32,6 @@ const storeState = reactive({
 const state = reactive({
     tooltipText: computed(() => `${props.label}${props.description ? ` ∙ ${props.description}` : ''}`),
 });
-
-const getTargetWorkspaceRoute = (workspaceId: string): Location => {
-    const reversedMatched = clone(router.currentRoute.matched).reverse();
-    const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
-    return { name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } };
-};
-const handleClickLink = (workspaceId:string) => {
-    topBarSearchStore.setIsActivated(false);
-    router.push(getTargetWorkspaceRoute(workspaceId));
-};
 </script>
 
 <template>
@@ -93,9 +72,7 @@ const handleClickLink = (workspaceId:string) => {
                     <p-link new-tab
                             action-icon="internal-link"
                     >
-                        <span class="label"
-                              @click="handleClickLink(props.workspaceId)"
-                        >{{ storeState.workspaceMap[props.workspaceId]?.label }}</span>
+                        <span class="label">{{ storeState.workspaceMap[props.workspaceId]?.label }}</span>
                     </p-link>
                 </div>
             </div>

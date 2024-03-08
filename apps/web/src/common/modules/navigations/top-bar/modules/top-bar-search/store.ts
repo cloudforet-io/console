@@ -13,6 +13,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
@@ -119,7 +120,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         },
         fetchSearchList: async (searchText: string, activeTab: SearchTab, workspaces:string[]) => {
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.clientV2.search.resource.search<ResourceSearchParameters, ResourceSearchResponse>({
                     resource_type: tabResourceTypeMap[activeTab],
                     keyword: searchText,
@@ -139,38 +139,45 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 state.searchMenuList = orderedResults ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
             }
         },
 
     };
+    watch([() => getters.trimmedInputText, () => state.activeTab], (trimmedText) => {
+        state.loading = true;
+        if (trimmedText) {
+            state.searchMenuList = [];
+        }
+    });
 
     watch([
         () => getters.trimmedInputText,
         () => getters.selectedWorkspaces,
+        () => state.activeTab,
         () => state.isActivated,
         () => state.allWorkspacesChecked,
-    ], debounce(async ([trimmedText, workspaces]) => {
-        if (trimmedText) {
-            await actions.fetchSearchList(trimmedText, state.activeTab, workspaces);
-        } else {
-            state.searchMenuList = [];
-        }
-    }, 500));
-
-    watch(() => state.activeTab, async (tab) => {
+    ], debounce(async ([trimmedText, workspaces, tab]) => {
         state.loading = true;
         state.recentMenuList = [];
-        if (getters.trimmedInputText) await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
-        if (storeState.currentWorkspaceId) {
+        if (!trimmedText && storeState.currentWorkspaceId) {
             state.recentMenuList = await recentStore.fetchRecent({
                 type: recentNSearchTabMap[tab],
                 workspaceIds: [storeState.currentWorkspaceId],
             });
+            state.loading = false;
+            return;
+        }
+
+        state.searchMenuList = [];
+        const isServiceTab = tab === SEARCH_TAB.SERVICE;
+        const isSpecificWorkspaceCase = getters.selectedWorkspaces && !state.allWorkspacesChecked;
+        if (!isServiceTab && getters.trimmedInputText && (isSpecificWorkspaceCase || state.allWorkspacesChecked)) {
+            await actions.fetchSearchList(trimmedText, tab, workspaces);
+        } else {
+            state.searchMenuList = [];
         }
         state.loading = false;
-    });
+    }, 500));
 
 
     return {
