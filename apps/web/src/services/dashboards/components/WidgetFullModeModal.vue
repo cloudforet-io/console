@@ -210,6 +210,7 @@ onBeforeUnmount(() => {
                                             v-show="state.sidebarVisible"
                                             :widget-config-id="state.originWidgetInfo.widget_name"
                                             :widget-key="state.originWidgetInfo.widget_key"
+                                            :template-widget-id="state.originWidgetInfo.template_widget_id"
                                             :visible="state.sidebarVisible"
                                             @close="handleCloseSidebar"
                                             @update:widget-info="handleUpdateSidebarWidgetInfo"
