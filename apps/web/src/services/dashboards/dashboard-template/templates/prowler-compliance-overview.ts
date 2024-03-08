@@ -42,7 +42,7 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
     ],
     version: '1',
     display_info: {
-        icon: 'ic_dashboard-template_compliance',
+        icon: 'ic_prowler',
     },
     settings: {
         date_range: {
