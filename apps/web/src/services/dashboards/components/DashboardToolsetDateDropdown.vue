@@ -53,12 +53,12 @@ const state = reactive({
             },
         ];
     }),
-    selectedMonthMenu: null,
+    selectedMonthMenuItem: {} as MenuItem,
     selectedMonthLabel: computed(() => {
-        if (state.selectedMonthMenu?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
+        if (state.selectedMonthMenuItem?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
             return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM')).format('MMMM YYYY');
         }
-        return state.selectedMonthMenu?.name;
+        return state.selectedMonthMenuItem?.name;
     }),
     selectedDateRange: {},
     customRangeModalVisible: false,
@@ -79,13 +79,17 @@ const updateDashboardDateRange = (dateRange: DashboardSettings['date_range']) =>
 
 /* Event */
 const handleSelectMonthMenuItem = (selected: string) => {
-    state.selectedMonthMenu = state.monthMenuItems.find((d) => d.name === selected);
-    if (state.selectedMonthMenu.name === 'current') {
+    if (selected === 'custom') {
+        state.customRangeModalVisible = true;
+        return;
+    }
+
+    state.selectedMonthMenuItem = state.monthMenuItems.find((d) => d.name === selected);
+    if (selected === 'current') {
         state.selectedDateRange = { start: undefined, end: undefined };
         updateDashboardDateRange(state.selectedDateRange);
-    } else if (state.selectedMonthMenu.name === 'custom') state.customRangeModalVisible = true;
-    else {
-        setSelectedDateRange(state.selectedMonthMenu.name, state.selectedMonthMenu.name);
+    } else {
+        setSelectedDateRange(state.selectedMonthMenuItem.name, state.selectedMonthMenuItem.name);
         updateDashboardDateRange(state.selectedDateRange);
     }
 };
@@ -93,7 +97,7 @@ const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
     const { start, end } = dateRange;
     setSelectedDateRange(start, end);
     updateDashboardDateRange(state.selectedDateRange);
-    state.selectedMonthMenu = state.monthMenuItems[state.monthMenuItems.length - 1];
+    state.selectedMonthMenuItem = state.monthMenuItems[state.monthMenuItems.length - 1];
     state.customRangeModalVisible = false;
 };
 
@@ -125,7 +129,7 @@ const setInitialDateRange = () => {
 };
 
 watch(() => props.dateRange, () => {
-    state.selectedMonthMenu = state.monthMenuItems[setInitialDateRange()];
+    state.selectedMonthMenuItem = state.monthMenuItems[setInitialDateRange()];
 }, { immediate: true });
 </script>
 
@@ -135,8 +139,9 @@ watch(() => props.dateRange, () => {
             :menu="state.monthMenuItems"
             :selection-label="$t('DASHBOARDS.DETAIL.BASED_ON')"
             style-type="rounded"
-            :selected="state.selectedMonthLabel"
+            :selected="state.selectedMonthMenuItem.name"
             menu-position="right"
+            disable-proxy
             @select="handleSelectMonthMenuItem"
         >
             <template #menu-item--format="{ item }">
