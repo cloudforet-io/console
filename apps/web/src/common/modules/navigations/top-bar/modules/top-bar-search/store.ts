@@ -160,6 +160,8 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
     }, 500));
 
     watch(() => state.activeTab, async (tab) => {
+        state.loading = true;
+        state.recentMenuList = [];
         await actions.fetchSearchList(getters.trimmedInputText, tab, getters.selectedWorkspaces);
         if (storeState.currentWorkspaceId) {
             state.recentMenuList = await recentStore.fetchRecent({
@@ -167,6 +169,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 workspaceIds: [storeState.currentWorkspaceId],
             });
         }
+        state.loading = false;
     });
 
 
