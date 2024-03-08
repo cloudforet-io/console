@@ -138,7 +138,7 @@ const state = reactive({
         }
         if (state.showAllType === FAVORITE_TYPE.DASHBOARD) {
             items = state.favoriteDashboardItems;
-            label = i18n.t('COMMON.GNB.FAVORITES.ALL_DASHBOARDS');
+            label = i18n.t('COMMON.GNB.FAVORITES.ALL_DASHBOARD');
         }
         if (state.showAllType === FAVORITE_TYPE.PROJECT) {
             items = state.favoriteProjects;
