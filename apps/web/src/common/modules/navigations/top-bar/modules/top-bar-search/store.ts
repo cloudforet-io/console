@@ -171,8 +171,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         state.searchMenuList = [];
         const isServiceTab = tab === SEARCH_TAB.SERVICE;
         const isSpecificWorkspaceCase = getters.selectedWorkspaces && !state.allWorkspacesChecked;
-        const isAllWorkspacesCase = !getters.selectedWorkspaces && state.allWorkspacesChecked;
-        if (!isServiceTab && getters.trimmedInputText && (isSpecificWorkspaceCase || isAllWorkspacesCase)) {
+        if (!isServiceTab && getters.trimmedInputText && (isSpecificWorkspaceCase || state.allWorkspacesChecked)) {
             await actions.fetchSearchList(trimmedText, tab, workspaces);
         } else {
             state.searchMenuList = [];

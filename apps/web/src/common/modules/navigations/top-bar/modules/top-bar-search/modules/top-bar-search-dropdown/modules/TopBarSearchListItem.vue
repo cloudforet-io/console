@@ -49,10 +49,6 @@ const getTargetWorkspaceRoute = (workspaceId: string): Location => {
     const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
     return { name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } };
 };
-const handleClickLink = (workspaceId:string) => {
-    topBarSearchStore.setIsActivated(false);
-    router.push(getTargetWorkspaceRoute(workspaceId));
-};
 </script>
 
 <template>
@@ -93,9 +89,7 @@ const handleClickLink = (workspaceId:string) => {
                     <p-link new-tab
                             action-icon="internal-link"
                     >
-                        <span class="label"
-                              @click="handleClickLink(props.workspaceId)"
-                        >{{ storeState.workspaceMap[props.workspaceId]?.label }}</span>
+                        <span class="label">{{ storeState.workspaceMap[props.workspaceId]?.label }}</span>
                     </p-link>
                 </div>
             </div>
