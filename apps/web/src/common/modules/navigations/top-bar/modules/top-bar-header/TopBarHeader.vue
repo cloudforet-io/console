@@ -24,7 +24,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { violet } from '@/styles/colors';
+import { gray, violet } from '@/styles/colors';
 
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
@@ -138,6 +138,13 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                            :selected="state.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
+            <template #dropdown-button-icon>
+                <p-i name="ic_chevron-sort"
+                     width="1rem"
+                     height="1rem"
+                     :color="gray[800]"
+                />
+            </template>
             <template #dropdown-button>
                 <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
                                      :theme="state.selectedWorkspace?.tags?.theme"
