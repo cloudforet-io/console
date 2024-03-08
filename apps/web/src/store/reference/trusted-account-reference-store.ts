@@ -14,8 +14,6 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -37,9 +35,9 @@ export const useTrustedAccountReferenceStore = defineStore('trusted-account-refe
             return state.items ?? {};
         }, {}, { lazy: true }),
         trustedAccountTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.trusted_account.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.trusted_account.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.trusted_account.name,
+            type: 'trusted_account',
+            key: 'trusted_account_id',
+            name: 'name',
             referenceMap: getters.trustedAccountItems,
         })),
     });

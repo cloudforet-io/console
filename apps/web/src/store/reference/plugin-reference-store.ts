@@ -15,7 +15,6 @@ import type {
 } from '@/store/modules/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,9 +37,9 @@ export const usePluginReferenceStore = defineStore('plugin-reference', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         pluginTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.plugin.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.plugin.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.plugin.name,
+            type: 'plugin',
+            key: 'plugin_id',
+            name: 'name',
             referenceMap: getters.pluginItems,
         })),
     });

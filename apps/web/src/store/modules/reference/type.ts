@@ -56,7 +56,7 @@ export interface ReferenceLoadOptions {
 }
 
 export interface ReferenceTypeInfo {
-    type: ManagedVariableModelKey; // 'project'
+    type: ManagedVariableModelKey | string; // 'project'
     key: string; // project_id
     name: string; // Project
     referenceMap: ReferenceMap;
