@@ -46,11 +46,14 @@ const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfigWithT
     }
 
     const _templateWidgets: DashboardLayoutWidgetInfo[] = flattenDeep(DASHBOARD_TEMPLATES[_templateId].layouts);
-    const _templateWidgetConfigWithTemplateWidgetId: Partial<WidgetConfigWithTemplateWidgetId>[] = _templateWidgets.map((widget) => ({
-        ..._allWidgetConfigs.find((config) => config.widget_config_id === widget.widget_name),
-        title: widget.title,
-        template_widget_id: widget.template_widget_id,
-    }));
+    const _templateWidgetConfigWithTemplateWidgetId: Partial<WidgetConfigWithTemplateWidgetId>[] = _templateWidgets.map((widget) => {
+        const _widgetConfig = _allWidgetConfigs.find((config) => config.widget_config_id === widget.widget_name);
+        return {
+            ..._widgetConfig,
+            title: widget.title || _widgetConfig?.title || '',
+            template_widget_id: widget.template_widget_id,
+        };
+    });
 
     if (label === 'all') return _templateWidgetConfigWithTemplateWidgetId;
     return _templateWidgetConfigWithTemplateWidgetId.filter((config) => config.labels?.includes(label));
