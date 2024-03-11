@@ -137,10 +137,11 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         widgetConfig: computed<WidgetConfig|undefined>(() => mergedWidgetState.value?.widgetConfig),
         //
         templateWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
-            const templateWidgetInfo = defaultTemplateWidgetInfo.value;
-            if (!templateWidgetInfo) return undefined;
+            const _templateWidgetInfo = defaultTemplateWidgetInfo.value;
+            if (!_templateWidgetInfo || !state.widgetConfigId) return undefined;
+
             const _variableSchema = dashboardDetailState.variablesSchema;
-            const _widgetConfig = getWidgetConfig(templateWidgetInfo.widget_name);
+            const _widgetConfig = getWidgetConfig(_templateWidgetInfo.widget_name);
             const initialSchemaProperties = getInitialSchemaProperties(_widgetConfig, _variableSchema);
             const _inheritOptions = getInitialWidgetInheritOptions(
                 _widgetConfig,
@@ -149,20 +150,22 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             );
 
             return {
-                ...templateWidgetInfo,
+                ..._templateWidgetInfo,
+                title: _templateWidgetInfo.title || getters.widgetConfig?.title,
                 widget_options: getRefinedWidgetOptions(
                     _widgetConfig,
-                    templateWidgetInfo.widget_options,
+                    _templateWidgetInfo.widget_options,
                     _inheritOptions,
                     dashboardDetailState.variables,
                 ),
                 inherit_options: _inheritOptions,
-                schema_properties: getRefinedSchemaProperties(
-                    templateWidgetInfo.schema_properties ?? [],
+                schema_properties: _templateWidgetInfo.schema_properties ? getRefinedSchemaProperties(
+                    _templateWidgetInfo.schema_properties ?? [],
                     initialSchemaProperties,
-                    templateWidgetInfo.widget_options,
-                    templateWidgetInfo.inherit_options,
-                ),
+                    _templateWidgetInfo.widget_options,
+                    _templateWidgetInfo.inherit_options,
+                ) : initialSchemaProperties,
+                fixed_options: dashboardWidgetInfo.value?.fixed_options,
             };
         }),
         mergedWidgetInfo: computed<PartialDashboardLayoutWidgetInfo|undefined>(() => {

@@ -80,6 +80,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => props.templateWi
                                        :project-id="dashboardDetailState.projectId"
                                        :variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                        :variables="dashboardDetailState.variables"
+                                       :template-id="dashboardDetailState.templateId"
         />
 
         <dashboard-widget-more-options class="more-option-container" />
