@@ -97,7 +97,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardType: 'PUBLIC' as DashboardType,
         dashboardScope: 'WORKSPACE' as DashboardScope,
         // template info
-        templateId: 'blank',
+        templateId: 'blank', // "templateId" exists in new dashboard, but not in existing dashboard.
         templateType: 'MANAGED' as TemplateType,
         // widget info states
         dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
