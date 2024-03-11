@@ -10,6 +10,7 @@ import {
 
 import { store } from '@/store';
 
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarFavoriteContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
 
@@ -21,9 +22,14 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
+const gnbStore = useGnbStore();
+
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
 
 const setVisible = (visible: boolean) => {
+    if (visible) {
+        gnbStore.fetchCostQuerySet();
+    }
     emit('update:visible', visible);
 };
 const hideRecentFavoriteMenu = () => {

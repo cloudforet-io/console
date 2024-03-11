@@ -105,6 +105,7 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
 watch(() => state.currentMenuId, async () => {
     if (state.selectedMenuId === MENU_ID.COST_ANALYSIS) return;
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
+    await gnbStore.fetchCostQuerySet();
 }, { immediate: true });
 </script>
 

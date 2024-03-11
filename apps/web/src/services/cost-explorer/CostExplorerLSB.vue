@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PCollapsibleToggle, PLazyImg, PSelectDropdown, PI,
+    PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -33,10 +33,8 @@ import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constan
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
-const FOLDING_COUNT_BY_SHOW_MORE = 7;
 const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
 const STARRED_MENU_ID = 'starred';
-const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetGetters = costQuerySetStore.getters;
@@ -58,7 +56,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    showMoreQuerySetStatus: true,
     currentPath: computed(() => route.fullPath),
     currentQueryMenuList: computed<LSBMenu>(() => costQuerySetState.costQuerySetList.map((d) => {
         if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
@@ -99,17 +96,9 @@ const state = reactive({
             },
         };
     })),
-    queryMenuSet: computed<LSBMenu>(() => {
-        const showMoreMenuSet: LSBMenu = [{
-            type: 'slot',
-            id: SHOW_MORE_MENU_ID,
-        }];
-
-        return [
-            ...filterMenuItems(state.showMoreQuerySetStatus ? state.currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : state.currentQueryMenuList),
-            ...(state.currentQueryMenuList.length > FOLDING_COUNT_BY_SHOW_MORE ? showMoreMenuSet : []),
-        ];
-    }),
+    queryMenuSet: computed<LSBMenu>(() => [
+        ...filterMenuItems(state.currentQueryMenuList),
+    ]),
     adminMenuSet: computed<LSBMenu>(() => (!storeState.isAdminMode ? [
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
@@ -127,7 +116,7 @@ const state = reactive({
         });
         return result;
     }),
-    starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.showMoreQuerySetStatus ? state.currentQueryMenuList.slice(0, FOLDING_COUNT_BY_SHOW_MORE) : state.currentQueryMenuList)),
+    starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.currentQueryMenuList)),
     menuSet: computed<LSBMenu[]>(() => [
         {
             type: MENU_ITEM_TYPE.COLLAPSIBLE,
@@ -239,11 +228,6 @@ const handleSelectDataSource = (selected: string) => {
                         </div>
                     </template>
                 </p-select-dropdown>
-            </template>
-            <template #slot-show-more>
-                <p-collapsible-toggle :is-collapsed.sync="state.showMoreQuerySetStatus"
-                                      class="show-more"
-                />
             </template>
         </l-s-b>
     </aside>
