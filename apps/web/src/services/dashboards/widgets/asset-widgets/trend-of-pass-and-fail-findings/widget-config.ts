@@ -26,7 +26,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         ['cloud_service_query_set', { fixed: true }],
-        ['asset_data_field', { fixed: true }],
+        'asset_data_field',
         'filters.project',
         // 'filters.service_account',
         'filters.provider',
