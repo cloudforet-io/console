@@ -14,12 +14,17 @@ import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/te
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 
+interface TemplateWidgetConfig extends WidgetConfig {
+    template_widget_id?: string
+}
+
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),
     selectedWidgetConfigId: undefined as string | undefined,
+    selectedTemplateWidgetId: undefined as string | undefined,
 });
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => [
@@ -32,7 +37,7 @@ const tabState = reactive({
 });
 
 /* Util */
-const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> => {
+const getWidgetConfigsByLabel = (label: string): Array<Partial<TemplateWidgetConfig>> => {
     const _allWidgetConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
     const _templateId = dashboardDetailState.templateId;
     if (_templateId === 'blank') {
@@ -41,19 +46,28 @@ const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> =>
     }
 
     const _templateWidgets: DashboardLayoutWidgetInfo[] = flattenDeep(DASHBOARD_TEMPLATES[_templateId].layouts);
-    const _templateWidgetConfigNames: string[] = _templateWidgets.map((widget) => widget.widget_name);
-    const _templateWidgetConfigs = _allWidgetConfigs.filter((config) => config.widget_config_id && _templateWidgetConfigNames.includes(config.widget_config_id));
-    if (label === 'all') return _templateWidgetConfigs;
-    return _templateWidgetConfigs.filter((config) => config.labels?.includes(label));
+    const _templateWidgetConfig: Partial<TemplateWidgetConfig>[] = _templateWidgets.map((widget) => {
+        const _widgetConfig = _allWidgetConfigs.find((config) => config.widget_config_id === widget.widget_name);
+        return {
+            ..._widgetConfig,
+            title: widget.title || _widgetConfig?.title || '',
+            template_widget_id: widget.template_widget_id,
+        };
+    });
+
+    if (label === 'all') return _templateWidgetConfig;
+    return _templateWidgetConfig.filter((config) => config.labels?.includes(label));
 };
 
 /* Event */
 const handleChangeTab = (selectedTab: string) => {
     tabState.activeTab = selectedTab;
     state.selectedWidgetConfigId = undefined;
+    state.selectedTemplateWidgetId = undefined;
 };
-const selectWidget = (widgetConfigId: string) => {
+const selectWidget = (widgetConfigId?: string, templateWidgetId?: string) => {
     state.selectedWidgetConfigId = widgetConfigId;
+    state.selectedTemplateWidgetId = templateWidgetId;
 };
 </script>
 
@@ -69,7 +83,7 @@ const selectWidget = (widgetConfigId: string) => {
                     :key="`card-${widget.widget_config_id}`"
                     class="widget-card"
                     :class="{'selected' : state.selectedWidgetConfigId === widget.widget_config_id}"
-                    @click="selectWidget(widget.widget_config_id)"
+                    @click="selectWidget(widget.widget_config_id, widget.template_widget_id)"
                 >
                     <div class="card-header">
                         {{ widget.title }}
@@ -91,7 +105,7 @@ const selectWidget = (widgetConfigId: string) => {
         <div id="dashboard-widget-option"
              class="right-area"
         >
-            <div v-if="!state.selectedWidgetConfigId"
+            <div v-if="!state.selectedWidgetConfigId && !state.selectedTemplateWidgetId"
                  class="no-selected-wrapper"
             >
                 <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
@@ -99,6 +113,7 @@ const selectWidget = (widgetConfigId: string) => {
             </div>
             <dashboard-widget-form v-else
                                    :widget-config-id="state.selectedWidgetConfigId"
+                                   :template-widget-id="state.selectedTemplateWidgetId"
             />
         </div>
     </div>
