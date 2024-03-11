@@ -180,5 +180,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.NOTICE,
         routeName: INFO_ROUTE.NOTICE._NAME,
         translationId: 'MENU.INFO_NOTICE',
+        icon: 'ic_gnb_bell',
     },
 });

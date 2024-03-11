@@ -22,10 +22,8 @@ import config from '@/lib/config';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 interface Props {
@@ -38,7 +36,6 @@ const props = withDefaults(defineProps<Props>(), {
 const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const route = useRoute();
 const router = useRouter();
@@ -272,18 +269,7 @@ const handleClickSignOut = async () => {
                     </p-button>
                 </div>
             </div>
-            <template v-if="!state.isMyPage">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="getProperRouteLocation({name: INFO_ROUTE.NOTICE._NAME})"
-                                 @click.native="hideProfileMenu"
-                    >
-                        {{ $t('MENU.INFO_NOTICE') }}
-                    </router-link>
-                </div>
-            </template>
-            <p-divider />
+            <p-divider class="divider" />
             <div class="sub-menu-wrapper">
                 <a v-for="{ link, label } in state.supportedMenu"
                    :key="label"
@@ -416,6 +402,10 @@ const handleClickSignOut = async () => {
                     }
                 }
             }
+        }
+
+        .divider {
+            height: 0.125rem;
         }
 
         .sub-menu-wrapper {
