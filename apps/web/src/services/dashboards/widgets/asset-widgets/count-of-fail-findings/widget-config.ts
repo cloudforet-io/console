@@ -26,13 +26,13 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: getWidgetOptionsSchema([
-        'cloud_service_query_set',
-        'asset_data_field',
-        'filters.project',
+        ['cloud_service_query_set', { fixed: true, hidden: true }],
+        ['asset_data_field', { fixed: true }],
+        ['filters.project', { fixed: true }],
         // 'filters.service_account', HACK: Re-enable it after backend is ready
+        ['filters.region', { fixed: true }],
         'filters.provider',
-        'filters.region',
-        'filters.asset_account',
+        // 'filters.asset_account',
     ]),
 };
 

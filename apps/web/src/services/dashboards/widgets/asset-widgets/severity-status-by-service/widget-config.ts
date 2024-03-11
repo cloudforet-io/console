@@ -19,7 +19,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
         data_criteria: 'realtime',
     },
     options_schema: getWidgetOptionsSchema([
-        'cloud_service_query_set',
+        ['cloud_service_query_set', { fixed: true }],
         'filters.project',
         // 'filters.service_account', HACK: Re-enable it after backend is ready
         'filters.provider',
