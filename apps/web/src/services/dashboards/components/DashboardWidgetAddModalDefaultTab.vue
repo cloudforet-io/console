@@ -14,7 +14,7 @@ import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/te
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 
-interface WidgetConfigWithTemplateWidgetId extends WidgetConfig {
+interface TemplateWidgetConfig extends WidgetConfig {
     template_widget_id?: string
 }
 
@@ -37,7 +37,7 @@ const tabState = reactive({
 });
 
 /* Util */
-const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfigWithTemplateWidgetId>> => {
+const getWidgetConfigsByLabel = (label: string): Array<Partial<TemplateWidgetConfig>> => {
     const _allWidgetConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
     const _templateId = dashboardDetailState.templateId;
     if (_templateId === 'blank') {
@@ -46,7 +46,7 @@ const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfigWithT
     }
 
     const _templateWidgets: DashboardLayoutWidgetInfo[] = flattenDeep(DASHBOARD_TEMPLATES[_templateId].layouts);
-    const _templateWidgetConfigWithTemplateWidgetId: Partial<WidgetConfigWithTemplateWidgetId>[] = _templateWidgets.map((widget) => {
+    const _templateWidgetConfig: Partial<TemplateWidgetConfig>[] = _templateWidgets.map((widget) => {
         const _widgetConfig = _allWidgetConfigs.find((config) => config.widget_config_id === widget.widget_name);
         return {
             ..._widgetConfig,
@@ -55,8 +55,8 @@ const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfigWithT
         };
     });
 
-    if (label === 'all') return _templateWidgetConfigWithTemplateWidgetId;
-    return _templateWidgetConfigWithTemplateWidgetId.filter((config) => config.labels?.includes(label));
+    if (label === 'all') return _templateWidgetConfig;
+    return _templateWidgetConfig.filter((config) => config.labels?.includes(label));
 };
 
 /* Event */
