@@ -22,12 +22,14 @@ import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/w
 interface Props {
     widgetKey?: string;
     widgetConfigId?: string;
+    templateWidgetId?: string;
     visible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
+    templateWidgetId: undefined,
 });
 const emit = defineEmits<{(e: 'close', save: boolean): void;
     (e: 'update:widget-info', widgetInfo: UpdatableWidgetInfo): void;
@@ -127,6 +129,7 @@ watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllO
                         <dashboard-widget-form :key="state.contextKey"
                                                :widget-config-id="props.widgetConfigId"
                                                :widget-key="props.widgetKey"
+                                               :template-widget-id="props.templateWidgetId"
                         />
                     </div>
                 </template>
