@@ -272,6 +272,7 @@ const handleSelect = (item: FavoriteMenuItem) => {
         }).catch(() => {});
     }
     emit('close');
+    fetchCostQuerySet();
 };
 
 const listCostQuerySetByDataSourceId = async (dataSourceId: string): Promise<CostQuerySetModel[]> => {
@@ -318,7 +319,6 @@ watch([
     () => costDataSourceReferenceStore.getters.hasLoaded,
     () => appContextStore.getters.globalGrantLoading,
     () => store.getters['user/getCurrentGrantInfo'],
-    () => state.favoriteCostAnalysisItems,
 ], ([hasLoaded, loading, grantInfo]) => {
     if (hasLoaded && !loading && grantInfo.scope === 'WORKSPACE') fetchCostQuerySet();
 }, { immediate: true });
