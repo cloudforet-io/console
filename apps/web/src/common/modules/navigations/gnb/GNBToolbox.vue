@@ -13,6 +13,8 @@ import { clone, isEmpty } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -28,7 +30,6 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -45,6 +46,7 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
+    beforeWorkspace: computed(() => route.query?.beforeWorkspace as string|undefined),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     routes: computed(() => {
         let routes: Breadcrumb[] = [];
@@ -52,9 +54,9 @@ const state = reactive({
             routes.push({
                 name: i18n.t('MENU.HOME_DASHBOARD'),
                 to: {
-                    name: HOME_DASHBOARD_ROUTE._NAME,
+                    name: ROOT_ROUTE.WORKSPACE._NAME,
                     params: {
-                        workspaceId: userWorkspaceGetters.currentWorkspaceId || '',
+                        workspaceId: userWorkspaceGetters.currentWorkspaceId || state.beforeWorkspace,
                     },
                 },
             });
