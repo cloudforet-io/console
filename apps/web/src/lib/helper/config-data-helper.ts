@@ -167,6 +167,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     name: resource.data_source_id,
                     label: dataSourceMap[resource.data_source_id].label,
                 }],
+                isDeleted: false,
             });
         } else if (parsedKeys) { // managed cost query set
             const [dataSourceId, costQuerySetId] = parsedKeys;
@@ -182,6 +183,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     name: dataSourceId,
                     label: dataSourceMap[dataSourceId].label,
                 }],
+                isDeleted: false,
             });
         } else {
             results.push({
