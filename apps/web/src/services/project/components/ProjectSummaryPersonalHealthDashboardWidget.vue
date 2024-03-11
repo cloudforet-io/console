@@ -8,12 +8,12 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
-import numeral from 'numeral';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -117,7 +117,6 @@ const tabState = reactive({
 });
 
 /* util */
-const summaryCount = (val) => (val < 100000 ? numeral(val).format('0,0') : numeral(val).format('0a'));
 const regionFormatter = (val) => state.regions[val]?.name || val;
 const summaryLinkFormatter = (category) => {
     const filters: ConsoleFilter[] = [];
@@ -232,7 +231,7 @@ watch(() => tabState.activeTab, () => {
                             class="count"
                             highlight
                     >
-                        {{ summaryCount(data.count) }}
+                        {{ numberFormatter(data.count, { notation: 'compact' }) }}
                     </p-link>
                     <span class="label">{{ data.label }}</span>
                     <span class="date">{{ data.date }}</span>
