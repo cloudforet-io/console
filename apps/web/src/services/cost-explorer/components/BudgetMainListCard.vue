@@ -202,7 +202,7 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .budget-main-list-card {
-    @apply rounded-lg border border-solid border-gray-200 rounded-lg bg-white;
+    @apply rounded-lg border border-solid border-gray-200 bg-white;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
     &:hover {
         @apply bg-secondary-2;

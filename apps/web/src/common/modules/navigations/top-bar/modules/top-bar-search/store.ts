@@ -7,11 +7,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { ResourceSearchParameters, ResourceSearchResponse } from '@/schema/search/resource/api-verbs/search';
+import type { ResourceModel } from '@/schema/search/resource/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { RecentMenu } from '@/common/modules/navigations/stores/recent-store';
 import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
@@ -23,8 +25,8 @@ interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activeTab: SearchTab;
-    recentMenuList: any[]; // TODO: check type
-    searchMenuList: any; // TODO: check type
+    recentMenuList: RecentMenu[];
+    searchMenuList: ResourceModel[];
     // workspace filter
     recentAccessedWorkspaces: string[];
     stagedWorkspaces: StageWorkspace[];
@@ -147,6 +149,7 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         state.loading = true;
         if (trimmedText) {
             state.searchMenuList = [];
+            state.recentMenuList = [];
         }
     });
 

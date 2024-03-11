@@ -61,7 +61,16 @@ const state = reactive({
 
 const getLabelByResourceId = (resourceId: string, activeTab: SearchTab) => {
     if (activeTab === SEARCH_TAB.SERVICE_ACCOUNT) {
-        return `${storeState.serviceAccountMap[resourceId]?.key} (${storeState.serviceAccountMap[resourceId]?.label})`;
+        const provider = storeState.serviceAccountMap[resourceId]?.provider;
+        let accountId;
+        if (provider === 'aws') {
+            accountId = storeState.serviceAccountMap[resourceId]?.data?.account_id;
+        } else if (provider === 'google_cloud') {
+            accountId = storeState.serviceAccountMap[resourceId]?.data?.project_id;
+        } else if (provider === 'azure') {
+            accountId = storeState.serviceAccountMap[resourceId]?.data?.subscription_id;
+        }
+        return `${accountId ?? ''} (${storeState.serviceAccountMap[resourceId]?.label})`;
     } if (activeTab === SEARCH_TAB.PROJECT) {
         return storeState.projectMap[resourceId]?.label;
     } if (activeTab === SEARCH_TAB.DASHBOARD) {

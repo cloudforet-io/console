@@ -16,7 +16,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     height: '100%',
-    initWidth: 300,
+    initWidth: 240,
     minWidth: 100,
     maxWidth: 500,
 });
