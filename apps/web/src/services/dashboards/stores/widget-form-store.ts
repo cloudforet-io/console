@@ -87,9 +87,11 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const state = reactive(initialState);
 
     const dashboardWidgetInfo = computed<DashboardLayoutWidgetInfo|undefined>(() => {
-        if (!state.widgetKey) return undefined;
+        if (!state.widgetKey && !state.templateWidgetId) return undefined;
         const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
-        return _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
+        const widgetInfoByWidgetKey = _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
+        const widgetInfoByTemplateWidgetId = _dashboardWidgetInfoList.find((w) => w.template_widget_id === state.templateWidgetId);
+        return state.widgetKey ? widgetInfoByWidgetKey : widgetInfoByTemplateWidgetId;
     });
     const dashboardScope = computed<DashboardScope>(() => {
         if (appContextGetters.isAdminMode) return 'DOMAIN';
@@ -103,7 +105,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         return dashboardDetailState.dashboardScope;
     });
     const defaultTemplateWidgetInfo = computed(() => {
-        if (!state.widgetKey) return undefined;
+        if (!state.templateWidgetId) return undefined;
         const template = DASHBOARD_TEMPLATES[dashboardDetailState.templateId];
         if (!template) return undefined;
         const templateWidgetInfoList = flattenDeep(template.layouts ?? []);
