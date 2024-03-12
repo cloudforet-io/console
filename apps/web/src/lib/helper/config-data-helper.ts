@@ -3,7 +3,6 @@ import { find } from 'lodash';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -17,13 +16,13 @@ import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/fa
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
-type Config = FavoriteConfig & RecentConfig;
+type Config = FavoriteConfig;
 
 export interface ConfigData extends Config {
     [key: string]: any;
 }
 
-type ReferenceItem = FavoriteItem & RecentItem;
+type ReferenceItem = FavoriteItem;
 
 export interface ReferenceData extends ReferenceItem {
     [key: string]: any;

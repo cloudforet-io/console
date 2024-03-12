@@ -10,42 +10,13 @@ import { store } from '@/store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { RecentMenu, RecentType } from '@/common/modules/navigations/type';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-
-export const RECENT_TYPE = {
-    SERVICE: 'SERVICE',
-    SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
-    PROJECT: 'PROJECT',
-    DASHBOARD: 'DASHBOARD',
-    CLOUD_SERVICE: 'CLOUD_SERVICE',
-} as const;
-
-export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
-
-export const recentNSearchTabMap = {
-    service: RECENT_TYPE.SERVICE,
-    serviceAccount: RECENT_TYPE.SERVICE_ACCOUNT,
-    project: RECENT_TYPE.PROJECT,
-    dashboard: RECENT_TYPE.DASHBOARD,
-    cloudService: RECENT_TYPE.CLOUD_SERVICE,
-} as const;
 
 const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
-export interface RecentMenu {
-    name: string;
-    user_id: string;
-    data: {
-        id: string;
-        label: string;
-        type: RecentType;
-        workspace_id: string;
-    };
-    created_at: string;
-    updated_at: string;
-    tags: {[key:string]: any};
-    domain_id: string;
-}
+
 
 interface RecentState {
     recentMenuList: RecentMenu[];
@@ -89,8 +60,8 @@ export const useRecentStore = defineStore('recent', () => {
             return state.recentMenuList;
         },
         createRecent: async ({
-            type, workspaceId, id, label,
-        }:{type: RecentType, workspaceId:string, id:string, label:string}) => {
+            type, workspaceId, id,
+        }:{type: RecentType, workspaceId:string, id:string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: `console:recent:${type}:${workspaceId}:${id}`,
@@ -98,7 +69,6 @@ export const useRecentStore = defineStore('recent', () => {
                         id,
                         workspace_id: workspaceId,
                         type,
-                        label,
                     },
                 });
             } catch (e) {
