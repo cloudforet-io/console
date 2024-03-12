@@ -795,31 +795,6 @@ If you don't want to use this feature, give true to the disableHandler prop.
     </Story>
 </Canvas>
 
-## Disable Proxy
-
-Currently, 'selected' has the proxy applied automatically.
-If you want to manipulate 'selected' directly on the page, set 'disableProxy' to true.
-
-<Canvas>
-    <Story name="Disable Proxy" args={{menu: getSelectDropdownMenuWithMultiTypes()}} height={'400px'}>
-        {{
-            props: Object.keys(getSelectDropdownArgTypes()),
-            components: { PSelectDropdown, PButton },
-            template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">disableProxy: false</p>
-                <p-select-dropdown :menu="menu" />
-                <br/>
-                <p class="text-label-lg font-bold my-3">disableProxy: true</p>
-                <p-select-dropdown :menu="menu" disable-proxy />
-                <br/>
-            </div>
-`,
-        }}
-    </Story>
-</Canvas>
-
-
 ## Show More & Page Size
 
 When using the `handler` prop, the first argument of the handler is the input text, the second argument is the pageStart value, and the third argument is the pageLimit. <br/>

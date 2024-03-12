@@ -246,24 +246,6 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-    disableProxy: {
-        name: 'disableProxy',
-        type: { name: 'boolean' },
-        description: 'disable proxy of `selected` props.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     isFilterable: {
         name: 'isFilterable',
         type: { name: 'boolean' },

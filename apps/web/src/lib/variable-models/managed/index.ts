@@ -32,6 +32,7 @@ import UserVariableModel from './user-variable-model';
 import WebhookVariableModel from './webhook-variable-model';
 import WorkspaceVariableModel from './workspace-variable-model';
 
+
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
     granularity: GranularityVariableModel,
