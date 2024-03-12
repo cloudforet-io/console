@@ -1,11 +1,11 @@
 import type { Route } from 'vue-router';
 
-import type { RecentConfig } from '@/store/modules/recent/type';
-import { RECENT_TYPE } from '@/store/modules/recent/type';
-
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
+import type { RecentType } from '@/common/modules/navigations/type';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
@@ -13,6 +13,12 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
+export interface RecentConfig {
+    itemType: RecentType;
+    workspaceId: string;
+    itemId: string;
+    updatedAt?: string;
+}
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     const workspaceId = to.params.workspaceId;
     /* DASHBOARD */
@@ -45,6 +51,12 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };
     }
 
+    if (to.name === ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME) {
+        const serviceAccountId = to?.params?.serviceAccountId;
+        if (!serviceAccountId) return undefined;
+        return { itemType: RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
+    }
+
     if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) {
         const dataSourceId = to?.params?.dataSourceId;
         const costQuerySetId = to?.params?.costQuerySetId;
@@ -59,7 +71,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
 
     const menu = to.meta?.menuId && MENU_INFO_MAP[to.meta?.menuId as MenuId];
     if (menu) {
-        return { itemType: RECENT_TYPE.MENU, workspaceId, itemId: to.meta?.menuId as MenuId };
+        return { itemType: RECENT_TYPE.SERVICE, workspaceId, itemId: to.meta?.menuId as MenuId };
     }
     return undefined;
 };

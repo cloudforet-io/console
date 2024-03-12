@@ -13,11 +13,12 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { RecentMenu } from '@/common/modules/navigations/stores/recent-store';
-import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
+import type { RecentMenu } from '@/common/modules/navigations/type';
+import { recentNSearchTabMap } from '@/common/modules/navigations/type';
 
 interface TopBarSearchStoreState {
     loading: boolean;

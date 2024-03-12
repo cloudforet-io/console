@@ -38,11 +38,27 @@ const storeState = reactive({
     publicDashboardMap: computed(() => allReferenceStore.getters.publicDashboard),
 });
 
+const splitCloudServiceInfo = (id:string): {provider:string; group:string; name: string} => {
+    const sliceList = id.split('.');
+    return {
+        provider: sliceList[0],
+        group: sliceList[1],
+        name: sliceList[2],
+    };
+};
+
 const state = reactive({
+    convertResourceId: computed(() => {
+        if (storeState.activeTab !== SEARCH_TAB.CLOUD_SERVICE) {
+            return props.resourceId;
+        }
+        const { provider, group, name } = splitCloudServiceInfo(props.resourceId);
+        return Object.values(storeState.cloudServiceTypeMap).filter((item) => item?.data?.provider === provider && item?.data?.group === group && item.name === name)[0]?.key;
+    }),
     tooltipText: computed(() => {
-        const mainLabel = getLabelByResourceId(props.resourceId, storeState.activeTab);
-        const isDescriptionExist = props.resourceId && (storeState.activeTab === SEARCH_TAB.DASHBOARD);
-        const description = getDescriptionByResourceId(props.resourceId, storeState.activeTab);
+        const mainLabel = getLabelByResourceId(state.convertResourceId, storeState.activeTab);
+        const isDescriptionExist = state.convertResourceId && (storeState.activeTab === SEARCH_TAB.DASHBOARD);
+        const description = getDescriptionByResourceId(state.convertResourceId, storeState.activeTab);
         return `${mainLabel}${isDescriptionExist ? ` ∙ ${description}` : ''}`;
     }),
     iconName: computed(() => {
@@ -95,8 +111,14 @@ const getDescriptionByResourceId = (resourceId: string, activeTab: SearchTab) =>
 const handleClick = () => {
     if (!storeState.currentWorkspaceId) return;
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
-        router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, props.resourceId, storeState.currentWorkspaceId, storeState.cloudServiceTypeMap[props.resourceId]));
-    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, props.resourceId, storeState.currentWorkspaceId));
+        router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, state.convertResourceId, storeState.currentWorkspaceId, storeState.cloudServiceTypeMap[state.convertResourceId]));
+    } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) {
+        router.push(topBarSearchReferenceRouter(
+            topBarSearchStore.state.activeTab,
+            state.convertResourceId,
+            storeState.currentWorkspaceId,
+        ));
+    }
     topBarSearchStore.setIsActivated(false);
 };
 </script>
@@ -114,7 +136,7 @@ const handleClick = () => {
             />
         </div>
         <p-lazy-img v-else
-                    :src="props.resourceId ? storeState.cloudServiceTypeMap[props.resourceId]?.icon : ''"
+                    :src="state.convertResourceId ? storeState.cloudServiceTypeMap[state.convertResourceId]?.icon : ''"
                     width="1.25rem"
                     height="1.25rem"
                     style="margin-right: 0.375rem;"
@@ -124,9 +146,9 @@ const handleClick = () => {
                        position="bottom"
             >
                 <div class="upper-part">
-                    <span>{{ getLabelByResourceId(props.resourceId, storeState.activeTab) }}</span><span v-if="props.resourceId"
-                                                                                                         class="desc"
-                    ><span v-if="storeState.activeTab === 'dashboard'"><span class="dot">∙</span><span>{{ getDescriptionByResourceId(props.resourceId, storeState.activeTab) }}</span>
+                    <span>{{ getLabelByResourceId(state.convertResourceId, storeState.activeTab) }}</span><span v-if="state.convertResourceId"
+                                                                                                                class="desc"
+                    ><span v-if="storeState.activeTab === 'dashboard'"><span class="dot">∙</span><span>{{ getDescriptionByResourceId(state.convertResourceId, storeState.activeTab) }}</span>
                     </span></span>
                 </div>
             </p-tooltip>
