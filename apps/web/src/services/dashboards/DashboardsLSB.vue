@@ -16,6 +16,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -226,11 +227,11 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     });
     return result;
 };
-
-
-(async () => {
+const loadDashboard = async () => {
     await dashboardStore.load();
-})();
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
+callApiWithGrantGuard();
 </script>
 
 <template>

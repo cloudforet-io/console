@@ -37,6 +37,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
@@ -275,7 +276,7 @@ const handleDeleteItem = (item: FavoriteItem) => {
 };
 
 /* Init */
-(async () => {
+const init = async () => {
     state.loading = true;
     await Promise.allSettled([
         favoriteStore.fetchFavorite(),
@@ -283,7 +284,10 @@ const handleDeleteItem = (item: FavoriteItem) => {
         // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
     ]);
     state.loading = false;
-})();
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+callApiWithGrantGuard();
+
 </script>
 
 <template>
