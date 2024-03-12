@@ -104,6 +104,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
+        dashboardScope: computed(() => state.dashboardScope),
     });
 
     /* Mutations */
@@ -208,6 +209,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const _dashboardInfo = cloneDeep(dashboardInfo);
 
         setDashboardInfo(_dashboardInfo);
+        const _dashboardScope = _dashboardInfo.private_dashboard_id ? 'PRIVATE' : _dashboardInfo.resource_group;
+        setDashboardScope(_dashboardScope);
         state.dashboardId = _dashboardInfo.public_dashboard_id ?? _dashboardInfo.private_dashboard_id;
         setName(_dashboardInfo.name);
         setLabels(_dashboardInfo.labels);
