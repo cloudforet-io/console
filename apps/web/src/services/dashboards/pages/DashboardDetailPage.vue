@@ -37,7 +37,6 @@ const props = defineProps<Props>();
 const gnbStore = useGnbStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
-const dashboardGetters = dashboardDetailStore.getters;
 const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
 const route = useRoute();
@@ -45,7 +44,7 @@ const route = useRoute();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
-    dashboardScope: computed(() => dashboardGetters.dashboardScope),
+    dashboardScope: computed(() => dashboardDetailState.dashboardScope),
     dashboardMiddleRouteLabel: computed(() => {
         if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
         if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
