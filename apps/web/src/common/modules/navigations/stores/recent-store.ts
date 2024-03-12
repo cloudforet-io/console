@@ -108,6 +108,7 @@ export const useRecentStore = defineStore('recent', () => {
     };
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
+        state.recentMenuList = [];
         if (workspaceId) {
             actions.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [workspaceId] });
         }
