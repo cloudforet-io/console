@@ -13,7 +13,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-export interface RecentConfig {
+interface RecentConfig {
     itemType: RecentType;
     workspaceId: string;
     itemId: string;
