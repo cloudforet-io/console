@@ -11,19 +11,12 @@ import {
     defineComponent,
 } from 'vue';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 export default defineComponent({
     name: 'PreferenceContainer',
     components: {
         GeneralPageLayout,
-    },
-    setup() {
-        const { breadcrumbs } = useBreadcrumbs();
-        return {
-            breadcrumbs,
-        };
     },
 });
 </script>

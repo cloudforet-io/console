@@ -27,7 +27,6 @@ import type { Vue } from 'vue/types/vue';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
@@ -44,13 +43,11 @@ export default defineComponent({
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
-        const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
             isVisible: computed((): boolean => (vm?.$route.name === makeAdminRouteName(IAM_ROUTE.ROLE.CREATE._NAME)
                     || vm?.$route.name === makeAdminRouteName(IAM_ROUTE.ROLE.EDIT._NAME))),
         });
         return {
-            breadcrumbs,
             handbookState,
         };
     },
