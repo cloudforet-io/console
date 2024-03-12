@@ -24,6 +24,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             'cost_data_field',
             'cost_data_type',
             'filters.cost_product',
+            'filters.project_group',
             'filters.project',
             'filters.service_account',
             'filters.region',
