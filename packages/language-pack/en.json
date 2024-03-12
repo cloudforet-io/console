@@ -1519,6 +1519,7 @@
 				"DESCRIPTION_GROUP_BY": "It’s used to group data together and see overall trends or patterns based on a specific option",
 				"DESCRIPTION_PRODUCT": "The cloud computing products and services provided by each cloud provider",
 				"DESCRIPTION_PROJECT": "The collections of cloud resources and services that are grouped together for a specific purpose",
+				"DESCRIPTION_PROJECT_GROUP": "The collections of cloud resources and services that are grouped together for specific project groups",
 				"DESCRIPTION_PROVIDER": "The cloud service providers such as AWS, Azure, Google",
 				"DESCRIPTION_REGION": "The geographic locations where each cloud provider has built data centers",
 				"DESCRIPTION_SERVICE_ACCOUNT": "The accounts created from each cloud provider and added in the ‘service account’ page",
