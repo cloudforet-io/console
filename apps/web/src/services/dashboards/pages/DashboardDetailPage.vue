@@ -3,13 +3,16 @@ import {
     computed,
     onUnmounted, reactive, ref, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
+import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -21,6 +24,7 @@ import DashboardRefreshDropdown from '@/services/dashboards/components/Dashboard
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -33,10 +37,34 @@ const props = defineProps<Props>();
 const gnbStore = useGnbStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardGetters = dashboardDetailStore.getters;
+const { breadcrumbs } = useBreadcrumbs();
+const router = useRouter();
+const route = useRoute();
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
+    dashboardScope: computed(() => dashboardGetters.dashboardScope),
+    dashboardMiddleRouteLabel: computed(() => {
+        if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
+        if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
+        if (state.dashboardScope === DASHBOARD_SCOPE.PRIVATE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
+        return '';
+    }),
+    dashboardCustomBreadcrumbs: computed(() => {
+        const _breadcrumbs = breadcrumbs.value;
+        const customMiddleRoute = router.match({
+            name: DASHBOARDS_ROUTE._NAME,
+            params: { workspaceId: route.params.workspaceId },
+            query: { scope: state.dashboardScope },
+        });
+        const dashboardMiddleRoute = {
+            name: state.dashboardMiddleRouteLabel,
+            to: { path: customMiddleRoute.fullPath },
+        };
+        return [_breadcrumbs[0], dashboardMiddleRoute, _breadcrumbs[1]];
+    }),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.DASHBOARD,
         id: props.dashboardId,
@@ -68,19 +96,23 @@ const handleUpdateLabels = async (labels: string[]) => {
     }
 };
 
-
 watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     /* NOTE: The dashboard data is reset in first entering case */
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
     await getDashboardData(dashboardId);
+    // Set Dashboard Detail Custom breadcrumbs
+    gnbStore.setBreadcrumbs(state.dashboardCustomBreadcrumbs);
 }, { immediate: true });
+
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {
+    gnbStore.setBreadcrumbs([]);
+    // Reset Dashboard Detail Custom breadcrumbs
     dashboardDetailStore.reset();
 });
 </script>
