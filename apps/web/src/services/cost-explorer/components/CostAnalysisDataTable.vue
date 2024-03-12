@@ -25,6 +25,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
@@ -84,6 +85,7 @@ const getValueSumKey = (dataType:string) => {
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
@@ -458,6 +460,9 @@ watch(
                 </span>
                 <span v-else-if="field.name === GROUP_BY.WORKSPACE">
                     {{ storeState.workspaces[value] ? storeState.workspaces[value].label : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
+                    {{ storeState.projectGroups[value] ? storeState.projectGroups[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT">
                     {{ storeState.projects[value] ? storeState.projects[value].label : value }}
