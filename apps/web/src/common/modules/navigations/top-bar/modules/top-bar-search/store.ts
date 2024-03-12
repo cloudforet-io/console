@@ -93,7 +93,6 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
                 value: workspace.workspace_id,
                 tags: workspace.tags,
             } as { label: string, value: string, tags: { theme: string } | undefined }));
-            // 현재 워크스페이스를 가장 상단에 위치시키기 위해 정렬
             const orderedWorkspaceList = orderWorkspaceList(workspaceList);
             state.stagedWorkspaces = orderedWorkspaceList.slice(0, 3).map((workspace) => ({
                 workspaceId: workspace.value,
