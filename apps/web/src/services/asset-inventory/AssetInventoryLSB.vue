@@ -48,6 +48,7 @@ const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
+    currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
     isCloudServiceDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME
         || route.name === makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME)),
     detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
@@ -147,7 +148,8 @@ const handleSelectProvider = (selected: string) => {
 };
 
 /* Watchers */
-watch(() => state.detailPageParams, async (params) => {
+watch([() => state.detailPageParams, () => state.currentGrantInfo.scope], async ([params, scope]) => {
+    if (scope === 'USER') return;
     if (!params) return;
     await initCloudServiceDetailLSB(params);
     if (!params.name) await routeToFirstCloudServiceType(params);
