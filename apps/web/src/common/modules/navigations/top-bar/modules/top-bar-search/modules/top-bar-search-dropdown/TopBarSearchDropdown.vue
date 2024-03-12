@@ -10,9 +10,6 @@ import {
 
 import { store } from '@/store';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import { recentNSearchTabMap, useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     topBarSearchReferenceRouter,
@@ -27,8 +24,6 @@ import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modul
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
-
 
 
 interface Props {
@@ -49,9 +44,6 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
-const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreGetter = userWorkspaceStore.getters;
-const recentStore = useRecentStore();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
@@ -116,12 +108,6 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
             });
         } else router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
-
-    if (workspaceStoreGetter.currentWorkspaceId === item.workspace_id && workspaceStoreGetter.currentWorkspaceId) {
-        recentStore.createRecent({
-            type: recentNSearchTabMap[topBarSearchStore.state.activeTab], workspaceId: workspaceStoreGetter.currentWorkspaceId, id: item.resource_id, label: item.label,
-        });
-    }
 
     topBarSearchStore.setIsActivated(false);
 };

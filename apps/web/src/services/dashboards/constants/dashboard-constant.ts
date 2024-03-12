@@ -5,4 +5,10 @@ export const DASHBOARD_LABEL = {
     SECURITY: 'Security',
     BLANK: 'Blank',
 } as const;
-export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
+
+export const DASHBOARD_SCOPE = {
+    DOMAIN: 'DOMAIN',
+    WORKSPACE: 'WORKSPACE',
+    PROJECT: 'PROJECT',
+    PRIVATE: 'PRIVATE',
+} as const;

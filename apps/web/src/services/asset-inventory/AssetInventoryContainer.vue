@@ -31,7 +31,6 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -54,7 +53,6 @@ export default defineComponent({
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 
-        const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
         const assetInventorySettings = useAssetInventorySettingsStore();
         assetInventorySettings.initState();
@@ -74,9 +72,6 @@ export default defineComponent({
             cloudServiceDetailPageStore.$dispose();
             cloudServiceDetailPageStore.$reset();
         });
-        return {
-            breadcrumbs,
-        };
     },
 });
 

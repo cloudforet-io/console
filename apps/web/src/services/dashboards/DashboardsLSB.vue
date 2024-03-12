@@ -144,7 +144,7 @@ const state = reactive({
 
 const filterLSBItemsByPagePermission = (scope: DashboardScope, items: LSBMenu[]): LSBMenu[] => {
     let label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
-    if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
+    if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PROJECT');
     else if (scope === 'PRIVATE') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
     const topTitle: LSBMenu = {
         type: MENU_ITEM_TYPE.TOP_TITLE,

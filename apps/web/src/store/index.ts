@@ -7,7 +7,6 @@ import display from './modules/display';
 import domain from './modules/domain';
 import error from './modules/error';
 import favorite from './modules/favorite';
-import recent from './modules/recent';
 // eslint-disable-next-line import/no-cycle
 import reference from './modules/reference';
 import service from './modules/service';
@@ -23,7 +22,6 @@ const store = new Vuex.Store<any>({
         settings,
         domain,
         favorite,
-        recent,
         reference,
         display,
         service,
