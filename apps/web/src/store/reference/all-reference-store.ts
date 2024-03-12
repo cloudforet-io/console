@@ -16,6 +16,7 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
@@ -30,6 +31,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
+    const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
 
     const getters = reactive({
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
@@ -38,10 +40,11 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
+        publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
     });
 
     const actions = {
-        async sync(type: ManagedVariableModelKey, data?: any) {
+        async sync(type: ManagedVariableModelKey|'public_dashboard', data?: any) {
             if (type === 'project') {
                 await projectReferenceStore.sync(data);
             } else if (type === 'project_group') {
@@ -50,9 +53,11 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await workspaceReferenceStore.sync(data);
             } else if (type === 'user') {
                 await userReferenceStore.sync(data);
+            } else if (type === 'public_dashboard') {
+                await publicDashboardReferenceStore.sync(data);
             }
         },
-        async load(type: ManagedVariableModelKey, options?: ReferenceLoadOptions) {
+        async load(type: ManagedVariableModelKey|'public_dashboard', options?: ReferenceLoadOptions) {
             if (type === 'cost_data_source') {
                 await costDataSourceReferenceStore.load(options);
             } else if (type === 'cloud_service_query_set') {
@@ -65,6 +70,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await workspaceReferenceStore.load(options);
             } else if (type === 'user') {
                 await userReferenceStore.load(options);
+            } else if (type === 'public_dashboard') {
+                await publicDashboardReferenceStore.load(options);
             }
         },
         flush() {
@@ -74,6 +81,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             projectGroupReferenceStore.flush();
             workspaceReferenceStore.flush();
             userReferenceStore.flush();
+            publicDashboardReferenceStore.flush();
         },
     };
 

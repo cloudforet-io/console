@@ -1,18 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
-                              :breadcrumbs="breadcrumbs"
-        >
-            <template #sidebar>
-                <alert-manager-l-n-b />
-            </template>
-            <template #default>
-                <router-view />
-            </template>
-        </vertical-page-layout>
-        <general-page-layout v-else
-                             :breadcrumbs="breadcrumbs"
-        >
+        <general-page-layout>
             <router-view />
         </general-page-layout>
     </fragment>
@@ -27,16 +15,12 @@ import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
-import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
 import { useAlertManagerSettingsStore } from '@/services/alert-manager/stores/alert-manager-settings-store';
 
 export default {
     name: 'AlertManagerContainer',
     components: {
-        AlertManagerLNB,
-        VerticalPageLayout,
         GeneralPageLayout,
     },
     setup() {

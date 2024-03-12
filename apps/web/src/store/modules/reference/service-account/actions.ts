@@ -27,7 +27,7 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
     try {
         const response = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
             query: {
-                only: ['service_account_id', 'name'],
+                only: ['service_account_id', 'name', 'provider', 'data'],
             },
         }, { timeout: 3000 });
         const serviceAccounts: ServiceAccountReferenceMap = {};
@@ -37,6 +37,8 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
                 key: serviceAccountInfo.service_account_id,
                 label: serviceAccountInfo.name,
                 name: serviceAccountInfo.name,
+                provider: serviceAccountInfo.provider,
+                data: serviceAccountInfo.data,
             };
         });
 

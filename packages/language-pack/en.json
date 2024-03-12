@@ -555,6 +555,7 @@
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
+				"DATA_SOURCE": "Data Source",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"
@@ -612,6 +613,7 @@
 				},
 				"PRIVATE": "Private",
 				"PROJECT": "Project",
+				"PROVIDERS_TITLE": "Service Providers",
 				"PUBLIC": "Public",
 				"RELOCATE_DASHBOARD_LABEL": "Go to Dashboard",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "You can now create enhanced cost dashboards within the new Dashboards menu.",
@@ -952,6 +954,7 @@
 			"TAG_COL": "Tag columns",
 			"TITLE": "Set columns"
 		},
+		"DELETED": "Deleted",
 		"EDITOR": {
 			"ALIGN_CENTER": "Center",
 			"ALIGN_JUSTIFY": "Justify",
@@ -1059,7 +1062,8 @@
 				"NO_RESULT_2": "Try different keywords related to Cloud service or Menu.",
 				"RECENT_CLOUD_SERVICE": "RECENT SEARCHES [CLOUD SERVICE]",
 				"RECENT_MENU": "RECENT SEARCHES [MENU]",
-				"SERACH": "Search...",
+				"SEARCH": "Search",
+				"SEARCH_PLACEHOLDER": "Search menu, projects, dashboards, and more",
 				"TOO_MANY_RESULTS": "Too many results for this search.",
 				"TRY_SEARCH_AGAIN": "Try your search again with more specific terms."
 			},
@@ -1068,18 +1072,22 @@
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "User Guide"
 			},
+			"TOOLBOX": {
+				"ID": "ID"
+			},
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Switch to Admin Mode",
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
+				"FAVORITE": "Favorites",
+				"NOTICE": "Notice",
 				"NOTIFICATIONS": "Notifications",
 				"PROFILE": "My Page",
-				"RECENT_FAVORITE": "Recent Visits / Favorites",
 				"SEARCH": "Search"
 			},
 			"WORKSPACE": {
-				"ALL_WORKSPACES": "All workspaces",
-				"CURRENT_WORKSPACE": "Current Workspace",
-				"SWITCH_TO": "Switch To"
+				"CREATE_WORKSPACE": "Create New Workspace",
+				"MANAGE_WORKSPACE": "Manage Workspace",
+				"WORKSPACES": "Workspaces"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1129,6 +1137,20 @@
 			"RESOURCE": "Resources",
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
+		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": "All Workspaces",
+				"FILTER_BY_WORKSPACE": "Filter by Workspace",
+				"HELP_TEXT": "Type in what you're looking for.",
+				"NO_RESULT_1": "No result found for \"{inputText}\"",
+				"NO_RESULT_2": "Try again with different term.",
+				"RECENTLY_VIEWED": "Recently Viewed",
+				"SITE_NAVIGATION": "Menu Navigation",
+				"WORKSPACE_FILTER_WARNING_DESC": "Please unselect at least one workspace before making a new selection.",
+				"WORKSPACE_FILTER_WARNING_TITLE": "You can filter by a maximum of 5 workspaces.",
+				"WORKSPACE_SWITCH_LINK": "Switch to this workspace"
+			}
 		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble,",
@@ -1207,6 +1229,8 @@
 			"VALIDATION": "Please, check your ID or Password.",
 			"VERSION": "Version"
 		},
+		"STARRED": "Starred",
+		"STARRED_NO_DATA": "Items will be displayed here.",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",
@@ -2126,6 +2150,7 @@
 			"ACTION": "Action",
 			"CREATE": "Create",
 			"CREATE_WORKSPACE": "Create Workspace",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "80 characters is the max length of a workspace name.",
 			"DELETE": "Delete",
 			"DELETE_WORKSPACE": "Delete",
 			"DELETE_WORKSPACE_DESC": "You cannot undo this action.",
@@ -2438,6 +2463,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
 				"AUTO_PERIOD": "Auto (Overall period)",
@@ -2459,14 +2485,14 @@
 					"SET_FILTER": "Set Filter"
 				},
 				"NO_REGION": "No Region",
-				"REGION": "Regions",
-				"SERVICE_CATEGORY": "Service Categories",
+				"REGION": "Region",
+				"SERVICE_CATEGORY": "Service Category",
 				"SERVICE_PROVIDER": "Service Providers",
 				"SET": "Set",
 				"SHOW_ALL": "Show all",
 				"SHOW_CHARTS": "Show Charts",
 				"SHOW_MAJOR": "Show Major Services ",
-				"TITLE": "{provider} Cloud Service",
+				"TITLE": "Cloud Service",
 				"USAGE_OVERVIEW": "Usage Overview",
 				"USAGE_OVERVIEW_OF_RESOURCE": "Usage Overview of {resource}"
 			},
@@ -2783,7 +2809,7 @@
 		"ADMINISTRATION_WORKSPACES": "Workspaces",
 		"ALERT_MANAGER": "Alert Manager",
 		"ALERT_MANAGER_ALERT": "Alert",
-		"ALERT_MANAGER_DASHBOARD": "Dashboard",
+		"ALERT_MANAGER_DASHBOARD": "Alert Dashboard",
 		"ALERT_MANAGER_ESCALATION_POLICY": "Escalation Policy",
 		"ASSET_INVENTORY": "Asset Inventory",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
@@ -2794,13 +2820,17 @@
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",
+		"COST_EXPLORER_DESC": "This contains Cost Analysis, Budget, Cost Report.",
 		"COST_EXPLORER_REPORT": "Cost Report",
+		"COST_EXPLORER_TITLE": "Activation required",
 		"DASHBOARDS": "Dashboard",
 		"DASHBOARDS_PROJECT": "Project Dashboard",
 		"DASHBOARDS_WORKSPACE": "Workspace Dashboard",
+		"DISMISS": "Dismiss",
 		"HOME_DASHBOARD": "Home",
 		"INFO": "Info",
 		"INFO_NOTICE": "Notice",
+		"LEARN_MORE": "Learn more",
 		"MY_PAGE": "My Page",
 		"MY_PAGE_ACCOUNT": "My Account",
 		"MY_PAGE_ACCOUNT_PROFILE": "Account & Profile",
@@ -2899,7 +2929,7 @@
 				"CREATED": "Created",
 				"CURRENT_PROJECT_STATUS": "Current Project Status",
 				"DAILY_AVERAGE": "Daily Average",
-				"DASHBOARD": "Dashboard",
+				"DASHBOARD": "Alert Dashboard",
 				"HEALTHY": "Healthy",
 				"HIGH": "High",
 				"ISSUE": "Issue",

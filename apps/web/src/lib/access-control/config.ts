@@ -30,7 +30,6 @@ export const WORKSPACE_OWNER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.ALERT_MANAGER,
     MENU_ID.ALERT,
     MENU_ID.ESCALATION_POLICY,
-    MENU_ID.ADMINISTRATION,
     MENU_ID.IAM,
     MENU_ID.USER,
     MENU_ID.APP,
@@ -64,7 +63,6 @@ export const WORKSPACE_MEMBER_DEFAULT_PERMISSIONS: MenuId[] = [
 
 // TODO: this need to be changed with new SYSTEM domain planning
 export const SYSTEM_USER_DEFAULT_PERMISSIONS: MenuId[] = [
-    MENU_ID.ADMINISTRATION,
     MENU_ID.IAM,
     MENU_ID.ROLE,
     MENU_ID.APP,

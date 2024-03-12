@@ -18,7 +18,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
+import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import type { NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';

@@ -38,7 +38,7 @@ test.describe('Single Project Dashboard', () => {
 
         await test.step('5. Check the created dashboard', async () => {
             const locatorScope = page.locator('.p-breadcrumbs > span:nth-child(2) .link');
-            const locatorName = page.locator('.lnb-menu-item .selected .text');
+            const locatorName = page.locator('.lsb-menu-item .selected .text');
 
             await expect(locatorScope).toContainText(' Project ');
             await expect(locatorName).toContainText(dashboardName);

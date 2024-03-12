@@ -14,7 +14,7 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { UserListItemType } from '@/services/administration/types/user-type';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 
 interface Props {
     email?: string

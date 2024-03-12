@@ -1,20 +1,15 @@
+<script lang="ts" setup>
+import FNB from '@/common/modules/navigations/FNB.vue';
+</script>
+
 <template>
-    <div class="general-page-layout"
-         :class="overflow"
-    >
-        <div class="header"
-             :class="{'without-breadcrumbs': !breadcrumbs.length}"
-        >
-            <p-breadcrumbs v-if="breadcrumbs.length"
-                           :routes="breadcrumbs"
-                           :copiable="copiable"
-            />
+    <div class="general-page-layout">
+        <portal-target name="page-top-notification" />
+        <div class="header">
             <slot name="handbook" />
         </div>
 
-        <div class="page-contents"
-             :class="{'without-breadcrumbs': !breadcrumbs.length}"
-        >
+        <div class="page-contents">
             <slot />
         </div>
         <div class="fnb">
@@ -23,55 +18,16 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import { computed } from 'vue';
-
-import { PBreadcrumbs } from '@spaceone/design-system';
-
-import FNB from '@/common/modules/navigations/FNB.vue';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
-
-export default {
-    name: 'GeneralPageLayout',
-    components: { PBreadcrumbs, FNB },
-    props: {
-        breadcrumbs: {
-            type: Array as PropType<Breadcrumb[]>,
-            default: () => [],
-        },
-        overflow: {
-            type: String as PropType<'auto'|'scroll'>,
-            default: 'auto',
-        },
-    },
-    setup(props) {
-        return {
-            copiable: computed(() => {
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
-                return last?.copiable;
-            }),
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 .general-page-layout {
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: stretch;
-    &.auto {
-        overflow: auto;
-    }
-    &.scroll {
-        overflow: scroll;
-    }
+    overflow: auto;
 
     .header {
-        @apply flex justify-between;
+        @apply flex;
         padding: 1.5rem 1.5rem 0.25rem 1.5rem;
         &.without-breadcrumbs {
             padding: 0;
@@ -81,6 +37,8 @@ export default {
         width: 100%;
         flex-grow: 1;
         padding: 0 1.5rem 2rem 1.5rem;
+        max-width: 1920px;
+
         &.without-breadcrumbs {
             padding: 1.5rem 1.5rem 2rem 1.5rem;
         }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { reactive } from 'vue';
 
 import {
@@ -45,7 +44,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const initNoticeApiHelper = () => {
     const initApiHelper = new ApiQueryHelper()
         .setPage(1, NOTICE_ITEM_LIMIT)
-        .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+        .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
     return initApiHelper;
 };
 let noticeApiHelper = initNoticeApiHelper();

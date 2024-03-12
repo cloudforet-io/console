@@ -7,8 +7,10 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-export const useGrantScopeGuard = (requiredScopes: GrantScope[], apiFunction: () => Promise<void>) => {
+interface GrantScopeGuardReturnType {
+    callApiWithGrantGuard: () => Promise<void|null>;
+}
+export const useGrantScopeGuard = (requiredScopes: GrantScope[], apiFunction: () => Promise<void>): GrantScopeGuardReturnType => {
     const appContextStore = useAppContextStore();
 
     const state = reactive({

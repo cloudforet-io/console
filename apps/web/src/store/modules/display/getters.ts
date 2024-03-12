@@ -2,6 +2,7 @@
 
 import type { RawLocation } from 'vue-router';
 import type VueRouter from 'vue-router';
+import { useRoute } from 'vue-router/composables';
 import type { Getter } from 'vuex';
 
 import { SpaceRouter } from '@/router';
@@ -19,6 +20,7 @@ import type {
 } from '@/store/modules/display/type';
 
 import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -107,6 +109,8 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean, currentWork
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
+    const route = useRoute();
+    const isMyPage = route.path.startsWith('/my-page');
     const appContextStore = useAppContextStore();
     const appContextState = appContextStore.$state;
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -119,6 +123,14 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     if (!isAdminMode) {
         _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, rootGetters['user/pageAccessPermissionList']);
+    }
+
+    if (!isMyPage) {
+        _allGnbMenuList.forEach((menu) => {
+            if (menu.id === MENU_ID.MY_PAGE) {
+                menu.hideOnGNB = true;
+            }
+        });
     }
 
     return _allGnbMenuList;

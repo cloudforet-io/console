@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-    onUnmounted, ref, watch,
+    computed,
+    onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -10,6 +11,9 @@ import {
 import { SpaceRouter } from '@/router';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
@@ -26,17 +30,25 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const gnbStore = useGnbStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+const state = reactive({
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.DASHBOARD,
+        id: props.dashboardId,
+    })),
+});
 
 const getDashboardData = async (dashboardId: string) => {
     try {
         await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE._NAME });
     }
 };
 
@@ -63,6 +75,9 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
         dashboardDetailStore.reset();
     }
     await getDashboardData(dashboardId);
+}, { immediate: true });
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 
 onUnmounted(() => {

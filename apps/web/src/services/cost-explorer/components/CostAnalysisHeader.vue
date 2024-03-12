@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -13,7 +13,7 @@ import { SpaceRouter } from '@/router';
 import type { CostQuerySetDeleteParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/delete';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
@@ -21,7 +21,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray } from '@/styles/colors';
 
@@ -36,8 +39,11 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const { getProperRouteLocation } = useProperRouteLocation();
+const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const favoriteStore = useFavoriteStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
@@ -52,6 +58,13 @@ const state = reactive({
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
     isEditableQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.COST_ANALYSIS,
+        id: state.isManagedCostQuerySet
+            ? getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId || '', costAnalysisPageGetters.selectedQueryId || '')
+            : costAnalysisPageGetters.selectedQueryId || '',
+    })),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 /* Event Handlers */
@@ -82,10 +95,19 @@ const handleDeleteQueryConfirm = async () => {
                 costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
             },
         }));
+        await favoriteStore.deleteFavorite({
+            itemType: FAVORITE_TYPE.COST_ANALYSIS,
+            workspaceId: state.currentWorkspaceId || '',
+            itemId: state.itemIdForDeleteQuery,
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }
 };
+
+watch(() => state.favoriteOptions, async (favoriteOptions) => {
+    await gnbStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
 </script>
 
 <template>
@@ -110,12 +132,6 @@ const handleDeleteQueryConfirm = async () => {
                     <div v-if="costAnalysisPageGetters.selectedQueryId"
                          class="title-right-extra icon-wrapper"
                     >
-                        <div class="favorite-button-wrapper">
-                            <favorite-button :item-id="getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId,costAnalysisPageGetters.selectedQueryId)"
-                                             :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
-                                             scale="0.8"
-                            />
-                        </div>
                         <template v-if="state.isEditableQuerySet && !state.isManagedCostQuerySet">
                             <p-icon-button name="ic_edit-text"
                                            size="md"
@@ -168,18 +184,11 @@ const handleDeleteQueryConfirm = async () => {
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
         margin-bottom: -0.25rem;
-        &.icon-wrapper {
-            gap: 0.5rem;
-            .favorite-button-wrapper {
-                @apply flex items-center justify-center;
-                width: 1.25rem;
-                height: 1.25rem;
-            }
-        }
         &.currency-wrapper {
             @apply justify-end text-gray-800;
             font-size: 0.875rem;
             float: right;
+            margin-left: auto;
             .label {
                 font-weight: 700;
                 padding-right: 0.25rem;

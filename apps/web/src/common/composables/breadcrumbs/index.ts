@@ -6,6 +6,7 @@ import { i18n } from '@/translations';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+
 export const useBreadcrumbs = () => {
     const route = useRoute();
     return {

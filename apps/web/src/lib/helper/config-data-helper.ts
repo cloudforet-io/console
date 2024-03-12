@@ -3,8 +3,6 @@ import { find } from 'lodash';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -13,18 +11,21 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/referenc
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 type Config = FavoriteConfig & RecentConfig;
 
-interface ConfigData extends Config {
+export interface ConfigData extends Config {
     [key: string]: any;
 }
 
 type ReferenceItem = FavoriteItem & RecentItem;
 
-interface ReferenceData extends ReferenceItem {
+export interface ReferenceData extends ReferenceItem {
     [key: string]: any;
 }
 
@@ -45,6 +46,11 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
                 icon: menu.parents?.[0]?.icon ?? menu.icon,
                 parents: menu.parents,
                 updatedAt: d?.updatedAt,
+            });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !menu,
             });
         }
     });
@@ -72,6 +78,11 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
                 }];
             }
             results.push(result);
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -89,7 +100,6 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
                 name: d.itemId,
                 label: resource?.name || d.itemId,
                 icon: 'ic_folder-filled',
-                updatedAt: d?.updatedAt,
             };
             if (resource?.data?.parentGroupInfo?.id) {
                 result.parents = [{
@@ -98,6 +108,11 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
                 }];
             }
             results.push(result);
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -123,6 +138,11 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
                 }],
                 updatedAt: d.updatedAt,
             });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
         }
     });
     return results;
@@ -147,6 +167,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     name: resource.data_source_id,
                     label: dataSourceMap[resource.data_source_id].label,
                 }],
+                isDeleted: false,
             });
         } else if (parsedKeys) { // managed cost query set
             const [dataSourceId, costQuerySetId] = parsedKeys;
@@ -162,6 +183,12 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     name: dataSourceId,
                     label: dataSourceMap[dataSourceId].label,
                 }],
+                isDeleted: false,
+            });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
             });
         }
     });
@@ -182,6 +209,11 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
                 label: resource.name,
                 updatedAt: d.updatedAt,
                 icon: 'ic_service_dashboard',
+            });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
             });
         }
     });

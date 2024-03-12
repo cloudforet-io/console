@@ -104,5 +104,9 @@
 	"TEXT_INPUT": {
 		"HIDE": "隠す",
 		"SHOW": "もっと見る"
+	},
+	"VERTICAL_LAYOUT": {
+		"COLLAPSE": "",
+		"EXPAND": ""
 	}
 }

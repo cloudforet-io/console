@@ -43,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
     selected: () => ([]),
 });
 
-const emit = defineEmits<{(e: 'update:selected', value: (string|undefined)[]): void;
+const emit = defineEmits<{(e: 'click-done', value: (string|undefined)[]): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
@@ -93,8 +93,12 @@ const regionMenuHandler = (inputText: string) => {
 };
 
 /* event */
-const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
-    emit('update:selected', selected.map((d) => d.name));
+const handleChangeSelected = (selected?: SelectDropdownMenuItem[]) => {
+    if (!selected || selected.length === 0) {
+        emit('click-done', []);
+        return;
+    }
+    emit('click-done', selected.map((d) => d.name));
 };
 
 // LOAD REFERENCE STORE
@@ -107,45 +111,42 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
 </script>
 
 <template>
-    <div>
-        <p-select-dropdown :search-text.sync="state.searchTerm"
-                           :menu="state.menuItems"
-                           :selected="state.selectedItems"
-                           parent-id="cloud-service-filter-search"
-                           multi-selectable
-                           use-fixed-menu-style
-                           appearance-type="stack"
-                           show-select-marker
-                           :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                           is-filterable
-                           show-delete-all-button
-                           @update:selected="handleUpdateSelected"
+    <p-select-dropdown :search-text.sync="state.searchTerm"
+                       :menu="state.menuItems"
+                       :selected="state.selectedItems"
+                       multi-selectable
+                       use-fixed-menu-style
+                       show-select-marker
+                       :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                       is-filterable
+                       show-select-header
+                       @click-done="handleChangeSelected"
+                       @clear-selection="handleChangeSelected"
+    >
+        <template v-if="props.type === CLOUD_SERVICE_FILTER_KEY.REGION"
+                  #menu-item--format="{item}"
         >
-            <template v-if="props.type === CLOUD_SERVICE_FILTER_KEY.REGION"
-                      #menu-item--format="{item}"
-            >
-                <div class="region-list-text">
-                    <div class="region-type">
-                        <text-highlighting class="region-provider"
-                                           :style="{color: item.color}"
-                                           :text="state.providers[item.provider] ? state.providers[item.provider].label : item.provider"
-                                           :term="state.searchTerm"
-                                           style-type="secondary"
-                        />
-                        <text-highlighting :text="item.regionName"
-                                           :term="state.searchTerm"
-                                           style-type="secondary"
-                        />
-                    </div>
-                    <text-highlighting class="region-code"
-                                       :text="item.name"
+            <div class="region-list-text">
+                <div class="region-type">
+                    <text-highlighting class="region-provider"
+                                       :style="{color: item.color}"
+                                       :text="state.providers[item.provider] ? state.providers[item.provider].label : item.provider"
+                                       :term="state.searchTerm"
+                                       style-type="secondary"
+                    />
+                    <text-highlighting :text="item.regionName"
                                        :term="state.searchTerm"
                                        style-type="secondary"
                     />
                 </div>
-            </template>
-        </p-select-dropdown>
-    </div>
+                <text-highlighting class="region-code"
+                                   :text="item.name"
+                                   :term="state.searchTerm"
+                                   style-type="secondary"
+                />
+            </div>
+        </template>
+    </p-select-dropdown>
 </template>
 
 <style lang="postcss" scoped>

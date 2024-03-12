@@ -48,10 +48,11 @@
                                  :key="`project-link-${project?.name}-${pIndex}`"
                             >
                                 <p-i v-if="project.isFavorite"
-                                     name="ic_favorite"
+                                     name="ic_favorite-filled"
                                      class="favorite-icon"
                                      width="0.625rem"
                                      height="0.625rem"
+                                     :color="yellow[500]"
                                 />
                                 <router-link :to="project?.to"
                                              class="project-link"
@@ -111,7 +112,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -123,7 +123,9 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 
+import { yellow } from '@/styles/colors';
 
 const EVENT_PERIOD = 7;
 
@@ -146,16 +148,19 @@ export default {
     setup(props) {
         const allReferenceStore = useAllReferenceStore();
         const userWorkspaceStore = useUserWorkspaceStore();
+        const favoriteStore = useFavoriteStore();
+        const favoriteGetters = favoriteStore.getters;
         const { getProperRouteLocation } = useProperRouteLocation();
+
         const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+            favoriteProjects: computed(() => favoriteGetters.projectItems),
         });
         const state = reactive({
             loading: false,
             timezone: computed(() => store.state.user.timezone),
-            favoriteProjects: computed(() => store.state.favorite.projectItems),
             data: [] as any[],
             fields: computed(() => [
                 { name: 'event', label: i18n.t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
@@ -178,7 +183,7 @@ export default {
                 affected_projects: d.affected_projects.map((projectId) => ({
                     name: projects[projectId]?.name,
                     to: getProperRouteLocation(referenceRouter(projectId, { resource_type: 'identity.Project' })),
-                    isFavorite: !!find(state.favoriteProjects, { id: projectId }),
+                    isFavorite: !!find(storeState.favoriteProjects, { id: projectId }),
                 })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
                 showAll: false,
             };
@@ -212,7 +217,6 @@ export default {
 
         const init = async () => {
             await Promise.allSettled([
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('reference/region/load'),
                 await getData(),
             ]);
@@ -226,6 +230,7 @@ export default {
             ...toRefs(state),
             storeState,
             handleClickToggle,
+            yellow,
         };
     },
 };

@@ -13,7 +13,7 @@ import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/ty
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
+import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 

@@ -38,7 +38,7 @@ const getDashboardData = async (dashboardId: string) => {
         await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) });
+        await SpaceRouter.router.push({ name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME) });
     }
 };
 

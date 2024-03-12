@@ -22,6 +22,7 @@ export interface DisplayState {
     sidebarType: SidebarType;
     isInitialized: boolean;
     uncheckedNotificationCount: number;
+    uncheckedNoticeCount: number,
     isSignInFailed: boolean;
     visibleMobileGuideModal: boolean;
 }

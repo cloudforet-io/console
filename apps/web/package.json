@@ -41,7 +41,7 @@
     "@tiptap/vue-2": "^2.0.3",
     "@vercel/edge-config": "^0.2.1",
     "@vueuse/components": "^9.0.2",
-    "@vueuse/core": "^8.9.1",
+    "@vueuse/core": "^10.7.2",
     "@vvo/tzdb": "^6.4.1",
     "animated-number-vue": "^1.0.0",
     "axios": "^1.6.0",

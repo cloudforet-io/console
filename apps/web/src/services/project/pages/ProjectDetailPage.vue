@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PBreadcrumbs, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
+    PBadge, PButtonModal, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -21,7 +21,7 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
@@ -31,7 +31,10 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -41,7 +44,6 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
-
 interface Props {
     id?: string;
 }
@@ -50,6 +52,7 @@ const route = useRoute();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
 
+const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
@@ -57,15 +60,19 @@ const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
+const favoriteStore = useFavoriteStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
-        const results: Route[] = [
+        let results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
         ];
         if (!isEmpty(state.projectGroupInfo)) {
@@ -74,13 +81,29 @@ const state = reactive({
                 to: referenceRouter(state.projectGroupId, { resource_type: 'identity.ProjectGroup' }),
             });
         }
-        results.push({ name: state.item?.name });
+        if (route.name === PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME) {
+            results = results.concat([
+                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
+            ]);
+        } else if (route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME) {
+            results = results.concat([
+                { name: state.item?.name, to: referenceRouter(state.item?.project_id, { resource_type: 'identity.Project' }) },
+                { name: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: route.query.protocolLabel }) as string },
+            ]);
+        } else {
+            results.push({ name: state.item?.name });
+        }
         return results;
     }),
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
     projectGroupMoveModalVisible: false,
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.PROJECT,
+        id: projectDetailPageState.projectId,
+    })),
 });
 
 /** Tabs */
@@ -139,7 +162,11 @@ const projectDeleteFormConfirm = async () => {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             project_id: projectDetailPageState.projectId as string,
         });
-        // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
+        await favoriteStore.deleteFavorite({
+            itemType: FAVORITE_TYPE.PROJECT,
+            workspaceId: storeState.currentWorkspaceId || '',
+            itemId: projectDetailPageState.projectId as string,
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
     } catch (e) {
@@ -185,6 +212,16 @@ watch([
     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
+watch([() => singleItemTabState.activeTab, () => state.item], () => {
+    gnbStore.setBreadcrumbs(state.pageNavigation);
+});
+watch(() => projectDetailPageState.projectId, (projectId) => {
+    gnbStore.setId(projectId);
+}, { immediate: true });
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    gnbStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
+
 onUnmounted(() => {
     projectDetailPageStore.reset();
 });
@@ -196,7 +233,6 @@ onUnmounted(() => {
                        :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
-            <p-breadcrumbs :routes="state.pageNavigation" />
             <div v-if="state.item"
                  class="top-wrapper"
             >
@@ -206,11 +242,6 @@ onUnmounted(() => {
                 >
                     <template #title-right-extra>
                         <div class="button-wrapper">
-                            <span class="favorite-button-wrapper">
-                                <favorite-button :item-id="projectDetailPageState.projectId"
-                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
-                                />
-                            </span>
                             <template v-if="projectPageState.isWorkspaceOwner">
                                 <p-icon-button name="ic_settings"
                                                class="edit-btn"
@@ -240,15 +271,6 @@ onUnmounted(() => {
                                     <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
                                 </div>
                             </p-badge>
-                        </div>
-                        <div class="top-right-group">
-                            <p class="copy-project-id">
-                                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                                {{ projectDetailPageState.projectId }}
-                                <p-copy-button class="icon"
-                                               :value="projectDetailPageState.projectId"
-                                />
-                            </p>
                         </div>
                     </template>
                 </p-heading>
@@ -311,11 +333,11 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .project-detail-page {
     height: 100%;
+    margin-top: -0.25rem;
 }
 .page-inner {
     height: 100%;
     max-width: 1368px;
-    margin: 0 auto;
 }
 .p-heading {
     margin-top: 0.25rem;
@@ -325,29 +347,11 @@ onUnmounted(() => {
     @apply mb-8 flex flex-wrap items-center;
     .button-wrapper {
         @apply inline-flex items-center;
-        .favorite-button-wrapper {
-            @apply inline-flex ml-2;
-        }
         .badge-content-wrapper {
             @apply text-gray-900;
             display: flex;
             align-content: center;
             gap: 0.25rem;
-        }
-    }
-    .top-right-group {
-        @apply inline-flex items-center justify-end flex-wrap;
-        float: right;
-        .copy-project-id {
-            @apply inline-flex items-center text-gray-500;
-            font-size: 0.875rem;
-            height: 2rem;
-            .label {
-                @apply text-gray-dark;
-            }
-            .icon {
-                @apply ml-2 text-gray-dark;
-            }
         }
     }
 }
@@ -356,7 +360,10 @@ onUnmounted(() => {
     @apply rounded-lg;
 }
 
-.edit-btn {
-    @apply ml-3;
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .data-wrapper {
+        overflow-y: unset;
+    }
 }
 </style>

@@ -15,13 +15,13 @@ import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-gro
 import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
@@ -238,6 +238,7 @@ watch(() => projectPageGetters.groupId, (data) => {
     if (!state.allProjectRoot) return;
     if (data) {
         state.allProjectRoot.resetSelect();
+        projectPageStore.selectNode(data);
     } else {
         state.allProjectRoot.changeSelectState(state.allProjectNode, [0]);
     }
@@ -309,7 +310,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
         </sidebar-title>
 
         <p-data-loader :loading="state.loading">
-            <div class="mx-3">
+            <div>
                 <p-tree :data-fetcher="() => state.allProjectNode"
                         :toggle-options="{disabled: true}"
                         :edit-options="{disabled: true}"
@@ -335,6 +336,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         :data-setter="dataSetter"
                         :data-getter="dataGetter"
                         :data-fetcher="dataFetcher"
+                        fetch-on-init
                         @init="handleTreeInit"
                         @finish-edit="handleFinishEdit"
                         @drop="handleDrop"

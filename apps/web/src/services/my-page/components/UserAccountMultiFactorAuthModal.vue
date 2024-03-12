@@ -15,7 +15,7 @@ import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { UserListItemType } from '@/services/administration/types/user-type';
+import type { UserListItemType } from '@/services/iam/types/user-type';
 import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
 import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 
