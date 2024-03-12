@@ -38,6 +38,15 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key },
         ],
     },
+    'filters.project_group': {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
+        selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key },
+        ],
+    },
     'filters.project': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,

@@ -35,7 +35,7 @@ const handleDeleteDashboardConfirm = async () => {
     try {
         state.loading = true;
         await dashboardDetailStore.deleteDashboard(props.dashboardId);
-        await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
+        await SpaceRouter.router.replace(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
     } finally {

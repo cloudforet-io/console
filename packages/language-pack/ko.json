@@ -1519,6 +1519,7 @@
 				"DESCRIPTION_GROUP_BY": "특정 옵션 기반 데이터를 그룹화하고 해당 그룹의 트렌드나 패턴을 파악하는데 사용가능",
 				"DESCRIPTION_PRODUCT": "각 클라우드 프로바이더가 제공하는 클라우드 컴퓨팅 제품 및 서비스",
 				"DESCRIPTION_PROJECT": "프로젝트로 그룹화된 클라우드 자원 및 서비스의 모음",
+				"DESCRIPTION_PROJECT_GROUP": "プロジェクトグループにグループ化されたクラウドリソースおよびサービスのコレクション",
 				"DESCRIPTION_PROVIDER": "AWS, Azure, Google과 같은 클라우드 서비스 프로바이더 리스트 ",
 				"DESCRIPTION_REGION": "각 클라우드 서비스 프로바이더가 데이터 센터를 구축한 지리적 위치",
 				"DESCRIPTION_SERVICE_ACCOUNT": "클라우드 서비스 프로바이더 콘솔에서 생성되어 '서비스 계정(service account)' 페이지에 등록된 계정 리스트",
