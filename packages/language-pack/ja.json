@@ -3627,6 +3627,10 @@
 				"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください"
 			},
+			"MODAL_PROJECT_GROUP_MEMBER": {
+				"NO_DATA_DESCRIPTION": "",
+				"REMOVE": "削除"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"NO_PROJECT_GROUP_MSG": "このワークスペースにはまだプロジェクトまたはプロジェクトグループが作成されていません。",
 			"ONLY_PEOPLE_INVITED": "招待された人だけ",

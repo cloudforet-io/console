@@ -3627,6 +3627,10 @@
 				"MODAL_VALIDATION_LENGTH": "40자 이하로 입력해주세요.",
 				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다."
 			},
+			"MODAL_PROJECT_GROUP_MEMBER": {
+				"NO_DATA_DESCRIPTION": "",
+				"REMOVE": "제거"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
 			"NO_PROJECT_GROUP_MSG": "이 워크스페이스에는 아직 생성된 프로젝트 또는 프로젝트 그룹이 없습니다.",
 			"ONLY_PEOPLE_INVITED": "초대된 사용자만",

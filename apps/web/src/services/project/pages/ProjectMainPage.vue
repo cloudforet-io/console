@@ -21,6 +21,7 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
@@ -75,6 +76,7 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT_GROUP,
         id: storeState.groupId,
     })),
+    projectGroupMemberManagementModalVisible: false,
 });
 
 const {
@@ -110,6 +112,9 @@ const handleConfirmProjectGroupMoveModal = () => {
 };
 
 /* Handling Forms */
+const handleClickAddProjectGroupMember = () => {
+    state.projectGroupMemberManagementModalVisible = true;
+};
 const handleClickCreateButton = () => {
     showContextMenu();
 };
@@ -165,6 +170,13 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                 <div v-if="projectPageState.isWorkspaceOwner"
                      class="top-button-box"
                 >
+                    <p-button style-type="tertiary"
+                              icon-left="ic_member"
+                              class="mr-4"
+                              @click="handleClickAddProjectGroupMember"
+                    >
+                        Group Member
+                    </p-button>
                     <p-button ref="targetRef"
                               icon-left="ic_plus_bold"
                               @click="handleClickCreateButton"
@@ -194,6 +206,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                                                :is-project="false"
                                                :target-id="storeState.groupId"
                                                @confirm="handleConfirmProjectGroupMoveModal"
+        />
+        <project-group-member-management-modal
+            v-if="state.projectGroupMemberManagementModalVisible"
+            :visible.sync="state.projectGroupMemberManagementModalVisible"
+            :project-group-id="storeState.groupId"
         />
     </div>
 </template>

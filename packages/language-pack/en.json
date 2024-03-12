@@ -3627,6 +3627,10 @@
 				"MODAL_VALIDATION_LENGTH": "Must be shorter than 40 characters.",
 				"MODAL_VALIDATION_REQUIRED": "Required field"
 			},
+			"MODAL_PROJECT_GROUP_MEMBER": {
+				"NO_DATA_DESCRIPTION": "Type a user ID / name and then press Enter",
+				"REMOVE": "Remove"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
 			"NO_PROJECT_GROUP_MSG": "There's no project or project group created in this workspace yet.",
 			"ONLY_PEOPLE_INVITED": "Only people invited",
