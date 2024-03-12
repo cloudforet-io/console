@@ -183,9 +183,11 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         // check admin mode
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
             if (_state.isAdminMode) {
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.PROJECT);
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties
+                    .filter((d) => ![GROUP_BY.PROJECT_GROUP, GROUP_BY.PROJECT].includes(d));
             } else {
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties
+                    .filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
             state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
