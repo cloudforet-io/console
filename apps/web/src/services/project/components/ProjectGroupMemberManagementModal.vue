@@ -182,7 +182,7 @@ const handleRemoveProjectGroupMember = (idx: number) => {
                                      title="No Group Member"
                             >
                                 <div>
-                                    Type a user ID / name and then press Enter
+                                    {{ $t('PROJECT.LANDING.MODAL_PROJECT_GROUP_MEMBER.NO_DATA_DESCRIPTION') }}
                                 </div>
                             </p-empty>
                         </template>
@@ -205,7 +205,7 @@ const handleRemoveProjectGroupMember = (idx: number) => {
                                               size="sm"
                                               @click="handleRemoveProjectGroupMember(idx)"
                                     >
-                                        Remove
+                                        {{ $t('PROJECT.LANDING.MODAL_PROJECT_GROUP_MEMBER.REMOVE') }}
                                     </p-button>
                                 </div>
                             </div>
