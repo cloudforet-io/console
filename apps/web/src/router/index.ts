@@ -280,7 +280,6 @@ export class SpaceRouter {
             if (!isAdminMode && routeScope === 'WORKSPACE') {
                 const recent = getRecentConfig(to);
                 if (recent) {
-                    console.log('recent', to);
                     SpaceConnector.clientV2.config.userConfig.set({
                         name: `console:recent:${recent.itemType}:${recent.workspaceId}:${recent.itemId}`,
                         data: {

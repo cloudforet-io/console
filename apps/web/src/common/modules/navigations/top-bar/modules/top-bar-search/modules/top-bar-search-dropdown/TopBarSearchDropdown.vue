@@ -10,9 +10,6 @@ import {
 
 import { store } from '@/store';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     topBarSearchReferenceRouter,
@@ -47,9 +44,6 @@ const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
 const windowSize = useWindowSize();
-const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreGetter = userWorkspaceStore.getters;
-const recentStore = useRecentStore();
 
 const dropdownRef = ref<null | HTMLElement>(null);
 const dropdownSize = useElementSize(dropdownRef);
