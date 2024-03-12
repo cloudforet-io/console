@@ -1,6 +1,7 @@
 export const WIDGET_OPTION_FILTER_KEY_MAP = {
     // common
     provider: 'filters.provider',
+    project_group: 'filters.project_group',
     project: 'filters.project',
     workspace: 'filters.workspace',
     service_account: 'filters.service_account',
