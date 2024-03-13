@@ -212,7 +212,7 @@ export default defineComponent<Props>({
             if (provider === 'all') return;
             const regionFilters = state.filters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [];
             cloudServicePageStore.setSelectedRegionsToFilters(regionFilters.filter((r) => {
-                const region = state.regions[r];
+                const region = storeState.regions[r];
                 if (!region) return false;
                 return region.data.provider === provider;
             }));

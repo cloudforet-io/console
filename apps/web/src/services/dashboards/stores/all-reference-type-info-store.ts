@@ -73,6 +73,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
                 referenceMap: store.getters['reference/providerItems'],
             },
+            cloud_service_type: cloudServiceTypeReferenceStore.getters.cloudServiceTypeTypeInfo,
             service_account: serviceAccountReferenceStore.getters.serviceAccountTypeInfo,
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             project: projectReferenceStore.getters.projectTypeInfo,
