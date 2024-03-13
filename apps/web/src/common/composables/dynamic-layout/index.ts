@@ -91,7 +91,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Project: computed(() => allReferenceStore.getters.project),
         ProjectGroup: computed(() => allReferenceStore.getters.projectGroup),
         ServiceAccount: computed(() => allReferenceStore.getters.serviceAccount),
-        CloudServiceType: computed(() => store.getters['reference/cloudServiceTypeItems']),
+        CloudServiceType: computed(() => allReferenceStore.getters.cloudServiceType),
         Secret: computed(() => allReferenceStore.getters.secret),
         Collector: computed(() => store.getters['reference/collectorItems']),
         Provider: computed(() => store.getters['reference/providerItems']),

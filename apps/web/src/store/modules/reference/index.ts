@@ -2,7 +2,6 @@ import type { ReferenceRootState } from '@/store/modules/reference/type';
 
 // eslint-disable-next-line import/no-cycle
 import * as actions from './actions';
-import cloudServiceType from './cloud-service-type';
 import collector from './collector';
 import * as getters from './getters';
 import * as mutations from './mutations';
@@ -23,7 +22,6 @@ export default {
     actions,
     getters,
     modules: {
-        cloudServiceType,
         collector,
         provider,
         region,
