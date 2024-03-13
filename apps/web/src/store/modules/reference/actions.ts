@@ -11,7 +11,6 @@ export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commi
         dispatch('plugin/load', options),
         dispatch('protocol/load', options),
         dispatch('provider/load', options),
-        dispatch('region/load', options),
     ]);
     commit('setIsAllLoaded', true);
 };

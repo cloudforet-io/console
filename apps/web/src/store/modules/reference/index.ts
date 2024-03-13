@@ -8,7 +8,6 @@ import * as mutations from './mutations';
 import plugin from './plugin';
 import protocol from './protocol';
 import provider from './provider';
-import region from './region';
 
 // TODO: This is a temporary state. It must be changed to check each modules' items state is null.
 const state: ReferenceRootState = {
@@ -24,7 +23,6 @@ export default {
     modules: {
         collector,
         provider,
-        region,
         plugin,
         protocol,
     },
