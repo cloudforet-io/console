@@ -97,6 +97,7 @@ const handleClickSend = async () => {
         if (state.loginUserId === state.data.user_id) {
             await store.dispatch('user/setUser', { email: email.value, email_verified: true });
         }
+        userPageStore.setUserEmail(state.data.user_id, email.value);
     } finally {
         state.loading = false;
     }

@@ -61,6 +61,7 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
@@ -162,13 +163,16 @@ const projectDeleteFormConfirm = async () => {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             project_id: projectDetailPageState.projectId as string,
         });
-        await favoriteStore.deleteFavorite({
-            itemType: FAVORITE_TYPE.PROJECT,
-            workspaceId: storeState.currentWorkspaceId || '',
-            itemId: projectDetailPageState.projectId as string,
-        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
+        const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectDetailPageState.projectId);
+        if (isFavoriteItem) {
+            await favoriteStore.deleteFavorite({
+                itemType: FAVORITE_TYPE.PROJECT,
+                workspaceId: storeState.currentWorkspaceId || '',
+                itemId: projectDetailPageState.projectId as string,
+            });
+        }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));
     } finally {
