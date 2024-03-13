@@ -2,7 +2,6 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { i18n } from '@/translations';
 
@@ -18,11 +17,10 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
-const route = useRoute();
-
 const projectGroupStore = useProjectGroupReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
+const projectPageGetters = projectPageStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -32,21 +30,22 @@ const state = reactive({
         get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
         set(val) { projectPageStore.setProjectGroupDeleteCheckModalVisible(val); },
     }),
-    groupId: route.query.select_pg as string,
+    groupId: computed((() => projectPageGetters.groupId)),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 const deleteProjectGroup = async () => {
     try {
+        const groupId = state.groupId;
         await projectPageStore.deleteProjectGroup();
         await projectGroupStore.load({ force: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-        const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === state.groupId);
+        const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === groupId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
                 itemType: FAVORITE_TYPE.PROJECT_GROUP,
                 workspaceId: state.currentWorkspaceId || '',
-                itemId: state.groupId,
+                itemId: groupId,
             });
         }
     } catch (e) {
