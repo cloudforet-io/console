@@ -136,6 +136,13 @@ export const useUserPageStore = defineStore('user-page', {
                 throw e;
             }
         },
+        setUserEmail(userId?: string, email?: string) {
+            const idx = this.users.findIndex((item) => item.user_id === userId);
+            this.users[idx].email = email;
+            if (this.selectedUser.user_id === userId) {
+                this.selectedUser.email = email;
+            }
+        },
         // Role
         async listRoles(params?: RoleListParameters) {
             try {
