@@ -72,8 +72,16 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('secret', data);
     },
-    '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-    '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
+    '/identity/service-account/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service_account', data);
+    },
+    '/identity/service-account/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service_account', data);
+    },
     '/identity/user/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -84,8 +92,16 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('user', data);
     },
-    '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
-    '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
+    '/monitoring/webhook/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
+    },
+    '/monitoring/webhook/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
+    },
     '/dashboard/public-dashboard/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();

@@ -27,7 +27,6 @@ export type VuexStoreReferenceType =
     |'cloudServiceType'|'cloud_service_type'
     |'provider'
     |'region'
-    |'serviceAccount'|'service_account'
     |'collector'
     |'protocol'
     |'plugin';

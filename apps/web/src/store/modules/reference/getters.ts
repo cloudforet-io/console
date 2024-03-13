@@ -7,7 +7,6 @@ import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/ty
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { VuexStoreAllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
@@ -25,8 +24,6 @@ export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => 
 export const regionItems: Getter<any, any> = (state): RegionReferenceMap => state.region?.items ?? {};
 
 export const secretItems: Getter<any, any> = (state): SecretReferenceMap => state.secret?.items ?? {};
-
-export const serviceAccountItems: Getter<any, any> = (state): ServiceAccountReferenceMap => state.serviceAccount?.items ?? {};
 
 export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStoreAllReferenceTypeInfo => ({
     protocol: {
@@ -66,14 +63,5 @@ export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStor
     secret: {
         ...REFERENCE_TYPE_INFO.secret,
         referenceMap: getters.secretItems,
-    },
-    //
-    serviceAccount: {
-        ...REFERENCE_TYPE_INFO.service_account,
-        referenceMap: getters.serviceAccountItems,
-    },
-    service_account: {
-        ...REFERENCE_TYPE_INFO.service_account,
-        referenceMap: getters.serviceAccountItems,
     },
 });

@@ -18,6 +18,7 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
+import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -27,16 +28,23 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 
 type PiniaStoreReferenceType =
-    'cost_data_source'
+    'cloud_service_type'
     |'cloud_service_query_set'
-    |'project'
+    |'collector'
+    |'cost_data_source'
+    |'plugin'
     |'project_group'
-    |'workspace'
-    |'user'
+    |'project'
+    |'protocol'
+    |'provider'
     |'public_dashboard'
-    |'webhook'
+    |'region'
+    |'secret'
+    |'service_account'
     |'trusted_account'
-    |'secret';
+    |'user'
+    |'webhook'
+    |'workspace';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
@@ -46,6 +54,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
+    const serviceAccountReferenceStore = useServiceAccountReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
     const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
@@ -58,6 +67,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
+        serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
         secret: computed(() => secretReferenceStore.getters.secretItems),
@@ -76,6 +86,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await userReferenceStore.sync(data); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.sync(data); break;
+            case 'service_account':
+                await serviceAccountReferenceStore.sync(data); break;
             case 'webhook':
                 await webhookReferenceStore.sync(data); break;
             case 'trusted_account':
@@ -101,6 +113,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await userReferenceStore.load(options); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.load(options); break;
+            case 'service_account':
+                await serviceAccountReferenceStore.load(options); break;
             case 'webhook':
                 await webhookReferenceStore.load(options); break;
             case 'trusted_account':
@@ -118,6 +132,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             workspaceReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();
+            serviceAccountReferenceStore.flush();
             webhookReferenceStore.flush();
             trustedAccountReferenceStore.flush();
             secretReferenceStore.flush();

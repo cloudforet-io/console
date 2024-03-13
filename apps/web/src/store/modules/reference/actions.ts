@@ -13,7 +13,6 @@ export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commi
         dispatch('protocol/load', options),
         dispatch('provider/load', options),
         dispatch('region/load', options),
-        dispatch('serviceAccount/load', options),
     ]);
     commit('setIsAllLoaded', true);
 };
