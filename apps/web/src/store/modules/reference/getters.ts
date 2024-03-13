@@ -1,19 +1,15 @@
 import type { Getter } from 'vuex';
 
-import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { VuexStoreAllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 export const protocolItems: Getter<any, any> = (state): ProtocolReferenceMap => state.protocol?.items ?? {};
-
-export const cloudServiceTypeItems: Getter<any, any> = (state): CloudServiceTypeReferenceMap => state.cloudServiceType?.items ?? {};
 
 export const collectorItems: Getter<any, any> = (state): CollectorReferenceMap => state.collector?.items ?? {};
 
@@ -23,21 +19,10 @@ export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => 
 
 export const regionItems: Getter<any, any> = (state): RegionReferenceMap => state.region?.items ?? {};
 
-export const secretItems: Getter<any, any> = (state): SecretReferenceMap => state.secret?.items ?? {};
-
 export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStoreAllReferenceTypeInfo => ({
     protocol: {
         ...REFERENCE_TYPE_INFO.protocol,
         referenceMap: getters.protocolItems,
-    },
-    //
-    cloudServiceType: {
-        ...REFERENCE_TYPE_INFO.cloud_service_type,
-        referenceMap: getters.cloudServiceTypeItems,
-    },
-    cloud_service_type: {
-        ...REFERENCE_TYPE_INFO.cloud_service_type,
-        referenceMap: getters.cloudServiceTypeItems,
     },
     //
     collector: {
@@ -58,10 +43,5 @@ export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStor
     region: {
         ...REFERENCE_TYPE_INFO.region,
         referenceMap: getters.regionItems,
-    },
-    //
-    secret: {
-        ...REFERENCE_TYPE_INFO.secret,
-        referenceMap: getters.secretItems,
     },
 });
