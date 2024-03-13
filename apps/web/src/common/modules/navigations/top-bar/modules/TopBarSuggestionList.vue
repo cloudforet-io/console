@@ -43,7 +43,7 @@ const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number)
 const contextMenuRef = ref<any|null>(null);
 const state = reactive({
     refinedItems: computed(() => props.items.map((d) => ({
-        ...d, icon: undefined, itemIcon: d.icon, disabled: d.isDeleted,
+        ...d, icon: undefined, itemIcon: d?.icon, disabled: d?.isDeleted,
     }))),
 });
 
