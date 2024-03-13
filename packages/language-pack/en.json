@@ -2814,6 +2814,7 @@
 		"ASSET_INVENTORY": "Asset Inventory",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
 		"ASSET_INVENTORY_COLLECTOR": "Collector",
+		"ASSET_INVENTORY_SECURITY": "Security",
 		"ASSET_INVENTORY_SERVER": "Server",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"COST_EXPLORER": "Cost Explorer",
