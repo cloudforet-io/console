@@ -95,6 +95,7 @@ const getProvider = async () => {
         state.providerData = {};
     }
 };
+
 const updateServiceAccount = async () => {
     try {
         state.loading = true;
