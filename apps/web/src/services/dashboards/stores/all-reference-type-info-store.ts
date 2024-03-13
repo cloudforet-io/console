@@ -10,10 +10,12 @@ import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-sou
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'protocol'
@@ -40,6 +42,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
+    const webhookReferenceStore = useWebhookReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -85,18 +88,13 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
                 referenceMap: store.getters['reference/serviceAccountItems'],
             },
-            webhook: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.webhook.name,
-                referenceMap: store.getters['reference/webhookItems'],
-            },
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             project: projectReferenceStore.getters.projectTypeInfo,
             user: userReferenceStore.getters.userTypeInfo,
             cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
             cloud_service_query_set: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
+            webhook: webhookReferenceStore.getters.webhookTypeInfo,
         })),
     });
 

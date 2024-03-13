@@ -177,7 +177,6 @@ const enableWebhook = async () => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'));
     } finally {
-        state.selectedIndex = [];
         await listWebhooks();
         checkModalState.visible = false;
     }
@@ -191,7 +190,6 @@ const disableWebhook = async () => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'));
     } finally {
-        state.selectedIndex = [];
         await listWebhooks();
         checkModalState.visible = false;
     }
@@ -274,7 +272,6 @@ const onChange = async (options: any = {}) => {
 /* init */
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/webhook/load'),
         store.dispatch('reference/plugin/load'),
         listWebhooks(),
     ]);
