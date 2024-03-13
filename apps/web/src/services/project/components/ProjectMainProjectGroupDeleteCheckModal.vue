@@ -2,6 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { i18n } from '@/translations';
 
@@ -17,9 +18,10 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
+const route = useRoute();
+
 const projectGroupStore = useProjectGroupReferenceStore();
 const projectPageStore = useProjectPageStore();
-const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 const favoriteStore = useFavoriteStore();
@@ -30,12 +32,15 @@ const state = reactive({
         get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
         set(val) { projectPageStore.setProjectGroupDeleteCheckModalVisible(val); },
     }),
-    groupId: computed((() => projectPageGetters.groupId)),
+    groupId: route.query.select_pg as string,
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 
 const deleteProjectGroup = async () => {
     try {
+        await projectPageStore.deleteProjectGroup();
+        await projectGroupStore.load({ force: true });
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
         const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === state.groupId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
@@ -44,9 +49,6 @@ const deleteProjectGroup = async () => {
                 itemId: state.groupId,
             });
         }
-        await projectPageStore.deleteProjectGroup();
-        await projectGroupStore.load({ force: true });
-        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
     } finally {
