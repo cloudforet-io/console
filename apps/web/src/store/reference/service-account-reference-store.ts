@@ -20,7 +20,11 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type ServiceAccountItem = Required<Pick<ReferenceItem<ServiceAccountModel>, 'key'|'label'|'name'>>;
+export type ServiceAccountItem = Required<Pick<ReferenceItem<{
+    account_id?: string;
+    subscription_id?: string;
+    project_id?: string;
+}>, 'key'|'label'|'name'|'provider'|'data'>>;
 export type ServiceAccountReferenceMap = ReferenceMap<ServiceAccountItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
@@ -58,7 +62,7 @@ export const useServiceAccountReferenceStore = defineStore('service-account-refe
         try {
             const response = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
                 query: {
-                    only: ['service_account_id', 'name'],
+                    only: ['service_account_id', 'name', 'provider', 'data'],
                 },
             }, { timeout: 3000 });
 
@@ -67,6 +71,8 @@ export const useServiceAccountReferenceStore = defineStore('service-account-refe
                     key: serviceAccountInfo.service_account_id,
                     label: serviceAccountInfo.name,
                     name: serviceAccountInfo.name,
+                    provider: serviceAccountInfo.provider,
+                    data: serviceAccountInfo.data,
                 };
             });
             state.items = referenceMap;
@@ -83,6 +89,8 @@ export const useServiceAccountReferenceStore = defineStore('service-account-refe
                 key: serviceAccountInfo.service_account_id,
                 label: serviceAccountInfo.name,
                 name: serviceAccountInfo.name,
+                provider: serviceAccountInfo.provider,
+                data: serviceAccountInfo.data,
             },
         };
     };
