@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 import { store } from '@/store';
 
 import type { ReferenceTypeInfo } from '@/store/modules/reference/type';
+import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
@@ -17,6 +18,7 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
@@ -38,6 +40,7 @@ export type ReferenceType = Extract<ManagedVariableModelKey,
 export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
 export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info', () => {
+    const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
     const projectReferenceStore = useProjectReferenceStore();
@@ -62,12 +65,6 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: 'Plugin',
                 referenceMap: store.getters['reference/pluginItems'],
             },
-            cloud_service_type: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_type.name,
-                referenceMap: store.getters['reference/cloudServiceTypeItems'],
-            },
             provider: {
                 type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
                 key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.idKey as string,
@@ -80,6 +77,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
                 referenceMap: store.getters['reference/regionItems'],
             },
+            cloud_service_type: cloudServiceTypeReferenceStore.getters.cloudServiceTypeTypeInfo,
             service_account: serviceAccountReferenceStore.getters.serviceAccountTypeInfo,
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             project: projectReferenceStore.getters.projectTypeInfo,

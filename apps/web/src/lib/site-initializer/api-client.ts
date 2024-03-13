@@ -10,8 +10,16 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 
 const getAfterCallApiMap = (store) => ({
-    '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
-    '/inventory/cloud-service-type/update': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
+    '/inventory/cloud-service-type/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('cloud_service_type', data);
+    },
+    '/inventory/cloud-service-type/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('cloud_service_type', data);
+    },
     '/inventory/collector/create': (data) => { store.dispatch('reference/collector/sync', data); },
     '/inventory/collector/update': (data) => { store.dispatch('reference/collector/sync', data); },
     '/repository/plugin/create': (data) => { store.dispatch('reference/plugin/sync', data); },
