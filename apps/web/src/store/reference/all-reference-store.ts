@@ -18,8 +18,8 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
-import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
@@ -28,16 +28,23 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 
 
 type PiniaStoreReferenceType =
-    'cost_data_source'
+    'cloud_service_type'
     |'cloud_service_query_set'
-    |'project'
+    |'collector'
+    |'cost_data_source'
+    |'plugin'
     |'project_group'
-    |'workspace'
-    |'user'
+    |'project'
+    |'protocol'
+    |'provider'
     |'public_dashboard'
-    |'webhook'
+    |'region'
+    |'secret'
+    |'service_account'
     |'trusted_account'
-    |'secret';
+    |'user'
+    |'webhook'
+    |'workspace';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
