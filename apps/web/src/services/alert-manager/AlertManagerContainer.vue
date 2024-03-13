@@ -13,7 +13,6 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
-import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { useAlertManagerSettingsStore } from '@/services/alert-manager/stores/alert-manager-settings-store';
@@ -24,7 +23,6 @@ export default {
         GeneralPageLayout,
     },
     setup() {
-        const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
         const alertManagerSettings = useAlertManagerSettingsStore();
         alertManagerSettings.initState();
@@ -42,9 +40,6 @@ export default {
             alertManagerSettings.$reset();
             alertManagerSettings.$dispose();
         });
-        return {
-            breadcrumbs,
-        };
     },
 };
 </script>

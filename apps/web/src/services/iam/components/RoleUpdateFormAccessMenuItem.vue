@@ -67,7 +67,8 @@ watch(() => props.menu.isAccessible, (isAccessible) => {
         <div class="right-part"
              :class="props.isSubMenu ? 'sub-menu' : 'menu'"
         >
-            <p-toggle-button :value="state.toggleState"
+            <p-toggle-button :disabled="props.menu.id === 'home-dashboard'"
+                             :value="state.toggleState"
                              @change-toggle="handleChangeToggle"
             />
         </div>
