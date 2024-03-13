@@ -9,6 +9,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -23,8 +24,7 @@ const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 
 const route = useRoute();
-
-watch(() => route.params, async (params) => {
+const setCostParams = async () => {
     // Case - Directly access Budget Page
     if (!costQuerySetState.selectedDataSourceId) {
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
@@ -46,11 +46,16 @@ watch(() => route.params, async (params) => {
     /*
     * Both parameters are set in the route. (beforeEnter navigation guard in routes.ts)
     * */
-    if (params.dataSourceId && params.costQuerySetId) {
-        costQuerySetStore.setSelectedDataSourceId(params.dataSourceId);
-        costQuerySetStore.setSelectedQuerySetId(params.costQuerySetId);
+    if (route.params.dataSourceId && route.params.costQuerySetId) {
+        costQuerySetStore.setSelectedDataSourceId(route.params.dataSourceId);
+        costQuerySetStore.setSelectedQuerySetId(route.params.costQuerySetId);
     }
     await costQuerySetStore.listCostQuerySets();
+};
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], setCostParams);
+
+watch(() => route.params, async () => {
+    await callApiWithGrantGuard();
 }, { immediate: true });
 
 costExplorerSettingsStore.initState();
