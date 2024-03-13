@@ -8,6 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
+// eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
 import type {
