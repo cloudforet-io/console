@@ -4,7 +4,6 @@ import type { CollectorReferenceMap } from '@/store/modules/reference/collector/
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { VuexStoreAllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
@@ -16,8 +15,6 @@ export const collectorItems: Getter<any, any> = (state): CollectorReferenceMap =
 export const pluginItems: Getter<any, any> = (state): PluginReferenceMap => state.plugin?.items ?? {};
 
 export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => state.provider?.items ?? {};
-
-export const regionItems: Getter<any, any> = (state): RegionReferenceMap => state.region?.items ?? {};
 
 export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStoreAllReferenceTypeInfo => ({
     protocol: {
@@ -38,10 +35,5 @@ export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStor
     provider: {
         ...REFERENCE_TYPE_INFO.provider,
         referenceMap: getters.providerItems,
-    },
-    //
-    region: {
-        ...REFERENCE_TYPE_INFO.region,
-        referenceMap: getters.regionItems,
     },
 });

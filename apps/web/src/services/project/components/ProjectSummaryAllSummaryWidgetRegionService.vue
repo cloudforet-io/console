@@ -21,7 +21,6 @@ import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -60,7 +59,6 @@ const state = reactive({
     loading: true,
     skeletons: range(3),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     data: [] as Data[],
     chart: null as null | any,
     chartRegistry: {},
@@ -194,7 +192,6 @@ onUnmounted(() => {
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
     ]);
     await getData();
 })();

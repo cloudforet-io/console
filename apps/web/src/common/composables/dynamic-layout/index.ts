@@ -95,7 +95,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Secret: computed(() => allReferenceStore.getters.secret),
         Collector: computed(() => store.getters['reference/collectorItems']),
         Provider: computed(() => store.getters['reference/providerItems']),
-        Region: computed(() => store.getters['reference/regionItems']),
+        Region: computed(() => allReferenceStore.getters.region),
         Plugin: computed(() => store.getters['reference/pluginItems']),
         User: computed(() => allReferenceStore.getters.user),
         Protocol: computed(() => store.getters['reference/protocolItems']),

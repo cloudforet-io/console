@@ -10,6 +10,7 @@ import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-s
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -50,6 +51,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const serviceAccountReferenceStore = useServiceAccountReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
+    const regionReferenceStore = useRegionReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -71,12 +73,6 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
                 referenceMap: store.getters['reference/providerItems'],
             },
-            region: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.region.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
-                referenceMap: store.getters['reference/regionItems'],
-            },
             cloud_service_type: cloudServiceTypeReferenceStore.getters.cloudServiceTypeTypeInfo,
             service_account: serviceAccountReferenceStore.getters.serviceAccountTypeInfo,
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
@@ -87,6 +83,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
             webhook: webhookReferenceStore.getters.webhookTypeInfo,
             secret: secretReferenceStore.getters.secretTypeInfo,
+            region: regionReferenceStore.getters.regionTypeInfo,
         })),
     });
 
