@@ -231,8 +231,10 @@ const refinedMenuList = (list, value) => {
     padding: 1rem 0.75rem;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     z-index: 51;
+    transition: width 0.3s ease;
     .navigation-rail-wrapper {
-        width: 100%;
+        width: calc($gnb-navigation-rail-max-width - 1.625rem);
+        transition: width 0.3s ease;
         .service-menu {
             @apply flex items-center justify-between text-label-md;
             width: 100%;
