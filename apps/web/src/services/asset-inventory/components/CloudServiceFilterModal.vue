@@ -220,7 +220,6 @@ export default defineComponent<Props>({
         (async () => {
             await Promise.allSettled([
                 store.dispatch('reference/provider/load'),
-                store.dispatch('reference/region/load'),
             ]);
         })();
 

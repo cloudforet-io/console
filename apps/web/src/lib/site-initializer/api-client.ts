@@ -68,8 +68,16 @@ const getAfterCallApiMap = (store) => ({
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/identity/provider/create': (data) => { store.dispatch('reference/provider/sync', data); },
     '/identity/provider/update': (data) => { store.dispatch('reference/provider/sync', data); },
-    '/inventory/region/create': (data) => { store.dispatch('reference/region/sync', data); },
-    '/inventory/region/update': (data) => { store.dispatch('reference/region/sync', data); },
+    '/inventory/region/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('region', data);
+    },
+    '/inventory/region/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('region', data);
+    },
     '/secret/secret/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();

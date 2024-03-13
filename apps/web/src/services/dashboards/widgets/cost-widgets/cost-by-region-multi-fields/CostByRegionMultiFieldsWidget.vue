@@ -16,7 +16,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';

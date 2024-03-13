@@ -48,7 +48,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'inventory.Region': (data) => ({
-        data: store.getters['reference/regionItems'][data]?.label || data,
+        data: allReferenceStore.getters.region[data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
         options: {

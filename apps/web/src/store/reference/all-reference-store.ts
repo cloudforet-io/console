@@ -18,6 +18,7 @@ import { useProjectGroupReferenceStore } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
+import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
@@ -60,6 +61,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const webhookReferenceStore = useWebhookReferenceStore();
     const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
+    const regionReferenceStore = useRegionReferenceStore();
 
     const getters = reactive({
         cloudServiceType: computed(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
@@ -74,6 +76,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
         secret: computed(() => secretReferenceStore.getters.secretItems),
+        region: computed(() => regionReferenceStore.getters.regionItems),
     });
 
     const actions = {
@@ -99,6 +102,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await trustedAccountReferenceStore.sync(data); break;
             case 'secret':
                 await secretReferenceStore.sync(data); break;
+            case 'region':
+                await regionReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -128,6 +133,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await trustedAccountReferenceStore.load(options); break;
             case 'secret':
                 await secretReferenceStore.load(options); break;
+            case 'region':
+                await regionReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -144,6 +151,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             webhookReferenceStore.flush();
             trustedAccountReferenceStore.flush();
             secretReferenceStore.flush();
+            regionReferenceStore.flush();
         },
     };
 

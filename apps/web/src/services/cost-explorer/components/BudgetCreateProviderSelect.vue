@@ -18,14 +18,13 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-
 
 
 type ProviderFilter = BudgetModel['provider_filter'];
@@ -39,7 +38,6 @@ interface DistinctResult {
     results?: {name: string; key: string}[];
     total_count?: number;
 }
-const allReferenceStore = useAllReferenceStore();
 
 const getSearchDropdownItems = (resourceItems: ReferenceMap): SelectDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
     name: k, label: resourceItems[k].label,
@@ -70,9 +68,10 @@ const {
     },
 }, { selectedCostType: true, selectedResources: true });
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     costTypeItems: computed(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
@@ -138,7 +137,6 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
     ]);
 })();
 

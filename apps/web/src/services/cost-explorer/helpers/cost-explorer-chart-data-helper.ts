@@ -61,7 +61,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnal
         const _providers = store.getters['reference/providerItems'];
         const _serviceAccounts = allReferenceStore.getters.serviceAccount;
         const _projects = allReferenceStore.getters.project;
-        const _regions = store.getters['reference/regionItems'];
+        const _regions = allReferenceStore.getters.region;
         const _workspaces = allReferenceStore.getters.workspace;
 
         const legends: Legend[] = [];
