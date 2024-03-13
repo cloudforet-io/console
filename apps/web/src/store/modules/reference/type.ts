@@ -30,8 +30,7 @@ export type VuexStoreReferenceType =
     |'serviceAccount'|'service_account'
     |'collector'
     |'protocol'
-    |'plugin'
-    |'secret';
+    |'plugin';
 
 interface VuexStoreReferenceTypeInfo {
     type: VuexStoreReferenceType;

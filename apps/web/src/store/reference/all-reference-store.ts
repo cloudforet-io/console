@@ -17,6 +17,7 @@ import { useProjectGroupReferenceStore } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
+import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
@@ -34,7 +35,8 @@ type PiniaStoreReferenceType =
     |'user'
     |'public_dashboard'
     |'webhook'
-    |'trusted_account';
+    |'trusted_account'
+    |'secret';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
@@ -46,6 +48,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
     const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
+    const secretReferenceStore = useSecretReferenceStore();
 
     const getters = reactive({
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
@@ -57,6 +60,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
+        secret: computed(() => secretReferenceStore.getters.secretItems),
     });
 
     const actions = {
@@ -76,6 +80,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await webhookReferenceStore.sync(data); break;
             case 'trusted_account':
                 await trustedAccountReferenceStore.sync(data); break;
+            case 'secret':
+                await secretReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -99,6 +105,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await webhookReferenceStore.load(options); break;
             case 'trusted_account':
                 await trustedAccountReferenceStore.load(options); break;
+            case 'secret':
+                await secretReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -112,6 +120,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             publicDashboardReferenceStore.flush();
             webhookReferenceStore.flush();
             trustedAccountReferenceStore.flush();
+            secretReferenceStore.flush();
         },
     };
 

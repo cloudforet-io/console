@@ -9,6 +9,7 @@ import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-s
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
@@ -43,6 +44,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
+    const secretReferenceStore = useSecretReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -76,12 +78,6 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
                 referenceMap: store.getters['reference/regionItems'],
             },
-            secret: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.secret.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.secret.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.secret.name,
-                referenceMap: store.getters['reference/secretItems'],
-            },
             service_account: {
                 type: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
                 key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.idKey as string,
@@ -95,6 +91,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             cloud_service_query_set: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
             webhook: webhookReferenceStore.getters.webhookTypeInfo,
+            secret: secretReferenceStore.getters.secretTypeInfo,
         })),
     });
 

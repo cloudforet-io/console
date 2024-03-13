@@ -62,8 +62,16 @@ const getAfterCallApiMap = (store) => ({
     '/identity/provider/update': (data) => { store.dispatch('reference/provider/sync', data); },
     '/inventory/region/create': (data) => { store.dispatch('reference/region/sync', data); },
     '/inventory/region/update': (data) => { store.dispatch('reference/region/sync', data); },
-    '/secret/secret/create': (data) => { store.dispatch('reference/secret/sync', data); },
-    '/secret/secret/update': (data) => { store.dispatch('reference/secret/sync', data); },
+    '/secret/secret/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('secret', data);
+    },
+    '/secret/secret/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('secret', data);
+    },
     '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
     '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
     '/identity/user/create': (data) => {
