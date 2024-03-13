@@ -70,7 +70,7 @@ const state = reactive<State>({
     mode: 'READ',
     isFormValid: undefined,
     // baseInformationSchema: {},
-    baseInformationSchema: computed(() => serviceAccountSchemaStore.getters.generalAccountSchema),
+    baseInformationSchema: computed(() => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema)),
     baseInformationForm: {},
     originBaseInformationForm: computed(() => ({
         accountName: props.serviceAccountData?.name,
