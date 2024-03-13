@@ -19,8 +19,9 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -38,6 +39,7 @@ interface DistinctResult {
     results?: {name: string; key: string}[];
     total_count?: number;
 }
+const allReferenceStore = useAllReferenceStore();
 
 const getSearchDropdownItems = (resourceItems: ReferenceMap): SelectDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
     name: k, label: resourceItems[k].label,
@@ -71,7 +73,7 @@ const {
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     costTypeItems: computed(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
@@ -137,7 +139,6 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
         store.dispatch('reference/region/load'),
-        store.dispatch('reference/serviceAccount/load'),
     ]);
 })();
 

@@ -10,6 +10,7 @@ import plugin from './plugin';
 import protocol from './protocol';
 import provider from './provider';
 import region from './region';
+import secret from './secret';
 import serviceAccount from './service-account';
 
 // TODO: This is a temporary state. It must be changed to check each modules' items state is null.
@@ -24,7 +25,6 @@ export default {
     actions,
     getters,
     modules: {
-        serviceAccount,
         cloudServiceType,
         collector,
         provider,

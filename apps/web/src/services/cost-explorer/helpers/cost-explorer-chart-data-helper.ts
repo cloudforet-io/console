@@ -59,7 +59,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnal
             _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
         }
         const _providers = store.getters['reference/providerItems'];
-        const _serviceAccounts = store.getters['reference/serviceAccountItems'];
+        const _serviceAccounts = allReferenceStore.getters.serviceAccount;
         const _projects = allReferenceStore.getters.project;
         const _regions = store.getters['reference/regionItems'];
         const _workspaces = allReferenceStore.getters.workspace;

@@ -42,7 +42,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'identity.ServiceAccount': (data, reference) => ({
-        data: store.getters['reference/serviceAccountItems'][data]?.label || data,
+        data: allReferenceStore.getters.serviceAccount[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },

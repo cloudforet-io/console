@@ -86,9 +86,9 @@ import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-ser
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -141,7 +141,7 @@ export default {
         const storeState = reactive({
             projects: computed(() => allReferenceStore.getters.project),
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
         const handlerState = reactive({
@@ -237,7 +237,7 @@ export default {
         let urlQueryStringWatcherStop;
         const init = async () => {
             /* load references */
-            await Promise.allSettled([store.dispatch('reference/provider/load'), store.dispatch('reference/serviceAccount/load')]);
+            await Promise.allSettled([store.dispatch('reference/provider/load')]);
 
             /* init states from url query */
             const currentQuery = SpaceRouter.router.currentRoute.query;
@@ -255,11 +255,6 @@ export default {
                 _state.period = urlQueryValue.period;
                 _state.searchFilters = searchQueryHelper.filters as ConsoleFilter[];
             });
-
-            // LOAD REFERENCE STORE
-            await Promise.allSettled([
-                store.dispatch('reference/serviceAccount/load'),
-            ]);
 
             /* register urlQueryString watcher after initiating states from url query */
             urlQueryStringWatcherStop = watch(() => state.urlQueryString, (urlQueryString) => {

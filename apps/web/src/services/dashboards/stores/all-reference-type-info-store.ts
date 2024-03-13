@@ -10,6 +10,7 @@ import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-sou
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
+import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
@@ -43,6 +44,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
+    const serviceAccountReferenceStore = useServiceAccountReferenceStore();
     const webhookReferenceStore = useWebhookReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
 
@@ -78,12 +80,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
                 referenceMap: store.getters['reference/regionItems'],
             },
-            service_account: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
-                referenceMap: store.getters['reference/serviceAccountItems'],
-            },
+            service_account: serviceAccountReferenceStore.getters.serviceAccountTypeInfo,
             project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             project: projectReferenceStore.getters.projectTypeInfo,
             user: userReferenceStore.getters.userTypeInfo,
