@@ -22,9 +22,9 @@ import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -80,7 +80,7 @@ const emit = defineEmits<{(e: 'select', array): void}>();
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     workspaces: computed(() => allReferenceStore.getters.workspace),
 });
@@ -219,11 +219,6 @@ onActivated(async () => {
 onDeactivated(() => {
     if (stopSelectStatusWatch) stopSelectStatusWatch();
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/serviceAccount/load');
-})();
 </script>
 
 <template>

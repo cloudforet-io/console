@@ -1,7 +1,8 @@
 import { groupBy, sum } from 'lodash';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
+
 
 interface ContinentInfo {
     continent_code: string;

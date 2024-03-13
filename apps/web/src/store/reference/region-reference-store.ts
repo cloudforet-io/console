@@ -8,9 +8,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
+// eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
-import { RegionMap } from '@/store/modules/reference/region/config';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/modules/reference/type';
@@ -20,9 +20,48 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
+const RegionMap = {
+    africa: {
+        continent_code: 'africa',
+        continent_label: 'Africa',
+        latitude: 11.081385,
+        longitude: 21.621094,
+    },
+    europe: {
+        continent_code: 'europe',
+        continent_label: 'Europe',
+        latitude: 50.896104,
+        longitude: 19.160156,
+    },
+    north_america: {
+        continent_code: 'north_america',
+        continent_label: 'North America',
+        latitude: 39.563353,
+        longitude: -99.316406,
+    },
+    south_america: {
+        continent_code: 'south_america',
+        continent_label: 'South America',
+        latitude: -13.6631791,
+        longitude: -69.6417454,
+    },
+    asia_pacific: {
+        continent_code: 'asia_pacific',
+        continent_label: 'Asia Pacific',
+        longitude: 103.183594,
+        latitude: 47.212106,
+    },
+    middle_east: {
+        continent_code: 'middle_east',
+        continent_label: 'Middle East',
+        longitude: 26.3842897,
+        latitude: 26.8448363,
+    },
+};
+
 type PickedRegionModel = Pick<RegionModel, 'provider'>;
-export type RegionItem = Required<Pick<ReferenceItem<PickedRegionModel>, 'key'|'label'|'name'|'continent'|'data'>>;
-export type RegionReferenceMap = ReferenceMap<RegionItem>;
+export type RegionReferenceItem = Required<Pick<ReferenceItem<PickedRegionModel>, 'key'|'label'|'name'|'continent'|'data'>>;
+export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;

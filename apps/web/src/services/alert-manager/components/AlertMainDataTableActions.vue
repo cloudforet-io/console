@@ -17,9 +17,9 @@ import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -73,7 +73,7 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+    webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     selectedItemsState: computed(() => props.selectedItems.map((selectedItem) => selectedItem.state)),
     isSelectedNone: computed(() => props.selectedItems.length === 0),
     isSelectedOne: computed(() => props.selectedItems.length === 1),
@@ -155,14 +155,6 @@ const onConfirmResolve = () => {
     emit('refresh');
     projectDetailPageStore.getAlertCounts();
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/webhook/load'),
-    ]);
-})();
-
 </script>
 
 <template>

@@ -8,6 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
 import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+// eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
 import type {

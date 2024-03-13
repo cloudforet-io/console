@@ -11,8 +11,9 @@ import type {
 import type { CollectorOptions } from '@/schema/inventory/collector/type';
 import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
 import type { PluginModel } from '@/schema/repository/plugin/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -119,8 +120,8 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         async resetAttachedServiceAccount() {
-            await store.dispatch('reference/serviceAccount/load');
-            const accountItems = store.getters['reference/serviceAccountItems'];
+            const allReferenceStore = useAllReferenceStore();
+            const accountItems = allReferenceStore.getters.serviceAccount;
             const secretFilter = this.originCollector?.secret_filter;
             const attachedServiceAccount = this.selectedServiceAccountFilterOption === 'include' ? secretFilter?.service_accounts : secretFilter?.exclude_service_accounts;
             this.attachedServiceAccount = (attachedServiceAccount ?? []).map((d) => ({

@@ -8,7 +8,7 @@ import {
     PTab, screens, PLazyImg,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
@@ -30,6 +30,8 @@ interface Props {
     isFocused: boolean;
     focusingDirection: string;
 }
+
+const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<Props>(), {
     isFocused: false,
@@ -58,7 +60,7 @@ const getTabHeaderHeight = () => {
 
 const storeState = reactive({
     activeTab: computed(() => topBarSearchStore.state.activeTab),
-    cloudServiceTypeMap: computed(() => store.state.reference.cloudServiceType.items),
+    cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
 });
 
 const state = reactive({

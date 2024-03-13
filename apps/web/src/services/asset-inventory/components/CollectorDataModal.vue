@@ -50,6 +50,7 @@ import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -66,6 +67,7 @@ import {
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -87,7 +89,7 @@ const state = reactive({
         }
         return recentJob.status === JOB_STATE.IN_PROGRESS;
     }),
-    serviceAccountReferenceMap: computed(() => store.state.reference.serviceAccount.items),
+    serviceAccountReferenceMap: computed(() => allReferenceStore.getters.serviceAccount),
     provider: computed(() => {
         const selectedCollector = collectorDataModalState.selectedCollector;
         return selectedCollector?.provider ? storeState.providers[selectedCollector.provider] : undefined;
