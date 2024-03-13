@@ -6,10 +6,8 @@ import {
 
 import { PI, screens, PTooltip } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import TopBarSearchDropdown from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/TopBarSearchDropdown.vue';
 import TopBarSearchInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchInput.vue';
 import TopBarSearchMobileInput from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/TopBarSearchMobileInput.vue';
@@ -90,15 +88,6 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('keydown', handleKeyDown);
 });
-
-/* Init */
-const init = async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/cloudServiceType/load'),
-    ]);
-};
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], init);
-callApiWithGrantGuard();
 
 </script>
 

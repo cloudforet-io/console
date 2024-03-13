@@ -19,9 +19,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -30,6 +31,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 
 enum EVENT_CATEGORY {
@@ -47,18 +49,20 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
+const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
+const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
     loading: false,
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     timezone: computed(() => store.state.user.timezone),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     pageStart: 1,
     pageLimit: 5,
@@ -117,7 +121,6 @@ const tabState = reactive({
 });
 
 /* util */
-const regionFormatter = (val) => state.regions[val]?.name || val;
 const summaryLinkFormatter = (category) => {
     const filters: ConsoleFilter[] = [];
     const status = ['open'];
@@ -203,8 +206,6 @@ watch(() => tabState.activeTab, () => {
 (async () => {
     await Promise.allSettled([
         getEvents(), getCount(),
-        store.dispatch('reference/region/load'),
-        store.dispatch('reference/cloudServiceType/load'),
         store.dispatch('reference/provider/load'),
     ]);
 })();
@@ -260,7 +261,7 @@ watch(() => tabState.activeTab, () => {
                         </p-link>
                     </template>
                     <template #col-region_code-format="{ value }">
-                        <span>{{ regionFormatter(value) }}</span>
+                        <span>{{ state.regions[value]?.name || value }}</span>
                     </template>
                     <template #col-start_time-format="{ value }">
                         <span>{{ value }}</span>

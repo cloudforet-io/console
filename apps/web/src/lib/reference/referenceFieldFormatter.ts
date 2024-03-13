@@ -42,13 +42,13 @@ const formatterMap: FormatterMap = {
         },
     }),
     'identity.ServiceAccount': (data, reference) => ({
-        data: store.getters['reference/serviceAccountItems'][data]?.label || data,
+        data: allReferenceStore.getters.serviceAccount[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'inventory.Region': (data) => ({
-        data: store.getters['reference/regionItems'][data]?.label || data,
+        data: allReferenceStore.getters.region[data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
         options: {
@@ -56,7 +56,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'secret.Secret': (data) => ({
-        data: store.getters['reference/secretItems'][data]?.label || data,
+        data: allReferenceStore.getters.secret[data]?.label || data,
     }),
 };
 

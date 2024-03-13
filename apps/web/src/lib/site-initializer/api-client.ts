@@ -10,8 +10,16 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 
 const getAfterCallApiMap = (store) => ({
-    '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
-    '/inventory/cloud-service-type/update': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
+    '/inventory/cloud-service-type/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('cloud_service_type', data);
+    },
+    '/inventory/cloud-service-type/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('cloud_service_type', data);
+    },
     '/inventory/collector/create': (data) => { store.dispatch('reference/collector/sync', data); },
     '/inventory/collector/update': (data) => { store.dispatch('reference/collector/sync', data); },
     '/repository/plugin/create': (data) => { store.dispatch('reference/plugin/sync', data); },
@@ -60,12 +68,36 @@ const getAfterCallApiMap = (store) => ({
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/identity/provider/create': (data) => { store.dispatch('reference/provider/sync', data); },
     '/identity/provider/update': (data) => { store.dispatch('reference/provider/sync', data); },
-    '/inventory/region/create': (data) => { store.dispatch('reference/region/sync', data); },
-    '/inventory/region/update': (data) => { store.dispatch('reference/region/sync', data); },
-    '/secret/secret/create': (data) => { store.dispatch('reference/secret/sync', data); },
-    '/secret/secret/update': (data) => { store.dispatch('reference/secret/sync', data); },
-    '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-    '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
+    '/inventory/region/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('region', data);
+    },
+    '/inventory/region/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('region', data);
+    },
+    '/secret/secret/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('secret', data);
+    },
+    '/secret/secret/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('secret', data);
+    },
+    '/identity/service-account/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service_account', data);
+    },
+    '/identity/service-account/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('service_account', data);
+    },
     '/identity/user/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
@@ -76,8 +108,16 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('user', data);
     },
-    '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
-    '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
+    '/monitoring/webhook/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
+    },
+    '/monitoring/webhook/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('webhook', data);
+    },
     '/dashboard/public-dashboard/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();

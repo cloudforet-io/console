@@ -8,8 +8,6 @@ import {
     PI, PTooltip,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import TopBarFavoriteContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
@@ -43,13 +41,6 @@ const showRecentFavoriteMenu = () => {
 const handleRecentFavoriteButtonClick = () => {
     setVisible(!props.visible);
 };
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/cloudServiceType/load'),
-    ]);
-})();
 </script>
 
 <template>

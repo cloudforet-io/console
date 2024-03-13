@@ -113,9 +113,9 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -126,6 +126,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 
 import { yellow } from '@/styles/colors';
+
 
 const EVENT_PERIOD = 7;
 
@@ -154,7 +155,7 @@ export default {
 
         const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             favoriteProjects: computed(() => favoriteGetters.projectItems),
         });
@@ -216,10 +217,7 @@ export default {
 
 
         const init = async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/region/load'),
-                await getData(),
-            ]);
+            await getData();
         };
 
         const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);

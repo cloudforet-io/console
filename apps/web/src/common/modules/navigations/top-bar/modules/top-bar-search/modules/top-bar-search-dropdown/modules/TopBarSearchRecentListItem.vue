@@ -7,8 +7,6 @@ import {
     PI, PLazyImg, PTooltip,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
@@ -32,9 +30,9 @@ const storeState = reactive({
     workspaceMap: computed(() => topBarSearchStore.storeState.workspaceMap),
     currentWorkspaceId: computed(() => topBarSearchStore.storeState.currentWorkspaceId),
     activeTab: computed(() => topBarSearchStore.state.activeTab),
-    serviceAccountMap: computed(() => store.state.reference.serviceAccount.items),
+    serviceAccountMap: computed(() => allReferenceStore.getters.serviceAccount),
     projectMap: computed(() => allReferenceStore.getters.project),
-    cloudServiceTypeMap: computed(() => store.state.reference.cloudServiceType.items),
+    cloudServiceTypeMap: computed(() => allReferenceStore.getters.cloudServiceType),
     publicDashboardMap: computed(() => allReferenceStore.getters.publicDashboard),
 });
 

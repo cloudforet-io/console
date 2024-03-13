@@ -18,7 +18,8 @@ import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-consta
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -51,6 +52,7 @@ const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
     data: null as FullData | null,
@@ -74,7 +76,7 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
 });
 
 const chartContext = ref<HTMLElement|null>(null);

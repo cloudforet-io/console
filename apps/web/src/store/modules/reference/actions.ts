@@ -7,14 +7,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     commit('setIsAllLoaded', false);
     await Promise.allSettled([
-        dispatch('cloudServiceType/load', options),
         dispatch('collector/load', options),
         dispatch('plugin/load', options),
         dispatch('protocol/load', options),
         dispatch('provider/load', options),
-        dispatch('region/load', options),
-        dispatch('secret/load', options),
-        dispatch('serviceAccount/load', options),
     ]);
     commit('setIsAllLoaded', true);
 };
