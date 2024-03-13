@@ -8,9 +8,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 import type { VuexStoreAllReferenceTypeInfo } from '@/store/modules/reference/type';
-import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
@@ -29,10 +27,6 @@ export const regionItems: Getter<any, any> = (state): RegionReferenceMap => stat
 export const secretItems: Getter<any, any> = (state): SecretReferenceMap => state.secret?.items ?? {};
 
 export const serviceAccountItems: Getter<any, any> = (state): ServiceAccountReferenceMap => state.serviceAccount?.items ?? {};
-
-export const trustedAccountItems: Getter<any, any> = (state): TrustedAccountReferenceMap => state.trustedAccount?.items ?? {};
-
-export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => state.webhook?.items ?? {};
 
 export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStoreAllReferenceTypeInfo => ({
     protocol: {
@@ -78,17 +72,8 @@ export const allReferenceTypeInfo: Getter<any, any> = (state, getters): VuexStor
         ...REFERENCE_TYPE_INFO.service_account,
         referenceMap: getters.serviceAccountItems,
     },
-    trustedAccount: {
-        ...REFERENCE_TYPE_INFO.trusted_account,
-        referenceMap: getters.trustedAccountItems,
-    },
     service_account: {
         ...REFERENCE_TYPE_INFO.service_account,
         referenceMap: getters.serviceAccountItems,
-    },
-    //
-    webhook: {
-        ...REFERENCE_TYPE_INFO.webhook,
-        referenceMap: getters.webhookItems,
     },
 });

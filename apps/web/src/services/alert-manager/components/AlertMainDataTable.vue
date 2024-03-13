@@ -23,10 +23,10 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants'
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 
-import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -86,7 +86,7 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+    webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
 });
 
 /* Search Tags */
@@ -113,7 +113,7 @@ const queryTagsHelper = useQueryTags({
     }),
     referenceStore: {
         'identity.Project': computed(() => allReferenceStore.getters.project),
-        'monitoring.Webhook': computed(() => store.getters['reference/webhookItems']),
+        'monitoring.Webhook': computed(() => allReferenceStore.getters.webhook),
     },
 });
 const { keyItemSets } = queryTagsHelper;
@@ -308,13 +308,6 @@ onActivated(() => {
 if (!props.keepAlive) {
     initPage();
 }
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/webhook/load'),
-    ]);
-})();
 </script>
 
 <template>

@@ -28,12 +28,10 @@ export type VuexStoreReferenceType =
     |'provider'
     |'region'
     |'serviceAccount'|'service_account'
-    |'trustedAccount'
     |'collector'
     |'protocol'
     |'plugin'
-    |'secret'
-    |'webhook';
+    |'secret';
 
 interface VuexStoreReferenceTypeInfo {
     type: VuexStoreReferenceType;

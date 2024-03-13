@@ -17,12 +17,24 @@ import { useProjectGroupReferenceStore } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
+import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+
+type PiniaStoreReferenceType =
+    'cost_data_source'
+    |'cloud_service_query_set'
+    |'project'
+    |'project_group'
+    |'workspace'
+    |'user'
+    |'public_dashboard'
+    |'webhook'
+    |'trusted_account';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
@@ -32,6 +44,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
+    const webhookReferenceStore = useWebhookReferenceStore();
+    const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
 
     const getters = reactive({
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
@@ -41,37 +55,51 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
+        webhook: computed(() => webhookReferenceStore.getters.webhookItems),
+        trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
     });
 
     const actions = {
-        async sync(type: ManagedVariableModelKey|'public_dashboard', data?: any) {
-            if (type === 'project') {
-                await projectReferenceStore.sync(data);
-            } else if (type === 'project_group') {
-                await projectGroupReferenceStore.sync(data);
-            } else if (type === 'workspace') {
-                await workspaceReferenceStore.sync(data);
-            } else if (type === 'user') {
-                await userReferenceStore.sync(data);
-            } else if (type === 'public_dashboard') {
-                await publicDashboardReferenceStore.sync(data);
+        async sync(type: PiniaStoreReferenceType, data?: any) {
+            switch (type) {
+            case 'project':
+                await projectReferenceStore.sync(data); break;
+            case 'project_group':
+                await projectGroupReferenceStore.sync(data); break;
+            case 'workspace':
+                await workspaceReferenceStore.sync(data); break;
+            case 'user':
+                await userReferenceStore.sync(data); break;
+            case 'public_dashboard':
+                await publicDashboardReferenceStore.sync(data); break;
+            case 'webhook':
+                await webhookReferenceStore.sync(data); break;
+            case 'trusted_account':
+                await trustedAccountReferenceStore.sync(data); break;
+            default: break;
             }
         },
-        async load(type: ManagedVariableModelKey|'public_dashboard', options?: ReferenceLoadOptions) {
-            if (type === 'cost_data_source') {
-                await costDataSourceReferenceStore.load(options);
-            } else if (type === 'cloud_service_query_set') {
-                await cloudServiceQuerySetReferenceStore.load(options);
-            } else if (type === 'project') {
-                await projectReferenceStore.load(options);
-            } else if (type === 'project_group') {
-                await projectGroupReferenceStore.load(options);
-            } else if (type === 'workspace') {
-                await workspaceReferenceStore.load(options);
-            } else if (type === 'user') {
-                await userReferenceStore.load(options);
-            } else if (type === 'public_dashboard') {
-                await publicDashboardReferenceStore.load(options);
+        async load(type: PiniaStoreReferenceType, options?: ReferenceLoadOptions) {
+            switch (type) {
+            case 'cost_data_source':
+                await costDataSourceReferenceStore.load(options); break;
+            case 'cloud_service_query_set':
+                await cloudServiceQuerySetReferenceStore.load(options); break;
+            case 'project':
+                await projectReferenceStore.load(options); break;
+            case 'project_group':
+                await projectGroupReferenceStore.load(options); break;
+            case 'workspace':
+                await workspaceReferenceStore.load(options); break;
+            case 'user':
+                await userReferenceStore.load(options); break;
+            case 'public_dashboard':
+                await publicDashboardReferenceStore.load(options); break;
+            case 'webhook':
+                await webhookReferenceStore.load(options); break;
+            case 'trusted_account':
+                await trustedAccountReferenceStore.load(options); break;
+            default: break;
             }
         },
         flush() {
@@ -82,6 +110,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             workspaceReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();
+            webhookReferenceStore.flush();
+            trustedAccountReferenceStore.flush();
         },
     };
 

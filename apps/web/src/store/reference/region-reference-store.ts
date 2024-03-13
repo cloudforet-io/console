@@ -8,6 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
 import type { RegionModel } from '@/schema/inventory/region/model';
+// eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
 import { RegionMap } from '@/store/modules/reference/region/config';
