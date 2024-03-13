@@ -58,7 +58,6 @@ onActivated(() => {
 // reference store
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/collector/load'),
         store.dispatch('reference/plugin/load'),
     ]);
 })();
