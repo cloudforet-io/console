@@ -5,12 +5,11 @@ import {
 import type { ComputedRef } from 'vue';
 
 import type { SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { KeyItem, KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler, makeCloudServiceTagValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
@@ -100,7 +99,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Plugin: computed(() => store.getters['reference/pluginItems']),
         User: computed(() => allReferenceStore.getters.user),
         Protocol: computed(() => store.getters['reference/protocolItems']),
-        Webhook: computed(() => store.getters['reference/webhookItems']),
+        Webhook: computed(() => allReferenceStore.getters.webhook),
     });
 
     const state = reactive({

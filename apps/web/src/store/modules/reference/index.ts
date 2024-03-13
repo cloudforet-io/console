@@ -13,7 +13,6 @@ import region from './region';
 import secret from './secret';
 import serviceAccount from './service-account';
 import trustedAccount from './trusted-account';
-import webhook from './webhook';
 
 // TODO: This is a temporary state. It must be changed to check each modules' items state is null.
 const state: ReferenceRootState = {
@@ -36,6 +35,5 @@ export default {
         region,
         plugin,
         protocol,
-        webhook,
     },
 };

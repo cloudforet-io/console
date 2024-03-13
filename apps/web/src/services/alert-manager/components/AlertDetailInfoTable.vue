@@ -17,9 +17,9 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import type { WebhookReferenceMap } from '@/store/reference/webhook-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -87,7 +87,7 @@ const state = reactive({
         { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
     ]),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+    webhooks: computed<WebhookReferenceMap>(() => allReferenceStore.getters.webhook),
     data: computed(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
     timezone: computed(() => store.state.user.timezone),
@@ -110,7 +110,6 @@ const getEscalationPolicy = async () => {
 (async () => {
     await Promise.allSettled([
         getEscalationPolicy(),
-        store.dispatch('reference/webhook/load'),
     ]);
 })();
 

@@ -15,7 +15,6 @@ export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commi
         dispatch('region/load', options),
         dispatch('secret/load', options),
         dispatch('serviceAccount/load', options),
-        dispatch('webhook/load', options),
     ]);
     commit('setIsAllLoaded', true);
 };
