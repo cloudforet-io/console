@@ -239,7 +239,7 @@ const postResetPassword = async (request) => {
     state.loading = true;
     try {
         const userInfo = await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
-        await store.dispatch('user/setUser', userInfo);
+        await store.commit('user/setUser', userInfo);
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
@@ -262,7 +262,7 @@ const initStatesByUrlSSOToken = async () => {
         state.userInfo.userId = userId;
         state.userInfo.email = userId;
 
-        await store.dispatch('user/setUser', state.userInfo);
+        await store.commit('user/setUser', state.userInfo);
     } catch (e: any) {
         if (e.message.includes('Invalid token')) {
             ErrorHandler.handleError('Invalid token.');
