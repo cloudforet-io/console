@@ -77,6 +77,7 @@ const state = reactive({
         id: storeState.groupId,
     })),
     projectGroupMemberManagementModalVisible: false,
+    projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
 });
 
 const {
@@ -170,12 +171,16 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                 <div v-if="projectPageState.isWorkspaceOwner"
                      class="top-button-box"
                 >
-                    <p-button style-type="tertiary"
+                    <p-button v-if="storeState.groupId"
+                              style-type="tertiary"
                               icon-left="ic_member"
                               class="mr-4"
                               @click="handleClickAddProjectGroupMember"
                     >
-                        Group Member
+                        <span>{{ $t('PROJECT.LANDING.GROUP_MEMBER') }}</span>
+                        <span v-if="state.projectGroupMemberCount"
+                              class="pl-1"
+                        >({{ state.projectGroupMemberCount }})</span>
                     </p-button>
                     <p-button ref="targetRef"
                               icon-left="ic_plus_bold"
