@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

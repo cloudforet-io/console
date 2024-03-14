@@ -2,7 +2,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ReferenceTypeInfo } from '@/store/modules/reference/type';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
@@ -15,6 +14,7 @@ import { useProviderReferenceStore } from '@/store/reference/provider-reference-
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import type { ReferenceTypeInfo } from '@/store/reference/type';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';

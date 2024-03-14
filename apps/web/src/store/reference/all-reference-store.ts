@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import type { CloudServiceQuerySetReferenceMap } from '@/store/reference/cloue-service-query-set-reference-store';
@@ -28,6 +27,7 @@ import { useRegionReferenceStore } from '@/store/reference/region-reference-stor
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
+import type { ReferenceLoadOptions } from '@/store/reference/type';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';

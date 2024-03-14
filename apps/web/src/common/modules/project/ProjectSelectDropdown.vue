@@ -8,10 +8,10 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import { SpaceRouter } from '@/router';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
