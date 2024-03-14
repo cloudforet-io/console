@@ -58,7 +58,6 @@ const state = reactive({
         });
         return items;
     }),
-    existingMemberList: [] as string[],
     searchText: '',
 });
 const {
@@ -122,7 +121,6 @@ const handleConfirm = async () => {
 
 /* Init */
 (async () => {
-    // initForm();
     await Promise.allSettled([
         fetchWorkspaceUsers(),
         getProjectUserData(),
