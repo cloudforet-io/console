@@ -50,10 +50,11 @@
                                               class="project-name"
                                         >
                                             <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite"
-                                                 name="ic_favorite"
+                                                 name="ic_favorite-filled"
                                                  class="favorite-icon"
                                                  width="0.625rem"
                                                  height="0.625rem"
+                                                 :color="yellow[500]"
                                             />
                                             <span>{{ projectSummaryData[colNum * thisPage - 1].projectName }}</span>
                                         </span>
@@ -114,23 +115,23 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+
+import { yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import TrustedAdvisorOverall from '@/services/home-dashboard/components/TrustedAdvisorOverall.vue';
-
 
 enum STATUS {
     error = 'error',
@@ -176,9 +177,12 @@ export default {
         const queryHelper = new QueryHelper();
         const allReferenceStore = useAllReferenceStore();
         const userWorkspaceStore = useUserWorkspaceStore();
+        const favoriteStore = useFavoriteStore();
+        const favoriteGetters = favoriteStore.getters;
+
         const storeState = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+            favoriteProjects: computed<FavoriteItem[]>(() => favoriteGetters.projectItems),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
         });
         const state = reactive({
@@ -280,7 +284,7 @@ export default {
                         projectName: projects[projectId]?.name,
                         tooltipText: projects[projectId]?.label,
                         counts,
-                        isFavorite: !!find(storeState.favoriteProjects, { itemId: projectId }),
+                        isFavorite: !!find(storeState.favoriteProjects, { id: projectId }),
                     });
                 });
                 state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
@@ -293,12 +297,7 @@ export default {
         };
 
         const asyncInit = async () => {
-            await Promise.allSettled([
-                store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/provider/load'),
-                getProjectSummary(allReferenceStore.getters.project),
-            ]);
+            await getProjectSummary(allReferenceStore.getters.project);
         };
         const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], asyncInit);
         callApiWithGrantGuard();
@@ -312,6 +311,7 @@ export default {
             getProjectBoxStatus,
             getProjectBoxCount,
             projectSummaryLinkFormatter,
+            yellow,
         };
     },
 };

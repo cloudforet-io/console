@@ -66,11 +66,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
@@ -120,8 +120,10 @@ export default {
     },
     setup(props) {
         const userWorkspaceStore = useUserWorkspaceStore();
+        const allReferenceStore = useAllReferenceStore();
+
         const storeState = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
         });
         const state = reactive({
@@ -199,10 +201,7 @@ export default {
         };
 
         const init = async () => {
-            await Promise.allSettled([
-                getSummaryInfo(props.activeTab),
-                store.dispatch('reference/provider/load'), // LOAD REFERENCE STORE
-            ]);
+            await getSummaryInfo(props.activeTab);
         };
 
         const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);

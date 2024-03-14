@@ -64,4 +64,18 @@ export const getBreadcrumbsArgTypes = (): ArgTypes => ({
             category: 'events',
         },
     },
+    onClickDropdownMEnuItem: {
+        name: 'click-dropdown-menu-item',
+        description: `Emitted when the click a breadcrumb's dropdown menu item. Handler arguments:
+        \`
+        [value: Route]
+        \`
+        `,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 });

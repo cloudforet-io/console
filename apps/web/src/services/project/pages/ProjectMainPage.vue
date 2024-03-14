@@ -1,50 +1,40 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
 import {
-    PHeading, PBreadcrumbs, PButton, PContextMenu, useContextMenuController, PIconButton,
+    PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
-import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type {
-    ProjectGroupTreeNodeData, ProjectGroupTreeItem,
-} from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
-const router = useRouter();
+
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
-
-/* Query String */
-watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
-    router.replace({
-        query: {
-            select_pg: selectedItem.node?.data.id || null,
-        },
-    }).catch(() => {});
-});
 
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -81,9 +71,11 @@ const state = reactive({
         },
     ])),
     projectGroupModalVisible: false,
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.PROJECT_GROUP,
+        id: storeState.groupId,
+    })),
 });
-
-const { favoriteItems } = useProjectFavorite();
 
 const {
     visibleMenu,
@@ -99,7 +91,7 @@ const {
 onClickOutside(menuRef, hideContextMenu);
 
 /* Navigation */
-const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroupTreeNodeData}) => {
+const onProjectGroupNavClick = async (item: Breadcrumb) => {
     if (item.data) await projectPageStore.selectNode(item.data.id);
 };
 
@@ -134,29 +126,19 @@ watch(() => route.query, async (after, before) => {
         await projectPageStore.selectNode(after.select_pg);
     }
 });
-
-onUnmounted(() => {
-    projectPageStore.reset();
+watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-    ]);
-})();
+watch(() => gnbGetters.selectedItem, (selectedItem) => {
+    onProjectGroupNavClick(selectedItem);
+});
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    gnbStore.setFavoriteItemId(favoriteOptions);
+}, { immediate: true });
 </script>
 
 <template>
     <div class="page-wrapper">
-        <div class="parents-info">
-            <span class="group-name">
-                <p-breadcrumbs :routes="state.projectGroupNavigation"
-                               @click="onProjectGroupNavClick"
-                />
-            </span>
-        </div>
         <p-heading :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECTS')"
                    use-total-count
                    :total-count="storeState.projectCount || 0"
@@ -165,10 +147,6 @@ onUnmounted(() => {
                 <div v-if="storeState.groupId"
                      class="title-right-button-wrapper"
                 >
-                    <favorite-button :favorite-items="favoriteItems"
-                                     :item-id="storeState.groupId"
-                                     :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
-                    />
                     <template v-if="projectPageState.isWorkspaceOwner">
                         <p-icon-button name="ic_edit-text"
                                        style-type="transparent"
@@ -239,6 +217,7 @@ onUnmounted(() => {
 .top-button-box {
     display: inline-block;
     float: right;
+    margin-left: auto;
     .create-context-menu {
         z-index: 10;
     }

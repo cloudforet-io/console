@@ -555,6 +555,7 @@
 				"COST_ANALYSIS": "비용 분석",
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
+				"DATA_SOURCE": "데이터 소스",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
@@ -612,6 +613,7 @@
 				},
 				"PRIVATE": "비공개",
 				"PROJECT": "프로젝트",
+				"PROVIDERS_TITLE": "서비스 제공자",
 				"PUBLIC": "공개",
 				"RELOCATE_DASHBOARD_LABEL": "대시보드로 이동",
 				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "새로운 대시보드 메뉴에서는 좀 더 향상된 방식으로 비용 대시보드를 만들 수 있습니다.",
@@ -952,6 +954,7 @@
 			"TAG_COL": "태그 필드",
 			"TITLE": "필드 변경하기"
 		},
+		"DELETED": "삭제됨",
 		"EDITOR": {
 			"ALIGN_CENTER": "가운데 정렬",
 			"ALIGN_JUSTIFY": "양쪽 정렬",
@@ -1059,7 +1062,8 @@
 				"NO_RESULT_2": "클라우드 서비스 또는 메인 메뉴와 관련된 검색어를 입력해주세요.",
 				"RECENT_CLOUD_SERVICE": "최근 검색 [클라우드 서비스]",
 				"RECENT_MENU": "최근 검색 [메뉴]",
-				"SERACH": "검색",
+				"SEARCH": "검색",
+				"SEARCH_PLACEHOLDER": "메뉴, 프로젝트, 대시보드 등 검색",
 				"TOO_MANY_RESULTS": "검색결과가 너무 많습니다.",
 				"TRY_SEARCH_AGAIN": "보다 자세하게 검색해주세요."
 			},
@@ -1068,18 +1072,22 @@
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "사용자 가이드"
 			},
+			"TOOLBOX": {
+				"ID": "아이디"
+			},
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"FAVORITE": "즐겨찾기 ",
+				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
 				"PROFILE": "마이페이지",
-				"RECENT_FAVORITE": "최근 방문 / 즐겨찾기 ",
 				"SEARCH": "검색"
 			},
 			"WORKSPACE": {
-				"ALL_WORKSPACES": "전체 워크스페이스",
-				"CURRENT_WORKSPACE": "현재 워크스페이스",
-				"SWITCH_TO": "다른 워크스페이스로 변경"
+				"CREATE_WORKSPACE": "새 워크스페이스 생성",
+				"MANAGE_WORKSPACE": "워크스페이스 관리",
+				"WORKSPACES": "워크스페이스"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -1129,6 +1137,20 @@
 			"RESOURCE": "리소스",
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
+		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": "전체 워크스페이스",
+				"FILTER_BY_WORKSPACE": "워크스페이스 필터",
+				"HELP_TEXT": "찾고 싶은 내용을 입력하세요.",
+				"NO_RESULT_1": "\"{inputText}\"에 대한 검색결과가 없습니다.",
+				"NO_RESULT_2": "검색어를 다시 입력해주세요.",
+				"RECENTLY_VIEWED": "최근 방문",
+				"SITE_NAVIGATION": "메뉴 네비게이션",
+				"WORKSPACE_FILTER_WARNING_DESC": "이전 워크스페이스 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
+				"WORKSPACE_FILTER_WARNING_TITLE": "최대 5개의 워크스페이스로 필터할 수 있습니다. ",
+				"WORKSPACE_SWITCH_LINK": "이 워크스페이스로 이동하기"
+			}
 		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "스팸 메일을 확인하거나 조금만 더 기다려 주세요. 만일 아직도 이메일을 받지 못한 경우, ",
@@ -1207,6 +1229,8 @@
 			"VALIDATION": "아이디 또는 비밀번호를 확인해 주세요.",
 			"VERSION": "버전 "
 		},
+		"STARRED": "즐겨찾기",
+		"STARRED_NO_DATA": "로 추가한 목록이 이곳에 표시됩니다.",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",
@@ -2140,6 +2164,7 @@
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "워크스페이스 생성",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "워크스페이스명은 최대 80글자까지 입력 가능합니다. ",
 			"DELETE": "삭제",
 			"DELETE_WORKSPACE": "삭제",
 			"DELETE_WORKSPACE_DESC": "이 작업은 취소 할 수 없습니다.",
@@ -2452,6 +2477,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
+				"ALL": "모두",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
 				"AUTO_PERIOD": "자동 (전체 기간)",
@@ -2480,7 +2506,7 @@
 				"SHOW_ALL": "모두 보기",
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
-				"TITLE": "{provider} 클라우드 서비스 ",
+				"TITLE": "클라우드 서비스 ",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},
@@ -2797,7 +2823,7 @@
 		"ADMINISTRATION_WORKSPACES": "워크스페이스",
 		"ALERT_MANAGER": "얼럿 매니저",
 		"ALERT_MANAGER_ALERT": "얼럿",
-		"ALERT_MANAGER_DASHBOARD": "대시보드",
+		"ALERT_MANAGER_DASHBOARD": "얼럿 대시보드",
 		"ALERT_MANAGER_ESCALATION_POLICY": "에스컬레이션 정책",
 		"ASSET_INVENTORY": "에셋 인벤토리",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",
@@ -2808,13 +2834,17 @@
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
+		"COST_EXPLORER_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",
 		"COST_EXPLORER_REPORT": "비용 리포트",
+		"COST_EXPLORER_TITLE": "기능 활성화 필요",
 		"DASHBOARDS": "대시보드",
 		"DASHBOARDS_PROJECT": "프로젝트 대시보드",
 		"DASHBOARDS_WORKSPACE": "워크스페이스 대시보드",
+		"DISMISS": "닫기",
 		"HOME_DASHBOARD": "홈",
 		"INFO": "정보",
 		"INFO_NOTICE": "공지사항 ",
+		"LEARN_MORE": "더보기",
 		"MY_PAGE": "마이페이지",
 		"MY_PAGE_ACCOUNT": "내 계정",
 		"MY_PAGE_ACCOUNT_PROFILE": "계정 & 프로필",

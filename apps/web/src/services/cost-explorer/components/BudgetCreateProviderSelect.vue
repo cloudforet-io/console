@@ -14,17 +14,17 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-
 
 
 type ProviderFilter = BudgetModel['provider_filter'];
@@ -68,10 +68,11 @@ const {
     },
 }, { selectedCostType: true, selectedResources: true });
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     costTypeItems: computed(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
@@ -131,16 +132,6 @@ watch(() => selectedCostType.value, () => {
 watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInfo, isValid]) => {
     emit('update', costTypeInfo, isValid);
 }, 300) as any, { immediate: true });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
-        store.dispatch('reference/serviceAccount/load'),
-    ]);
-})();
-
 </script>
 
 <template>

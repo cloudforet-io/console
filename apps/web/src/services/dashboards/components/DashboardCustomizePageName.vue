@@ -168,7 +168,7 @@ onMounted(() => {
                 margin-bottom: 0.25rem;
             }
             .back-button {
-                margin-top: 0.1875rem;
+                margin-top: 0.75rem;
             }
         }
     }

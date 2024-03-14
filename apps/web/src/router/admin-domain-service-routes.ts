@@ -2,9 +2,9 @@ import type { RouteConfig } from 'vue-router';
 
 import { errorRoutes } from '@/router/error-routes';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import administrationRoute from '@/services/administration/routes/routes';
 import authRoutes from '@/services/auth/routes/routes';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import iamRoutes from '@/services/iam/routes/routes';
 
 const TotalDashboardPage = () => import('@/services/total-dashboard/TotalDashboardPage.vue');
 
@@ -12,8 +12,8 @@ const ROOT_DOMAIN_ROUTE = Object.freeze({
     _NAME: 'root',
     HOME_DASHBOARD: { _NAME: 'home_dashboard' },
     IDENTITY: {
-        _NAME: ADMINISTRATION_ROUTE._NAME,
-        USER: ADMINISTRATION_ROUTE.IAM.USER,
+        _NAME: IAM_ROUTE._NAME,
+        USER: IAM_ROUTE.USER,
     },
 });
 
@@ -30,7 +30,7 @@ export const adminDomainServiceRoutes: RouteConfig[] = [
                 name: ROOT_DOMAIN_ROUTE.HOME_DASHBOARD._NAME,
                 component: TotalDashboardPage,
             },
-            administrationRoute,
+            iamRoutes,
         ] as RouteConfig[],
     },
     ...errorRoutes,

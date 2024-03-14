@@ -57,8 +57,6 @@ import { computed, reactive, defineExpose } from 'vue';
 
 import { PCenteredLayoutHeader } from '@spaceone/design-system';
 
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
@@ -95,11 +93,6 @@ const handleChangeStep = (step: number) => {
 };
 
 defineExpose({ setPathFrom });
-
-
-(() => {
-    store.dispatch('reference/provider/load');
-})();
 </script>
 
 <style lang="postcss" scoped>

@@ -11,10 +11,10 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 import { SpaceRouter } from '@/router';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
-import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -36,8 +36,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'edit'): void;
 }>();
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
+    trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
 });
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -103,13 +104,6 @@ const fieldHandler = (field) => {
 const handleClickAddButton = () => {
     emit('edit');
 };
-
-/* Init */
-(async () => {
-    await store.dispatch('reference/trustedAccount/load');
-})();
-
-
 </script>
 
 <template>

@@ -27,7 +27,6 @@ const infoRoute: RouteConfig = {
         {
             path: 'notice',
             meta: {
-                lnbVisible: true,
                 menuId: MENU_ID.NOTICE,
                 translationId: MENU_INFO_MAP[MENU_ID.NOTICE].translationId,
             },
@@ -37,20 +36,19 @@ const infoRoute: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME),
-                    meta: { lnbVisible: true },
                     component: AdminNoticeMainPage as any,
                 },
                 {
                     path: 'create',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.CREATE._NAME),
-                    meta: { translationId: 'INFO.NOTICE.FORM.CREATE_NOTICE', lnbVisible: true },
+                    meta: { translationId: 'INFO.NOTICE.FORM.CREATE_NOTICE' },
                     component: AdminNoticeCreatePage as any,
                 },
                 {
                     path: ':postId',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.DETAIL._NAME),
                     meta: {
-                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, label: ({ params }) => params.postId, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', label: ({ params }) => params.postId, copiable: true,
                     },
                     component: AdminNoticeDetailPage as any,
                     props: true,
@@ -58,7 +56,7 @@ const infoRoute: RouteConfig = {
                 {
                     path: 'update/:postId',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.UPDATE._NAME),
-                    meta: { translationId: 'INFO.NOTICE.FORM.EDIT_TITLE', lnbVisible: true },
+                    meta: { translationId: 'INFO.NOTICE.FORM.EDIT_TITLE' },
                     component: AdminNoticeUpdatePage as any,
                     props: true,
                 },

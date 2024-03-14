@@ -62,11 +62,10 @@ import { cloneDeep } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceItem } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
@@ -104,15 +103,16 @@ export default defineComponent<Props>({
         const appContextStore = useAppContextStore();
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
+        const allReferenceStore = useAllReferenceStore();
 
         const { getProperRouteLocation } = useProperRouteLocation();
 
         const state = reactive({
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
             cloudServiceTypeToItemMap: computed(() => {
-                const res: Record<string, CloudServiceTypeReferenceItem> = {};
+                const res: Record<string, CloudServiceTypeItem> = {};
                 Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
                     res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
                 });
@@ -185,14 +185,6 @@ export default defineComponent<Props>({
 
             return '';
         };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

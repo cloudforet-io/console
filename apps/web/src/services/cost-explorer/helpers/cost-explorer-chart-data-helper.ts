@@ -2,7 +2,6 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import { store } from '@/store';
 
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -58,10 +57,10 @@ export const getLegends = <CostAnalyzeRawData>(rawData: AnalyzeResponse<CostAnal
         if (groupBy.includes('.')) {
             _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
         }
-        const _providers = store.getters['reference/providerItems'];
-        const _serviceAccounts = store.getters['reference/serviceAccountItems'];
+        const _providers = allReferenceStore.getters.provider;
+        const _serviceAccounts = allReferenceStore.getters.serviceAccount;
         const _projects = allReferenceStore.getters.project;
-        const _regions = store.getters['reference/regionItems'];
+        const _regions = allReferenceStore.getters.region;
         const _workspaces = allReferenceStore.getters.workspace;
 
         const legends: Legend[] = [];

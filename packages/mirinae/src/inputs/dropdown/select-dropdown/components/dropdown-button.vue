@@ -168,11 +168,13 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 <span class="arrow-button"
                       @click.stop="emit('click-dropdown-button')"
                 >
-                    <p-i :name="props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                         width="1.5rem"
-                         height="1.5rem"
-                         color="inherit"
-                    />
+                    <slot name="button-icon">
+                        <p-i :name="props.isVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
+                             width="1.5rem"
+                             height="1.5rem"
+                             color="inherit"
+                        />
+                    </slot>
                 </span>
             </div>
         </div>

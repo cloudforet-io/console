@@ -72,11 +72,11 @@ import {
 } from '@spaceone/design-system';
 import { sum } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -121,10 +121,11 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
+        const allReferenceStore = useAllReferenceStore();
 
         const storeState = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+            regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
         });
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
@@ -210,19 +211,11 @@ export default defineComponent<Props>({
             if (provider === 'all') return;
             const regionFilters = state.filters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [];
             cloudServicePageStore.setSelectedRegionsToFilters(regionFilters.filter((r) => {
-                const region = state.regions[r];
+                const region = storeState.regions[r];
                 if (!region) return false;
                 return region.data.provider === provider;
             }));
         });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/region/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

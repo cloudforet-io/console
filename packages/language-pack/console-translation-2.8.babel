@@ -9789,6 +9789,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>DATA_SOURCE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>DEFAULT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -10818,6 +10839,27 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>PROJECT</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>PROVIDERS_TITLE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -17051,6 +17093,27 @@
                             </concept_node>
                         </children>
                     </folder_node>
+                    <concept_node>
+                        <name>DELETED</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
                     <folder_node>
                         <name>EDITOR</name>
                         <children>
@@ -18782,7 +18845,28 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>SERACH</name>
+                                        <name>SEARCH</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>SEARCH_PLACEHOLDER</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -18915,6 +18999,32 @@
                                 </children>
                             </folder_node>
                             <folder_node>
+                                <name>TOOLBOX</name>
+                                <children>
+                                    <concept_node>
+                                        <name>ID</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                </children>
+                            </folder_node>
+                            <folder_node>
                                 <name>TOOLTIP</name>
                                 <children>
                                     <concept_node>
@@ -18940,6 +19050,48 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>EXIT_ADMIN_MODE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>FAVORITE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>NOTICE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -19002,27 +19154,6 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>RECENT_FAVORITE</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>SEARCH</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -19049,7 +19180,7 @@
                                 <name>WORKSPACE</name>
                                 <children>
                                     <concept_node>
-                                        <name>ALL_WORKSPACES</name>
+                                        <name>CREATE_WORKSPACE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -19070,7 +19201,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>CURRENT_WORKSPACE</name>
+                                        <name>MANAGE_WORKSPACE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -19091,7 +19222,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>SWITCH_TO</name>
+                                        <name>WORKSPACES</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -19862,6 +19993,226 @@
                                     </translation>
                                 </translations>
                             </concept_node>
+                        </children>
+                    </folder_node>
+                    <folder_node>
+                        <name>NAVIGATIONS</name>
+                        <children>
+                            <folder_node>
+                                <name>TOP_BAR</name>
+                                <children>
+                                    <concept_node>
+                                        <name>ALL_WORKSPACE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>FILTER_BY_WORKSPACE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>HELP_TEXT</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>NO_RESULT_1</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>NO_RESULT_2</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>RECENTLY_VIEWED</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>SITE_NAVIGATION</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>WORKSPACE_FILTER_WARNING_DESC</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>WORKSPACE_FILTER_WARNING_TITLE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>WORKSPACE_SWITCH_LINK</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                </children>
+                            </folder_node>
                         </children>
                     </folder_node>
                     <folder_node>
@@ -21222,6 +21573,48 @@
                             </concept_node>
                         </children>
                     </folder_node>
+                    <concept_node>
+                        <name>STARRED</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
+                        <name>STARRED_NO_DATA</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
                     <folder_node>
                         <name>TAGS</name>
                         <children>
@@ -27991,15 +28384,15 @@
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
-                                        <approved>false</approved>
+                                        <approved>true</approved>
                                     </translation>
                                     <translation>
                                         <language>ja-JP</language>
-                                        <approved>false</approved>
+                                        <approved>true</approved>
                                     </translation>
                                     <translation>
                                         <language>ko-KR</language>
-                                        <approved>false</approved>
+                                        <approved>true</approved>
                                     </translation>
                                 </translations>
                             </concept_node>
@@ -38097,6 +38490,27 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>CREATE_WORKSPACE_TEXT_LENGTH</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>true</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>true</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>true</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>DELETE</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
@@ -43595,6 +44009,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>ALL</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>true</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>ALT_E_CHECK_MODAL</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -44222,15 +44657,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -44243,15 +44678,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -44264,15 +44699,15 @@
                                         <translations>
                                             <translation>
                                                 <language>en-US</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ja-JP</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                             <translation>
                                                 <language>ko-KR</language>
-                                                <approved>false</approved>
+                                                <approved>true</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -50256,7 +50691,49 @@
                         </translations>
                     </concept_node>
                     <concept_node>
+                        <name>COST_EXPLORER_DESC</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
                         <name>COST_EXPLORER_REPORT</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
+                        <name>COST_EXPLORER_TITLE</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -50340,6 +50817,27 @@
                         </translations>
                     </concept_node>
                     <concept_node>
+                        <name>DISMISS</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
                         <name>HOME_DASHBOARD</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
@@ -50383,6 +50881,27 @@
                     </concept_node>
                     <concept_node>
                         <name>INFO_NOTICE</name>
+                        <definition_loaded>false</definition_loaded>
+                        <description/>
+                        <comment/>
+                        <default_text/>
+                        <translations>
+                            <translation>
+                                <language>en-US</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ja-JP</language>
+                                <approved>true</approved>
+                            </translation>
+                            <translation>
+                                <language>ko-KR</language>
+                                <approved>true</approved>
+                            </translation>
+                        </translations>
+                    </concept_node>
+                    <concept_node>
+                        <name>LEARN_MORE</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>

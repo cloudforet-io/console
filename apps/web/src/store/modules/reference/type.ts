@@ -5,6 +5,7 @@ export interface ReferenceItem<Data = Record<string, any>> {
     color?: string;
     icon?: string;
     linkTemplate?: string;
+    provider?: string;
     continent?: {
         continent_code?: string;
         continent_label?: string;
@@ -20,26 +21,6 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
-export type VuexStoreReferenceType =
-    |'cloudServiceType'|'cloud_service_type'
-    |'provider'
-    |'region'
-    |'serviceAccount'|'service_account'
-    |'trustedAccount'
-    |'collector'
-    |'protocol'
-    |'plugin'
-    |'secret'
-    |'webhook';
-
-interface VuexStoreReferenceTypeInfo {
-    type: VuexStoreReferenceType;
-    key: string; // project_id
-    name: string; // Project
-    referenceMap: ReferenceMap;
-}
-export type VuexStoreAllReferenceTypeInfo = Record<VuexStoreReferenceType, VuexStoreReferenceTypeInfo>;
-
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;
 }
@@ -54,7 +35,7 @@ export interface ReferenceLoadOptions {
 }
 
 export interface ReferenceTypeInfo {
-    type: string;
+    type: string; // 'project'
     key: string; // project_id
     name: string; // Project
     referenceMap: ReferenceMap;

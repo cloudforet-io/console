@@ -312,10 +312,10 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
     float: right;
 }
 .heading-right-part {
-    display: inline-flex;
-    align-items: center;
+    @apply flex-shrink-0 inline-flex items-center;
     float: right;
     gap: 0.5rem;
+    margin-left: auto;
 }
 
 /* custom design-system component - p-toolbox-table */

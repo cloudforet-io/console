@@ -9,13 +9,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
+import { utcToTimezoneFormatter } from '@/services/iam/helpers/user-notification-timezone-helper';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
+const allReferenceStore = useAllReferenceStore();
 
 const getBadgeColor = (level: string) => {
     switch (level) {
@@ -52,7 +54,7 @@ const state = reactive({
     ]),
     items: [] as NotiChannelItem[],
     timezone: computed(() => store.state.user.timezone),
-    protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
+    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
 });
 
 const apiQueryHelper = new ApiQueryHelper();
@@ -78,11 +80,7 @@ const listNotificationsChannel = async () => {
 const protocolFormatter = (val) => state.protocols[val]?.name || val;
 
 (async () => {
-    await Promise.allSettled([
-        listNotificationsChannel(),
-        // LOAD REFERENCE STORE
-        store.dispatch('reference/protocol/load'),
-    ]);
+    await listNotificationsChannel();
 })();
 
 </script>

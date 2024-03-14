@@ -8,20 +8,21 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
-import numeral from 'numeral';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -30,6 +31,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 
 enum EVENT_CATEGORY {
@@ -47,6 +49,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
 });
+const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
@@ -56,10 +59,10 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     timezone: computed(() => store.state.user.timezone),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     pageStart: 1,
     pageLimit: 5,
     totalCount: 0,
@@ -117,8 +120,6 @@ const tabState = reactive({
 });
 
 /* util */
-const summaryCount = (val) => (val < 100000 ? numeral(val).format('0,0') : numeral(val).format('0a'));
-const regionFormatter = (val) => state.regions[val]?.name || val;
 const summaryLinkFormatter = (category) => {
     const filters: ConsoleFilter[] = [];
     const status = ['open'];
@@ -204,9 +205,6 @@ watch(() => tabState.activeTab, () => {
 (async () => {
     await Promise.allSettled([
         getEvents(), getCount(),
-        store.dispatch('reference/region/load'),
-        store.dispatch('reference/cloudServiceType/load'),
-        store.dispatch('reference/provider/load'),
     ]);
 })();
 </script>
@@ -232,7 +230,7 @@ watch(() => tabState.activeTab, () => {
                             class="count"
                             highlight
                     >
-                        {{ summaryCount(data.count) }}
+                        {{ numberFormatter(data.count, { notation: 'compact' }) }}
                     </p-link>
                     <span class="label">{{ data.label }}</span>
                     <span class="date">{{ data.date }}</span>
@@ -261,7 +259,7 @@ watch(() => tabState.activeTab, () => {
                         </p-link>
                     </template>
                     <template #col-region_code-format="{ value }">
-                        <span>{{ regionFormatter(value) }}</span>
+                        <span>{{ state.regions[value]?.name || value }}</span>
                     </template>
                     <template #col-start_time-format="{ value }">
                         <span>{{ value }}</span>

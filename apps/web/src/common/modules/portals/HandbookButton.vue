@@ -134,6 +134,8 @@ export default defineComponent({
     cursor: pointer;
     font-size: 0.75rem;
     line-height: 1.2;
+    padding-top: 0.5rem;
+    z-index: 10;
     &:hover {
         @apply text-secondary;
         .text {
@@ -147,7 +149,7 @@ export default defineComponent({
 
 .handbook-contents {
     @apply relative flex h-full flex-col;
-    height: calc(32vh - 6rem);
+    height: calc(32vh - 7.5rem);
     &::before {
         @apply absolute block bg-blue-300;
         width: 93.63%;
@@ -193,7 +195,7 @@ export default defineComponent({
     }
     .handbook-contents {
         @apply overflow-auto;
-        height: calc(100vh - 8.825rem);
+        height: calc(100vh - 10.325rem);
         &::before {
             bottom: 2.225rem;
         }

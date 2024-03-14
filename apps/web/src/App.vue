@@ -29,14 +29,15 @@ import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
-import GNB from '@/common/modules/navigations/gnb/GNB.vue';
-import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
+import TopBar from '@/common/modules/navigations/top-bar/TopBar.vue';
+import TopBarMyPage from '@/common/modules/navigations/top-bar/TopBarMyPage.vue';
+import LayoutContainer from '@/common/modules/page-layouts/LayoutContainer.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
@@ -94,7 +95,7 @@ watch(() => route.path, () => {
 
 
 watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
+    if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
         state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });
@@ -117,66 +118,66 @@ watch(() => state.userId, (userId) => {
             <p-notice-alert group="noticeBottomRight" />
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
-            <template v-if="state.showGNB">
-                <my-page-g-n-b v-if="state.isMyPage"
-                               class="gnb"
-                />
-                <g-n-b v-else
-                       class="gnb"
-                />
-                <div v-if="!state.globalGrantLoading"
-                     class="app-body"
-                     :style="{ height: globalUIGetters.appBodyHeight }"
-                >
-                    <p-sidebar :visible="store.state.display.visibleSidebar"
-                               :style-type="store.getters['display/sidebarProps'].styleType"
-                               :size="store.getters['display/sidebarProps'].size"
-                               :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
-                               :hide-close-button="store.getters['display/sidebarProps'].disableButton"
-                               :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
-                               @close="store.dispatch('display/hideSidebar')"
-                    >
-                        <main class="main">
-                            <portal-target ref="topNotiRef"
-                                           name="top-notification"
-                                           :slot-props="{hasDefaultMessage: true}"
-                            />
-                            <router-view />
-                        </main>
-                        <template #title>
-                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
-                                           name="info-title"
-                            />
-                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
-                                           name="widget-title"
-                            />
-                            <portal-target v-else
-                                           name="handbook-title"
-                            />
-                        </template>
-                        <template #sidebar>
-                            <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
-                                           name="info-contents"
-                            />
-                            <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
-                                           name="widget-contents"
-                            />
-                            <portal-target v-else
-                                           name="handbook-contents"
-                            />
-                        </template>
-                        <template #footer>
-                            <portal-target name="widget-footer" />
-                        </template>
-                    </p-sidebar>
+            <div v-if="state.showGNB">
+                <div class="top-bar">
+                    <top-bar-my-page v-if="state.isMyPage" />
+                    <top-bar v-else />
                 </div>
-            </template>
+                <layout-container class="app-body"
+                                  :style="{ height: globalUIGetters.appBodyHeight }"
+                >
+                    <template #main>
+                        <p-sidebar v-if="!state.globalGrantLoading"
+                                   :visible="store.state.display.visibleSidebar"
+                                   :style-type="store.getters['display/sidebarProps'].styleType"
+                                   :size="store.getters['display/sidebarProps'].size"
+                                   :is-fixed-size="store.getters['display/sidebarProps'].isFixedSize"
+                                   :hide-close-button="store.getters['display/sidebarProps'].disableButton"
+                                   :disable-scroll="store.getters['display/sidebarProps'].disableScroll"
+                                   @close="store.dispatch('display/hideSidebar')"
+                        >
+                            <div class="main-content">
+                                <portal-target ref="topNotiRef"
+                                               name="top-notification"
+                                               :slot-props="{hasDefaultMessage: true}"
+                                />
+                                <router-view />
+                            </div>
+                            <template #title>
+                                <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                               name="info-title"
+                                />
+                                <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                               name="widget-title"
+                                />
+                                <portal-target v-else
+                                               name="handbook-title"
+                                />
+                            </template>
+                            <template #sidebar>
+                                <portal-target v-if="store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                               name="info-contents"
+                                />
+                                <portal-target v-else-if="store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                               name="widget-contents"
+                                />
+                                <portal-target v-else
+                                               name="handbook-contents"
+                                />
+                            </template>
+                            <template #footer>
+                                <portal-target name="widget-footer" />
+                            </template>
+                        </p-sidebar>
+                        <p-data-loader v-else
+                                       :loading="state.globalGrantLoading"
+                                       :data="true"
+                                       class="console-loading-wrapper"
+                        />
+                    </template>
+                </layout-container>
+            </div>
             <router-view v-else />
-            <p-data-loader v-if="state.globalGrantLoading"
-                           :loading="state.globalGrantLoading"
-                           :data="true"
-                           class="console-loading-wrapper"
-            />
             <p-icon-modal :visible="state.isExpired"
                           emoji="👋"
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -213,32 +214,35 @@ watch(() => state.userId, (userId) => {
     .console-loading-wrapper {
         position: absolute;
         height: 100%;
-        z-index: 101;
+        z-index: 10;
         & > .data-loader-container > .loader-wrapper > .loader.spinner {
             max-height: unset;
         }
     }
 
-    .gnb {
+    .top-bar {
         position: fixed;
         width: 100%;
-        height: $gnb-height;
+        height: $top-bar-height;
         z-index: 100;
         flex-shrink: 0;
         top: 0;
     }
     .app-body {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
+        @apply relative flex flex-col;
+        margin-top: $top-bar-height;
         overflow-y: hidden;
         width: 100%;
-        margin-top: $gnb-height;
         flex-grow: 1;
-        .p-sidebar .non-sidebar-wrapper {
-            min-height: 100%;
+        .p-sidebar {
+            .sidebar-container {
+                @apply bg-gray-100;
+            }
+            .non-sidebar-wrapper {
+                min-height: 100%;
+            }
         }
-        .main {
+        .main-content {
             display: flex;
             flex-direction: column;
             height: 100%;

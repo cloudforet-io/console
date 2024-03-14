@@ -4,10 +4,8 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PBreadcrumbs, PCard, PI, PButton,
+    PHeading, PCard, PI, PButton,
 } from '@spaceone/design-system';
-import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
-import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -24,7 +22,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -33,8 +30,6 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
 import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
 
 type EditMode = 'CREATE' | 'UPDATE';
 
@@ -58,24 +53,6 @@ const state = reactive({
     isEditMode: false,
     mode: undefined as undefined | EditMode,
     selectedOrder: undefined as number|undefined,
-});
-const routeState = reactive({
-    routes: computed<Route[]>(() => {
-        let results: Route[] = [
-            { name: i18n.t('MENU.PROJECT') as string, to: { name: PROJECT_ROUTE._NAME } },
-        ];
-        if (!isEmpty(state.project.data.groupInfo)) {
-            results.push({
-                name: state.project.data.groupInfo?.name,
-                to: referenceRouter(state.project.data.groupInfo?.id, { resource_type: 'identity.ProjectGroup' }),
-            });
-        }
-        results = results.concat([
-            { name: state.project?.name, to: referenceRouter(props.projectId, { resource_type: 'identity.Project' }) },
-            { name: i18n.t('PROJECT.DETAIL.ALERT.EVENT_RULE') as string },
-        ]);
-        return results;
-    }),
 });
 const checkDeleteState = reactive({
     visible: false,
@@ -203,9 +180,6 @@ const handleClickFormCancel = () => {
 
 <template>
     <general-page-layout>
-        <p-breadcrumbs class="flex-grow"
-                       :routes="routeState.routes"
-        />
         <p-heading show-back-button
                    class="page-title"
                    @click-back-button="$router.go(-1)"

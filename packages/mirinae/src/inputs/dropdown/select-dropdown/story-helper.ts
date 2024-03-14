@@ -501,6 +501,15 @@ const extraArgTypes: ArgTypes = {
         },
     },
     /* slots */
+    dropdownIcon: {
+        name: 'dropdown-icon',
+        description: 'This is a slot for custom dropdown icon.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
     dropdownButton: {
         name: 'dropdown-button',
         description: 'This is a slot for custom dropdown button.',
@@ -637,6 +646,19 @@ const extraArgTypes: ArgTypes = {
     onClearSelection: {
         name: 'clear-selection',
         description: 'Event emitted when \'clear selection\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClickDone: {
+        name: 'click-done',
+        description: 'Event emitted when \'done\' item is clicked.',
         table: {
             type: {
                 summary: null,

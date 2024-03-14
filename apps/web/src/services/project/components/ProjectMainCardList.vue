@@ -18,18 +18,17 @@ import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProviderReferenceMap, ProviderReferenceItem } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { arrayToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -61,7 +60,7 @@ const projectPageGetters = projectPageStore.getters;
 const storeState = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     items: [] as ProjectModel[],
@@ -88,7 +87,7 @@ const state = reactive({
 });
 
 /* Util */
-const getProvider = (name: string): ProviderReferenceItem => storeState.providers[name] || {};
+const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
 const getCloudServiceCount = (summaryType: SummaryType, projectId: string) => {
     const cloudServiceData = state.cloudServiceDataMap[summaryType]?.find((d) => d.project_id === projectId);
@@ -233,13 +232,6 @@ watch(() => state.shouldUpdateProjectList, async () => {
 watch([() => projectPageState.isInitiated, () => state.groupId], async ([isInitiated]) => {
     if (isInitiated) await handleConfirmProjectForm();
 }, { immediate: true });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
-})();
 </script>
 
 <template>

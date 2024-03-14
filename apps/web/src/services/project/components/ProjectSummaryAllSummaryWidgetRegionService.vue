@@ -17,11 +17,9 @@ import { range, orderBy } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -49,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
     label: undefined,
     count: undefined,
 });
+const allReferenceStore = useAllReferenceStore();
 
 const chartContext = ref<HTMLElement|null>(null);
 const queryHelper = new QueryHelper();
@@ -59,8 +58,7 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     skeletons: range(3),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     data: [] as Data[],
     chart: null as null | any,
     chartRegistry: {},
@@ -190,12 +188,7 @@ onUnmounted(() => {
     if (state.chart) state.chart.dispose();
 });
 
-// LOAD REFERENCE STORE
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
-    ]);
     await getData();
 })();
 </script>

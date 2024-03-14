@@ -12,7 +12,7 @@
             <p-i width="1.25rem"
                  height="1.25rem"
                  class="check-icon"
-                 :color="isSelected||disabled ? undefined : 'inherit transparent'"
+                 :color="(isSelected || indeterminate) || disabled ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
@@ -38,6 +38,7 @@ import { useMultiSelect } from '@/hooks/select';
 
 interface CheckboxProps extends SelectProps {
     invalid?: boolean;
+    indeterminate?: boolean;
 }
 
 export default defineComponent<CheckboxProps>({
@@ -70,6 +71,10 @@ export default defineComponent<CheckboxProps>({
             type: Boolean,
             default: false,
         },
+        indeterminate: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: CheckboxProps, { emit }) {
         const {
@@ -80,13 +85,16 @@ export default defineComponent<CheckboxProps>({
             selected: computed(() => props.selected),
             predicate: computed(() => props.predicate),
             disabled: computed(() => props.disabled),
+            indeterminate: computed(() => props.indeterminate),
         });
 
         const iconName = computed(() => {
             if (props.disabled) {
+                if (props.indeterminate) return 'ic_checkbox-indeterminate-disabled';
                 if (isSelected.value) return 'ic_checkbox-disabled-selected';
                 return 'ic_checkbox-disabled';
             }
+            if (props.indeterminate) return 'ic_checkbox-indeterminate';
             if (isSelected.value) return 'ic_checkbox-selected';
             return 'ic_checkbox';
         });

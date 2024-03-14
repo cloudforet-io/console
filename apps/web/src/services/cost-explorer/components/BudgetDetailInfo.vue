@@ -10,11 +10,10 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -44,7 +43,7 @@ const costTypeRef = ref<HTMLElement|null>(null);
 const storeState = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),

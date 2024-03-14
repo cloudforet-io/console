@@ -5,7 +5,6 @@ export const MENU_LIST: Menu[] = [
     {
         id: MENU_ID.HOME_DASHBOARD,
         needPermissionByRole: true,
-        hideOnGNB: true,
     },
     {
         id: MENU_ID.DASHBOARDS,
@@ -51,7 +50,6 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.MY_PAGE,
-        hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
             { id: MENU_ID.ACCOUNT_PROFILE },
@@ -72,7 +70,6 @@ export const ADMIN_MENU_LIST: Menu[] = [
     // HACK: hide for now
     // {
     //     id: MENU_ID.HOME_DASHBOARD,
-    //     hideOnGNB: true,
     // },
     // {
     //     id: MENU_ID.DASHBOARDS,
@@ -94,29 +91,22 @@ export const ADMIN_MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ADMINISTRATION,
+        id: MENU_ID.IAM,
         subMenuList: [
-            {
-                id: MENU_ID.IAM,
-                subMenuList: [
-                    { id: MENU_ID.USER },
-                    { id: MENU_ID.APP },
-                    { id: MENU_ID.ROLE },
-                ],
-            },
-            {
-                id: MENU_ID.PREFERENCE,
-                subMenuList: [
-                    { id: MENU_ID.WORKSPACES },
-                    { id: MENU_ID.DOMAIN_SETTINGS },
-                ],
-            },
+            { id: MENU_ID.USER },
+            { id: MENU_ID.APP },
+            { id: MENU_ID.ROLE },
+        ],
+    },
+    {
+        id: MENU_ID.PREFERENCE,
+        subMenuList: [
+            { id: MENU_ID.WORKSPACES },
+            { id: MENU_ID.DOMAIN_SETTINGS },
         ],
     },
     {
         id: MENU_ID.INFO,
-        hideOnGNB: true,
-        hideOnSiteMap: true,
         subMenuList: [
             { id: MENU_ID.NOTICE },
         ],

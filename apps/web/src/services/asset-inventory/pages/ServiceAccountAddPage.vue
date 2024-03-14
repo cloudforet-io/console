@@ -17,11 +17,12 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountCreateParameters } from '@/schema/identity/trusted-account/api-verbs/create';
 import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -37,15 +38,17 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
+
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    trustedAccounts: computed<TrustedAccountReferenceMap>(() => allReferenceStore.getters.trustedAccount),
 });
 
 const state = reactive({
@@ -167,10 +170,6 @@ const handleChangeCredentialForm = (credentialForm) => {
 (async () => {
     state.providerSchemaLoading = true;
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/trustedAccount/load'),
-    ]);
     state.providerSchemaLoading = false;
 })();
 

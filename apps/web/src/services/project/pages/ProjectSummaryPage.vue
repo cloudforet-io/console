@@ -8,7 +8,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
@@ -45,8 +44,6 @@ const getProjectAlertConfig = async () => {
 (async () => {
     await Promise.allSettled([
         getProjectAlertConfig(),
-        // LOAD REFERENCE STORE
-        store.dispatch('reference/cloudServiceType/load'),
     ]);
 })();
 </script>

@@ -84,7 +84,7 @@ test.describe('Create Compliance Overview Dashboard', () => {
 
         await test.step('7. Check the created dashboard', async () => {
             const locatorScope = await page.locator('.p-breadcrumbs > span:nth-child(2) .link');
-            const locatorName = await page.locator('.lnb-menu-item .selected .text');
+            const locatorName = await page.locator('.lsb-menu-item .selected .text');
 
             await expect(locatorScope).toContainText(' Workspace ');
             await expect(locatorName).toContainText(dashboardName);

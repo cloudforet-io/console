@@ -1,14 +1,8 @@
 <template>
     <div class="page-wrapper">
-        <p-heading :title="title"
+        <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.MAIN.TITLE')"
                    class="page-title"
-        >
-            <template #title-right-extra>
-                <service-provider-dropdown class="provider-dropdown"
-                                           :has-all="true"
-                />
-            </template>
-        </p-heading>
+        />
         <p-divider class="cloud-service-divider" />
         <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
@@ -89,12 +83,11 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -107,7 +100,6 @@ import {
 } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import ServiceProviderDropdown from '@/common/modules/dropdown/service-provider-dropdown/ServiceProviderDropdown.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -134,7 +126,6 @@ export default {
     components: {
         CloudServiceListCard,
         CloudServiceToolbox,
-        ServiceProviderDropdown,
         PDivider,
         PButton,
         PHeading,
@@ -149,8 +140,8 @@ export default {
         const storeState = reactive({
             projects: computed(() => allReferenceStore.getters.project),
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
         });
         const handlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -244,9 +235,6 @@ export default {
         /* Init */
         let urlQueryStringWatcherStop;
         const init = async () => {
-            /* load references */
-            await Promise.allSettled([store.dispatch('reference/provider/load'), store.dispatch('reference/serviceAccount/load')]);
-
             /* init states from url query */
             const currentQuery = SpaceRouter.router.currentRoute.query;
             const urlQueryValue: CloudServicePageUrlQueryValue = {
@@ -263,11 +251,6 @@ export default {
                 _state.period = urlQueryValue.period;
                 _state.searchFilters = searchQueryHelper.filters as ConsoleFilter[];
             });
-
-            // LOAD REFERENCE STORE
-            await Promise.allSettled([
-                store.dispatch('reference/serviceAccount/load'),
-            ]);
 
             /* register urlQueryString watcher after initiating states from url query */
             urlQueryStringWatcherStop = watch(() => state.urlQueryString, (urlQueryString) => {

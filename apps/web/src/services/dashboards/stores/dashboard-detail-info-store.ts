@@ -247,6 +247,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const _dashboardInfo = cloneDeep(dashboardInfo);
 
         setDashboardInfo(_dashboardInfo);
+        const _dashboardScope = _dashboardInfo.private_dashboard_id ? 'PRIVATE' : _dashboardInfo.resource_group;
+        setDashboardScope(_dashboardScope);
         state.dashboardId = _dashboardInfo.public_dashboard_id ?? _dashboardInfo.private_dashboard_id;
         setName(_dashboardInfo.name);
         setLabels(_dashboardInfo.labels);

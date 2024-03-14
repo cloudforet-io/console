@@ -1,21 +1,16 @@
-import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
-import type { Period } from '@/services/asset-inventory/types/type';
-
 
 export const useCloudServicePageStore = defineStore('cloud-service-page', {
     state: () => ({
         selectedProvider: 'all',
-        period: undefined as undefined | Period,
         additionalFilters: {
             [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: [],
             [CLOUD_SERVICE_FILTER_KEY.REGION]: [],
@@ -28,7 +23,7 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
         allFilters(state): ConsoleFilter[] {
             const filters: ConsoleFilter[] = [];
             if (state.selectedProvider !== 'all') {
-                filters.push({ k: 'provider', v: state.selectedProvider, o: '=' });
+                filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
             }
             if (this.selectedRegions.length) {
                 filters.push({ k: CLOUD_SERVICE_FILTER_KEY.REGION, v: this.selectedRegions, o: '=' });
@@ -41,11 +36,8 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
     },
     actions: {
         async setSelectedProvider(provider = 'all') {
-            let providers: ProviderReferenceMap = store.getters['reference/providerItems'];
-            if (isEmpty(providers)) {
-                await store.dispatch('reference/provider/load', undefined, { root: true });
-                providers = store.getters['reference/providerItems'];
-            }
+            const allReferenceStore = useAllReferenceStore();
+            const providers: ProviderReferenceMap = allReferenceStore.getters.provider;
 
             const providerReference = providers[provider];
             if (!providerReference) {

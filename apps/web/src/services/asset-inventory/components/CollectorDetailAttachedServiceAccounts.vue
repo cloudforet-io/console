@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    defineProps, defineEmits, reactive, computed, watch, onMounted,
+    defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
 import {
@@ -21,10 +21,10 @@ import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -90,8 +90,8 @@ const state = reactive({
     }),
     // reference data
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
 
 const querySearchHandlers = {
@@ -181,13 +181,6 @@ watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFi
     if (!provider) return;
     await getSecrets(provider, serviceAccounts);
 }, { immediate: true });
-
-onMounted(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/provider/load'),
-    ]);
-});
 </script>
 
 <template>

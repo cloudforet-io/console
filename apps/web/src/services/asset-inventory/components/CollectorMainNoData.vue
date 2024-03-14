@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router/composables';
+
 import { PEmpty, PButton } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
+
 const handleCreate = () => {
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }));
 };
 </script>
 
