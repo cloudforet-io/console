@@ -122,10 +122,9 @@ const tableState = reactive({
     }),
     selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
-        console.debug('tableState.selectedProvider', state.selectedProvider);
-        if (state.selectedProvider === 'google_cloud') return PROVIDER_ACCOUNT_NAME.google_cloud;
-        if (state.selectedProvider === 'azure') return PROVIDER_ACCOUNT_NAME.azure;
-        if (state.selectedProvider === 'kubernetes') return PROVIDER_ACCOUNT_NAME.kubernetes;
+        if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
+            return PROVIDER_ACCOUNT_NAME[state.selectedProvider];
+        }
         return tableState.isTrustedAccount ? 'Trusted Account' : 'General Account';
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
