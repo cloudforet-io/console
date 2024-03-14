@@ -80,7 +80,7 @@ export class SpaceRouter {
             const { rol: prevRole, wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
             const routeScope = getRouteScope(to);
 
-            /* Verification Process */
+            /* Route-Validation-and-Verification Process */
             let continueProcess: boolean;
             continueProcess = processTokenVerification(to, next);
             if (!continueProcess) return;
