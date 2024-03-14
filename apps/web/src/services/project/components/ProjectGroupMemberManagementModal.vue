@@ -1,27 +1,27 @@
 <script lang="ts" setup>
 import {
-    reactive, computed,
+    reactive, computed, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PDataLoader, PEmpty, PFieldGroup, PButton, PTextInput,
+    PButtonModal, PDataLoader, PEmpty, PFieldGroup, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, isEmpty } from 'lodash';
+import { cloneDeep, difference } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { ProjectGroupAddUsersParameters } from '@/schema/identity/project-group/api-verbs/add-users';
+import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupRemoveUsersParameters } from '@/schema/identity/project-group/api-verbs/remove-users';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -29,17 +29,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 
 
-interface SelectedUserItem extends SelectDropdownMenuItem {
-    roleImage?: string;
-    roleName?: TranslateResult;
-}
 interface Props {
     visible?: boolean;
-    projectGroupId?: string;
+    projectGroupId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    projectGroupId: undefined,
 });
 const emit = defineEmits<{(e: 'confirm'): void;
 }>();
@@ -49,109 +44,125 @@ const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
-    loading: false,
+    loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    workSpaceUserList: [] as WorkspaceUserModel[],
     projectGroupUserIdList: [] as string[],
     //
     userMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const _items: SelectDropdownMenuItem[] = [];
-        state.workSpaceUserList.forEach((user) => {
+        Object.values(storeState.users).forEach((user) => {
             const singleItem = {
-                name: user.user_id,
-                label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
+                name: user.key,
+                label: user.label,
                 disabled: false,
             };
-            if ((state.selectedUserItems.find((d) => d.name === user.user_id))
-                || (state.projectGroupUserIdList.includes(user.user_id))) {
+            if (state.selectedUserIdList.includes(user.key)) {
                 singleItem.disabled = true;
             }
             _items.push(singleItem);
         });
         return _items;
     }),
-    selectedUserItems: [] as SelectedUserItem[],
-    existingMemberList: [] as string[],
+    selectedUserIdList: [] as string[],
     searchText: '',
 });
 
 /* Util */
-const fetchWorkspaceUsers = async () => {
-    try {
-        const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
-        state.workSpaceUserList = response.results ?? [];
-    } catch (e) {
-        state.workSpaceUserList = [];
-        ErrorHandler.handleError(e);
-    }
+const getRoleImage = (userId: string): string => {
+    const _roleType = storeState.users[userId]?.data?.roleInfo?.role_type;
+    const _roleInfo = _roleType ? useRoleFormatter(_roleType) : undefined;
+    return _roleInfo?.image ?? '';
 };
-const getRoleType = (userId: string): string|undefined => {
-    if (isEmpty(storeState.users)) return undefined;
-    return storeState.users[userId].data.roleInfo?.role_type;
+const getRoleName = (userId: string): TranslateResult => {
+    const _roleType = storeState.users[userId]?.data?.roleInfo?.role_type;
+    const _roleInfo = _roleType ? useRoleFormatter(_roleType) : undefined;
+    return _roleInfo?.name ?? '';
 };
 
 /* Api */
-const addMember = async () => {
+const addMember = async (userIds: string[]) => {
     try {
-        const params: ProjectAddUsersParameters = {
+        const params: ProjectGroupAddUsersParameters = {
             project_group_id: props.projectGroupId,
-            users: state.selectedUserItems.map((d) => d.name),
+            users: userIds,
         };
         await SpaceConnector.clientV2.identity.projectGroup.addUsers(params);
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
+        ErrorHandler.handleError(e);
+        throw e;
     }
 };
-// const getProjectGroupUserData = async () => {
-//     try {
-//         const params: ProjectGroupGetParameters = {
-//             project_group_id: props.projectGroupId,
-//         };
-//         const res: ProjectGroupModel = await SpaceConnector.clientV2.identity.projectGroup.get(params);
-//         state.projectGroupUserIdList = res.users ?? [];
-//     } catch (e) {
-//         ErrorHandler.handleError(e);
-//         state.projectGroupUserIdList = [];
-//     }
-// };
+const removeMember = async (userIds: string[]) => {
+    try {
+        const params: ProjectGroupRemoveUsersParameters = {
+            project_group_id: props.projectGroupId,
+            users: userIds,
+        };
+        await SpaceConnector.clientV2.identity.projectGroup.removeUsers(params);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        throw e;
+    }
+};
+const addAndRemoveMember = async () => {
+    const _addedUserIds = difference(state.selectedUserIdList, state.projectGroupUserIdList);
+    const _removedUserIds = difference(state.projectGroupUserIdList, state.selectedUserIdList);
+    try {
+        if (_addedUserIds.length) await addMember(_addedUserIds);
+        if (_removedUserIds.length) await removeMember(_removedUserIds);
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP_MEMBER'), '');
+    } catch (e) {
+        showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP_MEMBER'), e);
+    }
+};
+const getProjectGroupUserData = async () => {
+    try {
+        state.loading = true;
+        const params: ProjectGroupGetParameters = {
+            project_group_id: props.projectGroupId as string,
+        };
+        const res: ProjectGroupModel = await SpaceConnector.clientV2.identity.projectGroup.get(params);
+        state.projectGroupUserIdList = res.users ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectGroupUserIdList = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
 /* Event */
 const handleConfirm = async () => {
-    await addMember();
+    await addAndRemoveMember();
     emit('confirm');
     state.proxyVisible = false;
 };
 const handleUpdateSelected = (items?: SelectDropdownMenuItem[]) => {
     if (!items?.length) return;
     const _selected = items[0];
-    if (state.workSpaceUserList.find((user) => user.user_id === _selected.name)) {
-        const _roleType = getRoleType(_selected.name);
-        const _roleInfo = _roleType ? useRoleFormatter(_roleType) : undefined;
-        state.selectedUserItems.push({
-            ...items[0],
-            roleImage: _roleInfo?.image,
-            roleName: _roleInfo?.name,
-        });
+    if (storeState.users[_selected.name]) {
+        state.selectedUserIdList.unshift(_selected.name);
         state.searchText = '';
     }
 };
 const handleRemoveProjectGroupMember = (idx: number) => {
-    const _selectedUserItems = cloneDeep(state.selectedUserItems);
+    const _selectedUserItems = cloneDeep(state.selectedUserIdList);
     _selectedUserItems.splice(idx, 1);
-    state.selectedUserItems = _selectedUserItems;
+    state.selectedUserIdList = _selectedUserItems;
 };
 
 /* Init */
-(async () => {
-    await Promise.allSettled([
-        fetchWorkspaceUsers(),
-    ]);
-})();
+watch(() => props.visible, async (visible) => {
+    if (visible) {
+        await getProjectGroupUserData();
+        state.selectedUserIdList = cloneDeep(state.projectGroupUserIdList);
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <p-button-modal
-        :header-title="$t('PROJECT.DETAIL.MEMBER.INVITE_MEMBER')"
+        :header-title="$t('PROJECT.LANDING.PROJECT_GROUP_MEMBER')"
         :fade="true"
         :backdrop="true"
         size="md"
@@ -161,7 +172,7 @@ const handleRemoveProjectGroupMember = (idx: number) => {
         <template #body>
             <div class="project-group-management-box">
                 <div class="project-group-management-wrapper">
-                    <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.MEMBER')"
+                    <p-field-group :label="$t('PROJECT.LANDING.GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS')"
                                    required
                     >
                         <p-text-input
@@ -170,43 +181,48 @@ const handleRemoveProjectGroupMember = (idx: number) => {
                             :selected="[]"
                             use-auto-complete
                             use-fixed-menu-style
+                            :placeholder="$t('PROJECT.LANDING.ADD_GROUP_MEMBER')"
+                            :page-size="5"
                             @update="handleUpdateSelected"
                         />
                     </p-field-group>
                     <p-data-loader :loading="state.loading"
-                                   :data="state.selectedUserItems"
+                                   :data="state.selectedUserIdList"
                                    class="data-loader"
                     >
                         <template #no-data>
                             <p-empty show-image
-                                     title="No Group Member"
+                                     :title="$t('PROJECT.LANDING.NO_GROUP_MEMBER')"
                             >
                                 <div>
                                     {{ $t('PROJECT.LANDING.MODAL_PROJECT_GROUP_MEMBER.NO_DATA_DESCRIPTION') }}
                                 </div>
                             </p-empty>
                         </template>
-                        <template v-for="(selected, idx) in state.selectedUserItems">
-                            <div :key="`selected-member-${selected.name}`"
+                        <template v-for="(userId, idx) in state.selectedUserIdList">
+                            <div :key="`selected-member-${userId}`"
                                  class="selected-member-wrapper"
                             >
                                 <div class="left-part">
-                                    <img :src="selected.roleImage"
+                                    <img :src="getRoleImage(userId)"
                                          alt="role-type-icon"
                                          class="role-type-icon"
                                     >
-                                    <span>{{ selected.label }}</span>
+                                    <div class="inline-flex">
+                                        <span>{{ storeState.users[userId]?.label || userId }}</span>
+                                        <span v-if="!state.projectGroupUserIdList.includes(userId)"
+                                              class="new-text"
+                                        >new</span>
+                                    </div>
                                 </div>
                                 <div class="right-part">
                                     <span class="role-type-text">
-                                        {{ selected.roleName }}
+                                        {{ getRoleName(userId) }}
                                     </span>
-                                    <p-button style-type="negative-secondary"
-                                              size="sm"
-                                              @click="handleRemoveProjectGroupMember(idx)"
-                                    >
-                                        {{ $t('PROJECT.LANDING.MODAL_PROJECT_GROUP_MEMBER.REMOVE') }}
-                                    </p-button>
+                                    <p-icon-button name="ic_delete"
+                                                   size="sm"
+                                                   @click="handleRemoveProjectGroupMember(idx)"
+                                    />
                                 </div>
                             </div>
                         </template>
@@ -251,6 +267,12 @@ const handleRemoveProjectGroupMember = (idx: number) => {
                 @apply rounded-full;
                 width: 1.5rem;
                 height: 1.5rem;
+            }
+            .new-text {
+                @apply text-label-xs text-coral-500;
+                display: inline-flex;
+                align-items: flex-start;
+                padding-left: 0.25rem;
             }
         }
         .right-part {
