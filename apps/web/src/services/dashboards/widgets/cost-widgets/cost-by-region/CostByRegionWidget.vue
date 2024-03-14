@@ -15,10 +15,9 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -75,7 +74,7 @@ const state = reactive({
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
 });
 

@@ -62,12 +62,10 @@ import { cloneDeep } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
@@ -111,7 +109,7 @@ export default defineComponent<Props>({
 
         const state = reactive({
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
             cloudServiceTypeToItemMap: computed(() => {
                 const res: Record<string, CloudServiceTypeItem> = {};
@@ -187,13 +185,6 @@ export default defineComponent<Props>({
 
             return '';
         };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

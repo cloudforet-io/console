@@ -16,10 +16,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { NotificationLevel } from '@/schema/notification/notification/type';
 import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -29,7 +29,7 @@ import type { NotificationAddFormDataPayload } from '@/services/my-page/types/no
 
 
 const SPACEONE_USER_CHANNEL_TYPE = 'SpaceONE User' as const;
-
+const allReferenceStore = useAllReferenceStore();
 const PROTOCOL_TYPE = {
     INTERNAL: 'INTERNAL',
     EXTERNAL: 'EXTERNAL',
@@ -48,7 +48,7 @@ const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayl
 }>();
 
 const storeState = reactive({
-    protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
+    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
 });
 const state = reactive({
     protocol: computed(() => storeState.protocols[props.protocolId] ?? null),

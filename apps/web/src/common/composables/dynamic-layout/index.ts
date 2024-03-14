@@ -14,10 +14,9 @@ import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 
 useAllReferenceStore(pinia);
@@ -94,11 +93,11 @@ export function useQuerySearchPropsWithSearchSchema(
         CloudServiceType: computed(() => allReferenceStore.getters.cloudServiceType),
         Secret: computed(() => allReferenceStore.getters.secret),
         Collector: computed(() => allReferenceStore.getters.collector),
-        Provider: computed(() => store.getters['reference/providerItems']),
+        Provider: computed(() => allReferenceStore.getters.provider),
         Region: computed(() => allReferenceStore.getters.region),
         Plugin: computed(() => allReferenceStore.getters.plugin),
         User: computed(() => allReferenceStore.getters.user),
-        Protocol: computed(() => store.getters['reference/protocolItems']),
+        Protocol: computed(() => allReferenceStore.getters.protocol),
         Webhook: computed(() => allReferenceStore.getters.webhook),
     });
 

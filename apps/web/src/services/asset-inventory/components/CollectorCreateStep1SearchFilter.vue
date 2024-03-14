@@ -123,9 +123,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -138,12 +138,13 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
 const { width } = useWindowSize();
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerList: computed(() => [
         { name: 'all', label: 'All Providers', img: undefined },
         ...Object.keys(state.providers).map((k) => ({

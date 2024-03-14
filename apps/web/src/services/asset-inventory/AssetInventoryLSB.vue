@@ -14,7 +14,10 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -43,6 +46,7 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -108,7 +112,7 @@ const state = reactive({
     }),
 });
 const filterState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     contextMenuItems: computed(() => [
         { name: 'all', label: 'All', icon: undefined },
         ...Object.keys(filterState.providers).map((k) => ({

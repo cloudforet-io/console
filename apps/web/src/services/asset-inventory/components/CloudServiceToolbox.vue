@@ -8,8 +8,6 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { store } from '@/store';
-
 import CloudServiceExcelExportOptionModal from '@/services/asset-inventory/components/CloudServiceExcelExportOptionModal.vue';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
@@ -42,7 +40,6 @@ const cloudServicePageState = cloudServicePageStore.$state;
 
 const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
 const state = reactive({
-    // providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
     cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => ![
         'labels',
@@ -75,12 +72,6 @@ const handleRefresh = () => {
 const handleClickExcelDownload = (visible:boolean) => {
     excelState.visible = visible;
 };
-
-/* Init */
-(async () => {
-    // LOAD REFERENCE STORE
-    await store.dispatch('reference/provider/load');
-})();
 
 </script>
 

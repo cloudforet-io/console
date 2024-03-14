@@ -21,6 +21,8 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useProtocolReferenceStore } from '@/store/reference/protocol-reference-store';
+import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
@@ -60,6 +62,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const pluginReferenceStore = usePluginReferenceStore();
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
+    const protocolReferenceStore = useProtocolReferenceStore();
+    const providerReferenceStore = useProviderReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
@@ -75,6 +79,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         plugin: computed(() => pluginReferenceStore.getters.pluginItems),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
         project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
+        protocol: computed(() => protocolReferenceStore.getters.protocolItems),
+        provider: computed(() => providerReferenceStore.getters.providerItems),
         user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
@@ -100,6 +106,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await projectReferenceStore.sync(data); break;
             case 'project_group':
                 await projectGroupReferenceStore.sync(data); break;
+            case 'protocol':
+                await protocolReferenceStore.sync(data); break;
+            case 'provider':
+                await providerReferenceStore.sync(data); break;
             case 'workspace':
                 await workspaceReferenceStore.sync(data); break;
             case 'user':
@@ -135,12 +145,16 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await projectReferenceStore.load(options); break;
             case 'project_group':
                 await projectGroupReferenceStore.load(options); break;
+            case 'protocol':
+                await protocolReferenceStore.load(options); break;
             case 'workspace':
                 await workspaceReferenceStore.load(options); break;
             case 'user':
                 await userReferenceStore.load(options); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.load(options); break;
+            case 'provider':
+                await providerReferenceStore.load(options); break;
             case 'service_account':
                 await serviceAccountReferenceStore.load(options); break;
             case 'webhook':
@@ -162,6 +176,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             pluginReferenceStore.flush();
             projectReferenceStore.flush();
             projectGroupReferenceStore.flush();
+            protocolReferenceStore.flush();
+            providerReferenceStore.flush();
             workspaceReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();

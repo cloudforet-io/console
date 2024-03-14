@@ -19,10 +19,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -53,7 +53,6 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const getEventsApiQuery = new ApiQueryHelper();
 const queryHelper = new QueryHelper();
-const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -63,7 +62,7 @@ const state = reactive({
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     timezone: computed(() => store.state.user.timezone),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     pageStart: 1,
     pageLimit: 5,
     totalCount: 0,
@@ -206,7 +205,6 @@ watch(() => tabState.activeTab, () => {
 (async () => {
     await Promise.allSettled([
         getEvents(), getCount(),
-        store.dispatch('reference/provider/load'),
     ]);
 })();
 </script>

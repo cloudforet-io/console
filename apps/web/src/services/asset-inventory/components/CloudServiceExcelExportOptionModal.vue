@@ -18,7 +18,8 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -41,6 +42,7 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
+const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const appContextGetters = appContextStore.getters;
 
@@ -49,7 +51,7 @@ const DEFAULT_CONTENTS = 'Default Contents';
 const DETAIL_CONTENTS = 'Detail Contents';
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     downloadLoading: false,
     downloadOptions: [DEFAULT_CONTENTS, DETAIL_CONTENTS] as string[],
     allOptionValue: false,
