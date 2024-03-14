@@ -1,8 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lsbVisible"
-                              :breadcrumbs="breadcrumbs"
-        >
+        <vertical-page-layout v-if="$route.meta.lsbVisible">
             <template #sidebar>
                 <asset-inventory-l-s-b />
             </template>

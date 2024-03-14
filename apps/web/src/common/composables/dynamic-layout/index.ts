@@ -93,12 +93,12 @@ export function useQuerySearchPropsWithSearchSchema(
         ServiceAccount: computed(() => allReferenceStore.getters.serviceAccount),
         CloudServiceType: computed(() => allReferenceStore.getters.cloudServiceType),
         Secret: computed(() => allReferenceStore.getters.secret),
-        Collector: computed(() => store.getters['reference/collectorItems']),
+        Collector: computed(() => allReferenceStore.getters.collector),
         Provider: computed(() => store.getters['reference/providerItems']),
         Region: computed(() => allReferenceStore.getters.region),
-        Plugin: computed(() => store.getters['reference/pluginItems']),
+        Plugin: computed(() => allReferenceStore.getters.plugin),
         User: computed(() => allReferenceStore.getters.user),
-        Protocol: computed(() => store.getters['reference/protocolItems']),
+        Protocol: computed(() => allReferenceStore.getters.protocol),
         Webhook: computed(() => allReferenceStore.getters.webhook),
     });
 
