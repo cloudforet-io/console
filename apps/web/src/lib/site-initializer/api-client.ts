@@ -20,8 +20,16 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('cloud_service_type', data);
     },
-    '/inventory/collector/create': (data) => { store.dispatch('reference/collector/sync', data); },
-    '/inventory/collector/update': (data) => { store.dispatch('reference/collector/sync', data); },
+    '/inventory/collector/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('collector', data);
+    },
+    '/inventory/collector/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('collector', data);
+    },
     '/repository/plugin/create': (data) => { store.dispatch('reference/plugin/sync', data); },
     '/repository/plugin/update': (data) => { store.dispatch('reference/plugin/sync', data); },
     '/identity/project/create': (data) => {

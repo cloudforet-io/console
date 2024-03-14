@@ -56,8 +56,9 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
@@ -68,6 +69,8 @@ interface Props {
     job: JobModel;
 }
 
+const allReferenceStore = useAllReferenceStore();
+
 const props = withDefaults(defineProps<Props>(), {
     job: undefined,
 });
@@ -75,7 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     timezone: computed(() => store.state.user.timezone),
 });

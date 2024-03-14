@@ -27,8 +27,9 @@ import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -47,7 +48,7 @@ import {
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
 
-
+const allReferenceStore = useAllReferenceStore();
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },
     { label: 'Collector', name: 'collector_info.label', sortable: false },
@@ -84,7 +85,7 @@ const handlers = reactive({
 });
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 const state = reactive({
@@ -103,7 +104,7 @@ const state = reactive({
 const queryTagsHelper = useQueryTags({
     keyItemSets: handlers.keyItemSets,
     referenceStore: {
-        'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
+        'inventory.Collector': computed(() => allReferenceStore.getters.collector),
     },
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
@@ -212,7 +213,6 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
-        store.dispatch('reference/collector/load'),
     ]);
 
     const currentQuery = SpaceRouter.router.currentRoute.query;

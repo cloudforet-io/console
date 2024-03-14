@@ -31,9 +31,9 @@ import { i18n } from '@/translations';
 import { ROOT_ROUTE } from '@/router/constant';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -94,7 +94,7 @@ const handlers = reactive({
 });
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     workspaces: computed(() => allReferenceStore.getters.workspace),
 });
@@ -114,7 +114,7 @@ const state = reactive({
 const queryTagsHelper = useQueryTags({
     keyItemSets: handlers.keyItemSets,
     referenceStore: {
-        'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
+        'inventory.Collector': computed(() => allReferenceStore.getters.collector),
     },
 });
 const { queryTags, filters: searchFilters } = queryTagsHelper;
@@ -234,7 +234,6 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/plugin/load'),
-        store.dispatch('reference/collector/load'),
     ]);
 
     const currentQuery = SpaceRouter.router.currentRoute.query;
