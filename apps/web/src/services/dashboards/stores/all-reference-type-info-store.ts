@@ -2,8 +2,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { store } from '@/store';
-
 import type { ReferenceTypeInfo } from '@/store/modules/reference/type';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
@@ -78,10 +76,6 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             region: regionReferenceStore.getters.regionTypeInfo,
         })),
     });
-
-    (async () => {
-        await store.dispatch('reference/loadAll');
-    })();
 
     return {
         getters,

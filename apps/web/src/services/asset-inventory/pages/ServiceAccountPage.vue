@@ -112,7 +112,7 @@ const tableState = reactive({
 });
 
 const searchFilter = new ApiQueryHelper();
-const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed<SearchSchema>(() => tableState.schema?.options?.search as unknown as SearchSchema ?? []),
     'identity.ServiceAccount',
     computed(() => searchFilter.setFilters([
@@ -223,7 +223,7 @@ const handleClickRow = (index) => {
     });
 };
 const handleDynamicLayoutFetch = (changed) => {
-    if (tableState.schema === null || !isAllLoaded.value) return;
+    if (tableState.schema === null) return;
     fetchTableData(changed);
 };
 const handleVisibleCustomFieldModal = (visible) => {
