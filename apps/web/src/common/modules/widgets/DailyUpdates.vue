@@ -156,7 +156,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -214,9 +215,10 @@ export default {
     },
     setup(props) {
         const userWorkspaceStore = useUserWorkspaceStore();
+        const allReferenceStore = useAllReferenceStore();
         const queryHelper = new QueryHelper();
         const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             cloudServiceData: [] as CloudServiceData[],
             data: [] as Item[],
@@ -304,7 +306,6 @@ export default {
         const init = async (): Promise<void> => {
             await Promise.allSettled([
                 listCloudServiceData(),
-                store.dispatch('reference/provider/load'),
             ]);
             state.data = getConvertedCloudServiceData(state.cloudServiceData);
         };

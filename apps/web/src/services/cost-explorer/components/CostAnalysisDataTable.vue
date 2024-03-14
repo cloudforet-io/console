@@ -18,13 +18,12 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
@@ -86,7 +85,7 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
@@ -404,13 +403,6 @@ watch(
     },
     { immediate: true, deep: true },
 );
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
-})();
 </script>
 
 <template>

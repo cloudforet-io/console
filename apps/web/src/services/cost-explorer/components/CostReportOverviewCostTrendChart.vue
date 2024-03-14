@@ -15,10 +15,9 @@ import {
 } from 'lodash';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -52,7 +51,7 @@ const costReportPageStore = useCostReportPageStore();
 const costReportPageGetters = costReportPageStore.getters;
 const storeState = reactive({
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     legends: [] as Legend[],
@@ -140,12 +139,6 @@ const drawChart = () => {
         series.data.setAll(cloneDeep(state.chartData));
     });
 };
-
-/* Init */
-(async () => {
-    await store.dispatch('reference/provider/load');
-})();
-
 /* Watcher */
 watch([() => props.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) {

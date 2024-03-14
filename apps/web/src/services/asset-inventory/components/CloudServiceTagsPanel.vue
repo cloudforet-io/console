@@ -9,8 +9,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
 import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
@@ -36,13 +37,15 @@ const props = withDefaults(defineProps<{
     disabled: false,
     provider: '',
 });
+const allReferenceStore = useAllReferenceStore();
+
 const state = reactive({
     tagTypeList: computed(() => [
         { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.ALL') },
         { name: CLOUD_SERVICE_TAG_TYPE.CUSTOM, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.CUSTOM].label },
         { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
     ]),
-    providers: computed(() => store.getters['reference/provider/fieldItems']?.options),
+    providers: computed(() => allReferenceStore.getters.provider),
     selectedTagType: 'all',
     fields: computed(() => [
         { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
