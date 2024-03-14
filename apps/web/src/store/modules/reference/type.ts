@@ -24,8 +24,7 @@ export interface ReferenceItem<Data = Record<string, any>> {
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
 export type VuexStoreReferenceType =
-    |'provider'
-    |'protocol';
+    |'provider';
 
 interface VuexStoreReferenceTypeInfo {
     type: VuexStoreReferenceType;

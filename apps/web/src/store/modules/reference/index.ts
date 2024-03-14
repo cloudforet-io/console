@@ -4,7 +4,6 @@ import type { ReferenceRootState } from '@/store/modules/reference/type';
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import protocol from './protocol';
 import provider from './provider';
 
 // TODO: This is a temporary state. It must be changed to check each modules' items state is null.
@@ -20,6 +19,5 @@ export default {
     getters,
     modules: {
         provider,
-        protocol,
     },
 };
