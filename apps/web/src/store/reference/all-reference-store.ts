@@ -4,15 +4,19 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import type { CloudServiceQuerySetReferenceMap } from '@/store/reference/cloue-service-query-set-reference-store';
 import {
     useCloudServiceQuerySetReferenceStore,
 } from '@/store/reference/cloue-service-query-set-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
+import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
+import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -50,8 +54,10 @@ type PiniaStoreReferenceType =
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
+    const collectorReferenceStore = useCollectorReferenceStore();
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
+    const pluginReferenceStore = usePluginReferenceStore();
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
@@ -64,7 +70,9 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const regionReferenceStore = useRegionReferenceStore();
 
     const getters = reactive({
-        cloudServiceType: computed(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
+        cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
+        collector: computed<CollectorReferenceMap>(() => collectorReferenceStore.getters.collectorItems),
+        plugin: computed(() => pluginReferenceStore.getters.pluginItems),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
         project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
         user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
@@ -84,6 +92,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             switch (type) {
             case 'cloud_service_type':
                 await cloudServiceTypeReferenceStore.sync(data); break;
+            case 'collector':
+                await collectorReferenceStore.sync(data); break;
+            case 'plugin':
+                await pluginReferenceStore.sync(data); break;
             case 'project':
                 await projectReferenceStore.sync(data); break;
             case 'project_group':
@@ -111,10 +123,14 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             switch (type) {
             case 'cloud_service_type':
                 await cloudServiceTypeReferenceStore.load(options); break;
+            case 'collector':
+                await collectorReferenceStore.load(options); break;
             case 'cost_data_source':
                 await costDataSourceReferenceStore.load(options); break;
             case 'cloud_service_query_set':
                 await cloudServiceQuerySetReferenceStore.load(options); break;
+            case 'plugin':
+                await pluginReferenceStore.load(options); break;
             case 'project':
                 await projectReferenceStore.load(options); break;
             case 'project_group':
@@ -140,8 +156,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         },
         flush() {
             cloudServiceTypeReferenceStore.flush();
+            collectorReferenceStore.flush();
             costDataSourceReferenceStore.flush();
             cloudServiceQuerySetReferenceStore.flush();
+            pluginReferenceStore.flush();
             projectReferenceStore.flush();
             projectGroupReferenceStore.flush();
             workspaceReferenceStore.flush();

@@ -60,10 +60,8 @@ import {
     PButton, PTextButton,
 } from '@spaceone/design-system';
 
-
-import { store } from '@/store';
-
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -83,10 +81,11 @@ const emit = defineEmits([
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     loading: true,
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     isNameValid: false,
     isTagsValid: true,
@@ -132,10 +131,6 @@ const handleChangeIsTagsValid = (isValid: boolean) => {
 onMounted(() => {
     if (nameInputRef.value) nameInputRef.value.focus();
 });
-
-(async () => {
-    await store.dispatch('reference/collector/load', { force: true });
-})();
 </script>
 <style lang="postcss" scoped>
 .collector-page-2 {

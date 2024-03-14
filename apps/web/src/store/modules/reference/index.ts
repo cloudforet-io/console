@@ -2,10 +2,8 @@ import type { ReferenceRootState } from '@/store/modules/reference/type';
 
 // eslint-disable-next-line import/no-cycle
 import * as actions from './actions';
-import collector from './collector';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import plugin from './plugin';
 import protocol from './protocol';
 import provider from './provider';
 
@@ -21,9 +19,7 @@ export default {
     actions,
     getters,
     modules: {
-        collector,
         provider,
-        plugin,
         protocol,
     },
 };
