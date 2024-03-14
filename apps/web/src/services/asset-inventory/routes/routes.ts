@@ -22,6 +22,8 @@ const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
 const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
 
+const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
+
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
 
@@ -177,6 +179,12 @@ const assetInventoryRoute: RouteConfig = {
                     component: ServiceAccountAddPage as any,
                 },
             ],
+        },
+        {
+            path: 'metric-explorer',
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId },
+            component: MetricExplorerMainPage as any,
         },
     ],
 };
