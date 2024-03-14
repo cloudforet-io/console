@@ -29,12 +29,13 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import { store } from '@/store';
-
-import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+
+const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<{
     selectedTagKeys?: string[];
@@ -54,15 +55,14 @@ const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): vo
 
 /* providers */
 const providersMap = computed<ProviderReferenceMap>(() => ({
-    ...store.getters['reference/providerItems'],
+    ...allReferenceStore.getters.provider,
     custom: {
         label: 'Custom',
         key: 'custom',
         icon: 'ic_cloud-filled',
     },
 }));
-const providers = computed<ProviderReferenceItem[]>(() => Object.values(providersMap.value));
-store.dispatch('reference/provider/load');
+const providers = computed<ProviderItem[]>(() => Object.values(providersMap.value));
 const providerKeys = computed<string[]>(() => providers.value.map((provider) => provider.key));
 
 /* key items */

@@ -15,9 +15,9 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -36,9 +36,10 @@ import type {
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     initLoading: true,

@@ -1,6 +1,7 @@
 import { groupBy, sum } from 'lodash';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 

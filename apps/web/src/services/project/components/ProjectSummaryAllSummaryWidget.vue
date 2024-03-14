@@ -22,11 +22,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -61,13 +61,14 @@ const props = defineProps<Props>();
 
 const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
+const allReferenceStore = useAllReferenceStore();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
@@ -400,11 +401,6 @@ watch([() => chartState.loading, () => chartContext.value], async ([loading, _ch
 onUnmounted(() => {
     if (state.chart) state.chart.dispose();
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/provider/load');
-})();
 </script>
 
 <template>

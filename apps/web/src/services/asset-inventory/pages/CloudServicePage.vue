@@ -83,11 +83,10 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -142,7 +141,7 @@ export default {
             projects: computed(() => allReferenceStore.getters.project),
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
         });
         const handlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -236,9 +235,6 @@ export default {
         /* Init */
         let urlQueryStringWatcherStop;
         const init = async () => {
-            /* load references */
-            await Promise.allSettled([store.dispatch('reference/provider/load')]);
-
             /* init states from url query */
             const currentQuery = SpaceRouter.router.currentRoute.query;
             const urlQueryValue: CloudServicePageUrlQueryValue = {

@@ -18,7 +18,10 @@ import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -40,12 +43,13 @@ interface JobItem extends JobModel {
     provider?: string;
     collector?: string;
 }
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     loading: false,
     skeletons: range(2),
     timezone: computed(() => store.state.user.timezone || 'UTC'),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     jobs: [] as JobModel[],
     collectors: [] as CollectorModel[],
     collectorsMap: computed<Record<string, CollectorModel>>(() => {
@@ -159,10 +163,7 @@ const goToCollectorHistory = async (item) => {
 };
 
 const init = async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        getData(),
-    ]);
+    await getData();
 };
 
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
