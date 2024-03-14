@@ -11,7 +11,7 @@ import { ERROR_ROUTE } from '@/router/constant';
 import {
     getCurrentTime,
     getDecodedDataFromAccessToken,
-    getRouteScope,
+    getRouteScope, shouldUpdateScope,
     processRouteIntegrityCheck,
     processTokenVerification,
     processWorkspaceAccessValidation, verifyPageAccessAndRedirect,
@@ -94,12 +94,7 @@ export class SpaceRouter {
             }
 
             /* Grant Scope Process */
-            const isScopeChanged = !prevRole || !prevRole.startsWith(routeScope);
-            const isWorkspaceChanged = routeScope === 'WORKSPACE' && prevRole.startsWith(routeScope) && prevWorkspaceId !== to.params.workspaceId;
-            const isNotExcludeAuth = routeScope !== 'EXCLUDE_AUTH';
-            const needToChangeScope = (isScopeChanged || isWorkspaceChanged) && isNotExcludeAuth;
-
-            if (needToChangeScope) {
+            if (routeScope !== 'EXCLUDE_AUTH' && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
                 const { failStatus } = await grantAndLoadByCurrentScope(routeScope, to.params.workspaceId);
 
                 if (failStatus) { // Grant fail

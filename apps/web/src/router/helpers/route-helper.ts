@@ -54,6 +54,8 @@ export const getDecodedDataFromAccessToken = (): {rol: string, wid: string} => {
 export const getValidWorkspaceId = (workspaceId: string|undefined, workspaceList: WorkspaceModel[]): string|undefined => workspaceList.find((w) => w.workspace_id === workspaceId)?.workspace_id;
 
 
+
+// Router BeforeEach Guard - Route-Validation-and-Verification Process
 export const processTokenVerification = (to: Route, next: NavigationGuardNext): boolean => {
     const isTokenAlive = SpaceConnector.isTokenAlive;
 
@@ -137,6 +139,13 @@ export const processWorkspaceAccessValidation = async (to: Route, next: Navigati
     }
 
     return true;
+};
+
+// Grant Scope Process
+export const shouldUpdateScope = (prevRole: string, routeScope: RouteScopeType, prevWorkspaceId: string, targetWorkspaceId: string): boolean => {
+    const isScopeChanged = !prevRole || !prevRole.startsWith(routeScope);
+    const isWorkspaceChanged = routeScope === 'WORKSPACE' && prevRole.startsWith(routeScope) && prevWorkspaceId !== targetWorkspaceId;
+    return isScopeChanged || isWorkspaceChanged;
 };
 export const verifyPageAccessAndRedirect = (to: Route, next: NavigationGuardNext, workspaceId: string, pageAccessPermissionList: MenuId[]): void => {
     const isAccessibleRoute = calculateIsAccessibleRoute(to, pageAccessPermissionList);
