@@ -182,4 +182,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.INFO_NOTICE',
         icon: 'ic_gnb_bell',
     },
+    [MENU_ID.METRIC_EXPLORER]: {
+        menuId: MENU_ID.METRIC_EXPLORER,
+        routeName: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+        translationId: 'MENU.ASSET_INVENTORY_METRIC_EXPLORER',
+        icon: 'ic_service_service-account',
+    },
 });
