@@ -9,6 +9,7 @@ import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-servi
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
+import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
@@ -46,6 +47,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const collectorReferenceStore = useCollectorReferenceStore();
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
+    const pluginReferenceStore = usePluginReferenceStore();
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
@@ -63,12 +65,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
                 name: 'Protocol',
                 referenceMap: store.getters['reference/protocolItems'],
             },
-            plugin: {
-                type: 'plugin',
-                key: 'plugin_id',
-                name: 'Plugin',
-                referenceMap: store.getters['reference/pluginItems'],
-            },
+            plugin: pluginReferenceStore.getters.pluginTypeInfo,
             provider: {
                 type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
                 key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.idKey as string,

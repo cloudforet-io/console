@@ -12,7 +12,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import type { JobModel } from '@/schema/inventory/job/model';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -54,13 +53,6 @@ onActivated(() => {
     state.selectedItem = null;
     getJob();
 });
-
-// reference store
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/plugin/load'),
-    ]);
-})();
 </script>
 
 <template>

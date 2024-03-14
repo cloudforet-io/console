@@ -20,7 +20,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -72,10 +74,11 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.state;
+const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 

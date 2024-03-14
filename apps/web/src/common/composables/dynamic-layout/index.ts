@@ -96,7 +96,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Collector: computed(() => allReferenceStore.getters.collector),
         Provider: computed(() => store.getters['reference/providerItems']),
         Region: computed(() => allReferenceStore.getters.region),
-        Plugin: computed(() => store.getters['reference/pluginItems']),
+        Plugin: computed(() => allReferenceStore.getters.plugin),
         User: computed(() => allReferenceStore.getters.user),
         Protocol: computed(() => store.getters['reference/protocolItems']),
         Webhook: computed(() => allReferenceStore.getters.webhook),
