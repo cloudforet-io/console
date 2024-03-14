@@ -80,6 +80,16 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('project_group', data);
     },
+    '/identity/project-group/add-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project_group', data);
+    },
+    '/identity/project-group/remove-users': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project_group', data);
+    },
     '/notification/protocol/create': (data) => {
         useAllReferenceStore(pinia);
         const allReferenceStore = useAllReferenceStore();
