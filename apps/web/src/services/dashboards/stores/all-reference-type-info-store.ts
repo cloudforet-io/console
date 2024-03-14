@@ -12,6 +12,7 @@ import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-sou
 import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useProtocolReferenceStore } from '@/store/reference/protocol-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
@@ -50,6 +51,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const pluginReferenceStore = usePluginReferenceStore();
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
+    const protocolReferenceStore = useProtocolReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const serviceAccountReferenceStore = useServiceAccountReferenceStore();
@@ -59,12 +61,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
-            protocol: {
-                type: 'protocol',
-                key: 'protocol_id',
-                name: 'Protocol',
-                referenceMap: store.getters['reference/protocolItems'],
-            },
+            protocol: protocolReferenceStore.getters.protocolTypeInfo,
             plugin: pluginReferenceStore.getters.pluginTypeInfo,
             provider: {
                 type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
