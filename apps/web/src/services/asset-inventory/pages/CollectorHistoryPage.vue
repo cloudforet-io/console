@@ -27,9 +27,9 @@ import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -86,7 +86,7 @@ const handlers = reactive({
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
     collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 const state = reactive({
     loading: true,
@@ -211,10 +211,6 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 
 /* Init */
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/plugin/load'),
-    ]);
-
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
     apiQueryHelper.setPage(state.pageStart, state.pageSize)

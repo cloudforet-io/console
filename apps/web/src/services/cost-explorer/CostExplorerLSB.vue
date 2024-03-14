@@ -7,14 +7,13 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
@@ -53,6 +52,8 @@ const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     loading: true,
@@ -132,17 +133,15 @@ const state = reactive({
 });
 
 const dataSourceState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     items: computed<MenuItem[]>(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
+        const dataSourceMap: CostDataSourceReferenceMap = storeState.dataSourceMap;
         return Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
-            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon ? dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
+            imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
         }));
     }),
-    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
+    selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(storeState.dataSourceMap)[0]),
 });
 
 const filterMenuItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id])
@@ -153,7 +152,7 @@ const filterStarredItems = (menuItems: LSBItem[] = []): LSBItem[] => menuItems.f
 const getCurrentCurrencySet = (dataSourceKey: string): string => {
     const defaultCurrencySet = `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
 
-    const currentCurrency: string = dataSourceState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency;
+    const currentCurrency: string = storeState.dataSourceMap[dataSourceKey]?.data.plugin_info?.metadata?.currency;
     const currentSymbol: string = CURRENCY_SYMBOL[currentCurrency];
     const result = (currentCurrency && currentSymbol) && `${currentSymbol}${currentCurrency}`;
 
@@ -236,7 +235,7 @@ const handleSelectDataSource = (selected: string) => {
 <style scoped lang="postcss">
 .sidebar-menu {
     .no-data {
-        @apply flex items-center text-gray-500;
+        @apply flex items-center text-gray-500 text-label-md;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.125rem;

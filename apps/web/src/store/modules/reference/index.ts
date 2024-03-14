@@ -4,7 +4,6 @@ import type { ReferenceRootState } from '@/store/modules/reference/type';
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import plugin from './plugin';
 import protocol from './protocol';
 import provider from './provider';
 
@@ -21,7 +20,6 @@ export default {
     getters,
     modules: {
         provider,
-        plugin,
         protocol,
     },
 };

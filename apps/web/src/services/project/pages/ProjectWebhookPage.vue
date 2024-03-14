@@ -35,7 +35,8 @@ import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -60,6 +61,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const route = useRoute();
+const allReferenceStore = useAllReferenceStore();
 
 const handlers = {
     keyItemSets: [{
@@ -87,7 +89,7 @@ const webhookListApiQueryHelper = new ApiQueryHelper()
 const state = reactive({
     loading: true,
     timezone: computed(() => store.state.user.timezone),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dropdown: computed(() => ([
         {
             type: 'item',
@@ -271,10 +273,7 @@ const onChange = async (options: any = {}) => {
 
 /* init */
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/plugin/load'),
-        listWebhooks(),
-    ]);
+    await listWebhooks();
 })();
 
 onActivated(() => {
