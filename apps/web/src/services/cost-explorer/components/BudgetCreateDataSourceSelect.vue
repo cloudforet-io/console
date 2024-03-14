@@ -4,13 +4,11 @@ import { computed, reactive, watch } from 'vue';
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { store } from '@/store';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -37,7 +35,7 @@ const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

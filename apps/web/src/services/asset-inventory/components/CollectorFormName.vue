@@ -22,10 +22,10 @@ import {
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -35,6 +35,8 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 interface Props {
     loading: boolean;
 }
+
+const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
@@ -47,7 +49,7 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
-    collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     isFocused: false,
 });
@@ -80,10 +82,6 @@ watch(name, (value) => {
 watch(isAllValid, (value) => {
     emits('update-valid', value);
 }, { immediate: true });
-
-(async () => {
-    await store.dispatch('reference/collector/load', { force: true });
-})();
 
 defineExpose({ focus: () => { state.isFocused = true; } });
 

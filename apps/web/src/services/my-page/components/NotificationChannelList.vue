@@ -25,7 +25,8 @@ import type { UserChannelModel } from '@/schema/notification/user-channel/model'
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -46,6 +47,7 @@ interface EnrichedProtocolItem extends ProtocolModel {
     tags: Tags;
     icon: any;
 }
+const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<{
     projectId?: string;
@@ -82,7 +84,7 @@ const state = reactive({
             name: d.name,
         };
     })),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
 });
 
 
@@ -170,7 +172,6 @@ const onChangeChannelItem = async () => {
 };
 
 (async () => {
-    await store.dispatch('reference/plugin/load');
     await listProtocol();
     await listChannel();
 })();

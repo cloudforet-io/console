@@ -5,10 +5,11 @@ import { PI } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
 
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
-import { store } from '@/store';
 
-import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProtocolReferenceMap } from '@/store/reference/protocol-reference-store';
 
+const allReferenceStore = useAllReferenceStore();
 
 const CHANNEL_STATE = Object.freeze({
     ENABLED: 'ENABLED',
@@ -24,7 +25,7 @@ const props = withDefaults(defineProps<{
 });
 
 const state = reactive({
-    protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
+    protocols: computed<ProtocolReferenceMap>(() => allReferenceStore.getters.protocol),
 });
 
 const channelFormatter = (level?: string) => {
@@ -37,11 +38,6 @@ const protocolNameFormatter = (protocolId) => {
     const protocolName = get(state.protocols, protocolId);
     return protocolName ? protocolName.label : protocolId;
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/protocol/load');
-})();
 </script>
 
 <template>

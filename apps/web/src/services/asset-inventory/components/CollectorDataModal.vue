@@ -48,9 +48,9 @@ import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -70,7 +70,7 @@ const collectorDataModalState = collectorDataModalStore.$state;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 
