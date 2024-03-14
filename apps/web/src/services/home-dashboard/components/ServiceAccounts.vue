@@ -13,11 +13,11 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -27,6 +27,7 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { white } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 
 interface Data {
@@ -47,12 +48,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const CATEGORY_KEY = 'providerLabel';
 const VALUE_KEY = 'service_account_count';
+const allReferenceStore = useAllReferenceStore();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
@@ -138,7 +140,6 @@ const getData = debounce(async () => {
 }, 300);
 
 const init = async () => {
-    await store.dispatch('reference/provider/load', true);
     await getData();
 };
 const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);

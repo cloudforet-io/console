@@ -115,13 +115,12 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -182,7 +181,7 @@ export default {
         const favoriteGetters = favoriteStore.getters;
 
         const storeState = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
             favoriteProjects: computed<FavoriteItem[]>(() => favoriteGetters.projectItems),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
         });
@@ -298,11 +297,7 @@ export default {
         };
 
         const asyncInit = async () => {
-            await Promise.allSettled([
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/provider/load'),
-                getProjectSummary(allReferenceStore.getters.project),
-            ]);
+            await getProjectSummary(allReferenceStore.getters.project);
         };
         const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], asyncInit);
         callApiWithGrantGuard();
