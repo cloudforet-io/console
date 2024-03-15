@@ -183,6 +183,10 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         state.loading = false;
     }, 500));
 
+    watch(() => recentStore.state.totalCount, () => {
+        state.recentMenuList = recentStore.state.recentMenuList;
+    });
+
 
     return {
         storeState,

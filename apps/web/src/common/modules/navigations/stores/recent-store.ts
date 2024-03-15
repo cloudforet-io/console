@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -71,6 +72,20 @@ export const useRecentStore = defineStore('recent', () => {
                         type,
                     },
                 });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        deleteRecent: async (name: string) => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
+                    name,
+                });
+                const recentType = name.split(':')[2] as RecentType;
+                if (!Object.values(RECENT_TYPE).includes(recentType)) {
+                    throw new Error('Invalid recent type');
+                }
+                if (_getters.currentWorkspaceId) await actions.fetchRecent({ type: recentType, workspaceIds: [_getters.currentWorkspaceId] });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
