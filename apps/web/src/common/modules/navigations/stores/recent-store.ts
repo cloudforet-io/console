@@ -76,16 +76,19 @@ export const useRecentStore = defineStore('recent', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        deleteRecent: async (name: string) => {
+        deleteRecent: async ({ name, type, itemId }: {name?: string, type?: RecentType, itemId?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
-                    name,
+                    name: name ?? `console:recent:${type}:${_getters.currentWorkspaceId}:${itemId}`,
                 });
-                const recentType = name.split(':')[2] as RecentType;
-                if (!Object.values(RECENT_TYPE).includes(recentType)) {
-                    throw new Error('Invalid recent type');
+                let recentType = type;
+                if (name) {
+                    recentType = name.split(':')[2] as RecentType;
+                    if (!Object.values(RECENT_TYPE).includes(recentType)) {
+                        throw new Error('Invalid recent type');
+                    }
                 }
-                if (_getters.currentWorkspaceId) await actions.fetchRecent({ type: recentType, workspaceIds: [_getters.currentWorkspaceId] });
+                if (_getters.currentWorkspaceId && recentType) await actions.fetchRecent({ type: recentType, workspaceIds: [_getters.currentWorkspaceId] });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

@@ -25,7 +25,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
-        return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
+        const isPublicDashboard = dashboardId.slice(0, 6) === 'public';
+        if (isPublicDashboard) return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
+        return undefined;
     }
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {

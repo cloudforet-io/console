@@ -140,7 +140,7 @@ const handleClick = () => {
 };
 
 const handleDeleteRecent = () => {
-    recentStore.deleteRecent(props.recentId);
+    recentStore.deleteRecent({ name: props.recentId });
 };
 </script>
 
