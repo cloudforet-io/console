@@ -2,9 +2,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import { store } from '@/store';
-
-import type { ReferenceTypeInfo } from '@/store/modules/reference/type';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
@@ -13,16 +10,16 @@ import { usePluginReferenceStore } from '@/store/reference/plugin-reference-stor
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useProtocolReferenceStore } from '@/store/reference/protocol-reference-store';
+import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
+import type { ReferenceTypeInfo } from '@/store/reference/type';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
 
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
@@ -52,6 +49,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const protocolReferenceStore = useProtocolReferenceStore();
+    const providerReferenceStore = useProviderReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const serviceAccountReferenceStore = useServiceAccountReferenceStore();
@@ -63,12 +61,7 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
             protocol: protocolReferenceStore.getters.protocolTypeInfo,
             plugin: pluginReferenceStore.getters.pluginTypeInfo,
-            provider: {
-                type: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
-                key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.idKey as string,
-                name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
-                referenceMap: store.getters['reference/providerItems'],
-            },
+            provider: providerReferenceStore.getters.providerTypeInfo,
             collector: collectorReferenceStore.getters.collectorTypeInfo,
             cloud_service_type: cloudServiceTypeReferenceStore.getters.cloudServiceTypeTypeInfo,
             service_account: serviceAccountReferenceStore.getters.serviceAccountTypeInfo,
@@ -83,10 +76,6 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             region: regionReferenceStore.getters.regionTypeInfo,
         })),
     });
-
-    (async () => {
-        await store.dispatch('reference/loadAll');
-    })();
 
     return {
         getters,

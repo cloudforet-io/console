@@ -16,11 +16,9 @@ import { PDataLoader, PProgressBar, PEmpty } from '@spaceone/design-system';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import config from '@/lib/config';
@@ -68,7 +66,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
@@ -291,9 +289,6 @@ onUnmounted(() => {
 });
 
 const init = async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
     initLegends();
     initResourceInfo();
 };

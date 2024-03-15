@@ -16,7 +16,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';

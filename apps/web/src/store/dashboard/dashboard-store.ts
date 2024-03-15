@@ -49,6 +49,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
     const favoriteStore = useFavoriteStore();
+    const favoriteGetters = favoriteStore.getters;
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -220,11 +221,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
 
-            await favoriteStore.deleteFavorite({
-                itemType: FAVORITE_TYPE.DASHBOARD,
-                workspaceId: _state.currentWorkspaceId || '',
-                itemId: dashboardId,
-            });
+            const isFavoriteItem = favoriteGetters.dashboardItems.find((item) => item.itemId === dashboardId);
+            if (isFavoriteItem) {
+                await favoriteStore.deleteFavorite({
+                    itemType: FAVORITE_TYPE.DASHBOARD,
+                    workspaceId: _state.currentWorkspaceId || '',
+                    itemId: dashboardId,
+                });
+            }
         } catch (e) {
             ErrorHandler.handleError(e);
             throw e;

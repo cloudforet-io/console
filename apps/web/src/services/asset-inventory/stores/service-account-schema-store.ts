@@ -18,14 +18,17 @@ import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { ReferenceItem } from '@/store/modules/reference/type';
+
 import type { UserState } from '@/store/modules/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { ReferenceItem } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getAccountFields, getCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
+
 
 interface Getters {
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
@@ -41,8 +44,9 @@ interface Getters {
 // description: The JSON Schema required for the service account is defined for each provider.
 // The JSON Schema defined for each provider is used to configure the DynamicLayout on the client side.
 export const useServiceAccountSchemaStore = defineStore('service-account-schema', () => {
+    const allReferenceStore = useAllReferenceStore();
     const _providerSchemaMap = ref<Record<string, SchemaModel[]>>({});
-    const _providerItemMap = computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']);
+    const _providerItemMap = computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider);
     const _userConfigMap = computed<UserState>(() => store.state.user);
 
     const state = reactive({

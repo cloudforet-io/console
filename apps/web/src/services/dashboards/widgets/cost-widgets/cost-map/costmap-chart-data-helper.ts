@@ -1,6 +1,6 @@
 import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 

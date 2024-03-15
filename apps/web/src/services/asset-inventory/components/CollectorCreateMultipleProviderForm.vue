@@ -46,10 +46,8 @@ import {
     PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
 } from '@spaceone/design-system';
 
-
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import {
     useCollectorFormStore,
@@ -57,11 +55,12 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(event: 'update-valid', value: boolean): void; }>();
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerList: computed(() => {
         const supportedProviderList = collectorFormState.repositoryPlugin?.capability?.supported_providers ?? [];
         return supportedProviderList.map((providerName) => ({

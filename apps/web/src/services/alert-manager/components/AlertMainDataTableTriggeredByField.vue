@@ -10,7 +10,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/reference/type';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 

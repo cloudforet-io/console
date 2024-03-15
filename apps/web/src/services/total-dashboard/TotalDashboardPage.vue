@@ -97,7 +97,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
 import type { DomainModel } from '@/schema/identity/domain/model';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -168,7 +167,6 @@ export default {
         /** Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
                 getDomainList(),
             ]);
             switchDomain(state.domainList[0]);

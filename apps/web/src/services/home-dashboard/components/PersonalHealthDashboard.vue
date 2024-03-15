@@ -112,9 +112,9 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -154,7 +154,7 @@ export default {
         const { getProperRouteLocation } = useProperRouteLocation();
 
         const storeState = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
             regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
             currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             favoriteProjects: computed(() => favoriteGetters.projectItems),
