@@ -8,6 +8,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PSelectDropdown, PBadge,
 } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -71,12 +72,12 @@ const handleChangeTextInput = (value: string) => {
         state.menuVisible = true;
     }
 };
-const handleEnterTextInput = async () => {
+const handleEnterTextInput = debounce(async () => {
     if (formState.searchText === '') return;
     if (validateUserId()) {
         await getUserList();
     }
-};
+}, 100);
 const handleClickDeleteButton = (idx: number) => {
     state.selectedItems.splice(idx, 1);
     emit('change-input', { userList: state.selectedItems });
