@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
@@ -45,12 +45,11 @@ import type { CollectorCollectParameters } from '@/schema/inventory/collector/ap
 import type { JobModel } from '@/schema/inventory/job/model';
 import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -70,8 +69,8 @@ const collectorDataModalState = collectorDataModalStore.$state;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 
 const state = reactive({
@@ -169,10 +168,6 @@ watch([() => collectorDataModalState.selectedCollector, () => collectorDataModal
     await fetchSecrets(selectedCollector.provider, state.serviceAccountsFilter);
     await collectorDataModalStore.getJobs(selectedCollector.collector_id);
 }, { immediate: true });
-
-onMounted(() => {
-    store.dispatch('reference/provider/load');
-});
 
 onUnmounted(() => {
     collectorDataModalStore.$dispose();

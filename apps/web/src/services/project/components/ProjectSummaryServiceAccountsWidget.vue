@@ -11,11 +11,11 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { byteFormatter } from '@cloudforet/utils';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -51,6 +51,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     projectId: '',
 });
+const allReferenceStore = useAllReferenceStore();
 
 const queryHelper = new QueryHelper();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -59,7 +60,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     items: [] as Item[],
     fields: computed(() => [
         { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },
@@ -136,11 +137,6 @@ const getData = async () => {
         state.loading = false;
     }
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/provider/load');
-})();
 
 /* Watcher */
 watch(() => state.providers, (providers) => {

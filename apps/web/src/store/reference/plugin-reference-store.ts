@@ -13,7 +13,7 @@ import { store } from '@/store';
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
-} from '@/store/modules/reference/type';
+} from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

@@ -8,10 +8,8 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap, RegionReferenceItem } from '@/store/reference/region-reference-store';
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -53,7 +51,7 @@ const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
 });
 const state = reactive({
@@ -109,13 +107,6 @@ const handleChangeSelected = (selected?: SelectDropdownMenuItem[]) => {
     }
     emit('click-done', selected.map((d) => d.name));
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
-})();
 </script>
 
 <template>

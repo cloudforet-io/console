@@ -16,9 +16,9 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,10 +40,10 @@ const props = defineProps<{
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    providerLoading: true,
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
@@ -56,7 +56,7 @@ const state = reactive({
     attachedTrustedAccountId: computed(() => state.item?.trusted_account_id),
     providerId: computed(() => state.item?.provider),
     provider: computed(() => {
-        if (!storeState.providerLoading && !state.loading) {
+        if (!state.loading) {
             return storeState.providers[state.providerId] || undefined;
         }
         return undefined;
@@ -111,13 +111,6 @@ const handleClickBackbutton = () => {
     });
 };
 
-/* Init */
-(async () => {
-    storeState.providerLoading = true;
-    await store.dispatch('reference/provider/load');
-    storeState.providerLoading = false;
-})();
-
 /* Watcher */
 watch(() => props.serviceAccountId, async (serviceAccountId) => {
     if (serviceAccountId) {
@@ -137,7 +130,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
         >
             <template #title-left-extra>
                 <p-lazy-img :src="state.providerIcon"
-                            :loading="storeState.providerLoading || state.loading"
+                            :loading="state.loading"
                             error-icon="ic_cloud-filled"
                 />
             </template>

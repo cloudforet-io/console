@@ -13,14 +13,15 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -31,6 +32,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, white } from '@/styles/colors';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+
 
 
 const router = useRouter();
@@ -64,9 +66,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 
 const state = reactive({
@@ -273,7 +276,6 @@ const handlePrint = () => {
     const isSucceeded = await initStatesByUrlSSOToken();
     if (!isSucceeded) return;
     await fetchReportData();
-    await store.dispatch('reference/provider/load');
     await setI18nLocale(props.language);
     await fetchTableData();
     state.loading = false;

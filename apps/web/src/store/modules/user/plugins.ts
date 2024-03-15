@@ -2,6 +2,7 @@ import type { Store } from 'vuex';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
+// eslint-disable-next-line import/no-cycle
 import { STORAGE_KEY } from '@/store/modules/user';
 
 import * as mutations from './mutations';

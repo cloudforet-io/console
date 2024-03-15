@@ -12,8 +12,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilterOperator, ConsoleFilterValue, ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
 import type { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ReferenceMap } from '@/store/reference/type';
 
 interface KeyItem extends MirinaeKeyItem {
     reference?: string;

@@ -23,20 +23,6 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
-export type VuexStoreReferenceType =
-    |'provider'
-    |'collector'
-    |'protocol'
-    |'plugin';
-
-interface VuexStoreReferenceTypeInfo {
-    type: VuexStoreReferenceType;
-    key: string; // project_id
-    name: string; // Project
-    referenceMap: ReferenceMap;
-}
-export type VuexStoreAllReferenceTypeInfo = Record<VuexStoreReferenceType, VuexStoreReferenceTypeInfo>;
-
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;
 }

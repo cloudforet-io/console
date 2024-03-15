@@ -12,12 +12,9 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import { store } from '@/store';
-
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { pinia } from '@/store/pinia';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 
 useAllReferenceStore(pinia);
@@ -83,22 +80,19 @@ export function useQuerySearchPropsWithSearchSchema(
     searchSchema: ComputedRef<SearchSchema>,
     resourceType: string,
     filters?: ComputedRef<ApiFilter[]>,
-): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {
-    (async () => {
-        await store.dispatch('reference/loadAll');
-    })();
+): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap> } {
     const storeState = reactive({
         Project: computed(() => allReferenceStore.getters.project),
         ProjectGroup: computed(() => allReferenceStore.getters.projectGroup),
         ServiceAccount: computed(() => allReferenceStore.getters.serviceAccount),
         CloudServiceType: computed(() => allReferenceStore.getters.cloudServiceType),
         Secret: computed(() => allReferenceStore.getters.secret),
-        Collector: computed(() => store.getters['reference/collectorItems']),
-        Provider: computed(() => store.getters['reference/providerItems']),
+        Collector: computed(() => allReferenceStore.getters.collector),
+        Provider: computed(() => allReferenceStore.getters.provider),
         Region: computed(() => allReferenceStore.getters.region),
-        Plugin: computed(() => store.getters['reference/pluginItems']),
+        Plugin: computed(() => allReferenceStore.getters.plugin),
         User: computed(() => allReferenceStore.getters.user),
-        Protocol: computed(() => store.getters['reference/protocolItems']),
+        Protocol: computed(() => allReferenceStore.getters.protocol),
         Webhook: computed(() => allReferenceStore.getters.webhook),
     });
 
@@ -109,17 +103,15 @@ export function useQuerySearchPropsWithSearchSchema(
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    debouncedWatch([() => searchSchema.value, () => store.state.reference.isAllLoaded], (watchValue) => {
-        if (!watchValue) return;
-        const [schema, isAllLoaded] = watchValue;
-        if (isAllLoaded && schema.length) {
+    debouncedWatch(() => searchSchema.value, (schema) => {
+        if (!schema) return;
+        if (schema.length) {
             state.keyItemSets = getKeyItemSets(schema, storeState);
             state.valueHandlerMap = getValueHandlerMap(searchSchema.value, resourceType, filters?.value, storeState.Provider);
         }
     }, { immediate: true, debounce: 200 });
 
     return {
-        isAllLoaded: computed(() => store.state.reference.isAllLoaded),
         keyItemSets: computed(() => state.keyItemSets),
         valueHandlerMap: computed(() => state.valueHandlerMap),
     };

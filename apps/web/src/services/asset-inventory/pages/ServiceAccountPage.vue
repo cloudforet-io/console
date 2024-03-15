@@ -33,8 +33,10 @@ import type { TrustedAccountListParameters } from '@/schema/identity/trusted-acc
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
@@ -62,13 +64,17 @@ const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountSchemaState = serviceAccountSchemaStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerList: computed(() => Object.values(state.providers)),
     selectedProvider: undefined,
     selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
     timezone: computed(() => store.state.user.timezone || 'UTC'),
+    grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
+    currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
 });
 
 /** States for Dynamic Layout(search table type) * */
@@ -106,7 +112,7 @@ const tableState = reactive({
 });
 
 const searchFilter = new ApiQueryHelper();
-const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed<SearchSchema>(() => tableState.schema?.options?.search as unknown as SearchSchema ?? []),
     'identity.ServiceAccount',
     computed(() => searchFilter.setFilters([
@@ -217,7 +223,7 @@ const handleClickRow = (index) => {
     });
 };
 const handleDynamicLayoutFetch = (changed) => {
-    if (tableState.schema === null || !isAllLoaded.value) return;
+    if (tableState.schema === null) return;
     fetchTableData(changed);
 };
 const handleVisibleCustomFieldModal = (visible) => {
@@ -235,13 +241,14 @@ const reloadTable = async () => {
 };
 
 const replaceQueryHelper = new QueryHelper();
-watch(() => store.state.reference.provider.items, (providers) => {
+watch(() => state.providers, (providers) => {
     if (providers) {
         const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
         state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
     }
 }, { immediate: true });
-watch(() => state.selectedProvider, async (after, before) => {
+watch([() => state.selectedProvider, () => state.grantLoading], async ([after], [before]) => {
+    if (state.currentGrantInfo.scope === 'USER') return;
     if (after && after !== before) {
         await serviceAccountSchemaStore.setProviderSchema(after);
         await replaceUrlQuery('provider', after);
@@ -255,16 +262,13 @@ watch(() => tableState.searchFilters, (searchFilters) => {
         replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
     }
 });
-watch(() => tableState.selectedAccountType, () => {
+watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
+    if (state.currentGrantInfo.scope === 'USER') return;
     listServiceAccountData();
 }, { immediate: true });
 
 (async () => {
-    const actionList = [
-        store.dispatch('reference/provider/load'),
-    ];
-    if (state.selectedProvider) actionList.push(serviceAccountSchemaStore.setProviderSchema(state.selectedProvider));
-    await Promise.allSettled(actionList);
+    if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
 })();
 </script>
 

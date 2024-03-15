@@ -7,14 +7,13 @@ import {
 } from '@spaceone/design-system';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -41,7 +40,7 @@ const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
@@ -105,13 +104,6 @@ const state = reactive({
         return result || `${CURRENCY_SYMBOL.USD}${CURRENCY.USD}`;
     }),
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
-})();
 
 </script>
 
