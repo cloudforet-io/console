@@ -17,6 +17,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CloudServiceLSB from '@/services/asset-inventory/components/CloudServiceLSB.vue';
+import SecurityLSB from '@/services/asset-inventory/components/SecurityLSB.vue';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
@@ -62,6 +63,7 @@ onUnmounted(() => {
         <vertical-page-layout v-if="state.lsbVisible">
             <template #sidebar>
                 <cloud-service-l-s-b v-if="state.menuId === MENU_ID.CLOUD_SERVICE" />
+                <security-l-s-b v-if="state.menuId === MENU_ID.SECURITY" />
             </template>
             <template #default>
                 <router-view />
