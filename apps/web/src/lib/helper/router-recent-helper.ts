@@ -53,8 +53,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
 
     if (to.name === ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME) {
         const serviceAccountId = to?.params?.serviceAccountId;
+        const isTrustedAccount = serviceAccountId.slice(0, 2) === 'ta';
         if (!serviceAccountId) return undefined;
-        return { itemType: RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
+        return { itemType: isTrustedAccount ? RECENT_TYPE.TRUSTED_ACCOUNT : RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
     }
 
     if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) {
