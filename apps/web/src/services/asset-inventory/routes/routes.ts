@@ -98,7 +98,7 @@ const assetInventoryRoute: RouteConfig = {
         {
             path: 'security',
             name: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
-            meta: { menuId: MENU_ID.SECURITY, translationId: MENU_INFO_MAP[MENU_ID.SECURITY].translationId },
+            meta: { lsbVisible: true, menuId: MENU_ID.SECURITY, translationId: MENU_INFO_MAP[MENU_ID.SECURITY].translationId },
             component: SecurityPage as any,
         },
         {

@@ -42,7 +42,7 @@ const handleChangeToggle = (value: boolean) => {
 </script>
 
 <template>
-    <div class="asset-inventory-l-s-b-toggle-menu-item">
+    <div class="cloud-service-l-s-b-toggle-menu-item">
         <div class="toggle-title">
             <span>{{ props.label }}</span>
             <p-toggle-button :value="state.toggleStatus"
@@ -62,7 +62,7 @@ const handleChangeToggle = (value: boolean) => {
 </template>
 
 <style scoped lang="postcss">
-.asset-inventory-l-s-b-toggle-menu-item {
+.cloud-service-l-s-b-toggle-menu-item {
     @apply flex flex-col text-label-md;
     padding-right: 0.5rem;
     padding-bottom: 0.5rem;

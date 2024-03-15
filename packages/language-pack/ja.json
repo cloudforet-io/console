@@ -2686,6 +2686,11 @@
 			"NO_JOB": "近のジョブはありません",
 			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": ""
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "作業",

@@ -4,5 +4,5 @@ import CloudServiceDetailPage
 </script>
 
 <template>
-    <cloud-service-detail-page :is-server-page="true" />
+    <cloud-service-detail-page :is-security-page="true" />
 </template>
