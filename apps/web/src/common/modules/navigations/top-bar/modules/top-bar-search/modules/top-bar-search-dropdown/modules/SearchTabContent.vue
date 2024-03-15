@@ -178,7 +178,6 @@ watch(() => contentsSize.height.value, (height) => {
 .search-tab-content {
     @apply flex gap-3 h-full;
     padding: 1rem 0;
-    height: 100%;
 
     .service-item-list {
         width: 100%;

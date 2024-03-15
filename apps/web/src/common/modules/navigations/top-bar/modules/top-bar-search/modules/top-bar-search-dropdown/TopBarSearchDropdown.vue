@@ -96,7 +96,7 @@ const handleUpdateActiveTab = (tab: SearchTab) => {
 };
 
 const handleUpdateContentsSize = (height: number) => {
-    state.contentsHeight = height;
+    if (state.contentsHeight !== height) state.contentsHeight = height;
 };
 
 const handleSelect = (menuType: 'search'|'recent', item) => {
@@ -136,6 +136,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     :is-focused="props.isFocused"
                     :active-tab="storeState.activeTab"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
+                    @update:contents-size="handleUpdateContentsSize"
                     @move-focus-end="handleMoveFocusEnd"
                     @select="handleSelect"
                 />
