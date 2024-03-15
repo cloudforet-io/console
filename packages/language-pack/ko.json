@@ -2686,6 +2686,11 @@
 			"NO_JOB": "최근 작업내역 없음",
 			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": ""
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "작업",

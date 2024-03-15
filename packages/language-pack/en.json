@@ -2686,6 +2686,11 @@
 			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": "Security"
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",
