@@ -21,6 +21,8 @@ import { setI18nLocale } from '@/translations';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { MANAGED_ROLES } from '@/store/modules/user/config';
+// eslint-disable-next-line import/no-cycle
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
@@ -89,7 +91,7 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
     return decodedToken.rol;
 };
-export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     const appContextStore = useAppContextStore();
     const userWorkspaceStore = useUserWorkspaceStore();
     const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
@@ -126,7 +128,8 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             if (grantRequest.scope === 'USER') userWorkspaceStore.setCurrentWorkspace();
 
             if (roleInfo) {
-                await dispatch('reference/initializeAllReference', {}, { root: true });
+                const allReferenceStore = useAllReferenceStore();
+                allReferenceStore.flush();
             }
             commit('error/setGrantAccessFailStatus', false, { root: true });
         }
