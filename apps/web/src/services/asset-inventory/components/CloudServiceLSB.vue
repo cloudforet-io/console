@@ -166,7 +166,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 <template>
     <l-s-b :menu-set="state.menuSet"
            :top-title="state.topTitle"
-           class="asset-inventory-l-s-b"
+           class="cloud-service-l-s-b"
     >
         <template #collapsible-contents>
             <p-radio-group direction="vertical"
@@ -204,7 +204,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 </template>
 
 <style lang="postcss" scoped>
-.asset-inventory-l-s-b {
+.cloud-service-l-s-b {
     .provider-radio-group {
         .provider-item {
             @apply flex items-center;
