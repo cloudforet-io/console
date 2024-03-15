@@ -122,10 +122,11 @@ const tableState = reactive({
     }),
     selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
+        if (tableState.isTrustedAccount) return 'Trusted Account';
         if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
             return PROVIDER_ACCOUNT_NAME[state.selectedProvider];
         }
-        return tableState.isTrustedAccount ? 'Trusted Account' : 'General Account';
+        return 'General Account';
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
