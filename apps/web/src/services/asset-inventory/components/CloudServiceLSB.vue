@@ -14,8 +14,6 @@ import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
@@ -29,7 +27,7 @@ import type {
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import AssetInventoryLSBToggleMenuItem from '@/services/asset-inventory/components/AssetInventoryLSBToggleMenuItem.vue';
+import CloudServiceLSBToggleMenuItem from '@/services/asset-inventory/components/CloudServiceLSBToggleMenuItem.vue';
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
@@ -191,13 +189,13 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             </p-radio-group>
         </template>
         <template #slot-category>
-            <asset-inventory-l-s-b-toggle-menu-item :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY"
-                                                    :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
+            <cloud-service-l-s-b-toggle-menu-item :type="CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY"
+                                                  :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY')"
             />
         </template>
         <template #slot-region>
-            <asset-inventory-l-s-b-toggle-menu-item :type="CLOUD_SERVICE_FILTER_KEY.REGION"
-                                                    :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.REGION')"
+            <cloud-service-l-s-b-toggle-menu-item :type="CLOUD_SERVICE_FILTER_KEY.REGION"
+                                                  :label="$t('INVENTORY.CLOUD_SERVICE.MAIN.REGION')"
             />
         </template>
     </l-s-b>
