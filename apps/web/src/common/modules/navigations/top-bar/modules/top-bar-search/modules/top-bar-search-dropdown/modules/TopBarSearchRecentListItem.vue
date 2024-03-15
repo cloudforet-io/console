@@ -84,7 +84,7 @@ const getLabelByResourceId = (resourceId: string, activeTab: SearchTab) => {
         } else if (provider === 'azure') {
             accountId = storeState.serviceAccountMap[resourceId]?.data?.subscription_id;
         }
-        return `${accountId ?? resourceId} (${storeState.serviceAccountMap[resourceId]?.label})`;
+        return `${storeState.serviceAccountMap[resourceId]?.label} (${accountId ?? resourceId})`;
     } if (activeTab === SEARCH_TAB.PROJECT) {
         return storeState.projectMap[resourceId]?.label;
     } if (activeTab === SEARCH_TAB.DASHBOARD) {
