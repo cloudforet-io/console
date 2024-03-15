@@ -2686,6 +2686,15 @@
 			"NO_JOB": "近のジョブはありません",
 			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
+		"METRIC_EXPLORER": {
+			"DAILY": "日別データ",
+			"FILTERS": "フィルター",
+			"GRANULARITY": "細部基準",
+			"METRIC_EXPLORER": "",
+			"MONTHLY": "月別データ",
+			"SAVE": "保存",
+			"SAVE_AS": "名前を付けて保存"
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "作業",

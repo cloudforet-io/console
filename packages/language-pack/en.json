@@ -2686,6 +2686,15 @@
 			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
+		"METRIC_EXPLORER": {
+			"DAILY": "Daily",
+			"FILTERS": "Filters",
+			"GRANULARITY": "Granularity",
+			"METRIC_EXPLORER": "Metric Explorer",
+			"MONTHLY": "Monthly",
+			"SAVE": "Save",
+			"SAVE_AS": "Save as"
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",

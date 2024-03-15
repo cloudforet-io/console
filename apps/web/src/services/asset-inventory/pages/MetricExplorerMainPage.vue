@@ -1,17 +1,26 @@
 <script lang="ts" setup>
+import {
+    PDivider,
+} from '@spaceone/design-system';
+
+// import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
+// import MetricExplorerDataTable from '@/services/asset-inventory/components/MetricExplorerDataTable.vue';
+// import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
+import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
+import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
 </script>
 
 <template>
     <div class="metric-explorer-content">
-        <!--header-->
-        Metric Explorer 깡통
+        <metric-explorer-header />
+        <p-divider />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
-                <!--query section-->
+                <metric-explorer-query-section />
                 <div class="contents-wrapper">
-                    <!--group by-->
-                    <!--chart-->
-                    <!--data table-->
+                    <!--<metric-explorer-group-by />-->
+                    <!--<metric-explorer-chart />-->
+                    <!--<metric-explorer-data-table />-->
                 </div>
             </div>
         </div>

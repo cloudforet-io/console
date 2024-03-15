@@ -2686,6 +2686,15 @@
 			"NO_JOB": "최근 작업내역 없음",
 			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
+		"METRIC_EXPLORER": {
+			"DAILY": "일별 데이터",
+			"FILTERS": "필터",
+			"GRANULARITY": "세부 기준",
+			"METRIC_EXPLORER": "",
+			"MONTHLY": "월별 데이터",
+			"SAVE": "저장",
+			"SAVE_AS": "다른 이름으로 저장"
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "작업",
