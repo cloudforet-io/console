@@ -40,7 +40,7 @@ export const useSecurityPageStore = defineStore('security-page', () => {
         allFilters: computed<ConsoleFilter[]>(() => {
             const filters: ConsoleFilter[] = [];
             // TODO: will be changed to 'CSPM'
-            filters.push({ k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '=' });
+            filters.push({ k: 'ref_cloud_service_type.labels', v: ['Security'], o: '=' });
             return filters.concat(state.searchFilters);
         }),
     });
