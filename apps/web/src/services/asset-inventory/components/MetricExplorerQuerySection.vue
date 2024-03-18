@@ -11,6 +11,8 @@ import {
 } from '@spaceone/design-system';
 
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
+import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
+// import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -36,8 +38,9 @@ const handleClickFilter = () => {
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
             <div class="left-part">
-                <!--operator-->
+                <metric-explorer-operator-dropdown />
                 <metric-explorer-granularity-dropdown />
+                <!--<metric-explorer-period-dropdown />-->
                 <!--period-->
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
