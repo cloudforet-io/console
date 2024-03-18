@@ -46,7 +46,7 @@ export const useSecurityPageStore = defineStore('security-page', () => {
     });
 
     const actions = {
-        fetchCloudServiceAnalyze: async () => {
+        fetchCloudServiceAnalyze: async (): Promise<CloudServiceAnalyzeResult[] | undefined> => {
             try {
                 const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
                     query: getCloudServiceAnalyzeQuery(
@@ -54,9 +54,11 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                     ),
                 });
                 state.cloudServiceAnalyzeList = results;
+                return results || [];
             } catch (e) {
                 state.cloudServiceAnalyzeList = [];
                 ErrorHandler.handleError(e);
+                return undefined;
             }
         },
         listCloudServiceTypeData: async (provider: string, group: string) => {
