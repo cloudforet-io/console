@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_chart-treemap': {
-    width: 16,
-    height: 16,
-    viewBox: '0 0 16 16',
-    data: '<path pid="0" d="M14 1H2a1 1 0 00-1 1v12a1.001 1.001 0 001 1h12a1.001 1.001 0 001-1V2a1.001 1.001 0 00-1-1zm0 6h-2.5V2H14v5zM8 2h2.5v5H8V2zM7 2v8H2V2h5zm-5 9h5v3H2v-3zm6 3V8h6v6H8z" _fill="#515364"/>'
+    width: 24,
+    height: 24,
+    viewBox: '0 0 24 24',
+    data: '<path pid="0" d="M21 1.5H3A1.502 1.502 0 001.5 3v18A1.501 1.501 0 003 22.5h18a1.502 1.502 0 001.5-1.5V3A1.502 1.502 0 0021 1.5zm0 9h-3.75V3H21v7.5zM12 3h3.75v7.5H12V3zm-1.5 0v12H3V3h7.5zM3 16.5h7.5V21H3v-4.5zm9 4.5v-9h9v9h-9z" _fill="#232533"/>'
   }
 })
