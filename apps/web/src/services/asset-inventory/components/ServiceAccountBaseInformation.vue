@@ -10,7 +10,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
-import type { SchemaGetParameters } from '@/schema/identity/schema/api-verbs/get';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
@@ -28,6 +27,7 @@ import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
@@ -51,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'refresh'): void; }>();
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 
 interface State {
     loading: boolean;
@@ -58,7 +59,7 @@ interface State {
     providerData: Partial<ProviderModel>;
     mode: PageMode;
     isFormValid: boolean|undefined;
-    baseInformationSchema: Partial<SchemaModel>;
+    baseInformationSchema: ComputedRef<Partial<SchemaModel>>;
     baseInformationForm: Partial<BaseInformationForm>;
     originBaseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
 }
@@ -68,7 +69,8 @@ const state = reactive<State>({
     providerData: {},
     mode: 'READ',
     isFormValid: undefined,
-    baseInformationSchema: {},
+    // baseInformationSchema: {},
+    baseInformationSchema: computed(() => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema)),
     baseInformationForm: {},
     originBaseInformationForm: computed(() => ({
         accountName: props.serviceAccountData?.name,
@@ -93,6 +95,7 @@ const getProvider = async () => {
         state.providerData = {};
     }
 };
+
 const updateServiceAccount = async () => {
     try {
         state.loading = true;
@@ -120,17 +123,6 @@ const updateServiceAccount = async () => {
     }
 };
 
-const getBaseInformationSchema = async () => {
-    try {
-        state.baseInformationSchema = await SpaceConnector.clientV2.identity.schema.get<SchemaGetParameters, SchemaModel>({
-            schema_id: `${props.provider}-service-account`,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.baseInformationSchema = {};
-    }
-};
-
 /* Event */
 const handleClickEditButton = () => {
     state.mode = 'UPDATE';
@@ -152,7 +144,6 @@ const handleChangeForm = (form) => {
 watch(() => props.provider, async (provider) => {
     if (provider) {
         await getProvider();
-        await getBaseInformationSchema();
     }
 });
 

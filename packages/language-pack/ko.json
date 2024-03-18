@@ -2696,6 +2696,11 @@
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장"
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": ""
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "작업",
@@ -2825,6 +2830,7 @@
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",
 		"ASSET_INVENTORY_COLLECTOR": "컬렉터",
 		"ASSET_INVENTORY_METRIC_EXPLORER": "",
+		"ASSET_INVENTORY_SECURITY": "",
 		"ASSET_INVENTORY_SERVER": "서버",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 어카운트",
 		"COST_EXPLORER": "비용 관리",

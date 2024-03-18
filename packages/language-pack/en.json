@@ -2696,6 +2696,11 @@
 			"SAVE": "Save",
 			"SAVE_AS": "Save as"
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": "Security"
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",
@@ -2825,6 +2830,7 @@
 		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
 		"ASSET_INVENTORY_COLLECTOR": "Collector",
 		"ASSET_INVENTORY_METRIC_EXPLORER": "Metric Explorer",
+		"ASSET_INVENTORY_SECURITY": "Security",
 		"ASSET_INVENTORY_SERVER": "Server",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"COST_EXPLORER": "Cost Explorer",

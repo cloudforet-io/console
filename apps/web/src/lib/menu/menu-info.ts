@@ -49,6 +49,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ASSET_INVENTORY_SERVER',
         icon: 'ic_service_server',
     },
+    [MENU_ID.SECURITY]: {
+        menuId: MENU_ID.SECURITY,
+        routeName: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
+        translationId: 'MENU.ASSET_INVENTORY_SECURITY',
+        icon: 'ic_service_security',
+    },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
         routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,

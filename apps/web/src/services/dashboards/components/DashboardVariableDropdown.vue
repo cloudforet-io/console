@@ -21,7 +21,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import { VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';

@@ -44,6 +44,7 @@ interface Props {
     group: string;
     name: string;
     isServerPage: boolean;
+    isSecurityPage: boolean;
     selectedIndex: number;
     timezone: string;
 }
@@ -57,14 +58,19 @@ const router = useRouter();
 
 /* Tabs */
 const singleItemTabState = reactive({
-    tabs: computed(() => ([
-        { name: 'detail', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
-        { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
-        { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
-        { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
-        { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
-        { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
-    ])),
+    tabs: computed(() => {
+        const defaultTabs = [
+            { name: 'detail', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
+            { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
+            { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
+            { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
+            { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
+        ];
+        if (props.isSecurityPage) {
+            defaultTabs.push({ name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') });
+        }
+        return defaultTabs;
+    }),
     activeTab: 'detail',
 });
 

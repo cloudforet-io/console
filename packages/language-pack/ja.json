@@ -2696,6 +2696,11 @@
 			"SAVE": "保存",
 			"SAVE_AS": "名前を付けて保存"
 		},
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": ""
+			}
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "作業",
@@ -2825,6 +2830,7 @@
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
 		"ASSET_INVENTORY_COLLECTOR": "コレクター",
 		"ASSET_INVENTORY_METRIC_EXPLORER": "",
+		"ASSET_INVENTORY_SECURITY": "",
 		"ASSET_INVENTORY_SERVER": "サーバ",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"COST_EXPLORER": "費用管理",
