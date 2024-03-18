@@ -33,7 +33,10 @@ import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
-import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
+import {
+    ACCOUNT_TYPE_BADGE_OPTION,
+    PROVIDER_ACCOUNT_NAME,
+} from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
@@ -53,6 +56,10 @@ const storeState = reactive({
 
 const state = reactive({
     isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    titleAccountName: computed(() => {
+        if (props.provider && !state.isTrustedAccount && Object.keys(PROVIDER_ACCOUNT_NAME).includes(props.provider)) return PROVIDER_ACCOUNT_NAME[props.provider];
+        return ACCOUNT_TYPE_BADGE_OPTION[formState.accountType].label;
+    }),
     providerSchemaLoading: true,
     providerSchemaData: computed<Partial<SchemaModel|undefined>>(
         () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
@@ -182,7 +189,7 @@ const handleChangeCredentialForm = (credentialForm) => {
     <div class="service-account-add-page">
         <p-heading class="mb-6"
                    show-back-button
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: ACCOUNT_TYPE_BADGE_OPTION[props.serviceAccountType].label })"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: state.titleAccountName })"
                    @click-back-button="handleGoBack"
         >
             <template #title-left-extra>
