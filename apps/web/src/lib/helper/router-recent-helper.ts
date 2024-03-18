@@ -25,7 +25,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
-        const isPublicDashboard = dashboardId.slice(0, 6) === 'public';
+        const isPublicDashboard = dashboardId.startsWith('public');
         if (isPublicDashboard) return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
         return undefined;
     }
@@ -55,7 +55,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
 
     if (to.name === ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME) {
         const serviceAccountId = to?.params?.serviceAccountId;
-        const isTrustedAccount = serviceAccountId.slice(0, 2) === 'ta';
+        const isTrustedAccount = serviceAccountId.startsWith('ta');
         if (!serviceAccountId) return undefined;
         return { itemType: isTrustedAccount ? RECENT_TYPE.TRUSTED_ACCOUNT : RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
     }
