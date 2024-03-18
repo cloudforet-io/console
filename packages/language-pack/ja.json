@@ -2692,6 +2692,7 @@
 			"GRANULARITY": "細部基準",
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "月別データ",
+			"OPERATOR": "",
 			"SAVE": "保存",
 			"SAVE_AS": "名前を付けて保存"
 		},

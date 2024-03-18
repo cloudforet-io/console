@@ -2692,6 +2692,7 @@
 			"GRANULARITY": "Granularity",
 			"METRIC_EXPLORER": "Metric Explorer",
 			"MONTHLY": "Monthly",
+			"OPERATOR": "Operator",
 			"SAVE": "Save",
 			"SAVE_AS": "Save as"
 		},

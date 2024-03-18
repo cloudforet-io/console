@@ -2692,6 +2692,7 @@
 			"GRANULARITY": "세부 기준",
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "월별 데이터",
+			"OPERATOR": "",
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장"
 		},
