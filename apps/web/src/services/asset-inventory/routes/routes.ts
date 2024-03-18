@@ -100,6 +100,22 @@ const assetInventoryRoute: RouteConfig = {
             name: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
             meta: { lsbVisible: true, menuId: MENU_ID.SECURITY, translationId: MENU_INFO_MAP[MENU_ID.SECURITY].translationId },
             component: SecurityPage as any,
+            children: [
+                {
+                    path: ':provider/:group',
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':name?',
+                            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+                            meta: { lsbVisible: true, label: ({ params }) => params.name },
+                            props: true,
+                            component: CloudServiceDetailPage as any,
+                        },
+                    ],
+                },
+            ],
         },
         {
             path: 'collector',
