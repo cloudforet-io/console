@@ -11,9 +11,12 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -32,7 +35,7 @@ const state = reactive({
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    state.granularity = granularity;
+    metricExplorerPageStore.setGranularity(granularity);
 };
 </script>
 
@@ -41,8 +44,9 @@ const handleSelectGranularity = async (granularity: Granularity) => {
         <p-select-dropdown :menu="state.granularityItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.GRANULARITY')"
                            style-type="rounded"
-                           :selected="state.granularity"
+                           :selected="metricExplorerPageState.granularity"
                            class="granularity-dropdown"
+                           reset-selection-on-menu-close
                            @select="handleSelectGranularity"
         />
     </div>
