@@ -91,7 +91,7 @@ onUnmounted(() => {
             >
                 <span class="image">
 
-                    <p-lazy-img v-if="item.itemType === FAVORITE_TYPE.CLOUD_SERVICE"
+                    <p-lazy-img v-if="item.itemType === FAVORITE_TYPE.CLOUD_SERVICE || item.itemType === FAVORITE_TYPE.SECURITY"
                                 :src="item.itemIcon || ''"
                                 width="1rem"
                                 height="1rem"

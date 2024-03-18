@@ -3,7 +3,7 @@ import { find } from 'lodash';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
-import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -14,8 +14,6 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
-
-
 
 type Config = FavoriteConfig;
 
@@ -132,7 +130,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
 
     const reorderedConfig: ConfigData[] = [];
     Object.values(cloudServiceReference).forEach((menu) => {
-        const configItem = config.find((item) => item.itemId === menu.data.cloudServiceTypeKey);
+        const configItem = config.find((item) => item.itemId === menu.data.cloud_service_type_key);
         if (configItem) {
             reorderedConfig.push(configItem);
         }
@@ -140,7 +138,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
 
     reorderedConfig.forEach((d) => {
         const resource = Object.values(cloudServiceReference)
-            .find((c) => c.data.cloudServiceTypeKey === d.itemId);
+            .find((c) => c.data.cloud_service_type_key === d.itemId);
         if (resource) {
             results.push({
                 ...d,
