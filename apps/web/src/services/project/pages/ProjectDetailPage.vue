@@ -35,6 +35,8 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
@@ -62,6 +64,7 @@ const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const storeState = reactive({
@@ -162,6 +165,10 @@ const projectDeleteFormConfirm = async () => {
     try {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             project_id: projectDetailPageState.projectId as string,
+        });
+        await recentStore.deleteRecent({
+            type: RECENT_TYPE.PROJECT,
+            itemId: projectDetailPageState.projectId as string,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);

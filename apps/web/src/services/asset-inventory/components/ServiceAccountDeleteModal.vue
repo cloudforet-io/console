@@ -19,9 +19,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
 
 const props = withDefaults(defineProps<{
     visible: boolean;
@@ -37,6 +38,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
 
+const recentStore = useRecentStore();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -50,9 +52,13 @@ const state = reactive({
 /* Api */
 const deleteServiceAccount = async () => {
     try {
-        if (state.isGeneralAccount && ('service_account_id' in props.serviceAccountData)) {
+        if (state.isGeneralAccount && props.serviceAccountData && ('service_account_id' in props.serviceAccountData)) {
             await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
                 service_account_id: props.serviceAccountData?.service_account_id ?? '',
+            });
+            await recentStore.deleteRecent({
+                type: RECENT_TYPE.SERVICE_ACCOUNT,
+                itemId: props.serviceAccountData?.service_account_id ?? '',
             });
         } else {
             await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({

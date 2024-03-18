@@ -4,11 +4,12 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PTooltip,
+    PI, PIconButton, PLazyImg, PTooltip,
 } from '@spaceone/design-system';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import { topBarSearchReferenceRouter } from '@/common/modules/navigations/top-bar/modules/top-bar-search/helper';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
@@ -17,13 +18,18 @@ import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top
 
 interface Props {
     resourceId: string;
+    recentId: string;
+    cachedLabel?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     resourceId: '',
+    recentId: '',
+    cachedLabel: '',
 });
 const topBarSearchStore = useTopBarSearchStore();
 const allReferenceStore = useAllReferenceStore();
+const recentStore = useRecentStore();
 const router = useRouter();
 
 const storeState = reactive({
@@ -53,8 +59,20 @@ const state = reactive({
         const { provider, group, name } = splitCloudServiceInfo(props.resourceId);
         return Object.values(storeState.cloudServiceTypeMap).filter((item) => item?.data?.provider === provider && item?.data?.group === group && item.name === name)[0]?.key;
     }),
+    isDeleted: computed(() => {
+        if (storeState.activeTab === SEARCH_TAB.SERVICE_ACCOUNT) {
+            return !storeState.serviceAccountMap[props.resourceId];
+        } if (storeState.activeTab === SEARCH_TAB.PROJECT) {
+            return !storeState.projectMap[props.resourceId];
+        } if (storeState.activeTab === SEARCH_TAB.DASHBOARD) {
+            return !storeState.publicDashboardMap[props.resourceId];
+        } if (storeState.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
+            return !storeState.cloudServiceTypeMap[state.convertResourceId];
+        }
+        return false;
+    }),
     tooltipText: computed(() => {
-        const mainLabel = getLabelByResourceId(state.convertResourceId, storeState.activeTab);
+        const mainLabel = state.isDeleted ? `[Deleted] ${props.cachedLabel}` : getLabelByResourceId(state.convertResourceId, storeState.activeTab);
         const isDescriptionExist = state.convertResourceId && (storeState.activeTab === SEARCH_TAB.DASHBOARD);
         const description = getDescriptionByResourceId(state.convertResourceId, storeState.activeTab);
         return `${mainLabel}${isDescriptionExist ? ` ∙ ${description}` : ''}`;
@@ -84,7 +102,7 @@ const getLabelByResourceId = (resourceId: string, activeTab: SearchTab) => {
         } else if (provider === 'azure') {
             accountId = storeState.serviceAccountMap[resourceId]?.data?.subscription_id;
         }
-        return `${accountId ?? resourceId} (${storeState.serviceAccountMap[resourceId]?.label})`;
+        return `${storeState.serviceAccountMap[resourceId]?.label} (${accountId ?? resourceId})`;
     } if (activeTab === SEARCH_TAB.PROJECT) {
         return storeState.projectMap[resourceId]?.label;
     } if (activeTab === SEARCH_TAB.DASHBOARD) {
@@ -107,6 +125,7 @@ const getDescriptionByResourceId = (resourceId: string, activeTab: SearchTab) =>
 };
 
 const handleClick = () => {
+    if (state.isDeleted) return;
     if (!storeState.currentWorkspaceId) return;
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
         router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, state.convertResourceId, storeState.currentWorkspaceId, storeState.cloudServiceTypeMap[state.convertResourceId]));
@@ -119,11 +138,16 @@ const handleClick = () => {
     }
     topBarSearchStore.setIsActivated(false);
 };
+
+const handleDeleteRecent = () => {
+    recentStore.deleteRecent({ name: props.recentId });
+};
 </script>
 
 <template>
     <div class="top-bar-search-list-item"
-         @click="handleClick"
+         :class="{ 'is-deleted': state.isDeleted }"
+         @click.stop="handleClick"
     >
         <div v-if="state.iconName"
              class="icon-background"
@@ -144,12 +168,18 @@ const handleClick = () => {
                        position="bottom"
             >
                 <div class="upper-part">
-                    <span>{{ getLabelByResourceId(state.convertResourceId, storeState.activeTab) }}</span><span v-if="state.convertResourceId"
-                                                                                                                class="desc"
+                    <span>{{ state.isDeleted ? `[Deleted] ${props.cachedLabel}` : getLabelByResourceId(state.convertResourceId, storeState.activeTab) }}</span><span v-if="state.convertResourceId"
+                                                                                                                                                                     class="desc"
                     ><span v-if="storeState.activeTab === 'dashboard'"><span class="dot">∙</span><span>{{ getDescriptionByResourceId(state.convertResourceId, storeState.activeTab) }}</span>
                     </span></span>
                 </div>
             </p-tooltip>
+            <p-icon-button v-if="state.isDeleted"
+                           class="delete-button"
+                           name="ic_delete"
+                           size="sm"
+                           @click.stop="handleDeleteRecent"
+            />
         </div>
     </div>
 </template>
@@ -166,9 +196,13 @@ const handleClick = () => {
     }
 
     .main-box {
-        @apply flex flex-col;
+        @apply flex justify-between;
         line-height: 1.125rem;
         width: calc(100% - 1.625rem);
+
+        :deep(.has-tooltip) {
+            width: calc(100% - 1.5rem);
+        }
 
         .upper-part {
             overflow: hidden;
@@ -184,23 +218,26 @@ const handleClick = () => {
             }
         }
 
-        .lower-part {
-            @apply flex justify-between;
-            .left-part {
-                @apply inline-flex items-center gap-1;
-                margin-top: 0;
-                line-height: 0.875rem;
+        .delete-button {
+            visibility: hidden;
+        }
 
-                .label {
-                    @apply text-label-sm text-gray-500;
-                }
-
-                /* custom design-system component - p-link */
-                :deep(.p-link) {
-                    @apply text-gray-500;
-                }
+        &:hover {
+            .delete-button {
+                visibility: visible;
             }
         }
+    }
+}
+
+.is-deleted {
+    cursor: not-allowed;
+    svg {
+        opacity: 40%;
+    }
+
+    .upper-part {
+        opacity: 40%;
     }
 }
 </style>
