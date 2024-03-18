@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
@@ -62,11 +63,14 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     };
 
     /* Actions */
+    const fetchApiHelper = new ApiQueryHelper().setSort('created_at', true);
     const fetchCostReportConfig = async () => {
         if (state.costReportConfig !== null) return;
         try {
             state.reportConfigLoading = true;
-            const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+            const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
+                query: fetchApiHelper.data,
+            });
             state.costReportConfig = results?.[0];
         } catch (e) {
             ErrorHandler.handleError(e);

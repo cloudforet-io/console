@@ -124,6 +124,7 @@ const analyzeCostReportData = debounce(async () => {
             end: state.currentDate?.format('YYYY-MM'),
         };
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
                 group_by: [state.selectedTarget],
@@ -221,8 +222,12 @@ watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
     state.currentDate = dayjs.utc(after);
 }, { immediate: true });
-watch(() => costReportPageGetters.currency, (_currency) => {
-    if (_currency) analyzeCostReportData();
+watch([
+    () => costReportPageGetters.currency,
+    () => () => costReportPageState.costReportConfig?.cost_report_config_id,
+], ([_currency, _cost_report_config_id]) => {
+    if (!_currency || !_cost_report_config_id) return;
+    analyzeCostReportData();
 }, { immediate: true });
 watch(() => state.currentDate, () => {
     if (state.currentDate) listCostReport();
