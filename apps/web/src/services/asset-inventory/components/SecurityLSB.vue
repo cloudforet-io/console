@@ -89,8 +89,6 @@ const initData = async () => {
     securityPageState.loading = true;
     try {
         await securityPageStore.fetchCloudServiceAnalyze();
-        await securityPageStore.setSelectedCloudServiceType();
-        await routeToFirstCloudServiceType();
     } finally {
         securityPageState.loading = false;
     }
@@ -99,16 +97,17 @@ const initData = async () => {
 const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
 
 /* Watchers */
-watch(() => storeState.cloudServiceTypeList, (cloudServiceTypeList) => {
+watch([() => storeState.cloudServiceTypeList, () => state.pageParams], async ([cloudServiceTypeList, pageParams]) => {
     if (cloudServiceTypeList.length === 0) {
-        callApiWithGrantGuard();
+        await callApiWithGrantGuard();
     }
-}, { immediate: true });
-watch(() => state.pageParams, (pageParams) => {
     if (pageParams?.name) {
-        securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
-    } else routeToFirstCloudServiceType();
-});
+        await securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+    } else {
+        await securityPageStore.setSelectedCloudServiceType();
+    }
+    await routeToFirstCloudServiceType();
+}, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 });
