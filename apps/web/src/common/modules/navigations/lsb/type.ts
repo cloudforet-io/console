@@ -42,6 +42,10 @@ export interface LSBItem {
     selectOptions?: SelectOptions;
 }
 
+export interface LSBCollapsibleItem extends LSBItem {
+    subItems?: any[];
+}
+
 export type LSBMenu = LSBItem[]|LSBItem;
 
 export interface BackLink {
