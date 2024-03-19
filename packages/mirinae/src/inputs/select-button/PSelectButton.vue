@@ -5,7 +5,7 @@
             v-on="$listeners"
     >
         <p-i v-if="layout === SELECT_BUTTON_LAYOUT_TYPE.ICON_ONLY"
-             :color="state.color"
+             :color="state.iconColor"
              :width="state.iconSize"
              :height="state.iconSize"
              :name="iconName"
@@ -118,7 +118,7 @@ export default defineComponent<Props>({
                 }
                 return props.size;
             }),
-            color: computed(() => {
+            iconColor: computed(() => {
                 if (props.styleType === SELECT_BUTTON_STYLE_TYPE.secondary) {
                     if (isSelected.value) {
                         return white;
