@@ -6,12 +6,11 @@ import {
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
-import { isEmpty } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
-interface DateOption {
+interface DateSetting {
     minDate?: string;
     maxDate?: string;
 }
@@ -20,18 +19,16 @@ interface Props {
     datetimePickerDataType?: DATA_TYPE;
     start?: string;
     end?: string;
-    startDateSetting?: DateOption;
-    endDateSetting?: DateOption;
-    hideHelpText?: boolean;
+    useRestrictedMode?: boolean;
+    disableFuture?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    datetimePickerDataType: 'yearToDate',
-    hideHelpText: false,
+    datetimePickerDataType: 'yearToMonth',
     start: undefined,
     end: undefined,
-    startDateSetting: () => ({}),
-    endDateSetting: () => ({}),
+    useRestrictedMode: false,
+    disableFuture: false,
 });
 
 const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
@@ -39,6 +36,7 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
     (event: 'cancel'): void;
 }>();
 
+const today = dayjs.utc();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     invalid: computed(() => {
@@ -50,13 +48,42 @@ const state = reactive({
     }),
     startDates: [] as string[],
     endDates: [] as string[],
-    endDateSetting: computed<DateOption>(() => {
-        if (!isEmpty(props.endDateSetting)) return props.endDateSetting;
-        if (!state.startDates.length) return {};
+    startDateSetting: computed<DateSetting|undefined>(() => {
+        if (!props.useRestrictedMode) return undefined;
+        if (props.datetimePickerDataType === 'yearToMonth') {
+            const minDate = today.subtract(35, 'month').format('YYYY-MM');
+            const maxDate = today.format('YYYY-MM');
+            return { minDate, maxDate };
+        }
+        if (props.datetimePickerDataType === 'yearToDate') {
+            const minDate = today.subtract(1, 'month').format('YYYY-MM-DD');
+            const maxDate = today.format('YYYY-MM-DD');
+            return { minDate, maxDate };
+        }
+        return undefined;
+    }),
+    endDateSetting: computed<DateSetting|undefined>(() => {
+        if (!state.startDates.length) return undefined;
+        const _dateFormat = props.datetimePickerDataType === 'yearToDate' ? 'YYYY-MM-DD' : 'YYYY-MM';
+        if (!props.useRestrictedMode) {
+            const startDate = dayjs.utc(state.startDates[0]);
+            const minDate = startDate.format(_dateFormat);
+            return { minDate };
+        }
 
+        let maxDate: string;
         const startDate = dayjs.utc(state.startDates[0]);
-        const minDate = startDate.format('YYYY-MM');
-        return { minDate };
+        const minDate = startDate.format(_dateFormat);
+
+        let maxRawData = startDate.add(11, 'month');
+        if (props.datetimePickerDataType === 'yearToDate') {
+            maxRawData = startDate.add(1, 'month');
+        }
+
+        if (props.disableFuture && maxRawData.isAfter(dayjs.utc())) {
+            maxDate = dayjs.utc().format(_dateFormat);
+        } else maxDate = maxRawData.format(_dateFormat);
+        return { minDate, maxDate };
     }),
 });
 
@@ -66,7 +93,6 @@ const handleUpdateVisible = (visible: boolean) => {
 };
 const handleConfirm = () => {
     state.proxyVisible = false;
-    // const period: Period = {};
     const start = dayjs.utc(state.startDates[0]).format('YYYY-MM');
     const end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM');
     emit('confirm', start, end);
@@ -116,14 +142,14 @@ watch(() => props.visible, (visible) => {
         <template #body>
             <p-field-group class="period-select"
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
-                           :help-text="props.hideHelpText ? '': $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS')"
+                           :help-text="props.useRestrictedMode ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS') : ''"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
                                    :selected-dates="state.startDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                   :min-date="props.startDateSetting?.minDate"
-                                   :max-date="props.startDateSetting?.maxDate"
+                                   :min-date="state.startDateSetting?.minDate"
+                                   :max-date="state.startDateSetting?.maxDate"
                                    data-type="yearToMonth"
                                    @update:selected-dates="handleUpdateSelectedDates('start', $event)"
                 />

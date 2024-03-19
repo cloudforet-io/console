@@ -936,6 +936,12 @@
 			"TOTAL": "총합계 ",
 			"TOTAL_AMOUNT_BY_PROVIDER": "프로바이더별 총합계 "
 		},
+		"CUSTOM_DATE_RANGE_MODAL": {
+			"CUSTOM_RANGE": "기간 선택",
+			"FROM": "시작",
+			"TO": "종료",
+			"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "알파벳순",
 			"ALT_E_UPDATE_COL": "필드 변경 실패",
@@ -2693,6 +2699,19 @@
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "월별 데이터",
 			"OPERATOR": "",
+			"PERIOD": {
+				"CUSTOM": "커스텀",
+				"LAST_12_MONTHS": "지난 12개월",
+				"LAST_14_DAYS": "최근 2주일",
+				"LAST_3_MONTHS": "지난 3개월",
+				"LAST_6_MONTHS": "지난 6개월",
+				"LAST_7_DAYS": "최근 1주일",
+				"LAST_MONTH": "지난달",
+				"LAST_YEAR": "지난해",
+				"PERIOD": "기간",
+				"THIS_MONTH": "이번 달",
+				"THIS_YEAR": "올해"
+			},
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장"
 		},

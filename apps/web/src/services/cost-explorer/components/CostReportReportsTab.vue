@@ -295,7 +295,7 @@ watch(() => costReportPageState.activeTab, (activeTab) => {
             </template>
         </p-toolbox-table>
         <custom-date-modal :visible.sync="state.customPeriodModalVisible"
-                           hide-help-text
+                           disable-future
                            :start="state.customPeriod?.start"
                            :end="state.customPeriod?.end"
                            @confirm="handleConfirmCustomPeriod"
