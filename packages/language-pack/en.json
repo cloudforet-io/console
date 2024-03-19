@@ -936,6 +936,12 @@
 			"TOTAL": "Total",
 			"TOTAL_AMOUNT_BY_PROVIDER": "Total amount by provider"
 		},
+		"CUSTOM_DATE_RANGE_MODAL": {
+			"CUSTOM_RANGE": "Custom Range",
+			"FROM": "From",
+			"TO": "To",
+			"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "Alphabetical",
 			"ALT_E_UPDATE_COL": "Failed to Update Columns",
@@ -2693,6 +2699,19 @@
 			"METRIC_EXPLORER": "Metric Explorer",
 			"MONTHLY": "Monthly",
 			"OPERATOR": "Operator",
+			"PERIOD": {
+				"CUSTOM": "Custom",
+				"LAST_12_MONTHS": "Last 12 Months",
+				"LAST_14_DAYS": "Last 14 Days",
+				"LAST_3_MONTHS": "Last 3 Months",
+				"LAST_6_MONTHS": "Last 6 Months",
+				"LAST_7_DAYS": "Last 7 Days",
+				"LAST_MONTH": "Last Month",
+				"LAST_YEAR": "Last Year",
+				"PERIOD": "Period",
+				"THIS_MONTH": "This Month",
+				"THIS_YEAR": "This Year"
+			},
 			"SAVE": "Save",
 			"SAVE_AS": "Save as"
 		},
