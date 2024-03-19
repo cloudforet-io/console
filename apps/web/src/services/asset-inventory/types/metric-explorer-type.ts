@@ -21,4 +21,5 @@ export type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 export interface MetricNamespace {
     provider: string;
     cloud_service_group: string;
+    cloud_service_type: string;
 }

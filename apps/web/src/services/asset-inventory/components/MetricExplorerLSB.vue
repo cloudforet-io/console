@@ -8,6 +8,8 @@ import { PI, PSearch } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -21,6 +23,11 @@ import type { MetricNamespace } from '@/services/asset-inventory/types/metric-ex
 
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    providerItems: computed(() => allReferenceStore.getters.provider),
+});
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
@@ -34,13 +41,18 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
-            {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: i18n.t('COMMON.NAMESPACE'),
-                id: 'namespace',
-            },
         ];
-        return baseMenuSet;
+        const namespaceMenuSet = [{
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: i18n.t('COMMON.NAMESPACE'),
+            id: 'namespace',
+        }];
+        const metricMenuSet = [{
+            type: MENU_ITEM_TYPE.SLOT,
+            id: 'metric',
+        }];
+        if (namespaceState.selectedNamespace === '') return [...baseMenuSet, ...namespaceMenuSet];
+        return [...baseMenuSet, ...metricMenuSet];
     }),
     starredMenuSet: computed<LSBMenu[]>(() => []),
 });
@@ -54,26 +66,35 @@ const namespaceState = reactive({
     selectedNamespace: '',
 });
 
-// const metricState = reactive({
-//
-// });
+const metricState = reactive({
+    inputValue: '',
+    // metricMenuSet: computed(() => []),
+});
 
 /* Helper */
 const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): LSBCollapsibleItem[] => {
     const namespaceMap = {};
     namespaces.forEach((namespace) => {
+        const providerData = storeState.providerItems[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
-                label: `${namespace.provider}/${namespace.cloud_service_group}`,
-                name: namespace.cloud_service_group,
+                label: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                name: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                provider: namespace.provider,
+                cloudServiceGroup: namespace.cloud_service_group,
+                cloudServiceType: namespace.cloud_service_type,
             });
         } else {
             namespaceMap[namespace.provider] = {
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: namespace.provider,
+                label: providerData.label,
+                icon: providerData.icon,
                 subItems: [{
-                    label: `${namespace.provider}/${namespace.cloud_service_group}`,
-                    name: namespace.cloud_service_group,
+                    label: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                    name: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                    provider: namespace.provider,
+                    cloudServiceGroup: namespace.cloud_service_group,
+                    cloudServiceType: namespace.cloud_service_type,
                 }],
             };
         }
@@ -82,8 +103,11 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): L
 };
 
 /* Event */
-const handleSearch = (keyword: string) => {
+const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
+};
+const handleSearchMetric = (keyword: string) => {
+    metricState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: string) => {
     namespaceState.selectedNamespace = namespace;
@@ -123,9 +147,9 @@ onMounted(async () => {
         </template>
         <template #collapsible-contents-namespace>
             <div class="namespace-wrapper">
-                <p-search class="metric-search"
+                <p-search class="namespace-search"
                           :value="namespaceState.inputValue"
-                          @update:value="handleSearch"
+                          @update:value="handleSearchNamespace"
                 />
                 <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
                                              :key="`provider-${idx}`"
@@ -145,6 +169,15 @@ onMounted(async () => {
                         </div>
                     </template>
                 </l-s-b-collapsible-menu-item>
+            </div>
+        </template>
+        <template #slot-metric>
+            <div class="metric-wrapper">
+                <div class="metric-title-item" />
+                <p-search class="metric-search"
+                          :value="metricState.inputValue"
+                          @update:value="handleSearchMetric"
+                />
             </div>
         </template>
     </l-s-b>
@@ -169,6 +202,12 @@ onMounted(async () => {
                 @apply text-label-md overflow-hidden whitespace-no-wrap;
                 text-overflow: ellipsis;
             }
+        }
+    }
+    .metric-wrapper {
+
+        .metric-title-item {
+            @apply flex items-center;
         }
     }
     .no-data {
