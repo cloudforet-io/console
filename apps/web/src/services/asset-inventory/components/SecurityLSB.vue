@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onBeforeMount, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@spaceone/design-system';
 
@@ -31,16 +31,21 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
+const securityPageState = securityPageStore.state;
 const securityPageGetters = securityPageStore.getters;
 
 const route = useRoute();
+const router = useRouter();
 
+const storeState = reactive({
+    cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
+});
 const state = reactive({
     currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
-    detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
+    pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
     menuSet: computed<LSBItem[]>(() => {
         const defaultMenuSet: LSBItem[] = [];
-        securityPageGetters.cloudServiceTypeList?.forEach((d, index, array) => {
+        storeState.cloudServiceTypeList?.forEach((d, index, array) => {
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: d.group,
@@ -71,10 +76,46 @@ const state = reactive({
     })),
 });
 
+const routeToFirstCloudServiceType = async () => {
+    const selectedCloudServiceType = securityPageGetters.selectedCloudServiceType;
+    await router.replace(getProperRouteLocation({
+        name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+        params: {
+            provider: selectedCloudServiceType?.provider || '',
+            group: selectedCloudServiceType?.group || '',
+            name: selectedCloudServiceType?.name || '',
+        },
+        query: route.query,
+    })).catch(() => {});
+};
+const initData = async () => {
+    try {
+        securityPageState.loading = true;
+        const res = await securityPageStore.fetchCloudServiceAnalyze();
+        if (res && res?.length > 0) {
+            const promises = res.map((d) => securityPageStore.listCloudServiceTypeData(d.provider || '', d.cloud_service_group || ''));
+            await Promise.all(promises);
+        }
+        await securityPageStore.setSelectedCloudServiceType();
+        await routeToFirstCloudServiceType();
+    } finally {
+        securityPageState.loading = false;
+    }
+};
+
 /* Watchers */
+watch(() => state.pageParams, (pageParams) => {
+    if (pageParams?.name) {
+        securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+    }
+});
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
+
+onBeforeMount(() => {
+    initData();
+});
 </script>
 
 <template>

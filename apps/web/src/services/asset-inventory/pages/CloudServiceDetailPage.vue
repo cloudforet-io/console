@@ -424,7 +424,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                    @click-back-button="$router.go(-1)"
         />
         <p-heading v-else-if="props.isSecurityPage"
-                   :title="`[${allReferenceGetters.provider[props.provider].label}] ${props.name}`"
+                   :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                    use-total-count
                    use-selected-count
                    :total-count="typeOptionState.totalCount"
