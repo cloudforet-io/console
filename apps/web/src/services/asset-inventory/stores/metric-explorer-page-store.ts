@@ -23,6 +23,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
         filters: {} as Record<string, string[]>,
         namespaces: [] as MetricNamespace[],
+        selectedGroupByList: [] as string[],
+        selectedChartGroupBy: undefined as string|undefined,
         selectedNamespace: undefined as MetricNamespace|undefined,
     });
 
@@ -36,6 +38,12 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const setRelativePeriod = (relativePeriod?: RelativePeriod) => {
         state.relativePeriod = relativePeriod;
     };
+    const setSelectedGroupByList = (groupByList: string[]) => {
+        state.selectedGroupByList = groupByList;
+    };
+    const setSelectedChartGroupBy = (groupBy: string|undefined) => {
+        state.selectedChartGroupBy = groupBy;
+    };
 
     /* Actions */
     const reset = () => {
@@ -43,6 +51,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         state.period = undefined;
         state.relativePeriod = undefined;
         state.filters = {};
+        state.selectedGroupByList = [];
+        state.selectedChartGroupBy = undefined;
     };
     const loadNamespaces = async () => {
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudService.analyze);
@@ -72,6 +82,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         setGranularity,
         setPeriod,
         setRelativePeriod,
+        setSelectedGroupByList,
+        setSelectedChartGroupBy,
     };
 
     return {

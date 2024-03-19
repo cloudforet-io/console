@@ -2693,9 +2693,12 @@
 			"NO_OPTIONS": "No Selectable Options"
 		},
 		"METRIC_EXPLORER": {
+			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
+			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
 			"DAILY": "Daily",
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
+			"GROUP_BY": "Group By",
 			"METRIC_EXPLORER": "Metric Explorer",
 			"MONTHLY": "Monthly",
 			"OPERATOR": "Operator",
