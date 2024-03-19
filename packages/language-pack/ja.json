@@ -2693,9 +2693,12 @@
 			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
 		"METRIC_EXPLORER": {
+			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
+			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
 			"DAILY": "日別データ",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準",
+			"GROUP_BY": "グループ別統計",
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "月別データ",
 			"OPERATOR": "",
