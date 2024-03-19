@@ -2699,8 +2699,10 @@
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準",
 			"GROUP_BY": "グループ別統計",
+			"HIDE_ALL": "すべて隠す",
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "月別データ",
+			"NO_ITEMS": "アイテムがありません",
 			"OPERATOR": "",
 			"PERIOD": {
 				"CUSTOM": "カスタム",
@@ -2716,7 +2718,9 @@
 				"THIS_YEAR": "本年"
 			},
 			"SAVE": "保存",
-			"SAVE_AS": "名前を付けて保存"
+			"SAVE_AS": "名前を付けて保存",
+			"SHOW_ALL": "すべて表示",
+			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください"
 		},
 		"SECURITY": {
 			"MAIN": {

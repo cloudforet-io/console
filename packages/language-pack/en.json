@@ -2699,8 +2699,10 @@
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
 			"GROUP_BY": "Group By",
+			"HIDE_ALL": "Hide all",
 			"METRIC_EXPLORER": "Metric Explorer",
 			"MONTHLY": "Monthly",
+			"NO_ITEMS": "No Items",
 			"OPERATOR": "Operator",
 			"PERIOD": {
 				"CUSTOM": "Custom",
@@ -2716,7 +2718,9 @@
 				"THIS_YEAR": "This Year"
 			},
 			"SAVE": "Save",
-			"SAVE_AS": "Save as"
+			"SAVE_AS": "Save as",
+			"SHOW_ALL": "Show all",
+			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items."
 		},
 		"SECURITY": {
 			"MAIN": {
