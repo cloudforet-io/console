@@ -96,12 +96,8 @@ const handleSelect = (id: string, selected: string) => {
             <l-s-b-collapsible-menu-item v-else-if="item.type === MENU_ITEM_TYPE.COLLAPSIBLE"
                                          :item="item"
             >
-                <template v-for="(_, slot) of $scopedSlots"
-                          #[slot]="scope"
-                >
-                    <slot :name="slot"
-                          v-bind="scope"
-                    />
+                <template #collapsible-contents>
+                    <slot :name="`collapsible-contents-${item.id}`" />
                 </template>
             </l-s-b-collapsible-menu-item>
             <l-s-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />

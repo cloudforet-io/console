@@ -32,7 +32,7 @@ import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constan
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
-const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
+const DATA_SOURCE_MENU_ID = 'data-source';
 const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
@@ -174,31 +174,8 @@ const handleSelectDataSource = (selected: string) => {
 <template>
     <aside class="sidebar-menu">
         <l-s-b :menu-set="state.menuSet">
-            <template #collapsible-contents="{item: collapsible_item}">
-                <div v-if="collapsible_item?.id === STARRED_MENU_ID">
-                    <div v-if="state.starredMenuSet.length > 0">
-                        <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
-                                                :key="idx"
-                                                :item="menu"
-                                                :idx="idx"
-                                                :current-path="state.currentPath"
-                                                is-hide-favorite
-                        />
-                    </div>
-                    <span v-else
-                          class="no-data"
-                    >
-                        <p-i class="menu-icon"
-                             name="ic_star-filled"
-                             height="1rem"
-                             width="1rem"
-                             :color="yellow[500]"
-                        />
-                        {{ $t('COMMON.STARRED_NO_DATA') }}
-                    </span>
-                </div>
-                <p-select-dropdown v-else
-                                   class="select-options-dropdown"
+            <template #collapsible-contents-data-source>
+                <p-select-dropdown class="select-options-dropdown"
                                    :menu="dataSourceState.items"
                                    :selected="dataSourceState.selected"
                                    use-fixed-menu-style
@@ -227,6 +204,28 @@ const handleSelectDataSource = (selected: string) => {
                         </div>
                     </template>
                 </p-select-dropdown>
+            </template>
+            <template #collapsible-contents-starred>
+                <div v-if="state.starredMenuSet.length > 0">
+                    <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
+                                            :key="idx"
+                                            :item="menu"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
+                    />
+                </div>
+                <span v-else
+                      class="no-data"
+                >
+                    <p-i class="menu-icon"
+                         name="ic_star-filled"
+                         height="1rem"
+                         width="1rem"
+                         :color="yellow[500]"
+                    />
+                    {{ $t('COMMON.STARRED_NO_DATA') }}
+                </span>
             </template>
         </l-s-b>
     </aside>

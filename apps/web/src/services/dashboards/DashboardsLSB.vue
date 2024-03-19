@@ -118,6 +118,7 @@ const state = reactive({
             {
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
                 label: i18n.t('COMMON.STARRED'),
+                id: 'starred',
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
         ];
@@ -238,7 +239,7 @@ callApiWithGrantGuard();
     <l-s-b class="dashboards-l-s-b"
            :menu-set="state.menuSet"
     >
-        <template #collapsible-contents>
+        <template #collapsible-contents-starred>
             <div v-if="state.starredMenuSet.length > 0">
                 <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
                                         :key="idx"
@@ -266,7 +267,7 @@ callApiWithGrantGuard();
 <style scoped lang="postcss">
 .dashboards-l-s-b {
     .no-data {
-        @apply flex items-center text-gray-500;
+        @apply flex text-gray-500;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.125rem;
