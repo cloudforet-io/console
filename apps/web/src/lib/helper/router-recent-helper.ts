@@ -25,7 +25,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
-        return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
+        const isPublicDashboard = dashboardId.startsWith('public');
+        if (isPublicDashboard) return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
+        return undefined;
     }
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
@@ -53,8 +55,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
 
     if (to.name === ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME) {
         const serviceAccountId = to?.params?.serviceAccountId;
+        const isTrustedAccount = serviceAccountId.startsWith('ta');
         if (!serviceAccountId) return undefined;
-        return { itemType: RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
+        return { itemType: isTrustedAccount ? RECENT_TYPE.TRUSTED_ACCOUNT : RECENT_TYPE.SERVICE_ACCOUNT, workspaceId, itemId: serviceAccountId };
     }
 
     if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) {

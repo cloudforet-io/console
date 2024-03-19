@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PTab, screens, PLazyImg,
 } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -95,9 +96,9 @@ const handleUpdateActiveTab = (tab: SearchTab) => {
     });
 };
 
-const handleUpdateContentsSize = (height: number) => {
-    state.contentsHeight = height;
-};
+const handleUpdateContentsSize = debounce((height: number) => {
+    if (state.contentsHeight !== height) state.contentsHeight = height;
+}, 100);
 
 const handleSelect = (menuType: 'search'|'recent', item) => {
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
@@ -136,6 +137,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     :is-focused="props.isFocused"
                     :active-tab="storeState.activeTab"
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
+                    @update:contents-size="handleUpdateContentsSize"
                     @move-focus-end="handleMoveFocusEnd"
                     @select="handleSelect"
                 />

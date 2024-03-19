@@ -120,7 +120,10 @@ watch(() => contentsSize.height.value, (height) => {
                                     @select="(item) => handleSelect('recent', item)"
                     >
                         <template #item--format="{ item }">
-                            <top-bar-search-recent-list-item :resource-id="item?.data?.id" />
+                            <top-bar-search-recent-list-item :resource-id="item?.data?.id"
+                                                             :cached-label="item?.data?.label"
+                                                             :recent-id="item?.name"
+                            />
                         </template>
                     </p-context-menu>
                     <template #no-data>
@@ -178,7 +181,6 @@ watch(() => contentsSize.height.value, (height) => {
 .search-tab-content {
     @apply flex gap-3 h-full;
     padding: 1rem 0;
-    height: 100%;
 
     .service-item-list {
         width: 100%;
