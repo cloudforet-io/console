@@ -3,12 +3,20 @@
 import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI, PSearch } from '@spaceone/design-system';
+import {
+    PI, PLazyImg, PSearch, PIconButton, PTooltip,
+} from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type {
+    CloudServiceTypeItem,
+    CloudServiceTypeReferenceMap,
+} from '@/store/reference/cloud-service-type-reference-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
@@ -21,12 +29,28 @@ import { yellow } from '@/styles/colors';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricNamespace } from '@/services/asset-inventory/types/metric-explorer-type';
 
+interface NamespaceSubItemType {
+    label: string;
+    name: string;
+    provider: string;
+    cloudServiceGroup: string;
+    cloudServiceType: string;
+}
+
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     providerItems: computed(() => allReferenceStore.getters.provider),
+    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    cloudServiceTypeToItemMap: computed(() => {
+        const res: Record<string, CloudServiceTypeItem> = {};
+        Object.entries(storeState.cloudServiceTypes).forEach(([, item]) => {
+            res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
+        });
+        return res;
+    }),
 });
 
 const state = reactive({
@@ -51,7 +75,7 @@ const state = reactive({
             type: MENU_ITEM_TYPE.SLOT,
             id: 'metric',
         }];
-        if (namespaceState.selectedNamespace === '') return [...baseMenuSet, ...namespaceMenuSet];
+        if (!namespaceState.selectedNamespace) return [...baseMenuSet, ...namespaceMenuSet];
         return [...baseMenuSet, ...metricMenuSet];
     }),
     starredMenuSet: computed<LSBMenu[]>(() => []),
@@ -60,19 +84,18 @@ const state = reactive({
 const namespaceState = reactive({
     inputValue: '',
     namespaces: computed(() => metricExplorerPageStore.state.namespaces),
-    namespaceItems: computed<LSBCollapsibleItem[]>(() => [
+    namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => [
         ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
     ]),
-    selectedNamespace: '',
+    selectedNamespace: undefined as NamespaceSubItemType | undefined,
 });
 
 const metricState = reactive({
     inputValue: '',
-    // metricMenuSet: computed(() => []),
 });
 
 /* Helper */
-const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): LSBCollapsibleItem[] => {
+const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
     namespaces.forEach((namespace) => {
         const providerData = storeState.providerItems[namespace.provider];
@@ -101,6 +124,18 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): L
     });
     return Object.values(namespaceMap);
 };
+const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined => {
+    const cloudServiceGroup = namespace.cloudServiceGroup;
+    const cloudServiceType = namespace.cloudServiceType;
+    const provider = namespace.provider;
+
+    if (cloudServiceGroup && provider && cloudServiceType) {
+        const key = `${provider}:${cloudServiceGroup}:${cloudServiceType}`;
+        const icon = storeState.cloudServiceTypeToItemMap[key]?.icon;
+        if (icon) return assetUrlConverter(icon);
+    }
+    return undefined;
+};
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
@@ -109,8 +144,11 @@ const handleSearchNamespace = (keyword: string) => {
 const handleSearchMetric = (keyword: string) => {
     metricState.inputValue = keyword;
 };
-const handleClickNamespace = (namespace: string) => {
+const handleClickNamespace = (namespace: NamespaceSubItemType) => {
     namespaceState.selectedNamespace = namespace;
+};
+const handleClickBackToNamespace = () => {
+    namespaceState.selectedNamespace = undefined;
 };
 
 onMounted(async () => {
@@ -161,7 +199,7 @@ onMounted(async () => {
                         <div v-for="(_menu, _idx) in _item.subItems"
                              :key="`${_menu.label}-${_idx}`"
                              class="namespace-menu-item"
-                             @click="handleClickNamespace(_menu.name)"
+                             @click="handleClickNamespace(_menu)"
                         >
                             <span class="text">
                                 {{ _menu.label }}
@@ -173,7 +211,32 @@ onMounted(async () => {
         </template>
         <template #slot-metric>
             <div class="metric-wrapper">
-                <div class="metric-title-item" />
+                <div class="metric-title-item">
+                    <div class="title-wrapper">
+                        <p-icon-button class="back-button"
+                                       name="ic_arrow-left"
+                                       size="sm"
+                                       @click="handleClickBackToNamespace"
+                        />
+                        <p-lazy-img class="namespace-image"
+                                    :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
+                                    width="1.25rem"
+                                    height="1.25rem"
+                        />
+                        <p-tooltip class="title"
+                                   :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
+                        >
+                            <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
+                            <span class="divider">/</span>
+                            <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
+                        </p-tooltip>
+                    </div>
+                    <p-icon-button style-type="tertiary"
+                                   name="ic_plus"
+                                   shape="square"
+                                   size="sm"
+                    />
+                </div>
                 <p-search class="metric-search"
                           :value="metricState.inputValue"
                           @update:value="handleSearchMetric"
@@ -205,9 +268,31 @@ onMounted(async () => {
         }
     }
     .metric-wrapper {
+        @apply w-full;
 
         .metric-title-item {
-            @apply flex items-center;
+            @apply flex items-center justify-between w-full;
+            margin-bottom: 0.5rem;
+
+            .title-wrapper {
+                @apply inline-flex items-center gap-1 truncate;
+                width: calc(100% - 2rem);
+
+                .namespace-image {
+                    min-width: 1.25rem;
+                }
+                .title {
+                    @apply text-label-md truncate;
+
+                    .divider {
+                        @apply text-gray-500;
+                        margin: 0 0.125rem;
+                    }
+                    .type {
+                        @apply font-bold;
+                    }
+                }
+            }
         }
     }
     .no-data {

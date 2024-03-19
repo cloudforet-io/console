@@ -42,8 +42,8 @@ export interface LSBItem {
     selectOptions?: SelectOptions;
 }
 
-export interface LSBCollapsibleItem extends LSBItem {
-    subItems?: any[];
+export interface LSBCollapsibleItem<T = any> extends LSBItem {
+    subItems?: T[];
 }
 
 export type LSBMenu = LSBItem[]|LSBItem;
