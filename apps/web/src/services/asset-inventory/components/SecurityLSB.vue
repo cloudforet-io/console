@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    computed, onBeforeMount, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -10,13 +8,12 @@ import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
-import type {
-    LSBItem,
-} from '@/common/modules/navigations/lsb/type';
+import type { LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -49,18 +46,18 @@ const state = reactive({
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: d.group,
-                titleIcon: d.titleIcon,
+                titleIcon: d.items && d.items[0].icon,
                 id: d.group,
             });
             d.items?.forEach((i) => {
                 defaultMenuSet.push({
                     type: MENU_ITEM_TYPE.ITEM,
-                    label: `[${allReferenceGetters.provider[i.provider].label}] ${i.name}`,
-                    id: i.cloud_service_type_id,
-                    to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME, params: { group: d.group, provider: d.provider, name: i.name || '' } }),
+                    label: `[${allReferenceGetters.provider[i.data.provider].label}] ${i.name}`,
+                    id: i.key,
+                    to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME, params: { group: i.data.group, provider: i.data.provider, name: i.name } }),
                     favoriteOptions: {
                         type: FAVORITE_TYPE.SECURITY,
-                        id: i.cloud_service_type_key,
+                        id: i.data.cloud_service_type_key,
                     },
                 });
             });
@@ -72,7 +69,7 @@ const state = reactive({
     }),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.SECURITY,
-        id: securityPageGetters.selectedCloudServiceType?.cloud_service_type_key || '',
+        id: securityPageGetters.selectedCloudServiceType?.data.cloud_service_type_key || '',
     })),
 });
 
@@ -81,41 +78,40 @@ const routeToFirstCloudServiceType = async () => {
     await router.replace(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
         params: {
-            provider: selectedCloudServiceType?.provider || '',
-            group: selectedCloudServiceType?.group || '',
+            provider: selectedCloudServiceType?.data.provider || '',
+            group: selectedCloudServiceType?.data.group || '',
             name: selectedCloudServiceType?.name || '',
         },
         query: route.query,
     })).catch(() => {});
 };
 const initData = async () => {
+    securityPageState.loading = true;
     try {
-        securityPageState.loading = true;
-        const res = await securityPageStore.fetchCloudServiceAnalyze();
-        if (res && res?.length > 0) {
-            const promises = res.map((d) => securityPageStore.listCloudServiceTypeData(d.provider || '', d.cloud_service_group || ''));
-            await Promise.all(promises);
-        }
-        await securityPageStore.setSelectedCloudServiceType();
-        await routeToFirstCloudServiceType();
+        await securityPageStore.fetchCloudServiceAnalyze();
     } finally {
         securityPageState.loading = false;
     }
 };
 
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
+
 /* Watchers */
-watch(() => state.pageParams, (pageParams) => {
-    if (pageParams?.name) {
-        securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+watch([() => storeState.cloudServiceTypeList, () => state.pageParams], async ([cloudServiceTypeList, pageParams]) => {
+    if (cloudServiceTypeList.length === 0) {
+        await callApiWithGrantGuard();
     }
-});
+    if (pageParams?.name) {
+        await securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+    } else {
+        await securityPageStore.setSelectedCloudServiceType();
+    }
+    await routeToFirstCloudServiceType();
+}, { immediate: true });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
-}, { immediate: true });
-
-onBeforeMount(() => {
-    initData();
 });
+
 </script>
 
 <template>

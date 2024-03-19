@@ -1,42 +1,48 @@
 import { computed, reactive } from 'vue';
 
-import { find } from 'lodash';
+import { find, uniqBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
-import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CloudServiceTypeItem } from '@/store/reference/cloud-service-type-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
-import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 
-interface CloudServiceTypeItem {
-    provider: string;
-    group: string;
-    items: CloudServiceTypeModel[];
-    titleIcon: string;
+interface CloudServiceTypeListItem {
+    provider?: string;
+    group?: string;
+    items?: CloudServiceTypeItem[];
+    titleIcon?: string;
 }
 export const useSecurityPageStore = defineStore('security-page', () => {
+    const allReferenceStore = useAllReferenceStore();
+    const allReferenceGetters = allReferenceStore.getters;
+
+    const _getters = reactive({
+        cloudServiceType: computed(() => allReferenceGetters.cloudServiceType),
+    });
+
     const state = reactive({
         loading: false,
         searchFilters: [] as ConsoleFilter[],
         cloudServiceAnalyzeList: [] as CloudServiceAnalyzeResult[],
-        cloudServiceTypeList: [] as CloudServiceTypeItem[],
-        selectedCloudServiceType: undefined as undefined | CloudServiceTypeModel,
+        cloudServiceTypeList: [] as CloudServiceTypeListItem[],
+        selectedCloudServiceType: undefined as undefined | CloudServiceTypeItem,
     });
 
     const getters = reactive({
         loading: computed<boolean>(() => state.loading),
         cloudServiceAnalyzeList: computed<CloudServiceAnalyzeResult[]>(() => state.cloudServiceAnalyzeList),
-        cloudServiceTypeList: computed<CloudServiceTypeItem[]>(() => state.cloudServiceTypeList),
-        selectedCloudServiceType: computed<CloudServiceTypeModel|undefined>(() => state.selectedCloudServiceType),
+        cloudServiceTypeList: computed<CloudServiceTypeListItem[]>(() => state.cloudServiceTypeList),
+        selectedCloudServiceType: computed<CloudServiceTypeItem|undefined>(() => state.selectedCloudServiceType),
         allFilters: computed<ConsoleFilter[]>(() => {
             const filters: ConsoleFilter[] = [];
             // TODO: will be changed to 'CSPM'
@@ -54,6 +60,14 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                     ),
                 });
                 state.cloudServiceAnalyzeList = results;
+                state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => {
+                    const items = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group);
+                    return {
+                        provider: listItem.provider,
+                        group: listItem.cloud_service_group,
+                        items: uniqBy(items || [], 'name'),
+                    };
+                });
                 return results || [];
             } catch (e) {
                 state.cloudServiceAnalyzeList = [];
@@ -61,39 +75,19 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                 return undefined;
             }
         },
-        listCloudServiceTypeData: async (provider: string, group: string) => {
-            try {
-                const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
-                    query: getCloudServiceTypeQuery(provider, group),
-                });
-                const existingGroupIndex = state.cloudServiceTypeList.findIndex((item) => item.group === group);
-                if (existingGroupIndex === -1) {
-                    const groupObject = {
-                        provider,
-                        group,
-                        items: results || [],
-                        titleIcon: Object.values((results || [])[0].tags)[0],
-                    };
-                    state.cloudServiceTypeList.push(groupObject);
-                } else {
-                    state.cloudServiceTypeList[existingGroupIndex].items = results || [];
-                }
-            } catch (e) {
-                state.cloudServiceTypeList = [];
-                ErrorHandler.handleError(e);
-            }
-        },
         setSelectedCloudServiceType: async (group?: string, name?: string) => {
             if (name) {
                 const cloudServiceTypeList = find(state.cloudServiceTypeList, { group });
                 state.selectedCloudServiceType = find(cloudServiceTypeList?.items, { name });
-            } else state.selectedCloudServiceType = state.cloudServiceTypeList[0].items[0];
+            } else if (state.cloudServiceTypeList[0].items) {
+                state.selectedCloudServiceType = state.cloudServiceTypeList[0]?.items[0];
+            }
         },
         initState: () => {
             state.searchFilters = [] as ConsoleFilter[];
             state.cloudServiceAnalyzeList = [] as CloudServiceAnalyzeResult[];
-            state.cloudServiceTypeList = [] as CloudServiceTypeItem[];
-            state.selectedCloudServiceType = undefined as undefined | CloudServiceTypeModel;
+            state.cloudServiceTypeList = [] as CloudServiceTypeListItem[];
+            state.selectedCloudServiceType = undefined as undefined | CloudServiceTypeItem;
         },
     };
 

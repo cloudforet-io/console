@@ -21,8 +21,8 @@ onUnmounted(() => {
 
 <template>
     <cloud-service-detail-page :is-security-page="true"
-                               :provider="storeState.selectedCloudServiceType?.provider"
-                               :group="storeState.selectedCloudServiceType?.group"
+                               :provider="storeState.selectedCloudServiceType?.data.provider"
+                               :group="storeState.selectedCloudServiceType?.data.group"
                                :name="storeState.selectedCloudServiceType?.name"
     />
 </template>

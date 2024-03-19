@@ -79,7 +79,8 @@ export const ADMIN_MENU_LIST: Menu[] = [
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.CLOUD_SERVICE },
-            { id: MENU_ID.SERVER, needPermissionByRole: true },
+            { id: MENU_ID.SERVER },
+            { id: MENU_ID.SECURITY },
             { id: MENU_ID.COLLECTOR },
         ],
     },
