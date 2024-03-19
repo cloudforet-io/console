@@ -7,41 +7,34 @@ import type { Granularity, Period, RelativePeriod } from '@/services/asset-inven
 export const getRefinedPeriod = (granularity: Granularity, relativePeriod: RelativePeriod): Period => {
     const today = dayjs.utc();
     const includeToday = relativePeriod?.include_today;
+    const dateFormat = granularity === GRANULARITY.DAILY ? 'YYYY-MM-DD' : 'YYYY-MM';
     if (granularity === GRANULARITY.MONTHLY) {
         if (relativePeriod?.unit === 'year') {
             if (includeToday) {
                 return {
-                    start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('year')
-                        .format('YYYY-MM'),
-                    end: today.startOf('month').format('YYYY-MM'),
+                    start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('year').format(dateFormat),
+                    end: today.startOf('month').format(dateFormat),
                 };
             }
             return {
-                start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('year')
-                    .format('YYYY-MM'),
-                end: today.subtract(relativePeriod.value, relativePeriod.unit).endOf('year')
-                    .format('YYYY-MM'),
+                start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('year').format(dateFormat),
+                end: today.subtract(relativePeriod.value, relativePeriod.unit).endOf('year').format(dateFormat),
             };
         }
         return {
-            start: today.subtract(relativePeriod.value, relativePeriod.unit)
-                .format('YYYY-MM'),
-            end: today.subtract(relativePeriod.include_today ? 0 : 1, 'month')
-                .format('YYYY-MM'),
+            start: today.subtract(relativePeriod.value, relativePeriod.unit).format(dateFormat),
+            end: today.subtract(relativePeriod.include_today ? 0 : 1, 'month').format(dateFormat),
         };
     }
     if (includeToday) {
         return {
-            start: today.subtract(relativePeriod.value, 'month').startOf('month')
-                .format('YYYY-MM'),
-            end: today.format('YYYY-MM'),
+            start: today.subtract(relativePeriod.value, 'month').startOf('month').format(dateFormat),
+            end: today.format(dateFormat),
         };
     }
     return {
-        start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('month')
-            .format('YYYY-MM'),
-        end: today.subtract(relativePeriod.value, relativePeriod.unit).endOf('month')
-            .format('YYYY-MM'),
+        start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('month').format(dateFormat),
+        end: today.subtract(relativePeriod.value, relativePeriod.unit).endOf('month').format(dateFormat),
     };
 };
 

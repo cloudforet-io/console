@@ -31,7 +31,6 @@ import type {
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
-    // period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0],
     dailyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const locale = i18n.locale;
         return [
@@ -122,9 +121,6 @@ const handleSelectPeriod = (periodMenuName: string) => {
     metricExplorerPageStore.setRelativePeriod(_relativePeriod);
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    // state.period = period;
-    // const start = dayjs.utc(period?.start).format('YYYY-MM');
-    // const end = dayjs.utc(period?.end).format('YYYY-MM');
     metricExplorerPageStore.setPeriod({ start, end });
     metricExplorerPageStore.setRelativePeriod(undefined);
     state.selectedPeriod = 'custom';

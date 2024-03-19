@@ -10,6 +10,8 @@ import dayjs from 'dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
+const DATE_3_YEARS_TO_MONTHS = 36;
+const DATE_1_YEAR_TO_MONTHS = 12;
 interface DateSetting {
     minDate?: string;
     maxDate?: string;
@@ -19,6 +21,7 @@ interface Props {
     datetimePickerDataType?: DATA_TYPE;
     start?: string;
     end?: string;
+    /* Restricted mode applies a limit of '12 months' for month type, and '1 month' for day type */
     useRestrictedMode?: boolean;
     disableFuture?: boolean;
 }
@@ -44,45 +47,39 @@ const state = reactive({
         const timeUnit = props.datetimePickerDataType === 'yearToDate' ? 'day' : 'month';
         const startDate = dayjs.utc(state.startDates[0]);
         const endDate = dayjs.utc(state.endDates[0]);
-        return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, 'year') >= 1;
+
+        const diffUnit = props.datetimePickerDataType === 'yearToDate' ? 'month' : 'year';
+        return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, diffUnit) >= 1;
     }),
     startDates: [] as string[],
     endDates: [] as string[],
+    dateFormat: computed<string>(() => (props.datetimePickerDataType === 'yearToDate' ? 'YYYY-MM-DD' : 'YYYY-MM')),
     startDateSetting: computed<DateSetting|undefined>(() => {
         if (!props.useRestrictedMode) return undefined;
-        if (props.datetimePickerDataType === 'yearToMonth') {
-            const minDate = today.subtract(35, 'month').format('YYYY-MM');
-            const maxDate = today.format('YYYY-MM');
-            return { minDate, maxDate };
-        }
-        if (props.datetimePickerDataType === 'yearToDate') {
-            const minDate = today.subtract(1, 'month').format('YYYY-MM-DD');
-            const maxDate = today.format('YYYY-MM-DD');
-            return { minDate, maxDate };
-        }
-        return undefined;
+        const minDate = today.subtract(DATE_3_YEARS_TO_MONTHS - 1, 'month').format(state.dateFormat);
+        const maxDate = today.format(state.dateFormat);
+        return { minDate, maxDate };
     }),
     endDateSetting: computed<DateSetting|undefined>(() => {
         if (!state.startDates.length) return undefined;
-        const _dateFormat = props.datetimePickerDataType === 'yearToDate' ? 'YYYY-MM-DD' : 'YYYY-MM';
         if (!props.useRestrictedMode) {
             const startDate = dayjs.utc(state.startDates[0]);
-            const minDate = startDate.format(_dateFormat);
+            const minDate = startDate.format(state.dateFormat);
             return { minDate };
         }
 
         let maxDate: string;
         const startDate = dayjs.utc(state.startDates[0]);
-        const minDate = startDate.format(_dateFormat);
+        const minDate = startDate.format(state.dateFormat);
 
-        let maxRawData = startDate.add(11, 'month');
+        let maxRawData = startDate.add(DATE_1_YEAR_TO_MONTHS - 1, 'month');
         if (props.datetimePickerDataType === 'yearToDate') {
-            maxRawData = startDate.add(1, 'month');
+            maxRawData = startDate.add(1, 'month').subtract(1, 'day');
         }
 
         if (props.disableFuture && maxRawData.isAfter(dayjs.utc())) {
-            maxDate = dayjs.utc().format(_dateFormat);
-        } else maxDate = maxRawData.format(_dateFormat);
+            maxDate = dayjs.utc().format(state.dateFormat);
+        } else maxDate = maxRawData.format(state.dateFormat);
         return { minDate, maxDate };
     }),
 });
@@ -93,8 +90,8 @@ const handleUpdateVisible = (visible: boolean) => {
 };
 const handleConfirm = () => {
     state.proxyVisible = false;
-    const start = dayjs.utc(state.startDates[0]).format('YYYY-MM');
-    const end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM');
+    const start = dayjs.utc(state.startDates[0]).format(state.dateFormat);
+    const end = dayjs.utc(state.endDates[0]).format(state.dateFormat);
     emit('confirm', start, end);
 };
 const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
@@ -150,7 +147,7 @@ watch(() => props.visible, (visible) => {
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.startDateSetting?.minDate"
                                    :max-date="state.startDateSetting?.maxDate"
-                                   data-type="yearToMonth"
+                                   :data-type="props.datetimePickerDataType"
                                    @update:selected-dates="handleUpdateSelectedDates('start', $event)"
                 />
             </p-field-group>
@@ -163,7 +160,7 @@ watch(() => props.visible, (visible) => {
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.endDateSetting?.minDate"
                                    :max-date="state.endDateSetting?.maxDate"
-                                   data-type="yearToMonth"
+                                   :data-type="props.datetimePickerDataType"
                                    @update:selected-dates="handleUpdateSelectedDates('end', $event)"
                 />
             </p-field-group>
