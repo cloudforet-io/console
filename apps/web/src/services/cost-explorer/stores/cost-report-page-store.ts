@@ -83,10 +83,17 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const fetchCostReportsList = async (params?: CostReportListParameters): Promise<void> => {
         state.reportListLoading = true;
         try {
-            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+            const _params: CostReportListParameters = {
                 ...params,
-                status: 'SUCCESS',
-            });
+                query: {
+                    ...params?.query,
+                    filter: [
+                        ...(params?.query?.filter || []),
+                        { k: 'cost_report_config_id', v: state.costReportConfig?.cost_report_config_id, o: 'eq' },
+                    ],
+                },
+            };
+            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>(_params);
             state.reportListItems = results || [];
             state.reportListTotalCount = total_count || 0;
         } catch (e) {
@@ -115,13 +122,17 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
-    const fetchRecentReportData = async () => {
+    const fetchRecentReportData = async (costReportConfigId?: string) => {
+        if (!costReportConfigId) return;
         try {
             state.recentReportDataLoading = true;
             const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
                 status: 'SUCCESS',
                 query: {
                     only: ['report_month', 'issue_date'],
+                    filter: [
+                        { k: 'cost_report_config_id', v: costReportConfigId, o: 'eq' },
+                    ],
                 },
             });
             const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];
