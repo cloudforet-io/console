@@ -37,7 +37,7 @@ const fetchSearchResources = getCancellableFetcher<object, {results: {name: stri
 const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     try {
         const { status, response } = await fetchSearchResources({
-            resource_type: 'inventory.CloudServiceType',
+            resource_type: 'inventory.CloudServiceType', // TODO: change resource_type
             distinct_key: distinctKey,
             search: inputText,
             options: {
