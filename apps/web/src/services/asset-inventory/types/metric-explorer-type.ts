@@ -1,6 +1,6 @@
 import type { ManipulateType } from 'dayjs';
 
-import type { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import type { GRANULARITY, OPERATOR, PERIOD_DROPDOWN_MENU } from '@/services/asset-inventory/constants/metric-explorer-constant';
 
 
 export interface Period {
@@ -22,3 +22,5 @@ export interface MetricNamespace {
     provider: string;
     cloud_service_group: string;
 }
+
+export type PeriodDropdownMenu = typeof PERIOD_DROPDOWN_MENU[keyof typeof PERIOD_DROPDOWN_MENU];
