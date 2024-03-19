@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@spaceone/design-system';
 
 import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 
@@ -36,6 +36,12 @@ const handleClickCollapsibleTitle = () => {
                  color="inherit transparent"
                  class="arrow-button"
             />
+            <p-lazy-img v-if="props.item.icon"
+                        class="title-image"
+                        :src="props.item.icon"
+                        width="1rem"
+                        height="1rem"
+            />
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">
@@ -53,6 +59,9 @@ const handleClickCollapsibleTitle = () => {
         @apply flex items-center font-bold;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
+        }
+        .title-image {
+            margin-right: 0.25rem;
         }
     }
     .collapsible-contents {
