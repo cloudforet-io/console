@@ -135,6 +135,7 @@ const monitoringState: MonitoringProps = reactive({
                 :cloud-service-group="props.group"
                 :cloud-service-type="props.name"
                 :is-server-page="props.isServerPage"
+                :is-security-page="props.isSecurityPage"
             />
         </template>
 
@@ -209,6 +210,7 @@ const monitoringState: MonitoringProps = reactive({
                                                   :cloud-service-group="props.group"
                                                   :cloud-service-type="props.name"
                                                   :cloud-service-id-list="tableState.selectedItems.map((item) => item?.cloud_service_id)"
+                                                  :is-security-page="props.isSecurityPage"
             />
         </template>
         <template #monitoring>

@@ -235,7 +235,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
                 cloud_service_id: id,
             });
             window.open(router.resolve({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,
