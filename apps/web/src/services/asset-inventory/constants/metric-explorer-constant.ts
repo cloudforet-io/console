@@ -52,3 +52,10 @@ export const PERIOD_DROPDOWN_MENU_ITEM_MAP = {
         relativePeriod: { unit: 'year', value: 1, include_today: false },
     },
 } as const;
+
+export const CHART_TYPE = {
+    LINE: 'LINE',
+    COLUMN: 'COLUMN',
+    TREEMAP: 'TREEMAP',
+    DONUT: 'DONUT',
+} as const;

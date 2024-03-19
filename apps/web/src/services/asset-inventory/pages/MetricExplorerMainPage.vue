@@ -3,7 +3,7 @@ import {
     PDivider,
 } from '@spaceone/design-system';
 
-// import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
+import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
 // import MetricExplorerDataTable from '@/services/asset-inventory/components/MetricExplorerDataTable.vue';
 import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
 import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
@@ -19,7 +19,7 @@ import MetricExplorerQuerySection from '@/services/asset-inventory/components/Me
                 <metric-explorer-query-section />
                 <div class="contents-wrapper">
                     <metric-explorer-group-by />
-                    <!--<metric-explorer-chart />-->
+                    <metric-explorer-chart />
                     <!--<metric-explorer-data-table />-->
                 </div>
             </div>

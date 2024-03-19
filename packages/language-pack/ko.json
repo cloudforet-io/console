@@ -2699,8 +2699,10 @@
 			"FILTERS": "필터",
 			"GRANULARITY": "세부 기준",
 			"GROUP_BY": "그룹별 통계",
+			"HIDE_ALL": "전체 숨김",
 			"METRIC_EXPLORER": "",
 			"MONTHLY": "월별 데이터",
+			"NO_ITEMS": "아이템이 없습니다",
 			"OPERATOR": "",
 			"PERIOD": {
 				"CUSTOM": "커스텀",
@@ -2716,7 +2718,9 @@
 				"THIS_YEAR": "올해"
 			},
 			"SAVE": "저장",
-			"SAVE_AS": "다른 이름으로 저장"
+			"SAVE_AS": "다른 이름으로 저장",
+			"SHOW_ALL": "전체 보기",
+			"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요."
 		},
 		"SECURITY": {
 			"MAIN": {

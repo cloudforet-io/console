@@ -1,6 +1,10 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { ManipulateType } from 'dayjs';
 
-import type { GRANULARITY, OPERATOR, PERIOD_DROPDOWN_MENU } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import type {
+    GRANULARITY, OPERATOR, PERIOD_DROPDOWN_MENU, CHART_TYPE,
+} from '@/services/asset-inventory/constants/metric-explorer-constant';
 
 
 export interface Period {
@@ -25,3 +29,12 @@ export interface MetricNamespace {
 }
 
 export type PeriodDropdownMenu = typeof PERIOD_DROPDOWN_MENU[keyof typeof PERIOD_DROPDOWN_MENU];
+
+export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export interface Legend {
+    name: string;
+    label: string | TranslateResult;
+    color?: string;
+    disabled?: boolean;
+}
