@@ -12,7 +12,7 @@ import {
 
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
 import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
-// import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
+import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -40,7 +40,7 @@ const handleClickFilter = () => {
             <div class="left-part">
                 <metric-explorer-operator-dropdown />
                 <metric-explorer-granularity-dropdown />
-                <!--<metric-explorer-period-dropdown />-->
+                <metric-explorer-period-dropdown />
                 <!--period-->
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"

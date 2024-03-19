@@ -9,6 +9,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
     Granularity, Period, RelativePeriod, MetricNamespace,
 } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -18,8 +19,8 @@ import type {
 export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
     const state = reactive({
         granularity: GRANULARITY.MONTHLY as Granularity,
-        period: undefined as Period|undefined,
-        relativePeriod: undefined as RelativePeriod|undefined,
+        period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
+        relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
         filters: {} as Record<string, string[]>,
         namespaces: [] as MetricNamespace[],
         selectedNamespace: undefined as MetricNamespace|undefined,
