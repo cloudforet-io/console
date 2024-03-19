@@ -26,6 +26,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { yellow } from '@/styles/colors';
 
+import AddCustomMetricModal from '@/services/asset-inventory/components/AddCustomMetricModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricNamespace } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -92,6 +93,9 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
+    selectedMetric: undefined as any|undefined,
+    metricList: computed(() => []),
+    addCustomMetricModalVisible: false,
 });
 
 /* Helper */
@@ -136,6 +140,12 @@ const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined
     }
     return undefined;
 };
+const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
+    if (!metricState.selectedMetric) return false;
+    return metricState.selectedMetric.cloudServiceGroup === namespace.cloudServiceGroup
+        && metricState.selectedMetric.cloudServiceType === namespace.cloudServiceType
+        && metricState.selectedMetric.provider === namespace.provider;
+};
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
@@ -150,6 +160,10 @@ const handleClickNamespace = (namespace: NamespaceSubItemType) => {
 const handleClickBackToNamespace = () => {
     namespaceState.selectedNamespace = undefined;
 };
+const handleOpenAddCustomMetricModal = () => {
+    console.debug('handleOpenAddCustomMetricModal', metricState.addCustomMetricModalVisible);
+    metricState.addCustomMetricModalVisible = true;
+};
 
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
@@ -158,92 +172,102 @@ onMounted(async () => {
 </script>
 
 <template>
-    <l-s-b class="metric-explorer-l-s-b"
-           :menu-set="state.menuSet"
-    >
-        <template #collapsible-contents-starred>
-            <div v-if="state.starredMenuSet.length > 0">
-                <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
-                                        :key="idx"
-                                        :item="item"
-                                        :idx="idx"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                />
-            </div>
-            <span v-else
-                  class="no-data"
-            >
-                <p-i class="menu-icon"
-                     name="ic_star-filled"
-                     height="1rem"
-                     width="1rem"
-                     :color="yellow[500]"
-                />
-                {{ $t('COMMON.STARRED_NO_DATA') }}
-            </span>
-        </template>
-        <template #collapsible-contents-namespace>
-            <div class="namespace-wrapper">
-                <p-search class="namespace-search"
-                          :value="namespaceState.inputValue"
-                          @update:value="handleSearchNamespace"
-                />
-                <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                             :key="`provider-${idx}`"
-                                             class="provider-menu-item"
-                                             :item="item"
-                                             is-sub-item
-                >
-                    <template #collapsible-contents="{ item: _item }">
-                        <div v-for="(_menu, _idx) in _item.subItems"
-                             :key="`${_menu.label}-${_idx}`"
-                             class="namespace-menu-item"
-                             @click="handleClickNamespace(_menu)"
-                        >
-                            <span class="text">
-                                {{ _menu.label }}
-                            </span>
-                        </div>
-                    </template>
-                </l-s-b-collapsible-menu-item>
-            </div>
-        </template>
-        <template #slot-metric>
-            <div class="metric-wrapper">
-                <div class="metric-title-item">
-                    <div class="title-wrapper">
-                        <p-icon-button class="back-button"
-                                       name="ic_arrow-left"
-                                       size="sm"
-                                       @click="handleClickBackToNamespace"
-                        />
-                        <p-lazy-img class="namespace-image"
-                                    :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
-                                    width="1.25rem"
-                                    height="1.25rem"
-                        />
-                        <p-tooltip class="title"
-                                   :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
-                        >
-                            <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
-                            <span class="divider">/</span>
-                            <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
-                        </p-tooltip>
-                    </div>
-                    <p-icon-button style-type="tertiary"
-                                   name="ic_plus"
-                                   shape="square"
-                                   size="sm"
+    <fragment>
+        <l-s-b class="metric-explorer-l-s-b"
+               :menu-set="state.menuSet"
+        >
+            <template #collapsible-contents-starred>
+                <div v-if="state.starredMenuSet.length > 0">
+                    <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+                                            :key="idx"
+                                            :item="item"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
                     />
                 </div>
-                <p-search class="metric-search"
-                          :value="metricState.inputValue"
-                          @update:value="handleSearchMetric"
-                />
-            </div>
-        </template>
-    </l-s-b>
+                <span v-else
+                      class="no-data"
+                >
+                    <p-i class="menu-icon"
+                         name="ic_star-filled"
+                         height="1rem"
+                         width="1rem"
+                         :color="yellow[500]"
+                    />
+                    {{ $t('COMMON.STARRED_NO_DATA') }}
+                </span>
+            </template>
+            <template #collapsible-contents-namespace>
+                <div class="namespace-wrapper">
+                    <p-search class="namespace-search"
+                              :value="namespaceState.inputValue"
+                              @update:value="handleSearchNamespace"
+                    />
+                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                 :key="`provider-${idx}`"
+                                                 class="provider-menu-item"
+                                                 :item="item"
+                                                 is-sub-item
+                    >
+                        <template #collapsible-contents="{ item: _item }">
+                            <div v-for="(_menu, _idx) in _item.subItems"
+                                 :key="`${_menu.label}-${_idx}`"
+                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                 @click="handleClickNamespace(_menu)"
+                            >
+                                <span class="text">
+                                    {{ _menu.label }}
+                                </span>
+                            </div>
+                        </template>
+                    </l-s-b-collapsible-menu-item>
+                </div>
+            </template>
+            <template #slot-metric>
+                <div class="metric-wrapper">
+                    <div class="metric-title-item">
+                        <div class="title-wrapper">
+                            <p-icon-button class="back-button"
+                                           name="ic_arrow-left"
+                                           size="sm"
+                                           @click="handleClickBackToNamespace"
+                            />
+                            <p-lazy-img class="namespace-image"
+                                        :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
+                                        width="1.25rem"
+                                        height="1.25rem"
+                            />
+                            <p-tooltip class="title"
+                                       :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
+                            >
+                                <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
+                                <span class="divider">/</span>
+                                <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
+                            </p-tooltip>
+                        </div>
+                        <p-icon-button style-type="tertiary"
+                                       name="ic_plus"
+                                       shape="square"
+                                       size="sm"
+                                       @click="handleOpenAddCustomMetricModal"
+                        />
+                    </div>
+                    <p-search class="metric-search"
+                              :value="metricState.inputValue"
+                              @update:value="handleSearchMetric"
+                    />
+                    <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricList"
+                                            :key="idx"
+                                            :item="item"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                    />
+                </div>
+            </template>
+        </l-s-b>
+        <add-custom-metric-modal :visible.sync="metricState.addCustomMetricModalVisible" />
+    </fragment>
 </template>
 
 <style scoped lang="postcss">
@@ -257,6 +281,9 @@ onMounted(async () => {
             height: 2rem;
             padding: 0 0.5rem;
             border-radius: 0.25rem;
+            &.selected {
+                @apply bg-blue-200;
+            }
 
             &:hover {
                 @apply bg-blue-100 cursor-pointer;
