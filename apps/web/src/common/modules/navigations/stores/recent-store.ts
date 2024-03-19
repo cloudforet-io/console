@@ -11,7 +11,7 @@ import { store } from '@/store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { RecentMenu, RecentType } from '@/common/modules/navigations/type';
+import type { RecentItem, RecentType } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 
@@ -20,7 +20,7 @@ const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
 
 interface RecentState {
-    recentMenuList: RecentMenu[];
+    recentMenuList: RecentItem[];
     totalCount: number;
 }
 
@@ -61,8 +61,8 @@ export const useRecentStore = defineStore('recent', () => {
             return state.recentMenuList;
         },
         createRecent: async ({
-            type, workspaceId, id,
-        }:{type: RecentType, workspaceId:string, id:string}) => {
+            type, workspaceId, id, options,
+        }:{type: RecentType, workspaceId:string, id:string, options?: {[key:string]: any}}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: `console:recent:${type}:${workspaceId}:${id}`,
@@ -70,6 +70,7 @@ export const useRecentStore = defineStore('recent', () => {
                         id,
                         workspace_id: workspaceId,
                         type,
+                        ...options,
                     },
                 });
             } catch (e) {

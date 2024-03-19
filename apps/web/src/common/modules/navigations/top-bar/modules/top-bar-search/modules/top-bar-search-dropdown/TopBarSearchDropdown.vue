@@ -5,12 +5,13 @@ import { computed, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PTab, screens, PLazyImg,
+    PTab, screens, PLazyImg, PI,
 } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import {
     topBarSearchReferenceRouter,
@@ -23,9 +24,7 @@ import TopBarSearchServiceTab
     from '@/common/modules/navigations/top-bar/modules/top-bar-search/modules/top-bar-search-dropdown/modules/TopBarSearchServiceTab.vue';
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { SearchTab } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 interface Props {
     isFocused: boolean;
@@ -46,6 +45,7 @@ const SEARCH_LIMIT = 15;
 const BOTTOM_MARGIN = 5.5 * 16;
 
 const topBarSearchStore = useTopBarSearchStore();
+const recentStore = useRecentStore();
 const windowSize = useWindowSize();
 
 const dropdownRef = ref<null | HTMLElement>(null);
@@ -100,16 +100,19 @@ const handleUpdateContentsSize = debounce((height: number) => {
     if (state.contentsHeight !== height) state.contentsHeight = height;
 }, 100);
 
-const handleSelect = (menuType: 'search'|'recent', item) => {
+const handleSelect = (item) => {
     if (topBarSearchStore.state.activeTab === SEARCH_TAB.CLOUD_SERVICE) {
-        if (menuType === 'search') {
-            router.push({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    name: item?.tags?.name, workspaceId: item?.workspace_id, group: item?.tags?.group, provider: item?.tags?.provider,
-                },
-            });
-        } else router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, storeState.cloudServiceTypeMap[item.resource_id]));
+        router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id, item?.tags));
+        recentStore.createRecent({
+            workspaceId: item?.workspace_id,
+            type: RECENT_TYPE.CLOUD_SERVICE,
+            id: item?.resource_id,
+            options: {
+                ...item?.tags,
+                description: item?.description,
+                label: item?.name,
+            },
+        });
     } else if (topBarSearchStore.state.activeTab !== SEARCH_TAB.SERVICE) router.push(topBarSearchReferenceRouter(topBarSearchStore.state.activeTab, item.resource_id, item.workspace_id));
 
     topBarSearchStore.setIsActivated(false);
@@ -139,7 +142,6 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     :style="{ height: state.tabContextHeight ? state.tabContextHeight + 'px': undefined}"
                     @update:contents-size="handleUpdateContentsSize"
                     @move-focus-end="handleMoveFocusEnd"
-                    @select="handleSelect"
                 />
             </template>
             <template #serviceAccount>
@@ -153,7 +155,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     @update:contents-size="handleUpdateContentsSize"
                     @select="handleSelect"
                 >
-                    <template #item-format="{item}">
+                    <template #search-menu-item="{item}">
                         <top-bar-search-list-item key="serviceAccount"
                                                   :label="item?.name"
                                                   icon-name="ic_service_service-account"
@@ -174,7 +176,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     @update:contents-size="handleUpdateContentsSize"
                     @select="handleSelect"
                 >
-                    <template #item-format="{item}">
+                    <template #search-menu-item="{item}">
                         <top-bar-search-list-item key="project"
                                                   :label="item?.name"
                                                   icon-name="ic_document-filled"
@@ -195,7 +197,7 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     @update:contents-size="handleUpdateContentsSize"
                     @select="handleSelect"
                 >
-                    <template #item-format="{item}">
+                    <template #search-menu-item="{item}">
                         <top-bar-search-list-item key="dashboard"
                                                   :label="item?.name"
                                                   icon-name="ic_service_dashboard"
@@ -216,18 +218,24 @@ const handleSelect = (menuType: 'search'|'recent', item) => {
                     @update:contents-size="handleUpdateContentsSize"
                     @select="handleSelect"
                 >
-                    <template #item-format="{item}">
+                    <template #search-menu-item="{item}">
                         <top-bar-search-list-item key="cloudService"
                                                   :label="item?.name"
                                                   :workspace-id="item?.workspace_id"
                                                   :description="item?.description"
                         >
                             <template #icon>
-                                <p-lazy-img :src="item?.tags?.icon"
-                                            width="1.25rem"
-                                            height="1.25rem"
-                                            style="margin-right: 0.375rem;"
-                                />
+                                <span style="margin-right: 0.375rem;">
+                                    <p-lazy-img v-if="item?.tags?.icon"
+                                                :src="item?.tags?.icon"
+                                                width="1.25rem"
+                                                height="1.25rem"
+                                    />
+                                    <p-i v-else
+                                         name="ic_service_cloud-service"
+                                         width="1.25rem"
+                                         height="1.25rem"
+                                    /></span>
                             </template>
                         </top-bar-search-list-item>
                     </template>
