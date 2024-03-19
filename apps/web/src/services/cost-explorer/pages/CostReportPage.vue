@@ -25,6 +25,7 @@ const costReportPageStore = useCostReportPageStore();
 const costReportPageState = costReportPageStore.state;
 
 const state = reactive({
+    loading: true,
     tabs: computed<TabItem[]>(() => [
         {
             name: 'overview',
@@ -46,9 +47,11 @@ watch(() => state.activeTab, (activeTab) => {
     costReportPageState.activeTab = activeTab;
 });
 
-onMounted(() => {
-    costReportPageStore.fetchCostReportConfig();
-    costReportPageStore.fetchRecentReportData();
+onMounted(async () => {
+    state.loading = true;
+    await costReportPageStore.fetchCostReportConfig();
+    await costReportPageStore.fetchRecentReportData(costReportPageState.costReportConfig?.cost_report_config_id);
+    state.loading = false;
 });
 </script>
 
@@ -59,7 +62,7 @@ onMounted(() => {
                :active-tab.sync="state.activeTab"
         >
             <template #overview>
-                <div v-if="!costReportPageState.recentReportDataLoading"
+                <div v-if="!state.loading"
                      class="overview-tab-pane"
                 >
                     <cost-report-overview-cost-trend-card v-if="!costReportPageState.recentReportDataLoading && costReportPageState.hasReport"
