@@ -49,11 +49,11 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         try {
             const { response, status } = await fetcher<CloudServiceAnalyzeParameters, ListResponse<MetricNamespace>>({
                 query: {
-                    group_by: ['cloud_service_group', 'provider'],
+                    group_by: ['cloud_service_group', 'provider', 'cloud_service_type'],
                     fields: {},
                     filter: [{ k: 'state', v: ['ACTIVE'], o: 'in' }],
                     filter_or: [],
-                    sort: [{ key: 'provider', desc: false }, { key: 'cloud_service_group', desc: false }],
+                    sort: [{ key: 'provider', desc: false }, { key: 'cloud_service_group', desc: false }, { key: 'cloud_service_type', desc: false }],
                 },
             });
             if (status === 'succeed') {

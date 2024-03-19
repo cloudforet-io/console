@@ -21,6 +21,7 @@ export type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 export interface MetricNamespace {
     provider: string;
     cloud_service_group: string;
+    cloud_service_type: string;
 }
 
 export type PeriodDropdownMenu = typeof PERIOD_DROPDOWN_MENU[keyof typeof PERIOD_DROPDOWN_MENU];
