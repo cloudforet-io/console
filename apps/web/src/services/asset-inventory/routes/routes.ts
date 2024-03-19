@@ -190,7 +190,7 @@ const assetInventoryRoute: RouteConfig = {
         {
             path: 'metric-explorer',
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
-            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId },
+            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId, lsbVisible: true },
             component: MetricExplorerMainPage as any,
         },
     ],
