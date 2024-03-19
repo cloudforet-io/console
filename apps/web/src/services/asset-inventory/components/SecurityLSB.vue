@@ -96,7 +96,7 @@ const initData = async () => {
     }
 };
 
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], initData);
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
 
 /* Watchers */
 watch(() => storeState.cloudServiceTypeList, (cloudServiceTypeList) => {
@@ -107,11 +107,11 @@ watch(() => storeState.cloudServiceTypeList, (cloudServiceTypeList) => {
 watch(() => state.pageParams, (pageParams) => {
     if (pageParams?.name) {
         securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
-    }
+    } else routeToFirstCloudServiceType();
 });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
-}, { immediate: true });
+});
 
 </script>
 

@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 
-import { find } from 'lodash';
+import { find, uniqBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -60,11 +60,14 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                     ),
                 });
                 state.cloudServiceAnalyzeList = results;
-                state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => ({
-                    provider: listItem.provider,
-                    group: listItem.cloud_service_group,
-                    items: Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group),
-                }));
+                state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => {
+                    const items = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group);
+                    return {
+                        provider: listItem.provider,
+                        group: listItem.cloud_service_group,
+                        items: uniqBy(items || [], 'name'),
+                    };
+                });
                 return results || [];
             } catch (e) {
                 state.cloudServiceAnalyzeList = [];
