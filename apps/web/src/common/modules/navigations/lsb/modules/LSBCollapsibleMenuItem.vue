@@ -3,14 +3,15 @@ import { reactive } from 'vue';
 
 import { PI } from '@spaceone/design-system';
 
-import type { LSBItem } from '@/common/modules/navigations/lsb/type';
+import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    item: LSBItem;
+    item: LSBCollapsibleItem;
+    isSubItem?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: () => ({}) as LSBItem,
+    item: () => ({}) as LSBCollapsibleItem,
 });
 
 const state = reactive({
@@ -24,7 +25,7 @@ const handleClickCollapsibleTitle = () => {
 
 <template>
     <div class="l-s-b-collapsible-menu-item"
-         :class="{ 'is-collapsed': state.isCollapsed }"
+         :class="{ 'is-collapsed': state.isCollapsed, 'is-sub-item': props.isSubItem }"
     >
         <div class="collapsible-title"
              @click="handleClickCollapsibleTitle"
@@ -60,6 +61,15 @@ const handleClickCollapsibleTitle = () => {
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
+    &.is-sub-item {
+        .collapsible-title {
+            @apply text-gray-600;
+            height: 1.25rem;
+        }
+        .collapsible-contents {
+            padding-left: 0.75rem;
+        }
+    }
     &.is-collapsed {
         .collapsible-title {
             .arrow-button {
@@ -67,6 +77,7 @@ const handleClickCollapsibleTitle = () => {
             }
         }
         .collapsible-contents {
+            display: none;
             height: 0;
             margin: 0;
             padding: 0;
