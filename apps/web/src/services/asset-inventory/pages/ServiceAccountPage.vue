@@ -12,10 +12,7 @@ import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type {
-    DynamicLayout, DynamicLayoutOptions,
-    SearchSchema,
-} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayoutOptions, SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -55,6 +52,7 @@ import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
+import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
@@ -109,7 +107,7 @@ const typeOptionState = reactive({
 const tableState = reactive({
     isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
-    schema: computed<DynamicLayout|undefined>(() => (tableState.isTrustedAccount
+    schema: computed<QuerySearchTableLayout|undefined>(() => (tableState.isTrustedAccount
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,

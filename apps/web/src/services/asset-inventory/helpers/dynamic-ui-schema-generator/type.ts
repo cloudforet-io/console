@@ -1,3 +1,6 @@
+import type { ItemOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QuerySearchTableOptions } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+
 import type { SchemaModel } from '@/schema/identity/schema/model';
 
 export type ResourceType = 'identity.ServiceAccount'|'identity.TrustedAccount'|'inventory.CloudService'|'inventory.Server';
@@ -33,3 +36,15 @@ export interface UpdateSchemaParams {
     };
     data: any;
 }
+
+export type ItemLayout = {
+    name: string;
+    type: string;
+    options:ItemOptions
+};
+
+export type QuerySearchTableLayout = {
+    name: string;
+    type: string;
+    options: QuerySearchTableOptions;
+};
