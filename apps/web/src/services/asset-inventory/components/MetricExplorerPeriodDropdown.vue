@@ -15,16 +15,16 @@ import CustomDateModal from '@/common/components/custom-date-modal/CustomDateMod
 
 import {
     GRANULARITY,
-    PERIOD_DROPDOWN_MENU,
-    PERIOD_DROPDOWN_MENU_ITEM_MAP,
+    METRIC_PERIOD_MENU,
+    METRIC_PERIOD_MENU_ITEM_MAP,
 } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
     getInitialPeriodByGranularity,
-    getRefinedPeriod,
+    convertRelativePeriodToPeriod, getRefinedDailyPeriod,
 } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
-    Granularity, PeriodDropdownMenu,
+    Granularity, MetricPeriodMenu,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -35,11 +35,11 @@ const state = reactive({
         const locale = i18n.locale;
         return [
             {
-                name: PERIOD_DROPDOWN_MENU.CURRENT_MONTH,
+                name: METRIC_PERIOD_MENU.CURRENT_MONTH,
                 label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_MONTH'),
             },
             {
-                name: PERIOD_DROPDOWN_MENU.LAST_MONTH,
+                name: METRIC_PERIOD_MENU.LAST_MONTH,
                 label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_MONTH'),
             },
             ...(range(12).map((i) => {
@@ -53,23 +53,23 @@ const state = reactive({
     }),
     monthlyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
-            name: PERIOD_DROPDOWN_MENU.LAST_3_MONTHS,
+            name: METRIC_PERIOD_MENU.LAST_3_MONTHS,
             label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_3_MONTHS'),
         },
         {
-            name: PERIOD_DROPDOWN_MENU.LAST_6_MONTHS,
+            name: METRIC_PERIOD_MENU.LAST_6_MONTHS,
             label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_6_MONTHS'),
         },
         {
-            name: PERIOD_DROPDOWN_MENU.LAST_12_MONTHS,
+            name: METRIC_PERIOD_MENU.LAST_12_MONTHS,
             label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_12_MONTHS'),
         },
         {
-            name: PERIOD_DROPDOWN_MENU.CURRENT_YEAR,
+            name: METRIC_PERIOD_MENU.CURRENT_YEAR,
             label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_YEAR'),
         },
         {
-            name: PERIOD_DROPDOWN_MENU.LAST_YEAR,
+            name: METRIC_PERIOD_MENU.LAST_YEAR,
             label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_YEAR'),
         }])),
     allPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
@@ -93,7 +93,7 @@ const state = reactive({
             ...customItem,
         ];
     }),
-    selectedPeriod: PERIOD_DROPDOWN_MENU.LAST_6_MONTHS as PeriodDropdownMenu,
+    selectedPeriod: METRIC_PERIOD_MENU.LAST_6_MONTHS as MetricPeriodMenu,
     customDateModalVisible: false,
 });
 
@@ -102,7 +102,7 @@ const setSelectedPeriodItemByGranularity = (granularity: Granularity) => {
     const [_period, _relativePeriod] = getInitialPeriodByGranularity(granularity);
     metricExplorerPageStore.setPeriod(_period);
     metricExplorerPageStore.setRelativePeriod(_relativePeriod);
-    state.selectedPeriod = Object.values(PERIOD_DROPDOWN_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, _relativePeriod))?.name;
+    state.selectedPeriod = Object.values(METRIC_PERIOD_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, _relativePeriod))?.name;
 };
 
 /* Event */
@@ -113,12 +113,17 @@ const handleSelectPeriod = (periodMenuName: string) => {
     }
 
     state.selectedPeriod = periodMenuName;
-    const _selectedPeriodItem = PERIOD_DROPDOWN_MENU_ITEM_MAP[periodMenuName];
-    const _relativePeriod = _selectedPeriodItem.relativePeriod;
-    const _period = _relativePeriod ? getRefinedPeriod(metricExplorerPageState.granularity, _relativePeriod) : _selectedPeriodItem.period;
-    // state.period = _relativePeriod ? getRefinedPeriod(metricExplorerPageState.granularity, _relativePeriod) : _selectedPeriodItem.period;
-    metricExplorerPageStore.setPeriod(_period);
-    metricExplorerPageStore.setRelativePeriod(_relativePeriod);
+    const _selectedPeriodItem = METRIC_PERIOD_MENU_ITEM_MAP[periodMenuName];
+    if (_selectedPeriodItem) {
+        const _relativePeriod = _selectedPeriodItem.relativePeriod;
+        const _period = convertRelativePeriodToPeriod(metricExplorerPageState.granularity, _relativePeriod);
+        metricExplorerPageStore.setPeriod(_period);
+        metricExplorerPageStore.setRelativePeriod(_relativePeriod);
+    } else {
+        const _period = getRefinedDailyPeriod(periodMenuName);
+        metricExplorerPageStore.setPeriod(_period);
+        metricExplorerPageStore.setRelativePeriod(undefined);
+    }
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
     metricExplorerPageStore.setPeriod({ start, end });
