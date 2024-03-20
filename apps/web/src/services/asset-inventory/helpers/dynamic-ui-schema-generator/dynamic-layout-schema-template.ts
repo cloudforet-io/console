@@ -80,31 +80,57 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                 name: 'Name',
                 type: 'text',
             },
-            ...((isTrustedAccount && [{
-                key: 'resource_group',
-                name: 'Scope',
-                type: 'enum',
-                options: {
-                    items: {
-                        WORKSPACE: {
-                            name: 'Workspace',
-                            type: 'badge',
-                            options: {
-                                text_color: 'violet.600',
-                                background_color: 'violet.200',
+            ...((isTrustedAccount && [
+                {
+                    key: 'resource_group',
+                    name: 'Scope',
+                    type: 'enum',
+                    options: {
+                        items: {
+                            WORKSPACE: {
+                                name: 'Workspace',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'violet.600',
+                                    background_color: 'violet.200',
+                                },
                             },
-                        },
-                        DOMAIN: {
-                            name: 'Domain',
-                            type: 'badge',
-                            options: {
-                                text_color: 'gray.900',
-                                background_color: 'gray.200',
+                            DOMAIN: {
+                                name: 'Domain',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'gray.900',
+                                    background_color: 'gray.200',
+                                },
                             },
                         },
                     },
                 },
-            }]) || []),
+                {
+                    key: 'auto_sync',
+                    name: 'Auto Sync',
+                    type: 'enum',
+                    options: {
+                        items: {
+                            WORKSPACE: {
+                                name: 'Workspace',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'violet.600',
+                                    background_color: 'violet.200',
+                                },
+                            },
+                            DOMAIN: {
+                                name: 'Domain',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'gray.900',
+                                    background_color: 'gray.200',
+                                },
+                            },
+                        },
+                    },
+                }]) || []),
             ...fields.map((field) => ({
                 key: field.key,
                 name: field.name,
