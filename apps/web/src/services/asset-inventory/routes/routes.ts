@@ -24,6 +24,7 @@ const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue
 const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
 
 const MetricExplorerMainPage = () => import('@/services/asset-inventory/pages/MetricExplorerMainPage.vue');
+const MetricExplorerDetailPage = () => import('@/services/asset-inventory/pages/MetricExplorerDetailPage.vue');
 
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
@@ -189,9 +190,23 @@ const assetInventoryRoute: RouteConfig = {
         },
         {
             path: 'metric-explorer',
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
-            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId, lsbVisible: true },
-            component: MetricExplorerMainPage as any,
+            meta: { menuId: MENU_ID.METRIC_EXPLORER, translationId: MENU_INFO_MAP[MENU_ID.METRIC_EXPLORER].translationId },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+                    meta: { menuId: MENU_ID.METRIC_EXPLORER, lsbVisible: true },
+                    component: MetricExplorerMainPage as any,
+                },
+                {
+                    path: ':id',
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                    meta: { label: ({ params }) => params.id, lsbVisible: true },
+                    props: true,
+                    component: MetricExplorerDetailPage as any,
+                },
+            ],
         },
     ],
 };
