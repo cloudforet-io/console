@@ -3,7 +3,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { ManipulateType } from 'dayjs';
 
 import type {
-    GRANULARITY, OPERATOR, PERIOD_DROPDOWN_MENU, CHART_TYPE,
+    GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,
 } from '@/services/asset-inventory/constants/metric-explorer-constant';
 
 
@@ -28,7 +28,7 @@ export interface MetricNamespace {
     cloud_service_type: string;
 }
 
-export type PeriodDropdownMenu = typeof PERIOD_DROPDOWN_MENU[keyof typeof PERIOD_DROPDOWN_MENU];
+export type MetricPeriodMenu = typeof METRIC_PERIOD_MENU[keyof typeof METRIC_PERIOD_MENU];
 
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 
