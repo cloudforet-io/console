@@ -137,7 +137,7 @@ const tableState = reactive({
 });
 
 const schemaQueryHelper = new QueryHelper();
-const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => tableState.schema?.options?.search ?? []),
     'inventory.CloudService',
     computed(() => (props.isServerPage
@@ -370,7 +370,7 @@ const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
             _state.searchFilters = excelQuery.filters;
         });
     }
-    if (tableState.schema === null || !isAllLoaded.value) return;
+    if (tableState.schema === null) return;
     fetchTableData(changed);
 };
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };

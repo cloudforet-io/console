@@ -119,6 +119,7 @@ const analyzeTrendData = async () => {
     state.loading = true;
     try {
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
+            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
                 granularity: GRANULARITY.MONTHLY,
@@ -155,8 +156,13 @@ const handleChangeTarget = (target: string) => {
 };
 
 /* Watcher */
-watch([() => state.period, () => state.selectedTarget, () => costReportPageGetters.currency], async (after, before) => {
-    if (isEqual(after, before) || !costReportPageGetters.currency) return;
+watch([
+    () => state.period,
+    () => state.selectedTarget,
+    () => costReportPageGetters.currency,
+    () => costReportPageState.costReportConfig?.cost_report_config_id,
+], async (after, before) => {
+    if (isEqual(after, before) || !costReportPageGetters.currency || !costReportPageState.costReportConfig?.cost_report_config_id) return;
     await analyzeTrendData();
 }, { immediate: true });
 </script>

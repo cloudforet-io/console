@@ -43,7 +43,7 @@ const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number)
 const contextMenuRef = ref<any|null>(null);
 const state = reactive({
     refinedItems: computed(() => props.items.map((d) => ({
-        ...d, icon: undefined, itemIcon: d.icon, disabled: d.isDeleted,
+        ...d, icon: undefined, itemIcon: d?.icon, disabled: d?.isDeleted,
     }))),
 });
 
@@ -137,7 +137,7 @@ onUnmounted(() => {
                 />
                 <p-icon-button v-if="item.isDeleted"
                                class="delete-button"
-                               name="ic_close"
+                               name="ic_delete"
                                size="sm"
                                @click="$emit('delete', item)"
                 />

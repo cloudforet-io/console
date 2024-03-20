@@ -83,7 +83,6 @@ const state = reactive({
         { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
         { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
     ]),
-    shouldUpdateProjectList: computed<boolean>(() => projectPageState.shouldUpdateProjectList),
 });
 
 /* Util */
@@ -141,12 +140,15 @@ const fetchProjectList = async () => {
 };
 const analyzeCloudServiceApiQueryHelper = new ApiQueryHelper();
 const analyzeCloudService = async (summaryType: SummaryType, projectIdList: string[]) => {
+    const _existingProjectIdList = state.cloudServiceDataMap[summaryType]?.map((d) => d.project_id) || [];
+    if (projectIdList.every((d) => _existingProjectIdList.includes(d))) return;
     analyzeCloudServiceApiQueryHelper.setFilters([
         { k: 'ref_cloud_service_type.labels', v: summaryType, o: '=' },
         { k: 'ref_cloud_service_type.is_major', v: true, o: '=' },
     ]);
     if (projectIdList.length > 0) analyzeCloudServiceApiQueryHelper.addFilter({ k: 'project_id', v: projectIdList, o: '=' });
     try {
+        state.cardSummaryLoading = { ...state.cardSummaryLoading, [summaryType]: true };
         const res = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: {
                 group_by: ['project_id'],
@@ -162,12 +164,17 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
                 ...analyzeCloudServiceApiQueryHelper.data,
             },
         });
-        state.cloudServiceDataMap[summaryType] = res.results || [];
+        const convertedResults = projectIdList.map((d) => {
+            const found = res.results?.find((r) => r.project_id === d);
+            if (found) return found;
+            return { project_id: d, total_count: 0, total_size: 0 };
+        });
+        state.cloudServiceDataMap = { ...state.cloudServiceDataMap, [summaryType]: convertedResults };
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        state.cloudServiceDataMap[summaryType] = [];
+        state.cloudServiceDataMap = { ...state.cloudServiceDataMap, [summaryType]: [] };
     } finally {
-        state.cardSummaryLoading[summaryType] = false;
+        state.cardSummaryLoading = { ...state.cardSummaryLoading, [summaryType]: false };
     }
 };
 const listServiceAccountApiQueryHelper = new ApiQueryHelper();
@@ -221,8 +228,8 @@ const getLocation = (serviceType: SummaryType, name: string, projectId: string) 
 });
 
 // When ProjectGroupTreeNodeData has been updated | project has been created
-watch(() => state.shouldUpdateProjectList, async () => {
-    if (state.shouldUpdateProjectList) {
+watch(() => projectPageState.shouldUpdateProjectList, async (_shouldUpdateProjectList) => {
+    if (_shouldUpdateProjectList) {
         await fetchAll();
         projectPageStore.setShouldUpdateProjectList(false);
     }

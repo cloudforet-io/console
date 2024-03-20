@@ -43,6 +43,7 @@ const gnbStore = useGnbStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
@@ -95,11 +96,14 @@ const handleDeleteQueryConfirm = async () => {
                 costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
             },
         }));
-        await favoriteStore.deleteFavorite({
-            itemType: FAVORITE_TYPE.COST_ANALYSIS,
-            workspaceId: state.currentWorkspaceId || '',
-            itemId: state.itemIdForDeleteQuery,
-        });
+        const isFavoriteItem = favoriteGetters.costAnalysisItems.find((item) => item.itemId === state.itemIdForDeleteQuery);
+        if (isFavoriteItem) {
+            await favoriteStore.deleteFavorite({
+                itemType: FAVORITE_TYPE.COST_ANALYSIS,
+                workspaceId: state.currentWorkspaceId || '',
+                itemId: state.itemIdForDeleteQuery,
+            });
+        }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }

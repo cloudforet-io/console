@@ -13,7 +13,7 @@ import { store } from '@/store';
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap,
-} from '@/store/modules/reference/type';
+} from '@/store/reference/type';
 
 
 
