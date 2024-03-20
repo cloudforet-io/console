@@ -1,67 +1,7 @@
-<template>
-    <div class="favorite-list"
-         @mouseleave="hoveredItem = null"
-    >
-        <template v-if="loading" />
-        <span v-else-if="items.length === 0"
-              class="no-data"
-        >
-            <p-i class="menu-icon"
-                 name="ic_star-filled"
-                 height="1rem"
-                 width="1rem"
-                 :color="yellow[500]"
-            />
-            {{ $t('COMMON.STARRED_NO_DATA') }}
-        </span>
-        <template v-else>
-            <div v-for="item in displayItems"
-                 :key="item.itemId"
-                 class="item"
-                 :class="{hovered: hoveredItem ? hoveredItem?.itemId === item.itemId : false}"
-                 @click="handleClickItem(item, $event)"
-                 @mouseenter="hoveredItem = item"
-                 @mouseleave="hoveredItem = null"
-            >
-                <router-link :to="referenceRouter(
-                                 item.itemId, {
-                                     resource_type: getResourceType(item.itemType),
-                                     workspace_id: currentWorkspaceId,
-                                 })"
-                             class="item-link"
-                >
-                    <span class="icon"><slot name="icon"
-                                             :item="item"
-                    /></span>
-                    <span class="name">{{ item.label }}</span>
-                </router-link>
-                <favorite-button v-if="hoveredItem && hoveredItem?.itemId === item.itemId"
-                                 :item-id="item.itemId"
-                                 :favorite-type="item.itemType"
-                                 scale="0.8"
-                                 class="favorite-button"
-                />
-            </div>
-            <summary v-if="items.length > LIMIT_COUNT"
-                     class="toggle-btn"
-                     @click.stop="handleClickToggle"
-            >
-                {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
-                <p-i :name="isExpanded ? 'ic_chevron-up' : 'ic_chevron-down'"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit transparent"
-                />
-            </summary>
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PI } from '@spaceone/design-system';
 
@@ -76,71 +16,106 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { yellow } from '@/styles/colors';
 
 const LIMIT_COUNT = 5;
-export default {
-    name: 'FavoriteList',
-    components: { FavoriteButton, PI },
-    props: {
-        items: {
-            type: Array,
-            required: true,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        beforeRoute: {
-            type: Function,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const userWorkspaceStore = useUserWorkspaceStore();
-        const state = reactive({
-            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
-            displayItems: computed<FavoriteItem[]>(() => {
-                if (state.isExpanded) return props.items;
-                return props.items.slice(0, LIMIT_COUNT);
-            }),
-            hoveredItem: null as null|FavoriteItem,
-            isExpanded: false,
-        });
 
-        const getResourceType = (type: FavoriteType) => {
-            if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
-            if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
-            if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
-            return '';
-        };
+interface Props {
+    items: FavoriteItem[];
+    loading?: boolean;
+    beforeRoute?: (item: FavoriteItem, e: MouseEvent) => Promise<void>|void;
+}
 
-        const handleClickDelete = (item: FavoriteItem) => {
-            vm.$emit('delete', item);
-        };
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+    beforeRoute: undefined,
+});
 
-        const handleClickToggle = () => {
-            state.isExpanded = !state.isExpanded;
-        };
+const userWorkspaceStore = useUserWorkspaceStore();
+const state = reactive({
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    displayItems: computed<FavoriteItem[]>(() => {
+        if (state.isExpanded) return props.items;
+        return props.items.slice(0, LIMIT_COUNT);
+    }),
+    hoveredItem: null as null|FavoriteItem,
+    isExpanded: false,
+});
 
-        const handleClickItem = async (item, e) => {
-            if (props.beforeRoute) {
-                const res = props.beforeRoute(item, e);
-                if (res) await res;
-            }
-        };
+const getResourceType = (type: FavoriteType) => {
+    if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
+    if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
+    if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
+    return '';
+};
 
-        return {
-            ...toRefs(state),
-            handleClickDelete,
-            handleClickToggle,
-            handleClickItem,
-            getResourceType,
-            referenceRouter,
-            LIMIT_COUNT,
-            yellow,
-        };
-    },
+const handleClickToggle = () => {
+    state.isExpanded = !state.isExpanded;
+};
+
+const handleClickItem = async (item, e) => {
+    if (props.beforeRoute) {
+        const res = props.beforeRoute(item, e);
+        if (res) await res;
+    }
 };
 </script>
+
+<template>
+    <div class="favorite-list"
+         @mouseleave="state.hoveredItem = null"
+    >
+        <template v-if="props.loading" />
+        <span v-else-if="props.items.length === 0"
+              class="no-data"
+        >
+            <p-i class="menu-icon"
+                 name="ic_star-filled"
+                 height="1rem"
+                 width="1rem"
+                 :color="yellow[500]"
+            />
+            {{ $t('COMMON.STARRED_NO_DATA') }}
+        </span>
+        <template v-else>
+            <div v-for="item in state.displayItems"
+                 :key="item.itemId"
+                 class="item"
+                 :class="{hovered: state.hoveredItem ? state.hoveredItem?.itemId === item.itemId : false}"
+                 @click="handleClickItem(item, $event)"
+                 @mouseenter="state.hoveredItem = item"
+                 @mouseleave="state.hoveredItem = null"
+            >
+                <router-link :to="referenceRouter(
+                                 item.itemId, {
+                                     resource_type: getResourceType(item.itemType),
+                                     workspace_id: state.currentWorkspaceId,
+                                 })"
+                             class="item-link"
+                >
+                    <span class="icon"><slot name="icon"
+                                             :item="item"
+                    /></span>
+                    <span class="name">{{ item.label }}</span>
+                </router-link>
+                <favorite-button v-if="state.hoveredItem && state.hoveredItem?.itemId === item.itemId"
+                                 :item-id="item.itemId"
+                                 :favorite-type="item.itemType"
+                                 scale="0.8"
+                                 class="favorite-button"
+                />
+            </div>
+            <summary v-if="props.items.length > LIMIT_COUNT"
+                     class="toggle-btn"
+                     @click.stop="handleClickToggle"
+            >
+                {{ state.isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
+                <p-i :name="state.isExpanded ? 'ic_chevron-up' : 'ic_chevron-down'"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit transparent"
+                />
+            </summary>
+        </template>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .favorite-list {
