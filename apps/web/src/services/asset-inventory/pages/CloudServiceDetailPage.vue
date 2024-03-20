@@ -159,8 +159,7 @@ const hiddenFilters = computed<ConsoleFilter[]>(() => {
     if (props.isServerPage) {
         hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
     } else if (props.isSecurityPage) {
-        // TODO: will be changed to 'CSPM'
-        hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Security', o: '=' });
+        hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'CSPM', o: '=' });
     } else {
         hiddenFilterHelper.addFilter(
             { k: 'provider', o: '=', v: props.provider },
