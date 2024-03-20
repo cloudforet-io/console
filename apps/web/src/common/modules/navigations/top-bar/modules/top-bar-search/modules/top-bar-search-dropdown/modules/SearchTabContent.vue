@@ -31,8 +31,6 @@ interface Props {
     focusingDirection: string;
 }
 
-type MenuType = 'search' | 'recent';
-
 const props = withDefaults(defineProps<Props>(), {
     searchLimit: 15,
     isFocused: false,
@@ -43,7 +41,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetter = userWorkspaceStore.getters;
 const topBarSearchStore = useTopBarSearchStore();
 
-const emit = defineEmits<{(event: 'select', menuType: MenuType, item: SuggestionItem): void;
+const emit = defineEmits<{(event: 'select', item: SuggestionItem): void;
     (event: 'close'): void;
     (event: 'move-focus-end'): void;
     (event: 'update:isFocused', value: boolean): void;
@@ -77,8 +75,8 @@ const handleFocusEnd = (type: SuggestionType, direction: FocusingDirection) => {
     emit('move-focus-end');
 };
 
-const handleSelect = (menuType: MenuType, item) => {
-    emit('select', menuType, item);
+const handleSelect = (item) => {
+    emit('select', item);
 };
 
 watch(() => contentsSize.height.value, (height) => {
@@ -117,13 +115,9 @@ watch(() => contentsSize.height.value, (height) => {
                                     @keyup:esc="emit('close')"
                                     @focus="emit('update:isFocused', true)"
                                     @blur="emit('update:isFocused', false)"
-                                    @select="(item) => handleSelect('recent', item)"
                     >
                         <template #item--format="{ item }">
-                            <top-bar-search-recent-list-item :resource-id="item?.data?.id"
-                                                             :cached-label="item?.data?.label"
-                                                             :recent-id="item?.name"
-                            />
+                            <top-bar-search-recent-list-item :recent-item="item" />
                         </template>
                     </p-context-menu>
                     <template #no-data>
@@ -148,10 +142,10 @@ watch(() => contentsSize.height.value, (height) => {
                                     @keyup:esc="emit('close')"
                                     @focus="emit('update:isFocused', true)"
                                     @blur="emit('update:isFocused', false)"
-                                    @select="(item) => handleSelect('search', item)"
+                                    @select="handleSelect"
                     >
                         <template #item--format="{ item }">
-                            <slot name="item-format"
+                            <slot name="search-menu-item"
                                   v-bind="{item}"
                             />
                         </template>

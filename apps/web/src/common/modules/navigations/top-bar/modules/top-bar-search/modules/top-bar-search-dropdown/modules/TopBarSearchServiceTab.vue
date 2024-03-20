@@ -27,7 +27,7 @@ import TopBarSearchEmpty
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
-import type { RecentMenu } from '@/common/modules/navigations/type';
+import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 
@@ -85,7 +85,7 @@ const state = reactive({
         }
         return results;
     }),
-    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentMenu) => ({
+    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentItem) => ({
         id: r.data.id,
         label: state.allMenuMap.get(r.data.id)?.fullLabel ?? r.data.label,
         icon: state.allMenuMap.get(r.data.id)?.icon,
