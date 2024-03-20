@@ -37,5 +37,6 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
     },
     METRIC_EXPLORER: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}`,
+        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.METRIC_EXPLORER}.detail` },
     },
 });
