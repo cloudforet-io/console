@@ -1,25 +1,54 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, onMounted, onUnmounted, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PHeading, PDivider, PEmpty } from '@spaceone/design-system';
+
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import CloudServiceDetailPage
     from '@/services/asset-inventory/pages/CloudServiceDetailPage.vue';
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
 
+const route = useRoute();
+
 const storeState = reactive({
+    loading: computed(() => securityPageGetters.loading),
     cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
+});
+const state = reactive({
+    pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
+});
+
+const initData = async () => {
+    await securityPageStore.fetchCloudServiceAnalyze();
+    if (state.pageParams?.name) {
+        await securityPageStore.setSelectedCloudServiceType(state.pageParams.group, state.pageParams.name);
+    } else {
+        await securityPageStore.setSelectedCloudServiceType();
+    }
+};
+
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
+
+onMounted(async () => {
+    await callApiWithGrantGuard();
+});
+
+onUnmounted(() => {
+    securityPageStore.initState();
 });
 </script>
 
 <template>
-    <cloud-service-detail-page v-if="securityPageGetters.loading || storeState.cloudServiceTypeList.length > 0"
+    <cloud-service-detail-page v-if="storeState.loading || storeState.cloudServiceTypeList.length > 0"
                                :is-security-page="true"
                                :provider="storeState.selectedCloudServiceType?.data.provider"
                                :group="storeState.selectedCloudServiceType?.data.group"
