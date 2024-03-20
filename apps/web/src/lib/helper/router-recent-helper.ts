@@ -35,7 +35,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         const group = to?.params?.group;
         const name = to?.params?.name;
         if (!provider || !group || !name) return undefined;
-        return { itemType: RECENT_TYPE.CLOUD_SERVICE, workspaceId, itemId: `${provider}.${group}.${name}` };
+        return { itemType: RECENT_TYPE.CLOUD_SERVICE_TYPE, workspaceId, itemId: `${provider}.${group}.${name}` };
     }
 
     /* PROJECT GROUP */
