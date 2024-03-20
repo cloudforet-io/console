@@ -8,7 +8,7 @@ import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 interface Props {
     item: LSBCollapsibleItem;
     isSubItem?: boolean;
-    isCollapsed?: boolean;
+    overrideCollapsed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,8 +24,11 @@ const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
 
-watch(() => props.isCollapsed, (changed) => {
-    state.isCollapsed = !!changed;
+const updateCollapsedByForced = (collapsed: boolean) => {
+    state.isCollapsed = collapsed;
+};
+watch(() => props.overrideCollapsed, (changedCollapsed) => {
+    updateCollapsedByForced(!!changedCollapsed);
 }, { immediate: true });
 </script>
 

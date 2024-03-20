@@ -226,7 +226,7 @@ onMounted(async () => {
                                                      class="provider-menu-item"
                                                      :item="item"
                                                      is-sub-item
-                                                     :is-collapsed="namespaceState.collapsed"
+                                                     :override-collapsed="namespaceState.collapsed"
                         >
                             <template #collapsible-contents="{ item: _item }">
                                 <div v-for="(_menu, _idx) in _item.subItems"
