@@ -2690,7 +2690,9 @@
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": ""
-			}
+			},
+			"NOTIFICATION_DESC": "",
+			"NOTIFICATION_TITLE": ""
 		},
 		"SERVER": {
 			"MAIN": {

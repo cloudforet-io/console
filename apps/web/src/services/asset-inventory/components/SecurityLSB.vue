@@ -106,16 +106,38 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <template>
     <p-data-loader :loading="storeState.loading"
-                   :data="true"
+                   :data="storeState.loading ? true : storeState.cloudServiceTypeList"
                    :loader-backdrop-color="BACKGROUND_COLOR"
                    class="security-l-s-b"
     >
         <l-s-b :menu-set="state.menuSet" />
+        <template #no-data>
+            <div class="no-data-scoped-notification">
+                <p class="contents">
+                    <strong class="title">{{ $t('INVENTORY.SECURITY.NOTIFICATION_TITLE') }}</strong>
+                    <span class="desc">{{ $t('INVENTORY.SECURITY.NOTIFICATION_DESC') }}</span>
+                </p>
+            </div>
+        </template>
     </p-data-loader>
 </template>
 
 <style lang="postcss" scoped>
 .security-l-s-b {
     height: 100%;
+    .no-data-scoped-notification {
+        @apply bg-violet-200 text-paragraph-md text-gray-900;
+        margin: 1.5rem 1rem 3.75rem 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        .contents {
+            @apply flex flex-col break-all;
+            gap: 0.25rem;
+            text-align: start;
+            .title {
+                @apply text-label-lg text-violet-700;
+            }
+        }
+    }
 }
 </style>
