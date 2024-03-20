@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-service-type-reference-store';
 import type { CloudServiceQuerySetReferenceMap } from '@/store/reference/cloue-service-query-set-reference-store';
@@ -22,11 +21,13 @@ import { useProjectGroupReferenceStore } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import { useProtocolReferenceStore } from '@/store/reference/protocol-reference-store';
+import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 import { usePublicDashboardReferenceStore } from '@/store/reference/public-dashboard-reference-store';
 import { useRegionReferenceStore } from '@/store/reference/region-reference-store';
 import { useSecretReferenceStore } from '@/store/reference/secret-reference-store';
 import { useServiceAccountReferenceStore } from '@/store/reference/service-account-reference-store';
 import { useTrustedAccountReferenceStore } from '@/store/reference/trusted-account-reference-store';
+import type { ReferenceLoadOptions } from '@/store/reference/type';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
@@ -62,6 +63,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const protocolReferenceStore = useProtocolReferenceStore();
+    const providerReferenceStore = useProviderReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
     const userReferenceStore = useUserReferenceStore();
     const publicDashboardReferenceStore = usePublicDashboardReferenceStore();
@@ -78,6 +80,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
         project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
         protocol: computed(() => protocolReferenceStore.getters.protocolItems),
+        provider: computed(() => providerReferenceStore.getters.providerItems),
         user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
@@ -105,6 +108,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await projectGroupReferenceStore.sync(data); break;
             case 'protocol':
                 await protocolReferenceStore.sync(data); break;
+            case 'provider':
+                await providerReferenceStore.sync(data); break;
             case 'workspace':
                 await workspaceReferenceStore.sync(data); break;
             case 'user':
@@ -148,6 +153,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await userReferenceStore.load(options); break;
             case 'public_dashboard':
                 await publicDashboardReferenceStore.load(options); break;
+            case 'provider':
+                await providerReferenceStore.load(options); break;
             case 'service_account':
                 await serviceAccountReferenceStore.load(options); break;
             case 'webhook':
@@ -170,6 +177,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             projectReferenceStore.flush();
             projectGroupReferenceStore.flush();
             protocolReferenceStore.flush();
+            providerReferenceStore.flush();
             workspaceReferenceStore.flush();
             userReferenceStore.flush();
             publicDashboardReferenceStore.flush();

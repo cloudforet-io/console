@@ -12,6 +12,7 @@ import {
     MapImageSeries, projections, MapPolygonSeries, MapChart,
 } from '@amcharts/amcharts4/maps';
 import { PDataLoader, PProgressBar, PEmpty } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -19,15 +20,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import config from '@/lib/config';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import { coral, gray } from '@/styles/colors';
 
@@ -68,7 +68,8 @@ const chartContext = ref<HTMLElement|null>(null);
 const allReferenceStore = useAllReferenceStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
@@ -119,8 +120,8 @@ const getResourceByRegionData = async () => {
         state.data = results.map((d) => ({
             ...d,
             title: storeState.regions[d.region_code]?.name || d.region_code,
-            longitude: parseFloat(storeState.regions[d.region_code]?.longitude ?? 0),
-            latitude: parseFloat(storeState.regions[d.region_code]?.latitude ?? 0),
+            longitude: storeState.regions[d.region_code]?.continent?.longitude || 0,
+            latitude: storeState.regions[d.region_code]?.continent?.latitude || 0,
             color: storeState.providers[d.provider]?.color ?? '',
         })) as Resource[];
     } catch (e) {
@@ -290,23 +291,12 @@ onUnmounted(() => {
     if (state.chart) state.chart.dispose();
 });
 
-const init = async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-    ]);
+watch([() => storeState.providers, () => storeState.regions, () => storeState.currentGrantInfo.scope], async ([providers, regions, scope]) => {
+    if (scope === 'USER' || isEmpty(providers) || isEmpty(regions)) return;
+    await getResourceByRegionData();
     initLegends();
     initResourceInfo();
-};
-
-watch([() => storeState.providers, () => storeState.regions], ([providers, regions]) => {
-    if (providers && regions) {
-        getResourceByRegionData();
-    }
 }, { immediate: true });
-
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
-callApiWithGrantGuard();
-
 </script>
 
 <template>

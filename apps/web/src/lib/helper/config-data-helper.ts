@@ -16,6 +16,7 @@ import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/fa
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
+
 type Config = FavoriteConfig;
 
 export interface ConfigData extends Config {
@@ -33,7 +34,15 @@ export const convertMenuConfigToReferenceData = (config: ConfigData[]|null, menu
     const results: ReferenceData[] = [];
     if (!config) return results;
 
-    config.forEach((d) => {
+    const reorderedConfig: ConfigData[] = [];
+    allMenuList.forEach((menu) => {
+        const configItem = config.find((item) => item.itemId === menu.id);
+        if (configItem) {
+            reorderedConfig.push(configItem);
+        }
+    });
+
+    reorderedConfig.forEach((d) => {
         const menu = find(allMenuList, { id: d.itemId });
         if (menu) {
             results.push({
@@ -121,7 +130,15 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
     const results: ReferenceData[] = [];
     if (!config) return results;
 
-    config.forEach((d) => {
+    const reorderedConfig: ConfigData[] = [];
+    Object.values(cloudServiceReference).forEach((menu) => {
+        const configItem = config.find((item) => item.itemId === menu.data.cloudServiceTypeKey);
+        if (configItem) {
+            reorderedConfig.push(configItem);
+        }
+    });
+
+    reorderedConfig.forEach((d) => {
         const resource = Object.values(cloudServiceReference)
             .find((c) => c.data.cloudServiceTypeKey === d.itemId);
         if (resource) {
@@ -151,27 +168,14 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
     const results: ReferenceData[] = [];
     if (!config) return results;
 
+    const groupedResults: Record<string, ReferenceData[]> = {};
+
     config.forEach((d) => {
-        const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(d.itemId);
-        if (resource) {
-            results.push({
-                ...d,
-                name: resource.cost_query_set_id,
-                label: resource.name,
-                updatedAt: d.updatedAt,
-                icon: 'ic_service_cost-explorer',
-                dataSourceId: resource.data_source_id,
-                parents: [{
-                    name: resource.data_source_id,
-                    label: dataSourceMap[resource.data_source_id].label,
-                }],
-                isDeleted: false,
-            });
-        } else if (parsedKeys) { // managed cost query set
+        if (parsedKeys) { // managed cost query set
             const [dataSourceId, costQuerySetId] = parsedKeys;
             if (!dataSourceMap[dataSourceId]) return;
-            results.push({
+            const item: ReferenceData = {
                 ...d,
                 name: d.itemId,
                 label: costQuerySetId,
@@ -183,7 +187,44 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     label: dataSourceMap[dataSourceId].label,
                 }],
                 isDeleted: false,
-            });
+            };
+
+            if (!groupedResults[dataSourceId]) {
+                groupedResults[dataSourceId] = [];
+            }
+            groupedResults[dataSourceId].push(item);
+        }
+    });
+
+    const reorderedConfig: ConfigData[] = [];
+    costQuerySetList.forEach((menu) => {
+        const configItem = config.find((item) => item.itemId === menu.cost_query_set_id);
+        if (configItem) {
+            reorderedConfig.push(configItem);
+        }
+    });
+
+    reorderedConfig.forEach((d) => {
+        const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
+        if (resource) {
+            const item: ReferenceData = {
+                ...d,
+                name: resource.cost_query_set_id,
+                label: resource.name,
+                updatedAt: d.updatedAt,
+                icon: 'ic_service_cost-explorer',
+                dataSourceId: resource.data_source_id,
+                parents: [{
+                    name: resource.data_source_id,
+                    label: dataSourceMap[resource.data_source_id].label,
+                }],
+                isDeleted: false,
+            };
+
+            if (!groupedResults[resource.data_source_id]) {
+                groupedResults[resource.data_source_id] = [];
+            }
+            groupedResults[resource.data_source_id].push(item);
         } else {
             results.push({
                 ...d,
@@ -191,24 +232,35 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
             });
         }
     });
+
+    Object.values(groupedResults).forEach((group) => {
+        results.push(...group);
+    });
+
     return results;
 };
 
-export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[]): ReferenceData[] => {
+export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList): ReferenceData[] => {
     const results: ReferenceData[] = [];
     if (!config) return results;
+
+    // Create a map to quickly find the index of each dashboard
+    const dashboardMap: { [key: string]: number } = {};
+    dashboardList.forEach((dashboard, index) => {
+        dashboardMap[dashboard.public_dashboard_id || dashboard.private_dashboard_id] = index;
+    });
 
     config.forEach((d) => {
         const resource: DashboardModel|undefined = find(dashboardList, { public_dashboard_id: d.itemId })
             || find(dashboardList, { private_dashboard_id: d.itemId });
         if (resource) {
-            results.push({
+            const index = dashboardMap[resource.public_dashboard_id || resource.private_dashboard_id || ''];
+            results[index] = {
                 ...d,
                 name: resource.public_dashboard_id || resource.private_dashboard_id,
                 label: resource.name,
-                updatedAt: d.updatedAt,
                 icon: 'ic_service_dashboard',
-            });
+            };
         } else {
             results.push({
                 ...d,
@@ -216,7 +268,8 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
             });
         }
     });
-    return results;
+
+    return results.filter((result) => result);
 };
 
 export const getCompoundKeyWithManagedCostQuerySetFavoriteKey = (dataSourceId:string, costQuerySetId: string): string => `managed_${dataSourceId}_${costQuerySetId}`;

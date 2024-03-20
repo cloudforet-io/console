@@ -7,15 +7,10 @@ import {
     PFieldGroup, PTextInput, PTooltip, PI, PButton, PBadge,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
-import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
-import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -69,34 +64,13 @@ const handleClickBadge = () => {
     }
 };
 
-/* API */
-const updateUserEmail = async () => {
-    await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>({
-        user_id: state.data.user_id || '',
-        email: email.value || '',
-    });
-};
-const verifyUserEmail = async () => {
-    await postUserValidationEmail({
-        user_id: state.data.user_id || '',
-        email: email.value || '',
-    });
-};
-
 /* Event */
 const handleClickSend = async () => {
     state.loading = true;
     try {
-        await updateUserEmail();
-        await verifyUserEmail();
         state.isEdit = false;
         state.isValidEmail = true;
         emit('change-input', { email: email.value, isValidEmail: true });
-        emit('change-verify', true);
-
-        if (state.loginUserId === state.data.user_id) {
-            await store.dispatch('user/setUser', { email: email.value, email_verified: true });
-        }
     } finally {
         state.loading = false;
     }

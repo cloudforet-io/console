@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
@@ -62,11 +63,14 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     };
 
     /* Actions */
+    const fetchApiHelper = new ApiQueryHelper().setSort('created_at', true);
     const fetchCostReportConfig = async () => {
         if (state.costReportConfig !== null) return;
         try {
             state.reportConfigLoading = true;
-            const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>();
+            const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
+                query: fetchApiHelper.data,
+            });
             state.costReportConfig = results?.[0];
         } catch (e) {
             ErrorHandler.handleError(e);
@@ -79,10 +83,17 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
     const fetchCostReportsList = async (params?: CostReportListParameters): Promise<void> => {
         state.reportListLoading = true;
         try {
-            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
+            const _params: CostReportListParameters = {
                 ...params,
-                status: 'SUCCESS',
-            });
+                query: {
+                    ...params?.query,
+                    filter: [
+                        ...(params?.query?.filter || []),
+                        { k: 'cost_report_config_id', v: state.costReportConfig?.cost_report_config_id, o: 'eq' },
+                    ],
+                },
+            };
+            const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>(_params);
             state.reportListItems = results || [];
             state.reportListTotalCount = total_count || 0;
         } catch (e) {
@@ -111,13 +122,17 @@ export const useCostReportPageStore = defineStore('cost-report-page', () => {
         }
     };
 
-    const fetchRecentReportData = async () => {
+    const fetchRecentReportData = async (costReportConfigId?: string) => {
+        if (!costReportConfigId) return;
         try {
             state.recentReportDataLoading = true;
             const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.costReport.list<CostReportListParameters, ListResponse<CostReportModel>>({
                 status: 'SUCCESS',
                 query: {
                     only: ['report_month', 'issue_date'],
+                    filter: [
+                        { k: 'cost_report_config_id', v: costReportConfigId, o: 'eq' },
+                    ],
                 },
             });
             const reportMonthList: string[] = results?.map((report) => report.report_month) ?? [];

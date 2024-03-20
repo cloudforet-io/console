@@ -23,6 +23,7 @@ import { i18n } from '@/translations';
 import config from '@/lib/config';
 import { postUserDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -68,7 +69,7 @@ const state = reactive({
 const formState = reactive({
     name: '',
     email: '',
-    isValidEmail: true,
+    isValidEmail: false,
     // password
     password: '',
     passwordType: '',
@@ -98,9 +99,6 @@ const handleChangeInputs = (value) => {
     if (value.passwordType) formState.passwordType = value.passwordType;
     if (value.role) formState.role = value.role;
 };
-const handleChangeVerify = (status) => {
-    state.data.email_verified = status;
-};
 const buildUserInfoParams = (): UserManagementData => ({
     user_id: state.data.user_id || '',
     name: formState.name,
@@ -115,6 +113,14 @@ const handleConfirm = async () => {
     state.loading = true;
 
     try {
+        if (formState.isValidEmail) {
+            await updateUserEmail();
+            await verifyUserEmail();
+            if (state.loginUserId === state.data.user_id) {
+                await store.dispatch('user/setUser', { email: state.data.email, email_verified: true });
+            }
+            userPageStore.setUserEmail(state.data.user_id, state.data.email);
+        }
         if (state.isChangedMfaToggle) {
             await fetchPostDisableMfa();
         }
@@ -215,6 +221,18 @@ const fetchListRoleBindingInfo = async () => {
 
     state.roleBindingList = results || [];
 };
+const updateUserEmail = async () => {
+    await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>({
+        user_id: state.data.user_id || '',
+        email: state.data.email || '',
+    });
+};
+const verifyUserEmail = async () => {
+    await postUserValidationEmail({
+        user_id: state.data.user_id || '',
+        email: state.data.email || '',
+    });
+};
 
 /* Watcher */
 watch(() => userPageState.modal.visible.form, async (visible) => {
@@ -248,7 +266,6 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                 <user-management-form-notification-email-form
                     v-if="state.smtpEnabled"
                     @change-input="handleChangeInputs"
-                    @change-verify="handleChangeVerify"
                 />
                 <user-management-form-password-form
                     v-if="state.data.auth_type === 'LOCAL'"

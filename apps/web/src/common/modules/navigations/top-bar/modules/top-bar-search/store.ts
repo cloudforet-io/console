@@ -17,7 +17,7 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import { SEARCH_TAB } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { SearchTab, StageWorkspace } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import { tabResourceTypeMap } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
-import type { RecentMenu } from '@/common/modules/navigations/type';
+import type { RecentItem } from '@/common/modules/navigations/type';
 import { recentNSearchTabMap } from '@/common/modules/navigations/type';
 
 interface TopBarSearchStoreState {
@@ -26,7 +26,7 @@ interface TopBarSearchStoreState {
     isActivated: boolean;
     inputText: string;
     activeTab: SearchTab;
-    recentMenuList: RecentMenu[];
+    recentMenuList: RecentItem[];
     searchMenuList: ResourceModel[];
     // workspace filter
     recentAccessedWorkspaces: string[];
@@ -182,6 +182,10 @@ export const useTopBarSearchStore = defineStore('top-bar-search', () => {
         }
         state.loading = false;
     }, 500));
+
+    watch(() => recentStore.state.totalCount, () => {
+        state.recentMenuList = recentStore.state.recentMenuList;
+    });
 
 
     return {

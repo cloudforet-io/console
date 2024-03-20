@@ -21,13 +21,12 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -75,7 +74,7 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     loading: true,
@@ -125,6 +124,7 @@ const analyzeCostReportData = debounce(async () => {
             end: state.currentDate?.format('YYYY-MM'),
         };
         state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+            cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
                 group_by: [state.selectedTarget],
@@ -212,11 +212,6 @@ const handleChangeDate = (date: Dayjs) => {
     analyzeCostReportData();
 };
 
-/* Init */
-(async () => {
-    await store.dispatch('reference/provider/load');
-})();
-
 /* Watcher */
 watch([() => chartContext.value, () => state.chartData], async ([_chartContext, _chartData]) => {
     if (_chartContext && _chartData) {
@@ -227,8 +222,12 @@ watch(() => costReportPageState.recentReportMonth, async (after) => {
     if (!after) return;
     state.currentDate = dayjs.utc(after);
 }, { immediate: true });
-watch(() => costReportPageGetters.currency, (_currency) => {
-    if (_currency) analyzeCostReportData();
+watch([
+    () => costReportPageGetters.currency,
+    () => () => costReportPageState.costReportConfig?.cost_report_config_id,
+], ([_currency, _cost_report_config_id]) => {
+    if (!_currency || !_cost_report_config_id) return;
+    analyzeCostReportData();
 }, { immediate: true });
 watch(() => state.currentDate, () => {
     if (state.currentDate) listCostReport();
