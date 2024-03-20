@@ -45,8 +45,7 @@ export const useSecurityPageStore = defineStore('security-page', () => {
         selectedCloudServiceType: computed<CloudServiceTypeItem|undefined>(() => state.selectedCloudServiceType),
         allFilters: computed<ConsoleFilter[]>(() => {
             const filters: ConsoleFilter[] = [];
-            // TODO: will be changed to 'CSPM'
-            filters.push({ k: 'ref_cloud_service_type.labels', v: ['Security'], o: '=' });
+            filters.push({ k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '=' });
             return filters.concat(state.searchFilters);
         }),
     });
