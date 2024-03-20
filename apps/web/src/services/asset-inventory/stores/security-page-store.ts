@@ -52,34 +52,37 @@ export const useSecurityPageStore = defineStore('security-page', () => {
     });
 
     const actions = {
-        fetchCloudServiceAnalyze: async (): Promise<CloudServiceAnalyzeResult[] | undefined> => {
+        fetchCloudServiceAnalyze: async () => {
+            state.loading = true;
             try {
                 const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
                     query: getCloudServiceAnalyzeQuery(
                         getters.allFilters,
                     ),
                 });
-                state.cloudServiceAnalyzeList = results;
-                state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => {
-                    const items = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group);
-                    return {
-                        provider: listItem.provider,
-                        group: listItem.cloud_service_group,
-                        items: uniqBy(items || [], 'name'),
-                    };
-                });
-                return results || [];
+                state.cloudServiceAnalyzeList = results || [];
+                if (state.cloudServiceAnalyzeList.length > 0) {
+                    state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => {
+                        const items = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group);
+                        return {
+                            provider: listItem.provider,
+                            group: listItem.cloud_service_group,
+                            items: uniqBy(items || [], 'name'),
+                        };
+                    });
+                }
             } catch (e) {
                 state.cloudServiceAnalyzeList = [];
                 ErrorHandler.handleError(e);
-                return undefined;
+            } finally {
+                state.loading = false;
             }
         },
         setSelectedCloudServiceType: async (group?: string, name?: string) => {
             if (name) {
                 const cloudServiceTypeList = find(state.cloudServiceTypeList, { group });
                 state.selectedCloudServiceType = find(cloudServiceTypeList?.items, { name });
-            } else if (state.cloudServiceTypeList[0].items) {
+            } else if (state.cloudServiceTypeList[0]?.items) {
                 state.selectedCloudServiceType = state.cloudServiceTypeList[0]?.items[0];
             }
         },

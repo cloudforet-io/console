@@ -8,7 +8,6 @@ import { store } from '@/store';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -28,14 +27,15 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
-const securityPageState = securityPageStore.state;
 const securityPageGetters = securityPageStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 
 const storeState = reactive({
+    loading: computed(() => securityPageGetters.loading),
     cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
+    selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
 });
 const state = reactive({
     currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
@@ -69,53 +69,43 @@ const state = reactive({
     }),
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.SECURITY,
-        id: securityPageGetters.selectedCloudServiceType?.data.cloud_service_type_key || '',
+        id: storeState.selectedCloudServiceType?.data.cloud_service_type_key || '',
     })),
 });
 
 const routeToFirstCloudServiceType = async () => {
-    const selectedCloudServiceType = securityPageGetters.selectedCloudServiceType;
-    await router.replace(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
-        params: {
-            provider: selectedCloudServiceType?.data.provider || '',
-            group: selectedCloudServiceType?.data.group || '',
-            name: selectedCloudServiceType?.name || '',
-        },
-        query: route.query,
-    })).catch(() => {});
-};
-const initData = async () => {
-    securityPageState.loading = true;
-    try {
-        await securityPageStore.fetchCloudServiceAnalyze();
-    } finally {
-        securityPageState.loading = false;
+    const selectedCloudServiceType = storeState.selectedCloudServiceType;
+    if (selectedCloudServiceType) {
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+            params: {
+                provider: selectedCloudServiceType?.data.provider || '',
+                group: selectedCloudServiceType?.data.group || '',
+                name: selectedCloudServiceType?.name || '',
+            },
+            query: route.query,
+        })).catch(() => {});
     }
 };
-
-const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN', 'WORKSPACE'], initData);
 
 /* Watchers */
-watch([() => storeState.cloudServiceTypeList, () => state.pageParams], async ([cloudServiceTypeList, pageParams]) => {
-    if (cloudServiceTypeList.length === 0) {
-        await callApiWithGrantGuard();
-    }
+watch(() => state.pageParams, (pageParams) => {
     if (pageParams?.name) {
-        await securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+        securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
     } else {
-        await securityPageStore.setSelectedCloudServiceType();
+        securityPageStore.setSelectedCloudServiceType();
     }
-    await routeToFirstCloudServiceType();
 }, { immediate: true });
+watch(() => storeState.selectedCloudServiceType, () => {
+    routeToFirstCloudServiceType();
+});
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 });
-
 </script>
 
 <template>
-    <p-data-loader :loading="securityPageGetters.loading"
+    <p-data-loader :loading="storeState.loading"
                    :data="true"
                    :loader-backdrop-color="BACKGROUND_COLOR"
                    class="security-l-s-b"
