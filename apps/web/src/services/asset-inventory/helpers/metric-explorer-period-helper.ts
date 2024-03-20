@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import type { Granularity, Period, RelativePeriod } from '@/services/asset-inventory/types/metric-explorer-type';
+import { GRANULARITY, METRIC_PERIOD_MENU, METRIC_PERIOD_MENU_ITEM_MAP } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import type {
+    Granularity, Period, RelativePeriod, MetricPeriodMenu,
+} from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-export const getRefinedPeriod = (granularity: Granularity, relativePeriod: RelativePeriod): Period => {
+export const convertRelativePeriodToPeriod = (granularity: Granularity, relativePeriod: RelativePeriod): Period => {
     const today = dayjs.utc();
     const includeToday = relativePeriod?.include_today;
     const dateFormat = granularity === GRANULARITY.DAILY ? 'YYYY-MM-DD' : 'YYYY-MM';
@@ -38,13 +40,16 @@ export const getRefinedPeriod = (granularity: Granularity, relativePeriod: Relat
     };
 };
 
-export const getInitialPeriodByGranularity = (granularity?: Granularity): [Period, RelativePeriod|undefined] => {
+export const getRefinedDailyPeriod = (yearMonth: string): Period => ({
+    start: dayjs.utc(yearMonth).startOf('month').format('YYYY-MM-DD'),
+    end: dayjs.utc(yearMonth).endOf('month').format('YYYY-MM-DD'),
+});
+
+export const getInitialPeriodByGranularity = (granularity: Granularity): [Period, RelativePeriod|undefined] => {
+    let periodMenu: MetricPeriodMenu = METRIC_PERIOD_MENU.LAST_6_MONTHS;
     if (granularity === GRANULARITY.DAILY) {
-        const thisMonthRelativePeriod: RelativePeriod = { unit: 'month', value: 0, include_today: true };
-        return [getRefinedPeriod(granularity, thisMonthRelativePeriod), thisMonthRelativePeriod];
-    } if (granularity === GRANULARITY.MONTHLY) {
-        const last6MonthsRelativePeriod: RelativePeriod = { unit: 'month', value: 5, include_today: true };
-        return [getRefinedPeriod(granularity, last6MonthsRelativePeriod), last6MonthsRelativePeriod];
+        periodMenu = METRIC_PERIOD_MENU.CURRENT_MONTH;
     }
-    return [{}, undefined];
+    const relativePeriod: RelativePeriod = METRIC_PERIOD_MENU_ITEM_MAP[periodMenu].relativePeriod;
+    return [convertRelativePeriodToPeriod(granularity, relativePeriod), relativePeriod];
 };
