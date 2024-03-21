@@ -160,7 +160,6 @@ const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
-    console.debug('keyword', keyword);
     if (keyword) namespaceState.collapsed = false; else namespaceState.collapsed = true;
     namespaceState.inputValue = keyword;
 };
