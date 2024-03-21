@@ -7,6 +7,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
@@ -15,6 +16,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface WorkspacePageState {
     loading: boolean;
@@ -40,6 +42,16 @@ export interface WorkspaceTableModel extends WorkspaceModel {
     users?: string;
 }
 
+const listRoles = async (): Promise<RoleModel[]> => {
+    const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+        query: {
+            filter: [
+                { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+            ],
+        },
+    });
+    return results || [];
+};
 export const useWorkspacePageStore = defineStore('workspace-page', {
     state: (): WorkspacePageState => ({
         loading: false,
@@ -85,7 +97,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 this.totalCount = total_count || 0;
                 this.selectedIndices = [];
                 if (!this.roles.length) {
-                    await this.listRoles();
+                    this.roles = await listRoles();
                 }
 
                 const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>();
@@ -101,6 +113,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 ErrorHandler.handleError(e);
                 this.workspaces = [];
                 this.totalCount = 0;
+                this.roles = [];
             } finally {
                 this.loading = false;
             }
@@ -115,18 +128,6 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 ErrorHandler.handleError(e);
             } finally {
                 this.userLoading = false;
-            }
-        },
-        // Role
-        async listRoles(params?: RoleListParameters) {
-            try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
-                this.roles = results || [];
-                return results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                this.roles = [];
-                throw e;
             }
         },
     },
