@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { PI, PLazyImg } from '@spaceone/design-system';
 
@@ -8,11 +8,13 @@ import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 interface Props {
     item: LSBCollapsibleItem;
     isSubItem?: boolean;
+    overrideCollapsed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     item: () => ({}) as LSBCollapsibleItem,
 });
+
 
 const state = reactive({
     isCollapsed: false,
@@ -21,6 +23,13 @@ const state = reactive({
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
+
+const updateCollapsedByForced = (collapsed: boolean) => {
+    state.isCollapsed = collapsed;
+};
+watch(() => props.overrideCollapsed, (changedCollapsed) => {
+    updateCollapsedByForced(!!changedCollapsed);
+}, { immediate: true });
 </script>
 
 <template>

@@ -18,6 +18,7 @@ import type {
 
 export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
     const state = reactive({
+        loading: false,
         granularity: GRANULARITY.MONTHLY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
@@ -55,6 +56,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         state.selectedChartGroupBy = undefined;
     };
     const loadNamespaces = async () => {
+        state.loading = true;
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudService.analyze);
         try {
             const { response, status } = await fetcher<CloudServiceAnalyzeParameters, ListResponse<MetricNamespace>>({
@@ -71,6 +73,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             }
         } catch (e) {
             console.error(e);
+        } finally {
+            state.loading = false;
         }
     };
 

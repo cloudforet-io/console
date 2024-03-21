@@ -4,7 +4,7 @@ import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PSearch, PIconButton, PTooltip,
+    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader,
 } from '@spaceone/design-system';
 
 
@@ -24,7 +24,7 @@ import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRoute
 import type { LSBMenu, LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { yellow } from '@/styles/colors';
+import { gray, yellow } from '@/styles/colors';
 
 import AddCustomMetricModal from '@/services/asset-inventory/components/AddCustomMetricModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -43,6 +43,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
+    loading: computed(() => metricExplorerPageStore.state.loading),
     providerItems: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
@@ -84,9 +85,19 @@ const state = reactive({
 
 const namespaceState = reactive({
     inputValue: '',
+    collapsed: true,
     namespaces: computed(() => metricExplorerPageStore.state.namespaces),
+    namespacesFilteredByInput: computed(() => {
+        const keyword = namespaceState.inputValue.toLowerCase();
+        if (!keyword) return namespaceState.namespaces;
+        return namespaceState.namespaces.filter((namespace) => {
+            const providerData = storeState.providerItems[namespace.provider];
+            return providerData.label.toLowerCase().includes(keyword)
+                || `${namespace.cloud_service_group}/${namespace.cloud_service_type}`.toLowerCase().includes(keyword);
+        });
+    }),
     namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => [
-        ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+        ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
     ]),
     selectedNamespace: undefined as NamespaceSubItemType | undefined,
 });
@@ -149,6 +160,7 @@ const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
+    if (keyword) namespaceState.collapsed = false; else namespaceState.collapsed = true;
     namespaceState.inputValue = keyword;
 };
 const handleSearchMetric = (keyword: string) => {
@@ -161,7 +173,6 @@ const handleClickBackToNamespace = () => {
     namespaceState.selectedNamespace = undefined;
 };
 const handleOpenAddCustomMetricModal = () => {
-    console.debug('handleOpenAddCustomMetricModal', metricState.addCustomMetricModalVisible);
     metricState.addCustomMetricModalVisible = true;
 };
 
@@ -199,71 +210,88 @@ onMounted(async () => {
                 </span>
             </template>
             <template #collapsible-contents-namespace>
-                <div class="namespace-wrapper">
-                    <p-search class="namespace-search"
-                              :value="namespaceState.inputValue"
-                              @update:value="handleSearchNamespace"
-                    />
-                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                 :key="`provider-${idx}`"
-                                                 class="provider-menu-item"
-                                                 :item="item"
-                                                 is-sub-item
-                    >
-                        <template #collapsible-contents="{ item: _item }">
-                            <div v-for="(_menu, _idx) in _item.subItems"
-                                 :key="`${_menu.label}-${_idx}`"
-                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                 @click="handleClickNamespace(_menu)"
-                            >
-                                <span class="text">
-                                    {{ _menu.label }}
-                                </span>
-                            </div>
-                        </template>
-                    </l-s-b-collapsible-menu-item>
-                </div>
+                <p-data-loader :loading="storeState.loading"
+                               :data="namespaceState.namespaceItems"
+                               :loader-backdrop-opacity="0.5"
+                               :loader-backdrop-color="gray[100]"
+                               class="namespace-data-loader"
+                >
+                    <div class="namespace-wrapper">
+                        <p-search class="namespace-search"
+                                  :value="namespaceState.inputValue"
+                                  @update:value="handleSearchNamespace"
+                        />
+                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                     :key="`provider-${idx}`"
+                                                     class="provider-menu-item"
+                                                     :item="item"
+                                                     is-sub-item
+                                                     :override-collapsed="namespaceState.collapsed"
+                        >
+                            <template #collapsible-contents="{ item: _item }">
+                                <div v-for="(_menu, _idx) in _item.subItems"
+                                     :key="`${_menu.label}-${_idx}`"
+                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                     @click="handleClickNamespace(_menu)"
+                                >
+                                    <p-text-highlighting class="text"
+                                                         :term="namespaceState.inputValue"
+                                                         :text="_menu?.label || ''"
+                                    />
+                                </div>
+                            </template>
+                        </l-s-b-collapsible-menu-item>
+                    </div>
+                </p-data-loader>
             </template>
             <template #slot-metric>
-                <div class="metric-wrapper">
-                    <div class="metric-title-item">
-                        <div class="title-wrapper">
-                            <p-icon-button class="back-button"
-                                           name="ic_arrow-left"
+                <!--                TODO: active data-loader after API-->
+                <p-data-loader :loading="false"
+                               :data="namespaceState.selectedNamespace"
+                               :min-loading-time="3000"
+                               :loader-backdrop-opacity="0.5"
+                               :loader-backdrop-color="gray[100]"
+                >
+                    <div class="metric-wrapper">
+                        <div class="metric-title-item">
+                            <div class="title-wrapper">
+                                <p-icon-button class="back-button"
+                                               name="ic_arrow-left"
+                                               size="sm"
+                                               @click="handleClickBackToNamespace"
+                                />
+                                <p-lazy-img class="namespace-image"
+                                            :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
+                                            width="1.25rem"
+                                            height="1.25rem"
+                                />
+                                <p-tooltip class="title"
+                                           :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
+                                >
+                                    <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
+                                    <span class="divider">/</span>
+                                    <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
+                                </p-tooltip>
+                            </div>
+                            <p-icon-button style-type="tertiary"
+                                           name="ic_plus"
+                                           shape="square"
                                            size="sm"
-                                           @click="handleClickBackToNamespace"
+                                           @click="handleOpenAddCustomMetricModal"
                             />
-                            <p-lazy-img class="namespace-image"
-                                        :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
-                                        width="1.25rem"
-                                        height="1.25rem"
-                            />
-                            <p-tooltip class="title"
-                                       :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
-                            >
-                                <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
-                                <span class="divider">/</span>
-                                <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
-                            </p-tooltip>
                         </div>
-                        <p-icon-button style-type="tertiary"
-                                       name="ic_plus"
-                                       shape="square"
-                                       size="sm"
-                                       @click="handleOpenAddCustomMetricModal"
+                        <p-search class="metric-search"
+                                  :value="metricState.inputValue"
+                                  @update:value="handleSearchMetric"
+                        />
+                        <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricList"
+                                                :key="idx"
+                                                :item="item"
+                                                :idx="idx"
+                                                :current-path="state.currentPath"
                         />
                     </div>
-                    <p-search class="metric-search"
-                              :value="metricState.inputValue"
-                              @update:value="handleSearchMetric"
-                    />
-                    <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricList"
-                                            :key="idx"
-                                            :item="item"
-                                            :idx="idx"
-                                            :current-path="state.currentPath"
-                    />
-                </div>
+                </p-data-loader>
             </template>
         </l-s-b>
         <add-custom-metric-modal :visible.sync="metricState.addCustomMetricModalVisible" />
@@ -272,25 +300,28 @@ onMounted(async () => {
 
 <style scoped lang="postcss">
 .metric-explorer-l-s-b {
-    .namespace-wrapper {
-        @apply flex flex-col gap-1;
-        padding: 0 0.5rem;
-
-        .namespace-menu-item {
-            @apply inline-flex items-center w-full text-gray-800;
-            height: 2rem;
+    .namespace-data-loader {
+        min-height: 15rem;
+        .namespace-wrapper {
+            @apply flex flex-col gap-1;
             padding: 0 0.5rem;
-            border-radius: 0.25rem;
-            &.selected {
-                @apply bg-blue-200;
-            }
 
-            &:hover {
-                @apply bg-blue-100 cursor-pointer;
-            }
-            .text {
-                @apply text-label-md overflow-hidden whitespace-no-wrap;
-                text-overflow: ellipsis;
+            .namespace-menu-item {
+                @apply inline-flex items-center w-full text-gray-800;
+                height: 2rem;
+                padding: 0 0.5rem;
+                border-radius: 0.25rem;
+                &.selected {
+                    @apply bg-blue-200;
+                }
+
+                &:hover {
+                    @apply bg-blue-100 cursor-pointer;
+                }
+                .text {
+                    @apply text-label-md overflow-hidden whitespace-no-wrap;
+                    text-overflow: ellipsis;
+                }
             }
         }
     }
