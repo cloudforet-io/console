@@ -1144,6 +1144,7 @@
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
 		},
+		"NAMESPACE": "",
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "전체 워크스페이스",
