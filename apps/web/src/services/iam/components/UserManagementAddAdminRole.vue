@@ -15,7 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -96,11 +96,10 @@ const fetchListRoles = async (inputText: string) => {
             o: '=',
         }]);
     } else {
-        roleListApiQueryHelper.setFilters([{
-            k: 'role_type',
-            v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
-            o: '=',
-        }]);
+        roleListApiQueryHelper.setFilters([
+            { k: 'role_type', v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER], o: '=' },
+            { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+        ]);
     }
 
     if (inputText) {
