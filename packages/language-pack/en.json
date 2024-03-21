@@ -1144,6 +1144,7 @@
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
 		},
+		"NAMESPACE": "Namespace",
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "All Workspaces",

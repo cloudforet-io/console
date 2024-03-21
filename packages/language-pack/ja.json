@@ -1144,6 +1144,7 @@
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
 		},
+		"NAMESPACE": "",
 		"NAVIGATIONS": {
 			"TOP_BAR": {
 				"ALL_WORKSPACE": "すべてのワークスペース",

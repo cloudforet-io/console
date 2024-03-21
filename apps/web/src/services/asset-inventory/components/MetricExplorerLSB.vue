@@ -68,19 +68,19 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        const namespaceMenuSet = [{
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('COMMON.NAMESPACE'),
-            id: 'namespace',
-        }];
-        const metricMenuSet = [{
-            type: MENU_ITEM_TYPE.SLOT,
-            id: 'metric',
-        }];
-        if (!namespaceState.selectedNamespace) return [...baseMenuSet, ...namespaceMenuSet];
-        return [...baseMenuSet, ...metricMenuSet];
+        if (!namespaceState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        return [...baseMenuSet, state.metircMenu];
     }),
     starredMenuSet: computed<LSBMenu[]>(() => []),
+    namespaceMenu: computed(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        label: i18n.t('COMMON.NAMESPACE'),
+        id: 'namespace',
+    })),
+    metircMenu: computed(() => ({
+        type: MENU_ITEM_TYPE.SLOT,
+        id: 'metric',
+    })),
 });
 
 const namespaceState = reactive({
@@ -209,39 +209,44 @@ onMounted(async () => {
                     {{ $t('COMMON.STARRED_NO_DATA') }}
                 </span>
             </template>
-            <template #collapsible-contents-namespace>
+            <template #slot-namespace>
                 <p-data-loader :loading="storeState.loading"
-                               :data="namespaceState.namespaceItems"
+                               :data="namespaceState.namespaces"
+                               :min-loading-time="10000"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
                 >
-                    <div class="namespace-wrapper">
-                        <p-search class="namespace-search"
-                                  :value="namespaceState.inputValue"
-                                  @update:value="handleSearchNamespace"
-                        />
-                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                     :key="`provider-${idx}`"
-                                                     class="provider-menu-item"
-                                                     :item="item"
-                                                     is-sub-item
-                                                     :override-collapsed="namespaceState.collapsed"
-                        >
-                            <template #collapsible-contents="{ item: _item }">
-                                <div v-for="(_menu, _idx) in _item.subItems"
-                                     :key="`${_menu.label}-${_idx}`"
-                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                     @click="handleClickNamespace(_menu)"
+                    <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
+                        <template #collapsible-contents>
+                            <div class="namespace-wrapper">
+                                <p-search class="namespace-search"
+                                          :value="namespaceState.inputValue"
+                                          @update:value="handleSearchNamespace"
+                                />
+                                <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                             :key="`provider-${idx}`"
+                                                             class="category-menu-item"
+                                                             :item="item"
+                                                             is-sub-item
+                                                             :override-collapsed="namespaceState.collapsed"
                                 >
-                                    <p-text-highlighting class="text"
-                                                         :term="namespaceState.inputValue"
-                                                         :text="_menu?.label || ''"
-                                    />
-                                </div>
-                            </template>
-                        </l-s-b-collapsible-menu-item>
-                    </div>
+                                    <template #collapsible-contents="{ item: _item }">
+                                        <div v-for="(_menu, _idx) in _item.subItems"
+                                             :key="`${_menu.label}-${_idx}`"
+                                             :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                             @click="handleClickNamespace(_menu)"
+                                        >
+                                            <p-text-highlighting class="text"
+                                                                 :term="namespaceState.inputValue"
+                                                                 :text="_menu?.label || ''"
+                                            />
+                                        </div>
+                                    </template>
+                                </l-s-b-collapsible-menu-item>
+                            </div>
+                        </template>
+                    </l-s-b-collapsible-menu-item>
                 </p-data-loader>
             </template>
             <template #slot-metric>
@@ -304,23 +309,25 @@ onMounted(async () => {
         min-height: 15rem;
         .namespace-wrapper {
             @apply flex flex-col gap-1;
-            padding: 0 0.5rem;
 
-            .namespace-menu-item {
-                @apply inline-flex items-center w-full text-gray-800;
-                height: 2rem;
-                padding: 0 0.5rem;
-                border-radius: 0.25rem;
-                &.selected {
-                    @apply bg-blue-200;
-                }
+            .category-menu-item {
+                padding: 0 0.25rem;
+                .namespace-menu-item {
+                    @apply inline-flex items-center w-full text-gray-800;
+                    height: 2rem;
+                    padding: 0 0.5rem;
+                    border-radius: 0.25rem;
+                    &.selected {
+                        @apply bg-blue-200;
+                    }
 
-                &:hover {
-                    @apply bg-blue-100 cursor-pointer;
-                }
-                .text {
-                    @apply text-label-md overflow-hidden whitespace-no-wrap;
-                    text-overflow: ellipsis;
+                    &:hover {
+                        @apply bg-blue-100 cursor-pointer;
+                    }
+                    .text {
+                        @apply text-label-md overflow-hidden whitespace-no-wrap;
+                        text-overflow: ellipsis;
+                    }
                 }
             }
         }
