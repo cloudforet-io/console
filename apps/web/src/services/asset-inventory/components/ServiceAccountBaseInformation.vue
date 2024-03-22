@@ -76,10 +76,9 @@ const state = reactive<State>({
         accountName: props.serviceAccountData?.name,
         customSchemaForm: props.serviceAccountData?.data,
         tags: props.serviceAccountData?.tags,
-        ...((state.isTrustedAccount && ('project_id' in props.serviceAccountData)) && {
-            selectedProjectId: props.serviceAccountData?.project_id ?? '',
+        ...((!state.isTrustedAccount && props.serviceAccountData && ('project_id' in props.serviceAccountData)) && {
+            projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
         }),
-        projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
     })),
 });
 
@@ -101,14 +100,14 @@ const updateServiceAccount = async () => {
         state.loading = true;
         if (state.isTrustedAccount) {
             await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-                trusted_account_id: props.serviceAccountId,
+                trusted_account_id: props.serviceAccountId ?? '',
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,
             });
         } else {
             await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
-                service_account_id: props.serviceAccountId,
+                service_account_id: props.serviceAccountId ?? '',
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,

@@ -157,7 +157,7 @@ watch(() => props.originForm, (originForm) => {
                        class="account-tags"
         >
             <service-account-project-form :is-valid.sync="state.isProjectFormValid"
-                                          :project-id="props.originForm?.projectForm?.selectedProjectId"
+                                          :project-id="props.originForm?.projectForm?.selectedProjectId ?? ''"
                                           @change="handleChangeProjectForm"
             />
         </p-field-group>
