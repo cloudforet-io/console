@@ -27,6 +27,7 @@ interface Props {
     isValid: boolean;
     originForm?: Partial<BaseInformationForm>;
     accountType?: AccountType;
+    isUpdateMode: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
     isValid: false,
     originForm: () => ({}),
     accountType: ACCOUNT_TYPE.GENERAL,
+    mode: false,
 });
 
 const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
@@ -130,7 +132,8 @@ watch(() => props.originForm, (originForm) => {
 
 <template>
     <div class="service-account-base-information-form">
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
+        <p-field-group v-if="!props.isUpdateMode"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
                        :invalid="invalidState.serviceAccountName"
                        :invalid-text="invalidTexts.serviceAccountName"
                        :required="true"

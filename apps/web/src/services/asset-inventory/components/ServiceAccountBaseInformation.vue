@@ -186,6 +186,7 @@ watch(() => props.provider, async (provider) => {
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
+                                                   :is-update-mode="state.mode === 'UPDATE'"
                                                    :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"

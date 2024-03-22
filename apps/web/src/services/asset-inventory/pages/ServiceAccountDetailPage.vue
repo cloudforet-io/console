@@ -30,6 +30,7 @@ import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
+import ServiceAccountEditModal from '@/services/asset-inventory/components/ServiceAccountEditModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
@@ -52,6 +53,7 @@ const state = reactive({
     loading: true,
     item: {} as ServiceAccountModel,
     serviceAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
+    isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
     attachedTrustedAccountId: computed(() => state.item?.trusted_account_id),
     providerId: computed(() => state.item?.provider),
@@ -74,6 +76,7 @@ const state = reactive({
     }),
     projectId: computed(() => state.item.project_info?.project_id),
     deleteModalVisible: false,
+    editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
 });
 
@@ -81,7 +84,7 @@ const state = reactive({
 const getAccount = async (serviceAccountId: string) => {
     state.loading = true;
     try {
-        if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+        if (state.isTrustedAccount) {
             state.item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
                 trusted_account_id: serviceAccountId,
             });
@@ -102,6 +105,10 @@ const getAccount = async (serviceAccountId: string) => {
 const handleOpenDeleteModal = () => {
     state.deleteModalVisible = true;
 };
+
+const handleClickEditButton = () => {
+    state.editModalVisible = true;
+};
 const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
@@ -112,8 +119,8 @@ const handleClickBackbutton = () => {
 };
 
 /* Watcher */
-watch(() => props.serviceAccountId, async (serviceAccountId) => {
-    if (serviceAccountId) {
+watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serviceAccountId, updateVisible]) => {
+    if (serviceAccountId && !updateVisible) {
         state.serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
         await getAccount(serviceAccountId);
     }
@@ -142,6 +149,10 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                    class="w-full delete-button"
                                    @click="handleOpenDeleteModal"
                     />
+                    <p-icon-button name="ic_edit"
+                                   class="w-full delete-button"
+                                   @click="handleClickEditButton"
+                    />
                 </div>
             </template>
             <template v-if="!state.isManagedTrustedAccount"
@@ -167,7 +178,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                               :editable="!state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />
-            <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && props.serviceAccountId"
+            <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
@@ -186,6 +197,10 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                       :service-account-type="state.serviceAccountType"
                                       :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
+        />
+        <service-account-edit-modal :visible.sync="state.editModalVisible"
+                                    :is-trusted-account="state.isTrustedAccount"
+                                    :service-account="state.item"
         />
     </div>
 </template>
