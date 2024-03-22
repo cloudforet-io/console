@@ -157,7 +157,7 @@ watch(() => props.provider, async (provider) => {
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable"
                           icon-left="ic_edit"
-                          style-type="transparent"
+                          style-type="secondary"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}

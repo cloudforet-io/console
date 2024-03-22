@@ -214,7 +214,7 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
                           icon-left="ic_edit"
-                          style-type="transparent"
+                          style-type="secondary"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
