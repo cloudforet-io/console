@@ -5,8 +5,6 @@ import {
     PFieldTitle, PCheckboxGroup, PCheckbox, PLazyImg, PSelectDropdown,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
@@ -30,7 +28,7 @@ const allReferenceStore = useAllReferenceStore();
 
 
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerList: computed(() => (Object.values(state.providers) as PluginItem[]).map((provider) => ({
         label: provider.name,
         name: provider.key,
@@ -47,7 +45,7 @@ const state = reactive({
 });
 
 const pluginState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     pluginList: computed(() => {
         // Cost Plugin

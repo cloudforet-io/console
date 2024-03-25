@@ -6,11 +6,10 @@ import {
 } from '@spaceone/design-system';
 
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import type {
     FilterLabelItem,
@@ -24,11 +23,14 @@ import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-s
 
 
 const emit = defineEmits<{(e: 'select-template', value: DashboardModel)}>();
+const allReferenceStore = useAllReferenceStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+});
 const state = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     managedTemplates: [] as DashboardTemplate[],
     outOfTheBoxTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = state.managedTemplates;
@@ -38,7 +40,6 @@ const state = reactive({
         const _templates = dashboardGetters.allItems;
         return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
 });
 
 const filterState = reactive({
@@ -81,7 +82,7 @@ const handleClickCreateTemplate = (template: DashboardModel) => {
 };
 
 const listTemplates = async () => {
-    state.managedTemplates = await generateDashboardTemplateList(state.plugins);
+    state.managedTemplates = await generateDashboardTemplateList(storeState.plugins);
 };
 
 listTemplates();
