@@ -47,7 +47,6 @@ const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
     projectGroupUserIdList: [] as string[],
-    //
     userMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const _items: SelectDropdownMenuItem[] = [];
         Object.values(storeState.users).forEach((user) => {
