@@ -57,6 +57,11 @@ export const getValidWorkspaceId = (workspaceId: string|undefined, workspaceList
 
 // Router BeforeEach Guard - Route-Validation-and-Verification Process
 export const processTokenVerification = (to: Route, next: NavigationGuardNext): boolean => {
+    if (to.name === ERROR_ROUTE._NAME) {
+        next();
+        return false;
+    }
+
     const isTokenAlive = SpaceConnector.isTokenAlive;
 
     if (!isTokenAlive) {
