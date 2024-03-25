@@ -65,7 +65,7 @@ const handleChangeScope = (selected) => {
 .dashboard-main-select-filter {
     @apply flex items-center;
     height: 2rem;
-    margin: 1.125rem 0 0.625rem 0;
+    margin-bottom: 0.625rem;
     gap: 1rem;
 
     .filter-header {
