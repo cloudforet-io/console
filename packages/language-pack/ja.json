@@ -2419,6 +2419,7 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "関連するメンバー"
@@ -2463,7 +2464,6 @@
 				"HISTORY": "変更履歴"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
 				"ALL": "すべて",
 				"ALT_E_CHECK_MODAL": "{action}失敗",
 				"ALT_S_CHECK_MODAL": "{action}完了",
@@ -2471,7 +2471,6 @@
 				"CHECK_MODAL_DELETE_DESC": "本当に削除しますか？",
 				"CHECK_MODAL_DELETE_TITLE": "クラウドサービス削除",
 				"CLOSE": "閉じる",
-				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"FILTER": "フィルター",
 				"FILTERED_BY_DATE": "日付で絞り込み",
@@ -2687,6 +2686,9 @@
 			"NO_JOB": "近のジョブはありません",
 			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
+		"CREATE_COLLECTOR": "コレクタ生成",
+		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "",
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": ""

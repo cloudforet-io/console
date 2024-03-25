@@ -2419,6 +2419,7 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "연관된 멤버"
@@ -2463,7 +2464,6 @@
 				"HISTORY": "변경 이력"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
 				"ALL": "모두",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
@@ -2471,7 +2471,6 @@
 				"CHECK_MODAL_DELETE_DESC": "정말 삭제하시겠습니까?",
 				"CHECK_MODAL_DELETE_TITLE": "클라우드 서비스 삭제",
 				"CLOSE": "닫기",
-				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
 				"FILTER": "필터",
 				"FILTERED_BY_DATE": "날짜 필터",
@@ -2687,6 +2686,9 @@
 			"NO_JOB": "최근 작업내역 없음",
 			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
+		"CREATE_COLLECTOR": "컬렉터 생성",
+		"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "자원 수집을 위한 컬렉터 생성이 필요합니다.",
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": ""
