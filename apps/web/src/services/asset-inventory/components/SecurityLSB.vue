@@ -19,6 +19,7 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
@@ -28,6 +29,7 @@ const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -89,11 +91,12 @@ const routeToFirstCloudServiceType = async () => {
 };
 
 /* Watchers */
-watch(() => state.pageParams, (pageParams) => {
+watch(() => state.pageParams, async (pageParams) => {
     if (pageParams?.name) {
-        securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+        await securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
+        await cloudServiceDetailPageStore.setProviderGroupName(pageParams);
     } else {
-        securityPageStore.setSelectedCloudServiceType();
+        await securityPageStore.setSelectedCloudServiceType();
     }
 }, { immediate: true });
 watch(() => storeState.selectedCloudServiceType, () => {
