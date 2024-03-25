@@ -124,7 +124,7 @@ const tableState = reactive({
     tableTitle: computed(() => {
         if (tableState.isTrustedAccount) return 'Trusted Account';
         if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
-            return PROVIDER_ACCOUNT_NAME[state.selectedProvider];
+            return `${state.selectedProviderName} ${PROVIDER_ACCOUNT_NAME[state.selectedProvider]}`;
         }
         return 'General Account';
     }),
