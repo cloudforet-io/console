@@ -12,8 +12,11 @@ import {
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -42,9 +45,12 @@ const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
 const route = useRoute();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
     dashboardScope: computed(() => dashboardDetailState.dashboardScope),
     dashboardMiddleRouteLabel: computed(() => {
@@ -60,6 +66,7 @@ const state = reactive({
             params: { workspaceId: route.params.workspaceId },
             query: { scope: state.dashboardScope },
         });
+        if (state.isAdminMode) return _breadcrumbs;
         const dashboardMiddleRoute = {
             name: state.dashboardMiddleRouteLabel,
             to: { path: customMiddleRoute.fullPath },
@@ -77,7 +84,7 @@ const getDashboardData = async (dashboardId: string) => {
         await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE._NAME });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     }
 };
 

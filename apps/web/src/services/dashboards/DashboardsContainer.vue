@@ -13,7 +13,7 @@ const dashboardStore = useDashboardStore();
 const loadDashboard = async () => {
     await dashboardStore.load();
 };
-const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], loadDashboard);
+const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE', 'DOMAIN'], loadDashboard);
 callApiWithGrantGuard();
 
 </script>

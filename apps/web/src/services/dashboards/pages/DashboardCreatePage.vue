@@ -26,14 +26,18 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useGoBack } from '@/common/composables/go-back';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
 import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
@@ -43,13 +47,16 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
+
 interface Step {
     step: number;
     description?: string;
 }
+const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 const {
     forms: { dashboardTemplate, dashboardProject },
     setForm,
@@ -68,12 +75,18 @@ const {
 });
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: false,
-    steps: computed<Step[]>(() => [
+    adminSteps: computed<Step[]>(() => [
+        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
+        { step: 2 },
+    ]),
+    userSteps: computed<Step[]>(() => [
         { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
         { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
         { step: 3 },
     ]),
+    steps: computed(() => (state.isAdminMode ? state.adminSteps : state.userSteps)),
     currentStep: 1,
     isValid: computed(() => {
         if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
@@ -83,7 +96,9 @@ const state = reactive({
 });
 
 const goStep = (direction: 'prev'|'next') => {
-    if (state.currentStep === 2 && direction === 'next') {
+    if (state.isAdminMode && (state.currentStep === 1 && direction === 'next')
+        || !state.isAdminMode && (state.currentStep === 2 && direction === 'next')
+    ) {
         saveCurrentStateToStore();
     }
     if (direction === 'prev') state.currentStep--;
@@ -112,19 +127,19 @@ const createDashboard = async () => {
             display_info: dashboardDetailGetters.displayInfo,
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            (apiParam as PublicDashboardCreateParameters).resource_group = dashboardDetailState.dashboardScope;
+            apiParam.resource_group = state.isAdminMode ? RESOURCE_GROUP.DOMAIN : dashboardDetailState.dashboardScope;
         }
         if (dashboardDetailState.dashboardScope === 'PROJECT') {
             (apiParam as PublicDashboardCreateParameters).project_id = dashboardDetailState.projectId;
         }
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
-        await SpaceRouter.router.push({
+        await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
             },
-        }).catch(() => {});
+        })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     } finally {
@@ -145,16 +160,16 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
     setForm('dashboardProject', project);
 };
 
-const { setPathFrom, handleClickBackButton } = useGoBack({
+const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation({
     name: DASHBOARDS_ROUTE._NAME,
-});
+}));
 
 defineExpose({ setPathFrom });
 </script>
 
 <template>
     <div class="dashboard-create-page"
-         :class="`step-${state.currentStep}`"
+         :class="[`step-${state.currentStep}`, { 'admin-mode': state.isAdminMode }]"
     >
         <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
                                   :description="state.steps[state.currentStep - 1].description"
@@ -167,7 +182,7 @@ defineExpose({ setPathFrom });
         <dashboard-create-step1 v-if="state.currentStep === 1"
                                 @select-template="handleSelectTemplate"
         />
-        <template v-else-if="state.currentStep === 2">
+        <template v-else-if="!state.isAdminMode && state.currentStep === 2">
             <dashboard-create-step2 :selected-template="dashboardTemplate"
                                     @select-project="handleSelectProject"
             />
@@ -188,7 +203,7 @@ defineExpose({ setPathFrom });
                 </p-button>
             </div>
         </template>
-        <div v-if="state.currentStep === 3">
+        <div v-if="state.currentStep === 3 || (state.isAdminMode && state.currentStep === 2)">
             <dashboard-customize :loading="state.loading"
                                  :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
                                  hide-cancel-button
@@ -209,6 +224,11 @@ defineExpose({ setPathFrom });
     }
     &.step-2 {
         width: 45rem;
+        &.admin-mode {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 8rem);
+        }
     }
     &.step-3 {
         width: 100%;
