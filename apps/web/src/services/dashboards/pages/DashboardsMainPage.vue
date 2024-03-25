@@ -58,7 +58,10 @@ const state = reactive({
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
         return dashboardGetters.privateItems as DashboardModel[] || [];
     }),
-    dashboardTotalCount: computed<number>(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
+    dashboardTotalCount: computed<number>(() => {
+        if (state.isAdminMode) return dashboardGetters.domainItems.length;
+        return state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length;
+    }),
     filteredDashboardStatus: computed(() => {
         if (state.isAdminMode) {
             return !!(dashboardGetters.domainItems.length);
