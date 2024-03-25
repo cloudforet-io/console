@@ -2,9 +2,11 @@
 import { computed, reactive, watch } from 'vue';
 
 import { PDynamicLayout } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -24,6 +26,7 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
+    timezone: computed<string>(() => store.state.user.timezone),
     detailSchema: {} as ItemLayout,
     fieldHandler: [],
     baseInformationData: computed(() => {
@@ -65,7 +68,11 @@ watch(() => props.provider, async (provider) => {
                               loading: !state.detailSchema?.type || props.loading
                           }"
                           :field-handler="fieldHandler"
-        />
+        >
+            <template #data-created_at="item">
+                {{ dayjs(item.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+        </p-dynamic-layout>
     </div>
 </template>
 
