@@ -1,4 +1,4 @@
-export const initDomain = async (store, config): Promise<string|undefined> => {
+export const initDomain = async (store, config): Promise<string> => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
