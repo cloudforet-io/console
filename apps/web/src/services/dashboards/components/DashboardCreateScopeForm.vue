@@ -16,7 +16,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import WorkspaceLogoIcon from '@/common/modules/navigations/gnb/modules/gnb-header/WorkspaceLogoIcon.vue';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';

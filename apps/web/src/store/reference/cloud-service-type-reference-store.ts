@@ -12,8 +12,8 @@ import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-typ
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
-} from '@/store/modules/reference/type';
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';

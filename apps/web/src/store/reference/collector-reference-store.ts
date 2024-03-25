@@ -12,14 +12,13 @@ import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
-} from '@/store/modules/reference/type';
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/reference/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export type CollectorItem = Required<Pick<ReferenceItem<CollectorModel>, 'key'|'label'|'name'|'icon'>>;
 export type CollectorReferenceMap = ReferenceMap<CollectorItem>;
