@@ -1,5 +1,4 @@
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -15,17 +14,17 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
-import type { GetSchemaParams, ResourceType } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+import type { GetSchemaParams, ResourceType, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 const getCustomTableSchemaKey = (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string) => {
     const { userType, userId } = userData;
     return `console:${userType}:${userId}:page-schema:${resourceType}?provider=${provider}:table`;
 };
 
-export const getCustomTableSchema = async (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string):Promise<DynamicLayout | undefined> => {
-    let userConfig:UserConfigModel<DynamicLayout>|undefined;
+export const getCustomTableSchema = async (userData:{userType:string, userId: string}, resourceType:ResourceType, provider:string):Promise<QuerySearchTableLayout | undefined> => {
+    let userConfig:UserConfigModel<QuerySearchTableLayout>|undefined;
     try {
-        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigGetParameters, ListResponse<UserConfigModel<DynamicLayout>>>({
+        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigGetParameters, ListResponse<UserConfigModel<QuerySearchTableLayout>>>({
             name: getCustomTableSchemaKey(userData, resourceType, provider),
         });
         userConfig = results ? results[0] : undefined;

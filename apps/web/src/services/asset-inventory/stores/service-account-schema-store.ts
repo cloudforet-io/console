@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { defineStore } from 'pinia';
 
 
@@ -28,6 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getAccountFields, getCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
+import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 
 interface Getters {
@@ -52,10 +52,10 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
     const state = reactive({
         selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
         currentProvider: undefined as string|undefined,
-        generalAccountTableSchema: undefined as DynamicLayout|undefined,
-        trustedAccountTableSchema: undefined as DynamicLayout|undefined,
-        generalAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
-        trustedAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
+        generalAccountTableSchema: undefined as QuerySearchTableLayout|undefined,
+        trustedAccountTableSchema: undefined as QuerySearchTableLayout|undefined,
+        generalAccountDetailSchema: undefined as ItemLayout|undefined,
+        trustedAccountDetailSchema: undefined as ItemLayout|undefined,
     });
 
     const getters = reactive<Getters>({
