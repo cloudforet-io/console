@@ -1,0 +1,7 @@
+export const NAMESPACE_CATEGORY = {
+    COMMON: 'COMMON',
+    ASSET: 'ASSET',
+    SECURITY: 'SECURITY',
+    INFORMATION: 'INFORMATION',
+    CUSTOM: 'CUSTOM',
+} as const;
