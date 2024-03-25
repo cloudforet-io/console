@@ -12,8 +12,8 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
-} from '@/store/modules/reference/type';
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
+} from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

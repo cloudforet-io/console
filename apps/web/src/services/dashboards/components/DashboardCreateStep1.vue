@@ -9,8 +9,8 @@ import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type
 import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { PluginReferenceItem, PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import type {
     FilterLabelItem,
@@ -45,7 +45,7 @@ const filterState = reactive({
     inputValue: '',
     selectedLabels: [] as FilterLabelItem[],
     selectedProviders: [] as FilterLabelItem[],
-    selectedPlugins: [] as PluginReferenceItem[],
+    selectedPlugins: [] as PluginItem[],
 });
 
 /* Util */
@@ -54,7 +54,7 @@ const getFilteredTemplates = (
     inputValue: string,
     selectedLabels: FilterLabelItem[],
     selectedProviders: FilterLabelItem[],
-    selectedPlugins: PluginReferenceItem[],
+    selectedPlugins: PluginItem[],
 ): DashboardTemplate[] => {
     const _inputValue = inputValue.toLowerCase();
     return templates.filter((template) => (!selectedPlugins.length || (template.plugin_ids ?? []).some((pluginId) => selectedPlugins.map((sel) => sel.name).includes(pluginId)))
@@ -68,7 +68,7 @@ const handleSelectLabels = (labels: FilterLabelItem[]) => {
     filterState.selectedLabels = labels;
 };
 
-const handleSelectPlugins = (plugins: PluginReferenceItem[]) => {
+const handleSelectPlugins = (plugins: PluginItem[]) => {
     filterState.selectedPlugins = plugins;
 };
 

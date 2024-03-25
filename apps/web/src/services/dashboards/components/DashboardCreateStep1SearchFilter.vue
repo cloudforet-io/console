@@ -7,10 +7,10 @@ import {
 
 import { store } from '@/store';
 
-import type { PluginReferenceMap, PluginReferenceItem } from '@/store/modules/reference/plugin/type';
-import type { ProviderReferenceItem, ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceItems, CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { PluginItem, PluginReferenceMap } from '@/store/reference/plugin-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { DASHBOARD_LABELS } from '@/services/dashboards/constants/dashboard-labels';
 
@@ -23,7 +23,7 @@ export interface FilterLabelItem {
 
 const emit = defineEmits<{(e:'select-label', labels: FilterLabelItem[]):void;
     (e:'select-provider', plugins: FilterLabelItem[]):void;
-    (e:'select-plugin', plugins: PluginReferenceItem[]):void;
+    (e:'select-plugin', plugins: PluginItem[]):void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -31,7 +31,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    providerList: computed(() => (Object.values(state.providers) as ProviderReferenceItem[]).map((provider) => ({
+    providerList: computed(() => (Object.values(state.providers) as PluginItem[]).map((provider) => ({
         label: provider.name,
         name: provider.key,
         image: provider.icon,
@@ -85,7 +85,7 @@ const pluginState = reactive({
 
         return [...costPluginList, ...assetPluginList];
     }),
-    selectedPlugins: [] as PluginReferenceItem[],
+    selectedPlugins: [] as PluginItem[],
 });
 
 const handleChangeLabelFilter = (selected: FilterLabelItem[]) => {
@@ -98,7 +98,7 @@ const handleChangeProviderFilter = (selected: FilterLabelItem[]) => {
     emit('select-provider', selected);
 };
 
-const handleChangePluginFilter = (selected: PluginReferenceItem[]) => {
+const handleChangePluginFilter = (selected: PluginItem[]) => {
     pluginState.selectedPlugins = selected;
     emit('select-plugin', selected);
 };

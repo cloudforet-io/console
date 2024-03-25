@@ -5,7 +5,7 @@ import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-s
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { awsCdnAndTrafficDashboard } from '@/services/dashboards/dashboard-template/templates/aws-cdn-and-traffic';
 import { awsMonthlyCostSummaryDashboard } from '@/services/dashboards/dashboard-template/templates/aws-monthly-cost-summary';
