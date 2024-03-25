@@ -71,9 +71,9 @@ export const ADMIN_MENU_LIST: Menu[] = [
     // {
     //     id: MENU_ID.HOME_DASHBOARD,
     // },
-    // {
-    //     id: MENU_ID.DASHBOARDS,
-    // },
+    {
+        id: MENU_ID.DASHBOARDS,
+    },
     {
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
