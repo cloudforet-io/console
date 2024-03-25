@@ -4,15 +4,22 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PHeading, PDivider, PEmpty } from '@spaceone/design-system';
+import {
+    PHeading, PDivider, PEmpty, PButton,
+} from '@spaceone/design-system';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
 import CloudServiceDetailPage
     from '@/services/asset-inventory/pages/CloudServiceDetailPage.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
+const allReferenceStore = useAllReferenceStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
 
@@ -22,9 +29,11 @@ const storeState = reactive({
     loading: computed(() => securityPageGetters.loading),
     cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
 });
 const state = reactive({
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
+    isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
 });
 
 const initData = async () => {
@@ -60,16 +69,35 @@ onUnmounted(() => {
                    :total-count="0"
         />
         <p-divider />
-        <p-empty show-image
-                 image-size="md"
-                 class="no-data"
+        <p-empty
+            show-image
+            image-size="md"
+            show-button
+            class="no-data"
         >
             <template #image>
-                <img src="@/assets/images/illust_microscope.svg"
-                     alt="empty-image"
+                <img v-if="state.isNoServiceAccounts"
+                     alt="empty-cloud-service-img"
+                     src="@/assets/images/illust_satellite.svg"
+                >
+                <img v-else
+                     alt="empty-cloud-service-img"
+                     src="@/assets/images/illust_microscope.svg"
                 >
             </template>
-            {{ $t('COMMON.ERROR.NO_RESOURCE_TITLE') }}
+            <template #button>
+                <router-link
+                    :to="state.isNoServiceAccounts ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }"
+                >
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus_bold"
+                              class="mx-auto text-center"
+                    >
+                        {{ state.isNoServiceAccounts ? $t('INVENTORY.ADD_SERVICE_ACCOUNT') : $t('INVENTORY.CREATE_COLLECTOR') }}
+                    </p-button>
+                </router-link>
+            </template>
+            {{ state.isNoServiceAccounts ? $t('INVENTORY.EMPTY_CLOUD_SERVICE') : $t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') }}
         </p-empty>
     </div>
 </template>

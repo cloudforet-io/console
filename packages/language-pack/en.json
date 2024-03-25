@@ -2419,6 +2419,7 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "Add Service Account",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "Related Member"
@@ -2463,7 +2464,6 @@
 				"HISTORY": "History"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "Add Service Account",
 				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
@@ -2471,7 +2471,6 @@
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
 				"CLOSE": "Close",
-				"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
 				"FAVORITES": "Favorites",
 				"FILTER": "Filter",
 				"FILTERED_BY_DATE": "Filtered by Date",
@@ -2687,6 +2686,9 @@
 			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
+		"CREATE_COLLECTOR": "Create Collector",
+		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "A collector has not been created yet.",
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": "Security"
