@@ -7,6 +7,11 @@ export const initDomain = async (store, config): Promise<string> => {
         domainName = config.get('DOMAIN_NAME');
     }
 
-    await store.dispatch('domain/load', domainName);
-    return store.state.domain.domainId;
+    try {
+        await store.dispatch('domain/load', domainName);
+        return store.state.domain.domainId;
+    } catch (e) {
+        console.error(e);
+        throw new Error('Failed to load domain.');
+    }
 };
