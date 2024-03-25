@@ -1,6 +1,7 @@
 import createLogger from 'vuex/dist/logger';
 
 import settingsPlugins from '@/store/modules/settings/plugins';
+// eslint-disable-next-line import/no-cycle
 import userPlugins from '@/store/modules/user/plugins';
 
 const DEBUG = import.meta.env.DEV;

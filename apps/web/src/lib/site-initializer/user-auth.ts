@@ -4,13 +4,13 @@ import type { UserModel } from '@/schema/identity/user/model';
 
 export const initUserAndAuth = async (store, config): Promise<string | undefined> => {
     let userId = store.state.user.userId;
+    const domainSettings = store.state.domain.config?.settings;
     const isTokenAlive = SpaceConnector.isTokenAlive;
     const devMode = config.get('DEV.ENABLED');
     const authEnabled = config.get('DEV.AUTH.ENABLED');
     if (devMode && authEnabled) userId = config.get('DEV.AUTH.USER_ID');
 
     if (userId && isTokenAlive) {
-        const domainSettings = store.state.domain.config?.settings;
         try {
             const response = await SpaceConnector.clientV2.identity.userProfile.get<undefined, UserModel>();
             store.commit('user/setUser', {
@@ -30,6 +30,10 @@ export const initUserAndAuth = async (store, config): Promise<string | undefined
         } catch (e) {
             console.error(e);
         }
+    } else {
+        store.commit('user/setUser', {
+            language: domainSettings?.language,
+        });
     }
 
     SpaceConnector.flushToken();

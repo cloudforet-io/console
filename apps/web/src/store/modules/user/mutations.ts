@@ -1,8 +1,10 @@
 import type { Mutation } from 'vuex';
 
+import { setI18nLocale } from '@/translations';
+
 import type { UserState, RoleInfo, GrantInfo } from './type';
 
-export const setUser = (state: UserState, userInfo: UserState): void => {
+export const setUser = async (state: UserState, userInfo: UserState): Promise<void> => {
     state.userId = userInfo.userId;
     state.authType = userInfo.authType;
     state.roleType = userInfo.roleType;
@@ -13,6 +15,10 @@ export const setUser = (state: UserState, userInfo: UserState): void => {
     state.requiredActions = userInfo.requiredActions;
     state.emailVerified = userInfo.emailVerified;
     state.mfa = userInfo.mfa;
+
+    if (userInfo.language) {
+        await setI18nLocale(userInfo.language);
+    }
 };
 
 export const setIsSessionExpired = (state: UserState, isSessionExpired?: boolean): void => {

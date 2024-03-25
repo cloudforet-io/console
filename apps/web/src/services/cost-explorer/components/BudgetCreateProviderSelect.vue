@@ -17,11 +17,11 @@ import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
+import type { ReferenceMap } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';

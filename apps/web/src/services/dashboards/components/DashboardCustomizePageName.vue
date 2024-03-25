@@ -176,6 +176,9 @@ onMounted(() => {
         :deep(.invalid-feedback) {
             font-weight: normal;
         }
+        .back-button {
+            margin-bottom: 0.75rem;
+        }
     }
 }
 </style>

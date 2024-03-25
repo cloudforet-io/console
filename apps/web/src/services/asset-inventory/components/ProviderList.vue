@@ -33,7 +33,7 @@ import { computed, reactive, ref } from 'vue';
 import { PLazyImg, PButton } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
+import type { ReferenceItem } from '@/store/reference/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

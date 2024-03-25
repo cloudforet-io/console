@@ -19,10 +19,10 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
 import type { UserState } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { ReferenceItem } from '@/store/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

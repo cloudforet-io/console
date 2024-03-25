@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -33,6 +33,7 @@ const {
 
 const state = reactive({
     loading: false,
+    isLocalLogin: computed(() => userId && !accessToken),
     confirmLoading: false,
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
@@ -105,13 +106,15 @@ const handleClickConfirmButton = async () => {
     }
 };
 
-
-/* Init */
-(() => {
-    if (!userId) {
+onMounted(() => {
+    if (state.isLocalLogin) {
+        if (!userId) {
+            router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
+        }
+    } else if (!accessToken) {
         router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
     }
-})();
+});
 </script>
 
 <template>

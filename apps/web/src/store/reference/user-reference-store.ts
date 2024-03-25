@@ -19,7 +19,7 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
-} from '@/store/modules/reference/type';
+} from '@/store/reference/type';
 
 import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
