@@ -254,10 +254,10 @@ const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
 const handleCloseAddClusterModal = () => {
-    router.replace({
+    router.replace(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
         query: { provider: 'kubernetes' },
-    });
+    }));
 };
 
 /** ******* Page Init ******* */
