@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -32,10 +32,18 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         filters: {} as Record<string, string[]>,
         namespaces: [] as MetricNamespace[],
         metricList: [] as MetricModel[],
-        groupByList: [] as string[],
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedNamespace: undefined as MetricNamespace|undefined,
+    });
+    const getters = reactive({
+        groupByItems: computed<Array<{name: string, label: string}>>(() => {
+            if (!state.metric?.label_keys?.length) return [];
+            return state.metric.label_keys.map((label) => ({
+                name: label.key,
+                label: label.name,
+            }));
+        }),
     });
 
     /* Mutations */
@@ -54,9 +62,6 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const setSelectedChartGroupBy = (groupBy: string|undefined) => {
         state.selectedChartGroupBy = groupBy;
     };
-    const setGroupByList = (groupByList: string[]) => {
-        state.groupByList = groupByList;
-    };
     const setEnabledFiltersProperties = (enabledProperties: string[]) => {
         state.enabledFiltersProperties = enabledProperties;
     };
@@ -73,7 +78,6 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         state.period = undefined;
         state.relativePeriod = undefined;
         state.filters = {};
-        state.groupByList = [];
         state.selectedGroupByList = [];
         state.selectedChartGroupBy = undefined;
         state.selectedNamespace = undefined;
@@ -144,12 +148,12 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         setSelectedChartGroupBy,
         setEnabledFiltersProperties,
         setFilters,
-        setGroupByList,
         setMetric,
     };
 
     return {
         state,
+        getters,
         ...mutations,
         ...actions,
     };
