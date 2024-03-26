@@ -3577,7 +3577,7 @@
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
 			"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가 ",
-			"ALL_PROJECTS": "프로젝트 ",
+			"ALL_PROJECTS": "모든 프로젝트",
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
 			"ALT_E_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 실패",
 			"ALT_E_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 실패",
