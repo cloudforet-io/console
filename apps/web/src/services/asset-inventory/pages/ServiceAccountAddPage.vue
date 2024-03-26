@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
@@ -66,7 +67,8 @@ const state = reactive({
     ),
     providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
     description: computed(() => state.providerSchemaData?.options?.help),
-    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
+    // TODO: enhance kubernetes provider schema after API done
+    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
 });
 
@@ -153,7 +155,9 @@ const handleSave = async () => {
         formState.formLoading = true;
         accountId = await createAccount();
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
-        SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+        const query: Location['query'] = { provider: props.provider };
+        if (props.provider === 'kubernetes') query.kubernetesAccountId = accountId;
+        SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
