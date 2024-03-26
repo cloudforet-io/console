@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive, nextTick,
+    defineProps, defineEmits, reactive,
 } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -92,9 +92,9 @@ const listServiceAccounts = async () => {
     });
     state.serviceAccountNames = (results ?? []).map((v) => v.name);
 };
-(async () => {
-    await listServiceAccounts();
-    await nextTick();
+
+(() => {
+    listServiceAccounts();
     setForm('serviceAccountName', props.serviceAccount.name);
 })();
 
