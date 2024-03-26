@@ -27,10 +27,10 @@
                 <p-empty
                     show-image
                     image-size="md"
-                    :show-button="!Object.keys(storeState.serviceAccounts).length"
+                    show-button
                 >
                     <template #image>
-                        <img v-if="!Object.keys(storeState.serviceAccounts).length"
+                        <img v-if="isNoServiceAccounts"
                              alt="empty-cloud-service-img"
                              src="@/assets/images/illust_satellite.svg"
                         >
@@ -41,19 +41,17 @@
                     </template>
                     <template #button>
                         <router-link
-                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                            :to="isNoServiceAccounts ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }"
                         >
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="mx-auto text-center"
                             >
-                                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
+                                {{ isNoServiceAccounts ? $t('INVENTORY.ADD_SERVICE_ACCOUNT') : $t('INVENTORY.CREATE_COLLECTOR') }}
                             </p-button>
                         </router-link>
                     </template>
-                    {{ Object.keys(storeState.serviceAccounts).length ? $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')
-                        : $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE')
-                    }}
+                    {{ isNoServiceAccounts ? $t('INVENTORY.EMPTY_CLOUD_SERVICE') : $t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') }}
                 </p-empty>
             </template>
         </p-data-loader>
@@ -187,6 +185,7 @@ export default {
                 period: objectToQueryString(cloudServicePageState.period),
                 filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
             })),
+            isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
         });
 
         /* api */

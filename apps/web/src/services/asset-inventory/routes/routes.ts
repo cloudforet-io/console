@@ -21,6 +21,7 @@ const CloudServicePage = () => import('@/services/asset-inventory/pages/CloudSer
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
 const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
+const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
 
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
@@ -93,6 +94,28 @@ const assetInventoryRoute: RouteConfig = {
             name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
             meta: { menuId: MENU_ID.SERVER, translationId: MENU_INFO_MAP[MENU_ID.SERVER].translationId },
             component: ServerPage as any,
+        },
+        {
+            path: 'security',
+            name: ASSET_INVENTORY_ROUTE.SECURITY._NAME,
+            meta: { lsbVisible: true, menuId: MENU_ID.SECURITY, translationId: MENU_INFO_MAP[MENU_ID.SECURITY].translationId },
+            component: SecurityPage as any,
+            children: [
+                {
+                    path: ':provider/:group',
+                    meta: { label: ({ params }) => `[${upperCase(params.provider)}] ${params.group}` },
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':name?',
+                            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+                            meta: { lsbVisible: true, label: ({ params }) => params.name },
+                            props: true,
+                            component: CloudServiceDetailPage as any,
+                        },
+                    ],
+                },
+            ],
         },
         {
             path: 'collector',
