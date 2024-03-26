@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import type Vue from 'vue';
 import {
-    computed, reactive, watch, getCurrentInstance,
+    computed, reactive, watch, onMounted,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab,
@@ -19,7 +19,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
@@ -48,6 +47,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
+import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
@@ -58,9 +58,9 @@ import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/
 
 const { width } = useWindowSize();
 
-
-const vm = getCurrentInstance()?.proxy as Vue;
-const { query } = SpaceRouter.router.currentRoute;
+const router = useRouter();
+const route = useRoute();
+const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
@@ -69,6 +69,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
+
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -111,10 +112,13 @@ const tableState = reactive({
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,
-    accountTypeList: computed(() => [
-        { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
-        { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
-    ]),
+    accountTypeList: computed(() => {
+        if (state.selectedProviderName === 'k8s') return [{ name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label }];
+        return [
+            { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
+            { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
+        ];
+    }),
     selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
         if (tableState.isTrustedAccount) return 'Trusted Account';
@@ -125,6 +129,10 @@ const tableState = reactive({
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
+});
+
+const modalState = reactive({
+    addClusterModalVisible: false,
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -219,10 +227,10 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 
 /** Add & Delete Service Accounts Action (Dropdown) * */
 const clickAddServiceAccount = () => {
-    SpaceRouter.router.push(getProperRouteLocation({
+    router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
         params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : tableState.selectedAccountType },
-        query: { nextPath: vm.$route.fullPath },
+        query: { nextPath: route.fullPath },
     }));
 };
 
@@ -233,7 +241,7 @@ const handleClickSettings = () => {
 const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
-    SpaceRouter.router.push({
+    router.push({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
     });
@@ -245,6 +253,13 @@ const handleDynamicLayoutFetch = (changed) => {
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
+const handleCloseAddClusterModal = () => {
+    router.replace(getProperRouteLocation({
+        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+        query: { provider: 'kubernetes' },
+    }));
+};
+
 /** ******* Page Init ******* */
 
 const reloadTable = async () => {
@@ -286,6 +301,14 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 (async () => {
     if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
 })();
+
+onMounted(() => {
+    if (query.kubernetesAccountId) {
+        modalState.addClusterModalVisible = true;
+    }
+});
+
+
 </script>
 
 <template>
@@ -351,6 +374,9 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                             :options="{provider: state.selectedProvider}"
                             @update:visible="handleVisibleCustomFieldModal"
                             @complete="reloadTable"
+        />
+        <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
+                                           @close="handleCloseAddClusterModal"
         />
     </section>
 </template>
