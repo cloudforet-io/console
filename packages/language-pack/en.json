@@ -2713,7 +2713,9 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"CLUSTER_MODAL": {
+				"CONTINUE_BUTTON": "Continue",
 				"INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
+				"NOT_NOW_BUTTON": "Not Now",
 				"TITLE": "You can totally do this!\nA few setups are required."
 			},
 			"DELETE_CHECK_MODAL": {

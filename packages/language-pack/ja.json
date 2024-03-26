@@ -2713,7 +2713,9 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"CLUSTER_MODAL": {
+				"CONTINUE_BUTTON": "",
 				"INFORMATION": "",
+				"NOT_NOW_BUTTON": "",
 				"TITLE": ""
 			},
 			"DELETE_CHECK_MODAL": {
