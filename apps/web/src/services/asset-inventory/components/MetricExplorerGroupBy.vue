@@ -17,7 +17,6 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 /* Event */
 const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: boolean) => {
-    console.log('selectedItems', selectedItems);
     if (isSelected && metricExplorerPageState.selectedGroupByList.length >= 3) {
         showInfoMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_GROUP_BY'), i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_GROUP_BY_DESC'));
         return;
