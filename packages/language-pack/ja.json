@@ -1021,7 +1021,7 @@
 				"ALL_DASHBOARD": "すべてのダッシュボード",
 				"ALL_MENU": "すべてのメニュー",
 				"ALL_PROJECTS": "プロジェクト",
-				"ALL_SECURITY": "",
+				"ALL_SECURITY": "オールセキュリティ",
 				"FAVORITES": "お気に入り",
 				"FAVORITES_HELP_TEXT": "よく利用されるページをお気に入りに追加してください",
 				"GO_TO_CLOUD_SERVICE": "クラウドサービス",
@@ -2688,13 +2688,13 @@
 		},
 		"CREATE_COLLECTOR": "コレクタ生成",
 		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
-		"EMPTY_CLOUD_SERVICE_RESOURCE": "",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "まだコレクターが作成されていません。",
 		"SECURITY": {
 			"MAIN": {
-				"TITLE": ""
+				"TITLE": "セキュリティ"
 			},
-			"NOTIFICATION_DESC": "",
-			"NOTIFICATION_TITLE": ""
+			"NOTIFICATION_DESC": "セキュリティの脆弱性を特定するプロセスは、さまざまなコンプライアンスポリシーに基づいています。セキュリティコレクターを作成し、関連リソースを収集して、クラウドのセキュリティ状態を継続的にチェックしてください。",
+			"NOTIFICATION_TITLE": "クラウドのセキュリティ状態をチェックしてください！"
 		},
 		"SERVER": {
 			"MAIN": {
@@ -2824,7 +2824,7 @@
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
 		"ASSET_INVENTORY_COLLECTOR": "コレクター",
-		"ASSET_INVENTORY_SECURITY": "",
+		"ASSET_INVENTORY_SECURITY": "セキュリティ",
 		"ASSET_INVENTORY_SERVER": "サーバ",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"COST_EXPLORER": "費用管理",
