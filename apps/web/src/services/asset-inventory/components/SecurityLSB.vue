@@ -128,10 +128,13 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <style lang="postcss" scoped>
 .security-l-s-b {
+    @apply relative;
     height: 100%;
     .no-data-scoped-notification {
-        @apply bg-violet-200 text-paragraph-md text-gray-900;
-        margin: 1.5rem 1rem 3.75rem 1rem;
+        @apply absolute bg-violet-200 text-paragraph-md text-gray-900;
+        top: 1.5rem;
+        right: 1rem;
+        left: 1rem;
         padding: 0.5rem 1rem;
         border-radius: 0.25rem;
         .contents {
