@@ -2714,8 +2714,12 @@
 		"SERVICE_ACCOUNT": {
 			"CLUSTER_MODAL": {
 				"CONTINUE_BUTTON": "",
+				"COPY_CODE": "",
 				"INFORMATION": "",
 				"NOT_NOW_BUTTON": "",
+				"PREVIOUS_BUTTON": "",
+				"SCRIPT_GUIDE_FIRST": "",
+				"SCRIPT_GUIDE_SECOND": "",
 				"TITLE": ""
 			},
 			"DELETE_CHECK_MODAL": {
