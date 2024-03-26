@@ -8,6 +8,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
+import type { MetricListParameters } from '@/schema/inventory/metric/api-verbs/list';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
@@ -20,6 +21,7 @@ import type {
 export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
     const state = reactive({
         loading: false,
+        metricListLoading: false,
         metricLoading: false,
         metricId: undefined as string|undefined,
         metric: undefined as MetricModel|undefined,
@@ -29,6 +31,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         enabledFiltersProperties: undefined as string[]|undefined,
         filters: {} as Record<string, string[]>,
         namespaces: [] as MetricNamespace[],
+        metricList: [] as MetricModel[],
         groupByList: [] as string[],
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
@@ -98,7 +101,21 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             state.loading = false;
         }
     };
-    const fetchMetric = async () => {
+    const loadMetrics = async () => {
+        state.metricListLoading = true;
+        try {
+            const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
+                // namespace_id: state.selectedNamespaceId,
+            });
+            state.metricList = response.results ?? [];
+        } catch (e) {
+            state.metricList = [];
+            console.error(e);
+        } finally {
+            state.metricListLoading = false;
+        }
+    };
+    const loadMetric = async () => {
         if (!state.metricId) return;
         state.metricLoading = true;
         try {
@@ -116,7 +133,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const actions = {
         reset,
         loadNamespaces,
-        fetchMetric,
+        loadMetrics,
+        loadMetric,
     };
     const mutations = {
         setGranularity,
