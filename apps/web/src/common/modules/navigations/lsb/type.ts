@@ -39,6 +39,7 @@ export interface LSBItem {
     hideFavorite?: boolean;
     favoriteOptions?: FavoriteOptions;
     icon?: LSBIcon;
+    titleIcon?: string;
     selectOptions?: SelectOptions;
 }
 

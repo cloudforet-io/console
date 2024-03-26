@@ -52,10 +52,12 @@ interface Props {
     cloudServiceGroup: string;
     cloudServiceType: string;
     isServerPage: boolean;
+    isSecurityPage: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isServerPage: false,
+    isSecurityPage: false,
 });
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
@@ -126,7 +128,7 @@ const handleClickLinkButton = async (type: string, id: string) => {
                 cloud_service_id: state.data.cloud_service_id,
             });
             window.open(router.resolve({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,
