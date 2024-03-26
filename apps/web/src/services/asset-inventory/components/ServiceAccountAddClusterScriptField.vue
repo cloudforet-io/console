@@ -21,7 +21,7 @@ const state = reactive({
         lineNumbers: true,
         line: true,
         mode: 'shell',
-        lineWrapping: true,
+        lineWrapping: false,
         theme: 'dracula',
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
@@ -41,7 +41,8 @@ const handleClickCopyButton = (script: any) => {
             <span class="script-description">
                 {{ props.description }}
             </span>
-            <p-button style-type="tertiary"
+            <p-button class="copy-button"
+                      style-type="tertiary"
                       size="sm"
                       icon-left="ic_copy"
                       @click="handleClickCopyButton(props.script)"
@@ -64,11 +65,14 @@ const handleClickCopyButton = (script: any) => {
 .service-account-add-cluster-script-field {
     margin-bottom: 1.5rem;
     .description-wrapper {
-        @apply flex justify-between items-end;
+        @apply flex justify-between items-end gap-2;
         margin-bottom: 0.625rem;
         .script-description {
             @apply text-paragraph-md text-gray-900;
             white-space: pre-line;
+        }
+        .copy-button {
+            min-width: 6rem;
         }
     }
     .script-wrapper {

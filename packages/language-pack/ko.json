@@ -2718,10 +2718,12 @@
 				"DONE_BUTTON": "완료",
 				"FIRST_TITLE": "어머, 이건 꼭 해야돼!\n추가 작업이 필요합니다.",
 				"INFORMATION": "helm 설치 및 클러스터 연결을 위해 먼저 쿠버네티스 클러스터 이름을 \n알려주세요.",
+				"LOADING": "새로운 키 기다리는 중...",
 				"NOT_NOW_BUTTON": "나중에 하기",
 				"PREVIOUS_BUTTON": "이전 단계",
 				"SCRIPT_GUIDE_FIRST": "버전 확인을 위해 다음 명령을 실행하세요.",
 				"SCRIPT_GUIDE_SECOND": "SpaceONE Helm 저장소를 생성하기 위해 다음 명령어를 \n실행하세요.",
+				"SCRIPT_GUIDE_THIRD": "클라우드 셀이나 터미널에 아래 코드를 복사하여 붙여넣으세요.",
 				"SECOND_TITLE": "이제, 아래 가이드에 따라\nHelm을 시스템에 설치해주세요.",
 				"THIRD_TITLE": "거의 다왔어요!\n쿠버네티스 클러스터에 연결해주세요."
 			},
