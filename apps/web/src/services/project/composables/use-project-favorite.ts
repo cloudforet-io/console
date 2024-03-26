@@ -47,6 +47,8 @@ export const useProjectFavorite = () => {
             if (storeState.groupId !== item.itemId) {
                 await projectPageStore.selectNode(item.itemId);
             }
+        } else {
+            await projectPageStore.selectNode();
         }
     };
     const handleDeleteFavorite = (item: FavoriteItem) => {

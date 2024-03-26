@@ -2,6 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
@@ -14,6 +15,9 @@ import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favo
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { yellow } from '@/styles/colors';
+
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 const LIMIT_COUNT = 5;
 
@@ -28,29 +32,34 @@ const props = withDefaults(defineProps<Props>(), {
     beforeRoute: undefined,
 });
 
+const route = useRoute();
+
 const userWorkspaceStore = useUserWorkspaceStore();
+const projectPageStore = useProjectPageStore();
+
+const storeState = reactive({
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
+});
 const state = reactive({
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     displayItems: computed<FavoriteItem[]>(() => {
         if (state.isExpanded) return props.items;
         return props.items.slice(0, LIMIT_COUNT);
     }),
     hoveredItem: null as null|FavoriteItem,
     isExpanded: false,
+    selectedItem: computed(() => (route.name === PROJECT_ROUTE._NAME ? route.query.select_pg : route.params.id)),
 });
 
 const getResourceType = (type: FavoriteType) => {
-    if (type === FAVORITE_TYPE.CLOUD_SERVICE) return 'inventory.CloudService';
     if (type === FAVORITE_TYPE.PROJECT) return 'identity.Project';
     if (type === FAVORITE_TYPE.PROJECT_GROUP) return 'identity.ProjectGroup';
     return '';
 };
-
 const handleClickToggle = () => {
     state.isExpanded = !state.isExpanded;
 };
-
 const handleClickItem = async (item, e) => {
+    projectPageStore.setSelectedFavoriteItem(item);
     if (props.beforeRoute) {
         const res = props.beforeRoute(item, e);
         if (res) await res;
@@ -78,7 +87,10 @@ const handleClickItem = async (item, e) => {
             <div v-for="item in state.displayItems"
                  :key="item.itemId"
                  class="item"
-                 :class="{hovered: state.hoveredItem ? state.hoveredItem?.itemId === item.itemId : false}"
+                 :class="{
+                     hovered: state.hoveredItem ? state.hoveredItem?.itemId === item.itemId : false,
+                     clicked: state.selectedItem === item.itemId,
+                 }"
                  @click="handleClickItem(item, $event)"
                  @mouseenter="state.hoveredItem = item"
                  @mouseleave="state.hoveredItem = null"
@@ -86,7 +98,7 @@ const handleClickItem = async (item, e) => {
                 <router-link :to="referenceRouter(
                                  item.itemId, {
                                      resource_type: getResourceType(item.itemType),
-                                     workspace_id: state.currentWorkspaceId,
+                                     workspace_id: storeState.currentWorkspaceId,
                                  })"
                              class="item-link"
                 >
@@ -126,6 +138,9 @@ const handleClickItem = async (item, e) => {
         cursor: pointer;
         &.hovered {
             @apply bg-secondary2 text-secondary;
+        }
+        &.clicked {
+            @apply bg-blue-200;
         }
         .item-link {
             @apply flex flex-grow items-center;
