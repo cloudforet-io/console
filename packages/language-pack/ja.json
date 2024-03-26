@@ -2715,12 +2715,15 @@
 			"CLUSTER_MODAL": {
 				"CONTINUE_BUTTON": "",
 				"COPY_CODE": "",
+				"DONE_BUTTON": "",
+				"FIRST_TITLE": "",
 				"INFORMATION": "",
 				"NOT_NOW_BUTTON": "",
 				"PREVIOUS_BUTTON": "",
 				"SCRIPT_GUIDE_FIRST": "",
 				"SCRIPT_GUIDE_SECOND": "",
-				"TITLE": ""
+				"SECOND_TITLE": "",
+				"THIRD_TITLE": ""
 			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",

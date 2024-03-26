@@ -5,6 +5,8 @@ import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PTextButton,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { violet } from '@/styles/colors';
@@ -26,6 +28,12 @@ const emit = defineEmits<{(e: 'update:visible'): void;
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     step: 1,
+    title: computed(() => {
+        if (state.step === 1) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIRST_TITLE');
+        if (state.step === 2) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SECOND_TITLE');
+        if (state.step === 3) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.THIRD_TITLE');
+        return '';
+    }),
 });
 
 const formState = reactive({
@@ -97,7 +105,7 @@ watch(() => state.step, () => {
     >
         <template #custom-header>
             <p class="title">
-                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.TITLE') }}
+                {{ state.title }}
             </p>
         </template>
         <template #body>
@@ -152,12 +160,12 @@ watch(() => state.step, () => {
                     </div>
                 </div>
                 <div class="button-wrapper">
-                    <p-button style-type="substitutive"
-                              icon-right="ic_arrow-right"
+                    <p-button :style-type="state.step === 3 ? 'primary' : 'substitutive'"
+                              :icon-right="state.step === 3 ? undefined :'ic_arrow-right'"
                               :disabled="!formState.isValid || !formState.commonValidForDelay"
                               @click="handleClickContinueButton"
                     >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}
+                        {{ state.step === 3 ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.DONE_BUTTON') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}
                     </p-button>
                     <p-button v-if="state.step === 1"
                               style-type="transparent"
@@ -175,7 +183,6 @@ watch(() => state.step, () => {
 .service-account-add-cluster-modal {
     .title {
         @apply text-violet-500 text-display-md font-bold;
-        width: 19.625rem;
         margin: auto;
         text-align: center;
         white-space: pre-line;
