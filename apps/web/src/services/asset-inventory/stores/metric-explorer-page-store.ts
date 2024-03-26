@@ -7,23 +7,29 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
+import type { MetricModel } from '@/schema/inventory/metric/model';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
-    Granularity, Period, RelativePeriod, MetricNamespace,
+    Granularity, MetricNamespace, Period, RelativePeriod,
 } from '@/services/asset-inventory/types/metric-explorer-type';
-
 
 
 export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
     const state = reactive({
         loading: false,
+        metricLoading: false,
+        metricId: undefined as string|undefined,
+        metric: undefined as MetricModel|undefined,
         granularity: GRANULARITY.MONTHLY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
+        enabledFiltersProperties: undefined as string[]|undefined,
         filters: {} as Record<string, string[]>,
         namespaces: [] as MetricNamespace[],
+        groupByList: [] as string[],
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedNamespace: undefined as MetricNamespace|undefined,
@@ -45,6 +51,18 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const setSelectedChartGroupBy = (groupBy: string|undefined) => {
         state.selectedChartGroupBy = groupBy;
     };
+    const setGroupByList = (groupByList: string[]) => {
+        state.groupByList = groupByList;
+    };
+    const setEnabledFiltersProperties = (enabledProperties: string[]) => {
+        state.enabledFiltersProperties = enabledProperties;
+    };
+    const setFilters = (filters: Record<string, string[]>) => {
+        state.filters = filters;
+    };
+    const setMetric = (metric?: MetricModel) => {
+        state.metric = metric;
+    };
 
     /* Actions */
     const reset = () => {
@@ -52,8 +70,11 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         state.period = undefined;
         state.relativePeriod = undefined;
         state.filters = {};
+        state.groupByList = [];
         state.selectedGroupByList = [];
         state.selectedChartGroupBy = undefined;
+        state.selectedNamespace = undefined;
+        state.enabledFiltersProperties = undefined;
     };
     const loadNamespaces = async () => {
         state.loading = true;
@@ -77,10 +98,25 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             state.loading = false;
         }
     };
+    const fetchMetric = async () => {
+        if (!state.metricId) return;
+        state.metricLoading = true;
+        try {
+            state.metric = await SpaceConnector.clientV2.inventory.metric.get<MetricGetParameters, MetricModel>({
+                metric_id: state.metricId,
+            });
+        } catch (e) {
+            state.metric = undefined;
+            console.error(e);
+        } finally {
+            state.metricLoading = false;
+        }
+    };
 
     const actions = {
         reset,
         loadNamespaces,
+        fetchMetric,
     };
     const mutations = {
         setGranularity,
@@ -88,6 +124,10 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         setRelativePeriod,
         setSelectedGroupByList,
         setSelectedChartGroupBy,
+        setEnabledFiltersProperties,
+        setFilters,
+        setGroupByList,
+        setMetric,
     };
 
     return {
