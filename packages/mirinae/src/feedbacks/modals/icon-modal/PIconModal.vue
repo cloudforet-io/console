@@ -42,7 +42,7 @@
                         <div class="body-wrapper">
                             <slot name="body" />
                         </div>
-                        <p-button v-if="!props.disableButton"
+                        <p-button v-if="!props.hideButton"
                                   class="button"
                                   :style-type="props.buttonStyleType"
                                   @click="handleClickButton"
@@ -77,7 +77,7 @@ interface IconModalProps {
     buttonText: string;
     buttonStyleType?: string;
     backdrop?: boolean;
-    disableButton?: boolean;
+    hideButton?: boolean;
 }
 const props = withDefaults(defineProps<IconModalProps>(), {
     size: 'sm',

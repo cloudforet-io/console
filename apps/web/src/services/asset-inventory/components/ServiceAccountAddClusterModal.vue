@@ -37,7 +37,7 @@ const state = reactive({
     <p-icon-modal class="service-account-add-cluster-modal"
                   :visible.sync="state.proxyVisible"
                   icon-name="img_musly-navigating-kubernetes"
-                  disable-button
+                  hide-button
     >
         <template #custom-header>
             <p class="title">

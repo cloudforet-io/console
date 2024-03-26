@@ -186,8 +186,8 @@ export const getIconModalArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    disableButton: {
-        name: 'disableButton',
+    hideButton: {
+        name: 'hideButton',
         type: { name: 'boolean' },
         description: 'Whether to use default button or not.',
         defaultValue: false,
