@@ -97,6 +97,7 @@ watch(() => state.pageParams, async (pageParams) => {
         await cloudServiceDetailPageStore.setProviderGroupName(pageParams);
     } else {
         await securityPageStore.setSelectedCloudServiceType();
+        await routeToFirstCloudServiceType();
     }
 }, { immediate: true });
 watch(() => storeState.selectedCloudServiceType, () => {
