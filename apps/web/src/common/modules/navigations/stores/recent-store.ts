@@ -5,12 +5,13 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { RecentMenu, RecentType } from '@/common/modules/navigations/type';
+import type { RecentItem, RecentType } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 
@@ -19,7 +20,7 @@ const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
 
 interface RecentState {
-    recentMenuList: RecentMenu[];
+    recentMenuList: RecentItem[];
     totalCount: number;
 }
 
@@ -60,8 +61,8 @@ export const useRecentStore = defineStore('recent', () => {
             return state.recentMenuList;
         },
         createRecent: async ({
-            type, workspaceId, id,
-        }:{type: RecentType, workspaceId:string, id:string}) => {
+            type, workspaceId, id, options,
+        }:{type: RecentType, workspaceId:string, id:string, options?: {[key:string]: any}}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: `console:recent:${type}:${workspaceId}:${id}`,
@@ -69,8 +70,26 @@ export const useRecentStore = defineStore('recent', () => {
                         id,
                         workspace_id: workspaceId,
                         type,
+                        ...options,
                     },
                 });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        deleteRecent: async ({ name, type, itemId }: {name?: string, type?: RecentType, itemId?: string}) => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
+                    name: name ?? `console:recent:${type}:${_getters.currentWorkspaceId}:${itemId}`,
+                });
+                let recentType = type;
+                if (name) {
+                    recentType = name.split(':')[2] as RecentType;
+                    if (!Object.values(RECENT_TYPE).includes(recentType)) {
+                        throw new Error('Invalid recent type');
+                    }
+                }
+                if (_getters.currentWorkspaceId && recentType) await actions.fetchRecent({ type: recentType, workspaceIds: [_getters.currentWorkspaceId] });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

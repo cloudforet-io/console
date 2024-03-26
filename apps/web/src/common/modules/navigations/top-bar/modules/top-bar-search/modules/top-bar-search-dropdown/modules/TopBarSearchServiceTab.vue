@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useParentElement } from '@vueuse/core';
+import { useElementSize } from '@vueuse/core/index';
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
@@ -27,7 +27,7 @@ import TopBarSearchEmpty
 import { useTopBarSearchStore } from '@/common/modules/navigations/top-bar/modules/top-bar-search/store';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
 import TopBarSuggestionList from '@/common/modules/navigations/top-bar/modules/TopBarSuggestionList.vue';
-import type { RecentMenu } from '@/common/modules/navigations/type';
+import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 
@@ -48,10 +48,11 @@ const topBarSearchStore = useTopBarSearchStore();
 const recentStore = useRecentStore();
 const router = useRouter();
 const emit = defineEmits<{(event: 'move-focus-end'): void;
+    (event: 'update:contents-size', value: number): void;
 }>();
 
 const contentRef = ref<null | HTMLElement>(null);
-const parentEl = useParentElement(contentRef);
+const contentSize = useElementSize(contentRef);
 const MAIN_SERVICE_ID_LIST = ['dashboards', 'project', 'asset_inventory', 'cost_explorer', 'alert_manager'];
 
 const storeState = reactive({
@@ -84,7 +85,7 @@ const state = reactive({
         }
         return results;
     }),
-    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentMenu) => ({
+    recentMenuList: computed(() => recentStore.state.recentMenuList.map((r: RecentItem) => ({
         id: r.data.id,
         label: state.allMenuMap.get(r.data.id)?.fullLabel ?? r.data.label,
         icon: state.allMenuMap.get(r.data.id)?.icon,
@@ -100,13 +101,6 @@ const state = reactive({
     // focus
     proxyFocusingDirection: useProxyValue('focusingDirection', props, emit),
     focusingType: SUGGESTION_TYPE.DEFAULT_SERVICE as SuggestionType,
-    tabHeaderHeight: computed(() => {
-        if (parentEl.value) {
-            const tabHeaderHeight = parentEl.value.previousElementSibling?.clientHeight;
-            if (tabHeaderHeight) return (tabHeaderHeight + 4) ?? 0;
-        }
-        return 0;
-    }),
 });
 
 const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
@@ -190,57 +184,62 @@ watch(() => props.isFocused, (isFocused) => {
         }
     }
 });
+
+watch(() => contentSize.height.value, (height) => {
+    emit('update:contents-size', height);
+});
+
 </script>
 <template>
-    <div ref="contentRef"
-         class="g-n-b-search-service-tab"
-    >
+    <div class="top-bar-search-service-tab">
         <div class="service-item-list">
-            <div v-show="!storeState.inputText.length">
-                <top-bar-suggestion-list
-                    :items="state.defaultServiceMenuItems || []"
-                    :input-text="storeState.inputText"
-                    :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
-                    :focusing-direction="props.focusingDirection"
-                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, ...arguments)"
-                    @select="handleSelect"
-                />
-                <p-divider v-if="state.recentMenuList.length"
-                           class="divider"
-                />
-                <top-bar-suggestion-list
-                    v-if="state.recentMenuList.length"
-                    :items="state.recentMenuItems || []"
-                    :input-text="storeState.inputText"
-                    :is-focused="state.focusingType === SUGGESTION_TYPE.RECENT ? props.isFocused : false"
-                    :focusing-direction="props.focusingDirection"
-                    @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.RECENT, ...arguments)"
-                    @select="handleSelect"
-                />
-            </div>
-            <p-data-loader :data="state.serviceMenuList ||[]"
-                           :loading="false"
-            >
-                <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
-                                         :items="state.serviceMenuList || []"
-                                         :input-text="storeState.inputText"
-                                         :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
-                                         :focusing-direction="props.focusingDirection"
-                                         @move-focus-end="() => emit('move-focus-end')"
-                                         @select="handleSelect"
-                />
-                <template #no-data>
-                    <top-bar-search-empty :input-text="storeState.inputText"
-                                          :is-recent="false"
+            <div ref="contentRef">
+                <div v-show="!storeState.inputText.length">
+                    <top-bar-suggestion-list
+                        :items="state.defaultServiceMenuItems || []"
+                        :input-text="storeState.inputText"
+                        :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
+                        :focusing-direction="props.focusingDirection"
+                        @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.DEFAULT_SERVICE, ...arguments)"
+                        @select="handleSelect"
                     />
-                </template>
-            </p-data-loader>
+                    <p-divider v-if="state.recentMenuList.length"
+                               class="divider"
+                    />
+                    <top-bar-suggestion-list
+                        v-if="state.recentMenuList.length"
+                        :items="state.recentMenuItems || []"
+                        :input-text="storeState.inputText"
+                        :is-focused="state.focusingType === SUGGESTION_TYPE.RECENT ? props.isFocused : false"
+                        :focusing-direction="props.focusingDirection"
+                        @move-focus-end="handleFocusEnd(SUGGESTION_TYPE.RECENT, ...arguments)"
+                        @select="handleSelect"
+                    />
+                </div>
+                <p-data-loader :data="state.serviceMenuList ||[]"
+                               :loading="false"
+                >
+                    <top-bar-suggestion-list v-show="state.serviceMenuList && state.serviceMenuList.length > 0"
+                                             :items="state.serviceMenuList || []"
+                                             :input-text="storeState.inputText"
+                                             :is-focused="state.focusingType === SUGGESTION_TYPE.DEFAULT_SERVICE ? props.isFocused : false"
+                                             :focusing-direction="props.focusingDirection"
+                                             @move-focus-end="() => emit('move-focus-end')"
+                                             @select="handleSelect"
+                    />
+                    <template #no-data>
+                        <top-bar-search-empty :input-text="storeState.inputText"
+                                              :is-recent="false"
+                        />
+                    </template>
+                </p-data-loader>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
-.g-n-b-search-service-tab {
+.top-bar-search-service-tab {
     padding: 1rem 0;
     height: 100%;
     .service-item-list {

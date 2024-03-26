@@ -1,5 +1,6 @@
 export interface CostReportDataAnalyzeParameters {
     query?: any;
+    cost_report_config_id?: string;
     is_confirmed?: boolean;
     product?: string;
     provider?: string;

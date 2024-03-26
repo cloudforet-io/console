@@ -137,7 +137,7 @@ onUnmounted(() => {
                 />
                 <p-icon-button v-if="item.isDeleted"
                                class="delete-button"
-                               name="ic_close"
+                               name="ic_delete"
                                size="sm"
                                @click="$emit('delete', item)"
                 />

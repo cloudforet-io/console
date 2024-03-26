@@ -20,6 +20,6 @@ export const tabResourceTypeMap = {
     serviceAccount: 'identity.ServiceAccount',
     project: 'identity.Project',
     dashboard: 'dashboard.PublicDashboard',
-    cloudService: 'inventory.CloudServiceType',
+    cloudService: 'inventory.CloudService',
 };
 export type SearchTab = keyof typeof tabResourceTypeMap | 'service';

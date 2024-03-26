@@ -129,6 +129,7 @@ export class SpaceRouter {
                             id: recent.itemId,
                             workspace_id: recent.workspaceId,
                             type: recent.itemType,
+                            label: recent.itemId,
                         },
                     }).catch((e) => {
                         console.error(e);
