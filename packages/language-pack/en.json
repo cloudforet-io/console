@@ -2715,12 +2715,15 @@
 			"CLUSTER_MODAL": {
 				"CONTINUE_BUTTON": "Continue",
 				"COPY_CODE": "Copy Code",
+				"DONE_BUTTON": "Done",
+				"FIRST_TITLE": "You can totally do this!\nA few setups are required.",
 				"INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
 				"NOT_NOW_BUTTON": "Not Now",
 				"PREVIOUS_BUTTON": "Previous",
 				"SCRIPT_GUIDE_FIRST": "Check the version run the following command:",
 				"SCRIPT_GUIDE_SECOND": "To create the SpaceONE Helm repository, \nplease run the following command:",
-				"TITLE": "You can totally do this!\nA few setups are required."
+				"SECOND_TITLE": "Install Helm on your system \nby following the instructions below.",
+				"THIRD_TITLE": "You’re almost there!\nConnect to the Kubernetes cluster."
 			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "Please note that this Trusted Account is currently attached in following accounts.",
