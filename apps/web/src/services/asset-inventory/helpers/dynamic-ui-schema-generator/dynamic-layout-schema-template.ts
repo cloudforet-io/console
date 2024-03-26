@@ -74,7 +74,10 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
     },
 });
 
-export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: boolean): QuerySearchTableLayout => ({
+export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
+    isTrustedAccount: boolean,
+    isAdminMode?: boolean,
+}): QuerySearchTableLayout => ({
     name: 'Base Table',
     type: 'query-search-table',
     options: {
@@ -85,8 +88,8 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                 name: 'Name',
                 type: 'text',
             },
-            ...((isTrustedAccount && [
-                {
+            ...((options.isTrustedAccount && [
+                ...((!options.isAdminMode && [{
                     key: 'resource_group',
                     name: 'Scope',
                     type: 'enum',
@@ -110,7 +113,7 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                             },
                         },
                     },
-                },
+                }]) || []),
                 {
                     key: 'auto_sync',
                     name: 'Auto Sync',
@@ -136,12 +139,12 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                         },
                     },
                 }]) || []),
-            ...fields.map((field) => ({
+            ...dynamicFields.map((field) => ({
                 key: field.key,
                 name: field.name,
                 type: 'text',
             })),
-            ...((!isTrustedAccount && [{
+            ...((!options.isTrustedAccount && [{
                 key: 'project_id',
                 name: 'Project',
                 type: 'text',
