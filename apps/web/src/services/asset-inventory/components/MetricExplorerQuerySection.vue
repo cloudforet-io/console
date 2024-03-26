@@ -10,6 +10,7 @@ import {
     PButton, PPopover, PBadge,
 } from '@spaceone/design-system';
 
+import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
 import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
 import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
@@ -41,7 +42,6 @@ const handleClickFilter = () => {
                 <metric-explorer-operator-dropdown />
                 <metric-explorer-granularity-dropdown />
                 <metric-explorer-period-dropdown />
-                <!--period-->
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -65,7 +65,9 @@ const handleClickFilter = () => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <!--popper-->
+                        <metric-explorer-filters-popper ref="filtersPopperRef"
+                                                        :visible="state.filtersPopoverVisible"
+                        />
                     </template>
                 </p-popover>
             </div>
