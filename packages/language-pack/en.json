@@ -2730,6 +2730,8 @@
 				"CONNECT_TO_CONSOLE": "Connect to Console",
 				"CREDENTIALS_LABEL": "Do you want to attach an existing Trusted Account?",
 				"EDIT": "Edit",
+				"EDIT_SERVICE_ACCOUNT_NAME": "Edit Service Account Name",
+				"NAME": "Service Account Name",
 				"NO_CREDENTIALS": "There’s no credentials found.",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "Project is required",
