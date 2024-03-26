@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { watch } from 'vue';
+
 import {
     PDivider,
 } from '@spaceone/design-system';
@@ -8,6 +10,16 @@ import MetricExplorerDataTable from '@/services/asset-inventory/components/Metri
 import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
 import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
 import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+
+
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+
+watch(() => metricExplorerPageState.metricId, (metricId) => {
+    if (metricId) metricExplorerPageStore.fetchMetric();
+    else metricExplorerPageStore.setMetric(undefined);
+}, { immediate: true });
 </script>
 
 <template>
