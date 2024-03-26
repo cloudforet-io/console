@@ -2712,6 +2712,10 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CLUSTER_MODAL": {
+				"INFORMATION": "",
+				"TITLE": ""
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
 				"TITLE": "このアカウントは削除できません。"

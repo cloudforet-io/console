@@ -2712,6 +2712,10 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CLUSTER_MODAL": {
+				"INFORMATION": "helm 설치 및 클러스터 연결을 위해 먼저 쿠버네티스 클러스터 이름을 \n알려주세요.",
+				"TITLE": "어머, 이건 꼭 해야돼!\n추가 작업이 필요합니다."
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "해당 어카운트는 현재 다음의 어카운트들에 연결되어 있습니다.",
 				"TITLE": "본 어카운트는 삭제가 불가합니다"
