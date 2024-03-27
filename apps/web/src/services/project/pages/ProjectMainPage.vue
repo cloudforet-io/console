@@ -10,6 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -28,6 +29,7 @@ import ProjectMainProjectGroupFormModal from '@/services/project/components/Proj
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
+
 const route = useRoute();
 
 const gnbStore = useGnbStore();
@@ -41,6 +43,7 @@ const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
 const storeState = reactive({
+    userId: computed(() => store.state.user.userId),
     groupId: computed(() => projectPageGetters.groupId),
     groupName: computed(() => projectPageGetters.groupName),
     selectedItem: computed(() => projectPageState.selectedItem),
@@ -78,6 +81,12 @@ const state = reactive({
     })),
     projectGroupMemberManagementModalVisible: false,
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
+    showProjectGroupButton: computed<boolean>(() => {
+        if (!storeState.groupId) return false;
+        if (projectPageState.isWorkspaceOwner) return true;
+        const isProjectGroupMember = !!(storeState.projectGroups?.[storeState.groupId]?.data.users?.some((user) => user === storeState.userId));
+        return isProjectGroupMember && !!storeState.projectGroups?.[storeState.groupId]?.data.users?.length;
+    }),
 });
 
 const {
@@ -168,10 +177,8 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                         />
                     </template>
                 </div>
-                <div v-if="projectPageState.isWorkspaceOwner"
-                     class="top-button-box"
-                >
-                    <p-button v-if="storeState.groupId"
+                <div class="top-button-box">
+                    <p-button v-if="state.showProjectGroupButton"
                               style-type="tertiary"
                               icon-left="ic_member"
                               class="mr-4"
@@ -182,20 +189,22 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                               class="pl-1"
                         >({{ state.projectGroupMemberCount }})</span>
                     </p-button>
-                    <p-button ref="targetRef"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickCreateButton"
-                    >
-                        {{ $t('PROJECT.LANDING.CREATE') }}
-                    </p-button>
-                    <p-context-menu v-show="visibleMenu"
-                                    ref="menuRef"
-                                    class="create-context-menu"
-                                    no-select-indication
-                                    :style="contextMenuStyle"
-                                    :menu="state.createDropdownMenuItems"
-                                    @select="handleSelectCreateMenu"
-                    />
+                    <template v-if="projectPageState.isWorkspaceOwner">
+                        <p-button ref="targetRef"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleClickCreateButton"
+                        >
+                            {{ $t('PROJECT.LANDING.CREATE') }}
+                        </p-button>
+                        <p-context-menu v-show="visibleMenu"
+                                        ref="menuRef"
+                                        class="create-context-menu"
+                                        no-select-indication
+                                        :style="contextMenuStyle"
+                                        :menu="state.createDropdownMenuItems"
+                                        @select="handleSelectCreateMenu"
+                        />
+                    </template>
                 </div>
             </template>
         </p-heading>
