@@ -3577,7 +3577,7 @@
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
-			"ADD_GROUP_MEMBER": "",
+			"ADD_GROUP_MEMBER": "グループメンバーを追加",
 			"ADD_SERVICE_ACCOUNT": "サービスアカウント追加",
 			"ALL_PROJECTS": "プロジェクト",
 			"ALT_E_CREATE_PROJECT": "プロジェクト作成に失敗",
@@ -3608,8 +3608,8 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "プロジェクト担当者もしくはドメインアドミンに問い合わせください。",
 			"EVERYONE_AT_THIS_WORKSPACE": "このワークスペースの全員",
 			"FAVORITES": "お気に入り",
-			"GROUP_MEMBER": "",
-			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "",
+			"GROUP_MEMBER": "グループメンバー",
+			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "グループメンバーはすべてのサブプロジェクトにアクセスできます",
 			"INVITE_ONLY": "招待のみ",
 			"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
@@ -3633,11 +3633,11 @@
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください"
 			},
 			"MODAL_PROJECT_GROUP_MEMBER": {
-				"NO_DATA_DESCRIPTION": "",
+				"NO_DATA_DESCRIPTION": "ユーザーIDまたは名前を入力してから、「Enter」キーを押してください",
 				"REMOVE": "削除"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
-			"NO_GROUP_MEMBER": "",
+			"NO_GROUP_MEMBER": "グループメンバーなし",
 			"NO_PROJECT_GROUP_MSG": "このワークスペースにはまだプロジェクトまたはプロジェクトグループが作成されていません。",
 			"ONLY_PEOPLE_INVITED": "招待された人だけ",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
@@ -3646,7 +3646,7 @@
 			"PROJECT": "プロジェクト",
 			"PROJECT_GROUP": "プロジェクトグループ",
 			"PROJECT_GROUPS": "プロジェクトグループ",
-			"PROJECT_GROUP_MEMBER": "",
+			"PROJECT_GROUP_MEMBER": "プロジェクトグループメンバー",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "作成",
 				"DONE": "完了",
