@@ -3609,7 +3609,7 @@
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
 			"GROUP_MEMBER": "Group Member",
-			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "Group Members with access to all sub-projects",
+			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "Group Members will have access to all sub-projects",
 			"INVITE_ONLY": "Invite only",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
@@ -3633,7 +3633,7 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field"
 			},
 			"MODAL_PROJECT_GROUP_MEMBER": {
-				"NO_DATA_DESCRIPTION": "Type a user ID / name and then press Enter",
+				"NO_DATA_DESCRIPTION": "Type your user ID or name and then hit 'Enter'",
 				"REMOVE": "Remove"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
