@@ -42,6 +42,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -358,7 +359,13 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                               @export="exportServiceAccountData"
                               @click-settings="handleClickSettings"
                               @click-row="handleClickRow"
-            />
+            >
+                <template #col-schedule.state-format="{value}">
+                    <auto-sync-state :state="value"
+                                     size="md"
+                    />
+                </template>
+            </p-dynamic-layout>
         </component>
         <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
