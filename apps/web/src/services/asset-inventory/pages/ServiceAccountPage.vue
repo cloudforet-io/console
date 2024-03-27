@@ -363,7 +363,6 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                 <template #col-schedule.state-format="{value}">
                     <auto-sync-state v-if="value"
                                      :state="value"
-                                     size="md"
                     />
                 </template>
             </p-dynamic-layout>

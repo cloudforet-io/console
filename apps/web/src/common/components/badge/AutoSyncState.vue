@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTooltip } from '@spaceone/design-system';
 
 interface AutoSyncStateProps {
     state: 'ENABLED' | 'DISABLED'
@@ -34,22 +34,31 @@ const state = reactive({
 </script>
 
 <template>
-    <span class="auto-sync-state"
-          :class="{ [props.size]: true, [props.state]: true}"
+    <p-tooltip :contents="!state.isLabelVisible ? 'Auto Synced' : ''"
+               position="bottom"
     >
-        <p-i :width="state.iconSize"
-             :height="state.iconSize"
-             name="ic_automation"
-        /><span v-if="state.isLabelVisible"
-                class="state"
-        >{{ props.state === 'ENABLED' ? 'ON' : 'Off' }}</span>
-    </span>
+        <span v-if="!(!state.isLabelVisible && props.state === 'DISABLED')"
+              class="auto-sync-state"
+              :class="{ [props.size]: true, [props.state]: true}"
+        >
+            <p-i :width="state.iconSize"
+                 :height="state.iconSize"
+                 name="ic_automation"
+            /><span v-if="state.isLabelVisible"
+                    class="state"
+            >{{ props.state === 'ENABLED' ? 'ON' : 'Off' }}</span>
+        </span>
+    </p-tooltip>
 </template>
 
 <style scoped lang="postcss">
 .auto-sync-state {
     @apply bg-peacock-200 text-peacock-800 inline-flex items-center justify-center;
     border-radius: 6.25rem;
+}
+
+.DISABLED {
+    @apply bg-gray-200 text-gray-700;
 }
 
 .lg {
