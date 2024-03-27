@@ -12,7 +12,7 @@ export interface MetricModel {
     is_managed: boolean;
     query_options: object;
     unit: string;
-    label_keys: string[];
+    label_keys: Array<{key: string, name: string}>;
     tags: Tags;
     namespace_id: string;
     workspace_id: string;

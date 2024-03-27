@@ -2,7 +2,7 @@ export interface MetricDataModel {
     metric_id: string;
     value: number;
     unit: string;
-    labels: object;
+    labels: Record<string, string[]>;
     namespace_id: string;
     project_id: string;
     workspace_id: string;
