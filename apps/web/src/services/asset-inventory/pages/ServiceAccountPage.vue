@@ -6,7 +6,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -124,11 +124,12 @@ const tableState = reactive({
     }),
     selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
-        if (tableState.isTrustedAccount) return 'Trusted Account';
-        if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
-            return `${state.selectedProviderName} ${PROVIDER_ACCOUNT_NAME[state.selectedProvider]}`;
-        }
-        return 'General Account';
+        let baseTitle:string;
+        if (tableState.isTrustedAccount) baseTitle = 'Trusted Account';
+        else if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
+            baseTitle = PROVIDER_ACCOUNT_NAME[state.selectedProvider];
+        } else baseTitle = 'General Account';
+        return `${state.selectedProviderName} ${baseTitle}`;
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
@@ -326,6 +327,11 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                        :total-count="typeOptionState.totalCount"
                        heading-type="sub"
             >
+                <template #title-left-extra>
+                    <p-lazy-img class="provider"
+                                :src="state.providers[state.selectedProvider]?.icon || ''"
+                    />
+                </template>
                 <template #extra>
                     <p-button style-type="primary"
                               icon-left="ic_plus_bold"
@@ -367,6 +373,10 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 
 .service-account-table-heading {
     margin-bottom: 0;
+
+    .provider {
+        margin-left: 0.5rem;
+    }
 }
 
 .service-account-provider-list {

@@ -27,7 +27,7 @@ interface Props {
     isValid: boolean;
     originForm?: Partial<BaseInformationForm>;
     accountType?: AccountType;
-    isUpdateMode: boolean;
+    isUpdateMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
