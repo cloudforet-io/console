@@ -86,7 +86,10 @@ export const getServiceAccountTableSchema = async ({
         return undefined;
     }
     const fields:DynamicField[] = getAccountFields(accountSchema);
-    let schemaData = getDefaultTableSchema(fields, isTrustedAccount);
+    let schemaData = getDefaultTableSchema(fields, {
+        isTrustedAccount,
+        isAdminMode: options?.isAdminMode,
+    });
 
     const customSchemaData = accountSchema?.provider ? await getCustomTableSchema(userData, resourceType, accountSchema?.provider) : undefined;
     if (customSchemaData && !options?.include_optional_fields) schemaData = customSchemaData;

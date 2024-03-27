@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive, nextTick,
+    defineProps, defineEmits, reactive,
 } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -92,9 +92,9 @@ const listServiceAccounts = async () => {
     });
     state.serviceAccountNames = (results ?? []).map((v) => v.name);
 };
-(async () => {
-    await listServiceAccounts();
-    await nextTick();
+
+(() => {
+    listServiceAccounts();
     setForm('serviceAccountName', props.serviceAccount.name);
 })();
 
@@ -102,7 +102,7 @@ const listServiceAccounts = async () => {
 
 <template>
     <p-button-modal :visible="props.visible"
-                    :header-title="$t('INVENTORY.COLLECTOR.DETAIL.EDIT_COLLECTOR_NAME')"
+                    :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT_SERVICE_ACCOUNT_NAME')"
                     :disabled="invalidState.serviceAccountName"
                     size="sm"
                     :loading="state.loading"
@@ -110,7 +110,7 @@ const listServiceAccounts = async () => {
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
+            <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NAME')"
                            :invalid="invalidState.serviceAccountName"
                            :invalid-text="invalidTexts.serviceAccountName"
                            :required="true"

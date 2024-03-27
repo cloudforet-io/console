@@ -23,6 +23,7 @@ export interface GetSchemaParams {
         widget_type?: string;
         is_multiple?: boolean;
         include_workspace_info?: boolean;
+        isAdminMode?: boolean;
     }
 }
 
