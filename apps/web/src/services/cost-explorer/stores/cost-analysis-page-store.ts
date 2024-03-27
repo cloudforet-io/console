@@ -39,7 +39,7 @@ const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, str
     return result;
 };
 
-export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => {
+export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => {
     const allReferenceStore = useAllReferenceStore();
     const costQuerySetStore = useCostQuerySetStore();
     const costQuerySetGetters = costQuerySetStore.getters;

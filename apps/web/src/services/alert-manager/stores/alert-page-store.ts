@@ -16,7 +16,7 @@ interface UpdateAlertPayload {
     updateParams: Omit<AlertUpdateParameters, 'alert_id'>;
 }
 
-export const useAlertPageStore = defineStore('alert-page', () => {
+export const useAlertPageStore = defineStore('page-alert', () => {
     const state = reactive({
         alertData: null as Partial<AlertModel>|null,
     });

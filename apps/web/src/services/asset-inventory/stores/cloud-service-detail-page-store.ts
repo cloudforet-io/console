@@ -13,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
-export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-page', {
+export const useCloudServiceDetailPageStore = defineStore('page-cloud-service-detail', {
     state: () => ({
         provider: '' as string,
         group: '' as string,
