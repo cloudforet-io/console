@@ -3566,6 +3566,7 @@
 			"EDIT": "編集",
 			"EDIT_EVENT_RULE": "イベントルール編集",
 			"EQUALS": "equals",
+			"ESCALATION_POLICY": "",
 			"EVENT_RULE": "イベントルール",
 			"HIGH": "高い",
 			"LOW": "低い",

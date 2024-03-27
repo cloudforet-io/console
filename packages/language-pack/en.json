@@ -3566,6 +3566,7 @@
 			"EDIT": "Edit",
 			"EDIT_EVENT_RULE": "Edit Event Rule",
 			"EQUALS": "equals",
+			"ESCALATION_POLICY": "Escalation Policy",
 			"EVENT_RULE": "Event Rule",
 			"HIGH": "High",
 			"LOW": "Low",
