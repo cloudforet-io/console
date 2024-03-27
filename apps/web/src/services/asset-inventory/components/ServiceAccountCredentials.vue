@@ -91,15 +91,8 @@ const deleteGeneralSecret = async (): Promise<void> => {
 
 const setGeneralSecret = async () => {
     try {
-        let data;
-        if (state.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(state.credentialForm.credentialJson);
-        } else if (state.credentialForm.activeDataType === 'input') {
-            data = state.credentialForm.customSchemaForm;
-        }
-
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
-            secret_data: data,
+            secret_data: state.credentialForm.customSchemaForm,
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             service_account_id: props.serviceAccountId ?? '',
             trusted_account_id: state.credentialForm.attachedTrustedAccountId,
@@ -111,17 +104,10 @@ const setGeneralSecret = async () => {
 };
 const updateTrustedSecretData = async () => {
     try {
-        let data;
-        if (state.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(state.credentialForm.credentialJson);
-        } else if (state.credentialForm.activeDataType === 'input') {
-            data = state.credentialForm.customSchemaForm;
-        }
-
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
-            secret_data: data,
+            secret_data: state.credentialForm.customSchemaForm,
         });
 
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
