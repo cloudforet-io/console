@@ -1,6 +1,8 @@
 import { computed, reactive } from 'vue';
 
-import { find, uniqBy } from 'lodash';
+import {
+    find, flatMap, groupBy, uniqBy,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -17,7 +19,6 @@ import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/
 import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 
 interface CloudServiceTypeListItem {
-    provider?: string;
     group?: string;
     items?: CloudServiceTypeItem[];
     titleIcon?: string;
@@ -61,12 +62,16 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                 });
                 state.cloudServiceAnalyzeList = results || [];
                 if (state.cloudServiceAnalyzeList.length > 0) {
-                    state.cloudServiceTypeList = state.cloudServiceAnalyzeList.map((listItem) => {
-                        const items = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group);
+                    state.cloudServiceTypeList = Object.values(groupBy(state.cloudServiceAnalyzeList, 'cloud_service_group')).map((group) => {
+                        const items = flatMap(group, (listItem) => {
+                            const referenceItem = Object.values(_getters.cloudServiceType).filter((dataItem) => dataItem.data.group === listItem.cloud_service_group
+                                && dataItem.data.provider === listItem.provider);
+                            return uniqBy(referenceItem || [], 'name');
+                        });
+
                         return {
-                            provider: listItem.provider,
-                            group: listItem.cloud_service_group,
-                            items: uniqBy(items || [], 'name'),
+                            group: group[0].cloud_service_group,
+                            items,
                         };
                     });
                 }
@@ -77,10 +82,10 @@ export const useSecurityPageStore = defineStore('security-page', () => {
                 state.loading = false;
             }
         },
-        setSelectedCloudServiceType: async (group?: string, name?: string) => {
+        setSelectedCloudServiceType: async (group?: string, name?: string, provider?: string) => {
             if (name) {
                 const cloudServiceTypeList = find(state.cloudServiceTypeList, { group });
-                state.selectedCloudServiceType = find(cloudServiceTypeList?.items, { name });
+                state.selectedCloudServiceType = cloudServiceTypeList?.items?.find((i) => i.name === name && i.data.provider === provider);
             } else if (state.cloudServiceTypeList[0]?.items) {
                 state.selectedCloudServiceType = state.cloudServiceTypeList[0]?.items[0];
             }
