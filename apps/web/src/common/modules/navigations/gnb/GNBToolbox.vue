@@ -30,20 +30,21 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
-
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const favoriteStore = useFavoriteStore();
 const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const route = useRoute();
 const { width } = useWindowSize();
 const { breadcrumbs } = useBreadcrumbs();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
+    currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
 });
 const state = reactive({
     beforeWorkspace: computed(() => route.query?.beforeWorkspace as string|undefined),
@@ -56,7 +57,7 @@ const state = reactive({
                 to: {
                     name: ROOT_ROUTE.WORKSPACE._NAME,
                     params: {
-                        workspaceId: userWorkspaceGetters.currentWorkspaceId || state.beforeWorkspace,
+                        workspaceId: storeState.currentWorkspaceId || state.beforeWorkspace,
                     },
                 },
             });
@@ -84,7 +85,8 @@ const state = reactive({
 });
 
 const handleClickMenuButton = () => {
-    gnbStore.setMinimizeGnb(!gnbGetters.isMinimizeGnb);
+    if (!state.isMobileSize) gnbStore.createHideNavRail(!gnbGetters.isHideNavRail);
+    else gnbStore.createMinimizeNavRail(!gnbGetters.isMinimizeNavRail);
 };
 const handleClickBreadcrumbsItem = (item: Breadcrumb) => {
     if (item) gnbStore.setSelectedItem(item);

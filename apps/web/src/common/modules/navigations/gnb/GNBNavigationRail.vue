@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, screens, PButton, PTextButton,
+    PI, screens, PButton, PTextButton, PTooltip,
 } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { clone } from 'lodash';
@@ -44,7 +44,8 @@ const { width } = useWindowSize();
 
 
 const storeState = reactive({
-    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+    isHideNavRail: computed(() => gnbGetters.isHideNavRail),
+    isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
 const state = reactive({
     isHovered: false,
@@ -99,6 +100,9 @@ const handleMenuDescription = (value?: boolean) => {
         });
     }
 };
+const handleMinimizedGnbRail = () => {
+    gnbStore.createMinimizeNavRail(!gnbGetters.isMinimizeNavRail);
+};
 const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenuType = 'item'): GNBMenuType[] => menuList.map((menu) => ({
     ...menu,
     name: menu.id,
@@ -133,10 +137,22 @@ const refinedMenuList = (list, value) => {
 
 <template>
     <div class="g-n-b-navigation-rail"
-         :class="{'is-minimize': storeState.isMinimizeGnb, 'is-mobile': state.isMobileSize}"
+         :class="{'is-minimize': !storeState.isHideNavRail && storeState.isMinimizeNavRail, 'is-mobile': state.isMobileSize, 'is-hide': storeState.isHideNavRail}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
     >
+        <p-tooltip class="minimize-button-wrapper"
+                   position="bottom"
+                   :contents="storeState.isMinimizeNavRail ? $t('COMMON.GNB.TOOLTIP.EXPAND_GNB_RAIL') : $t('COMMON.GNB.TOOLTIP.MINIMIZE_GNB_RAIL')"
+                   @click="handleMinimizedGnbRail"
+        >
+            <p-i :name="storeState.isMinimizeNavRail ? 'ic_double-chevron-right' : 'ic_double-chevron-left'"
+                 class="menu-button"
+                 height="1.5rem"
+                 width="1.5rem"
+                 color="inherit"
+            />
+        </p-tooltip>
         <div v-for="(item, idx) in state.visibleGnbMenuList"
              :key="`navigation-rail-item-${idx}`"
              class="navigation-rail-wrapper"
@@ -149,7 +165,9 @@ const refinedMenuList = (list, value) => {
                              'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
                          }"
             >
-                <div class="menu-wrapper">
+                <div v-if="!storeState.isHideNavRail"
+                     class="menu-wrapper"
+                >
                     <p-i v-if="item.subMenuList?.length === 0"
                          :name="item.icon"
                          class="menu-button"
@@ -158,12 +176,12 @@ const refinedMenuList = (list, value) => {
                          color="inherit"
                     />
                     <div class="menu-container">
-                        <span v-if="!storeState.isMinimizeGnb || state.isHovered"
+                        <span v-if="!storeState.isMinimizeNavRail || state.isHovered"
                               class="menu-title"
                         >
                             {{ item.label }}
                         </span>
-                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeGnb"
+                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeNavRail"
                                   icon-right="ic_arrow-right"
                                   style-type="tertiary"
                                   size="sm"
@@ -172,7 +190,7 @@ const refinedMenuList = (list, value) => {
                         >
                             {{ $t('MENU.LEARN_MORE') }}
                         </p-button>
-                        <span v-if="item.highlightTag && (!storeState.isMinimizeGnb || state.isHovered)"
+                        <span v-if="item.highlightTag && (!storeState.isMinimizeNavRail || state.isHovered)"
                               class="mark"
                         >
                             <new-mark v-if="item.highlightTag === 'new'"
@@ -224,7 +242,7 @@ const refinedMenuList = (list, value) => {
 
 <style scoped lang="postcss">
 .g-n-b-navigation-rail {
-    @apply flex-col items-start bg-white border-r overflow-y-auto overflow-x-hidden;
+    @apply relative flex-col items-start bg-white border-r overflow-y-auto overflow-x-hidden;
     top: $gnb-toolbox-height;
     width: $gnb-navigation-rail-max-width;
     height: calc(100% - $gnb-toolbox-height);
@@ -286,12 +304,41 @@ const refinedMenuList = (list, value) => {
             }
         }
     }
+    .minimize-button-wrapper {
+        @apply absolute bg-white border border-gray-200 text-gray-500 cursor-pointer;
+        top: 1.125rem;
+        right: 0;
+        padding: 0.125rem;
+        border-right: hidden;
+        border-top-left-radius: 6.25rem;
+        border-bottom-left-radius: 6.25rem;
+        transition: padding 0.1s ease;
+        &:hover {
+            @apply bg-violet-200 text-violet-600;
+            padding-right: 0.75rem;
+            padding-left: 0.25rem;
+        }
+    }
+    &.is-hide {
+        @apply bg-transparent;
+        width: 0;
+        padding: 0;
+        transition: width 0.3s ease;
+        .minimize-button-wrapper, .service-menu, .menu-wrapper {
+            width: 0;
+            padding: 0;
+        }
+    }
     &.is-mobile {
         transition: width 0.3s ease;
+        .minimize-button-wrapper {
+            width: 0;
+            padding: 0;
+        }
         &.is-minimize {
             width: 0;
             padding: 0;
-            .service-menu, .menu-wrapper {
+            .minimize-button-wrapper, .service-menu, .menu-wrapper {
                 width: 0;
                 padding: 0;
             }
@@ -302,6 +349,9 @@ const refinedMenuList = (list, value) => {
         width: $gnb-navigation-rail-min-width;
         box-shadow: unset;
         z-index: 49;
+        .minimize-button-wrapper {
+            @apply hidden;
+        }
         .service-menu {
             width: 2.25rem;
             &:hover:not(.is-only-label) {
@@ -316,6 +366,9 @@ const refinedMenuList = (list, value) => {
                 @apply bg-white;
                 width: $gnb-navigation-rail-max-width;
                 box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+                .minimize-button-wrapper {
+                    @apply block;
+                }
                 .service-menu {
                     width: 100%;
                     &:hover:not(.is-only-label) {

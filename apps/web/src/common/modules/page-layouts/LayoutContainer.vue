@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onBeforeMount, reactive, watch,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { screens } from '@spaceone/design-system';
@@ -19,7 +21,8 @@ const { width } = useWindowSize();
 
 const storeState = reactive({
     visibleSidebar: computed(() => store.state.display.visibleSidebar),
-    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+    isHideNavRail: computed(() => gnbGetters.isHideNavRail),
+    isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
@@ -27,14 +30,18 @@ const state = reactive({
 
 watch([() => state.isMobileSize, () => route.path], ([isMobileSize]) => {
     if (!isMobileSize) return;
-    gnbStore.setMinimizeGnb(isMobileSize);
+    gnbStore.createHideNavRail(isMobileSize);
 }, { immediate: true });
 
 watch(() => storeState.visibleSidebar, (visibleSidebar) => {
     if (visibleSidebar) {
-        gnbStore.setMinimizeGnb(true);
+        gnbStore.createHideNavRail(true);
     }
 }, { immediate: true });
+
+onBeforeMount(() => {
+    gnbStore.fetchNavRailStatus();
+});
 </script>
 
 <template>
@@ -44,7 +51,10 @@ watch(() => storeState.visibleSidebar, (visibleSidebar) => {
             <g-n-b-navigation-rail class="g-n-b-item" />
         </nav>
         <main class="main"
-              :class="{'is-mobile': state.isMobileSize, 'is-minimize': !state.isMobileSize && storeState.isMinimizeGnb}"
+              :class="{
+                  'is-hide': state.isMobileSize || storeState.isHideNavRail,
+                  'is-minimize': !storeState.isHideNavRail && storeState.isMinimizeNavRail,
+              }"
         >
             <slot name="main" />
         </main>
@@ -66,13 +76,15 @@ watch(() => storeState.visibleSidebar, (visibleSidebar) => {
     height: calc(100% - $gnb-toolbox-height);
     margin: auto;
     transition: left 0.3s ease, width 0.3s ease;
-    &.is-mobile {
+    &.is-hide {
         left: 0;
         width: 100%;
     }
     &.is-minimize {
-        left: $gnb-navigation-rail-min-width;
-        width: calc(100% - $gnb-navigation-rail-min-width);
+        &:not(.is-mobile) {
+            left: $gnb-navigation-rail-min-width;
+            width: calc(100% - $gnb-navigation-rail-min-width);
+        }
     }
 }
 </style>
