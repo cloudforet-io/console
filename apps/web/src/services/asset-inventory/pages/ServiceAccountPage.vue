@@ -300,7 +300,7 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 
 <template>
     <section class="service-account-page">
-        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})" />
+        <p-heading :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT')" />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
                        class="service-account-provider-list"
@@ -361,7 +361,8 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                               @click-row="handleClickRow"
             >
                 <template #col-schedule.state-format="{value}">
-                    <auto-sync-state :state="value"
+                    <auto-sync-state v-if="value"
+                                     :state="value"
                                      size="md"
                     />
                 </template>
