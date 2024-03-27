@@ -3446,7 +3446,7 @@
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
-				"PRIVATE_MEMBER_DESC": "設定に基づいて、招待された人のみがこのプロジェクトにアクセスできます。({settings})",
+				"PRIVATE_MEMBER_DESC": "設定に基づき、ワークスペースの所有者、プロジェクトグループメンバー、および招待されたワークスペースメンバーのみがこのプロジェクトにアクセスできます {settings}",
 				"PROJECT_SETTINGS": "プロジェクト設定",
 				"PUBLIC_MEMBER_DESC": "このワークスペースのすべてのメンバーは、[settings}]に基づいてこのプロジェクトにアクセスできます。",
 				"REMOVE": "削除",
@@ -3516,8 +3516,8 @@
 				"TRIGGERED": "生成"
 			},
 			"TAB_ALERT": "アラート",
-			"TAB_MEMBER": "メンバー",
 			"TAB_NOTIFICATIONS": "通知",
+			"TAB_PROEJCT_MEMBER": "プロジェクト メンバー",
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
