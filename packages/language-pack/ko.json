@@ -1021,6 +1021,7 @@
 				"ALL_DASHBOARD": "모든 대시보드",
 				"ALL_MENU": "모든 메뉴",
 				"ALL_PROJECTS": "프로젝트",
+				"ALL_SECURITY": "보안 전체",
 				"FAVORITES": "즐겨찾기",
 				"FAVORITES_HELP_TEXT": "자주 방문하는 페이지를 즐겨찾기에 저장하세요.",
 				"GO_TO_CLOUD_SERVICE": "클라우드 서비스",
@@ -2418,6 +2419,7 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "연관된 멤버"
@@ -2462,7 +2464,6 @@
 				"HISTORY": "변경 이력"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가",
 				"ALL": "모두",
 				"ALT_E_CHECK_MODAL": "{action} 실패",
 				"ALT_S_CHECK_MODAL": "{action} 완료",
@@ -2470,7 +2471,6 @@
 				"CHECK_MODAL_DELETE_DESC": "정말 삭제하시겠습니까?",
 				"CHECK_MODAL_DELETE_TITLE": "클라우드 서비스 삭제",
 				"CLOSE": "닫기",
-				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
 				"FILTER": "필터",
 				"FILTERED_BY_DATE": "날짜 필터",
@@ -2686,6 +2686,16 @@
 			"NO_JOB": "최근 작업내역 없음",
 			"NO_OPTIONS": "추가 옵션이 없습니다."
 		},
+		"CREATE_COLLECTOR": "컬렉터 생성",
+		"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 어카운트를 추가해주세요. ",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "자원 수집을 위한 컬렉터 생성이 필요합니다.",
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": "보안"
+			},
+			"NOTIFICATION_DESC": "보안 취약점을 판별하는 과정은 다양한 컴플라이언스 정책에 기반하여 이루어집니다. 보안 컬렉터를 생성하고 관련 리소스를 수집해서 클라우드 보안 상태를 지속적으로 관리해 보세요.",
+			"NOTIFICATION_TITLE": "클라우드 보안 상태를 확인해보세요!"
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "작업",
@@ -2816,6 +2826,7 @@
 		"ASSET_INVENTORY": "에셋 인벤토리",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "클라우드 서비스",
 		"ASSET_INVENTORY_COLLECTOR": "컬렉터",
+		"ASSET_INVENTORY_SECURITY": "보안",
 		"ASSET_INVENTORY_SERVER": "서버",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 어카운트",
 		"COST_EXPLORER": "비용 관리",

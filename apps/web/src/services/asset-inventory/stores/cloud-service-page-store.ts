@@ -21,7 +21,9 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
         selectedCategories: (state): CloudServiceCategory[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] ?? [],
         selectedRegions: (state): string[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [],
         allFilters(state): ConsoleFilter[] {
-            const filters: ConsoleFilter[] = [];
+            const filters: ConsoleFilter[] = [
+                { k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '!=' },
+            ];
             if (state.selectedProvider !== 'all') {
                 filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
             }
