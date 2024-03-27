@@ -24,7 +24,7 @@ export type TrustedAccountReferenceMap = ReferenceMap<TrustedAccountItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useTrustedAccountReferenceStore = defineStore('trusted-account-reference', () => {
+export const useTrustedAccountReferenceStore = defineStore('reference-trusted-account', () => {
     const state = reactive({
         items: null as TrustedAccountReferenceMap | null,
     });

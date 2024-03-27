@@ -61,7 +61,7 @@ const _listRole = async (roleIdList: string[]): Promise<RoleModel[]> => {
         return [];
     }
 };
-export const useUserReferenceStore = defineStore('user-reference', () => {
+export const useUserReferenceStore = defineStore('reference-user', () => {
     const appContextStore = useAppContextStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),

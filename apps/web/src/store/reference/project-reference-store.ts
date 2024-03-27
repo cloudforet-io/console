@@ -56,7 +56,7 @@ const _listProjectGroup = async (projectGroupIdList: string[]): Promise<ProjectG
         return [];
     }
 };
-export const useProjectReferenceStore = defineStore('project-reference', () => {
+export const useProjectReferenceStore = defineStore('reference-project', () => {
     const _state = reactive({
         projectGroupList: [] as ProjectGroupModel[],
     });
