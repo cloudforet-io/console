@@ -3446,7 +3446,7 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
-				"PRIVATE_MEMBER_DESC": "Only people invited can access this project, based on the {settings}",
+				"PRIVATE_MEMBER_DESC": "Only Workspace Owners, Project Group Members & Invited Workspace Members can have access to this project based on the {settings}",
 				"PROJECT_SETTINGS": "project settings",
 				"PUBLIC_MEMBER_DESC": "Everyone in this workspace can access this project, based on the {settings}",
 				"REMOVE": "Remove",
@@ -3516,8 +3516,8 @@
 				"TRIGGERED": "Triggered"
 			},
 			"TAB_ALERT": "Alert",
-			"TAB_MEMBER": "Member",
 			"TAB_NOTIFICATIONS": "Notifications",
+			"TAB_PROEJCT_MEMBER": "Project Member",
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
 			"TAB_TAG": "Tag",

@@ -27,6 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
 interface Props {
@@ -39,6 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'confirm'): void;
 }>();
 
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
@@ -46,6 +49,7 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
+    readonlyMode: computed<boolean>(() => !projectPageState.isWorkspaceOwner),
     projectGroupUserIdList: [] as string[],
     userMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const _items: SelectDropdownMenuItem[] = [];
@@ -132,8 +136,10 @@ const getProjectGroupUserData = async () => {
 
 /* Event */
 const handleConfirm = async () => {
-    await addAndRemoveMember();
-    emit('confirm');
+    if (!state.readonlyMode) {
+        await addAndRemoveMember();
+        emit('confirm');
+    }
     state.proxyVisible = false;
 };
 const handleUpdateSelected = (items?: SelectDropdownMenuItem[]) => {
@@ -166,12 +172,14 @@ watch(() => props.visible, async (visible) => {
         :backdrop="true"
         size="md"
         :visible.sync="state.proxyVisible"
+        :hide-footer-close-button="state.readonlyMode"
         @confirm="handleConfirm"
     >
         <template #body>
             <div class="project-group-management-box">
                 <div class="project-group-management-wrapper">
-                    <p-field-group :label="$t('PROJECT.LANDING.GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS')"
+                    <p-field-group v-if="!state.readonlyMode"
+                                   :label="$t('PROJECT.LANDING.GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS')"
                                    required
                     >
                         <p-text-input
@@ -218,7 +226,8 @@ watch(() => props.visible, async (visible) => {
                                     <span class="role-type-text">
                                         {{ getRoleName(userId) }}
                                     </span>
-                                    <p-icon-button name="ic_delete"
+                                    <p-icon-button v-if="!state.readonlyMode"
+                                                   name="ic_delete"
                                                    size="sm"
                                                    @click="handleRemoveProjectGroupMember(idx)"
                                     />
@@ -228,6 +237,11 @@ watch(() => props.visible, async (visible) => {
                     </p-data-loader>
                 </div>
             </div>
+        </template>
+        <template v-if="state.readonlyMode"
+                  #confirm-button
+        >
+            Done
         </template>
     </p-button-modal>
 </template>

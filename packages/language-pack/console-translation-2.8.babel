@@ -63589,7 +63589,7 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
-                                <name>TAB_MEMBER</name>
+                                <name>TAB_NOTIFICATIONS</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
                                 <comment/>
@@ -63610,7 +63610,7 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
-                                <name>TAB_NOTIFICATIONS</name>
+                                <name>TAB_PROEJCT_MEMBER</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
                                 <comment/>

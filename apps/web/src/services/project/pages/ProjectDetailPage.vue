@@ -120,7 +120,7 @@ const singleItemTabState = reactive({
         },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
+            label: i18n.t('PROJECT.DETAIL.TAB_PROEJCT_MEMBER'),
         },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
