@@ -23,7 +23,7 @@ interface CloudServiceTypeListItem {
     items?: CloudServiceTypeItem[];
     titleIcon?: string;
 }
-export const useSecurityPageStore = defineStore('security-page', () => {
+export const useSecurityPageStore = defineStore('page-security', () => {
     const allReferenceStore = useAllReferenceStore();
     const allReferenceGetters = allReferenceStore.getters;
 

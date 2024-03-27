@@ -24,7 +24,7 @@ export type ProtocolReferenceMap = ReferenceMap<ProtocolItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useProtocolReferenceStore = defineStore('protocol-reference', () => {
+export const useProtocolReferenceStore = defineStore('reference-protocol', () => {
     const state = reactive({
         items: null as ProtocolReferenceMap | null,
     });
