@@ -18,7 +18,7 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel>, 'key'|'label'|'name'>>;
+export type EscalationPolicyItem = Required<Pick<ReferenceItem<EscalationPolicyModel>, 'key'|'label'|'name'|'data'>>;
 export type EscalationPolicyReferenceMap = ReferenceMap<EscalationPolicyItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
@@ -56,7 +56,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
         try {
             const response = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
                 query: {
-                    only: ['escalation_policy_id', 'name'],
+                    only: ['escalation_policy_id', 'name', 'resource_group'],
                 },
             }, { timeout: 3000 });
 
@@ -65,6 +65,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
                     key: escalationPolicyInfo.escalation_policy_id,
                     label: escalationPolicyInfo.name,
                     name: escalationPolicyInfo.name,
+                    data: escalationPolicyInfo,
                 };
             });
             state.items = referenceMap;
@@ -81,6 +82,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
                 key: escalationPolicyInfo.escalation_policy_id,
                 label: escalationPolicyInfo.name,
                 name: escalationPolicyInfo.name,
+                data: escalationPolicyInfo,
             },
         };
     };
