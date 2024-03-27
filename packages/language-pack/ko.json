@@ -3577,7 +3577,7 @@
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
-			"ADD_GROUP_MEMBER": "",
+			"ADD_GROUP_MEMBER": "그룹 멤버 추가",
 			"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가 ",
 			"ALL_PROJECTS": "프로젝트 ",
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
@@ -3608,8 +3608,8 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "프로젝트 담당자 또는 도메인 Admin에게 요청하세요. ",
 			"EVERYONE_AT_THIS_WORKSPACE": "워크스페이스 내 전체 사용자",
 			"FAVORITES": "즐겨찾기",
-			"GROUP_MEMBER": "",
-			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "",
+			"GROUP_MEMBER": "그룹 멤버",
+			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "하위 프로젝트에 모두 접근 가능한 그룹 멤버 추가",
 			"INVITE_ONLY": "초대된 사용자만",
 			"MANAGE_PROJECT_GROUP_MEMBER": "프로젝트 그룹 멤버 관리",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
@@ -3633,11 +3633,11 @@
 				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다."
 			},
 			"MODAL_PROJECT_GROUP_MEMBER": {
-				"NO_DATA_DESCRIPTION": "",
+				"NO_DATA_DESCRIPTION": "사용자 ID 또는 이름을 입력한 다음 'Enter' 키를 누르세요",
 				"REMOVE": "제거"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
-			"NO_GROUP_MEMBER": "",
+			"NO_GROUP_MEMBER": "프로젝트 그룹 멤버 없음",
 			"NO_PROJECT_GROUP_MSG": "이 워크스페이스에는 아직 생성된 프로젝트 또는 프로젝트 그룹이 없습니다.",
 			"ONLY_PEOPLE_INVITED": "초대된 사용자만",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
@@ -3646,7 +3646,7 @@
 			"PROJECT": "프로젝트",
 			"PROJECT_GROUP": "프로젝트 그룹 ",
 			"PROJECT_GROUPS": "프로젝트 그룹 ",
-			"PROJECT_GROUP_MEMBER": "",
+			"PROJECT_GROUP_MEMBER": "프로젝트 그룹 멤버",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "생성",
 				"DONE": "완료",
