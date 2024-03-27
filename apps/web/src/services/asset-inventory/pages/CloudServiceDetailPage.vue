@@ -400,7 +400,7 @@ watch(() => keyItemSets.value, (after) => {
 }, { immediate: true });
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-debouncedWatch([() => props.group, () => props.name], async () => {
+debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
     if (!props.isServerPage && !props.name) return;
     tableState.schema = await getTableSchema();
     resetSort(tableState.schema.options);

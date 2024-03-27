@@ -5,8 +5,11 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { PDataLoader } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
@@ -48,7 +51,7 @@ const state = reactive({
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
                 label: d.group,
-                titleIcon: d.items && d.items[0].icon,
+                titleIcon: d.items && assetUrlConverter(d.items[0].icon),
                 id: d.group,
             });
             d.items?.forEach((i) => {
@@ -73,6 +76,20 @@ const state = reactive({
         type: FAVORITE_TYPE.SECURITY,
         id: storeState.selectedCloudServiceType?.data.cloud_service_type_key || '',
     })),
+    securityNavigation: computed(() => {
+        if (state.pageParams.name) {
+            return [
+                { name: i18n.t('MENU.ASSET_INVENTORY'), to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE._NAME }) },
+                { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SECURITY._NAME }) },
+                { name: state.pageParams.group || '', data: null },
+                { name: `[${allReferenceGetters.provider[state.pageParams.provider || '']?.label}] ${state.pageParams.name || ''}` },
+            ];
+        }
+        return [
+            { name: i18n.t('MENU.ASSET_INVENTORY'), to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE._NAME }) },
+            { name: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), to: getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SECURITY._NAME }) },
+        ];
+    }),
 });
 
 const routeToFirstCloudServiceType = async () => {
@@ -91,20 +108,20 @@ const routeToFirstCloudServiceType = async () => {
 };
 
 /* Watchers */
-watch(() => state.pageParams, async (pageParams) => {
-    if (pageParams?.name) {
-        await securityPageStore.setSelectedCloudServiceType(pageParams.group, pageParams.name);
-        await cloudServiceDetailPageStore.setProviderGroupName(pageParams);
-    } else {
-        await securityPageStore.setSelectedCloudServiceType();
-        await routeToFirstCloudServiceType();
+watch([() => state.pageParams.name, () => state.pageParams.provider, () => state.pageParams.group], async ([name, provider, group]) => {
+    if (name) {
+        await securityPageStore.setSelectedCloudServiceType(group, name, provider);
+        await cloudServiceDetailPageStore.setProviderGroupName(state.pageParams);
     }
-}, { immediate: true });
+});
 watch(() => storeState.selectedCloudServiceType, () => {
     routeToFirstCloudServiceType();
 });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
+});
+watch(() => state.securityNavigation, async (securityNavigation) => {
+    gnbStore.setBreadcrumbs(securityNavigation);
 });
 </script>
 
@@ -138,7 +155,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
         padding: 0.5rem 1rem;
         border-radius: 0.25rem;
         .contents {
-            @apply flex flex-col break-all;
+            @apply flex flex-col;
             gap: 0.25rem;
             text-align: start;
             .title {
