@@ -2745,7 +2745,7 @@
 				"NO_CREDENTIALS": "There’s no credentials found.",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "Project is required",
-				"SAVE": "Save",
+				"SAVE": "Save Changes",
 				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. "
 			}
 		}
