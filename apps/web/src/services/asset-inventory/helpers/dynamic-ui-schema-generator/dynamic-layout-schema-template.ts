@@ -24,8 +24,8 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
                             name: 'Workspace',
                             type: 'badge',
                             options: {
-                                text_color: 'violet.600',
-                                background_color: 'violet.200',
+                                text_color: 'green.700',
+                                background_color: 'green.200',
                             },
                         },
                         DOMAIN: {
@@ -99,8 +99,8 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                                 name: 'Workspace',
                                 type: 'badge',
                                 options: {
-                                    text_color: 'violet.600',
-                                    background_color: 'violet.200',
+                                    text_color: 'green.700',
+                                    background_color: 'green.200',
                                 },
                             },
                             DOMAIN: {
