@@ -81,12 +81,6 @@ const state = reactive({
     })),
     projectGroupMemberManagementModalVisible: false,
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
-    showProjectGroupButton: computed<boolean>(() => {
-        if (!storeState.groupId) return false;
-        if (projectPageState.isWorkspaceOwner) return true;
-        const isProjectGroupMember = !!(storeState.projectGroups?.[storeState.groupId]?.data.users?.some((user) => user === storeState.userId));
-        return isProjectGroupMember && !!storeState.projectGroups?.[storeState.groupId]?.data.users?.length;
-    }),
 });
 
 const {
@@ -178,7 +172,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                     </template>
                 </div>
                 <div class="top-button-box">
-                    <p-button v-if="state.showProjectGroupButton"
+                    <p-button v-if="storeState.groupId"
                               style-type="tertiary"
                               icon-left="ic_member"
                               class="mr-4"
