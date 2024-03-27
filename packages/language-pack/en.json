@@ -1078,7 +1078,9 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Switch to Admin Mode",
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
+				"EXPAND_GNB_RAIL": "Expand menu",
 				"FAVORITE": "Favorites",
+				"MINIMIZE_GNB_RAIL": "Minimize menu",
 				"NOTICE": "Notice",
 				"NOTIFICATIONS": "Notifications",
 				"PROFILE": "My Page",
