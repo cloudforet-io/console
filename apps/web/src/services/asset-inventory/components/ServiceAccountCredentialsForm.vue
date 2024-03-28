@@ -204,6 +204,7 @@ watch(() => state.secretTypes, (secretTypes) => {
 }, { immediate: true });
 watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
     getTrustedAccountCredentialData(attachedTrustedAccountId);
+    formState.isCustomSchemaFormValid = true;
 });
 watch(() => formState.formData, (formData) => {
     emit('change', formData);
@@ -234,7 +235,9 @@ const getSecretSchema = async (isTrustingSchema:boolean) => {
 watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
     getSecretSchema(attachTrustedAccount);
 }, { immediate: true });
-
+watch(() => formState.credentialJson, () => {
+    formState.isCustomSchemaFormValid = checkJsonStringAvailable(formState.credentialJson);
+});
 
 </script>
 
