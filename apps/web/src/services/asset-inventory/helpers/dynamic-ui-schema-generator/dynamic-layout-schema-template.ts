@@ -58,7 +58,7 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
             }]) || []),
             {
                 key: 'created_at',
-                name: 'Added',
+                name: 'Created',
                 type: 'text',
             },
             {
