@@ -1,12 +1,11 @@
 <script setup lang="ts">
-
 import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
     PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader,
 } from '@spaceone/design-system';
-
+import { isEmpty } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -30,6 +29,7 @@ import AddCustomMetricModal from '@/services/asset-inventory/components/AddCusto
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricNamespace } from '@/services/asset-inventory/types/metric-explorer-type';
 
+
 interface NamespaceSubItemType {
     label: string;
     name: string;
@@ -44,7 +44,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     loading: computed(() => metricExplorerPageStore.state.loading),
-    providerItems: computed(() => allReferenceStore.getters.provider),
+    providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
         const res: Record<string, CloudServiceTypeItem> = {};
@@ -91,14 +91,17 @@ const namespaceState = reactive({
         const keyword = namespaceState.inputValue.toLowerCase();
         if (!keyword) return namespaceState.namespaces;
         return namespaceState.namespaces.filter((namespace) => {
-            const providerData = storeState.providerItems[namespace.provider];
-            return providerData.label.toLowerCase().includes(keyword)
+            const providerData = storeState.providers[namespace.provider];
+            return providerData?.label.toLowerCase().includes(keyword)
                 || `${namespace.cloud_service_group}/${namespace.cloud_service_type}`.toLowerCase().includes(keyword);
         });
     }),
-    namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => [
-        ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
-    ]),
+    namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
+        if (isEmpty(storeState.providers)) return [];
+        return [
+            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+        ];
+    }),
     selectedNamespace: undefined as NamespaceSubItemType | undefined,
 });
 
@@ -113,7 +116,7 @@ const metricState = reactive({
 const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
     namespaces.forEach((namespace) => {
-        const providerData = storeState.providerItems[namespace.provider];
+        const providerData = storeState.providers[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
                 label: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
