@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PIconButton, PBreadcrumbs, PCopyButton, screens,
+    PIconButton, PBreadcrumbs, PCopyButton, screens, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone, isEmpty } from 'lodash';
@@ -45,6 +45,7 @@ const { breadcrumbs } = useBreadcrumbs();
 const storeState = reactive({
     isAdminMode: computed(() => appContextGetters.isAdminMode),
     currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
+    isHideNavRail: computed(() => gnbGetters.isHideNavRail),
 });
 const state = reactive({
     beforeWorkspace: computed(() => route.query?.beforeWorkspace as string|undefined),
@@ -114,7 +115,10 @@ watch(() => state.currentMenuId, async () => {
 <template>
     <div class="g-n-b-toolbox">
         <div class="navigation-section">
-            <div class="menu-button-wrapper">
+            <p-tooltip class="menu-button-wrapper"
+                       position="bottom"
+                       :contents="storeState.isHideNavRail ? $t('COMMON.GNB.TOOLTIP.OPEN_GNB_RAIL') : $t('COMMON.GNB.TOOLTIP.HIDE_GNB_RAIL')"
+            >
                 <p-icon-button name="ic_gnb_menu"
                                style-type="transparent"
                                class="menu-button"
@@ -122,7 +126,7 @@ watch(() => state.currentMenuId, async () => {
                                size="md"
                                @click="handleClickMenuButton"
                 />
-            </div>
+            </p-tooltip>
             <p-breadcrumbs :routes="state.routes"
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"

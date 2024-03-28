@@ -28,14 +28,15 @@ const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
-watch([() => state.isMobileSize, () => route.path], ([isMobileSize]) => {
+watch([() => state.isMobileSize, () => route.path], async ([isMobileSize]) => {
     if (!isMobileSize) return;
-    gnbStore.createHideNavRail(isMobileSize);
+    await gnbStore.createMinimizeNavRail(isMobileSize);
+    await gnbStore.fetchNavRailStatus();
 }, { immediate: true });
 
 watch(() => storeState.visibleSidebar, (visibleSidebar) => {
     if (visibleSidebar) {
-        gnbStore.createHideNavRail(true);
+        gnbStore.createMinimizeNavRail(visibleSidebar);
     }
 }, { immediate: true });
 
@@ -53,7 +54,7 @@ onBeforeMount(() => {
         <main class="main"
               :class="{
                   'is-hide': state.isMobileSize || storeState.isHideNavRail,
-                  'is-minimize': !storeState.isHideNavRail && storeState.isMinimizeNavRail,
+                  'is-minimize': !state.isMobileSize && !storeState.isHideNavRail && storeState.isMinimizeNavRail,
               }"
         >
             <slot name="main" />
@@ -81,10 +82,8 @@ onBeforeMount(() => {
         width: 100%;
     }
     &.is-minimize {
-        &:not(.is-mobile) {
-            left: $gnb-navigation-rail-min-width;
-            width: calc(100% - $gnb-navigation-rail-min-width);
-        }
+        left: $gnb-navigation-rail-min-width;
+        width: calc(100% - $gnb-navigation-rail-min-width);
     }
 }
 </style>
