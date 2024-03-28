@@ -122,7 +122,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 });
 watch(() => state.securityNavigation, async (securityNavigation) => {
     gnbStore.setBreadcrumbs(securityNavigation);
-});
+}, { immediate: true });
 </script>
 
 <template>
