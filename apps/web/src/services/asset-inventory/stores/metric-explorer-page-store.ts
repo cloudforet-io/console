@@ -95,11 +95,11 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
             if (status === 'succeed') {
                 state.namespaces = response.results || [];
+                state.loading = false;
             }
         } catch (e) {
             console.error(e);
             state.namespaces = [];
-        } finally {
             state.loading = false;
         }
     };
