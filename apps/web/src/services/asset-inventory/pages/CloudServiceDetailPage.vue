@@ -142,7 +142,7 @@ const schemaQueryHelper = new QueryHelper();
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => tableState.schema?.options?.search ?? []),
     'inventory.CloudService',
-    computed(() => ((props.isServerPage || props.isSecurityPage)
+    computed(() => (props.isServerPage
         ? schemaQueryHelper.setFilters([
             { k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' },
         ]).apiQuery.filter
@@ -156,8 +156,10 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
 const hiddenFilterHelper = new QueryHelper();
 const hiddenFilters = computed<ConsoleFilter[]>(() => {
     hiddenFilterHelper.setFilters([]);
-    if (props.isServerPage || props.isSecurityPage) {
+    if (props.isServerPage) {
         hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
+    } else if (props.isSecurityPage) {
+        hiddenFilterHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'CSPM', o: '=' });
     } else {
         hiddenFilterHelper.addFilter(
             { k: 'provider', o: '=', v: props.provider },
@@ -186,7 +188,7 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         const params: Record<string, any> = {
             schema: 'table',
         };
-        if (props.isServerPage || props.isSecurityPage) {
+        if (props.isServerPage) {
             params.resource_type = 'inventory.Server';
             params.options = {
                 include_workspace_info: appContextGetters.isAdminMode,
@@ -235,7 +237,7 @@ const handleClickLinkButton = async (type: string, workspaceId: string, id: stri
                 cloud_service_id: id,
             });
             window.open(router.resolve({
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                name: props.isSecurityPage ? ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: response.provider,
                     group: response.cloud_service_group,
@@ -323,7 +325,7 @@ const excelState = reactive({
 const excelQuery = new ApiQueryHelper()
     .setMultiSortV2([{ key: 'created_at', desc: true }]);
 const exportCloudServiceData = async () => {
-    if (!(props.isServerPage || props.isSecurityPage)) excelState.visible = true;
+    if (!(props.isServerPage)) excelState.visible = true;
     else {
         const excelExportFetcher = () => {
             hiddenFilters.value.forEach((filter) => excelQuery.addFilter(filter));
@@ -398,8 +400,8 @@ watch(() => keyItemSets.value, (after) => {
 }, { immediate: true });
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-debouncedWatch([() => props.group, () => props.name], async () => {
-    if (!props.isServerPage && !props.isSecurityPage && !props.name) return;
+debouncedWatch([() => props.group, () => props.name, () => props.provider], async () => {
+    if (!props.isServerPage && !props.name) return;
     tableState.schema = await getTableSchema();
     resetSort(tableState.schema.options);
     await fetchTableData();
@@ -424,7 +426,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                    @click-back-button="$router.go(-1)"
         />
         <p-heading v-else-if="props.isSecurityPage"
-                   :title="$t('INVENTORY.SECURITY.MAIN.TITLE')"
+                   :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                    use-total-count
                    use-selected-count
                    :total-count="typeOptionState.totalCount"
@@ -549,7 +551,7 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                 cloudServiceType: props.name,
                                 include_workspace_info: appContextGetters.isAdminMode,
                             }"
-                            :is-server-page="props.isServerPage || props.isSecurityPage"
+                            :is-server-page="props.isServerPage"
                             @update:visible="handleCustomFieldModalVisibleUpdate"
                             @complete="reloadTable"
         />

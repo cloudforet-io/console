@@ -30,7 +30,7 @@ export type CloudServiceQuerySetReferenceMap = ReferenceMap<QuerySetItems>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-query-set-reference-store', () => {
+export const useCloudServiceQuerySetReferenceStore = defineStore('reference-cloud-service-query-set', () => {
     const state = reactive({
         items: null as CloudServiceQuerySetReferenceMap|null,
     });

@@ -29,6 +29,7 @@ const storeState = reactive({
 const state = reactive({
     lsbVisible: computed<boolean>(() => route.meta?.lsbVisible),
 });
+
 assetInventorySettings.initState();
 assetInventorySettings.$onAction((action) => {
     action.after(() => {

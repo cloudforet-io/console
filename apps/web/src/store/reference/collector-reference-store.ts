@@ -27,7 +27,7 @@ export type CollectorReferenceMap = ReferenceMap<CollectorItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useCollectorReferenceStore = defineStore('collector-reference', () => {
+export const useCollectorReferenceStore = defineStore('reference-collector', () => {
     const state = reactive({
         items: null as CollectorReferenceMap | null,
     });

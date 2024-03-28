@@ -3,9 +3,11 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { PI, PSelectDropdown } from '@spaceone/design-system';
+import { PI, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
@@ -73,6 +75,13 @@ const handleSelect = (id: string, selected: string) => {
             <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
                class="top-title-wrapper"
             >
+                <p-lazy-img
+                    v-if="item.titleIcon"
+                    :src="assetUrlConverter(item.titleIcon)"
+                    width="1.5rem"
+                    height="1.5rem"
+                    class="top-title-image"
+                />
                 <span class="top-title">
                     {{ item.label }}
                 </span>
@@ -151,6 +160,9 @@ const handleSelect = (id: string, selected: string) => {
         padding-left: 0.5rem;
         .top-title-icon {
             margin-left: 0.25rem;
+        }
+        .top-title-image {
+            margin-right: 0.25rem;
         }
     }
     .select-options-wrapper {

@@ -64,10 +64,12 @@ const singleItemTabState = reactive({
             { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
             { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
             { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
-            { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
         ];
-        if (props.isSecurityPage) {
-            defaultTabs.push({ name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') });
+        if (!props.isSecurityPage) {
+            defaultTabs.push(
+                { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
+                { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
+            );
         }
         return defaultTabs;
     }),
@@ -133,6 +135,7 @@ const monitoringState: MonitoringProps = reactive({
                 :cloud-service-group="props.group"
                 :cloud-service-type="props.name"
                 :is-server-page="props.isServerPage"
+                :is-security-page="props.isSecurityPage"
             />
         </template>
 
@@ -207,6 +210,7 @@ const monitoringState: MonitoringProps = reactive({
                                                   :cloud-service-group="props.group"
                                                   :cloud-service-type="props.name"
                                                   :cloud-service-id-list="tableState.selectedItems.map((item) => item?.cloud_service_id)"
+                                                  :is-security-page="props.isSecurityPage"
             />
         </template>
         <template #monitoring>

@@ -103,7 +103,7 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
-    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS) return;
+    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS || state.selectedMenuId === MENU_ID.SECURITY) return;
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
     await gnbStore.fetchCostQuerySet();
 }, { immediate: true });

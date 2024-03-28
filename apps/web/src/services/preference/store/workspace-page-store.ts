@@ -40,7 +40,7 @@ export interface WorkspaceTableModel extends WorkspaceModel {
     users?: string;
 }
 
-export const useWorkspacePageStore = defineStore('workspace-page', {
+export const useWorkspacePageStore = defineStore('page-sworkspace', {
     state: (): WorkspacePageState => ({
         loading: false,
         userLoading: false,
