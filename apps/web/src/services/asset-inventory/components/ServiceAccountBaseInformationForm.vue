@@ -177,7 +177,7 @@ watch(() => props.originForm, (originForm) => {
 <style lang="postcss" scoped>
 .service-account-base-information-form {
     .account-tags {
-        width: 50%;
+        width: 100%;
         max-width: 30rem;
         margin-bottom: 2rem;
     }
@@ -186,7 +186,7 @@ watch(() => props.originForm, (originForm) => {
     :deep(.account-name-input) {
         .input-container {
             max-width: 30rem;
-            width: 50%;
+            width: 100%;
         }
     }
 
@@ -205,7 +205,7 @@ watch(() => props.originForm, (originForm) => {
             width: 100%;
             .input-container {
                 max-width: 30rem;
-                width: 50%;
+                width: 100%;
             }
         }
     }
