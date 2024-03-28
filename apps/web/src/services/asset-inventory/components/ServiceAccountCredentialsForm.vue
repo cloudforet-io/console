@@ -261,6 +261,7 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
         </p-field-group>
         <template v-if="formState.hasCredentialKey">
             <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED && state.showTrustedAccount"
+                           class="mt-6"
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
@@ -320,7 +321,7 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')"
                            required
-                           class="mb-8"
+                           class="mb-8 mt-6"
             >
                 <div class="flex">
                     <p-radio v-for="(type, idx) in state.secretTypes"
