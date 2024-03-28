@@ -26,7 +26,7 @@ export type PublicDashboardReferenceMap = ReferenceMap<PublicDashboardReferenceI
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const usePublicDashboardReferenceStore = defineStore('dashboard-reference', () => {
+export const usePublicDashboardReferenceStore = defineStore('reference-dashboard', () => {
     const state = reactive({
         items: null as PublicDashboardReferenceMap | null,
     });

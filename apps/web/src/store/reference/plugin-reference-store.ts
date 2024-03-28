@@ -26,7 +26,7 @@ export type PluginReferenceMap = ReferenceMap<PluginItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const usePluginReferenceStore = defineStore('plugin-reference', () => {
+export const usePluginReferenceStore = defineStore('reference-plugin', () => {
     const state = reactive({
         items: null as PluginReferenceMap | null,
     });

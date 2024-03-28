@@ -49,7 +49,7 @@ const { email } = forms;
 const handleChangeInput = (value: string) => {
     state.isValidEmail = false;
     setForm('email', value);
-    emit('change-input', { email: email.value, isValidEmail: state.isValidEmail });
+    emit('change-input', { email: email.value });
 };
 const handleClickChange = () => {
     if (!state.isEdit) {

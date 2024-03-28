@@ -33,7 +33,7 @@ export type CostDataSourceReferenceMap = ReferenceMap<CostDataSourceItems>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
+export const useCostDataSourceReferenceStore = defineStore('reference-cost-data-source', () => {
     const appContextStore = useAppContextStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),

@@ -26,7 +26,7 @@ export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useWorkspaceReferenceStore = defineStore('workspace-reference', () => {
+export const useWorkspaceReferenceStore = defineStore('reference-workspace', () => {
     const appContextStore = useAppContextStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),

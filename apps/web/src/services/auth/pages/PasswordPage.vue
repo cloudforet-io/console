@@ -240,6 +240,7 @@ const postResetPassword = async (request) => {
     try {
         const userInfo = await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
         await store.commit('user/setUser', userInfo);
+        SpaceConnector.flushToken();
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));

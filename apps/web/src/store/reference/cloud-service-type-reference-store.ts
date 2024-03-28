@@ -28,7 +28,7 @@ export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useCloudServiceTypeReferenceStore = defineStore('cloud-service-type-reference', () => {
+export const useCloudServiceTypeReferenceStore = defineStore('reference-cloud-service-type', () => {
     const state = reactive({
         items: null as CloudServiceTypeReferenceMap | null,
     });

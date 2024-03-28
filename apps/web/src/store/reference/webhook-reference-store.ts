@@ -26,7 +26,7 @@ export type WebhookReferenceMap = ReferenceMap<WebhookItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useWebhookReferenceStore = defineStore('webhook-reference', () => {
+export const useWebhookReferenceStore = defineStore('reference-webhook', () => {
     const state = reactive({
         items: null as WebhookReferenceMap | null,
     });

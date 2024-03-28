@@ -26,7 +26,7 @@ export type SecretReferenceMap = ReferenceMap<SecretItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useSecretReferenceStore = defineStore('secret-reference', () => {
+export const useSecretReferenceStore = defineStore('reference-secret', () => {
     const state = reactive({
         items: null as SecretReferenceMap | null,
     });

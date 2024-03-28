@@ -116,6 +116,13 @@ const state = reactive({
             });
             results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
         }
+        if (state.favoriteSecurityItems.length) {
+            if (results.length !== 0) results.push({ type: 'divider' });
+            results.push({
+                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_SECURITY'), type: 'header', itemType: FAVORITE_TYPE.SECURITY,
+            });
+            results.push(...state.favoriteSecurityItems.slice(0, FAVORITE_LIMIT));
+        }
         if (state.favoriteCostAnalysisItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
             results.push({
@@ -147,6 +154,10 @@ const state = reactive({
         if (state.showAllType === FAVORITE_TYPE.COST_ANALYSIS) {
             items = state.favoriteCostAnalysisItems;
             label = i18n.t('COMMON.GNB.FAVORITES.ALL_COST_ANALYSIS');
+        }
+        if (state.showAllType === FAVORITE_TYPE.SECURITY) {
+            items = state.favoriteSecurityItems;
+            label = i18n.t('COMMON.GNB.FAVORITES.ALL_SECURITY');
         }
         return [
             {
@@ -192,6 +203,13 @@ const state = reactive({
         const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(favoriteGetters.projectGroupItems ?? [], storeState.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
+    favoriteSecurityItems: computed<FavoriteItem[]>(() => {
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.SECURITY, store.getters['user/pageAccessPermissionList']);
+        return isUserAccessible ? convertCloudServiceConfigToReferenceData(
+            favoriteGetters.securityItems ?? [],
+            storeState.cloudServiceTypes,
+        ) : [];
+    }),
 });
 
 /* Util */
@@ -201,6 +219,7 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.PROJECT) return state.favoriteProjects.length;
     if (type === FAVORITE_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
+    if (type === FAVORITE_TYPE.SECURITY) return state.favoriteSecurityItems.length;
     return 0;
 };
 
@@ -262,6 +281,16 @@ const handleSelect = (item: FavoriteMenuItem) => {
             params: {
                 dataSourceId,
                 costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
+            },
+        }).catch(() => {});
+    } else if (item.itemType === FAVORITE_TYPE.SECURITY) {
+        const itemInfo: string[] = itemName.split('.');
+        router.push({
+            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+            params: {
+                provider: itemInfo[0],
+                group: itemInfo[1],
+                name: itemInfo[2],
             },
         }).catch(() => {});
     }

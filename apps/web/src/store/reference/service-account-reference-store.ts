@@ -30,7 +30,7 @@ export type ServiceAccountReferenceMap = ReferenceMap<ServiceAccountItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useServiceAccountReferenceStore = defineStore('service-account-reference', () => {
+export const useServiceAccountReferenceStore = defineStore('reference-service-account', () => {
     const state = reactive({
         items: null as ServiceAccountReferenceMap | null,
     });

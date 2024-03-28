@@ -28,7 +28,7 @@ interface CostReportItem extends CostReportModel {
     report_url?: string;
 }
 
-export const useCostReportPageStore = defineStore('cost-report-page', () => {
+export const useCostReportPageStore = defineStore('page-cost-report', () => {
     const state = reactive({
         activeTab: 'overview',
         //

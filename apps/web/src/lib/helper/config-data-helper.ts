@@ -131,7 +131,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
 
     const reorderedConfig: ConfigData[] = [];
     Object.values(cloudServiceReference).forEach((menu) => {
-        const configItem = config.find((item) => item.itemId === menu.data.cloudServiceTypeKey);
+        const configItem = config.find((item) => item.itemId === menu.data.cloud_service_type_key);
         if (configItem) {
             reorderedConfig.push(configItem);
         }
@@ -139,7 +139,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
 
     reorderedConfig.forEach((d) => {
         const resource = Object.values(cloudServiceReference)
-            .find((c) => c.data.cloudServiceTypeKey === d.itemId);
+            .find((c) => c.data.cloud_service_type_key === d.itemId);
         if (resource) {
             results.push({
                 ...d,

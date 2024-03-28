@@ -14,7 +14,7 @@ import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export const useBudgetDetailPageStore = defineStore('budget-detail-page', {
+export const useBudgetDetailPageStore = defineStore('page-budget-detail', {
     state: () => ({
         loading: true,
         budgetData: null as BudgetModel|null,
