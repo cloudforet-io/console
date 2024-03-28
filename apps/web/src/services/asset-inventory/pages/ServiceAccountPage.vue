@@ -6,7 +6,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -42,6 +42,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
@@ -111,17 +112,25 @@ const tableState = reactive({
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,
-    accountTypeList: computed(() => [
-        { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
-        { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
-    ]),
+    accountTypeList: computed(() => {
+        if (state.isAdminMode) {
+            return [
+                { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
+            ];
+        }
+        return [
+            { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
+            { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
+        ];
+    }),
     selectedAccountType: computed<AccountType>(() => serviceAccountSchemaState.selectedAccountType),
     tableTitle: computed(() => {
-        if (tableState.isTrustedAccount) return 'Trusted Account';
-        if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
-            return `${state.selectedProviderName} ${PROVIDER_ACCOUNT_NAME[state.selectedProvider]}`;
-        }
-        return 'General Account';
+        let baseTitle:string;
+        if (tableState.isTrustedAccount) baseTitle = 'Trusted Account';
+        else if (Object.keys(PROVIDER_ACCOUNT_NAME).includes(state.selectedProvider)) {
+            baseTitle = PROVIDER_ACCOUNT_NAME[state.selectedProvider];
+        } else baseTitle = 'General Account';
+        return `${state.selectedProviderName} ${baseTitle}`;
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
@@ -284,13 +293,14 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 }, { immediate: true });
 
 (async () => {
+    serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
     if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
 })();
 </script>
 
 <template>
     <section class="service-account-page">
-        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: state.selectedProviderName})" />
+        <p-heading :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT')" />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
                        class="service-account-provider-list"
@@ -318,6 +328,11 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                        :total-count="typeOptionState.totalCount"
                        heading-type="sub"
             >
+                <template #title-left-extra>
+                    <p-lazy-img class="provider"
+                                :src="state.providers[state.selectedProvider]?.icon || ''"
+                    />
+                </template>
                 <template #extra>
                     <p-button style-type="primary"
                               icon-left="ic_plus_bold"
@@ -344,7 +359,13 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                               @export="exportServiceAccountData"
                               @click-settings="handleClickSettings"
                               @click-row="handleClickRow"
-            />
+            >
+                <template #col-schedule.state-format="{value}">
+                    <auto-sync-state v-if="value"
+                                     :state="value"
+                    />
+                </template>
+            </p-dynamic-layout>
         </component>
         <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
@@ -359,6 +380,10 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
 
 .service-account-table-heading {
     margin-bottom: 0;
+
+    .provider {
+        margin-left: 0.5rem;
+    }
 }
 
 .service-account-provider-list {

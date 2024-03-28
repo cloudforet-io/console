@@ -2745,7 +2745,7 @@
 				"NO_CREDENTIALS": "암호화 키가 등록되어 있지 않습니다.",
 				"PROJECT_REQUIRED_HELP_TEXT": "이제, 서비스 어카운트에 반드시 하나의 프로젝트를 연결해주어야 합니다. \n( 이후, 랜덤으로 생성된 프로젝트가 강제로 연결될 수 있습니다. ) ",
 				"REQUIRED": "프로젝트 추가 필요",
-				"SAVE": "저장",
+				"SAVE": "변경 저장 ",
 				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account의 암호화 키는 다른 General Account로부터의 참조를 허용합니다."
 			}
 		}

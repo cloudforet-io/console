@@ -91,15 +91,8 @@ const deleteGeneralSecret = async (): Promise<void> => {
 
 const setGeneralSecret = async () => {
     try {
-        let data;
-        if (state.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(state.credentialForm.credentialJson);
-        } else if (state.credentialForm.activeDataType === 'input') {
-            data = state.credentialForm.customSchemaForm;
-        }
-
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
-            secret_data: data,
+            secret_data: state.credentialForm.customSchemaForm,
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             service_account_id: props.serviceAccountId ?? '',
             trusted_account_id: state.credentialForm.attachedTrustedAccountId,
@@ -111,17 +104,10 @@ const setGeneralSecret = async () => {
 };
 const updateTrustedSecretData = async () => {
     try {
-        let data;
-        if (state.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(state.credentialForm.credentialJson);
-        } else if (state.credentialForm.activeDataType === 'input') {
-            data = state.credentialForm.customSchemaForm;
-        }
-
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
-            secret_data: data,
+            secret_data: state.credentialForm.customSchemaForm,
         });
 
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
@@ -219,21 +205,6 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="state.mode === 'UPDATE'"
-                     class="button-wrapper"
-                >
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!state.isFormValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
-                    </p-button>
-                </div>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -251,6 +222,23 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
                                               :origin-form="state.originCredentialForm"
                                               @change="handleChangeCredentialForm"
             />
+            <div v-if="state.mode === 'UPDATE'"
+                 class="button-wrapper"
+            >
+                <p-button style-type="tertiary"
+                          class="mr-4"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="state.loading"
+                          :disabled="!state.isFormValid"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -264,6 +252,11 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
         .service-account-credentials-form {
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+
+        .button-wrapper {
+            padding-left: 1rem;
+            margin-top: 2rem;
         }
     }
 }

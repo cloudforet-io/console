@@ -27,7 +27,7 @@ interface Props {
     isValid: boolean;
     originForm?: Partial<BaseInformationForm>;
     accountType?: AccountType;
-    isUpdateMode: boolean;
+    isUpdateMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -197,6 +197,10 @@ watch(() => props.originForm, (originForm) => {
 
     /* custom design-system component - p-json-schema-form */
     :deep(.p-json-schema-form) {
+        .p-field-group {
+            margin-bottom: 1.5rem;
+        }
+
         .p-text-input {
             width: 100%;
             .input-container {

@@ -161,21 +161,6 @@ watch(() => props.provider, async (provider) => {
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="state.mode === 'UPDATE'"
-                     class="button-wrapper"
-                >
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!state.isFormValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
-                    </p-button>
-                </div>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -193,6 +178,23 @@ watch(() => props.provider, async (provider) => {
                                                    :account-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
+            <div v-if="state.mode === 'UPDATE'"
+                 class="button-wrapper"
+            >
+                <p-button style-type="tertiary"
+                          class="mr-4"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="state.loading"
+                          :disabled="!state.isFormValid"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -205,6 +207,9 @@ watch(() => props.provider, async (provider) => {
         .service-account-base-information-form {
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+        .button-wrapper {
+            padding-left: 1rem;
         }
     }
 }
