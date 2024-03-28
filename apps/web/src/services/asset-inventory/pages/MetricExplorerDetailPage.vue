@@ -13,12 +13,22 @@ import MetricExplorerQuerySection from '@/services/asset-inventory/components/Me
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+interface Props {
+    id: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    id: '',
+});
 
-watch(() => metricExplorerPageState.metricId, (metricId) => {
-    if (metricId) metricExplorerPageStore.fetchMetric();
-    else metricExplorerPageStore.setMetric(undefined);
+const metricExplorerPageStore = useMetricExplorerPageStore();
+
+watch(() => props.id, (metricId) => {
+    if (metricId) {
+        metricExplorerPageStore.setMetricId(metricId);
+        metricExplorerPageStore.loadMetric();
+    } else {
+        metricExplorerPageStore.setMetricId();
+    }
 }, { immediate: true });
 </script>
 

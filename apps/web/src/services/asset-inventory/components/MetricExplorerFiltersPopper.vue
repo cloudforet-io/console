@@ -25,22 +25,14 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
 };
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
-        if (!metricExplorerPageState.enabledFiltersProperties) return [];
-        return metricExplorerPageState.enabledFiltersProperties.map((d) => {
-            if (metricExplorerPageState.groupByList.includes(d)) {
-                return { name: d, label: d };
-            }
-            return { name: d, label: d };
-        });
-    }),
-    groupByItems: computed<SelectDropdownMenuItem[]>(() => []),
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.groupByItems),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
-        state.groupByItems.forEach(({ name }) => {
+        metricExplorerPageGetters.groupByItems.forEach(({ name }) => {
             handlerMaps[name] = getMenuHandler(name);
         });
         return handlerMaps;

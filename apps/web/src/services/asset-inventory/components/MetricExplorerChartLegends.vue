@@ -6,7 +6,6 @@ import {
 import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -31,10 +30,10 @@ const emit = defineEmits<{(e: 'toggle-series', index: number): void;
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
-    groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => []),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
 });
 
@@ -78,18 +77,18 @@ const handleChartGroupByItem = (groupBy?: string) => {
 };
 
 /* Watcher */
-watch(() => state.groupByMenuItems, (after) => {
+watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
     if (!after.length) {
         metricExplorerPageStore.setSelectedChartGroupBy(undefined);
-    } else if (!after.filter((d) => d.name === metricExplorerPageState.selectedChartGroupBy).length) {
-        metricExplorerPageStore.setSelectedChartGroupBy(after[0].name);
+    } else if (!after.filter((d) => d === metricExplorerPageState.selectedChartGroupBy).length) {
+        metricExplorerPageStore.setSelectedChartGroupBy(after[0]);
     }
 });
 </script>
 
 <template>
     <div class="metric-explorer-chart-legends">
-        <p-select-dropdown :menu="state.groupByMenuItems"
+        <p-select-dropdown :menu="metricExplorerPageGetters.selectedGroupByItems"
                            :selected="metricExplorerPageState.selectedChartGroupBy"
                            :disabled="!metricExplorerPageState.selectedGroupByList.length"
                            class="group-by-select-dropdown"
