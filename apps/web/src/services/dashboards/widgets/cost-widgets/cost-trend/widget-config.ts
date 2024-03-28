@@ -28,6 +28,7 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
         'cost_data_type',
         ['granularity', { readonly: true }],
         'filters.provider',
+        'filters.project_group',
         'filters.project',
         'filters.service_account',
         'filters.region',

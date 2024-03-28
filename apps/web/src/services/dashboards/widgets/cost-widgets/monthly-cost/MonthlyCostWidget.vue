@@ -311,6 +311,7 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 watch(() => props.width, (_width) => {
+    if (!displayState.chartXAxis) return;
     if (_width && (_width < CHART_XAXIS_CHANGE_THRESHOLD_WIDTH)) {
         displayState.chartXAxis.get('dateFormats').month = 'M';
     } else {
