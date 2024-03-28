@@ -6,10 +6,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
 import type { MetricListParameters } from '@/schema/inventory/metric/api-verbs/list';
 import type { MetricModel } from '@/schema/inventory/metric/model';
+import type { NamespaceGetParameters } from '@/schema/inventory/namespace/api-verbs/get';
+import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
@@ -30,7 +31,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
         enabledFiltersProperties: undefined as string[]|undefined,
         filters: {} as Record<string, string[]>,
-        namespaces: [] as MetricNamespace[],
+        namespaces: [] as NamespaceModel[],
         metricList: [] as MetricModel[],
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
@@ -89,22 +90,15 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     };
     const loadNamespaces = async () => {
         state.loading = true;
-        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudService.analyze);
+        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.namespace.list);
         try {
-            const { response, status } = await fetcher<CloudServiceAnalyzeParameters, ListResponse<MetricNamespace>>({
-                query: {
-                    group_by: ['cloud_service_group', 'provider', 'cloud_service_type'],
-                    fields: {},
-                    filter: [{ k: 'state', v: ['ACTIVE'], o: 'in' }],
-                    filter_or: [],
-                    sort: [{ key: 'provider', desc: false }, { key: 'cloud_service_group', desc: false }, { key: 'cloud_service_type', desc: false }],
-                },
-            });
+            const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
             if (status === 'succeed') {
-                state.namespaces = response.results ?? [];
+                state.namespaces = response.results || [];
             }
         } catch (e) {
             console.error(e);
+            state.namespaces = [];
         } finally {
             state.loading = false;
         }
