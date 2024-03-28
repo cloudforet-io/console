@@ -1234,7 +1234,7 @@
 			"VERSION": "버전 "
 		},
 		"STARRED": "즐겨찾기",
-		"STARRED_NO_DATA": "로 추가한 목록이 이곳에 표시됩니다.",
+		"STARRED_NO_DATA": "즐겨찾기 없음",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",

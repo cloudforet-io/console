@@ -1234,7 +1234,7 @@
 			"VERSION": "バージョン"
 		},
 		"STARRED": "お気に入り",
-		"STARRED_NO_DATA": "アイテムはここに表示されます。",
+		"STARRED_NO_DATA": "お気に入りがありません。",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
