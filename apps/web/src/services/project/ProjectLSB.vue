@@ -32,8 +32,8 @@ const { favoriteItems, beforeFavoriteRoute, handleDeleteFavorite } = useProjectF
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
-const handleBeforeFavoriteRoute = (item: FavoriteItem, e: MouseEvent) => {
-    beforeFavoriteRoute(item, e);
+const handleBeforeFavoriteRoute = async (item: FavoriteItem) => {
+    await beforeFavoriteRoute(item);
     if (item.itemType !== FAVORITE_TYPE.PROJECT_GROUP) {
         router.push({
             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,

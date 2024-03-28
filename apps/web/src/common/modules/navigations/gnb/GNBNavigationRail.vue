@@ -137,7 +137,7 @@ const refinedMenuList = (list, value) => {
 
 <template>
     <div class="g-n-b-navigation-rail"
-         :class="{'is-minimize': !storeState.isHideNavRail && storeState.isMinimizeNavRail, 'is-mobile': state.isMobileSize, 'is-hide': storeState.isHideNavRail}"
+         :class="{'is-minimize': storeState.isMinimizeNavRail, 'is-mobile': state.isMobileSize, 'is-hide': !state.isMobileSize && storeState.isHideNavRail}"
          @mouseover="handleMouseEvent(true)"
          @mouseleave="handleMouseEvent(false)"
     >
@@ -313,6 +313,7 @@ const refinedMenuList = (list, value) => {
         border-top-left-radius: 6.25rem;
         border-bottom-left-radius: 6.25rem;
         transition: padding 0.1s ease;
+        z-index: 50;
         &:hover {
             @apply bg-violet-200 text-violet-600;
             padding-right: 0.75rem;
@@ -330,25 +331,21 @@ const refinedMenuList = (list, value) => {
         }
     }
     &.is-mobile {
-        transition: width 0.3s ease;
         .minimize-button-wrapper {
             width: 0;
             padding: 0;
         }
         &.is-minimize {
+            transition: width 0.3s ease;
             width: 0;
             padding: 0;
-            .minimize-button-wrapper, .service-menu, .menu-wrapper {
-                width: 0;
-                padding: 0;
-            }
         }
     }
-    &.is-minimize {
+    &.is-minimize:not(.is-mobile, .is-hide) {
         @apply bg-gray-100 cursor-pointer;
+        z-index: 49;
         width: $gnb-navigation-rail-min-width;
         box-shadow: unset;
-        z-index: 49;
         .minimize-button-wrapper {
             @apply hidden;
         }
@@ -361,27 +358,22 @@ const refinedMenuList = (list, value) => {
                 @apply bg-violet-200;
             }
         }
-        &:not(.is-mobile) {
-            &:hover {
-                @apply bg-white;
-                width: $gnb-navigation-rail-max-width;
-                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
-                .minimize-button-wrapper {
-                    @apply block;
+        &:hover {
+            @apply bg-white;
+            width: $gnb-navigation-rail-max-width;
+            z-index: 51;
+            .minimize-button-wrapper {
+                @apply block;
+            }
+            .service-menu {
+                width: 100%;
+                &:hover:not(.is-only-label) {
+                    @apply bg-violet-100;
                 }
-                .service-menu {
-                    width: 100%;
-                    &:hover:not(.is-only-label) {
-                        @apply bg-violet-100;
-                    }
-                    &.is-selected {
-                        @apply bg-violet-100;
-                    }
+                &.is-selected {
+                    @apply bg-violet-100;
                 }
             }
-        }
-        &:hover {
-            z-index: 51;
         }
     }
     .menu-description {

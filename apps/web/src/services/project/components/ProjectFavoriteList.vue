@@ -14,10 +14,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import type { FavoriteItem, FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { yellow } from '@/styles/colors';
-
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 const LIMIT_COUNT = 5;
 
@@ -35,7 +32,6 @@ const props = withDefaults(defineProps<Props>(), {
 const route = useRoute();
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const projectPageStore = useProjectPageStore();
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -59,7 +55,6 @@ const handleClickToggle = () => {
     state.isExpanded = !state.isExpanded;
 };
 const handleClickItem = async (item, e) => {
-    projectPageStore.setSelectedFavoriteItem(item);
     if (props.beforeRoute) {
         const res = props.beforeRoute(item, e);
         if (res) await res;
@@ -75,12 +70,6 @@ const handleClickItem = async (item, e) => {
         <span v-else-if="props.items.length === 0"
               class="no-data"
         >
-            <p-i class="menu-icon"
-                 name="ic_star-filled"
-                 height="1rem"
-                 width="1rem"
-                 :color="yellow[500]"
-            />
             {{ $t('COMMON.STARRED_NO_DATA') }}
         </span>
         <template v-else>
@@ -169,7 +158,7 @@ const handleClickItem = async (item, e) => {
         }
     }
     .no-data {
-        @apply flex items-center text-gray-500;
+        @apply flex items-start text-gray-500;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.125rem;
