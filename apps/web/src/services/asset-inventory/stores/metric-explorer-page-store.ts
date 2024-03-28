@@ -44,6 +44,10 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
                 label: label.name,
             }));
         }),
+        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => state.selectedGroupByList.map((groupBy) => ({
+            name: groupBy,
+            label: state.metric?.label_keys?.find((label) => label.key === groupBy)?.name ?? groupBy,
+        }))),
     });
 
     /* Mutations */
@@ -68,8 +72,8 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const setFilters = (filters: Record<string, string[]>) => {
         state.filters = filters;
     };
-    const setMetric = (metric?: MetricModel) => {
-        state.metric = metric;
+    const setMetricId = (metricId?: string) => {
+        state.metricId = metricId;
     };
 
     /* Actions */
@@ -148,7 +152,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         setSelectedChartGroupBy,
         setEnabledFiltersProperties,
         setFilters,
-        setMetric,
+        setMetricId,
     };
 
     return {
