@@ -1080,9 +1080,11 @@
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
 				"EXPAND_GNB_RAIL": "Expand menu",
 				"FAVORITE": "Favorites",
+				"HIDE_GNB_RAIL": "Close menu",
 				"MINIMIZE_GNB_RAIL": "Minimize menu",
 				"NOTICE": "Notice",
 				"NOTIFICATIONS": "Notifications",
+				"OPEN_GNB_RAIL": "Open menu",
 				"PROFILE": "My Page",
 				"SEARCH": "Search"
 			},

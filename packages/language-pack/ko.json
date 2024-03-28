@@ -1080,9 +1080,11 @@
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
 				"EXPAND_GNB_RAIL": "",
 				"FAVORITE": "즐겨찾기 ",
+				"HIDE_GNB_RAIL": "",
 				"MINIMIZE_GNB_RAIL": "",
 				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
+				"OPEN_GNB_RAIL": "",
 				"PROFILE": "마이페이지",
 				"SEARCH": "검색"
 			},
