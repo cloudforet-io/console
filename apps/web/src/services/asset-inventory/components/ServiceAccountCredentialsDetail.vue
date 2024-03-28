@@ -4,6 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PDataLoader, PDynamicLayout, PButton,
 } from '@spaceone/design-system';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@spaceone/design-system/src/data-display/tables/definition-table/config';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
@@ -84,6 +85,7 @@ const state = reactive({
             name: 'Credentials',
             type: 'item',
             options: {
+                styleType: DEFINITION_TABLE_STYLE_TYPE.white,
                 fields,
                 translation_id: 'IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS',
             },

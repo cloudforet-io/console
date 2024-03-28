@@ -22,7 +22,6 @@ import type {
 } from '@/schema/identity/trusted-account/api-verbs/update-secret-data';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import type { SecretGetParameters } from '@/schema/secret/secret/api-verbs/get';
-import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretGetParameters } from '@/schema/secret/trusted-secret/api-verbs/get';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
@@ -92,7 +91,7 @@ const deleteGeneralSecret = async (): Promise<void> => {
 const setGeneralSecret = async () => {
     try {
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
-            secret_data: state.credentialForm.customSchemaForm,
+            secret_data: JSON.parse(state.credentialForm.credentialJson),
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             service_account_id: props.serviceAccountId ?? '',
             trusted_account_id: state.credentialForm.attachedTrustedAccountId,
@@ -107,7 +106,7 @@ const updateTrustedSecretData = async () => {
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
-            secret_data: state.credentialForm.customSchemaForm,
+            secret_data: JSON.parse(state.credentialForm.credentialJson),
         });
 
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
@@ -125,10 +124,6 @@ const handleClickCancelButton = () => {
 };
 const handleClickSaveButton = async () => {
     if (!state.isFormValid) return;
-    // preprocessing for Google Cloud form
-    if (state.credentialForm.customSchemaForm?.private_key) {
-        state.credentialForm.customSchemaForm.private_key = state.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
-    }
     if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
         if (!state.credentialForm.hasCredentialKey) {
             if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
@@ -145,21 +140,6 @@ const handleChangeCredentialForm = (credentialForm) => {
     state.credentialForm = credentialForm;
 };
 
-const getSecretSchema = async () => {
-    try {
-        if (state.credentialData?.trusted_secret_id) {
-            state.credentialForm.customSchemaForm = await SpaceConnector.clientV2.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
-                trusted_secret_id: state.credentialData.trusted_secret_id,
-            });
-        } else if (state.credentialData && 'secret_id' in state.credentialData) {
-            state.credentialForm.customSchemaForm = await SpaceConnector.clientV2.secret.secret.get<SecretListParameters, SecretModel>({
-                secret_id: state.credentialData.secret_id,
-            });
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 const getSecretData = async () => {
     if (!props.serviceAccountData) return;
@@ -184,7 +164,6 @@ const getSecretData = async () => {
 watch(() => props.serviceAccountData, async (serviceAccountData) => {
     if (serviceAccountData && !props.serviceAccountLoading) {
         await getSecretData();
-        if (state.credentialData) await getSecretSchema();
     }
 }, { immediate: true });
 watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {

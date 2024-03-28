@@ -116,7 +116,7 @@ const getEscalationPolicy = async () => {
 </script>
 
 <template>
-    <p-pane-layout class="border-none">
+    <p-pane-layout class="alert-detail-info-table">
         <p-definition-table :fields="state.fields"
                             :data="state.data"
                             :skeleton-rows="10"
@@ -202,6 +202,11 @@ const getEscalationPolicy = async () => {
 </template>
 
 <style lang="postcss" scoped>
+.alert-detail-info-table {
+    overflow: hidden;
+    padding-bottom: 2.5rem;
+}
+
 .additional-info {
     @apply text-gray-500;
     font-size: 0.875rem;

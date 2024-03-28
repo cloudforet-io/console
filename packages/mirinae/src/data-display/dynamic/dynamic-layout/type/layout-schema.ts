@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-cycle
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import type { KeyDataType } from '@/inputs/search/query-search/type';
 
 /** Search schema types */
@@ -52,6 +53,7 @@ export interface CommonOptions {
 
 export interface ItemOptions extends CommonOptions {
     fields: DynamicField[];
+    styleType?: DEFINITION_TABLE_STYLE_TYPE;
 }
 
 export interface SimpleTableOptions extends CommonOptions {

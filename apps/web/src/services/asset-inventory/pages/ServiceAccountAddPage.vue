@@ -90,12 +90,6 @@ const createAccount = async (): Promise<string|undefined> => {
     const data = formState.baseInformationForm.customSchemaForm;
 
     let res: TrustedAccountModel|ServiceAccountModel;
-    if (formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
-        // preprocessing for Google Cloud form
-        if (formState.credentialForm.customSchemaForm?.private_key) {
-            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
-        }
-    }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
     if (state.isTrustedAccount) {
@@ -104,7 +98,7 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName,
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-            secret_data: formState.credentialForm.customSchemaForm,
+            secret_data: JSON.parse(formState.credentialForm.credentialJson),
             resource_group: 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
         });
@@ -114,7 +108,7 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName.trim(),
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-            secret_data: formState.credentialForm.customSchemaForm,
+            secret_data: JSON.parse(formState.credentialForm.credentialJson),
             tags: formState.baseInformationForm.tags,
             trusted_account_id: attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
