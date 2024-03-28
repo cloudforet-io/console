@@ -15,6 +15,8 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
+import { useEscalationPolicyReferenceStore } from '@/store/reference/escalation-policy-reference-store';
 import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
@@ -52,7 +54,8 @@ type PiniaStoreReferenceType =
     |'trusted_account'
     |'user'
     |'webhook'
-    |'workspace';
+    |'workspace'
+    |'escalation_policy';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
@@ -72,6 +75,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const trustedAccountReferenceStore = useTrustedAccountReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
     const regionReferenceStore = useRegionReferenceStore();
+    const escalationPolicyReferenceStore = useEscalationPolicyReferenceStore();
 
     const getters = reactive({
         cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
@@ -91,6 +95,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
         secret: computed(() => secretReferenceStore.getters.secretItems),
         region: computed(() => regionReferenceStore.getters.regionItems),
+        escalationPolicy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
     });
 
     const actions = {
@@ -126,6 +131,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await secretReferenceStore.sync(data); break;
             case 'region':
                 await regionReferenceStore.sync(data); break;
+            case 'escalation_policy':
+                await escalationPolicyReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -165,6 +172,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await secretReferenceStore.load(options); break;
             case 'region':
                 await regionReferenceStore.load(options); break;
+            case 'escalation_policy':
+                await escalationPolicyReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -186,6 +195,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             trustedAccountReferenceStore.flush();
             secretReferenceStore.flush();
             regionReferenceStore.flush();
+            escalationPolicyReferenceStore.flush();
         },
     };
 

@@ -16,6 +16,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+
 interface Props {
     data?: EventRuleModel;
 }
@@ -36,6 +38,7 @@ const state = reactive({
         { name: 'change_project', label: _i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
         { name: 'change_urgency', label: _i18n.t('PROJECT.EVENT_RULE.URGENCY') },
         { name: 'change_assignee', label: _i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
+        { name: 'change_escalation_policy', label: _i18n.t('PROJECT.EVENT_RULE.ESCALATION_POLICY') },
         { name: 'add_additional_info', label: _i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
         { name: 'stop_processing', label: _i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
     ])),
@@ -48,6 +51,7 @@ const state = reactive({
         ANY: _i18n.t('PROJECT.EVENT_RULE.ANY'),
         ALL: _i18n.t('PROJECT.EVENT_RULE.ALL'),
     })),
+    escalationPolicies: computed(() => allReferenceStore.getters.escalationPolicy),
 });
 </script>
 
@@ -92,6 +96,16 @@ const state = reactive({
                                             { resource_type: 'identity.Project' }))"
                                 >
                                     {{ state.projects[state.items[field.name]] ? state.projects[state.items[field.name]].label : state.items[field.name] }}
+                                </p-link>
+                            </td>
+                            <td v-else-if="field.name === 'change_escalation_policy'">
+                                <p-link action-icon="internal-link"
+                                        new-tab
+                                        :to="getProperRouteLocation({
+                                            name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME
+                                        })"
+                                >
+                                    {{ state.escalationPolicies[state.items[field.name]].label }}
                                 </p-link>
                             </td>
                             <td v-else-if="field.name === 'add_additional_info'">

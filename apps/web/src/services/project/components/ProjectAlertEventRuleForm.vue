@@ -57,6 +57,7 @@ const state = reactive({
     actions: {
         change_assignee: undefined,
         change_urgency: undefined,
+        change_escalation_policy: undefined,
         add_additional_info: undefined,
         no_notification: undefined,
     } as EventRuleActions,

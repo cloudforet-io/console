@@ -29,6 +29,7 @@ export interface EventRuleActions {
     change_assignee?: string;
     change_urgency?: AlertUrgency;
     change_project?: string;
+    change_escalation_policy?: string;
     add_additional_info?: Record<string, string>;
     no_notification?: boolean;
 }
