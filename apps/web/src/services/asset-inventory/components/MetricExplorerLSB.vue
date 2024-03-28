@@ -7,6 +7,8 @@ import {
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
+
+import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -27,15 +29,12 @@ import { gray, yellow } from '@/styles/colors';
 
 import AddCustomMetricModal from '@/services/asset-inventory/components/AddCustomMetricModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { MetricNamespace } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface NamespaceSubItemType {
     label: string;
     name: string;
-    provider: string;
-    cloudServiceGroup: string;
-    cloudServiceType: string;
+    provider?: string;
 }
 
 const route = useRoute();
@@ -86,7 +85,7 @@ const state = reactive({
 const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
-    namespaces: computed(() => metricExplorerPageStore.state.namespaces),
+    namespaces: computed<NamespaceModel[]>(() => metricExplorerPageStore.state.namespaces),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
         if (!keyword) return namespaceState.namespaces;
@@ -99,7 +98,8 @@ const namespaceState = reactive({
     namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
         return [
-            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
     selectedNamespace: undefined as NamespaceSubItemType | undefined,
@@ -113,17 +113,26 @@ const metricState = reactive({
 });
 
 /* Helper */
-const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+    const commonNamespaces = namespaces.filter((namespace) => namespace.provider === 'COMMON').map((namespace) => ({
+        label: namespace.name,
+        name: namespace.namespace_id,
+    }));
+    return [{
+        type: MENU_ITEM_TYPE.COLLAPSIBLE,
+        label: i18n.t('COMMON.COMMON'),
+        subItems: commonNamespaces,
+    }];
+};
+const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.forEach((namespace) => {
+    namespaces.filter((namespace) => namespace.category === 'ASSET').forEach((namespace) => {
         const providerData = storeState.providers[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
-                label: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
-                name: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                label: namespace.name,
+                name: namespace.namespace_id,
                 provider: namespace.provider,
-                cloudServiceGroup: namespace.cloud_service_group,
-                cloudServiceType: namespace.cloud_service_type,
             });
         } else {
             namespaceMap[namespace.provider] = {
@@ -131,11 +140,9 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): L
                 label: providerData.label,
                 icon: providerData.icon,
                 subItems: [{
-                    label: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
-                    name: `${namespace.cloud_service_group}/${namespace.cloud_service_type}`,
+                    label: namespace.name,
+                    name: namespace.namespace_id,
                     provider: namespace.provider,
-                    cloudServiceGroup: namespace.cloud_service_group,
-                    cloudServiceType: namespace.cloud_service_type,
                 }],
             };
         }
@@ -143,22 +150,20 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: MetricNamespace[]): L
     return Object.values(namespaceMap);
 };
 const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined => {
-    const cloudServiceGroup = namespace.cloudServiceGroup;
-    const cloudServiceType = namespace.cloudServiceType;
     const provider = namespace.provider;
+    const formattedCloudServiceName = namespace.label.replace('/', ':');
 
-    if (cloudServiceGroup && provider && cloudServiceType) {
-        const key = `${provider}:${cloudServiceGroup}:${cloudServiceType}`;
+    if (provider) {
+        const key = `${provider}:${formattedCloudServiceName}`;
         const icon = storeState.cloudServiceTypeToItemMap[key]?.icon;
         if (icon) return assetUrlConverter(icon);
     }
     return undefined;
 };
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
-    if (!metricState.selectedMetric) return false;
-    return metricState.selectedMetric.cloudServiceGroup === namespace.cloudServiceGroup
-        && metricState.selectedMetric.cloudServiceType === namespace.cloudServiceType
-        && metricState.selectedMetric.provider === namespace.provider;
+    if (!namespaceState.selectedNamespace) return false;
+    return namespaceState.selectedNamespace.name === namespace.name
+        && namespaceState.selectedNamespace.provider === namespace.provider;
 };
 
 /* Event */
@@ -274,11 +279,11 @@ onMounted(async () => {
                                             height="1.25rem"
                                 />
                                 <p-tooltip class="title"
-                                           :contents="`${namespaceState.selectedNamespace?.cloudServiceGroup} / ${namespaceState.selectedNamespace?.cloudServiceType}`"
+                                           :contents="namespaceState.selectedNamespace?.label || ''"
                                 >
-                                    <span>{{ namespaceState.selectedNamespace?.cloudServiceGroup }}</span>
+                                    <span>{{ namespaceState.selectedNamespace?.label.split('/')[0] }}</span>
                                     <span class="divider">/</span>
-                                    <span class="type">{{ namespaceState.selectedNamespace?.cloudServiceType }}</span>
+                                    <span class="type">{{ namespaceState.selectedNamespace?.label.split('/')[1] }}</span>
                                 </p-tooltip>
                             </div>
                             <p-icon-button style-type="tertiary"
