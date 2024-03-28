@@ -58,7 +58,7 @@ const state = reactive({
             result = {
                 to: undefined,
                 buttonText: undefined,
-                desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') as string,
+                desc: i18n.t('COMMON.ERROR.NO_RESOURCE_TITLE') as string,
             };
         }
         return result;
