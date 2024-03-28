@@ -114,7 +114,7 @@ const metricState = reactive({
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const commonNamespaces = namespaces.filter((namespace) => namespace.provider === 'COMMON').map((namespace) => ({
+    const commonNamespaces = namespaces.filter((namespace) => namespace.category === 'COMMON').map((namespace) => ({
         label: namespace.name,
         name: namespace.namespace_id,
     }));
