@@ -1078,7 +1078,9 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"EXPAND_GNB_RAIL": "",
 				"FAVORITE": "즐겨찾기 ",
+				"MINIMIZE_GNB_RAIL": "",
 				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
 				"PROFILE": "마이페이지",

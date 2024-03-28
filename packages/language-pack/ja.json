@@ -1078,7 +1078,9 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "管理者モードに切り替える",
 				"EXIT_ADMIN_MODE": "管理者モードを終了する",
+				"EXPAND_GNB_RAIL": "",
 				"FAVORITE": "お気に入り",
+				"MINIMIZE_GNB_RAIL": "",
 				"NOTICE": "お知らせ",
 				"NOTIFICATIONS": "通知",
 				"PROFILE": "マイページ",
