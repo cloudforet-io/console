@@ -20,7 +20,7 @@ export interface AlertCount {
     total: number;
 }
 
-export const useProjectDetailPageStore = defineStore('project-detail-page', () => {
+export const useProjectDetailPageStore = defineStore('page-project-detail', () => {
     const state = reactive({
         loading: false,
         projectId: undefined as string | undefined,

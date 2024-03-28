@@ -19,7 +19,7 @@ interface RolePageState {
     pageLimit: number,
 }
 
-export const useRolePageStore = defineStore('role-page', {
+export const useRolePageStore = defineStore('page-role', {
     state: (): RolePageState => ({
         loading: false,
         roles: [] as RoleModel[],

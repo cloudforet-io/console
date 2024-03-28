@@ -7,7 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { GrantScope } from '@/schema/identity/token/type';
 
-import { ERROR_ROUTE } from '@/router/constant';
+import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
 import {
     getCurrentTime,
     getDecodedDataFromAccessToken,
@@ -82,19 +82,19 @@ export class SpaceRouter {
 
             /* Route-Validation-and-Verification Process */
             let continueProcess: boolean;
-            continueProcess = processTokenVerification(to, next);
+            continueProcess = processTokenVerification(to, next, routeScope);
             if (!continueProcess) return;
 
             continueProcess = processRouteIntegrityCheck(to, next);
             if (!continueProcess) return;
 
-            if (routeScope === 'WORKSPACE') {
+            if (routeScope === ROUTE_SCOPE.WORKSPACE) {
                 continueProcess = await processWorkspaceAccessValidation(to, next, userWorkspaceStore.getters.workspaceList);
                 if (!continueProcess) return;
             }
 
             /* Grant Scope Process */
-            if (routeScope !== 'EXCLUDE_AUTH' && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
+            if (routeScope !== ROUTE_SCOPE.EXCLUDE_AUTH && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
                 const { failStatus } = await grantAndLoadByCurrentScope(routeScope, to.params.workspaceId);
 
                 if (failStatus) { // Grant fail
@@ -103,7 +103,7 @@ export class SpaceRouter {
                         name: ERROR_ROUTE._NAME,
                         params: { statusCode: '404' },
                     });
-                } else if (routeScope === 'WORKSPACE') { // Grant success - Workspace
+                } else if (routeScope === ROUTE_SCOPE.WORKSPACE) { // Grant success - Workspace
                     verifyPageAccessAndRedirect(to, next, to.params.workspaceId, SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList']);
                 } else next(); // Grant success - Others (Admin, User)
             } else { // Grant Process Not Needed

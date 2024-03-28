@@ -8,7 +8,7 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
 
-export const useCloudServicePageStore = defineStore('cloud-service-page', {
+export const useCloudServicePageStore = defineStore('page-cloud-service', {
     state: () => ({
         selectedProvider: 'all',
         additionalFilters: {
@@ -21,7 +21,9 @@ export const useCloudServicePageStore = defineStore('cloud-service-page', {
         selectedCategories: (state): CloudServiceCategory[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY] ?? [],
         selectedRegions: (state): string[] => state.additionalFilters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [],
         allFilters(state): ConsoleFilter[] {
-            const filters: ConsoleFilter[] = [];
+            const filters: ConsoleFilter[] = [
+                { k: 'ref_cloud_service_type.labels', v: ['CSPM'], o: '!=' },
+            ];
             if (state.selectedProvider !== 'all') {
                 filters.push({ k: 'provider', v: [state.selectedProvider, 'google'], o: '=' });
             }

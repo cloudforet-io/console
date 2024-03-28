@@ -35,7 +35,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 
-export const useProjectGroupReferenceStore = defineStore('project-group-reference', () => {
+export const useProjectGroupReferenceStore = defineStore('reference-project-group', () => {
     const state = reactive({
         items: null as ProjectGroupReferenceMap | null,
     });

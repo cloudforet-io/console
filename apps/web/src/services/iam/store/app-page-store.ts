@@ -17,8 +17,7 @@ import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-export const useAppPageStore = defineStore('app-page', {
+export const useAppPageStore = defineStore('page-app', {
     state: () => ({
         apps: [] as AppModel[],
         roles: [] as RoleModel[],

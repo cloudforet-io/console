@@ -22,8 +22,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { UserListItemType } from '@/services/iam/types/user-type';
 
-
-export const useUserPageStore = defineStore('user-page', {
+export const useUserPageStore = defineStore('page-user', {
     state: () => ({
         isAdminMode: false,
         loading: true,
