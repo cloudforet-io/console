@@ -16,7 +16,6 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 interface WorkspacePageState {
     loading: boolean;
     userLoading: boolean;
@@ -102,7 +101,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
                 ErrorHandler.handleError(e);
                 this.workspaces = [];
                 this.totalCount = 0;
-                this.roles = [];
             } finally {
                 this.loading = false;
             }

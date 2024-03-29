@@ -1,11 +1,10 @@
 import type { Tags } from '@/schema/_common/model';
-import type { RoleType, RoleState } from '@/schema/identity/role/type';
+import type { RoleType } from '@/schema/identity/role/type';
 
 
 export interface RoleModel {
     role_id: string;
     name: string;
-    state: RoleState;
     role_type: RoleType;
     permissions: string[];
     page_access: string[];
