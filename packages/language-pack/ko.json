@@ -3571,6 +3571,7 @@
 			"EDIT": "편집",
 			"EDIT_EVENT_RULE": "이벤트 규칙 편집",
 			"EQUALS": "같음(equals)",
+			"ESCALATION_POLICY": "에스컬레이션 정책",
 			"EVENT_RULE": "이벤트 규칙",
 			"HIGH": "높음",
 			"LOW": "낮음",
