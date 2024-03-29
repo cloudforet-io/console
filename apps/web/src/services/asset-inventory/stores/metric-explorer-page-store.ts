@@ -21,7 +21,7 @@ import type {
 
 export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
     const state = reactive({
-        loading: false,
+        namespaceListloading: false,
         metricListLoading: false,
         metricLoading: false,
         metricId: undefined as string|undefined,
@@ -89,25 +89,25 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         state.enabledFiltersProperties = undefined;
     };
     const loadNamespaces = async () => {
-        state.loading = true;
+        state.namespaceListloading = true;
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.namespace.list);
         try {
             const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
             if (status === 'succeed') {
                 state.namespaces = response.results || [];
-                state.loading = false;
+                state.namespaceListloading = false;
             }
         } catch (e) {
             console.error(e);
             state.namespaces = [];
-            state.loading = false;
+            state.namespaceListloading = false;
         }
     };
-    const loadMetrics = async () => {
+    const loadMetrics = async (namespaceId: string) => {
         state.metricListLoading = true;
         try {
             const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
-                // namespace_id: state.selectedNamespaceId,
+                namespace_id: namespaceId,
             });
             state.metricList = response.results ?? [];
         } catch (e) {
