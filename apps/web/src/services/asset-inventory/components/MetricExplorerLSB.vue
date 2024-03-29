@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
@@ -8,6 +10,7 @@ import {
 import { isEmpty } from 'lodash';
 
 
+import type { MetricModel } from '@/schema/inventory/metric/model';
 import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 import { i18n } from '@/translations';
 
@@ -19,15 +22,17 @@ import type {
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
-import type { LSBMenu, LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
+import type { LSBMenu, LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray, yellow } from '@/styles/colors';
 
 import AddCustomMetricModal from '@/services/asset-inventory/components/AddCustomMetricModal.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
@@ -40,9 +45,11 @@ interface NamespaceSubItemType {
 const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    loading: computed(() => metricExplorerPageStore.state.loading),
+    namespaceLoading: computed(() => metricExplorerPageStore.state.namespaceListloading),
+    metricLoading: computed(() => metricExplorerPageStore.state.metricListLoading),
     providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
@@ -89,11 +96,7 @@ const namespaceState = reactive({
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
         if (!keyword) return namespaceState.namespaces;
-        return namespaceState.namespaces.filter((namespace) => {
-            const providerData = storeState.providers[namespace.provider];
-            return providerData?.label.toLowerCase().includes(keyword)
-                || `${namespace.cloud_service_group}/${namespace.cloud_service_type}`.toLowerCase().includes(keyword);
-        });
+        return namespaceState.namespaces.filter((namespace) => namespace.name.toLowerCase().includes(keyword));
     }),
     namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
@@ -108,7 +111,21 @@ const namespaceState = reactive({
 const metricState = reactive({
     inputValue: '',
     selectedMetric: undefined as any|undefined,
-    metricList: computed(() => []),
+    metrics: computed<MetricModel[]>(() => metricExplorerPageStore.state.metricList),
+    metricsFilteredByInput: computed(() => {
+        const keyword = metricState.inputValue.toLowerCase();
+        if (!keyword) return metricState.metrics;
+        return metricState.metrics.filter((metric) => metric.name.toLowerCase().includes(keyword));
+    }),
+    metricItems: computed<LSBItem[]>(() => metricState.metricsFilteredByInput.map((metric) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        label: metric.name,
+        id: metric.metric_id,
+        to: getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: { id: metric.metric_id },
+        }),
+    }))),
     addCustomMetricModalVisible: false,
 });
 
@@ -172,6 +189,7 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleSearchMetric = (keyword: string) => {
+    console.debug('handleSearchMetric', keyword);
     metricState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
@@ -183,6 +201,12 @@ const handleClickBackToNamespace = () => {
 const handleOpenAddCustomMetricModal = () => {
     metricState.addCustomMetricModalVisible = true;
 };
+
+watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
+    if (selectedNamespace) {
+        metricExplorerPageStore.loadMetrics(selectedNamespace.name);
+    }
+});
 
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
@@ -218,9 +242,9 @@ onMounted(async () => {
                 </span>
             </template>
             <template #slot-namespace>
-                <p-data-loader :loading="storeState.loading"
+                <p-data-loader :loading="storeState.namespaceLoading"
                                :data="namespaceState.namespaces"
-                               :min-loading-time="10000"
+                               :min-loading-time="1000"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
@@ -258,12 +282,12 @@ onMounted(async () => {
                 </p-data-loader>
             </template>
             <template #slot-metric>
-                <!--                TODO: active data-loader after API-->
-                <p-data-loader :loading="false"
-                               :data="namespaceState.selectedNamespace"
-                               :min-loading-time="3000"
+                <p-data-loader :loading="storeState.metricLoading"
+                               :data="metricState.metrics"
+                               :min-loading-time="1000"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
+                               class="metric-data-loader"
                 >
                     <div class="metric-wrapper">
                         <div class="metric-title-item">
@@ -297,12 +321,19 @@ onMounted(async () => {
                                   :value="metricState.inputValue"
                                   @update:value="handleSearchMetric"
                         />
-                        <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricList"
+                        <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricItems"
                                                 :key="idx"
                                                 :item="item"
                                                 :idx="idx"
                                                 :current-path="state.currentPath"
-                        />
+                        >
+                            <template #text>
+                                <p-text-highlighting class="text"
+                                                     :term="metricState.inputValue"
+                                                     :text="item?.label || ''"
+                                />
+                            </template>
+                        </l-s-b-router-menu-item>
                     </div>
                 </p-data-loader>
             </template>
@@ -340,29 +371,39 @@ onMounted(async () => {
             }
         }
     }
-    .metric-wrapper {
-        @apply w-full;
+    .metric-data-loader {
+        min-height: 15rem;
 
-        .metric-title-item {
-            @apply flex items-center justify-between w-full;
-            margin-bottom: 0.5rem;
+        .metric-wrapper {
+            @apply w-full;
 
-            .title-wrapper {
-                @apply inline-flex items-center gap-1 truncate;
-                width: calc(100% - 2rem);
+            .metric-search {
+                margin-bottom: 0.25rem;
+            }
 
-                .namespace-image {
-                    min-width: 1.25rem;
-                }
-                .title {
-                    @apply text-label-md truncate;
+            .metric-title-item {
+                @apply flex items-center justify-between w-full;
+                margin-bottom: 0.5rem;
 
-                    .divider {
-                        @apply text-gray-500;
-                        margin: 0 0.125rem;
+                .title-wrapper {
+                    @apply inline-flex items-center gap-1 truncate;
+                    width: calc(100% - 2rem);
+
+                    .namespace-image {
+                        min-width: 1.25rem;
                     }
-                    .type {
-                        @apply font-bold;
+
+                    .title {
+                        @apply text-label-md truncate;
+
+                        .divider {
+                            @apply text-gray-500;
+                            margin: 0 0.125rem;
+                        }
+
+                        .type {
+                            @apply font-bold;
+                        }
                     }
                 }
             }
