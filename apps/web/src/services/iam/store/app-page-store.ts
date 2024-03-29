@@ -12,7 +12,6 @@ import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
 import type { AppUpdateParameters } from '@/schema/identity/app/api-verbs/update';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -125,15 +124,9 @@ export const useAppPageStore = defineStore('page-app', {
             }
         },
         //
-        async listRoles() {
+        async listRoles(params?: RoleListParameters) {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-                    query: {
-                        filter: [
-                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-                        ],
-                    },
-                });
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
                 this.roles = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
