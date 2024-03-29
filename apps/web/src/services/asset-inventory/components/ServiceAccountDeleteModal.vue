@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButtonModal, PDataTable, PDoubleCheckModal,
+    PButtonModal, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -93,16 +93,12 @@ const handleConfirmDelete = async () => {
                         :visible.sync="state.proxyVisible"
                         :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
                         theme-color="alert"
-                        :hide-header-close-button="true"
-                        :hide-footer-confirm-button="true"
+                        size="sm"
+                        :hide-footer-close-button="true"
+                        @confirm="() => state.proxyVisible = false"
         >
-            <template #body>
-                <span class="help-text">{{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.NOTE') }}</span>
-                <p-data-table :fields="state.fields"
-                              :items="props.attachedGeneralAccounts"
-                              :sortable="false"
-                              :selectable="false"
-                />
+            <template #confirm-button>
+                {{ $t('APP.MAIN.OK') }}
             </template>
         </p-button-modal>
     </div>

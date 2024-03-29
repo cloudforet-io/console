@@ -2725,7 +2725,7 @@
 		"SERVICE_ACCOUNT": {
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "Please note that this Trusted Account is currently attached in following accounts.",
-				"TITLE": "Cannot delete this account"
+				"TITLE": "Cannot delete this account because of attached accounts."
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "Account Type",
