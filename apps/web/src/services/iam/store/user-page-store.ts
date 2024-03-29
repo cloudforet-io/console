@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
@@ -144,9 +144,15 @@ export const useUserPageStore = defineStore('page-user', {
             }
         },
         // Role
-        async listRoles(params?: RoleListParameters) {
+        async listRoles() {
             try {
-                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    query: {
+                        filter: [
+                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                        ],
+                    },
+                });
                 this.roles = results || [];
                 return results;
             } catch (e) {
