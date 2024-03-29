@@ -102,7 +102,7 @@ const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     if (itemType === FAVORITE_TYPE.PROJECT_GROUP) {
         return convertProjectGroupConfigToReferenceData([favoriteConfig], storeState.projectGroups)[0];
     }
-    if (itemType === FAVORITE_TYPE.CLOUD_SERVICE) {
+    if (itemType === FAVORITE_TYPE.CLOUD_SERVICE || itemType === FAVORITE_TYPE.SECURITY) {
         return convertCloudServiceConfigToReferenceData([favoriteConfig], storeState.cloudServiceTypes)[0];
     }
     if (itemType === FAVORITE_TYPE.COST_ANALYSIS) {

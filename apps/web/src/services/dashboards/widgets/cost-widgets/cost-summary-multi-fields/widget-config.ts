@@ -39,6 +39,7 @@ const costSummaryMultiFieldsWidgetConfig: WidgetConfig = {
         ['granularity', { fixed: true, readonly: true }],
         ['filters.cost_product', { fixed: true }],
         'filters.provider',
+        'filters.project_group',
         'filters.project',
         'filters.service_account',
         'filters.region',

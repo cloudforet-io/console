@@ -56,16 +56,11 @@ export const getValidWorkspaceId = (workspaceId: string|undefined, workspaceList
 
 
 // Router BeforeEach Guard - Route-Validation-and-Verification Process
-export const processTokenVerification = (to: Route, next: NavigationGuardNext): boolean => {
-    if (to.name === ERROR_ROUTE._NAME) {
-        next();
-        return false;
-    }
-
+export const processTokenVerification = (to: Route, next: NavigationGuardNext, routeScope: RouteScopeType): boolean => {
     const isTokenAlive = SpaceConnector.isTokenAlive;
 
     if (!isTokenAlive) {
-        if (to.name === AUTH_ROUTE.SIGN_OUT._NAME || to.meta?.isSignInPage) {
+        if (routeScope === ROUTE_SCOPE.EXCLUDE_AUTH) {
             next();
             return false;
         }
@@ -76,7 +71,13 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext): 
         return false;
     }
 
-    if (to.meta?.isSignInPage) {
+    const ROOT_REDIRECT_SKIP_ROUTE_NAMES = [
+        AUTH_ROUTE.SIGN_OUT._NAME,
+        ERROR_ROUTE._NAME,
+        ROOT_ROUTE.COST_REPORT._NAME,
+    ];
+
+    if (!ROOT_REDIRECT_SKIP_ROUTE_NAMES.includes(to.name as string) && routeScope === ROUTE_SCOPE.EXCLUDE_AUTH) {
         next({ name: ROOT_ROUTE._NAME });
         return false;
     }

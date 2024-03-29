@@ -26,6 +26,7 @@ interface ProjectGroupResourceItemData {
         id: string;
         name: string;
     };
+    users?: string[];
 }
 export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
@@ -34,7 +35,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 
-export const useProjectGroupReferenceStore = defineStore('project-group-reference', () => {
+export const useProjectGroupReferenceStore = defineStore('reference-project-group', () => {
     const state = reactive({
         items: null as ProjectGroupReferenceMap | null,
     });
@@ -50,7 +51,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
 
         const params: ProjectGroupListParameters = {
             query: {
-                only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
+                only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id', 'users'],
             },
         };
         try {
@@ -70,6 +71,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
                             id: parentGroup.project_group_id,
                             name: parentGroup.name,
                         } : undefined,
+                        users: projectGroupInfo.users,
                     },
                 };
             });
@@ -95,6 +97,7 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
                         id: parentGroup.key,
                         name: parentGroup.name,
                     } : undefined,
+                    users: projectGroupInfo.users,
                 },
             },
         };

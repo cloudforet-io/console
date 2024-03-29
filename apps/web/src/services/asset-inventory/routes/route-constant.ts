@@ -12,6 +12,10 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
     SERVER: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
     },
+    SECURITY: {
+        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}`,
+        DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SECURITY}.detail` },
+    },
     COLLECTOR: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}`,
         CREATE: {

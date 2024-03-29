@@ -3,8 +3,6 @@ import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
@@ -12,21 +10,10 @@ import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-typ
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { getCloudServiceTypeQuery } from '@/services/asset-inventory/helpers/cloud-service-type-list-helper';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
-
-const _cloudServiceTypeQuery = new ApiQueryHelper()
-    .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type', 'cloud_service_type_key')
-    .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
-const _getCloudServiceTypeQuery = (provider: string, group: string): Query => {
-    _cloudServiceTypeQuery.setFilters([
-        { k: 'provider', v: provider, o: '=' },
-        { k: 'group', v: group, o: '=' },
-    ]);
-    return _cloudServiceTypeQuery.data;
-};
-
-export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-page', {
+export const useCloudServiceDetailPageStore = defineStore('page-cloud-service-detail', {
     state: () => ({
         provider: '' as string,
         group: '' as string,
@@ -42,7 +29,7 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
         async listCloudServiceTypeData() {
             try {
                 const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
-                    query: _getCloudServiceTypeQuery(this.provider, this.group),
+                    query: getCloudServiceTypeQuery(this.provider, this.group),
                 });
                 this.cloudServiceTypeList = uniqBy(results || [], 'cloud_service_type_key');
                 await this.setSelectedCloudServiceType(this.name);

@@ -1021,6 +1021,7 @@
 				"ALL_DASHBOARD": "All Dashboards",
 				"ALL_MENU": "All Menu",
 				"ALL_PROJECTS": "Project",
+				"ALL_SECURITY": "All Security",
 				"FAVORITES": "Favorites",
 				"FAVORITES_HELP_TEXT": "Add frequently visited pages to your favorites.",
 				"GO_TO_CLOUD_SERVICE": "Go to Cloud Service",
@@ -1523,6 +1524,7 @@
 				"DESCRIPTION_GROUP_BY": "It’s used to group data together and see overall trends or patterns based on a specific option",
 				"DESCRIPTION_PRODUCT": "The cloud computing products and services provided by each cloud provider",
 				"DESCRIPTION_PROJECT": "The collections of cloud resources and services that are grouped together for a specific purpose",
+				"DESCRIPTION_PROJECT_GROUP": "The collections of cloud resources and services that are grouped together for specific project groups",
 				"DESCRIPTION_PROVIDER": "The cloud service providers such as AWS, Azure, Google",
 				"DESCRIPTION_REGION": "The geographic locations where each cloud provider has built data centers",
 				"DESCRIPTION_SERVICE_ACCOUNT": "The accounts created from each cloud provider and added in the ‘service account’ page",
@@ -2422,6 +2424,7 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "Add Service Account",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "Related Member"
@@ -2466,7 +2469,6 @@
 				"HISTORY": "History"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "Add Service Account",
 				"ALL": "All",
 				"ALT_E_CHECK_MODAL": "Failed to {action}",
 				"ALT_S_CHECK_MODAL": "Success to {action}",
@@ -2474,7 +2476,6 @@
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
 				"CLOSE": "Close",
-				"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
 				"FAVORITES": "Favorites",
 				"FILTER": "Filter",
 				"FILTERED_BY_DATE": "Filtered by Date",
@@ -2690,6 +2691,16 @@
 			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
+		"CREATE_COLLECTOR": "Create Collector",
+		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "No collector has been created yet.",
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": "Security"
+			},
+			"NOTIFICATION_DESC": "The process of identifying security vulnerabilities is based on a variety of compliance policies. Create a security collector and collect related resources to continuously check the security status of your cloud.",
+			"NOTIFICATION_TITLE": "Check the security status of your cloud!"
+		},
 		"SERVER": {
 			"MAIN": {
 				"ACTION": "Action",
@@ -2818,6 +2829,7 @@
 		"ASSET_INVENTORY": "Asset Inventory",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "Cloud Service",
 		"ASSET_INVENTORY_COLLECTOR": "Collector",
+		"ASSET_INVENTORY_SECURITY": "Security",
 		"ASSET_INVENTORY_SERVER": "Server",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "Service Account",
 		"COST_EXPLORER": "Cost Explorer",
@@ -3449,7 +3461,7 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
-				"PRIVATE_MEMBER_DESC": "Only people invited can access this project, based on the {settings}",
+				"PRIVATE_MEMBER_DESC": "Only Workspace Owners, Project Group Members & Invited Workspace Members can have access to this project based on the {settings}",
 				"PROJECT_SETTINGS": "project settings",
 				"PUBLIC_MEMBER_DESC": "Everyone in this workspace can access this project, based on the {settings}",
 				"REMOVE": "Remove",
@@ -3519,8 +3531,8 @@
 				"TRIGGERED": "Triggered"
 			},
 			"TAB_ALERT": "Alert",
-			"TAB_MEMBER": "Member",
 			"TAB_NOTIFICATIONS": "Notifications",
+			"TAB_PROEJCT_MEMBER": "Project Member",
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
 			"TAB_TAG": "Tag",
@@ -3580,6 +3592,7 @@
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
+			"ADD_GROUP_MEMBER": "Add Group Member",
 			"ADD_SERVICE_ACCOUNT": "Add service account",
 			"ALL_PROJECTS": "All Projects",
 			"ALT_E_CREATE_PROJECT": "Failed to Create Project",
@@ -3587,11 +3600,13 @@
 			"ALT_E_DELETE_PROJECT_GROUP": "Failed to Delete Project Group",
 			"ALT_E_UPDATE_PROJECT": "Failed to Update Project",
 			"ALT_E_UPDATE_PROJECT_GROUP": "Failed to Update Project Group",
+			"ALT_E_UPDATE_PROJECT_GROUP_MEMBER": "Failed to Update Project Group Member",
 			"ALT_S_CREATE_PROJECT": "Project successfully created",
 			"ALT_S_CREATE_PROJECT_GROUP": "Project Group successfully created",
 			"ALT_S_DELETE_PROJECT_GROUP": "Project Group successfully deleted ",
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_GROUP": "Project Group successfully updated  ",
+			"ALT_S_UPDATE_PROJECT_GROUP_MEMBER": "Project group member succesfully updated",
 			"CAN_ACCESS_TO_THIS_PROJECT": "can access to this project",
 			"CLOUD_SERVICES": "Cloud Services",
 			"COMPUTE": "Compute",
@@ -3608,6 +3623,8 @@
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
 			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
+			"GROUP_MEMBER": "Group Member",
+			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "Group Members will have access to all sub-projects",
 			"INVITE_ONLY": "Invite only",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
@@ -3630,7 +3647,12 @@
 				"MODAL_VALIDATION_LENGTH": "Must be shorter than 40 characters.",
 				"MODAL_VALIDATION_REQUIRED": "Required field"
 			},
+			"MODAL_PROJECT_GROUP_MEMBER": {
+				"NO_DATA_DESCRIPTION": "Type your user ID or name and then hit 'Enter'",
+				"REMOVE": "Remove"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
+			"NO_GROUP_MEMBER": "No Group Member",
 			"NO_PROJECT_GROUP_MSG": "There's no project or project group created in this workspace yet.",
 			"ONLY_PEOPLE_INVITED": "Only people invited",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
@@ -3639,6 +3661,7 @@
 			"PROJECT": "Project",
 			"PROJECT_GROUP": "Project Group",
 			"PROJECT_GROUPS": "Project Groups",
+			"PROJECT_GROUP_MEMBER": "Project Group Member",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "Create",
 				"DONE": "Done",

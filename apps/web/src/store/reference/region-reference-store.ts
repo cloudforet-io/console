@@ -66,7 +66,7 @@ export type RegionReferenceMap = ReferenceMap<RegionReferenceItem>;
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useRegionReferenceStore = defineStore('region-reference', () => {
+export const useRegionReferenceStore = defineStore('reference-region', () => {
     const state = reactive({
         items: null as RegionReferenceMap | null,
     });
