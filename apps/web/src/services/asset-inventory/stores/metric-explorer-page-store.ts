@@ -104,6 +104,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         }
     };
     const loadMetrics = async (namespaceId: string) => {
+        state.metricList = [];
         state.metricListLoading = true;
         try {
             const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({

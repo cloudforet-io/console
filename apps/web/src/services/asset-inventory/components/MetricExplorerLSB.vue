@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, nextTick, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -110,7 +110,6 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
-    selectedMetric: undefined as any|undefined,
     metrics: computed<MetricModel[]>(() => metricExplorerPageStore.state.metricList),
     metricsFilteredByInput: computed(() => {
         const keyword = metricState.inputValue.toLowerCase();
@@ -121,6 +120,7 @@ const metricState = reactive({
         type: MENU_ITEM_TYPE.ITEM,
         label: metric.name,
         id: metric.metric_id,
+        icon: metric.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
         to: getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: { id: metric.metric_id },
@@ -135,6 +135,7 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[
         label: namespace.name,
         name: namespace.namespace_id,
     }));
+    if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
         label: i18n.t('COMMON.COMMON'),
@@ -189,7 +190,6 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleSearchMetric = (keyword: string) => {
-    console.debug('handleSearchMetric', keyword);
     metricState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
@@ -204,7 +204,9 @@ const handleOpenAddCustomMetricModal = () => {
 
 watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
     if (selectedNamespace) {
-        metricExplorerPageStore.loadMetrics(selectedNamespace.name);
+        nextTick(() => {
+            metricExplorerPageStore.loadMetrics(selectedNamespace.name);
+        });
     }
 });
 
@@ -243,8 +245,6 @@ onMounted(async () => {
             </template>
             <template #slot-namespace>
                 <p-data-loader :loading="storeState.namespaceLoading"
-                               :data="namespaceState.namespaces"
-                               :min-loading-time="1000"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
@@ -283,8 +283,6 @@ onMounted(async () => {
             </template>
             <template #slot-metric>
                 <p-data-loader :loading="storeState.metricLoading"
-                               :data="metricState.metrics"
-                               :min-loading-time="1000"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="metric-data-loader"
@@ -375,7 +373,7 @@ onMounted(async () => {
         min-height: 15rem;
 
         .metric-wrapper {
-            @apply w-full;
+            @apply flex flex-col;
 
             .metric-search {
                 margin-bottom: 0.25rem;
