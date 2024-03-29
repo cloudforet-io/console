@@ -19,7 +19,7 @@ import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding
 import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -150,11 +150,10 @@ const closeRemoveModal = () => {
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     dropdownState.loading = true;
 
-    roleListApiQueryHelper.setFilters([{
-        k: 'role_type',
-        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
-        o: '=',
-    }]);
+    roleListApiQueryHelper.setFilters([
+        { k: 'role_type', v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER], o: '=' },
+        { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+    ]);
     if (inputText) {
         roleListApiQueryHelper.addFilter({
             k: 'name',

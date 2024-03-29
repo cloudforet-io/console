@@ -6,9 +6,7 @@ export const ROLE_TYPE = {
     USER: 'USER',
 } as const;
 
-export const MANAGED_ROLE_TYPE = {
-    SYSTEM_ADMIN: 'managed-system-admin',
-    DOMAIN_ADMIN: 'managed-domain-admin',
-    WORKSPACE_OWNER: 'managed-workspace-owner',
-    WORKSPACE_MEMBER: 'managed-workspace-member',
+export const ROLE_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
 } as const;
