@@ -14,6 +14,7 @@ import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/eve
 import { i18n, i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
@@ -60,7 +61,7 @@ const state = reactive({
             label: _i18n.t('PROJECT.EVENT_RULE.LOW'),
         },
     ])),
-    escalationPolicies: computed(() => allReferenceStore.getters.escalationPolicy),
+    escalationPolicies: computed<EscalationPolicyReferenceMap>(() => allReferenceStore.getters.escalationPolicy),
     escalationPolicyList: computed(() => Object.keys(state.escalationPolicies).map((key) => ({
         name: state.escalationPolicies[key].key,
         label: state.escalationPolicies[key].name,
@@ -225,9 +226,28 @@ const handleStopProcessingChange = (value: boolean) => {
                 </p>
                 <p-select-dropdown class="escalation-dropdown"
                                    :menu="state.escalationPolicyList"
+                                   :selected.sync="state.selectedEscalationPolicy"
                                    show-delete-all-button
                                    reset-selected-on-unmounted
                 >
+                    <template #dropdown-button="item">
+                        <span v-if="state.escalationPolicyList.find((policy) => policy.name === item.name)"
+                              class="escalation-policy-menu-item"
+                        >
+                            <span class="escalation-policy-label">
+                                {{ state.escalationPolicyList.find((policy) => policy.name === item.name)?.label }}
+                            </span>
+                            <p-badge class="scope-badge"
+                                     :style-type="alertResourceGroupBadgeStyleTypeFormatter(state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope)"
+                                     badge-type="subtle"
+                            >
+                                {{ state.resourceGroups[state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope] }}
+                            </p-badge>
+                        </span>
+                        <span v-else
+                              class="escalation-policy-label placeholder"
+                        >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
+                    </template>
                     <template #menu-item--format="{ item }">
                         <p-tooltip class="escalation-policy-menu-item"
                                    :contents="item.label"
@@ -304,12 +324,16 @@ const handleStopProcessingChange = (value: boolean) => {
         }
 
         .escalation-dropdown {
+
             .escalation-policy-menu-item {
                 @apply flex justify-between items-center gap-2;
 
                 .escalation-policy-label {
                     white-space: normal;
                     word-break: normal;
+                }
+                .placeholder {
+                    @apply text-gray-600;
                 }
                 .scope-badge {
                     @apply flex-shrink-0;
