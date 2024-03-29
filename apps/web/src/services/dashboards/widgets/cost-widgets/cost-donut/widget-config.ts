@@ -22,6 +22,7 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
         'cost_data_field',
         ['granularity', { fixed: true, readonly: true }],
         'filters.provider',
+        'filters.project_group',
         'filters.project',
         'filters.service_account',
         'filters.cost_product',

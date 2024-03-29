@@ -15,7 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 
@@ -81,11 +81,10 @@ const handleChangeToggleButton = (value) => {
 const fetchListRoles = async (inputText: string) => {
     roleState.loading = true;
 
-    roleListApiQueryHelper.setFilters([{
-        k: 'role_type',
-        v: [ROLE_TYPE.DOMAIN_ADMIN],
-        o: '=',
-    }]);
+    roleListApiQueryHelper.setFilters([
+        { k: 'role_type', v: [ROLE_TYPE.DOMAIN_ADMIN], o: '=' },
+        { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+    ]);
 
     if (inputText) {
         roleListApiQueryHelper.addFilter({

@@ -26,7 +26,7 @@ import type {
 
 
 const projectTreeHelper = useProjectTree();
-export const useProjectPageStore = defineStore('project-page', () => {
+export const useProjectPageStore = defineStore('page-project', () => {
     const _state = reactive({
         currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
     });

@@ -243,6 +243,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
         formState.password = '';
         formState.passwordType = '';
         formState.passwordManual = false;
+        formState.isValidEmail = false;
         formState.role = {} as AddModalMenuItem;
     }
 });

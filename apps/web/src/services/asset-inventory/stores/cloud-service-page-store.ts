@@ -8,7 +8,7 @@ import type { ProviderReferenceMap } from '@/store/reference/provider-reference-
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
 
-export const useCloudServicePageStore = defineStore('cloud-service-page', {
+export const useCloudServicePageStore = defineStore('page-cloud-service', {
     state: () => ({
         selectedProvider: 'all',
         additionalFilters: {

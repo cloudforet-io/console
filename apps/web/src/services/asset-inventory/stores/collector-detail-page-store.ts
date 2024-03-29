@@ -13,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 
-export const useCollectorDetailPageStore = defineStore('collector-detail-page', () => {
+export const useCollectorDetailPageStore = defineStore('page-collector-detail', () => {
     const appContextStore = useAppContextStore();
 
     const state = reactive({

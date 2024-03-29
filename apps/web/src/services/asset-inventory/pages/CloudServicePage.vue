@@ -27,7 +27,7 @@
                 <p-empty
                     show-image
                     image-size="md"
-                    show-button
+                    :show-button="emptyData.to"
                 >
                     <template #image>
                         <img v-if="isNoServiceAccounts"
@@ -41,17 +41,17 @@
                     </template>
                     <template #button>
                         <router-link
-                            :to="isNoServiceAccounts ? { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME } : { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }"
+                            :to="emptyData.to"
                         >
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
                                       class="mx-auto text-center"
                             >
-                                {{ isNoServiceAccounts ? $t('INVENTORY.ADD_SERVICE_ACCOUNT') : $t('INVENTORY.CREATE_COLLECTOR') }}
+                                {{ emptyData.buttonText }}
                             </p-button>
                         </router-link>
                     </template>
-                    {{ isNoServiceAccounts ? $t('INVENTORY.EMPTY_CLOUD_SERVICE') : $t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') }}
+                    {{ emptyData.desc }}
                 </p-empty>
             </template>
         </p-data-loader>
@@ -81,8 +81,10 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { SpaceRouter } from '@/router';
 import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
@@ -112,7 +114,7 @@ import type {
     CloudServiceCategory, CloudServicePageUrlQuery,
     CloudServicePageUrlQueryValue,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
-import type { Period } from '@/services/asset-inventory/types/type';
+import type { EmptyData, Period } from '@/services/asset-inventory/types/type';
 
 
 interface Response {
@@ -140,6 +142,7 @@ export default {
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceStore.getters.serviceAccount),
             providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+            collectors: computed<CollectorReferenceMap>(() => allReferenceStore.getters.collector),
         });
         const handlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -186,6 +189,30 @@ export default {
                 filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
             })),
             isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
+            emptyData: computed<EmptyData>(() => {
+                let result = {} as EmptyData;
+                if (!Object.keys(storeState.serviceAccounts).length) {
+                    result = {
+                        to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                        buttonText: i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') as string,
+                        desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE') as string,
+                    };
+                } else {
+                    if (!Object.keys(storeState.collectors).length) {
+                        result = {
+                            to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
+                            buttonText: i18n.t('INVENTORY.CREATE_COLLECTOR') as string,
+                            desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') as string,
+                        };
+                    }
+                    result = {
+                        to: undefined,
+                        buttonText: undefined,
+                        desc: i18n.t('COMMON.ERROR.NO_RESOURCE_TITLE') as string,
+                    };
+                }
+                return result;
+            }),
         });
 
         /* api */
