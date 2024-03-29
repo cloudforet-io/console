@@ -14,8 +14,8 @@ export interface BaseInformationForm {
 export interface CredentialForm {
     hasCredentialKey: boolean;
     selectedSecretSchema: SchemaModel;
-    customSchemaForm: { [key: string]: any; };
     attachedTrustedAccountId?: string;
+    credentialJson: string;
 }
 
 export interface ProjectForm {
