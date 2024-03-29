@@ -113,8 +113,8 @@ export const processRouteIntegrityCheck = (to: Route, next: NavigationGuardNext)
 export const processWorkspaceAccessValidation = async (to: Route, next: NavigationGuardNext, workspaceList: WorkspaceModel[]): Promise<boolean> => {
     const { wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
 
-    if (!workspaceList.length) {
-        next({ name: makeAdminRouteName(LANDING_ROUTE._NAME) });
+    if (workspaceList.length) {
+        next({ name: LANDING_ROUTE._NAME });
         return false;
     }
 

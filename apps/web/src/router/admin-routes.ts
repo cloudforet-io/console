@@ -6,7 +6,6 @@ import adminDashboardsRoutes from '@/services/dashboards/routes/admin/routes';
 import adminHomeDashboardRoutes from '@/services/home-dashboard/routes/admin/routes';
 import adminIamRoutes from '@/services/iam/routes/admin/routes';
 import adminInfoRoute from '@/services/info/routes/admin/routes';
-import adminLandingPageRoutes from '@/services/landing/routes/admin/routes';
 import adminPreferenceRoutes from '@/services/preference/routes/admin/routes';
 
 
@@ -15,7 +14,6 @@ export const adminRoutes: RouteConfig[] = [
         path: 'dashboard',
         redirect: '/home-dashboard',
     },
-    adminLandingPageRoutes,
     adminHomeDashboardRoutes,
     adminDashboardsRoutes,
     adminCostExplorerRoutes,
