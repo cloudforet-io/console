@@ -8,6 +8,7 @@ import TopBarProfile
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+import LandingContents from '@/services/landing/components/LandingContents.vue';
 
 const storeState = reactive({
     hasPermission: computed((() => store.getters['user/hasPermission'])),
@@ -38,6 +39,7 @@ const handleOpenedMenu = (visible: boolean) => {
                          @update:visible="handleOpenedMenu"
         />
         <console-logo class="logo" />
+        <landing-contents />
         <f-n-b class="fnb" />
     </div>
 </template>
@@ -52,6 +54,8 @@ const handleOpenedMenu = (visible: boolean) => {
         margin-left: auto;
     }
     .logo {
+        position: initial !important;
+        margin-top: -2.625rem;
         margin-left: -2rem;
     }
     .fnb {
