@@ -305,7 +305,7 @@ const refinedMenuList = (list, value) => {
         }
     }
     .minimize-button-wrapper {
-        @apply absolute bg-white border border-gray-200 text-gray-500 cursor-pointer;
+        @apply hidden absolute bg-white border border-gray-200 text-gray-500 cursor-pointer;
         top: 1.125rem;
         right: 0;
         padding: 0.125rem;
@@ -318,6 +318,11 @@ const refinedMenuList = (list, value) => {
             @apply bg-violet-200 text-violet-600;
             padding-right: 0.75rem;
             padding-left: 0.25rem;
+        }
+    }
+    &:hover {
+        .minimize-button-wrapper {
+            @apply block;
         }
     }
     &.is-hide {
