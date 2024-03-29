@@ -17,7 +17,7 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -137,11 +137,10 @@ const roleListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 const fetchListRoles = async (inputText: string) => {
     dropdownState.loading = true;
-    roleListApiQueryHelper.setFilters([{
-        k: 'role_type',
-        v: storeState.isAdminMode ? [ROLE_TYPE.DOMAIN_ADMIN] : [ROLE_TYPE.WORKSPACE_OWNER],
-        o: '=',
-    }]);
+    roleListApiQueryHelper.setFilters([
+        { k: 'role_type', v: storeState.isAdminMode ? [ROLE_TYPE.DOMAIN_ADMIN] : [ROLE_TYPE.WORKSPACE_OWNER], o: '=' },
+        { k: 'state', v: ROLE_STATE.ENABLED, o: '=' },
+    ]);
     if (inputText) {
         roleListApiQueryHelper.addFilter({
             k: 'name',

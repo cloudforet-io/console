@@ -8,6 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_STATE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -47,11 +48,8 @@ const _listRole = async (roleIdList: string[]): Promise<RoleModel[]> => {
             query: {
                 only: ['role_id', 'name', 'role_type'],
                 filter: [
-                    {
-                        k: 'role_id',
-                        v: roleIdList,
-                        o: 'in',
-                    },
+                    { k: 'role_id', v: roleIdList, o: 'in' },
+                    { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
                 ],
             },
         });

@@ -4,10 +4,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ROLE_STATE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface RolePageState {
     loading: boolean;
@@ -39,7 +40,16 @@ export const useRolePageStore = defineStore('page-role', {
         async listRoles(params: RoleListParameters) {
             this.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    ...params,
+                    query: {
+                        ...params.query,
+                        filter: [
+                            ...(params.query?.filter || []),
+                            { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
+                        ],
+                    },
+                });
                 this.roles = results?.sort((roleA, roleB) => {
                     if (roleA.is_managed === roleB.is_managed) {
                         return 0;
