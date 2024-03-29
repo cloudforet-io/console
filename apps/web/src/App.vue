@@ -37,6 +37,7 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
@@ -44,7 +45,8 @@ const route = useRoute();
 
 const state = reactive({
     routeScope: computed(() => getRouteScope(route)),
-    showGNB: computed(() => route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage),
+    showGNB: computed(() => !state.isWorkspaceLandingPage && (route.matched[1]?.name === 'admin' || route.matched[1]?.name === 'workspace' || state.isMyPage)),
+    isWorkspaceLandingPage: computed(() => route.name === makeAdminRouteName(LANDING_ROUTE._NAME)),
     isMyPage: computed(() => route.path.startsWith('/my-page')),
     isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && state.routeScope !== 'EXCLUDE_AUTH'),
     isRoutingToSignIn: false,

@@ -7,7 +7,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { ERROR_ROUTE, ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
+import {
+    ERROR_ROUTE, ROOT_ROUTE, ROUTE_SCOPE,
+} from '@/router/constant';
 import type { RouteScopeType } from '@/router/type';
 
 
@@ -18,9 +20,7 @@ import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-
-
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 export const makeAdminRouteName = (routeName: string): string => {
     if (routeName.startsWith('admin.')) return routeName;
@@ -114,7 +114,7 @@ export const processWorkspaceAccessValidation = async (to: Route, next: Navigati
     const { wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
 
     if (!workspaceList.length) {
-        next({ name: MY_PAGE_ROUTE._NAME });
+        next({ name: makeAdminRouteName(LANDING_ROUTE._NAME) });
         return false;
     }
 
