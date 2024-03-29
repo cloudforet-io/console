@@ -50,6 +50,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const storeState = reactive({
     namespaceLoading: computed(() => metricExplorerPageStore.state.namespaceListloading),
     metricLoading: computed(() => metricExplorerPageStore.state.metricListLoading),
+    currentMetric: computed<MetricModel|undefined>(() => (state.isDetailPage ? metricExplorerPageStore.state.metric : undefined)),
     providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
@@ -63,6 +64,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
+    isDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -207,6 +209,15 @@ watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
         nextTick(() => {
             metricExplorerPageStore.loadMetrics(selectedNamespace.name);
         });
+    }
+});
+
+watch(() => storeState.currentMetric, (currentMetric) => {
+    if (currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+        namespaceState.selectedNamespace = {
+            label: namespaceState.namespaces.find((item) => item.namespace_id === currentMetric.namespace_id).name,
+            name: currentMetric.namespace_id,
+        };
     }
 });
 
