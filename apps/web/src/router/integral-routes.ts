@@ -11,6 +11,7 @@ import { workspaceRoutes } from '@/router/workspace-routes';
 
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import landingPageRoutes from '@/services/landing/routes/routes';
 import myPageRoutes from '@/services/my-page/routes/routes';
 
 
@@ -27,6 +28,7 @@ export const integralRoutes: RouteConfig[] = [
                 }),
             },
             ...authRoutes,
+            landingPageRoutes,
             ...additionalRoutes,
             {
                 path: 'admin',

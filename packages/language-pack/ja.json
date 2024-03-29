@@ -2749,6 +2749,23 @@
 			}
 		}
 	},
+	"LADING": {
+		"ALL_WORKSPACE": "すべてのワークスペース",
+		"BANNER_DESC": "",
+		"CREATE": "作成",
+		"CREATE_WORKSPACE": "ワークスペースの作成",
+		"DESC_ACCESSIBLE_WORKSPACE": "",
+		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "",
+		"DESC_CLICK": "",
+		"DESC_CLICK_OR_CREATE": "",
+		"DESC_CREATE_WORKSPACE": "",
+		"NOT_FOUND": "",
+		"NOT_FOUND_DESC": "",
+		"RECENT": "最近のアクセス",
+		"SEARCH_WORKSPACE": "",
+		"SHOW_ALL": "すべて表示",
+		"TITLE": ""
+	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
