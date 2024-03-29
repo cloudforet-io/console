@@ -4,8 +4,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { Root } from '@amcharts/amcharts5';
+import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { PDataLoader } from '@spaceone/design-system';
+import { PSkeleton } from '@spaceone/design-system';
 import { cloneDeep, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -67,6 +69,14 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const COLUMN_DATA_LIMIT = 10;
+const CHART_ROOT_OPTIONS: IRootSettings = {
+    tooltipContainerBounds: {
+        top: 1000,
+        right: 0,
+        bottom: 1000,
+        left: 0,
+    },
+};
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
@@ -215,6 +225,8 @@ const fetchData = async (): Promise<Response> => {
 const drawChart = (chartData) => {
     if (!state.showChart) return;
     if (!widgetState.parsedDataField) return;
+    chartHelper.disposeRoot();
+    chartHelper.setRoot(Root.new(chartContext.value as HTMLElement, CHART_ROOT_OPTIONS));
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     chartHelper.setChartColors(chart, colorSet.value);
     yAxis.set('categoryField', widgetState.parsedDataField);
@@ -327,19 +339,17 @@ defineExpose<WidgetExpose<Response>>({
             <div v-if="state.showChart"
                  class="chart-wrapper"
             >
-                <p-data-loader class="chart-loader"
-                               :loading="props.loading || state.loading"
-                               :data="state.slicedData"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
+                <div class="chart-loader">
+                    <p-skeleton v-show="props.loading || state.loading"
+                                height="100%"
+                                width="100%"
+                                class="chart-skeleton"
+                    />
                     <div ref="chartContext"
                          class="chart"
                     />
-                </p-data-loader>
+                </div>
             </div>
-
             <widget-data-table :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.tableData"
@@ -362,6 +372,7 @@ defineExpose<WidgetExpose<Response>>({
         display: flex;
         flex-direction: column;
         height: 100%;
+        overflow: hidden;
         .chart-wrapper {
             height: 185px;
             margin-bottom: 1rem;
