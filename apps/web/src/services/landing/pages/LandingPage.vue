@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-
-import { store } from '@/store';
+import { reactive } from 'vue';
 
 import FNB from '@/common/modules/navigations/FNB.vue';
 import TopBarProfile
@@ -10,25 +8,12 @@ import TopBarProfile
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
 import LandingContents from '@/services/landing/components/LandingContents.vue';
 
-const storeState = reactive({
-    hasPermission: computed((() => store.getters['user/hasPermission'])),
-});
 const state = reactive({
     openedProfileMenu: false,
 });
 
-const openMenu = (visible: boolean) => {
-    if (!visible) hideMenu();
-    else if (storeState.hasPermission) {
-        state.openedProfileMenu = true;
-    }
-};
-const hideMenu = () => {
-    state.openedProfileMenu = false;
-};
 const handleOpenedMenu = (visible: boolean) => {
-    if (visible) openMenu(visible);
-    else hideMenu();
+    state.openedProfileMenu = visible;
 };
 </script>
 
@@ -38,7 +23,9 @@ const handleOpenedMenu = (visible: boolean) => {
                          class="profile"
                          @update:visible="handleOpenedMenu"
         />
-        <console-logo class="logo" />
+        <console-logo class="logo"
+                      :position-fixed="false"
+        />
         <landing-contents />
         <f-n-b class="fnb" />
     </div>
@@ -54,7 +41,6 @@ const handleOpenedMenu = (visible: boolean) => {
         margin-left: auto;
     }
     .logo {
-        position: initial !important;
         margin-top: -2.625rem;
         margin-left: -2rem;
     }
