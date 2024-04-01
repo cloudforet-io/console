@@ -2706,6 +2706,7 @@
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
 			"COMMON": "Common",
 			"DAILY": "Daily",
+			"EMPTY_TEXT": "No results found \nTry again with different term",
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
 			"GROUP_BY": "Group By",

@@ -2706,6 +2706,7 @@
 			"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
 			"COMMON": "",
 			"DAILY": "일별 데이터",
+			"EMPTY_TEXT": "",
 			"FILTERS": "필터",
 			"GRANULARITY": "세부 기준",
 			"GROUP_BY": "그룹별 통계",
