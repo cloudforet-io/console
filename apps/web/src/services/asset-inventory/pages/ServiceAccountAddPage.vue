@@ -29,6 +29,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import ServiceAccountAutoSyncForm from '@/services/asset-inventory/components/ServiceAccountAutoSyncForm.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
@@ -38,11 +39,13 @@ import {
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
@@ -164,6 +167,7 @@ const handleChangeCredentialForm = (credentialForm) => {
 /* Init */
 (async () => {
     state.providerSchemaLoading = true;
+    serviceAccountPageStore.setProvider(props.provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     state.providerSchemaLoading = false;
 })();
@@ -225,6 +229,14 @@ const handleChangeCredentialForm = (credentialForm) => {
                     @change="handleChangeCredentialForm"
                 />
             </p-pane-layout>
+            <p-pane-layout v-if="state.isTrustedAccount"
+                           class="form-wrapper"
+            >
+                <p-heading heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
+                />
+                <service-account-auto-sync-form :provider="props.provider" />
+            </p-pane-layout>
         </div>
 
         <div class="button-wrapper">
@@ -255,6 +267,7 @@ const handleChangeCredentialForm = (credentialForm) => {
         gap: 1rem;
 
         .form-wrapper {
+            padding-bottom: 2.5rem;
             .service-account-project-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;
             }

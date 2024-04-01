@@ -2186,6 +2186,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "서비스 어카운트 생성 실패",
 				"ALT_S_CREATE_ACCOUNT_DESC": "서비스 어카운트 등록 완료",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "서비스 어카운트 추가 완료",
+				"AUTO_SYNC_TITLE": "",
 				"BASE_NAME_PLACEHOLDER": "서비스 어카운트 이름",
 				"BASE_TITLE": "기본 정보",
 				"CANCEL": "취소",
@@ -2723,6 +2724,9 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"TIMEZONE": ""
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "해당 어카운트는 현재 다음의 어카운트들에 연결되어 있습니다.",
 				"TITLE": ""

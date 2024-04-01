@@ -2186,6 +2186,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "Failed to Create Service Account",
 				"ALT_S_CREATE_ACCOUNT_DESC": "Service Account successfully registered",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "Service Account successfully added ",
+				"AUTO_SYNC_TITLE": "Auto Sync",
 				"BASE_NAME_PLACEHOLDER": "Cloud Account Name",
 				"BASE_TITLE": "Base Information",
 				"CANCEL": "Cancel",
@@ -2723,6 +2724,9 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"TIMEZONE": "Time Zone: {timezone}, Max: 2 Times"
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "Please note that this Trusted Account is currently attached in following accounts.",
 				"TITLE": "Cannot delete this account because of attached accounts."
