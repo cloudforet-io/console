@@ -1088,6 +1088,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "Create New Workspace",
 				"MANAGE_WORKSPACE": "Manage Workspace",
+				"VIEW_WORKSPACES": "View All Workspaces",
 				"WORKSPACES": "Workspaces"
 			}
 		},

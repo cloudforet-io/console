@@ -1088,6 +1088,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "ワークスペースの作成",
 				"MANAGE_WORKSPACE": "ワークスペースの管理",
+				"VIEW_WORKSPACES": "",
 				"WORKSPACES": "ワークスペース"
 			}
 		},
