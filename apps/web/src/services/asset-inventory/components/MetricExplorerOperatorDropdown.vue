@@ -9,9 +9,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Operator } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
     operatorItems: computed<MenuItem[]>(() => ([
         { type: 'item', name: OPERATOR.SUM, label: 'Sum' },
@@ -19,12 +22,11 @@ const state = reactive({
         { type: 'item', name: OPERATOR.MAX, label: 'Max' },
         { type: 'item', name: OPERATOR.MIN, label: 'Min' },
     ])),
-    operator: OPERATOR.SUM as Operator|undefined,
 });
 
 /* Event */
 const handleSelectOperator = async (operator: Operator) => {
-    state.operator = operator;
+    metricExplorerPageStore.setSelectedOperator(operator);
 };
 </script>
 
@@ -33,7 +35,7 @@ const handleSelectOperator = async (operator: Operator) => {
         <p-select-dropdown :menu="state.operatorItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.OPERATOR')"
                            style-type="rounded"
-                           :selected="state.operator"
+                           :selected="metricExplorerPageState.selectedOperator"
                            class="operator-dropdown"
                            @select="handleSelectOperator"
         />
