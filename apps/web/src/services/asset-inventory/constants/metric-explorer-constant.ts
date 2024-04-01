@@ -4,10 +4,10 @@ export const GRANULARITY = {
 } as const;
 
 export const OPERATOR = {
-    SUM: 'SUM',
-    AVG: 'AVG',
-    MAX: 'MAX',
-    MIN: 'MIN',
+    SUM: 'sum',
+    AVG: 'avg',
+    MAX: 'max',
+    MIN: 'min',
 } as const;
 
 export const METRIC_PERIOD_MENU = {

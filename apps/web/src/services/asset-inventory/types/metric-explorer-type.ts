@@ -35,6 +35,20 @@ export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 export interface Legend {
     name: string;
     label: string | TranslateResult;
-    color?: string;
     disabled?: boolean;
+}
+
+export type MetricDataAnalyzeResult = {
+    [groupBy: string]: string | any;
+    value_sum?: Array<{ date: string; value: number; }>;
+    value_avg?: Array<{ date: string; value: number; }>;
+    value_max?: Array<{ date: string; value: number; }>;
+    value_min?: Array<{ date: string; value: number; }>;
+    _total_value_sum?: number;
+};
+
+export interface XYChartData {
+    date: string;
+    totalCost?: number;
+    [key: string]: any;
 }
