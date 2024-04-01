@@ -39,13 +39,15 @@ export const useRecentStore = defineStore('recent', () => {
 
     const actions = {
         fetchRecent: async ({
-            type, workspaceIds = [], limit = 15, searchText,
-        }:{type: RecentType, workspaceIds:string[], limit?:number, searchText?:string}) => {
+            type, workspaceIds, limit = 15, searchText,
+        }:{type: RecentType, workspaceIds?:string[], limit?:number, searchText?:string}) => {
             recentListApiQuery.setFilters([
                 { k: 'name', v: `console:recent:${type}:`, o: '' },
-                { k: 'data.workspace_id', v: workspaceIds, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
             ]).setPageLimit(limit);
+            if (workspaceIds) {
+                recentListApiQuery.addFilter({ k: 'data.workspace_id', v: workspaceIds, o: '=' });
+            }
             if (searchText?.length) recentListApiQuery.addFilter({ k: 'data.label', v: searchText, o: '' });
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list({

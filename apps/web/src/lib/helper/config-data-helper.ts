@@ -13,6 +13,7 @@ import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
@@ -271,7 +272,7 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
     return results.filter((result) => result);
 };
 
-export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|null, menuList: WorkspaceModel[]): ReferenceData[] => {
+export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|RecentConfig[]|null, menuList: WorkspaceModel[]): ReferenceData[] => {
     const results: ReferenceData[] = [];
     if (!config) return results;
 

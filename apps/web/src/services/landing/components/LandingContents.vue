@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PDataLoader, PSearch, PDivider, PButton,
@@ -11,10 +11,11 @@ import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
-import type { RecentItem } from '@/common/modules/navigations/type';
+import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
@@ -30,13 +31,27 @@ const recentState = recentStore.state;
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
-    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'name')),
-    recentWorkspace: computed<RecentItem[]>(() => recentState.recentMenuList.filter((item) => item?.type === RECENT_TYPE.WORKSPACE)),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreState.getters.workspaceList.map((i) => ({
+        ...i,
+        label: i.name,
+    }))),
+    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
+    recentWorkspace: computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
+        itemType: i.data.type,
+        workspace_id: i.data.workspace_id,
+        itemId: i.data.id,
+    }))),
 });
 const state = reactive({
     loading: false,
     searchText: '',
+});
+
+onMounted(() => {
+    recentStore.fetchRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        limit: 6,
+    });
 });
 </script>
 
@@ -66,7 +81,9 @@ const state = reactive({
                 <p-search v-model="state.searchText"
                           :placeholder="$t('LADING.SEARCH_WORKSPACE')"
                 />
-                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0" />
+                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0"
+                                       :recent-visits="storeState.recentWorkspace"
+                />
                 <landing-all-workspaces :workspace-list="storeState.workspaceList"
                                         :favorite-list="storeState.favoriteList"
                                         :is-domain-admin="storeState.isDomainAdmin"
