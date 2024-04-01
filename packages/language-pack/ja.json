@@ -2704,7 +2704,6 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
-			"BACK_TO_HOME_BUTTON": "",
 			"COMMON": "",
 			"DAILY": "日別データ",
 			"FILTERS": "フィルター",
@@ -2712,6 +2711,7 @@
 			"GROUP_BY": "グループ別統計",
 			"HIDE_ALL": "すべて隠す",
 			"METRIC_EXPLORER": "",
+			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "月別データ",
 			"NO_ITEMS": "アイテムがありません",
 			"OPERATOR": "",

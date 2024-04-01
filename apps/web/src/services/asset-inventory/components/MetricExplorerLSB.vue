@@ -218,17 +218,8 @@ const handleClickBackToHome = () => {
 watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
     if (selectedNamespace) {
         nextTick(() => {
-            metricExplorerPageStore.loadMetrics(selectedNamespace.name);
+            metricExplorerPageStore.loadMetrics(selectedNamespace?.name);
         });
-    }
-});
-
-watch(() => storeState.currentMetric, (currentMetric) => {
-    if (currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
-        namespaceState.selectedNamespace = {
-            label: namespaceState.namespaces.find((item) => item.namespace_id === currentMetric.namespace_id).name,
-            name: currentMetric.namespace_id,
-        };
     }
 });
 
@@ -240,6 +231,12 @@ watch(() => route.params, (params) => {
 
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
+    if (storeState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+        namespaceState.selectedNamespace = {
+            label: namespaceState.namespaces.find((item) => item.namespace_id === storeState.currentMetric?.namespace_id).name,
+            name: storeState.currentMetric.namespace_id,
+        };
+    }
 });
 
 </script>
@@ -282,7 +279,7 @@ onMounted(async () => {
                                size="sm"
                                @click="handleClickBackToHome"
                 >
-                    {{ $t('INVENTORY.METRIC_EXPLORER.BACK_TO_HOME_BUTTON') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER_HOME') }}
                 </p-text-button>
                 <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
                     <template #collapsible-contents>

@@ -2704,7 +2704,6 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 			"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
-			"BACK_TO_HOME_BUTTON": "",
 			"COMMON": "",
 			"DAILY": "일별 데이터",
 			"FILTERS": "필터",
@@ -2712,6 +2711,7 @@
 			"GROUP_BY": "그룹별 통계",
 			"HIDE_ALL": "전체 숨김",
 			"METRIC_EXPLORER": "",
+			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "월별 데이터",
 			"NO_ITEMS": "아이템이 없습니다",
 			"OPERATOR": "",

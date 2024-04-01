@@ -2704,7 +2704,6 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
-			"BACK_TO_HOME_BUTTON": "Go to Metric Explorer Home",
 			"COMMON": "Common",
 			"DAILY": "Daily",
 			"FILTERS": "Filters",
@@ -2712,6 +2711,7 @@
 			"GROUP_BY": "Group By",
 			"HIDE_ALL": "Hide all",
 			"METRIC_EXPLORER": "Metric Explorer",
+			"METRIC_EXPLORER_HOME": "Metric Explorer Home",
 			"MONTHLY": "Monthly",
 			"NO_ITEMS": "No Items",
 			"OPERATOR": "Operator",
