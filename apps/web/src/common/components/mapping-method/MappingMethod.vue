@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
         overflow: hidden;
 
         .left {
-            @apply flex items-center bg-gray-100 p-2;
+            @apply flex items-center justify-center bg-gray-100 p-2;
             width: 3.5rem;
         }
 
