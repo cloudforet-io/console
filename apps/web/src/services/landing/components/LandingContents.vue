@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PDataLoader, PEmpty, PButton } from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
@@ -18,10 +20,6 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
 });
-
-const handleCreateWorkspace = () => {
-
-};
 </script>
 
 <template>
@@ -47,29 +45,7 @@ const handleCreateWorkspace = () => {
                        :data="[]"
         >
             <template #no-data>
-                <p-empty
-                    show-image
-                    show-button
-                    class="no-data-wrapper"
-                >
-                    <template #button>
-                        <p-button v-if="storeState.isDomainAdmin"
-                                  style-type="primary"
-                                  size="md"
-                                  icon-left="ic_plus_bold"
-                                  class="btn-create"
-                                  @click="handleCreateWorkspace"
-                        >
-                            {{ $t('LADING.CREATE_WORKSPACE') }}
-                        </p-button>
-                    </template>
-                    <div class="not-found">
-                        <p>{{ $t('LADING.NOT_FOUND_DESC') }}</p>
-                        <p v-if="storeState.isDomainAdmin">
-                            {{ $t('LADING.DESC_CREATE_WORKSPACE') }}
-                        </p>
-                    </div>
-                </p-empty>
+                <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
     </div>
@@ -78,6 +54,7 @@ const handleCreateWorkspace = () => {
 <style scoped lang="postcss">
 .landing-contents {
     @apply flex flex-col;
+    max-width: 44.5rem;
     padding-top: 5rem;
     gap: 2rem;
     .title-wrapper {
@@ -88,15 +65,6 @@ const handleCreateWorkspace = () => {
         }
         .desc {
             @apply text-label-md text-gray-700 text-center;
-        }
-    }
-    .no-data-wrapper {
-        padding-top: 1.5rem;
-        .not-found {
-            @apply flex flex-col text-paragraph-md text-gray-400;
-        }
-        .btn-create {
-            margin-top: 1rem;
         }
     }
 }
