@@ -2693,9 +2693,14 @@
 			"NO_JOB": "No recent jobs",
 			"NO_OPTIONS": "No Selectable Options"
 		},
+		"CREATE_COLLECTOR": "Create Collector",
+		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "No collector has been created yet.",
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
+			"BACK_TO_HOME_BUTTON": "Go to Metric Explorer Home",
+			"COMMON": "Common",
 			"DAILY": "Daily",
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
@@ -2724,9 +2729,6 @@
 			"SHOW_ALL": "Show all",
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items."
 		},
-		"CREATE_COLLECTOR": "Create Collector",
-		"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
-		"EMPTY_CLOUD_SERVICE_RESOURCE": "No collector has been created yet.",
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": "Security"

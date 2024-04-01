@@ -66,6 +66,7 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
     @apply flex flex-col text-label-md;
     .collapsible-title {
         @apply flex items-center font-bold;
+        height: 1.5rem;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
         }
