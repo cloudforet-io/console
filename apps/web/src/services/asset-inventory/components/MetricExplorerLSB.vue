@@ -223,15 +223,6 @@ watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
     }
 });
 
-watch(() => storeState.currentMetric, (currentMetric) => {
-    if (currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
-        namespaceState.selectedNamespace = {
-            label: namespaceState.namespaces.find((item) => item.namespace_id === currentMetric.namespace_id).name,
-            name: currentMetric.namespace_id,
-        };
-    }
-});
-
 watch(() => route.params, (params) => {
     if (!params.id) {
         namespaceState.selectedNamespace = undefined;
@@ -240,6 +231,12 @@ watch(() => route.params, (params) => {
 
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
+    if (storeState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+        namespaceState.selectedNamespace = {
+            label: namespaceState.namespaces.find((item) => item.namespace_id === storeState.currentMetric?.namespace_id).name,
+            name: storeState.currentMetric.namespace_id,
+        };
+    }
 });
 
 </script>
