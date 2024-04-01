@@ -2693,9 +2693,14 @@
 			"NO_JOB": "近のジョブはありません",
 			"NO_OPTIONS": "選択可能なオプションはありません。"
 		},
+		"CREATE_COLLECTOR": "コレクタ生成",
+		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "まだコレクターが作成されていません。",
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
+			"BACK_TO_HOME_BUTTON": "",
+			"COMMON": "",
 			"DAILY": "日別データ",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準",
@@ -2724,9 +2729,6 @@
 			"SHOW_ALL": "すべて表示",
 			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください"
 		},
-		"CREATE_COLLECTOR": "コレクタ生成",
-		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
-		"EMPTY_CLOUD_SERVICE_RESOURCE": "まだコレクターが作成されていません。",
 		"SECURITY": {
 			"MAIN": {
 				"TITLE": "セキュリティ"
@@ -2863,7 +2865,6 @@
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
 		"ASSET_INVENTORY_COLLECTOR": "コレクター",
 		"ASSET_INVENTORY_METRIC_EXPLORER": "",
-		"ASSET_INVENTORY_SECURITY": "",
 		"ASSET_INVENTORY_SECURITY": "セキュリティ",
 		"ASSET_INVENTORY_SERVER": "サーバ",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
