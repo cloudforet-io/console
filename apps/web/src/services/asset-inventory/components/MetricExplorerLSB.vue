@@ -2,10 +2,10 @@
 import {
     computed, nextTick, onMounted, reactive, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader,
+    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
@@ -43,6 +43,8 @@ interface NamespaceSubItemType {
 }
 
 const route = useRoute();
+const router = useRouter();
+
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
@@ -102,6 +104,13 @@ const namespaceState = reactive({
     namespaceItems: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
         return [
+            ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+        ];
+    }),
+    namespaceItemsByKeyword: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
+        if (isEmpty(storeState.providers)) return [];
+        return [
             ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
             ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
@@ -139,7 +148,7 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[
     if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
-        label: i18n.t('COMMON.COMMON'),
+        label: i18n.t('INVENTORY.METRIC_EXPLORER.COMMON'),
         subItems: commonNamespaces,
     }];
 };
@@ -201,6 +210,9 @@ const handleClickBackToNamespace = () => {
 };
 const handleOpenAddCustomMetricModal = () => {
     metricState.addCustomMetricModalVisible = true;
+};
+const handleClickBackToHome = () => {
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
 };
 
 watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
@@ -265,6 +277,14 @@ onMounted(async () => {
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
                 >
+                    <p-text-button v-if="state.isDetailPage"
+                                   class="back-to-home-button"
+                                   icon-left="ic_arrow-left"
+                                   size="sm"
+                                   @click="handleClickBackToHome"
+                    >
+                        {{ $t('INVENTORY.METRIC_EXPLORER.BACK_TO_HOME_BUTTON') }}
+                    </p-text-button>
                     <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
                         <template #collapsible-contents>
                             <div class="namespace-wrapper">
@@ -273,8 +293,28 @@ onMounted(async () => {
                                           @update:value="handleSearchNamespace"
                                 />
                                 <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                             v-show="!namespaceState.inputValue"
                                                              :key="`provider-${idx}`"
                                                              class="category-menu-item"
+                                                             :item="item"
+                                                             is-sub-item
+                                >
+                                    <template #collapsible-contents="{ item: _item }">
+                                        <div v-for="(_menu, _idx) in _item.subItems"
+                                             :key="`${_menu.label}-${_idx}`"
+                                             :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                             @click="handleClickNamespace(_menu)"
+                                        >
+                                            <span class="text">
+                                                {{ _menu?.label || '' }}
+                                            </span>
+                                        </div>
+                                    </template>
+                                </l-s-b-collapsible-menu-item>
+                                <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
+                                                             v-show="namespaceState.inputValue"
+                                                             :key="`provider-${idx}`"
+                                                             class="category-menu-item category-menu-item-by-keyword"
                                                              :item="item"
                                                              is-sub-item
                                                              :override-collapsed="namespaceState.collapsed"
@@ -360,6 +400,10 @@ onMounted(async () => {
 .metric-explorer-l-s-b {
     .namespace-data-loader {
         min-height: 15rem;
+
+        .back-to-home-button {
+            height: 1.6875rem;
+        }
         .namespace-wrapper {
             @apply flex flex-col gap-1;
 
