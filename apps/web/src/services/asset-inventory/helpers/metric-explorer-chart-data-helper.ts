@@ -16,9 +16,8 @@ export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, op
             _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
         }
         const legends: Legend[] = [];
-        const valueKey = `value_${operator}`;
         rawData.results?.forEach((d) => {
-            if (d[valueKey]) {
+            if (d.value) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 if (!_name) {
@@ -51,7 +50,6 @@ export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>
         _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
     }
 
-    const valueKey = `value_${operator}`;
     let now = dayjs.utc(period.start).clone();
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         const _date = now.format(dateFormat);
@@ -62,9 +60,9 @@ export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d[valueKey]?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate[groupByName] = d.value?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCost = d[valueKey]?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCost = d.value?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);

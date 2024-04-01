@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
@@ -12,30 +13,32 @@ import type { MetricModel } from '@/schema/inventory/metric/model';
 import type { NamespaceGetParameters } from '@/schema/inventory/namespace/api-verbs/get';
 import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
-    Granularity, MetricNamespace, Period, RelativePeriod,
+    Granularity, MetricNamespace, Operator, Period, RelativePeriod,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-export const useMetricExplorerPageStore = defineStore('metric-explorer-page', () => {
+export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
     const state = reactive({
         namespaceListloading: false,
         metricListLoading: false,
         metricLoading: false,
         metricId: undefined as string|undefined,
         metric: undefined as MetricModel|undefined,
+        namespaces: [] as NamespaceModel[],
+        metricList: [] as MetricModel[],
+        selectedNamespace: undefined as MetricNamespace|undefined,
+        // query section
         granularity: GRANULARITY.MONTHLY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
         enabledFiltersProperties: undefined as string[]|undefined,
         filters: {} as Record<string, string[]>,
-        namespaces: [] as NamespaceModel[],
-        metricList: [] as MetricModel[],
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
-        selectedNamespace: undefined as MetricNamespace|undefined,
+        selectedOperator: OPERATOR.SUM as Operator,
     });
     const getters = reactive({
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
@@ -49,6 +52,19 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             name: groupBy,
             label: state.metric?.label_keys?.find((label) => label.key === groupBy)?.name ?? groupBy,
         }))),
+        consoleFilters: computed<ConsoleFilter[]>(() => {
+            const results: ConsoleFilter[] = [];
+            Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
+                if (filterItems.length) {
+                    results.push({
+                        k: category,
+                        v: filterItems,
+                        o: '=',
+                    });
+                }
+            });
+            return results;
+        }),
     });
 
     /* Mutations */
@@ -76,17 +92,25 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
     const setMetricId = (metricId?: string) => {
         state.metricId = metricId;
     };
+    const setSelectedOperator = (operator: Operator) => {
+        state.selectedOperator = operator;
+    };
 
     /* Actions */
     const reset = () => {
         state.granularity = GRANULARITY.MONTHLY;
-        state.period = undefined;
-        state.relativePeriod = undefined;
+        state.period = getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0];
+        state.relativePeriod = getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1];
         state.filters = {};
         state.selectedGroupByList = [];
         state.selectedChartGroupBy = undefined;
         state.selectedNamespace = undefined;
         state.enabledFiltersProperties = undefined;
+        state.metricId = undefined;
+        state.metric = undefined;
+        state.metricList = [];
+        state.namespaces = [];
+        state.selectedOperator = OPERATOR.SUM;
     };
     const loadNamespaces = async () => {
         state.namespaceListloading = true;
@@ -119,18 +143,22 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
             state.metricListLoading = false;
         }
     };
+    const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
     const loadMetric = async () => {
         if (!state.metricId) return;
         state.metricLoading = true;
         try {
-            state.metric = await SpaceConnector.clientV2.inventory.metric.get<MetricGetParameters, MetricModel>({
+            const { status, response } = await loadMetricFetcher<MetricGetParameters, MetricModel>({
                 metric_id: state.metricId,
             });
+            if (status === 'succeed') {
+                state.metric = response;
+                state.metricLoading = false;
+            }
         } catch (e) {
             state.metric = undefined;
-            console.error(e);
-        } finally {
             state.metricLoading = false;
+            console.error(e);
         }
     };
 
@@ -149,6 +177,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         setEnabledFiltersProperties,
         setFilters,
         setMetricId,
+        setSelectedOperator,
     };
 
     return {
