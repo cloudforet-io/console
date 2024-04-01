@@ -36,6 +36,15 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
         ],
     },
+    'filters.project_group': {
+        key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group,
+        name: 'Project Group',
+        selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
+        ],
+    },
     'filters.project': {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.project,
         name: 'Project',
