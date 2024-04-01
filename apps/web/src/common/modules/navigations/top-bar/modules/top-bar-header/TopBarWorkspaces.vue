@@ -6,8 +6,9 @@ import { useRouter } from 'vue-router/composables';
 import {
     PSelectDropdown, PTooltip, PI, PButton, PDivider,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
-import { clone } from 'lodash';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { clone, sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
@@ -22,11 +23,18 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { gray, violet } from '@/styles/colors';
 
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+
+const PAGE_SIZE = 9;
 
 interface Props {
     isAdminMode: boolean;
@@ -38,50 +46,24 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreState = userWorkspaceStore.$state;
+const workspaceStoreGetters = userWorkspaceStore.getters;
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const router = useRouter();
 
+const storeState = reactive({
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
+    favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'name')),
+});
 const state = reactive({
     visibleDropdown: false,
-    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
-    workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
-    selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => {
-        const menuList: SelectDropdownMenuItem[] = [
-            // TODO: will be applied after API completion
-            // { type: 'header', name: 'starred_header', label: i18n.t('COMMON.STARRED') } as SelectDropdownMenuItem,
-            { type: 'header', name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${state.workspaceList.length})` } as SelectDropdownMenuItem,
-        ];
-        state.workspaceList.forEach((_workspace) => {
-            // TODO: will be applied after API completion
-            // if (state.selectedWorkspace?.workspace_id === _workspace.workspace_id) {
-            //     menuList.push({
-            //         name: _workspace.workspace_id,
-            //         label: _workspace.name,
-            //         headerName: 'starred_header',
-            //         tags: _workspace.tags,
-            //     } as SelectDropdownMenuItem);
-            // } else {
-            //     menuList.push({
-            //         name: _workspace.workspace_id,
-            //         label: _workspace.name,
-            //         headerName: 'workspace_header',
-            //         tags: _workspace.tags,
-            //     } as SelectDropdownMenuItem);
-            // }
-            menuList.push({
-                name: _workspace.workspace_id,
-                label: _workspace.name,
-                headerName: 'workspace_header',
-                tags: _workspace.tags,
-            } as SelectDropdownMenuItem);
-            return menuList;
-        });
-        return [...menuList];
-    }),
-    searchText: '',
+    workspaceMenuList: computed<MenuItem[]>(() => [
+        ...filterStarredItems(storeState.favoriteItems),
+        ...formatMenuItems(storeState.workspaceList),
+    ]),
 });
 
 const selectWorkspace = (name: string): void => {
@@ -111,6 +93,43 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         speed: 1,
     });
 };
+const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
+    const result = [
+        { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${storeState.workspaceList.length})` },
+    ] as MenuItem[];
+    menuItems.forEach((d) => {
+        result.push({
+            ...d,
+            type: CONTEXT_MENU_TYPE.item,
+            name: d.workspace_id || '',
+            label: d.name as string,
+        });
+    });
+    return result.slice(0, PAGE_SIZE);
+};
+const filterStarredItems = (menuItems: FavoriteItem[] = []): MenuItem[] => {
+    if (storeState.favoriteItems.length === 0) return [];
+    const result: MenuItem[] = [
+        { type: CONTEXT_MENU_TYPE.header, name: 'starred_header', label: i18n.t('COMMON.STARRED') },
+    ];
+    menuItems.forEach((d) => {
+        const item = storeState.workspaceList.find((w) => w.workspace_id === d.itemId);
+        if (item) {
+            result.push({
+                ...item,
+                type: CONTEXT_MENU_TYPE.item,
+                name: d.itemId || '',
+                label: d.label as string,
+            });
+        }
+    });
+    return result;
+};
+const handleClickAllWorkspaceButton = () => {
+    router.push({
+        name: LANDING_ROUTE._NAME,
+    });
+};
 </script>
 
 <template>
@@ -131,11 +150,11 @@ const handleClickButton = (hasNoWorkspace?: string) => {
             </span>
         </div>
         <p-select-dropdown v-if="!props.isAdminMode"
-                           :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
+                           :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
                            :menu="state.workspaceMenuList"
                            hide-header-without-items
-                           :selected="state.selectedWorkspace?.workspace_id"
+                           :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
             <template #dropdown-button-icon>
@@ -146,12 +165,12 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                 />
             </template>
             <template #dropdown-button>
-                <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
-                                     :theme="state.selectedWorkspace?.tags?.theme"
+                <workspace-logo-icon :text="storeState.selectedWorkspace?.name || ''"
+                                     :theme="storeState.selectedWorkspace?.tags?.theme"
                 />
                 <div>
                     <span class="selected-workspace">
-                        {{ state.selectedWorkspace?.name }}
+                        {{ storeState.selectedWorkspace?.name }}
                     </span>
                     <span class="tablet-selected">
                         ...
@@ -161,14 +180,14 @@ const handleClickButton = (hasNoWorkspace?: string) => {
             <template #menu-header>
                 <p-tooltip class="menu-header-selected-workspace"
                            position="bottom"
-                           :contents="state.selectedWorkspace?.name || ''"
+                           :contents="storeState.selectedWorkspace?.name || ''"
                 >
                     <div class="workspace-wrapper">
-                        <workspace-logo-icon :text="state.selectedWorkspace?.name || ''"
-                                             :theme="state.selectedWorkspace?.tags?.theme"
+                        <workspace-logo-icon :text="storeState.selectedWorkspace?.name || ''"
+                                             :theme="storeState.selectedWorkspace?.tags?.theme"
                                              size="xs"
                         />
-                        <span class="workspace-name">{{ state.selectedWorkspace?.name }}</span>
+                        <span class="workspace-name">{{ storeState.selectedWorkspace?.name }}</span>
                     </div>
                     <p-i name="ic_check"
                          :color="violet[600]"
@@ -186,19 +205,25 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                         />
                         <span class="label-text">{{ item.label }}</span>
                     </div>
-
-                    <!--                    TODO: will be applied after API completion-->
-                    <!--                    <favorite-button :item-id="item.name"-->
-                    <!--                                     :favorite-type="FAVORITE_TYPE.MENU"-->
-                    <!--                                     scale="0.875"-->
-                    <!--                                     class="favorite-button"-->
-                    <!--                    />-->
+                    <favorite-button :item-id="item.name"
+                                     :favorite-type="FAVORITE_TYPE.WORKSPACE"
+                                     scale="0.875"
+                                     class="favorite-button"
+                    />
                 </div>
             </template>
-            <template v-if="state.isDomainAdmin"
+            <template v-if="storeState.isDomainAdmin"
                       #menu-bottom
             >
                 <div class="workspace-toolbox-wrapper">
+                    <p-button style-type="transparent"
+                              size="md"
+                              class="view-all-workspace-button tool"
+                              icon-right="ic_arrow-right"
+                              @click="handleClickAllWorkspaceButton"
+                    >
+                        {{ $t("COMMON.GNB.WORKSPACE.VIEW_WORKSPACES") }}
+                    </p-button>
                     <p-divider />
                     <div class="workspace-toolbox">
                         <p-button style-type="substitutive"
@@ -367,7 +392,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         &.is-domain-admin {
             :deep(.p-context-menu) {
                 .menu-container {
-                    padding-bottom: 5.75rem;
+                    padding-bottom: 8.35rem;
                 }
                 .bottom-slot-area {
                     padding: 0;

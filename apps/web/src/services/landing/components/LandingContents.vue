@@ -76,8 +76,10 @@ const state = reactive({
                 <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
-        <p-divider />
-        <div class="banner">
+        <p-divider v-if="storeState.isDomainAdmin" />
+        <div v-if="storeState.isDomainAdmin"
+             class="banner"
+        >
             <img alt="empty-cloud-service-img"
                  src="@/assets/images/landing/img_landing_create_workspace.png"
                  class="create-workspace-img"
