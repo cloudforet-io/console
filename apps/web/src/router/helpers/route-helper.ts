@@ -71,7 +71,13 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
         return false;
     }
 
-    if (to.name !== AUTH_ROUTE.SIGN_OUT._NAME && to.name !== ERROR_ROUTE._NAME && routeScope === ROUTE_SCOPE.EXCLUDE_AUTH) {
+    const ROOT_REDIRECT_SKIP_ROUTE_NAMES = [
+        AUTH_ROUTE.SIGN_OUT._NAME,
+        ERROR_ROUTE._NAME,
+        ROOT_ROUTE.COST_REPORT._NAME,
+    ];
+
+    if (!ROOT_REDIRECT_SKIP_ROUTE_NAMES.includes(to.name as string) && routeScope === ROUTE_SCOPE.EXCLUDE_AUTH) {
         next({ name: ROOT_ROUTE._NAME });
         return false;
     }

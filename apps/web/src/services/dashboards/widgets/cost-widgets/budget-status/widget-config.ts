@@ -24,6 +24,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
         'filters.provider',
+        'filters.project_group',
         'filters.project',
     ]),
 };

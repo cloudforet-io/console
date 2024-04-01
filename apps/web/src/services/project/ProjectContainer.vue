@@ -7,11 +7,14 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import ProjectLSB from '@/services/project/ProjectLSB.vue';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 const gnbStore = useGnbStore();
+const projectPageStore = useProjectPageStore();
 
 onUnmounted(() => {
     gnbStore.initState();
+    projectPageStore.reset();
 });
 </script>
 
