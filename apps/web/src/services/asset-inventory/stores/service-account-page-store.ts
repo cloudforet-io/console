@@ -10,6 +10,7 @@ import type { ProviderItem } from '@/store/reference/provider-reference-store';
 interface Getters {
     autoSyncAdditionalOptions: ComputedRef<any>;
     selectedProviderItem: ComputedRef<ProviderItem>;
+    scheduleHours: ComputedRef<number[]>;
 }
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -23,6 +24,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const getters = reactive<Getters>({
         autoSyncAdditionalOptions: computed(() => state.autoSyncAdditionalOptions),
         selectedProviderItem: computed(() => allReferenceStore.getters.provider[state.selectedProvider]),
+        scheduleHours: computed(() => state.scheduleHours),
     });
     const actions = {
         setAutoSyncAdditionalOptions: () => {

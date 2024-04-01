@@ -78,11 +78,13 @@ const formState = reactive({
     isBaseInformationFormValid: false,
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
     credentialForm: {} as CredentialForm,
+    autoSyncForm: {},
     isCredentialFormValid: false,
+    isAutoSyncFormValid: false,
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-        if (state.isTrustedAccount) return true;
+        if (!formState.isAutoSyncFormValid && state.isTrustedAccount) return false;
         return true;
     }),
     formLoading: false,
@@ -164,6 +166,10 @@ const handleChangeCredentialForm = (credentialForm) => {
     formState.credentialForm = credentialForm;
 };
 
+const handleChangeAutoSyncForm = (autoSyncForm) => {
+    formState.autoSyncForm = autoSyncForm;
+};
+
 /* Init */
 (async () => {
     state.providerSchemaLoading = true;
@@ -235,7 +241,9 @@ const handleChangeCredentialForm = (credentialForm) => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
                 />
-                <service-account-auto-sync-form :provider="props.provider" />
+                <service-account-auto-sync-form :provider="props.provider"
+                                                @change="handleChangeAutoSyncForm"
+                />
             </p-pane-layout>
         </div>
 

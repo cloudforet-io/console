@@ -351,7 +351,7 @@ defineExpose({ reloadMenu });
                             default: !props.showSelectMarker,
                             [menuPosition]: !useFixedMenuStyle
                         }"
-                        :menu="refinedMenu"
+                        :menu="props.disableHandler ? props.menu : refinedMenu"
                         :loading="props.loading || loading"
                         :readonly="props.readonly"
                         :style="contextMenuStyle"
