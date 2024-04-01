@@ -40,15 +40,18 @@ export interface Legend {
 
 export type MetricDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    value_sum?: Array<{ date: string; value: number; }>;
-    value_avg?: Array<{ date: string; value: number; }>;
-    value_max?: Array<{ date: string; value: number; }>;
-    value_min?: Array<{ date: string; value: number; }>;
-    _total_value_sum?: number;
+    value?: Array<{ date: string; value: number; }>;
+    _total_value?: number;
 };
 
 export interface XYChartData {
     date: string;
     totalCost?: number;
     [key: string]: any;
+}
+
+export interface DonutChartData {
+    date: string;
+    value: number;
+    [key: string]: any; // provider: 'AWS'
 }

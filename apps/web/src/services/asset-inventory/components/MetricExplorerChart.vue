@@ -57,12 +57,12 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataModel>> =>
                 start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
-                    [`value_${metricExplorerPageState.selectedOperator}`]: {
+                    value: {
                         key: 'cost', // TODO: change key after api change
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: `_total_value_${metricExplorerPageState.selectedOperator}`, desc: true }],
+                sort: [{ key: '_total_value', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },
