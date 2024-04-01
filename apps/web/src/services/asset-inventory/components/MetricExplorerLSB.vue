@@ -294,7 +294,7 @@ onMounted(async () => {
                                 />
                                 <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
                                                              v-show="!namespaceState.inputValue"
-                                                             :key="`provider-${idx}`"
+                                                             :key="`namespace-${idx}`"
                                                              class="category-menu-item"
                                                              :item="item"
                                                              is-sub-item
@@ -313,7 +313,7 @@ onMounted(async () => {
                                 </l-s-b-collapsible-menu-item>
                                 <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
                                                              v-show="namespaceState.inputValue"
-                                                             :key="`provider-${idx}`"
+                                                             :key="`namespace-search-${idx}`"
                                                              class="category-menu-item category-menu-item-by-keyword"
                                                              :item="item"
                                                              is-sub-item
