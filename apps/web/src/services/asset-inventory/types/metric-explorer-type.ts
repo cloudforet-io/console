@@ -51,7 +51,7 @@ export interface XYChartData {
 }
 
 export interface DonutChartData {
-    date: string;
+    date?: string;
     value: number;
     [key: string]: any; // provider: 'AWS'
 }

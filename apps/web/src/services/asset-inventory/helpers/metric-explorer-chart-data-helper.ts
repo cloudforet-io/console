@@ -4,12 +4,12 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
-    Legend, Operator, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData,
+    Legend, MetricDataAnalyzeResult, Granularity, Period,
+    XYChartData, DonutChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, operator: Operator, groupBy?: string): Legend[] => {
+export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
@@ -39,7 +39,7 @@ export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, op
     return [];
 };
 
-export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, granularity: Granularity, period: Period, operator?: Operator, groupBy?: string): XYChartData[] => {
+export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, granularity: Granularity, period: Period, groupBy?: string): XYChartData[] => {
     if (!rawData.results?.length) return [];
     const chartData: XYChartData[] = [];
     const timeUnit = granularity === GRANULARITY.DAILY ? 'day' : 'month';
@@ -68,5 +68,34 @@ export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>
         chartData.push(chartDataByDate);
         now = now.add(1, timeUnit);
     }
+    return chartData;
+};
+
+
+export const getDonutChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): DonutChartData[] => {
+    if (!rawData.results?.length) return [];
+    const chartData: DonutChartData[] = [];
+
+    let _groupBy: string = groupBy || '';
+    if (groupBy?.includes('.')) {
+        _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
+    }
+
+    rawData.results.forEach((d) => {
+        if (_groupBy) {
+            let _name = d[_groupBy];
+            if (!_name) {
+                _name = 'Unknown';
+            }
+            chartData.push({
+                [_groupBy]: _name,
+                value: d.value || 0,
+            });
+        } else {
+            chartData.push({
+                value: d.value || 0,
+            });
+        }
+    });
     return chartData;
 };
