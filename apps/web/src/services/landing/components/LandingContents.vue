@@ -31,7 +31,9 @@ const handleCreateWorkspace = () => {
             <div class="desc">
                 <div v-if="storeState.isDomainAdmin">
                     <p>{{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN', { cnt: storeState.workspaceList.length }) }}</p>
-                    <p>{{ $t('LADING.DESC_CLICK_OR_CREATE') }}</p>
+                    <p v-if="storeState.workspaceList.length > 0">
+                        {{ $t('LADING.DESC_CLICK_OR_CREATE') }}
+                    </p>
                 </div>
                 <p v-else
                    class="desc"
@@ -50,11 +52,6 @@ const handleCreateWorkspace = () => {
                     show-button
                     class="no-data-wrapper"
                 >
-                    <template #image>
-                        <img alt="illust_astronaut_radio"
-                             src="@/assets/images/illust_astronaut_radio.svg"
-                        >
-                    </template>
                     <template #button>
                         <p-button v-if="storeState.isDomainAdmin"
                                   style-type="primary"
@@ -67,13 +64,10 @@ const handleCreateWorkspace = () => {
                         </p-button>
                     </template>
                     <div class="not-found">
-                        <p>{{ $t('LADING.NOT_FOUND') }}</p>
-                        <div class="not-found-desc">
-                            <p>{{ $t('LADING.NOT_FOUND_DESC') }}</p>
-                            <p v-if="storeState.isDomainAdmin">
-                                {{ $t('LADING.DESC_CREATE_WORKSPACE') }}
-                            </p>
-                        </div>
+                        <p>{{ $t('LADING.NOT_FOUND_DESC') }}</p>
+                        <p v-if="storeState.isDomainAdmin">
+                            {{ $t('LADING.DESC_CREATE_WORKSPACE') }}
+                        </p>
                     </div>
                 </p-empty>
             </template>
@@ -99,11 +93,7 @@ const handleCreateWorkspace = () => {
     .no-data-wrapper {
         padding-top: 1.5rem;
         .not-found {
-            @apply flex flex-col text-label-lg text-gray-400;
-            .not-found-desc {
-                @apply text-label-md text-violet-300;
-                margin-top: 0.5rem;
-            }
+            @apply flex flex-col text-paragraph-md text-gray-400;
         }
         .btn-create {
             margin-top: 1rem;
