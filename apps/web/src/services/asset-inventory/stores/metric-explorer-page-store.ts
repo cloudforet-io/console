@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
@@ -51,6 +52,19 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             name: groupBy,
             label: state.metric?.label_keys?.find((label) => label.key === groupBy)?.name ?? groupBy,
         }))),
+        consoleFilters: computed<ConsoleFilter[]>(() => {
+            const results: ConsoleFilter[] = [];
+            Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
+                if (filterItems.length) {
+                    results.push({
+                        k: category,
+                        v: filterItems,
+                        o: '=',
+                    });
+                }
+            });
+            return results;
+        }),
     });
 
     /* Mutations */
