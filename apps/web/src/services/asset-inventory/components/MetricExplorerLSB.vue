@@ -78,7 +78,7 @@ const state = reactive({
             },
         ];
         if (!namespaceState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
-        return [...baseMenuSet, state.metircMenu];
+        return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBMenu[]>(() => []),
     namespaceMenu: computed(() => ({
@@ -86,7 +86,7 @@ const state = reactive({
         label: i18n.t('COMMON.NAMESPACE'),
         id: 'namespace',
     })),
-    metircMenu: computed(() => ({
+    metricMenu: computed(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         id: 'metric',
     })),
@@ -245,155 +245,153 @@ onMounted(async () => {
 </script>
 
 <template>
-    <fragment>
-        <l-s-b class="metric-explorer-l-s-b"
-               :menu-set="state.menuSet"
-        >
-            <template #collapsible-contents-starred>
-                <div v-if="state.starredMenuSet.length > 0">
-                    <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+    <l-s-b class="metric-explorer-l-s-b"
+           :menu-set="state.menuSet"
+    >
+        <template #collapsible-contents-starred>
+            <div v-if="state.starredMenuSet.length > 0">
+                <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+                                        :key="idx"
+                                        :item="item"
+                                        :idx="idx"
+                                        :current-path="state.currentPath"
+                                        is-hide-favorite
+                />
+            </div>
+            <span v-else
+                  class="no-data"
+            >
+                <p-i class="menu-icon"
+                     name="ic_star-filled"
+                     height="1rem"
+                     width="1rem"
+                     :color="yellow[500]"
+                />
+                {{ $t('COMMON.STARRED_NO_DATA') }}
+            </span>
+        </template>
+        <template #slot-namespace>
+            <p-data-loader :loading="storeState.loading"
+                           :loader-backdrop-opacity="0.5"
+                           :loader-backdrop-color="gray[100]"
+                           class="namespace-data-loader"
+            >
+                <p-text-button v-if="state.isDetailPage"
+                               class="back-to-home-button"
+                               icon-left="ic_arrow-left"
+                               size="sm"
+                               @click="handleClickBackToHome"
+                >
+                    {{ $t('INVENTORY.METRIC_EXPLORER.BACK_TO_HOME_BUTTON') }}
+                </p-text-button>
+                <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
+                    <template #collapsible-contents>
+                        <div class="namespace-wrapper">
+                            <p-search class="namespace-search"
+                                      :value="namespaceState.inputValue"
+                                      @update:value="handleSearchNamespace"
+                            />
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                         v-show="!namespaceState.inputValue"
+                                                         :key="`namespace-${idx}`"
+                                                         class="category-menu-item"
+                                                         :item="item"
+                                                         is-sub-item
+                            >
+                                <template #collapsible-contents="{ item: _item }">
+                                    <div v-for="(_menu, _idx) in _item.subItems"
+                                         :key="`${_menu.label}-${_idx}`"
+                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                         @click="handleClickNamespace(_menu)"
+                                    >
+                                        <span class="text">
+                                            {{ _menu?.label || '' }}
+                                        </span>
+                                    </div>
+                                </template>
+                            </l-s-b-collapsible-menu-item>
+                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
+                                                         v-show="namespaceState.inputValue"
+                                                         :key="`namespace-search-${idx}`"
+                                                         class="category-menu-item category-menu-item-by-keyword"
+                                                         :item="item"
+                                                         is-sub-item
+                                                         :override-collapsed="namespaceState.collapsed"
+                            >
+                                <template #collapsible-contents="{ item: _item }">
+                                    <div v-for="(_menu, _idx) in _item.subItems"
+                                         :key="`${_menu.label}-${_idx}`"
+                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                         @click="handleClickNamespace(_menu)"
+                                    >
+                                        <p-text-highlighting class="text"
+                                                             :term="namespaceState.inputValue"
+                                                             :text="_menu?.label || ''"
+                                        />
+                                    </div>
+                                </template>
+                            </l-s-b-collapsible-menu-item>
+                        </div>
+                    </template>
+                </l-s-b-collapsible-menu-item>
+            </p-data-loader>
+        </template>
+        <template #slot-metric>
+            <p-data-loader :loading="storeState.loading"
+                           :loader-backdrop-opacity="0.5"
+                           :loader-backdrop-color="gray[100]"
+                           class="metric-data-loader"
+            >
+                <div class="metric-wrapper">
+                    <div class="metric-title-item">
+                        <div class="title-wrapper">
+                            <p-icon-button class="back-button"
+                                           name="ic_arrow-left"
+                                           size="sm"
+                                           @click="handleClickBackToNamespace"
+                            />
+                            <p-lazy-img class="namespace-image"
+                                        :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
+                                        width="1.25rem"
+                                        height="1.25rem"
+                            />
+                            <p-tooltip class="title"
+                                       :contents="namespaceState.selectedNamespace?.label || ''"
+                            >
+                                <span>{{ namespaceState.selectedNamespace?.label.split('/')[0] }}</span>
+                                <span class="divider">/</span>
+                                <span class="type">{{ namespaceState.selectedNamespace?.label.split('/')[1] }}</span>
+                            </p-tooltip>
+                        </div>
+                        <p-icon-button style-type="tertiary"
+                                       name="ic_plus"
+                                       shape="square"
+                                       size="sm"
+                                       @click="handleOpenAddCustomMetricModal"
+                        />
+                    </div>
+                    <p-search class="metric-search"
+                              :value="metricState.inputValue"
+                              @update:value="handleSearchMetric"
+                    />
+                    <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricItems"
                                             :key="idx"
                                             :item="item"
                                             :idx="idx"
                                             :current-path="state.currentPath"
-                                            is-hide-favorite
-                    />
-                </div>
-                <span v-else
-                      class="no-data"
-                >
-                    <p-i class="menu-icon"
-                         name="ic_star-filled"
-                         height="1rem"
-                         width="1rem"
-                         :color="yellow[500]"
-                    />
-                    {{ $t('COMMON.STARRED_NO_DATA') }}
-                </span>
-            </template>
-            <template #slot-namespace>
-                <p-data-loader :loading="storeState.loading"
-                               :loader-backdrop-opacity="0.5"
-                               :loader-backdrop-color="gray[100]"
-                               class="namespace-data-loader"
-                >
-                    <p-text-button v-if="state.isDetailPage"
-                                   class="back-to-home-button"
-                                   icon-left="ic_arrow-left"
-                                   size="sm"
-                                   @click="handleClickBackToHome"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.BACK_TO_HOME_BUTTON') }}
-                    </p-text-button>
-                    <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
-                        <template #collapsible-contents>
-                            <div class="namespace-wrapper">
-                                <p-search class="namespace-search"
-                                          :value="namespaceState.inputValue"
-                                          @update:value="handleSearchNamespace"
-                                />
-                                <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                             v-show="!namespaceState.inputValue"
-                                                             :key="`namespace-${idx}`"
-                                                             class="category-menu-item"
-                                                             :item="item"
-                                                             is-sub-item
-                                >
-                                    <template #collapsible-contents="{ item: _item }">
-                                        <div v-for="(_menu, _idx) in _item.subItems"
-                                             :key="`${_menu.label}-${_idx}`"
-                                             :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                             @click="handleClickNamespace(_menu)"
-                                        >
-                                            <span class="text">
-                                                {{ _menu?.label || '' }}
-                                            </span>
-                                        </div>
-                                    </template>
-                                </l-s-b-collapsible-menu-item>
-                                <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
-                                                             v-show="namespaceState.inputValue"
-                                                             :key="`namespace-search-${idx}`"
-                                                             class="category-menu-item category-menu-item-by-keyword"
-                                                             :item="item"
-                                                             is-sub-item
-                                                             :override-collapsed="namespaceState.collapsed"
-                                >
-                                    <template #collapsible-contents="{ item: _item }">
-                                        <div v-for="(_menu, _idx) in _item.subItems"
-                                             :key="`${_menu.label}-${_idx}`"
-                                             :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                             @click="handleClickNamespace(_menu)"
-                                        >
-                                            <p-text-highlighting class="text"
-                                                                 :term="namespaceState.inputValue"
-                                                                 :text="_menu?.label || ''"
-                                            />
-                                        </div>
-                                    </template>
-                                </l-s-b-collapsible-menu-item>
-                            </div>
-                        </template>
-                    </l-s-b-collapsible-menu-item>
-                </p-data-loader>
-            </template>
-            <template #slot-metric>
-                <p-data-loader :loading="storeState.loading"
-                               :loader-backdrop-opacity="0.5"
-                               :loader-backdrop-color="gray[100]"
-                               class="metric-data-loader"
-                >
-                    <div class="metric-wrapper">
-                        <div class="metric-title-item">
-                            <div class="title-wrapper">
-                                <p-icon-button class="back-button"
-                                               name="ic_arrow-left"
-                                               size="sm"
-                                               @click="handleClickBackToNamespace"
-                                />
-                                <p-lazy-img class="namespace-image"
-                                            :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
-                                            width="1.25rem"
-                                            height="1.25rem"
-                                />
-                                <p-tooltip class="title"
-                                           :contents="namespaceState.selectedNamespace?.label || ''"
-                                >
-                                    <span>{{ namespaceState.selectedNamespace?.label.split('/')[0] }}</span>
-                                    <span class="divider">/</span>
-                                    <span class="type">{{ namespaceState.selectedNamespace?.label.split('/')[1] }}</span>
-                                </p-tooltip>
-                            </div>
-                            <p-icon-button style-type="tertiary"
-                                           name="ic_plus"
-                                           shape="square"
-                                           size="sm"
-                                           @click="handleOpenAddCustomMetricModal"
+                        <template #text>
+                            <p-text-highlighting class="text"
+                                                 :term="metricState.inputValue"
+                                                 :text="item?.label || ''"
                             />
-                        </div>
-                        <p-search class="metric-search"
-                                  :value="metricState.inputValue"
-                                  @update:value="handleSearchMetric"
-                        />
-                        <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricItems"
-                                                :key="idx"
-                                                :item="item"
-                                                :idx="idx"
-                                                :current-path="state.currentPath"
-                        >
-                            <template #text>
-                                <p-text-highlighting class="text"
-                                                     :term="metricState.inputValue"
-                                                     :text="item?.label || ''"
-                                />
-                            </template>
-                        </l-s-b-router-menu-item>
-                    </div>
-                </p-data-loader>
-            </template>
-        </l-s-b>
+                        </template>
+                    </l-s-b-router-menu-item>
+                </div>
+            </p-data-loader>
+        </template>
         <add-custom-metric-modal :visible.sync="metricState.addCustomMetricModalVisible" />
-    </fragment>
+    </l-s-b>
 </template>
 
 <style scoped lang="postcss">
