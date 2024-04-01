@@ -2758,12 +2758,11 @@
 		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "You have {cnt} workspaces in your domain.",
 		"DESC_CLICK": "Click one to enter.",
 		"DESC_CLICK_OR_CREATE": "Click one to enter or Create a new workspace.",
-		"DESC_CREATE_WORKSPACE": "Create a new workspace to start.",
-		"NOT_FOUND": "No Workspace Found.",
-		"NOT_FOUND_DESC": "There’s no workspace created in this domain yet.",
+		"DESC_CREATE_WORKSPACE": "Create one by clicking the \"Create\" button.",
+		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
 		"RECENT": "Recent Visits",
 		"SEARCH_WORKSPACE": "Search Workspaces",
-		"SHOW_ALL": "Show all",
+		"SHOW_ALL": "Show All",
 		"TITLE": "Which Workspace?"
 	},
 	"MANAGEMENT": {

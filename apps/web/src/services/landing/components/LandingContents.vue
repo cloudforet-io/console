@@ -1,27 +1,43 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PDataLoader, PEmpty, PButton } from '@spaceone/design-system';
+import {
+    PDataLoader, PSearch, PDivider, PButton,
+} from '@spaceone/design-system';
+import { sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import type { RecentItem } from '@/common/modules/navigations/type';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
+
+import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
+import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
+import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const recentStore = useRecentStore();
+const recentState = recentStore.state;
 
 const storeState = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
+    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
+    favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'name')),
+    recentWorkspace: computed<RecentItem[]>(() => recentState.recentMenuList.filter((item) => item?.type === RECENT_TYPE.WORKSPACE)),
 });
 const state = reactive({
     loading: false,
+    searchText: '',
 });
-
-const handleCreateWorkspace = () => {
-
-};
 </script>
 
 <template>
@@ -31,7 +47,9 @@ const handleCreateWorkspace = () => {
             <div class="desc">
                 <div v-if="storeState.isDomainAdmin">
                     <p>{{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN', { cnt: storeState.workspaceList.length }) }}</p>
-                    <p>{{ $t('LADING.DESC_CLICK_OR_CREATE') }}</p>
+                    <p v-if="storeState.workspaceList.length > 0">
+                        {{ $t('LADING.DESC_CLICK_OR_CREATE') }}
+                    </p>
                 </div>
                 <p v-else
                    class="desc"
@@ -42,48 +60,46 @@ const handleCreateWorkspace = () => {
             </div>
         </div>
         <p-data-loader :loading="state.loading"
-                       :data="[]"
+                       :data="storeState.workspaceList"
         >
+            <div class="contents-wrapper">
+                <p-search v-model="state.searchText"
+                          :placeholder="$t('LADING.SEARCH_WORKSPACE')"
+                />
+                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0" />
+                <landing-all-workspaces :workspace-list="storeState.workspaceList"
+                                        :favorite-list="storeState.favoriteList"
+                                        :is-domain-admin="storeState.isDomainAdmin"
+                />
+            </div>
             <template #no-data>
-                <p-empty
-                    show-image
-                    show-button
-                    class="no-data-wrapper"
-                >
-                    <template #image>
-                        <img alt="illust_astronaut_radio"
-                             src="@/assets/images/illust_astronaut_radio.svg"
-                        >
-                    </template>
-                    <template #button>
-                        <p-button v-if="storeState.isDomainAdmin"
-                                  style-type="primary"
-                                  size="md"
-                                  icon-left="ic_plus_bold"
-                                  class="btn-create"
-                                  @click="handleCreateWorkspace"
-                        >
-                            {{ $t('LADING.CREATE_WORKSPACE') }}
-                        </p-button>
-                    </template>
-                    <div class="not-found">
-                        <p>{{ $t('LADING.NOT_FOUND') }}</p>
-                        <div class="not-found-desc">
-                            <p>{{ $t('LADING.NOT_FOUND_DESC') }}</p>
-                            <p v-if="storeState.isDomainAdmin">
-                                {{ $t('LADING.DESC_CREATE_WORKSPACE') }}
-                            </p>
-                        </div>
-                    </div>
-                </p-empty>
+                <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
+        <p-divider />
+        <div class="banner">
+            <img alt="empty-cloud-service-img"
+                 src="@/assets/images/landing/img_landing_create_workspace.png"
+                 class="create-workspace-img"
+                 srcset="@/assets/images/img_landing_create_workspace@2x.png 2x,
+                        @/assets/images/img_landing_create_workspace@3x.png 3x"
+            >
+            <span class="desc">{{ $t('LADING.BANNER_DESC') }}</span>
+            <p-button style-type="primary"
+                      size="md"
+                      icon-left="ic_plus_bold"
+                      class="create-button"
+            >
+                {{ $t('LADING.CREATE_WORKSPACE') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .landing-contents {
     @apply flex flex-col;
+    width: 44.5rem;
     padding-top: 5rem;
     gap: 2rem;
     .title-wrapper {
@@ -96,17 +112,25 @@ const handleCreateWorkspace = () => {
             @apply text-label-md text-gray-700 text-center;
         }
     }
-    .no-data-wrapper {
-        padding-top: 1.5rem;
-        .not-found {
-            @apply flex flex-col text-label-lg text-gray-400;
-            .not-found-desc {
-                @apply text-label-md text-violet-300;
-                margin-top: 0.5rem;
-            }
+    .contents-wrapper {
+        @apply flex flex-col;
+        gap: 2rem;
+    }
+    .banner {
+        @apply flex items-center bg-violet-200 rounded-md;
+        padding: 1rem 0.75rem;
+        gap: 1rem;
+        background-image: url("@/assets/images/landing/img_landing_create_workspace_bg.png");
+        .create-workspace-img {
+            width: 3rem;
+            height: 3rem;
         }
-        .btn-create {
-            margin-top: 1rem;
+        .desc {
+            @apply text-label-lg text-gray-700;
+            width: 12.125rem;
+        }
+        .create-button {
+            margin-left: auto;
         }
     }
 }
