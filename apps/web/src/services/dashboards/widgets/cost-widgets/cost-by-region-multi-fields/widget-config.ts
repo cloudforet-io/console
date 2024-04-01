@@ -37,6 +37,7 @@ const costByRegionMultiFieldsWidgetConfig: WidgetConfig = {
         ['cost_data_type', { fixed: true }],
         ['granularity', { fixed: true, readonly: true }],
         ['filters.cost_product', { fixed: true }],
+        ['filters.project_group', { fixed: true }],
         ['filters.project', { fixed: true }],
         ['filters.service_account', { fixed: true }],
         ['filters.region', { fixed: true }],

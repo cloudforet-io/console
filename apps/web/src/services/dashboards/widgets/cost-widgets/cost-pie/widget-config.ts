@@ -21,6 +21,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
         ['cost_data_source', { fixed: true, hidden: true }],
         ['cost_data_field', { fixed: true }],
         ['granularity', { fixed: true, readonly: true }],
+        ['filters.project_group', { fixed: true }],
         ['filters.project', { fixed: true }],
         ['filters.service_account', { fixed: true }],
         ['filters.region', { fixed: true }],

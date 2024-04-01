@@ -225,7 +225,7 @@ const handleDrop = async (node, oldParent, parent, rollback) => {
 };
 
 const handleChangeSelect = (selected) => {
-    projectPageStore.setSelectedItem(selected[0] || {});
+    projectPageStore.setSelectedItem(selected[0]);
 };
 
 const handleAllProjectChangeSelect = (selected) => {
@@ -328,7 +328,6 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         />
                     </template>
                 </p-tree>
-
                 <p-tree :edit-options="state.editOptions"
                         :drag-options="state.dragOptions"
                         :toggle-options="toggleOptions"

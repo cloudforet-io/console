@@ -211,7 +211,7 @@ watch(() => projectDetailPageGetters.projectType, () => {
                            :total-count="state.totalCount"
                 >
                     <template v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                              #title-right-extra
+                              #extra
                     >
                         <div class="action-button-wrapper">
                             <p-button style-type="tertiary"

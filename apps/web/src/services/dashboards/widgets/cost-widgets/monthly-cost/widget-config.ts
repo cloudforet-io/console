@@ -24,6 +24,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     options_schema: getWidgetOptionsSchema([
         ['cost_data_source', { fixed: true, hidden: true }],
         ['granularity', { fixed: true, readonly: true }],
+        ['filters.project_group', { fixed: true }],
         ['filters.project', { fixed: true }],
         ['filters.service_account', { fixed: true }],
         ['filters.region', { fixed: true }],

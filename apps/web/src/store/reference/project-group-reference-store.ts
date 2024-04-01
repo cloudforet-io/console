@@ -25,6 +25,7 @@ interface ProjectGroupResourceItemData {
         id: string;
         name: string;
     };
+    users?: string[];
 }
 export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
@@ -49,7 +50,7 @@ export const useProjectGroupReferenceStore = defineStore('reference-project-grou
 
         const params: ProjectGroupListParameters = {
             query: {
-                only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
+                only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id', 'users'],
             },
         };
         try {
@@ -69,6 +70,7 @@ export const useProjectGroupReferenceStore = defineStore('reference-project-grou
                             id: parentGroup.project_group_id,
                             name: parentGroup.name,
                         } : undefined,
+                        users: projectGroupInfo.users,
                     },
                 };
             });
@@ -94,6 +96,7 @@ export const useProjectGroupReferenceStore = defineStore('reference-project-grou
                         id: parentGroup.key,
                         name: parentGroup.name,
                     } : undefined,
+                    users: projectGroupInfo.users,
                 },
             },
         };

@@ -29,6 +29,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         ['cloud_service_query_set', { fixed: true, hidden: true }],
         ['asset_data_field', { fixed: true }],
         // HACK: add Legend
+        ['filters.project_group', { fixed: true }],
         ['filters.project', { fixed: true }],
         ['filters.service_account', { fixed: true }],
         ['filters.region', { fixed: true }],

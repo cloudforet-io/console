@@ -4,8 +4,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+import { Root } from '@amcharts/amcharts5';
+import type { IRootSettings } from '@amcharts/amcharts5/.internal/core/Root';
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { PDataLoader } from '@spaceone/design-system';
+import { PSkeleton } from '@spaceone/design-system';
 import { cloneDeep, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -66,6 +68,15 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
+const COLUMN_DATA_LIMIT = 10;
+const CHART_ROOT_OPTIONS: IRootSettings = {
+    tooltipContainerBounds: {
+        top: 1000,
+        right: 0,
+        bottom: 1000,
+        left: 0,
+    },
+};
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
@@ -77,10 +88,17 @@ const { colorSet } = useWidgetColorSet({
 const state = reactive({
     loading: true,
     data: null as Response | null,
+    slicedData: computed<Response|null>(() => {
+        if (!state.data) return null;
+        return {
+            results: state.data.results.map((d) => ({ ...d, value_sum: d.value_sum.slice(0, COLUMN_DATA_LIMIT) })),
+            more: state.data.more,
+        };
+    }),
     dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
-    legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo) : [])),
+    legends: computed<Legend[]>(() => (state.slicedData?.results ? getXYChartLegends(state.slicedData.results, widgetState.parsedDataField, props.allReferenceTypeInfo) : [])),
     chartData: computed<ChartData[]>(() => {
-        const _chartData = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
+        const _chartData = getRefinedXYChartData<Data, ChartData>(state.slicedData?.results, {
             dataField: widgetState.parsedDataField,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: 'value_sum',
@@ -91,8 +109,8 @@ const state = reactive({
         return _chartData.reverse();
     }),
     tableData: computed<TableData[]>(() => {
-        if (!widgetState.dataField || !state.data?.results?.length) return [];
-        return state.data.results.map((d: Data) => {
+        if (!widgetState.dataField || !state.slicedData?.results?.length) return [];
+        return state.slicedData.results.map((d: Data) => {
             const row: TableData = {
                 [widgetState.parsedDataField]: d[widgetState.parsedDataField] ?? 'Unknown',
             } as TableData;
@@ -113,7 +131,7 @@ const state = reactive({
         }
 
         const dynamicTableFields: Field[] = [];
-        state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
+        state.slicedData?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
                 label: getWidgetValueLabel(d[widgetState.parsedSecondaryDataField], {
                     allReferenceTypeInfo: props.allReferenceTypeInfo,
@@ -146,12 +164,12 @@ const state = reactive({
     //
     showChart: computed<boolean>(() => {
         if (state.dataType !== 'usage_quantity') return true;
-        if (!state.data?.results?.length) return true;
+        if (!state.slicedData?.results?.length) return true;
         // hide chart when there are different usage_unit in data or usage_unit is null
-        if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
-        return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
+        if (state.slicedData.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
+        return uniqBy(state.slicedData.results[0].value_sum, 'usage_unit').length === 1;
     }),
-    usageUnit: computed<string|null>(() => state.data?.results?.[0]?.value_sum[0]?.usage_unit),
+    usageUnit: computed<string|null>(() => state.slicedData?.results?.[0]?.value_sum[0]?.usage_unit),
     chartSeriesList: computed<string[]>(() => {
         if (!state.chartData?.length) return [];
         return Object.keys(state.chartData[0]).filter((d) => d !== widgetState.parsedDataField);
@@ -207,6 +225,8 @@ const fetchData = async (): Promise<Response> => {
 const drawChart = (chartData) => {
     if (!state.showChart) return;
     if (!widgetState.parsedDataField) return;
+    chartHelper.disposeRoot();
+    chartHelper.setRoot(Root.new(chartContext.value as HTMLElement, CHART_ROOT_OPTIONS));
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     chartHelper.setChartColors(chart, colorSet.value);
     yAxis.set('categoryField', widgetState.parsedDataField);
@@ -319,19 +339,17 @@ defineExpose<WidgetExpose<Response>>({
             <div v-if="state.showChart"
                  class="chart-wrapper"
             >
-                <p-data-loader class="chart-loader"
-                               :loading="props.loading || state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
+                <div class="chart-loader">
+                    <p-skeleton v-show="props.loading || state.loading"
+                                height="100%"
+                                width="100%"
+                                class="chart-skeleton"
+                    />
                     <div ref="chartContext"
                          class="chart"
                     />
-                </p-data-loader>
+                </div>
             </div>
-
             <widget-data-table :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.tableData"
@@ -340,7 +358,7 @@ defineExpose<WidgetExpose<Response>>({
                                :legends="state.legends"
                                :color-set="colorSet"
                                :this-page="thisPage"
-                               :show-next-page="state.data ? state.data.more : false"
+                               :show-next-page="state.slicedData ? state.slicedData.more : false"
                                @update:this-page="handleUpdateThisPage"
                                @click-row="handleClickRow"
             />
@@ -354,6 +372,7 @@ defineExpose<WidgetExpose<Response>>({
         display: flex;
         flex-direction: column;
         height: 100%;
+        overflow: hidden;
         .chart-wrapper {
             height: 185px;
             margin-bottom: 1rem;

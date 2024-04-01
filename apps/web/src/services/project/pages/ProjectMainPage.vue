@@ -10,6 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -21,11 +22,13 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+
 
 const route = useRoute();
 
@@ -40,6 +43,7 @@ const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
 const storeState = reactive({
+    userId: computed(() => store.state.user.userId),
     groupId: computed(() => projectPageGetters.groupId),
     groupName: computed(() => projectPageGetters.groupName),
     selectedItem: computed(() => projectPageState.selectedItem),
@@ -75,6 +79,8 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT_GROUP,
         id: storeState.groupId,
     })),
+    projectGroupMemberManagementModalVisible: false,
+    projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
 });
 
 const {
@@ -110,6 +116,9 @@ const handleConfirmProjectGroupMoveModal = () => {
 };
 
 /* Handling Forms */
+const handleClickAddProjectGroupMember = () => {
+    state.projectGroupMemberManagementModalVisible = true;
+};
 const handleClickCreateButton = () => {
     showContextMenu();
 };
@@ -162,23 +171,34 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                         />
                     </template>
                 </div>
-                <div v-if="projectPageState.isWorkspaceOwner"
-                     class="top-button-box"
-                >
-                    <p-button ref="targetRef"
-                              icon-left="ic_plus_bold"
-                              @click="handleClickCreateButton"
+                <div class="top-button-box">
+                    <p-button v-if="storeState.groupId"
+                              style-type="tertiary"
+                              icon-left="ic_member"
+                              class="mr-4"
+                              @click="handleClickAddProjectGroupMember"
                     >
-                        {{ $t('PROJECT.LANDING.CREATE') }}
+                        <span>{{ $t('PROJECT.LANDING.GROUP_MEMBER') }}</span>
+                        <span v-if="state.projectGroupMemberCount"
+                              class="pl-1"
+                        >({{ state.projectGroupMemberCount }})</span>
                     </p-button>
-                    <p-context-menu v-show="visibleMenu"
-                                    ref="menuRef"
-                                    class="create-context-menu"
-                                    no-select-indication
-                                    :style="contextMenuStyle"
-                                    :menu="state.createDropdownMenuItems"
-                                    @select="handleSelectCreateMenu"
-                    />
+                    <template v-if="projectPageState.isWorkspaceOwner">
+                        <p-button ref="targetRef"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleClickCreateButton"
+                        >
+                            {{ $t('PROJECT.LANDING.CREATE') }}
+                        </p-button>
+                        <p-context-menu v-show="visibleMenu"
+                                        ref="menuRef"
+                                        class="create-context-menu"
+                                        no-select-indication
+                                        :style="contextMenuStyle"
+                                        :menu="state.createDropdownMenuItems"
+                                        @select="handleSelectCreateMenu"
+                        />
+                    </template>
                 </div>
             </template>
         </p-heading>
@@ -194,6 +214,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                                                :is-project="false"
                                                :target-id="storeState.groupId"
                                                @confirm="handleConfirmProjectGroupMoveModal"
+        />
+        <project-group-member-management-modal
+            v-if="state.projectGroupMemberManagementModalVisible"
+            :visible.sync="state.projectGroupMemberManagementModalVisible"
+            :project-group-id="storeState.groupId"
         />
     </div>
 </template>

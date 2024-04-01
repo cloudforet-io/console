@@ -41,12 +41,13 @@ export const useProjectFavorite = () => {
         ].filter((i) => !i.isDeleted)),
     });
 
-    const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
+    const beforeFavoriteRoute = async (item: FavoriteItem) => {
         if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-            e.preventDefault();
             if (storeState.groupId !== item.itemId) {
                 await projectPageStore.selectNode(item.itemId);
-            }
+            } else await projectPageStore.selectNode();
+        } else {
+            await projectPageStore.selectNode();
         }
     };
     const handleDeleteFavorite = (item: FavoriteItem) => {
