@@ -104,6 +104,7 @@ export const useMetricExplorerPageStore = defineStore('metric-explorer-page', ()
         }
     };
     const loadMetrics = async (namespaceId: string) => {
+        if (!namespaceId) return;
         state.metricList = [];
         state.metricListLoading = true;
         try {
