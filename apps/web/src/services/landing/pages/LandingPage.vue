@@ -23,31 +23,38 @@ const handleOpenedMenu = (visible: boolean) => {
                          class="profile"
                          @update:visible="handleOpenedMenu"
         />
-        <console-logo class="logo"
-                      :position-fixed="false"
-        />
-        <landing-contents />
-        <f-n-b class="fnb" />
+        <div class="scroll-contents">
+            <console-logo class="logo"
+                          :position-fixed="false"
+            />
+            <landing-contents />
+            <f-n-b class="fnb" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .workspace-lading-page {
-    @apply relative flex flex-col items-center w-full h-full;
-    padding-top: 0.625rem;
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
+    @apply relative flex flex-col w-full h-full;
     .profile {
-        margin-left: auto;
+        @apply absolute;
+        top: 0.652rem;
+        right: 1.5rem;
     }
-    .logo {
-        margin-top: -2.625rem;
-        margin-left: -2rem;
-    }
-    .fnb {
-        @apply absolute w-full;
-        bottom: 0;
-        margin-top: 2rem;
+    .scroll-contents {
+        @apply flex flex-col items-center overflow-y-auto;
+        padding-right: 1.5rem;
+        padding-bottom: calc($fnb-height + 5.375rem);
+        padding-left: 1.5rem;
+        .logo {
+            margin-top: 0.5rem;
+            margin-left: -2rem;
+        }
+        .fnb {
+            @apply absolute w-full bg-gray-100;
+            bottom: 0;
+            margin-top: 2rem;
+        }
     }
 }
 </style>
