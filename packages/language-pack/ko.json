@@ -1088,6 +1088,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "새 워크스페이스 생성",
 				"MANAGE_WORKSPACE": "워크스페이스 관리",
+				"VIEW_WORKSPACES": "",
 				"WORKSPACES": "워크스페이스"
 			}
 		},
