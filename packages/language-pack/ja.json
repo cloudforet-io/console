@@ -2706,6 +2706,7 @@
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
 			"COMMON": "",
 			"DAILY": "日別データ",
+			"EMPTY_TEXT": "",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準",
 			"GROUP_BY": "グループ別統計",
