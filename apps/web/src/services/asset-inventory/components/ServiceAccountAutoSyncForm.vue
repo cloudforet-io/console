@@ -108,64 +108,71 @@ const handleAdditionalOptionsValidate = (isValid) => {
     <div class="service-account-auto-sync-form">
         <div class="auto-sync-toggle">
             <p-toggle-button v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
-                             v-model="state.isAutoSyncEnabled"
+                             :value="state.isAutoSyncEnabled"
                              show-state-text
                              position="left"
+                             @change-toggle="state.isAutoSyncEnabled = $event"
             /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
         </div>
-        <p-field-title label="Mapping Method"
-                       size="lg"
-                       class="mb-2"
-        />
-        <mapping-method :items="state.mappingItems"
-                        class="mb-6"
-        >
-            <template #provider>
-                <p>{{ serviceAccountPageStore.getters.selectedProviderItem?.name }}</p>
-            </template>
-            <template #workspace>
-                <p>{{ 'test' }}</p>
-            </template>
-            <template #project_group>
-                <p>{{ 'test' }}</p>
-            </template>
-        </mapping-method>
-
-        <p-field-title label="Additional Options"
-                       size="lg"
-                       class="mb-2"
-        />
-        <p-pane-layout class="p-4 mb-8">
-            <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
-                                class="p-json-schema-form"
-                                :form-data.sync="state.additionalOptions"
-                                :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
-                                :language="$store.state.user.language"
-                                @validate="handleAdditionalOptionsValidate"
+        <div v-if="state.isAutoSyncEnabled">
+            <p-field-title label="Mapping Method"
+                           size="lg"
+                           class="mb-2"
             />
-        </p-pane-layout>
-        <p-field-title label="Hourly Sync Schedule"
-                       size="lg"
-                       class="mb-1"
-        />
-        <p-field-group class="hourly-schedule-field-group"
-                       :help-text="state.scheduleHelpText"
-        >
-            <div class="hourly-schedule-wrapper"
-                 :class="{'is-read-mode': props.isReadMode}"
+            <mapping-method :items="state.mappingItems"
+                            class="mb-6"
             >
-                <span v-for="(hour) in hoursMatrix"
-                      :key="hour"
-                      class="time-block"
-                      :class="{
-                          active: !!state.timezoneAppliedHours.includes(hour)
-                      }"
-                      @click="handleClickHour(hour)"
+                <template #provider>
+                    <p>{{ serviceAccountPageStore.getters.selectedProviderItem?.name }}</p>
+                </template>
+                <template #workspace>
+                    <div>
+                        <div>{{ 'test' }}</div>
+                        <div>{{ 'test' }}</div>
+                        <div>{{ 'test' }}</div>
+                    </div>
+                </template>
+                <template #project_group>
+                    <p>{{ 'test' }}</p>
+                </template>
+            </mapping-method>
+
+            <p-field-title label="Additional Options"
+                           size="lg"
+                           class="mb-2"
+            />
+            <p-pane-layout class="p-4 mb-8">
+                <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
+                                    class="p-json-schema-form"
+                                    :form-data.sync="additionalOptionState.additionalOptions"
+                                    :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
+                                    :language="$store.state.user.language"
+                                    @validate="handleAdditionalOptionsValidate"
+                />
+            </p-pane-layout>
+            <p-field-title label="Hourly Sync Schedule"
+                           size="lg"
+                           class="mb-1"
+            />
+            <p-field-group class="hourly-schedule-field-group"
+                           :help-text="state.scheduleHelpText"
+            >
+                <div class="hourly-schedule-wrapper"
+                     :class="{'is-read-mode': props.isReadMode}"
                 >
-                    {{ hour }}
-                </span>
-            </div>
-        </p-field-group>
+                    <span v-for="(hour) in hoursMatrix"
+                          :key="hour"
+                          class="time-block"
+                          :class="{
+                              active: !!state.timezoneAppliedHours.includes(hour)
+                          }"
+                          @click="handleClickHour(hour)"
+                    >
+                        {{ hour }}
+                    </span>
+                </div>
+            </p-field-group>
+        </div>
     </div>
 </template>
 
