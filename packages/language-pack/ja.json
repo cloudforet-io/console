@@ -2186,6 +2186,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
 				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
+				"AUTO_SYNC_TITLE": "",
 				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
 				"BASE_TITLE": "基本情報",
 				"CANCEL": "キャンセル",
@@ -2723,9 +2724,12 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"TIMEZONE": ""
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
-				"TITLE": "このアカウントは削除できません。"
+				"TITLE": ""
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",

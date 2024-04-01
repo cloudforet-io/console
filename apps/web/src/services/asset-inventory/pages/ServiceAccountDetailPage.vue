@@ -145,13 +145,13 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
+                    <p-icon-button name="ic_edit-text"
+                                   class="w-full delete-button"
+                                   @click="handleClickEditButton"
+                    />
                     <p-icon-button name="ic_delete"
                                    class="w-full delete-button"
                                    @click="handleOpenDeleteModal"
-                    />
-                    <p-icon-button name="ic_edit"
-                                   class="w-full delete-button"
-                                   @click="handleClickEditButton"
                     />
                 </div>
             </template>
