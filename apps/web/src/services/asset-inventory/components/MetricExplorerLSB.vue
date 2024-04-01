@@ -48,8 +48,8 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    namespaceLoading: computed(() => metricExplorerPageStore.state.namespaceListloading),
-    metricLoading: computed(() => metricExplorerPageStore.state.metricListLoading),
+    loading: computed(() => metricExplorerPageStore.state.namespaceListloading || metricExplorerPageStore.state.metricListLoading),
+    currentMetric: computed<MetricModel|undefined>(() => (state.isDetailPage ? metricExplorerPageStore.state.metric : undefined)),
     providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
@@ -63,6 +63,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
+    isDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -210,6 +211,21 @@ watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
     }
 });
 
+watch(() => storeState.currentMetric, (currentMetric) => {
+    if (currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+        namespaceState.selectedNamespace = {
+            label: namespaceState.namespaces.find((item) => item.namespace_id === currentMetric.namespace_id).name,
+            name: currentMetric.namespace_id,
+        };
+    }
+});
+
+watch(() => route.params, (params) => {
+    if (!params.id) {
+        namespaceState.selectedNamespace = undefined;
+    }
+});
+
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
 });
@@ -244,7 +260,7 @@ onMounted(async () => {
                 </span>
             </template>
             <template #slot-namespace>
-                <p-data-loader :loading="storeState.namespaceLoading"
+                <p-data-loader :loading="storeState.loading"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
@@ -282,7 +298,7 @@ onMounted(async () => {
                 </p-data-loader>
             </template>
             <template #slot-metric>
-                <p-data-loader :loading="storeState.metricLoading"
+                <p-data-loader :loading="storeState.loading"
                                :loader-backdrop-opacity="0.5"
                                :loader-backdrop-color="gray[100]"
                                class="metric-data-loader"
