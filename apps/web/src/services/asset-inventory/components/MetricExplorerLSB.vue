@@ -5,7 +5,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton,
+    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton, PEmpty,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
@@ -328,6 +328,13 @@ onMounted(async () => {
                                     </div>
                                 </template>
                             </l-s-b-collapsible-menu-item>
+                            <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
+                                     class="keyword-search-empty"
+                            >
+                                <span>
+                                    {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                                </span>
+                            </p-empty>
                         </div>
                     </template>
                 </l-s-b-collapsible-menu-item>
@@ -384,6 +391,13 @@ onMounted(async () => {
                             />
                         </template>
                     </l-s-b-router-menu-item>
+                    <p-empty v-if="metricState.inputValue && !metricState.metricItems.length"
+                             class="keyword-search-empty"
+                    >
+                        <span>
+                            {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                        </span>
+                    </p-empty>
                 </div>
             </p-data-loader>
         </template>
@@ -467,6 +481,11 @@ onMounted(async () => {
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.125rem;
+    }
+    .keyword-search-empty {
+        @apply text-paragraph-md;
+        margin-top: 1.25rem;
+        white-space: pre;
     }
 }
 </style>
