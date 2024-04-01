@@ -24,7 +24,7 @@ const state = reactive({
 <template>
     <fragment>
         <cloud-service-l-s-b v-if="state.menuId === MENU_ID.CLOUD_SERVICE" />
-        <metric-explorer-l-s-b v-if="state.menuId === MENU_ID.METRIC_EXPLORER" />
-        <security-l-s-b v-if="state.menuId === MENU_ID.SECURITY" />
+        <metric-explorer-l-s-b v-else-if="state.menuId === MENU_ID.METRIC_EXPLORER" />
+        <security-l-s-b v-else-if="state.menuId === MENU_ID.SECURITY" />
     </fragment>
 </template>
