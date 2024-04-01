@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 import { PLink } from '@spaceone/design-system';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { isNotEmpty } from '@cloudforet/utils';
 
 import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
@@ -15,6 +18,10 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+
+
 
 interface Props {
     data?: EventRuleModel;
@@ -30,12 +37,15 @@ interface Field {
     label: TranslateResult;
 }
 const { getProperRouteLocation } = useProperRouteLocation();
+const queryHelper = new QueryHelper();
+
 const state = reactive({
     fields: computed<Field[]>(() => ([
         { name: 'no_notification', label: _i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
         { name: 'change_project', label: _i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
         { name: 'change_urgency', label: _i18n.t('PROJECT.EVENT_RULE.URGENCY') },
         { name: 'change_assignee', label: _i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
+        { name: 'change_escalation_policy', label: _i18n.t('PROJECT.EVENT_RULE.ESCALATION_POLICY') },
         { name: 'add_additional_info', label: _i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
         { name: 'stop_processing', label: _i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
     ])),
@@ -48,6 +58,18 @@ const state = reactive({
         ANY: _i18n.t('PROJECT.EVENT_RULE.ANY'),
         ALL: _i18n.t('PROJECT.EVENT_RULE.ALL'),
     })),
+    escalationPolicies: computed(() => allReferenceStore.getters.escalationPolicy),
+    escalationPolicyLink: computed<Location|undefined>(() => {
+        if (!state.items.change_escalation_policy) return undefined;
+        const filters: ConsoleFilter[] = [];
+        filters.push({ k: 'escalation_policy_id', o: '=', v: state.items.change_escalation_policy });
+        return {
+            name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
+            query: {
+                filters: queryHelper.setFilters(filters).rawQueryStrings,
+            },
+        };
+    }),
 });
 </script>
 
@@ -92,6 +114,14 @@ const state = reactive({
                                             { resource_type: 'identity.Project' }))"
                                 >
                                     {{ state.projects[state.items[field.name]] ? state.projects[state.items[field.name]].label : state.items[field.name] }}
+                                </p-link>
+                            </td>
+                            <td v-else-if="field.name === 'change_escalation_policy'">
+                                <p-link action-icon="internal-link"
+                                        new-tab
+                                        :to="getProperRouteLocation(state.escalationPolicyLink)"
+                                >
+                                    {{ state.escalationPolicies[state.items[field.name]].label }}
                                 </p-link>
                             </td>
                             <td v-else-if="field.name === 'add_additional_info'">

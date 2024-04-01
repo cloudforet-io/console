@@ -14,8 +14,6 @@ import { cloneDeep } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
 
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { gray } from '@/styles/colors';
@@ -47,7 +45,6 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -159,7 +156,7 @@ const drawChart = () => {
             if (dataContext) {
                 const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
-                value = currencyMoneyFormatter(value, { currency: costAnalysisPageGetters.currency, style: 'decimal' });
+                value = numberFormatter(value, { minimumFractionDigits: 2 });
                 return `${date}\n[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;

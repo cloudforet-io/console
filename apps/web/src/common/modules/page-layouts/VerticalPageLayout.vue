@@ -33,12 +33,12 @@ const { width } = useWindowSize();
 const { width: contentsWidth } = useElementSize(contentRef);
 
 const storeState = reactive({
-    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+    isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
 const state = reactive({
     padding: computed(() => {
         if (contentsWidth.value <= 1920) return '0';
-        if (storeState.isMinimizeGnb) return width.value - 1980;
+        if (storeState.isMinimizeNavRail) return width.value - 1980;
         return width.value - 2180;
     }),
 });
