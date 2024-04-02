@@ -24,6 +24,8 @@ import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -62,6 +64,7 @@ type FormMode = typeof FORM_MODE[keyof typeof FORM_MODE];
 
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const allReferenceStore = useAllReferenceStore();
 const tableState = reactive({
     loading: true,
     items: [] as TableItem[],
@@ -131,7 +134,7 @@ const listEscalationPolicies = async () => {
 const createEscalationPolicy = async (): Promise<string | undefined> => {
     try {
         if (!escalationPolicyFormState.name) throw new Error('name is required');
-        const { escalation_policy_id } = await SpaceConnector.clientV2.monitoring.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
+        const esalationPolicyInfo = await SpaceConnector.clientV2.monitoring.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
             resource_group: escalationPolicyFormState.resourceGroup,
@@ -139,7 +142,8 @@ const createEscalationPolicy = async (): Promise<string | undefined> => {
             repeat_count: escalationPolicyFormState.repeatCount,
             project_id: props.projectId,
         });
-        return escalation_policy_id;
+        await allReferenceStore.sync('escalation_policy', esalationPolicyInfo);
+        return esalationPolicyInfo.escalation_policy_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'));
         return undefined;
