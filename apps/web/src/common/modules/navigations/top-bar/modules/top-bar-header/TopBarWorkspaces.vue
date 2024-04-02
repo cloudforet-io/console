@@ -224,9 +224,7 @@ watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
                     />
                 </div>
             </template>
-            <template v-if="storeState.isDomainAdmin"
-                      #menu-bottom
-            >
+            <template #menu-bottom>
                 <div class="workspace-toolbox-wrapper">
                     <p-button style-type="transparent"
                               size="md"
@@ -236,8 +234,10 @@ watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
                     >
                         {{ $t("COMMON.GNB.WORKSPACE.VIEW_WORKSPACES") }}
                     </p-button>
-                    <p-divider />
-                    <div class="workspace-toolbox">
+                    <div v-if="storeState.isDomainAdmin"
+                         class="workspace-toolbox"
+                    >
+                        <p-divider />
                         <p-button style-type="substitutive"
                                   size="sm"
                                   class="create-new-button tool"
@@ -246,6 +246,7 @@ watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
                         >
                             {{ $t("COMMON.GNB.WORKSPACE.CREATE_WORKSPACE") }}
                         </p-button>
+                        <p-divider class="tools-divider" />
                         <p-button style-type="tertiary"
                                   size="sm"
                                   class="manage-button tool"
@@ -355,24 +356,21 @@ watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
 
         .workspace-toolbox-wrapper {
             @apply flex flex-col absolute bg-white;
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 1rem 1rem;
             bottom: 0;
             left: 0;
             width: 100%;
-            gap: 0.5rem;
+            gap: 0.625rem;
             .workspace-toolbox {
                 @apply relative flex flex-col;
-                gap: 1.25rem;
-                &::before {
-                    @apply absolute;
-                    content: "";
-                    top: 50%;
-                    left: -1rem;
-                    width: calc(100% + 2rem);
-                    border-bottom: 3px solid #dddddf;
-                }
+                gap: 0.5rem;
                 .tool {
                     height: 1.5rem;
+                }
+                .tools-divider {
+                    width: calc(100% + 2rem);
+                    height: 0.125rem;
+                    margin-left: -1rem;
                 }
             }
         }
