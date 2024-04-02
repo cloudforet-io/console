@@ -1,5 +1,37 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
+
 import { PFieldTitle } from '@spaceone/design-system';
+
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
+import type { ReferenceData } from '@/lib/helper/config-data-helper';
+import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
+
+import type { RecentConfig } from '@/common/modules/navigations/type';
+
+import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+
+interface Props {
+    recentVisits?: RecentConfig[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    recentVisits: () => ([]),
+});
+
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
+
+const storeState = reactive({
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+});
+
+const state = reactive({
+    recentBoardSets: computed<ReferenceData[]>(() => convertWorkspaceConfigToReferenceData(props.recentVisits ?? [], storeState.workspaceList)),
+});
 </script>
 
 <template>
@@ -9,16 +41,9 @@ import { PFieldTitle } from '@spaceone/design-system';
                        font-weight="bold"
                        size="md"
         />
-        <!--        <p-board :board-sets="tempData"-->
-        <!--                 selectable-->
-        <!--                 style-type="card"-->
-        <!--        >-->
-        <!--            <template #item-content="{board}">-->
-        <!--                {{ board }}-->
-        <!--                <strong>Left Icon</strong>-->
-        <!--                <p>Collector tags icon</p>-->
-        <!--            </template>-->
-        <!--        </p-board>-->
+        <landing-workspace-board :board-sets="state.recentBoardSets"
+                                 class="recent-board"
+        />
     </div>
 </template>
 
@@ -26,5 +51,8 @@ import { PFieldTitle } from '@spaceone/design-system';
 .landing-recent-visits {
     @apply flex flex-col;
     gap: 1rem;
+    .recent-board {
+        @apply grid grid-cols-3 gap-2;
+    }
 }
 </style>

@@ -24,6 +24,12 @@ export const recentNSearchTabMap = {
     costAnalysis: RECENT_TYPE.COST_ANALYSIS,
 } as const;
 
+export interface RecentConfig {
+    itemType: RecentType;
+    workspace_id: string;
+    itemId: string;
+}
+
 export type RecentItem = UserConfigModel<{
     id: string;
     label: string;

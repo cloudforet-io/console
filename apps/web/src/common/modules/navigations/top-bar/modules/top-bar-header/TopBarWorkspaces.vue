@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Vue, { computed, reactive } from 'vue';
+import Vue, { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
@@ -27,7 +27,9 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { gray, violet } from '@/styles/colors';
 
@@ -49,6 +51,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const recentStore = useRecentStore();
 
 const router = useRouter();
 
@@ -56,7 +59,7 @@ const storeState = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
-    favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'name')),
+    favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
 const state = reactive({
     visibleDropdown: false,
@@ -130,6 +133,15 @@ const handleClickAllWorkspaceButton = () => {
         name: LANDING_ROUTE._NAME,
     });
 };
+
+watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
+    if (!selectedWorkspace) return;
+    recentStore.createRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        workspaceId: selectedWorkspace?.workspace_id || '',
+        id: selectedWorkspace?.workspace_id || '',
+    });
+}, { immediate: true });
 </script>
 
 <template>
