@@ -22,13 +22,12 @@ import MetricExplorerLineChart from '@/services/asset-inventory/components/Metri
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getDonutChartData, getLegends, getRefinedTreemapChartData, getXYChartData,
+    getLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
-    ChartType, DonutChartData, Legend, MetricDataAnalyzeResult, Period,
-    XYChartData,
-    TreemapChartData,
+    ChartType, Legend, MetricDataAnalyzeResult, Period,
+    XYChartData, RealtimeChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -45,7 +44,7 @@ const state = reactive({
         { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     ]),
     selectedChartType: CHART_TYPE.LINE as ChartType,
-    chartData: [] as Array<XYChartData|DonutChartData|TreemapChartData>,
+    chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart | null,
 });
@@ -92,13 +91,9 @@ const setChartData = debounce(async () => {
 
     state.legends = getLegends(rawData, _groupBy);
     if (state.selectedChartType === CHART_TYPE.LINE) {
-        state.chartData = getXYChartData(rawData, _granularity, _period, _groupBy);
-    } else if (state.selectedChartType === CHART_TYPE.COLUMN) {
-        // TODO: implement column chart
-    } else if (state.selectedChartType === CHART_TYPE.DONUT) {
-        state.chartData = getDonutChartData(rawData, _groupBy);
-    } else if (state.selectedChartType === CHART_TYPE.TREEMAP) {
-        state.chartData = getRefinedTreemapChartData(rawData, _groupBy);
+        state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
+    } else {
+        state.chartData = getRefinedMetricRealtimeChartData(rawData, _groupBy);
     }
     state.loading = false;
 }, 300);

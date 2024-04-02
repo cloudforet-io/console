@@ -10,14 +10,13 @@ import {
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { DonutChartData, Legend } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface Props {
     loading: boolean;
     chart: null | am5xy.XYChart;
-    chartData: DonutChartData[];
+    chartData: RealtimeChartData[];
     legends: Legend[];
 }
 
@@ -30,20 +29,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const drawChart = () => {
     const chart = chartHelper.createDonutChart();
     const seriesSettings = {
-        categoryField: metricExplorerPageState.selectedChartGroupBy,
+        categoryField: 'category',
         valueField: 'value',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
-    series.labels.template.set('forceHidden', true);
-    series.ticks.template.set('forceHidden', true);
+    series.labels.template.set('forceHidden', false);
+    series.ticks.template.set('forceHidden', false);
     chart.series.push(series);
 
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {

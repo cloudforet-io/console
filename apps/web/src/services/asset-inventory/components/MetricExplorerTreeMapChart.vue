@@ -6,15 +6,18 @@ import {
 import {
     PSkeleton,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type { Legend, TreemapChartData } from '@/services/asset-inventory/types/metric-explorer-type';
+import type {
+    Legend, RealtimeChartData, TreemapChartData,
+} from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface Props {
     loading: boolean;
-    chartData: TreemapChartData[];
+    chartData: RealtimeChartData[];
     legends: Legend[];
 }
 
@@ -29,6 +32,9 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 
+const getRefinedTreemapChartData = (data: RealtimeChartData[]): TreemapChartData[] => [{
+    children: data,
+}];
 const drawChart = () => {
     if (!props.chartData?.length) return;
     const seriesSettings = {
@@ -43,7 +49,9 @@ const drawChart = () => {
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
-    series.data.setAll(props.chartData);
+
+    const _chartData = getRefinedTreemapChartData(cloneDeep(props.chartData));
+    series.data.setAll(_chartData);
 };
 
 watch([() => chartContext.value, () => props.loading, () => props.chartData], async ([_chartContext, loading, chartData]) => {
