@@ -3,19 +3,20 @@ import {
     nextTick, ref, watch,
 } from 'vue';
 
-import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
     PSkeleton,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
+import type {
+    Legend, RealtimeChartData, TreemapChartData,
+} from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface Props {
     loading: boolean;
-    chart: null | am5xy.XYChart;
     chartData: RealtimeChartData[];
     legends: Legend[];
 }
@@ -26,38 +27,38 @@ const props = withDefaults(defineProps<Props>(), {
     chartData: () => ([]),
     legends: () => ([]),
 });
-const emit = defineEmits<{(e: 'update:chart', value): void;
-}>();
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const drawChart = () => {
-    const chart = chartHelper.createDonutChart();
-    const seriesSettings = {
-        categoryField: 'category',
-        valueField: 'value',
-    };
-    const series = chartHelper.createPieSeries(seriesSettings);
-    series.labels.template.set('forceHidden', false);
-    series.ticks.template.set('forceHidden', false);
-    chart.series.push(series);
 
-    if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
-        const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip);
-        series.slices.template.set('tooltip', tooltip);
-        series.data.setAll(props.chartData);
-    }
-    return chart;
+const getRefinedTreemapChartData = (data: RealtimeChartData[]): TreemapChartData[] => [{
+    children: data,
+}];
+const drawChart = () => {
+    if (!props.chartData?.length) return;
+    const seriesSettings = {
+        valueField: 'value',
+        categoryField: 'category',
+        nodePaddingInner: 4,
+    };
+    const series = chartHelper.createTreeMapSeries(seriesSettings);
+    const tooltip = chartHelper.createTooltip();
+    series.set('tooltip', tooltip);
+    chartHelper.setTreemapTooltipText(series, tooltip);
+    chartHelper.setTreemapLabelText(series, {
+        oversizedBehavior: 'truncate',
+    });
+
+    const _chartData = getRefinedTreemapChartData(cloneDeep(props.chartData));
+    series.data.setAll(_chartData);
 };
 
 watch([() => chartContext.value, () => props.loading, () => props.chartData], async ([_chartContext, loading, chartData]) => {
     if (_chartContext && !loading && chartData.length) {
         chartHelper.refreshRoot();
         await nextTick();
-        const chart = drawChart();
-        emit('update:chart', chart);
+        drawChart();
     }
 }, { immediate: false });
 </script>
@@ -67,8 +68,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         <p-skeleton v-if="props.loading"
                     height="100%"
         />
-        <div v-else
-             ref="chartContext"
+        <div ref="chartContext"
              class="chart"
         />
     </div>

@@ -19,14 +19,15 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
 import MetricExplorerLineChart from '@/services/asset-inventory/components/MetricExplorerLineChart.vue';
+import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getDonutChartData, getLegends, getXYChartData,
+    getLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
-    ChartType, DonutChartData, Legend, MetricDataAnalyzeResult, Period,
-    XYChartData,
+    ChartType, Legend, MetricDataAnalyzeResult, Period,
+    XYChartData, RealtimeChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -43,7 +44,7 @@ const state = reactive({
         { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     ]),
     selectedChartType: CHART_TYPE.LINE as ChartType,
-    chartData: [] as Array<XYChartData|DonutChartData>,
+    chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart | null,
 });
@@ -90,13 +91,9 @@ const setChartData = debounce(async () => {
 
     state.legends = getLegends(rawData, _groupBy);
     if (state.selectedChartType === CHART_TYPE.LINE) {
-        state.chartData = getXYChartData(rawData, _granularity, _period, _groupBy);
-    } else if (state.selectedChartType === CHART_TYPE.COLUMN) {
-        // TODO: implement column chart
-    } else if (state.selectedChartType === CHART_TYPE.DONUT) {
-        state.chartData = getDonutChartData(rawData, _groupBy);
-    } else if (state.selectedChartType === CHART_TYPE.TREEMAP) {
-        // TODO: implement treemap chart
+        state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
+    } else {
+        state.chartData = getRefinedMetricRealtimeChartData(rawData, _groupBy);
     }
     state.loading = false;
 }, 300);
@@ -159,8 +156,13 @@ setChartData();
                     :chart-data="state.chartData"
                     :legends="state.legends"
                 />
+                <metric-explorer-tree-map-chart
+                    v-else-if="state.selectedChartType === CHART_TYPE.TREEMAP"
+                    :loading="state.loading"
+                    :chart-data="state.chartData"
+                    :legends="state.legends"
+                />
                 <!-- <metric-explorer-horizontal-column-chart-->
-                <!--<metric-explorer-tree-map-chart-->
             </div>
         </div>
         <div class="right-part">

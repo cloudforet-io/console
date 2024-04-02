@@ -35,6 +35,7 @@ export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 export interface Legend {
     name: string;
     label: string | TranslateResult;
+    color?: string;
     disabled?: boolean;
 }
 
@@ -50,8 +51,11 @@ export interface XYChartData {
     [key: string]: any;
 }
 
-export interface DonutChartData {
-    date?: string;
-    value: number;
-    [key: string]: any; // provider: 'AWS'
+export interface TreemapChartData {
+    children: RealtimeChartData[];
+}
+
+export interface RealtimeChartData {
+    category?: string;
+    value?: number;
 }

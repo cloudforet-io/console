@@ -5,7 +5,7 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData, DonutChartData,
+    XYChartData, RealtimeChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -39,7 +39,7 @@ export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, gr
     return [];
 };
 
-export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, granularity: Granularity, period: Period, groupBy?: string): XYChartData[] => {
+export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, granularity: Granularity, period: Period, groupBy?: string): XYChartData[] => {
     if (!rawData.results?.length) return [];
     const chartData: XYChartData[] = [];
     const timeUnit = granularity === GRANULARITY.DAILY ? 'day' : 'month';
@@ -71,10 +71,9 @@ export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>
     return chartData;
 };
 
-
-export const getDonutChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): DonutChartData[] => {
+export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): RealtimeChartData[] => {
     if (!rawData.results?.length) return [];
-    const chartData: DonutChartData[] = [];
+    const chartData: RealtimeChartData[] = [];
 
     let _groupBy: string = groupBy || '';
     if (groupBy?.includes('.')) {
@@ -83,17 +82,13 @@ export const getDonutChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResu
 
     rawData.results.forEach((d) => {
         if (_groupBy) {
-            let _name = d[_groupBy];
-            if (!_name) {
-                _name = 'Unknown';
-            }
             chartData.push({
-                [_groupBy]: _name,
-                value: d.value || 0,
+                category: d[_groupBy] || 'Unknown',
+                value: d._total_value || 0,
             });
         } else {
             chartData.push({
-                value: d.value || 0,
+                value: d._total_value || 0,
             });
         }
     });
