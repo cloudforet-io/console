@@ -5,7 +5,7 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData, DonutChartData,
+    XYChartData, DonutChartData, TreemapChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -71,7 +71,6 @@ export const getXYChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>
     return chartData;
 };
 
-
 export const getDonutChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): DonutChartData[] => {
     if (!rawData.results?.length) return [];
     const chartData: DonutChartData[] = [];
@@ -89,13 +88,29 @@ export const getDonutChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResu
             }
             chartData.push({
                 [_groupBy]: _name,
-                value: d.value || 0,
+                value: d._total_value || 0,
             });
         } else {
             chartData.push({
-                value: d.value || 0,
+                value: d._total_value || 0,
             });
         }
+    });
+    return chartData;
+};
+
+export const getRefinedTreemapChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): TreemapChartData[] => {
+    const chartData: TreemapChartData[] = [{
+        children: [],
+    }];
+    if (!rawData.results?.length || !groupBy) return [];
+
+    // const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField)?.referenceMap;
+    rawData.results.forEach((d) => {
+        chartData[0].children.push({
+            category: d[groupBy],
+            value: d._total_value || 0,
+        });
     });
     return chartData;
 };
