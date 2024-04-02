@@ -52,6 +52,8 @@ const state = reactive({
         }
         return menuList;
     }),
+    selected: props.selected,
+    selectedWorkspaceItem: computed(() => state.workspaceList.find((item) => item.workspace_id === state.selected)),
     searchText: '',
     totalCount: 0,
     pageStart: 1,
@@ -100,6 +102,7 @@ const handleUpdateSearchText = async (searchText:string) => {
 };
 
 const handleSelectWorkspace = (selected:string) => {
+    state.selected = selected;
     emit('update', selected);
 };
 
@@ -119,6 +122,7 @@ watch(() => state.searchText, debounce(async (searchText) => {
     <p-select-dropdown class="workspace-dropdown"
                        :disabled="props.disabled"
                        :menu="state.workspaceMenuList"
+                       :placeholder="$t('Select a workspace')"
                        :loading="state.loading"
                        disable-handler
                        use-fixed-menu-style
@@ -128,6 +132,14 @@ watch(() => state.searchText, debounce(async (searchText) => {
                        @update:search-text="handleUpdateSearchText"
                        @update:selected="handleSelectWorkspace"
     >
+        <template #dropdown-left-area>
+            <div v-if="state.selected">
+                <workspace-logo-icon :text="state.selectedWorkspaceItem?.name || ''"
+                                     :theme="state.selectedWorkspaceItem?.tags?.theme"
+                                     size="xs"
+                />
+            </div>
+        </template>
         <template #context-menu-header>
             <div class="context-menu-header">
                 <p-button style-type="tertiary"
