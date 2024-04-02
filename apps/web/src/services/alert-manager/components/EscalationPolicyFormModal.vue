@@ -10,6 +10,8 @@ import type { EscalationPolicyUpdateParameters } from '@/schema/monitoring/escal
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,6 +34,8 @@ const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
 
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const allReferenceStore = useAllReferenceStore();
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -59,13 +63,15 @@ const updateEscalationPolicy = async () => {
     try {
         const escalationPolicyId = escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id;
         if (!escalationPolicyId) throw new Error('escalationPolicyId is required');
-        await SpaceConnector.clientV2.monitoring.escalationPolicy.update<EscalationPolicyUpdateParameters, EscalationPolicyModel>({
+        const esalationPolicyInfo = await SpaceConnector.clientV2.monitoring.escalationPolicy.update<EscalationPolicyUpdateParameters, EscalationPolicyModel>({
             escalation_policy_id: escalationPolicyId,
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
             repeat_count: escalationPolicyFormState.repeatCount,
             finish_condition: escalationPolicyFormState.finishCondition,
         });
+        await allReferenceStore.sync('escalation_policy', esalationPolicyInfo);
+
         showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'));
