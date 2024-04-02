@@ -20,7 +20,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
 
 const props = withDefaults(defineProps<{
     selected?: string;
