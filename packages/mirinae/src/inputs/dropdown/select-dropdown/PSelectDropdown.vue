@@ -60,7 +60,7 @@ interface SelectDropdownProps {
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
     pageSize?: number;
-    resetSelectedOnUnmounted?: boolean;s
+    resetSelectedOnUnmounted?: boolean;
     initSelectedWithHandler?: boolean;
     hideHeaderWithoutItems?: boolean;
 }

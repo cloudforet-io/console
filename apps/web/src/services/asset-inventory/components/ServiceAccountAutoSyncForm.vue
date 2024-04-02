@@ -189,6 +189,10 @@ const handleUpdateWorkspace = (workspaceId:string) => {
     state.selectedWorkspace = workspaceId;
 };
 
+const handleChangeToggle = (e:boolean) => {
+    state.isAutoSyncEnabled = e;
+};
+
 (() => {
     serviceAccountPageStore.setAutoSyncAdditionalOptions();
 })();
@@ -206,7 +210,7 @@ watch(() => state.formData, (formData) => {
                              :value="state.isAutoSyncEnabled"
                              show-state-text
                              position="left"
-                             @change-toggle="state.isAutoSyncEnabled = $event"
+                             @change-toggle="handleChangeToggle"
             /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
