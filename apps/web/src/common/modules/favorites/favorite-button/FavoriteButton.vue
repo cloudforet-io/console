@@ -61,6 +61,7 @@ const gnbStoreGetters = gnbStore.getters;
 
 const storeState = reactive({
     favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
+    favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -72,7 +73,8 @@ const storeState = reactive({
 });
 const state = reactive({
     active: computed(() => {
-        const favoriteItem = storeState.favoriteMenuList.findIndex((d) => (d.itemId === props.itemId
+        const targetList = props.favoriteType === FAVORITE_TYPE.WORKSPACE ? storeState.favoriteWorkspaceMenuList : storeState.favoriteMenuList;
+        const favoriteItem = targetList.findIndex((d) => (d.itemId === props.itemId
             && (d.itemType === props.favoriteType)));
         return favoriteItem > -1;
     }),
