@@ -13,16 +13,21 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
-import type { MetricDataModel } from '@/schema/inventory/metric-data/model';
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
+import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
 import MetricExplorerLineChart from '@/services/asset-inventory/components/MetricExplorerLineChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { getLegends, getXYChartData } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
+import {
+    getDonutChartData, getLegends, getXYChartData,
+} from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { ChartType, Legend, Period } from '@/services/asset-inventory/types/metric-explorer-type';
+import type {
+    ChartType, DonutChartData, Legend, MetricDataAnalyzeResult, Period,
+    XYChartData,
+} from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -38,15 +43,15 @@ const state = reactive({
         { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     ]),
     selectedChartType: CHART_TYPE.LINE as ChartType,
-    chartData: [] as any[],
+    chartData: [] as Array<XYChartData|DonutChartData>,
     legends: [] as Legend[],
     chart: null as XYChart | null,
 });
 
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataModel>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataModel>> => {
+const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
+const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
         const { status, response } = await fetcher({
@@ -78,18 +83,18 @@ const setChartData = debounce(async () => {
     state.loading = true;
 
     const rawData = await analyzeMetricData();
-    state.legends = getLegends(rawData, metricExplorerPageState.selectedOperator, metricExplorerPageState.selectedChartGroupBy);
 
     const _granularity = metricExplorerPageState.granularity;
     const _period = metricExplorerPageState.period as Period;
-    const _operator = metricExplorerPageState.selectedOperator;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
+
+    state.legends = getLegends(rawData, _groupBy);
     if (state.selectedChartType === CHART_TYPE.LINE) {
-        state.chartData = getXYChartData(rawData, _granularity, _period, _operator, _groupBy);
+        state.chartData = getXYChartData(rawData, _granularity, _period, _groupBy);
     } else if (state.selectedChartType === CHART_TYPE.COLUMN) {
         // TODO: implement column chart
     } else if (state.selectedChartType === CHART_TYPE.DONUT) {
-        // TODO: implement donut chart
+        state.chartData = getDonutChartData(rawData, _groupBy);
     } else if (state.selectedChartType === CHART_TYPE.TREEMAP) {
         // TODO: implement treemap chart
     }
@@ -140,14 +145,22 @@ setChartData();
                 />
             </div>
             <div class="chart-wrapper">
-                <metric-explorer-line-chart :loading="state.loading"
-                                            :chart.sync="state.chart"
-                                            :chart-data="state.chartData"
-                                            :legends="state.legends"
+                <metric-explorer-line-chart
+                    v-if="state.selectedChartType === CHART_TYPE.LINE"
+                    :loading="state.loading"
+                    :chart.sync="state.chart"
+                    :chart-data="state.chartData"
+                    :legends="state.legends"
                 />
-                <!--<metric-explorer-horizontal-column-chart-->
+                <metric-explorer-donut-chart
+                    v-else-if="state.selectedChartType === CHART_TYPE.DONUT"
+                    :loading="state.loading"
+                    :chart.sync="state.chart"
+                    :chart-data="state.chartData"
+                    :legends="state.legends"
+                />
+                <!-- <metric-explorer-horizontal-column-chart-->
                 <!--<metric-explorer-tree-map-chart-->
-                <!--<metric-explorer-donut-chart-->
             </div>
         </div>
         <div class="right-part">

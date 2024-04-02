@@ -101,20 +101,13 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         <p-skeleton v-if="props.loading"
                     height="100%"
         />
-        <div v-else-if="props.chartData?.length"
-             ref="chartContext"
+        <div ref="chartContext"
              class="chart"
         />
     </div>
 </template>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-data-loader */
-:deep(.data-loader-container) {
-    .no-data-wrapper {
-        max-height: inherit;
-    }
-}
 .chart {
     height: 100%;
 }
