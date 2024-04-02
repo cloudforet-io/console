@@ -1,9 +1,9 @@
 {
   "CONSOLE_API": {
-    "ENDPOINT": "https://console.api.dev.spaceone.dev"
+    "ENDPOINT": "http://127.0.0.1:8081"
   },
   "CONSOLE_API_V2": {
-    "ENDPOINT": "https://console-v2.api.dev.spaceone.dev"
+    "ENDPOINT": "http://127.0.0.1:8082"
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",
@@ -22,6 +22,6 @@
     "AUTH": {
         "SKIP_TOKEN_CHECK": false,
         "API_KEY": "api-key"
-    },
+    }
   }
 }
