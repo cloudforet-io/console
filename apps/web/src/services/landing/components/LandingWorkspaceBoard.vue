@@ -48,8 +48,8 @@ const roleFormatter = (roleType: RoleType): string => {
     }
 };
 
-landingPageStore.setLoading(true);
 const handleClickBoardItem = (item: WorkspaceBoardSet) => {
+    landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     router.replace({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
 };

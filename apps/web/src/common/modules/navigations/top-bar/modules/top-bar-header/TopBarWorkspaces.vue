@@ -62,7 +62,6 @@ const storeState = reactive({
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
 const state = reactive({
-    visibleDropdown: false,
     workspaceMenuList: computed<MenuItem[]>(() => [
         ...filterStarredItems(storeState.favoriteItems),
         ...formatMenuItems(storeState.workspaceList),
