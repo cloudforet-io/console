@@ -100,8 +100,8 @@ onMounted(() => {
             <img alt="empty-cloud-service-img"
                  src="@/assets/images/landing/img_landing_create_workspace.png"
                  class="create-workspace-img"
-                 srcset="@/assets/images/img_landing_create_workspace@2x.png 2x,
-                        @/assets/images/img_landing_create_workspace@3x.png 3x"
+                 srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
+                        @/assets/images/landing/img_landing_create_workspace@3x.png 3x"
             >
             <span class="desc">{{ $t('LADING.BANNER_DESC') }}</span>
             <p-button style-type="primary"
