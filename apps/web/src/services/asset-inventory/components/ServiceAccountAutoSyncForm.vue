@@ -57,55 +57,43 @@ const cspAdditionalOptionMap = {
                 label: 'Nested Organization Units',
                 value: 'projectGroups',
             },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
-            },
         ],
     },
     azure: {
-        name: 'AWS Organization',
+        name: 'Azure Tenant',
         workspaceMappingOptions: [
             {
-                label: 'Top-level Organization Units',
+                label: 'Multitenant Organization',
                 value: 'multipleWorkspaces',
             },
             {
-                label: 'AWS Organization',
+                label: 'Azure Tenant',
                 value: 'singleWorkspace',
             },
         ],
         projectGroupMappingOptions: [
             {
-                label: 'Nested Organization Units',
+                label: 'Nested Management Groups',
                 value: 'projectGroups',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
             },
         ],
     },
     google_cloud: {
-        name: 'AWS Organization',
+        name: 'Google Cloud Organization',
         workspaceMappingOptions: [
             {
                 label: 'Top-level Organization Units',
                 value: 'multipleWorkspaces',
             },
             {
-                label: 'AWS Organization',
+                label: 'Google Cloud Organization',
                 value: 'singleWorkspace',
             },
         ],
         projectGroupMappingOptions: [
             {
-                label: 'Nested Organization Units',
+                label: 'Google Cloud Folders',
                 value: 'projectGroups',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
             },
         ],
     },
@@ -114,6 +102,7 @@ const cspAdditionalOptionMap = {
 const additionalOptionState = reactive({
     additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
     workspaceMapping: 'multipleWorkspaces',
+    projectGroupMapping: 'projectGroups',
     additionalOptions: {},
 });
 
@@ -148,6 +137,7 @@ const state = reactive({
         additionalOptions: additionalOptionState.additionalOptions,
         scheduleHours: serviceAccountPageGetters.scheduleHours,
         selectedSingleWorkspace: additionalOptionState.workspaceMapping === 'singleWorkspace' ? state.selectedWorkspace : '',
+        skipProjectGroupMapping: additionalOptionState.projectGroupMapping === 'skip',
     })),
 });
 
@@ -253,6 +243,20 @@ watch(() => state.formData, (formData) => {
                                        size="md"
                                        class="mb-1"
                         />
+                        <div class="flex flex-col gap-1">
+                            <p-radio v-for="option in additionalOptionState.additionalOptionUiByProvider.projectGroupMappingOptions"
+                                     :key="option.value"
+                                     v-model="additionalOptionState.projectGroupMapping"
+                                     :value="option.value"
+                            >
+                                {{ `${option.label} ➔ ${option.value === 'projectGroups' ? 'Project Groups' : 'Skip'}` }}
+                            </p-radio>
+                            <p-radio v-model="additionalOptionState.projectGroupMapping"
+                                     value="skip"
+                            >
+                                {{ $t('Skip project group mapping') }}
+                            </p-radio>
+                        </div>
                     </div>
                 </template>
             </mapping-method>
