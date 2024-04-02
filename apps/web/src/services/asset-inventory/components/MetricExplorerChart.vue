@@ -18,6 +18,8 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables
 
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
+import MetricExplorerHorizontalColumnChart
+    from '@/services/asset-inventory/components/MetricExplorerHorizontalColumnChart.vue';
 import MetricExplorerLineChart from '@/services/asset-inventory/components/MetricExplorerLineChart.vue';
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
@@ -162,7 +164,12 @@ setChartData();
                     :chart-data="state.chartData"
                     :legends="state.legends"
                 />
-                <!-- <metric-explorer-horizontal-column-chart-->
+                <metric-explorer-horizontal-column-chart
+                    v-else-if="state.selectedChartType === CHART_TYPE.COLUMN"
+                    :loading="state.loading"
+                    :chart.sync="state.chart"
+                    :chart-data="state.chartData"
+                />
             </div>
         </div>
         <div class="right-part">
