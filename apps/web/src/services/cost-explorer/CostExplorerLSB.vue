@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PLazyImg, PSelectDropdown, PI,
+    PLazyImg, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -26,7 +26,7 @@ import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRoute
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { gray, yellow } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -188,12 +188,6 @@ const handleSelectDataSource = (selected: string) => {
                     <span v-else
                           class="no-data"
                     >
-                        <p-i class="menu-icon"
-                             name="ic_star-filled"
-                             height="1rem"
-                             width="1rem"
-                             :color="yellow[500]"
-                        />
                         {{ $t('COMMON.STARRED_NO_DATA') }}
                     </span>
                 </div>
@@ -235,7 +229,7 @@ const handleSelectDataSource = (selected: string) => {
 <style scoped lang="postcss">
 .sidebar-menu {
     .no-data {
-        @apply flex items-center text-gray-500 text-label-md;
+        @apply flex items-start text-gray-500 text-label-md;
         padding-right: 0.5rem;
         padding-left: 0.5rem;
         gap: 0.125rem;

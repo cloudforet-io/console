@@ -1079,9 +1079,13 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "管理者モードに切り替える",
 				"EXIT_ADMIN_MODE": "管理者モードを終了する",
+				"EXPAND_GNB_RAIL": "",
 				"FAVORITE": "お気に入り",
+				"HIDE_GNB_RAIL": "",
+				"MINIMIZE_GNB_RAIL": "",
 				"NOTICE": "お知らせ",
 				"NOTIFICATIONS": "通知",
+				"OPEN_GNB_RAIL": "",
 				"PROFILE": "マイページ",
 				"SEARCH": "検索"
 			},
@@ -1232,7 +1236,7 @@
 			"VERSION": "バージョン"
 		},
 		"STARRED": "お気に入り",
-		"STARRED_NO_DATA": "アイテムはここに表示されます。",
+		"STARRED_NO_DATA": "お気に入りがありません。",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
@@ -3584,6 +3588,7 @@
 			"EDIT": "編集",
 			"EDIT_EVENT_RULE": "イベントルール編集",
 			"EQUALS": "equals",
+			"ESCALATION_POLICY": "",
 			"EVENT_RULE": "イベントルール",
 			"HIGH": "高い",
 			"LOW": "低い",
@@ -3607,7 +3612,7 @@
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
 			"ADD_GROUP_MEMBER": "グループメンバーを追加",
 			"ADD_SERVICE_ACCOUNT": "サービスアカウント追加",
-			"ALL_PROJECTS": "プロジェクト",
+			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALT_E_CREATE_PROJECT": "プロジェクト作成に失敗",
 			"ALT_E_CREATE_PROJECT_GROUP": "プロジェクトグループ作成失敗",
 			"ALT_E_DELETE_PROJECT_GROUP": "プロジェクトグループの削除に失敗",

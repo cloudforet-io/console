@@ -69,12 +69,12 @@ const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     disabledLegends: {} as Record<number, boolean>,
     tableOverflowXScroll: computed<boolean>(() => {
-        if (props.fields.length > 13) return true;
+        if (props.fields.length > 10) return true;
         return false;
     }),
     tableOverflowXScrollWidth: computed<string|undefined>(() => {
         if (!state.tableOverflowXScroll) return undefined;
-        return `${props.fields.length * 7}rem`;
+        return `${props.fields.length * 10}rem`;
     }),
 });
 
@@ -404,8 +404,10 @@ watch(() => props.legends, () => {
             padding: 0.25rem 0 0.25rem 1rem;
             line-height: 2;
             .th-text {
-                @apply inline-flex items-center gap-1;
+                @apply inline-block items-center gap-1;
+                width: 100%;
                 white-space: pre-line;
+                word-break: break-all;
                 text-align: right;
                 line-height: 1.25;
                 .usage-unit {
@@ -423,6 +425,13 @@ watch(() => props.legends, () => {
 
         &.fix-width {
             @apply min-w-19;
+        }
+        &:first-child {
+            .th-contents {
+                .th-text {
+                    text-align: left;
+                }
+            }
         }
         &:last-child {
             .th-contents:not(.has-icon) {
