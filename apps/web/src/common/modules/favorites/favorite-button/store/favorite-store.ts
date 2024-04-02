@@ -1,5 +1,4 @@
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { defineStore } from 'pinia';
 
@@ -21,8 +20,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
-
 const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
 interface FavoriteState {
@@ -32,8 +29,6 @@ interface FavoriteState {
 
 export const useFavoriteStore = defineStore('favorite', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
-
-    const route = useRoute();
 
     const _getters = reactive({
         userId: computed(() => store.state.user.userId),
@@ -118,7 +113,6 @@ export const useFavoriteStore = defineStore('favorite', () => {
     };
 
     watch(() => _getters.currentWorkspaceId, async (workspaceId) => {
-        if (route.name === LANDING_ROUTE._NAME) return;
         if (workspaceId) {
             await actions.fetchFavorite();
         }
