@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup, PRadio,
+    PJsonSchemaForm, PFieldTitle, PPaneLayout, PToggleButton, PFieldGroup,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
@@ -10,9 +10,8 @@ import { range } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import MappingMethod from '@/common/components/mapping-method/MappingMethod.vue';
-
-import WorkspaceDropdown from '@/services/asset-inventory/components/WorkspaceDropdown.vue';
+import ServiceAccountAutoSyncMappingMethod
+    from '@/services/asset-inventory/components/ServiceAccountAutoSyncMappingMethod.vue';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
 
@@ -26,8 +25,7 @@ interface Props {
 }
 
 const serviceAccountPageStore = useServiceAccountPageStore();
-const serviceAccountPageState = serviceAccountPageStore.state;
-const serviceAccountPageGetters = serviceAccountPageStore.getters;
+const serviceAccountPageFormState = serviceAccountPageStore.formState;
 
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
@@ -36,84 +34,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
-    (e:'change', formData: any): void;
 }>();
 
-const cspAdditionalOptionMap = {
-    aws: {
-        name: 'AWS Organization',
-        workspaceMappingOptions: [
-            {
-                label: 'Top-level Organization Units',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Nested Organization Units',
-                value: 'projectGroups',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
-            },
-        ],
-    },
-    azure: {
-        name: 'AWS Organization',
-        workspaceMappingOptions: [
-            {
-                label: 'Top-level Organization Units',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Nested Organization Units',
-                value: 'projectGroups',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
-            },
-        ],
-    },
-    google_cloud: {
-        name: 'AWS Organization',
-        workspaceMappingOptions: [
-            {
-                label: 'Top-level Organization Units',
-                value: 'multipleWorkspaces',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'singleWorkspace',
-            },
-        ],
-        projectGroupMappingOptions: [
-            {
-                label: 'Nested Organization Units',
-                value: 'projectGroups',
-            },
-            {
-                label: 'AWS Organization',
-                value: 'skip',
-            },
-        ],
-    },
-};
 
 const additionalOptionState = reactive({
-    additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
-    workspaceMapping: 'multipleWorkspaces',
     additionalOptions: {},
 });
 
@@ -122,32 +46,14 @@ const state = reactive({
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: true,
     domainName: computed(() => store.state.domain.name),
-    mappingItems: computed(() => [
-        {
-            imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
-            name: 'provider',
-        },
-        {
-            icon: 'ic_workspaces',
-            name: 'workspace',
-        },
-        {
-            icon: 'ic_document-filled',
-            name: 'project_group',
-        },
-    ]),
-    selectedWorkspace: '',
     timezoneAppliedHours: computed<number[]>(() => {
-        if (state.timezone === 'UTC') return serviceAccountPageState.scheduleHours;
-        // set an hour as utc and get the hour in timezone
-        return serviceAccountPageState.scheduleHours.map((utcHour) => dayjs.utc()
+        if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
+        return serviceAccountPageStore.formState.scheduleHours.map((utcHour) => dayjs.utc()
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
     formData: computed(() => ({
         additionalOptions: additionalOptionState.additionalOptions,
-        scheduleHours: serviceAccountPageGetters.scheduleHours,
-        selectedSingleWorkspace: additionalOptionState.workspaceMapping === 'singleWorkspace' ? state.selectedWorkspace : '',
     })),
 });
 
@@ -157,7 +63,7 @@ const selectedUtcHoursSet = new Set<number>();
 const updateSelectedHours = () => {
     const hours: number[] = Array.from(selectedUtcHoursSet.values());
     serviceAccountPageStore.$patch((_state) => {
-        _state.state.scheduleHours = hours;
+        _state.formState.scheduleHours = hours;
     });
 };
 
@@ -166,7 +72,6 @@ const handleClickHour = (hour: number) => {
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
-        // set an hour as timezone and get the hour in utc
         utcHour = dayjs().tz(state.timezone)
             .hour(hour).utc()
             .get('hour');
@@ -185,20 +90,19 @@ const handleAdditionalOptionsValidate = (isValid:boolean) => {
     } else emit('update:isValid', isValid);
 };
 
-const handleUpdateWorkspace = (workspaceId:string) => {
-    state.selectedWorkspace = workspaceId;
-};
 
 const handleChangeToggle = (e:boolean) => {
     state.isAutoSyncEnabled = e;
 };
 
 (() => {
-    serviceAccountPageStore.setAutoSyncAdditionalOptions();
+    serviceAccountPageStore.setAutoSyncAdditionalOptionsSchema();
 })();
 
 watch(() => state.formData, (formData) => {
-    emit('change', formData);
+    Object.entries(formData).forEach(([key, value]) => {
+        serviceAccountPageStore.setFormState(key, value);
+    });
 });
 
 </script>
@@ -206,7 +110,7 @@ watch(() => state.formData, (formData) => {
 <template>
     <div class="service-account-auto-sync-form">
         <div class="auto-sync-toggle">
-            <p-toggle-button v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
+            <p-toggle-button v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                              :value="state.isAutoSyncEnabled"
                              show-state-text
                              position="left"
@@ -214,58 +118,16 @@ watch(() => state.formData, (formData) => {
             /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <p-field-title label="Mapping Method"
-                           size="lg"
-                           class="mb-2"
-            />
-            <mapping-method :items="state.mappingItems"
-                            class="mb-6"
-            >
-                <template #provider>
-                    <p>{{ additionalOptionState.additionalOptionUiByProvider.name }}</p>
-                </template>
-                <template #workspace>
-                    <div>
-                        <p-field-title label="Workspace Mapping"
-                                       size="md"
-                                       class="mb-1"
-                        />
-                        <div class="flex flex-col gap-1">
-                            <p-radio v-for="option in additionalOptionState.additionalOptionUiByProvider.workspaceMappingOptions"
-                                     :key="option.value"
-                                     v-model="additionalOptionState.workspaceMapping"
-                                     :value="option.value"
-                            >
-                                {{ `${option.label} ➔ ${option.value === 'multipleWorkspaces' ? 'Multiple workspaces' : 'Single Workspace'}` }}
-                            </p-radio>
-                        </div>
-                        <div>
-                            <workspace-dropdown :disabled="additionalOptionState.workspaceMapping !== 'singleWorkspace'"
-                                                class="mt-2"
-                                                @update="handleUpdateWorkspace"
-                            />
-                        </div>
-                    </div>
-                </template>
-                <template #project_group>
-                    <div>
-                        <p-field-title label="Project Group Mapping"
-                                       size="md"
-                                       class="mb-1"
-                        />
-                    </div>
-                </template>
-            </mapping-method>
-
+            <service-account-auto-sync-mapping-method />
             <p-field-title label="Additional Options"
                            size="lg"
                            class="mb-2"
             />
             <p-pane-layout class="p-4 mb-8">
-                <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
+                <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                     class="p-json-schema-form"
                                     :form-data.sync="additionalOptionState.additionalOptions"
-                                    :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptions"
+                                    :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                     :language="$store.state.user.language"
                                     @validate="handleAdditionalOptionsValidate"
                 />

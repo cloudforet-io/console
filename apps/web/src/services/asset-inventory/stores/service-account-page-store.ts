@@ -8,7 +8,7 @@ import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
 
 interface Getters {
-    autoSyncAdditionalOptions: ComputedRef<any>;
+    autoSyncAdditionalOptionsSchema: ComputedRef<any>;
     selectedProviderItem: ComputedRef<ProviderItem>;
     scheduleHours: ComputedRef<number[]>;
 }
@@ -17,18 +17,24 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
 
     const state = reactive({
         selectedProvider: '',
-        autoSyncAdditionalOptions: {},
+        autoSyncAdditionalOptionsSchema: {},
+    });
+
+    const formState = reactive({
+        additionalOptions: {},
+        selectedSingleWorkspace: '',
+        skipProjectGroup: true,
         scheduleHours: [] as number[],
     });
 
     const getters = reactive<Getters>({
-        autoSyncAdditionalOptions: computed(() => state.autoSyncAdditionalOptions),
+        autoSyncAdditionalOptionsSchema: computed(() => state.autoSyncAdditionalOptionsSchema),
         selectedProviderItem: computed(() => allReferenceStore.getters.provider[state.selectedProvider]),
-        scheduleHours: computed(() => state.scheduleHours),
+        scheduleHours: computed(() => formState.scheduleHours),
     });
     const actions = {
-        setAutoSyncAdditionalOptions: () => {
-            state.autoSyncAdditionalOptions = { // dummy data
+        setAutoSyncAdditionalOptionsSchema: () => {
+            state.autoSyncAdditionalOptionsSchema = { // dummy data
                 type: 'object',
                 required: [
                     'compliance_framework',
@@ -56,13 +62,15 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
                 ],
             };
         },
-        setProvider: (provider: string) => {
-            state.selectedProvider = provider;
+        setProvider: (provider: string) => { state.selectedProvider = provider; },
+        setFormState: (key:string, data: any) => {
+            formState[key] = data;
         },
     };
 
     return {
         state,
+        formState,
         getters,
         ...actions,
     };
