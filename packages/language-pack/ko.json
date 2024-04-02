@@ -2766,6 +2766,8 @@
 		"DESC_CREATE_WORKSPACE": "",
 		"NOT_FOUND_DESC": "",
 		"RECENT": "최근 방문",
+		"ROLE_TYPE_MEMBER": "멤버",
+		"ROLE_TYPE_OWNER": "소유자",
 		"SEARCH_WORKSPACE": "",
 		"SHOW_ALL": "모두 보기",
 		"TITLE": ""

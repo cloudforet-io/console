@@ -2766,6 +2766,8 @@
 		"DESC_CREATE_WORKSPACE": "",
 		"NOT_FOUND_DESC": "",
 		"RECENT": "最近のアクセス",
+		"ROLE_TYPE_MEMBER": "構成員",
+		"ROLE_TYPE_OWNER": "オーナー",
 		"SEARCH_WORKSPACE": "",
 		"SHOW_ALL": "すべて表示",
 		"TITLE": ""
