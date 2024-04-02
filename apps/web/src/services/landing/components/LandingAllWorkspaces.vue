@@ -11,6 +11,7 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 const PAGE_SIZE = 16;
@@ -26,6 +27,8 @@ const props = withDefaults(defineProps<Props>(), {
     favoriteList: undefined,
     isDomainAdmin: false,
 });
+
+const emit = defineEmits<{(e: 'create'): void}>();
 
 const state = reactive({
     isShowAll: false,
@@ -64,12 +67,13 @@ const handleClickShowAll = () => {
                       style-type="primary"
                       size="md"
                       icon-left="ic_plus_bold"
+                      @click="emit('create')"
             >
                 {{ $t('LADING.CREATE') }}
             </p-button>
         </div>
         <landing-workspace-board :board-sets="state.workspaceBoardSets"
-                                 class="workspace-board"
+                                 :board-type="BOARD_TYPE.ALL_WORKSPACE"
         />
         <p-button v-if="props.workspaceList.length > PAGE_SIZE && state.workspaceBoardSets.length < props.workspaceList.length"
                   icon-right="ic_chevron-down"
@@ -94,9 +98,6 @@ const handleClickShowAll = () => {
                 @apply text-label-md;
             }
         }
-    }
-    .workspace-board {
-        @apply grid grid-cols-2 gap-2;
     }
     .show-more-button {
         width: 6.5rem;

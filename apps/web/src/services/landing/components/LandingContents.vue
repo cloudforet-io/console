@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import Vue, {
+    computed, onMounted, reactive,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PDataLoader, PSearch, PDivider, PButton,
@@ -8,12 +11,17 @@ import { sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
@@ -21,6 +29,9 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+
+
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreState = userWorkspaceStore.$state;
@@ -28,6 +39,9 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
+const appContextStore = useAppContextStore();
+
+const router = useRouter();
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
@@ -47,11 +61,29 @@ const state = reactive({
     searchText: '',
 });
 
-onMounted(() => {
-    recentStore.fetchRecent({
-        type: RECENT_TYPE.WORKSPACE,
-        limit: 6,
+const handleClickButton = () => {
+    appContextStore.enterAdminMode();
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        query: {
+            hasNoWorkpspace: 'true',
+        },
     });
+    Vue.notify({
+        group: 'toastTopCenter',
+        type: 'info',
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+        duration: 2000,
+        speed: 1,
+    });
+};
+
+onMounted(async () => {
+    await recentStore.fetchRecent({
+        type: RECENT_TYPE.WORKSPACE,
+        limit: 4,
+    });
+    await favoriteStore.fetchFavorite(FAVORITE_TYPE.WORKSPACE);
 });
 </script>
 
@@ -87,6 +119,7 @@ onMounted(() => {
                 <landing-all-workspaces :workspace-list="storeState.workspaceList"
                                         :favorite-list="storeState.favoriteList"
                                         :is-domain-admin="storeState.isDomainAdmin"
+                                        @create="handleClickButton"
                 />
             </div>
             <template #no-data>

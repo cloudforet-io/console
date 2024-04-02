@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router/composables';
+
 import { PBoard, PI } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
+
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -10,7 +15,7 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
-
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
 
@@ -23,6 +28,15 @@ const props = withDefaults(defineProps<Props>(), {
     boardSets: () => ([]),
     boardType: undefined,
 });
+
+const userWorkspaceStore = useUserWorkspaceStore();
+
+const router = useRouter();
+
+const handleClickBoardItem = (item: WorkspaceBoardSet) => {
+    userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
+    router.replace({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
+};
 </script>
 
 <template>
@@ -30,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
              selectable
              :style-type="BOARD_STYLE_TYPE.cards"
              class="landing-workspace-board"
+             @item-click="handleClickBoardItem"
     >
         <template #item-content="{board}">
             <div class="workspace-board-item-wrapper">
