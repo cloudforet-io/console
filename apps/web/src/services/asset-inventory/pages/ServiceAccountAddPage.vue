@@ -280,7 +280,7 @@ const handleChangeAutoSyncForm = (autoSyncForm) => {
                 padding: 0.5rem 1rem 2.5rem 1rem;
             }
             .service-account-credentials-form {
-                padding: 0.5rem 1rem 2.5rem 1rem;
+                padding: 0.5rem 1rem 0 1rem;
             }
             .service-account-base-information-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;
