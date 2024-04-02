@@ -13,6 +13,7 @@ import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-
 import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 
 interface Props {
     recentVisits?: RecentConfig[];
@@ -42,7 +43,7 @@ const state = reactive({
                        size="md"
         />
         <landing-workspace-board :board-sets="state.recentBoardSets"
-                                 class="recent-board"
+                                 :board-type="BOARD_TYPE.RECENT"
         />
     </div>
 </template>

@@ -11,14 +11,17 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { gray } from '@/styles/colors';
 
 
-import type { WorkspaceBoardSet } from '@/services/landing/type/type';
+import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
+import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
 
 interface Props {
     boardSets: ReferenceData[] | WorkspaceBoardSet[]
+    boardType?: BoardType,
 }
 
 const props = withDefaults(defineProps<Props>(), {
     boardSets: () => ([]),
+    boardType: undefined,
 });
 </script>
 
@@ -32,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
             <div class="workspace-board-item-wrapper">
                 <workspace-logo-icon :text="board?.label || ''"
                                      :theme="board?.tags?.theme"
-                                     size="sm"
+                                     :size="props.boardType === BOARD_TYPE.ALL_WORKSPACE ? 'sm' : 'md'"
                 />
                 <div class="text-wrapper">
                     <p>{{ board?.label }}</p>
@@ -59,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <style scoped lang="postcss">
 .landing-workspace-board {
+    @apply grid grid-cols-2 gap-2;
     .workspace-board-item-wrapper {
         @apply flex items-center;
         width: 100%;
@@ -89,6 +93,11 @@ const props = withDefaults(defineProps<Props>(), {
                 }
             }
         }
+    }
+
+    /* custom design-system component - p-board-item */
+    :deep(.p-board-item) {
+        padding: 0.75rem 1rem;
     }
 }
 </style>
