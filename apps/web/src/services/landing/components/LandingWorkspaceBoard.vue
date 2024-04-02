@@ -4,9 +4,12 @@ import { useRouter } from 'vue-router/composables';
 import { PBoard, PI } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import type { ReferenceData } from '@/lib/helper/config-data-helper';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleType } from '@/schema/identity/role/type';
+import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -17,10 +20,11 @@ import { gray } from '@/styles/colors';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
 
 interface Props {
-    boardSets: ReferenceData[] | WorkspaceBoardSet[]
+    boardSets: WorkspaceBoardSet[],
     boardType?: BoardType,
 }
 
@@ -29,10 +33,22 @@ const props = withDefaults(defineProps<Props>(), {
     boardType: undefined,
 });
 
+const landingPageStore = useLandingPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
+const roleFormatter = (roleType: RoleType): string => {
+    switch (roleType) {
+    case ROLE_TYPE.WORKSPACE_OWNER:
+        return i18n.t('LADING.ROLE_TYPE_OWNER') as string;
+    case ROLE_TYPE.WORKSPACE_MEMBER:
+        return i18n.t('LADING.ROLE_TYPE_MEMBER') as string;
+    default:
+        return '';
+    }
+};
 
+landingPageStore.setLoading(true);
 const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
     router.replace({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
@@ -48,14 +64,14 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     >
         <template #item-content="{board}">
             <div class="workspace-board-item-wrapper">
-                <workspace-logo-icon :text="board?.label || ''"
+                <workspace-logo-icon :text="board?.name || ''"
                                      :theme="board?.tags?.theme"
                                      :size="props.boardType === BOARD_TYPE.ALL_WORKSPACE ? 'sm' : 'md'"
                 />
                 <div class="text-wrapper">
-                    <p>{{ board?.label }}</p>
+                    <p>{{ board?.name }}</p>
                     <p class="role-type">
-                        role_type
+                        {{ roleFormatter(board?.role_type) }}
                     </p>
                 </div>
                 <div class="toolset-wrapper">
