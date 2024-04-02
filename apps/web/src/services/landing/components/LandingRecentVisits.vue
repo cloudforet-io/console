@@ -5,32 +5,36 @@ import { PFieldTitle } from '@spaceone/design-system';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import type { ReferenceData } from '@/lib/helper/config-data-helper';
-import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
-
 import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import LandingWorkspaceBoard from '@/services/landing/components/LandingWorkspaceBoard.vue';
+import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
+import type { WorkspaceBoardSet } from '@/services/landing/type/type';
 
 interface Props {
+    workspaceList?: WorkspaceModel[];
     recentVisits?: RecentConfig[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    recentVisits: () => ([]),
-});
-
-const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreGetters = userWorkspaceStore.getters;
-
-const storeState = reactive({
-    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
+    workspaceList: () => ([]),
+    recentVisits: undefined,
 });
 
 const state = reactive({
-    recentBoardSets: computed<ReferenceData[]>(() => convertWorkspaceConfigToReferenceData(props.recentVisits ?? [], storeState.workspaceList)),
+    recentBoardSets: computed<WorkspaceBoardSet[]>(() => {
+        const orderList: WorkspaceBoardSet[] = [];
+        props.recentVisits?.forEach((recentItem) => {
+            const matchingObj = props.workspaceList.find((workspaceItem) => workspaceItem.workspace_id === recentItem.itemId);
+            if (matchingObj) {
+                orderList.push({
+                    ...matchingObj,
+                    rounded: true,
+                });
+            }
+        });
+        return orderList;
+    }),
 });
 </script>
 
@@ -42,7 +46,7 @@ const state = reactive({
                        size="md"
         />
         <landing-workspace-board :board-sets="state.recentBoardSets"
-                                 class="recent-board"
+                                 :board-type="BOARD_TYPE.RECENT"
         />
     </div>
 </template>
@@ -51,8 +55,5 @@ const state = reactive({
 .landing-recent-visits {
     @apply flex flex-col;
     gap: 1rem;
-    .recent-board {
-        @apply grid grid-cols-3 gap-2;
-    }
 }
 </style>

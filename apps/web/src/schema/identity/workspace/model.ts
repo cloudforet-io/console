@@ -10,4 +10,6 @@ export interface WorkspaceModel {
     created_by: string;
     domain_id: string;
     created_at: string;
+    role_id?: string;
+    role_type?: string;
 }

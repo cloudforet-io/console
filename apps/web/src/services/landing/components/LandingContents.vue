@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import Vue, {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PDataLoader, PSearch, PDivider, PButton,
@@ -8,12 +11,17 @@ import { sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
@@ -21,20 +29,27 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
+import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+
+
 
 const userWorkspaceStore = useUserWorkspaceStore();
-const workspaceStoreState = userWorkspaceStore.$state;
+const workspaceStoreGetters = userWorkspaceStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const recentStore = useRecentStore();
 const recentState = recentStore.state;
+const landingPageStore = useLandingPageStore();
+const landingPageStoreGetters = landingPageStore.getters;
+const appContextStore = useAppContextStore();
+
+const router = useRouter();
 
 const storeState = reactive({
+    loading: computed<boolean>(() => landingPageStoreGetters.loading),
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreState.getters.workspaceList.map((i) => ({
-        ...i,
-        label: i.name,
-    }))),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
     recentWorkspace: computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
         itemType: i.data.type,
@@ -43,15 +58,43 @@ const storeState = reactive({
     }))),
 });
 const state = reactive({
-    loading: false,
     searchText: '',
 });
 
-onMounted(() => {
-    recentStore.fetchRecent({
-        type: RECENT_TYPE.WORKSPACE,
-        limit: 6,
+const handleClickButton = () => {
+    appContextStore.enterAdminMode();
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        query: {
+            hasNoWorkpspace: 'true',
+        },
     });
+    Vue.notify({
+        group: 'toastTopCenter',
+        type: 'info',
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+        duration: 2000,
+        speed: 1,
+    });
+};
+
+onMounted(async () => {
+    try {
+        await landingPageStore.setLoading(true);
+        // TODO: will be updated
+        // await landingPageStore.listRoles();
+        await recentStore.fetchRecent({
+            type: RECENT_TYPE.WORKSPACE,
+            limit: 4,
+        });
+        await favoriteStore.fetchFavorite(FAVORITE_TYPE.WORKSPACE);
+    } finally {
+        await landingPageStore.setLoading(false);
+    }
+});
+
+onUnmounted(() => {
+    landingPageStore.initState();
 });
 </script>
 
@@ -74,7 +117,7 @@ onMounted(() => {
                 </p>
             </div>
         </div>
-        <p-data-loader :loading="state.loading"
+        <p-data-loader :loading="storeState.loading"
                        :data="storeState.workspaceList"
         >
             <div class="contents-wrapper">
@@ -82,11 +125,13 @@ onMounted(() => {
                           :placeholder="$t('LADING.SEARCH_WORKSPACE')"
                 />
                 <landing-recent-visits v-if="storeState.recentWorkspace.length > 0"
+                                       :workspace-list="storeState.workspaceList"
                                        :recent-visits="storeState.recentWorkspace"
                 />
                 <landing-all-workspaces :workspace-list="storeState.workspaceList"
                                         :favorite-list="storeState.favoriteList"
                                         :is-domain-admin="storeState.isDomainAdmin"
+                                        @create="handleClickButton"
                 />
             </div>
             <template #no-data>
@@ -108,6 +153,7 @@ onMounted(() => {
                       size="md"
                       icon-left="ic_plus_bold"
                       class="create-button"
+                      @click="handleClickButton"
             >
                 {{ $t('LADING.CREATE_WORKSPACE') }}
             </p-button>

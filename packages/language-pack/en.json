@@ -2766,6 +2766,8 @@
 		"DESC_CREATE_WORKSPACE": "Create one by clicking the \"Create\" button.",
 		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
 		"RECENT": "Recent Visits",
+		"ROLE_TYPE_MEMBER": "Member",
+		"ROLE_TYPE_OWNER": "Owner",
 		"SEARCH_WORKSPACE": "Search Workspaces",
 		"SHOW_ALL": "Show All",
 		"TITLE": "Which Workspace?"
