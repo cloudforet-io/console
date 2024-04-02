@@ -1,4 +1,5 @@
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { defineStore } from 'pinia';
 
@@ -14,10 +15,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { RecentItem, RecentType } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-
-
 
 interface RecentState {
     recentMenuList: RecentItem[];
@@ -26,6 +26,8 @@ interface RecentState {
 
 export const useRecentStore = defineStore('recent', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
+
+    const route = useRoute();
 
     const _getters = reactive({
         userId: computed(() => store.state.user.userId),
@@ -99,6 +101,7 @@ export const useRecentStore = defineStore('recent', () => {
     };
 
     watch(() => _getters.currentWorkspaceId, (workspaceId) => {
+        if (route.name === LANDING_ROUTE._NAME) return;
         state.recentMenuList = [];
         if (workspaceId) {
             actions.fetchRecent({ type: RECENT_TYPE.SERVICE, workspaceIds: [workspaceId] });
