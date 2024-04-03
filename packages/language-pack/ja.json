@@ -2538,6 +2538,7 @@
 			"ACCOUNT": "アカウント",
 			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
+			"ALT_E_COLLECTOR_SCHEDULE": "1日に最大2回までスケジュールを設定できます。",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
 			"ALT_E_DELETE_COLLECTOR": "コレクター削除に失敗",
 			"ALT_E_GET_COLLECTOR": "コレクター取得に失敗",

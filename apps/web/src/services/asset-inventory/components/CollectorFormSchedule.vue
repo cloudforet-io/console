@@ -33,6 +33,11 @@
                     {{ hour }}
                 </span>
             </div>
+            <span v-if="state.isScheduleError"
+                  class="error-msg"
+            >
+                {{ $t('INVENTORY.COLLECTOR.ALT_E_COLLECTOR_SCHEDULE') }}
+            </span>
         </p-field-group>
     </p-data-loader>
 </template>
@@ -90,6 +95,7 @@ const state = reactive({
         if (props.disableLoading) return false;
         return collectorFormState.originCollector === null;
     }),
+    isScheduleError: false,
 });
 
 const updateSelectedHours = () => {
@@ -139,8 +145,14 @@ const handleClickHour = (hour: number) => {
     }
     if (selectedUtcHoursSet.has(utcHour)) {
         selectedUtcHoursSet.delete(utcHour);
+        state.isScheduleError = false;
     } else {
+        if (selectedUtcHoursSet?.size >= 2) {
+            state.isScheduleError = true;
+            return;
+        }
         selectedUtcHoursSet.add(utcHour);
+        state.isScheduleError = false;
     }
 
     updateSelectedHours();
@@ -175,6 +187,10 @@ watch([() => collectorFormStore.collectorId, () => props.hoursReadonly], ([colle
 .hourly-schedule-field-group {
     margin-top: 1.5rem;
     margin-bottom: 1.875rem;
+    .error-msg {
+        @apply block w-full text-label-sm text-alert;
+        margin-top: 0.25rem;
+    }
 }
 .hourly-schedule-wrapper {
     display: grid;
