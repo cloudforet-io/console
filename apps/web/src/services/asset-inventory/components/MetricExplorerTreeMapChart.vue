@@ -15,6 +15,8 @@ import type {
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const COLOR_FIELD_NAME = 'background_color';
+const TEXT_COLOR_FIELD_NAME = 'font_color';
 interface Props {
     loading: boolean;
     chartData: RealtimeChartData[];
@@ -23,7 +25,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
-    chart: null,
     chartData: () => ([]),
     legends: () => ([]),
 });
@@ -45,10 +46,12 @@ const drawChart = () => {
     const series = chartHelper.createTreeMapSeries(seriesSettings);
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
+    series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
     chartHelper.setTreemapTooltipText(series, tooltip);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
+    series.labels.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[TEXT_COLOR_FIELD_NAME]);
 
     const _chartData = getRefinedTreemapChartData(cloneDeep(props.chartData));
     series.data.setAll(_chartData);
@@ -68,7 +71,8 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         <p-skeleton v-if="props.loading"
                     height="100%"
         />
-        <div ref="chartContext"
+        <div v-else
+             ref="chartContext"
              class="chart"
         />
     </div>
