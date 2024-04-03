@@ -20,6 +20,7 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { i18n } from '@/translations';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
@@ -46,6 +47,9 @@ import type { BaseInformationForm, CredentialForm } from '@/services/asset-inven
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const appContextStore = useAppContextStore();
+
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
@@ -71,6 +75,7 @@ const state = reactive({
     description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const formState = reactive({
@@ -116,8 +121,18 @@ const createAccount = async (): Promise<string|undefined> => {
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
             secret_data: secretData,
-            resource_group: 'WORKSPACE',
+            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
+            ...(serviceAccountPageFormState.isAutoSyncEnabled && {
+                schedule: {
+                    state: serviceAccountPageFormState.scheduleHours.length ? 'ENABLED' : 'DISABLED',
+                    hours: serviceAccountPageFormState.scheduleHours,
+                },
+                sync_options: {
+                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                },
+            }),
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
