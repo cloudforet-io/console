@@ -3,9 +3,10 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PSelectButton } from '@spaceone/design-system';
-import { debounce } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -38,17 +39,17 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
-    data: undefined as any|undefined,
+    data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartTypeItems: computed(() => [
         { chartType: CHART_TYPE.LINE, icon: 'ic_chart-line' },
         { chartType: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
         { chartType: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
         { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     ]),
-    selectedChartType: CHART_TYPE.LINE as ChartType,
+    selectedChartType: CHART_TYPE.COLUMN as ChartType,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
-    chart: null as XYChart | null,
+    chart: null as XYChart|am5percent.PieChart| null,
 });
 
 /* Api */
@@ -82,16 +83,20 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         return { more: false, results: [] };
     }
 };
-const setChartData = debounce(async () => {
+const setChartData = debounce(async (fetchData = false) => {
     state.loading = true;
 
-    const rawData = await analyzeMetricData();
+    let rawData = cloneDeep(state.data);
+    if (!rawData || fetchData) {
+        rawData = await analyzeMetricData();
+        state.data = rawData;
+    }
 
     const _granularity = metricExplorerPageState.granularity;
     const _period = metricExplorerPageState.period as Period;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
 
-    state.legends = getLegends(rawData, _groupBy);
+    state.legends = getLegends(state.selectedChartType, rawData, _groupBy);
     if (state.selectedChartType === CHART_TYPE.LINE) {
         state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
     } else {
@@ -102,6 +107,7 @@ const setChartData = debounce(async () => {
 
 /* Event */
 const handleSelectChartType = (chartType: ChartType) => {
+    setChartData();
     state.selectedChartType = chartType;
 };
 const handleToggleSeries = (index: number) => {
@@ -120,10 +126,9 @@ watch([
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,
-    () => state.selectedChartType,
 ], async ([metricId]) => {
     if (!metricId) return;
-    await setChartData();
+    await setChartData(true);
 }, { immediate: true });
 setChartData();
 </script>
@@ -132,6 +137,7 @@ setChartData();
     <div class="metric-explorer-chart">
         <div class="left-part">
             <div class="chart-type-button-wrapper">
+                <span class="showing-top-text">{{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}</span>
                 <p-select-button v-for="item in state.chartTypeItems"
                                  :key="`chart-select-button-${item.chartType}`"
                                  :selected="state.selectedChartType"
@@ -173,8 +179,9 @@ setChartData();
             </div>
         </div>
         <div class="right-part">
-            <metric-explorer-chart-legends :legends="state.legends"
+            <metric-explorer-chart-legends :legends.sync="state.legends"
                                            :loading="state.loading"
+                                           :chart-type="state.selectedChartType"
                                            @toggle-series="handleToggleSeries"
                                            @show-all-series="handleAllSeries('show')"
                                            @hide-all-series="handleAllSeries('hide')"
@@ -196,6 +203,12 @@ setChartData();
             display: flex;
             justify-content: flex-end;
             gap: 0.375rem;
+            align-items: center;
+        }
+        .showing-top-text {
+            @apply text-label-md text-gray-500;
+            font-weight: 400;
+            padding-right: 0.125rem;
         }
         .chart-wrapper {
             height: 25rem;
