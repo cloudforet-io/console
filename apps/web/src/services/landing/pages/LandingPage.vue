@@ -26,6 +26,7 @@ const handleOpenedMenu = (visible: boolean) => {
         <div class="scroll-contents">
             <console-logo class="logo"
                           :position-fixed="false"
+                          :is-hidden-if-tablet="false"
             />
             <landing-contents />
             <f-n-b class="fnb" />
