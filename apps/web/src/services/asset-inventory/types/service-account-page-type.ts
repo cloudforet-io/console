@@ -18,6 +18,7 @@ export interface CredentialForm {
     selectedSecretSchema: SchemaModel;
     attachedTrustedAccountId?: string;
     credentialJson: string;
+    customSchemaForm: { [key: string]: any; };
     activeDataType: ActiveDataType;
 }
 

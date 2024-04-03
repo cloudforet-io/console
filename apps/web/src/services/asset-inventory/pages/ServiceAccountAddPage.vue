@@ -95,6 +95,18 @@ const createAccount = async (): Promise<string|undefined> => {
     const data = formState.baseInformationForm.customSchemaForm;
 
     let res: TrustedAccountModel|ServiceAccountModel;
+    if (formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+        // preprocessing for Google Cloud form
+        if (formState.credentialForm.customSchemaForm?.private_key) {
+            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+        }
+    }
+    let secretData;
+    if (formState.credentialForm.activeDataType === 'json') {
+        secretData = JSON.parse(formState.credentialForm.credentialJson);
+    } else if (formState.credentialForm.activeDataType === 'input') {
+        secretData = formState.credentialForm.customSchemaForm;
+    }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
     if (state.isTrustedAccount) {
@@ -103,7 +115,7 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName,
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-            secret_data: JSON.parse(formState.credentialForm.credentialJson),
+            secret_data: secretData,
             resource_group: 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
         });
@@ -113,7 +125,7 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName.trim(),
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-            secret_data: JSON.parse(formState.credentialForm.credentialJson),
+            secret_data: secretData,
             tags: formState.baseInformationForm.tags,
             trusted_account_id: attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,

@@ -24,7 +24,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
 
     const formState = reactive({
         // autoSync
-        isAutoSyncFormValid: false,
+        isAutoSyncFormValid: true,
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
