@@ -20,7 +20,6 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
-import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
@@ -101,6 +100,12 @@ const state = reactive({
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuSet = [
             {
+                type: MENU_ITEM_TYPE.STARRED,
+                childItems: state.starredMenuSet,
+                currentPath: state.currentPath,
+            },
+            { type: MENU_ITEM_TYPE.DIVIDER },
+            {
                 type: MENU_ITEM_TYPE.ITEM,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                 id: MENU_ID.DASHBOARDS,
@@ -109,11 +114,7 @@ const state = reactive({
                     name: DASHBOARDS_ROUTE._NAME,
                 }),
                 hideFavorite: true,
-            },
-            { type: 'divider' },
-            {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: i18n.t('COMMON.STARRED'),
+                icon: 'ic_dots-4-square',
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
         ];
@@ -233,33 +234,5 @@ callApiWithGrantGuard();
 <template>
     <l-s-b class="dashboards-l-s-b"
            :menu-set="state.menuSet"
-    >
-        <template #collapsible-contents>
-            <div v-if="state.starredMenuSet.length > 0">
-                <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
-                                        :key="idx"
-                                        :item="item"
-                                        :idx="idx"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                />
-            </div>
-            <span v-else
-                  class="no-data"
-            >
-                {{ $t('COMMON.STARRED_NO_DATA') }}
-            </span>
-        </template>
-    </l-s-b>
+    />
 </template>
-
-<style scoped lang="postcss">
-.dashboards-l-s-b {
-    .no-data {
-        @apply flex items-start text-gray-500;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-        gap: 0.125rem;
-    }
-}
-</style>
