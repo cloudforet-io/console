@@ -80,7 +80,7 @@ const formState = reactive({
     credentialForm: {} as CredentialForm,
     autoSyncForm: {},
     isCredentialFormValid: false,
-    isAutoSyncFormValid: false,
+    isAutoSyncFormValid: computed(() => serviceAccountPageStore.formState.isAutoSyncFormValid),
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
