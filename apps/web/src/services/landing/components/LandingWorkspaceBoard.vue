@@ -5,9 +5,10 @@ import { PBoard, PI } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
 
 
+import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
-import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -37,12 +38,12 @@ const landingPageStore = useLandingPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const router = useRouter();
-const roleFormatter = (roleType: RoleType): string => {
+const roleTypeImageFormatter = (roleType: RoleType): string => {
     switch (roleType) {
     case ROLE_TYPE.WORKSPACE_OWNER:
-        return i18n.t('LADING.ROLE_TYPE_OWNER') as string;
+        return WorkspaceOwnerImage;
     case ROLE_TYPE.WORKSPACE_MEMBER:
-        return i18n.t('LADING.ROLE_TYPE_MEMBER') as string;
+        return WorkspaceMemberImage;
     default:
         return '';
     }
@@ -72,9 +73,17 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                     <p class="workspace-name">
                         {{ board?.name }}
                     </p>
-                    <p class="role-type">
-                        {{ roleFormatter(board?.role_type) }}
-                    </p>
+                    <div v-if="board?.role_type"
+                         class="workspace-info"
+                    >
+                        <img :src="roleTypeImageFormatter(board?.role_type)"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <p class="role-type">
+                            {{ board?.role_name }}
+                        </p>
+                    </div>
                 </div>
                 <div class="toolset-wrapper">
                     <favorite-button :item-id="board?.workspace_id"
@@ -105,12 +114,21 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
             @apply flex flex-col text-label-md truncate;
             flex: 1;
             gap: 0.125rem;
+            .workspace-info {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .role-type-icon {
+                    @apply rounded-full;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
+                .role-type {
+                    @apply text-gray-700 truncate;
+                    width: 100%;
+                }
+            }
             .workspace-name {
                 @apply truncate;
-                width: 100%;
-            }
-            .role-type {
-                @apply text-gray-700 truncate;
                 width: 100%;
             }
         }
