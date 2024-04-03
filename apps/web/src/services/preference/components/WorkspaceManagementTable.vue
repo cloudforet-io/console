@@ -64,21 +64,6 @@ const storeState = reactive({
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
         type: 'item',
-        name: 'edit',
-        label: i18n.t('IAM.WORKSPACES.EDIT'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
-    },
-    {
-        type: 'item',
-        name: 'delete',
-        label: i18n.t('IAM.WORKSPACES.DELETE'),
-        disabled: workspacePageState.selectedIndices.length !== 1,
-    },
-    {
-        type: 'divider',
-    },
-    {
-        type: 'item',
         name: 'enable',
         label: i18n.t('IAM.WORKSPACES.ENABLE'),
         disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'ENABLED'),
@@ -88,6 +73,21 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         name: 'disable',
         label: i18n.t('IAM.WORKSPACES.DISABLE'),
         disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'DISABLED'),
+    },
+    {
+        type: 'divider',
+    },
+    {
+        type: 'item',
+        name: 'edit',
+        label: i18n.t('IAM.WORKSPACES.EDIT'),
+        disabled: workspacePageState.selectedIndices.length !== 1,
+    },
+    {
+        type: 'item',
+        name: 'delete',
+        label: i18n.t('IAM.WORKSPACES.DELETE'),
+        disabled: workspacePageState.selectedIndices.length !== 1,
     },
 ]));
 

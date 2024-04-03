@@ -12,12 +12,18 @@ import { useWorkspacePageStore } from '@/services/preference/store/workspace-pag
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
+const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
+
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.WORKSPACES.DETAIL.USERS'), name: 'users', keepAlive: true },
     ])),
     activeTab: 'users',
 });
+
+const handleSelectAction = (type: string) => {
+    emit('select-action', type);
+};
 
 </script>
 
@@ -28,7 +34,7 @@ const tabState = reactive({
                :active-tab.sync="tabState.activeTab"
         >
             <template #users>
-                <workspaces-user-management-tab-contents />
+                <workspaces-user-management-tab-contents @select-action="handleSelectAction" />
             </template>
         </p-tab>
     </section>

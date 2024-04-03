@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PStatus, PToolboxTable, PHeading, PTooltip,
+    PStatus, PToolboxTable, PHeading, PTooltip, PButton, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -24,6 +24,8 @@ import { useWorkspacePageStore } from '@/services/preference/store/workspace-pag
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
+const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
+
 const workspaceUserListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspacePageState.usersPageStart).setPageLimit(workspacePageState.usersPageLimit)
     .setSort('name', true);
@@ -31,8 +33,11 @@ let workspaceUserListApiQuery = workspaceUserListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: WORKSPACES_USER_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const storeState = reactive({
+    currentWorkspace: computed(() => workspacePageStore.selectedWorkspaces[0]),
+});
 const state = reactive({
-    currentWorkspaceId: computed(() => workspacePageStore.selectedWorkspaces[0]?.workspace_id),
+    currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
     refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
         ...user,
         role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id].role_id],
@@ -81,6 +86,9 @@ const handleChange = async (options: any = {}) => {
         query: workspaceUserListApiQuery,
     });
 };
+const handleClickButton = (type: string) => {
+    emit('select-action', type);
+};
 
 watch(() => workspacePageStore.selectedWorkspaces, async () => {
     await handleChange();
@@ -94,7 +102,35 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
                    use-total-count
                    heading-type="sub"
                    :total-count="workspacePageState.usersTotalCount"
-        />
+        >
+            <template #extra>
+                <div class="heading-toolset">
+                    <p-button v-if="storeState.currentWorkspace.state === 'DISABLED'"
+                              style-type="tertiary"
+                              @click="handleClickButton('enable')"
+                    >
+                        {{ $t('IAM.WORKSPACES.ENABLE') }}
+                    </p-button>
+                    <p-button v-else
+                              style-type="tertiary"
+                              @click="handleClickButton('disable')"
+                    >
+                        {{ $t('IAM.WORKSPACES.DISABLE') }}
+                    </p-button>
+                    <p-divider vertical />
+                    <p-icon-button name="ic_edit"
+                                   shape="square"
+                                   style-type="tertiary"
+                                   @click="handleClickButton('edit')"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   shape="square"
+                                   style-type="tertiary"
+                                   @click="handleClickButton('delete')"
+                    />
+                </div>
+            </template>
+        </p-heading>
         <p-toolbox-table
             class="workspace-user-management-table"
             search-type="query"
@@ -151,6 +187,10 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
 
 <style lang="postcss" scoped>
 .workspace-user-management-tab-contents {
+    .heading-toolset {
+        @apply flex;
+        gap: 0.5rem;
+    }
     .workspace-user-management-table {
         @apply border-0;
     }
