@@ -5,11 +5,12 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PRadio, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
+    PFieldGroup, PRadio, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI, PTab, PJsonSchemaForm,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -23,11 +24,12 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
-import type { CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
+import type { ActiveDataType, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
     serviceAccountType: AccountType;
@@ -56,6 +58,7 @@ interface State {
     trustedAccountMenuItems: ComputedRef<SelectDropdownMenuItem[]>;
     selectedTrustedAccountDataList: ComputedRef<Array<{ key: string|undefined; value: string }>>;
     secretTypes: SchemaModel[];
+    credentialSchema: ComputedRef<JsonSchema>;
     trustedAccountInfoLink: ComputedRef<string>;
     baseInformationSchema: ComputedRef<JsonSchema|undefined>;
 }
@@ -89,6 +92,7 @@ const state = reactive<State>({
         }));
     }),
     secretTypes: [],
+    credentialSchema: computed<JsonSchema>(() => formState.selectedSecretType?.schema ?? null),
     trustedAccountInfoLink: computed<string>(() => {
         const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
         return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
@@ -99,12 +103,14 @@ const formState = reactive({
     hasCredentialKey: true,
     selectedSecretType: {} as SchemaModel,
     credentialJson: '{}',
+    customSchemaForm: {},
     attachTrustedAccount: false,
     attachedTrustedAccountId: undefined,
     formData: computed<CredentialForm>(() => ({
         hasCredentialKey: formState.hasCredentialKey,
         selectedSecretSchema: formState.selectedSecretType,
         attachedTrustedAccountId: formState.attachedTrustedAccountId,
+        activeDataType: tabState.activeTab as ActiveDataType,
         credentialJson: formState.credentialJson,
     })),
     isCustomSchemaFormValid: false,
@@ -115,10 +121,18 @@ const formState = reactive({
             if (formState.attachTrustedAccount && !formState.attachedTrustedAccountId) return false;
         }
         if (state.secretTypes.length) {
-            return formState.isCredentialJsonValid;
+            if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
+            return checkJsonStringAvailable(formState.credentialJson);
         }
         return true;
     }),
+});
+const tabState = reactive({
+    tabs: computed<TabItem[]>(() => [
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
+    ]),
+    activeTab: 'input',
 });
 
 /* Util */
@@ -129,6 +143,7 @@ const initForm = () => {
     formState.credentialJson = '{}';
     formState.attachedTrustedAccountId = undefined;
     formState.isCustomSchemaFormValid = false;
+    tabState.activeTab = 'input';
 };
 const setOriginForm = (originForm: Partial<CredentialForm>) => {
     formState.hasCredentialKey = originForm?.hasCredentialKey;
@@ -166,6 +181,9 @@ const getTrustedAccountCredentialData = (trustedAccountId: string) => {
 };
 
 /* Event */
+const handleCredentialValidate = (isValid) => {
+    formState.isCustomSchemaFormValid = isValid;
+};
 const handleChangeSecretType = (val: string) => {
     if (formState.selectedSecretType !== val) {
         initForm();
@@ -338,15 +356,30 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
                 </div>
             </p-field-group>
 
-            <p-field-group required
-                           class="json-form-wrapper"
-                           :invalid="!checkJsonStringAvailable(formState.credentialJson)"
-                           :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
+            <p-tab :tabs="tabState.tabs"
+                   :active-tab.sync="tabState.activeTab"
+                   stretch
             >
-                <p-text-editor :code.sync="formState.credentialJson"
-                               :disable-auto-reformat="true"
-                />
-            </p-field-group>
+                <template #input>
+                    <p-json-schema-form :form-data.sync="formState.customSchemaForm"
+                                        :schema="state.credentialSchema"
+                                        :language="$store.state.user.language"
+                                        class="custom-schema-box"
+                                        @validate="handleCredentialValidate"
+                    />
+                </template>
+                <template #json>
+                    <p-field-group required
+                                   class="json-form-wrapper"
+                                   :invalid="!checkJsonStringAvailable(formState.credentialJson)"
+                                   :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
+                    >
+                        <p-text-editor :code.sync="formState.credentialJson"
+                                       :disable-auto-reformat="true"
+                        />
+                    </p-field-group>
+                </template>
+            </p-tab>
         </template>
     </div>
 </template>
