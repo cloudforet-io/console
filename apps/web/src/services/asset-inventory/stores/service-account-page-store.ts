@@ -12,6 +12,7 @@ interface Getters {
     autoSyncAdditionalOptionsSchema: ComputedRef<JsonSchema|undefined>;
     selectedProviderItem: ComputedRef<ProviderItem>;
     scheduleHours: ComputedRef<number[]>;
+    isAllValidToCreate: ComputedRef<boolean>;
     supportAutoSync: ComputedRef<boolean>;
 }
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
@@ -23,18 +24,19 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
 
     const formState = reactive({
         // autoSync
+        isAutoSyncFormValid: true,
+        isAutoSyncEnabled: false,
         additionalOptions: {},
-        isAdditionalOptionsValid: false,
         selectedSingleWorkspace: '',
         skipProjectGroup: true,
         scheduleHours: [] as number[],
-        isScheduleHoursValid: false,
     });
 
     const getters = reactive<Getters>({
         selectedProviderItem: computed(() => allReferenceStore.getters.provider[state.selectedProvider]),
         autoSyncAdditionalOptionsSchema: computed(() => getters.selectedProviderItem?.data?.plugin_info?.metadata?.additional_options_schema),
         scheduleHours: computed(() => formState.scheduleHours),
+        isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
     });
     const actions = {

@@ -20,6 +20,7 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { i18n } from '@/translations';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
@@ -46,6 +47,9 @@ import type { BaseInformationForm, CredentialForm } from '@/services/asset-inven
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const appContextStore = useAppContextStore();
+
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
@@ -71,6 +75,7 @@ const state = reactive({
     description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const formState = reactive({
@@ -80,7 +85,7 @@ const formState = reactive({
     credentialForm: {} as CredentialForm,
     autoSyncForm: {},
     isCredentialFormValid: false,
-    isAutoSyncFormValid: false,
+    isAutoSyncFormValid: computed(() => serviceAccountPageStore.formState.isAutoSyncFormValid),
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
@@ -95,6 +100,18 @@ const createAccount = async (): Promise<string|undefined> => {
     const data = formState.baseInformationForm.customSchemaForm;
 
     let res: TrustedAccountModel|ServiceAccountModel;
+    if (formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+        // preprocessing for Google Cloud form
+        if (formState.credentialForm.customSchemaForm?.private_key) {
+            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+        }
+    }
+    let secretData;
+    if (formState.credentialForm.activeDataType === 'json') {
+        secretData = JSON.parse(formState.credentialForm.credentialJson);
+    } else if (formState.credentialForm.activeDataType === 'input') {
+        secretData = formState.credentialForm.customSchemaForm;
+    }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
     if (state.isTrustedAccount) {
@@ -103,9 +120,19 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName,
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-            secret_data: JSON.parse(formState.credentialForm.credentialJson),
-            resource_group: 'WORKSPACE',
+            secret_data: secretData,
+            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
+            ...(serviceAccountPageFormState.isAutoSyncEnabled && {
+                schedule: {
+                    state: serviceAccountPageFormState.scheduleHours.length ? 'ENABLED' : 'DISABLED',
+                    hours: serviceAccountPageFormState.scheduleHours,
+                },
+                sync_options: {
+                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                },
+            }),
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
@@ -113,7 +140,7 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName.trim(),
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-            secret_data: JSON.parse(formState.credentialForm.credentialJson),
+            secret_data: secretData,
             tags: formState.baseInformationForm.tags,
             trusted_account_id: attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,

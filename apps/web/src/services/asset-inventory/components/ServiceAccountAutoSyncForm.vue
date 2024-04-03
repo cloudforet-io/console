@@ -18,7 +18,6 @@ import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/se
 const MAX_TIME_COUNT = 2;
 
 interface Props {
-    isValid: boolean;
     originForm?: any;
     isUpdateMode?: boolean;
     isReadMode?: boolean;
@@ -33,14 +32,10 @@ const props = withDefaults(defineProps<Props>(), {
     isReadMode: false,
 });
 
-const additionalOptionState = reactive({
-    additionalOptions: {},
-});
-
 const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
-    isAutoSyncEnabled: true,
+    isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
     domainName: computed(() => store.state.domain.name),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
@@ -48,9 +43,13 @@ const state = reactive({
             .hour(utcHour).tz(state.timezone)
             .get('hour')).sort((a, b) => a - b);
     }),
-    formData: computed(() => ({
-        additionalOptions: additionalOptionState.additionalOptions,
-    })),
+    additionalOptions: {},
+    isScheduleHoursValid: computed(() => ((state.isAutoSyncEnabled) ? !!serviceAccountPageFormState.scheduleHours.length : true)),
+    isAdditionalOptionsValid: false,
+    isAllValid: computed(() => {
+        if (!state.isAutoSyncEnabled) return true;
+        return state.isScheduleHoursValid && state.isAdditionalOptionsValid;
+    }),
 });
 
 const hoursMatrix: number[] = range(24);
@@ -60,8 +59,6 @@ const updateSelectedHours = () => {
     const hours: number[] = Array.from(selectedUtcHoursSet.values());
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.scheduleHours = hours;
-        const isValid = !!hours.length;
-        _state.formState.isScheduleHoursValid = (state.isAutoSyncEnabled) ? isValid : true;
     });
 };
 
@@ -83,22 +80,25 @@ const handleClickHour = (hour: number) => {
     updateSelectedHours();
 };
 const handleAdditionalOptionsValidate = (isValid:boolean) => {
-    serviceAccountPageStore.$patch((_state) => {
-        _state.formState.isAdditionalOptionsValid = state.isAutoSyncEnabled ? isValid : true;
-    });
+    state.isAdditionalOptionsValid = state.isAutoSyncEnabled ? isValid : true;
 };
 
 
 const handleChangeToggle = (e:boolean) => {
-    state.isAutoSyncEnabled = e;
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.isAutoSyncEnabled = e;
+    });
 };
 
-watch(() => state.formData, (formData) => {
-    Object.entries(formData).forEach(([key, value]) => {
-        serviceAccountPageStore.setFormState(key, value);
-    });
+watch(() => state.additionalOptions, (additionalOptions) => {
+    serviceAccountPageStore.setFormState('additionalOptions', additionalOptions);
 });
 
+watch(() => state.isAllValid, (isAllValid) => {
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.isAutoSyncFormValid = isAllValid;
+    });
+});
 </script>
 
 <template>
@@ -121,7 +121,7 @@ watch(() => state.formData, (formData) => {
                 <p-pane-layout class="p-4 mb-8">
                     <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                         class="p-json-schema-form"
-                                        :form-data.sync="additionalOptionState.additionalOptions"
+                                        :form-data.sync="state.additionalOptions"
                                         :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
                                         :language="$store.state.user.language"
                                         @validate="handleAdditionalOptionsValidate"

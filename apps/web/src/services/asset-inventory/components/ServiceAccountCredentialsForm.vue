@@ -110,6 +110,7 @@ const formState = reactive({
         hasCredentialKey: formState.hasCredentialKey,
         selectedSecretSchema: formState.selectedSecretType,
         attachedTrustedAccountId: formState.attachedTrustedAccountId,
+        customSchemaForm: formState.customSchemaForm,
         activeDataType: tabState.activeTab as ActiveDataType,
         credentialJson: formState.credentialJson,
     })),
