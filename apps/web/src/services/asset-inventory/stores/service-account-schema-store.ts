@@ -21,8 +21,7 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { UserState } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
-import type { ReferenceItem } from '@/store/reference/type';
+import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -33,7 +32,7 @@ import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-invent
 
 interface Getters {
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
-    currentProviderData: ComputedRef<ProviderModel|ReferenceItem<undefined>>;
+    currentProviderData: ComputedRef<ProviderItem>|undefined;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     trustedAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     trustingSecretSchema: ComputedRef<Partial<SchemaModel>|undefined>;
@@ -69,7 +68,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         trustingSecretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTING_SECRET')),
         secretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SECRET')),
         isSupportTrustedAccount: computed(() => {
-            const currentProviderData:ProviderModel = getters.currentProviderData;
+            const currentProviderData:ProviderModel = getters.currentProviderData?.data;
             return currentProviderData?.options?.support_trusted_account ?? false;
         }),
         isCachedProviderSchema: computed(() => !!_providerSchemaMap.value[state.currentProvider ?? '']),
