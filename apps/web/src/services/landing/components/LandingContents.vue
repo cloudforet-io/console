@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import Vue, {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDataLoader, PDivider, PButton,
+    PDataLoader, PDivider, PButton, screens,
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
@@ -43,6 +44,7 @@ const landingPageStoreGetters = landingPageStore.getters;
 const appContextStore = useAppContextStore();
 
 const router = useRouter();
+const { width } = useWindowSize();
 
 const storeState = reactive({
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
@@ -54,6 +56,9 @@ const storeState = reactive({
         workspace_id: i.data.workspace_id,
         itemId: i.data.id,
     }))),
+});
+const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
 const handleClickButton = () => {
@@ -142,7 +147,9 @@ onUnmounted(() => {
                      srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
                         @/assets/images/landing/img_landing_create_workspace@3x.png 3x"
                 >
-                <span class="desc">{{ $t('LADING.BANNER_DESC') }}</span>
+                <span v-if="!state.isMobileSize"
+                      class="desc"
+                >{{ $t('LADING.BANNER_DESC') }}</span>
                 <p-button style-type="primary"
                           size="md"
                           icon-left="ic_plus_bold"
@@ -159,7 +166,7 @@ onUnmounted(() => {
 <style scoped lang="postcss">
 .landing-contents {
     @apply flex flex-col;
-    width: 44.5rem;
+    max-width: 44.5rem;
     padding-top: 5rem;
     gap: 2rem;
     .title-wrapper {
@@ -196,6 +203,10 @@ onUnmounted(() => {
                 margin-left: auto;
             }
         }
+    }
+
+    @screen mobile {
+        max-width: 22.5rem;
     }
 }
 </style>

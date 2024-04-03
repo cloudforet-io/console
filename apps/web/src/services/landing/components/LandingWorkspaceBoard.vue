@@ -138,6 +138,16 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     /* custom design-system component - p-board-item */
     :deep(.p-board-item) {
         padding: 0.75rem 1rem;
+        width: 22rem;
+
+        @screen mobile {
+            width: 19.5rem;
+        }
+    }
+
+    @screen mobile {
+        @apply flex flex-col;
+        gap: 0.5rem;
     }
 }
 </style>
