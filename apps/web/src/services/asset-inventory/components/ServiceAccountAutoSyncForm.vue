@@ -19,21 +19,10 @@ import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/se
 
 const MAX_TIME_COUNT = 2;
 
-interface Props {
-    originForm?: any;
-    isUpdateMode?: boolean;
-    isReadMode?: boolean;
-}
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
-
-const props = withDefaults(defineProps<Props>(), {
-    isValid: false,
-    originForm: () => ({}),
-    isReadMode: false,
-});
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -68,7 +57,6 @@ const updateSelectedHours = () => {
 };
 
 const handleClickHour = (hour: number) => {
-    if (props.isReadMode) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
@@ -141,9 +129,7 @@ watch(() => state.isAllValid, (isAllValid) => {
             <p-field-group class="hourly-schedule-field-group"
                            :help-text="state.scheduleHelpText"
             >
-                <div class="hourly-schedule-wrapper"
-                     :class="{'is-read-mode': props.isReadMode}"
-                >
+                <div class="hourly-schedule-wrapper">
                     <span v-for="(hour) in hoursMatrix"
                           :key="hour"
                           class="time-block"

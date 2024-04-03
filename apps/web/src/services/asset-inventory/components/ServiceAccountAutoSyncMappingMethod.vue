@@ -73,7 +73,7 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 
 const state = reactive({
-    selectedWorkspace: '',
+    selectedWorkspace: computed(() => serviceAccountPageStore.formState.selectedSingleWorkspace ?? ''),
     additionalOptionUiByProvider: computed(() => cspAdditionalOptionMap[serviceAccountPageState.selectedProvider] ?? {}),
     workspaceMapping: 'multipleWorkspaces',
     projectGroupMapping: 'projectGroups',
@@ -98,7 +98,9 @@ const state = reactive({
 });
 
 const handleUpdateWorkspace = (workspaceId:string) => {
-    state.selectedWorkspace = workspaceId;
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.selectedSingleWorkspace = workspaceId;
+    });
 };
 
 watch(() => state.formData, (formData) => {
@@ -106,6 +108,13 @@ watch(() => state.formData, (formData) => {
         serviceAccountPageStore.setFormState(key, value);
     });
 });
+
+watch(() => serviceAccountPageState.serviceAccountItem, (item) => {
+    if (item) {
+        state.workspaceMapping = item.sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
+        state.projectGroupMapping = item.sync_options?.skip_project_group ? 'skip' : 'projectGroups';
+    }
+}, { immediate: true });
 
 </script>
 
@@ -138,6 +147,7 @@ watch(() => state.formData, (formData) => {
                     </div>
                     <div>
                         <workspace-dropdown :disabled="state.workspaceMapping !== 'singleWorkspace'"
+                                            :selected="state.selectedWorkspace"
                                             class="mt-2"
                                             @update="handleUpdateWorkspace"
                         />

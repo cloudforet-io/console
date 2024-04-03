@@ -1,8 +1,13 @@
 import type { ComputedRef } from 'vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { defineStore } from 'pinia';
+
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
@@ -15,11 +20,19 @@ interface Getters {
     isAllValidToCreate: ComputedRef<boolean>;
     supportAutoSync: ComputedRef<boolean>;
 }
+
+interface State {
+    selectedProvider: string;
+    serviceAccountType: AccountType;
+    serviceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
+}
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
 
-    const state = reactive({
+    const state = reactive<State>({
         selectedProvider: '',
+        serviceAccountType: ACCOUNT_TYPE.GENERAL,
+        serviceAccountItem: {},
     });
 
     const formState = reactive({
@@ -55,6 +68,15 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         },
     };
 
+    watch(() => state.serviceAccountItem, (item) => {
+        if (item?.schedule || item?.sync_options || item?.plugin_options) {
+            formState.isAutoSyncEnabled = true;
+            formState.scheduleHours = item?.schedule?.hours ?? [];
+            formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
+            formState.skipProjectGroup = item?.sync_options?.skip_project_group ?? false;
+            formState.additionalOptions = item?.plugin_options ?? {};
+        }
+    });
     return {
         state,
         formState,
