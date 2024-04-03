@@ -40,6 +40,15 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
     });
     const actions = {
+        initState: () => {
+            state.selectedProvider = '';
+            formState.isAutoSyncFormValid = true;
+            formState.isAutoSyncEnabled = false;
+            formState.additionalOptions = {};
+            formState.selectedSingleWorkspace = '';
+            formState.skipProjectGroup = true;
+            formState.scheduleHours = [];
+        },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
         setFormState: (key:string, data: any) => {
             formState[key] = data;
