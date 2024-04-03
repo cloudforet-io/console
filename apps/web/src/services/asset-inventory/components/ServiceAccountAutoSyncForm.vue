@@ -10,6 +10,8 @@ import { range } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ServiceAccountAutoSyncMappingMethod
     from '@/services/asset-inventory/components/ServiceAccountAutoSyncMappingMethod.vue';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
@@ -25,6 +27,7 @@ interface Props {
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const appContextStore = useAppContextStore();
 
 const props = withDefaults(defineProps<Props>(), {
     isValid: false,
@@ -33,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
@@ -48,6 +52,7 @@ const state = reactive({
     isAdditionalOptionsValid: false,
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
+        if (!state.isAdminMode) return state.isScheduleHoursValid;
         return state.isScheduleHoursValid && state.isAdditionalOptionsValid;
     }),
 });
@@ -104,29 +109,30 @@ watch(() => state.isAllValid, (isAllValid) => {
 <template>
     <div class="service-account-auto-sync-form">
         <div class="auto-sync-toggle">
-            <p-toggle-button v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                             :value="state.isAutoSyncEnabled"
+            <p-toggle-button :value="state.isAutoSyncEnabled"
                              show-state-text
                              position="left"
                              @change-toggle="handleChangeToggle"
             /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <service-account-auto-sync-mapping-method />
-            <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
-                <p-field-title label="Additional Options"
-                               size="lg"
-                               class="mb-2"
-                />
-                <p-pane-layout class="p-4 mb-8">
-                    <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                        class="p-json-schema-form"
-                                        :form-data.sync="state.additionalOptions"
-                                        :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                        :language="$store.state.user.language"
-                                        @validate="handleAdditionalOptionsValidate"
+            <div v-if="state.isAdminMode">
+                <service-account-auto-sync-mapping-method />
+                <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
+                    <p-field-title label="Additional Options"
+                                   size="lg"
+                                   class="mb-2"
                     />
-                </p-pane-layout>
+                    <p-pane-layout class="p-4 mb-8">
+                        <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                            class="p-json-schema-form"
+                                            :form-data.sync="state.additionalOptions"
+                                            :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                            :language="$store.state.user.language"
+                                            @validate="handleAdditionalOptionsValidate"
+                        />
+                    </p-pane-layout>
+                </div>
             </div>
             <p-field-title label="Hourly Sync Schedule"
                            size="lg"

@@ -242,10 +242,10 @@ const handleClickSettings = () => {
 const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
-    SpaceRouter.router.push({
+    SpaceRouter.router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
-    });
+    }));
 };
 const handleDynamicLayoutFetch = (changed) => {
     if (tableState.schema === null) return;

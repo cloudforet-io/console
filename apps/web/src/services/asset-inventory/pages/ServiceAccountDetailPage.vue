@@ -21,6 +21,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/components/ServiceAccountAttachedGeneralAccounts.vue';
@@ -42,6 +43,7 @@ const props = defineProps<{
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const allReferenceStore = useAllReferenceStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -113,9 +115,9 @@ const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
 const handleClickBackbutton = () => {
-    router.push({
+    router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-    });
+    }));
 };
 
 /* Watcher */
