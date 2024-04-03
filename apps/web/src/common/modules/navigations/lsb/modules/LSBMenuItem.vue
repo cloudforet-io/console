@@ -12,6 +12,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBDividerMenuItem from '@/common/modules/navigations/lsb/modules/LSBDividerMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
+import LSBStarredMenuItem from '@/common/modules/navigations/lsb/modules/LSBStarredMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
@@ -113,6 +114,9 @@ const handleSelect = (id: string, selected: string) => {
                     />
                 </template>
             </l-s-b-collapsible-menu-item>
+            <l-s-b-starred-menu-item v-else-if="item.type === MENU_ITEM_TYPE.STARRED"
+                                     :item="item"
+            />
             <l-s-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
             <l-s-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
