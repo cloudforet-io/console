@@ -2715,6 +2715,7 @@
 			"METRIC_EXPLORER_HOME": "Metric Explorer Home",
 			"MONTHLY": "Monthly",
 			"NO_ITEMS": "No Items",
+			"NO_LEGENDS": "There are no legends for this chart type",
 			"OPERATOR": "Operator",
 			"PERIOD": {
 				"CUSTOM": "Custom",
@@ -2732,6 +2733,7 @@
 			"RESET": "Reset",
 			"SAVE": "Save",
 			"SAVE_AS": "Save as",
+			"SHOWING_TOP_15": "Showing Top 15",
 			"SHOW_ALL": "Show all",
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items."
 		},

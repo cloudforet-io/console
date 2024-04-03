@@ -2715,6 +2715,7 @@
 			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "월별 데이터",
 			"NO_ITEMS": "아이템이 없습니다",
+			"NO_LEGENDS": "",
 			"OPERATOR": "",
 			"PERIOD": {
 				"CUSTOM": "커스텀",
@@ -2732,6 +2733,7 @@
 			"RESET": "초기화",
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장",
+			"SHOWING_TOP_15": "상위 15개 데이터",
 			"SHOW_ALL": "전체 보기",
 			"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요."
 		},
