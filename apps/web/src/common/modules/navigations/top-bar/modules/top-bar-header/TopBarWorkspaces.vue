@@ -360,8 +360,8 @@ onMounted(() => {
         }
 
         .workspace-toolbox-wrapper {
-            @apply flex flex-col absolute bg-white;
-            padding: 0.25rem 1rem 1rem;
+            @apply absolute flex flex-col bg-white;
+            padding: 0.25rem 1rem 0.5rem;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -388,6 +388,7 @@ onMounted(() => {
             .menu-container {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
+                padding-bottom: 2.75rem;
                 max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
             }
             .p-context-menu-item {
@@ -403,14 +404,20 @@ onMounted(() => {
                     }
                 }
             }
+            .bottom-slot-area {
+                padding: 0;
+            }
         }
+
         &.is-domain-admin {
+            .workspace-toolbox-wrapper {
+                padding-bottom: 1rem;
+            }
+
+            /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
                 .menu-container {
                     padding-bottom: 8.35rem;
-                }
-                .bottom-slot-area {
-                    padding: 0;
                 }
             }
         }

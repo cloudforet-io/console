@@ -5,7 +5,7 @@ import Vue, {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDataLoader, PSearch, PDivider, PButton,
+    PDataLoader, PDivider, PButton,
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
@@ -28,10 +28,9 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import LandingAllWorkspaces from '@/services/landing/components/LandingAllWorkspaces.vue';
 import LandingEmptyContents from '@/services/landing/components/LandingEmptyContents.vue';
 import LandingRecentVisits from '@/services/landing/components/LandingRecentVisits.vue';
+import LandingSearch from '@/services/landing/components/LandingSearch.vue';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
-
-
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
@@ -55,9 +54,6 @@ const storeState = reactive({
         workspace_id: i.data.workspace_id,
         itemId: i.data.id,
     }))),
-});
-const state = reactive({
-    searchText: '',
 });
 
 const handleClickButton = () => {
@@ -120,9 +116,7 @@ onUnmounted(() => {
                        :data="storeState.workspaceList"
         >
             <div class="contents-wrapper">
-                <p-search v-model="state.searchText"
-                          :placeholder="$t('LADING.SEARCH_WORKSPACE')"
-                />
+                <landing-search :workspace-list="storeState.workspaceList" />
                 <landing-recent-visits v-if="storeState.recentWorkspace.length > 0"
                                        :workspace-list="storeState.workspaceList"
                                        :recent-visits="storeState.recentWorkspace"
@@ -137,25 +131,27 @@ onUnmounted(() => {
                 <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
-        <p-divider v-if="storeState.isDomainAdmin" />
-        <div v-if="storeState.isDomainAdmin"
-             class="banner"
-        >
-            <img alt="empty-cloud-service-img"
-                 src="@/assets/images/landing/img_landing_create_workspace.png"
-                 class="create-workspace-img"
-                 srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
+        <div class="banner-wrapper">
+            <p-divider v-if="storeState.isDomainAdmin" />
+            <div v-if="storeState.isDomainAdmin"
+                 class="banner"
+            >
+                <img alt="empty-cloud-service-img"
+                     src="@/assets/images/landing/img_landing_create_workspace.png"
+                     class="create-workspace-img"
+                     srcset="@/assets/images/landing/img_landing_create_workspace@2x.png 2x,
                         @/assets/images/landing/img_landing_create_workspace@3x.png 3x"
-            >
-            <span class="desc">{{ $t('LADING.BANNER_DESC') }}</span>
-            <p-button style-type="primary"
-                      size="md"
-                      icon-left="ic_plus_bold"
-                      class="create-button"
-                      @click="handleClickButton"
-            >
-                {{ $t('LADING.CREATE_WORKSPACE') }}
-            </p-button>
+                >
+                <span class="desc">{{ $t('LADING.BANNER_DESC') }}</span>
+                <p-button style-type="primary"
+                          size="md"
+                          icon-left="ic_plus_bold"
+                          class="create-button"
+                          @click="handleClickButton"
+                >
+                    {{ $t('LADING.CREATE_WORKSPACE') }}
+                </p-button>
+            </div>
         </div>
     </div>
 </template>
@@ -180,21 +176,25 @@ onUnmounted(() => {
         @apply flex flex-col;
         gap: 2rem;
     }
-    .banner {
-        @apply flex items-center bg-violet-200 rounded-md;
-        padding: 1rem 0.75rem;
-        gap: 1rem;
-        background-image: url("@/assets/images/landing/img_landing_create_workspace_bg.png");
-        .create-workspace-img {
-            width: 3rem;
-            height: 3rem;
-        }
-        .desc {
-            @apply text-label-lg text-gray-700;
-            width: 12.125rem;
-        }
-        .create-button {
-            margin-left: auto;
+    .banner-wrapper {
+        @apply flex flex-col;
+        gap: 2rem;
+        .banner {
+            @apply flex items-center bg-violet-200 rounded-md;
+            padding: 1rem 0.75rem;
+            gap: 1rem;
+            background-image: url("@/assets/images/landing/img_landing_create_workspace_bg.png");
+            .create-workspace-img {
+                width: 3rem;
+                height: 3rem;
+            }
+            .desc {
+                @apply text-label-lg text-gray-700;
+                width: 12.125rem;
+            }
+            .create-button {
+                margin-left: auto;
+            }
         }
     }
 }

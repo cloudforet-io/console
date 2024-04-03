@@ -69,7 +69,9 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                                      :size="props.boardType === BOARD_TYPE.ALL_WORKSPACE ? 'sm' : 'md'"
                 />
                 <div class="text-wrapper">
-                    <p>{{ board?.name }}</p>
+                    <p class="workspace-name">
+                        {{ board?.name }}
+                    </p>
                     <p class="role-type">
                         {{ roleFormatter(board?.role_type) }}
                     </p>
@@ -97,12 +99,19 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     .workspace-board-item-wrapper {
         @apply flex items-center;
         width: 100%;
+        max-width: 19.875rem;
         gap: 0.75rem;
         .text-wrapper {
-            @apply flex flex-col text-label-md;
+            @apply flex flex-col text-label-md truncate;
+            flex: 1;
             gap: 0.125rem;
+            .workspace-name {
+                @apply truncate;
+                width: 100%;
+            }
             .role-type {
-                @apply text-gray-700;
+                @apply text-gray-700 truncate;
+                width: 100%;
             }
         }
         .toolset-wrapper {
