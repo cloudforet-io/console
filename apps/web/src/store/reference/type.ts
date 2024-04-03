@@ -6,7 +6,6 @@ export interface ReferenceItem<Data = Record<string, any>> {
     name?: string;
     color?: string;
     icon?: string;
-    linkTemplate?: string;
     provider?: string;
     continent?: {
         continent_code?: string;

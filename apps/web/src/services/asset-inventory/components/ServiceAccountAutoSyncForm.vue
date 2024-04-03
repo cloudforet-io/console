@@ -33,10 +33,6 @@ const props = withDefaults(defineProps<Props>(), {
     isReadMode: false,
 });
 
-const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
-}>();
-
-
 const additionalOptionState = reactive({
     additionalOptions: {},
 });
@@ -64,6 +60,8 @@ const updateSelectedHours = () => {
     const hours: number[] = Array.from(selectedUtcHoursSet.values());
     serviceAccountPageStore.$patch((_state) => {
         _state.formState.scheduleHours = hours;
+        const isValid = !!hours.length;
+        _state.formState.isScheduleHoursValid = (state.isAutoSyncEnabled) ? isValid : true;
     });
 };
 
@@ -85,19 +83,15 @@ const handleClickHour = (hour: number) => {
     updateSelectedHours();
 };
 const handleAdditionalOptionsValidate = (isValid:boolean) => {
-    if (state.isAutoSyncEnabled) {
-        emit('update:isValid', true);
-    } else emit('update:isValid', isValid);
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.isAdditionalOptionsValid = state.isAutoSyncEnabled ? isValid : true;
+    });
 };
 
 
 const handleChangeToggle = (e:boolean) => {
     state.isAutoSyncEnabled = e;
 };
-
-(() => {
-    serviceAccountPageStore.setAutoSyncAdditionalOptionsSchema();
-})();
 
 watch(() => state.formData, (formData) => {
     Object.entries(formData).forEach(([key, value]) => {
@@ -119,19 +113,21 @@ watch(() => state.formData, (formData) => {
         </div>
         <div v-if="state.isAutoSyncEnabled">
             <service-account-auto-sync-mapping-method />
-            <p-field-title label="Additional Options"
-                           size="lg"
-                           class="mb-2"
-            />
-            <p-pane-layout class="p-4 mb-8">
-                <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                    class="p-json-schema-form"
-                                    :form-data.sync="additionalOptionState.additionalOptions"
-                                    :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                    :language="$store.state.user.language"
-                                    @validate="handleAdditionalOptionsValidate"
+            <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
+                <p-field-title label="Additional Options"
+                               size="lg"
+                               class="mb-2"
                 />
-            </p-pane-layout>
+                <p-pane-layout class="p-4 mb-8">
+                    <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                        class="p-json-schema-form"
+                                        :form-data.sync="additionalOptionState.additionalOptions"
+                                        :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                        :language="$store.state.user.language"
+                                        @validate="handleAdditionalOptionsValidate"
+                    />
+                </p-pane-layout>
+            </div>
             <p-field-title label="Hourly Sync Schedule"
                            size="lg"
                            class="mb-1"
@@ -160,7 +156,7 @@ watch(() => state.formData, (formData) => {
 
 <style lang="postcss" scoped>
 .service-account-auto-sync-form {
-    margin-left: 1rem;
+    margin: 0 1rem;
 
     .auto-sync-toggle {
         @apply text-paragraph-lg flex items-center gap-4;
