@@ -28,11 +28,14 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
 interface Props {
     nextPath?: string;
@@ -70,7 +73,14 @@ const onSignIn = async (userId:string) => {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
         const hasBoundWorkspaces = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspaces);
+        const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
 
+        if (!lastAccessedWorkspaceId) {
+            await router.push({
+                name: LANDING_ROUTE._NAME,
+            });
+            return;
+        }
         if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
             await router.push(defaultRoute).catch(() => {});
             return;
