@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Vue, { computed, reactive, watch } from 'vue';
+import Vue, {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
@@ -62,7 +64,6 @@ const storeState = reactive({
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
 const state = reactive({
-    visibleDropdown: false,
     workspaceMenuList: computed<MenuItem[]>(() => [
         ...filterStarredItems(storeState.favoriteItems),
         ...formatMenuItems(storeState.workspaceList),
@@ -142,6 +143,10 @@ watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
         id: selectedWorkspace?.workspace_id || '',
     });
 }, { immediate: true });
+
+onMounted(() => {
+    favoriteStore.fetchWorkspaceFavorite();
+});
 </script>
 
 <template>

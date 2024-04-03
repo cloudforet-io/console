@@ -21,7 +21,6 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import type { RecentConfig } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
@@ -87,7 +86,7 @@ onMounted(async () => {
             type: RECENT_TYPE.WORKSPACE,
             limit: 4,
         });
-        await favoriteStore.fetchFavorite(FAVORITE_TYPE.WORKSPACE);
+        await favoriteStore.fetchWorkspaceFavorite();
     } finally {
         await landingPageStore.setLoading(false);
     }
