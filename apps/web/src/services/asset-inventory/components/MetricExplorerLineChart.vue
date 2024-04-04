@@ -101,7 +101,8 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         <p-skeleton v-if="props.loading"
                     height="100%"
         />
-        <div ref="chartContext"
+        <div v-else
+             ref="chartContext"
              class="chart"
         />
     </div>

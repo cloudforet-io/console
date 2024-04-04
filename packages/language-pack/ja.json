@@ -2715,6 +2715,7 @@
 			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "月別データ",
 			"NO_ITEMS": "アイテムがありません",
+			"NO_LEGENDS": "",
 			"OPERATOR": "",
 			"PERIOD": {
 				"CUSTOM": "カスタム",
@@ -2732,6 +2733,7 @@
 			"RESET": "初期化",
 			"SAVE": "保存",
 			"SAVE_AS": "名前を付けて保存",
+			"SHOWING_TOP_15": "上位15表示中",
 			"SHOW_ALL": "すべて表示",
 			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください"
 		},

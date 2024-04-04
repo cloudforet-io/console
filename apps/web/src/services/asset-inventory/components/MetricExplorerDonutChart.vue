@@ -3,10 +3,12 @@ import {
     nextTick, ref, watch,
 } from 'vue';
 
-import type * as am5xy from '@amcharts/amcharts5/xy';
+import type * as am5percent from '@amcharts/amcharts5/percent';
 import {
     PSkeleton,
 } from '@spaceone/design-system';
+
+import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -15,7 +17,7 @@ import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types
 
 interface Props {
     loading: boolean;
-    chart: null | am5xy.XYChart;
+    chart: null | am5percent.PieChart;
     chartData: RealtimeChartData[];
     legends: Legend[];
 }
@@ -41,11 +43,29 @@ const drawChart = () => {
     const series = chartHelper.createPieSeries(seriesSettings);
     series.labels.template.set('forceHidden', false);
     series.ticks.template.set('forceHidden', false);
+
+    series.labels.template.adapters.add('y', (y, target) => {
+        const dataItem = target.dataItem;
+        if (dataItem) {
+            const tick = dataItem.get('tick');
+            if (tick) {
+                if (dataItem.get('valuePercentTotal') < 5) {
+                    target.set('forceHidden', true);
+                    tick.set('forceHidden', true);
+                }
+            }
+            return y;
+        }
+        return undefined;
+    });
+
     chart.series.push(series);
+
 
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip);
+        const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+        chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(props.chartData);
     }

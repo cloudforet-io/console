@@ -2,21 +2,58 @@ import dayjs from 'dayjs';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import {
+    gray, transparent, violet, white,
+} from '@/styles/colors';
+
+import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData, RealtimeChartData,
+    XYChartData, RealtimeChartData, ChartType,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
+const getTreemapChartColor = (idx: number) => {
+    let backgroundColor;
+    let fontColor;
+
+    switch (true) {
+    case [0].includes(idx):
+        backgroundColor = violet[700];
+        fontColor = white;
+        break;
+    case [1].includes(idx):
+        backgroundColor = violet[500];
+        fontColor = white;
+        break;
+    case [2].includes(idx):
+        backgroundColor = violet[400];
+        fontColor = white;
+        break;
+    case [3].includes(idx):
+        backgroundColor = violet[300];
+        fontColor = gray[900];
+        break;
+    case [4, 5, 6, 7].includes(idx):
+        backgroundColor = violet[300];
+        fontColor = transparent;
+        break;
+    default:
+        backgroundColor = violet[200];
+        fontColor = transparent;
+        break;
+    }
+    return [backgroundColor, fontColor];
+};
+
+export const getLegends = (chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
             _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
         }
         const legends: Legend[] = [];
-        rawData.results?.forEach((d) => {
+        rawData.results?.forEach((d, idx) => {
             if (d.value) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
@@ -24,10 +61,14 @@ export const getLegends = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, gr
                     _name = `no_${_groupBy}`;
                     _label = 'Unknown';
                 }
+                let _color;
+                if (chartType === CHART_TYPE.TREEMAP) _color = getTreemapChartColor(idx)[0];
+                else if (chartType === CHART_TYPE.COLUMN) _color = violet[400];
                 legends.push({
                     name: _name,
                     label: _label,
                     disabled: false,
+                    color: _color,
                 });
             }
         });
@@ -80,15 +121,20 @@ export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<Metri
         _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
     }
 
-    rawData.results.forEach((d) => {
+    rawData.results.forEach((d, idx) => {
+        const [backgroundColor, fontColor] = getTreemapChartColor(idx);
         if (_groupBy) {
             chartData.push({
                 category: d[_groupBy] || 'Unknown',
                 value: d._total_value || 0,
+                background_color: backgroundColor,
+                font_color: fontColor,
             });
         } else {
             chartData.push({
                 value: d._total_value || 0,
+                background_color: backgroundColor,
+                font_color: fontColor,
             });
         }
     });

@@ -12,16 +12,19 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { Legend } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { ChartType, Legend } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface Props {
     loading: boolean;
     legends: Legend[];
+    chartType?: ChartType;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
+    chartType: undefined,
 });
 const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'hide-all-series'): void;
@@ -35,6 +38,7 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
+    disableLegendToggle: computed<boolean>(() => props.chartType === CHART_TYPE.TREEMAP || props.chartType === CHART_TYPE.COLUMN),
 });
 
 /* Util */
@@ -52,6 +56,7 @@ const getLegendTextColor = (index) => {
 
 /* Event */
 const handleToggleSeries = (index) => {
+    if (state.disableLegendToggle) return;
     const _legends = cloneDeep(props.legends);
     _legends[index].disabled = !_legends[index]?.disabled;
     state.proxyLegends = _legends;
@@ -106,6 +111,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             <div v-for="(legend, idx) in legends"
                  :key="`legend-${legend.name}-${idx}`"
                  class="legend"
+                 :class="{ 'disable-toggle' : state.disableLegendToggle }"
                  @click="handleToggleSeries(idx)"
             >
                 <p-status :text="legend.label"
@@ -117,7 +123,8 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <p-text-button size="md"
+        <p-text-button v-if="!state.disableLegendToggle"
+                       size="md"
                        :disabled="!legends.length"
                        @click="handleToggleAllLegends"
         >
@@ -155,6 +162,9 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             }
             &.disabled {
                 @apply text-gray-300;
+            }
+            &.disable-toggle {
+                cursor: default;
             }
 
             /* custom design-system component - p-status */

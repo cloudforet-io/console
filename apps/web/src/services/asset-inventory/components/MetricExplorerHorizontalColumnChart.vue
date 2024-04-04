@@ -24,7 +24,6 @@ interface Props {
     chart: null | am5xy.XYChart;
     chartData: RealtimeChartData[];
 }
-
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
@@ -40,7 +39,8 @@ const chartHelper = useAmcharts5(chartContext);
 const drawChart = () => {
     // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
-    yAxis.data.setAll(cloneDeep(props.chartData));
+    const _chartData = cloneDeep(props.chartData).reverse();
+    yAxis.data.setAll(_chartData);
 
     const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
         name: '{category}',
@@ -50,9 +50,7 @@ const drawChart = () => {
         yAxis,
         baseAxis: yAxis,
         stacked: true,
-        // fill: chartHelper.color(legend.color as string),
-        // stroke: chartHelper.color(legend.color as string),
-        // opacity: props.chartData?.length ? 1 : 0,
+        stroke: undefined,
     };
 
     // create series
@@ -60,7 +58,7 @@ const drawChart = () => {
 
     // set series style
     series.columns.template.setAll({
-        height: 24,
+        height: 16,
     });
 
     // set tooltip if showPassFindings is true
@@ -73,7 +71,7 @@ const drawChart = () => {
     chart.series.push(series);
 
     // set data to series
-    series.data.setAll(cloneDeep(props.chartData));
+    series.data.setAll(_chartData);
 
     return chart;
 };
