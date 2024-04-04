@@ -2725,6 +2725,7 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"CREATE": {
+				"COMPLETE_MODAL_SYNC": "",
 				"TIMEZONE": ""
 			},
 			"DELETE_CHECK_MODAL": {
