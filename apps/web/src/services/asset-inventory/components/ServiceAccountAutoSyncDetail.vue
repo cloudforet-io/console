@@ -31,27 +31,31 @@ const state = reactive({
 
 <template>
     <div class="service-account-auto-sync-detail">
-        <p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
+        <p class="mb-6">
+            {{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}
+        </p>
 
-        <p-field-title label="Hourly Sync Schedule"
-                       size="lg"
-                       class="mb-1"
-        />
-        <p-field-group class="hourly-schedule-field-group"
-                       :help-text="state.scheduleHelpText"
-        >
-            <div class="hourly-schedule-wrapper is-read-mode">
-                <span v-for="(hour) in hoursMatrix"
-                      :key="hour"
-                      class="time-block"
-                      :class="{
-                          active: !!state.timezoneAppliedHours.includes(hour)
-                      }"
-                >
-                    {{ hour }}
-                </span>
-            </div>
-        </p-field-group>
+        <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">
+            <p-field-title label="Hourly Sync Schedule"
+                           size="lg"
+                           class="mb-1"
+            />
+            <p-field-group class="hourly-schedule-field-group"
+                           :help-text="state.scheduleHelpText"
+            >
+                <div class="hourly-schedule-wrapper is-read-mode">
+                    <span v-for="(hour) in hoursMatrix"
+                          :key="hour"
+                          class="time-block"
+                          :class="{
+                              active: !!state.timezoneAppliedHours.includes(hour)
+                          }"
+                    >
+                        {{ hour }}
+                    </span>
+                </div>
+            </p-field-group>
+        </div>
     </div>
 </template>
 

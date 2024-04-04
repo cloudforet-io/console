@@ -126,16 +126,14 @@ const createAccount = async (): Promise<string|undefined> => {
             secret_data: secretData,
             resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
-            ...(serviceAccountPageFormState.isAutoSyncEnabled && {
-                schedule: {
-                    state: serviceAccountPageFormState.scheduleHours.length ? 'ENABLED' : 'DISABLED',
-                    hours: serviceAccountPageFormState.scheduleHours,
-                },
-                sync_options: {
-                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-                },
-            }),
+            schedule: {
+                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                hours: serviceAccountPageFormState.scheduleHours,
+            },
+            sync_options: {
+                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+            },
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
