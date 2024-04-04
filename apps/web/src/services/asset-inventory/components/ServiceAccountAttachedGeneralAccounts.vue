@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -20,6 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
 const props = withDefaults(defineProps<{
     serviceAccountId: string;
@@ -28,6 +29,8 @@ const props = withDefaults(defineProps<{
     serviceAccountId: undefined,
     attachedGeneralAccounts: () => ([]),
 });
+
+const serviceAccountPageStore = useServiceAccountPageStore();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
@@ -92,6 +95,16 @@ const handleSort = async (sortBy, sortDesc) => {
     }
 };
 
+const handleSync = async () => {
+    try {
+        await SpaceConnector.clientV2.identity.trustedAccount.sync({
+            trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_secret_id,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
 const init = async () => {
     await getAttachedGeneralAccountList();
 };
@@ -107,7 +120,15 @@ const init = async () => {
                    :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
                    use-total-count
                    :total-count="state.totalCount"
-        />
+        >
+            <template #extra>
+                <p-button style-type="secondary"
+                          @click="handleSync"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                </p-button>
+            </template>
+        </p-heading>
         <div class="content-wrapper mb-16">
             <div class="px-4">
                 <p-toolbox :searchable="false"
