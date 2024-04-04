@@ -135,7 +135,8 @@ const init = async () => {
                    :total-count="state.totalCount"
         >
             <template #extra>
-                <p-button style-type="secondary"
+                <p-button v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                          style-type="secondary"
                           @click="handleSync"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
