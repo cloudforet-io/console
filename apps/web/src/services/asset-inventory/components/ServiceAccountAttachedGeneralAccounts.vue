@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -16,11 +16,15 @@ import type { ServiceAccountListParameters } from '@/schema/identity/service-acc
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const props = withDefaults(defineProps<{
     serviceAccountId: string;
@@ -31,11 +35,13 @@ const props = withDefaults(defineProps<{
 });
 
 const serviceAccountPageStore = useServiceAccountPageStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
 }>();
-const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
+    project: computed(() => allReferenceStore.getters.project),
     loading: true,
     items: [] as any,
     sortBy: 'name',
@@ -45,8 +51,10 @@ const state = reactive({
     pageLimit: 15,
 });
 const fields = [
-    { name: 'name', label: 'Name', sortable: true },
+    { name: 'name', label: 'Account Name' },
     { name: 'service_account_id', label: 'Account ID', sortable: false },
+    { name: 'workspace_id', label: 'Workspace', sortable: false },
+    { name: 'project_id', label: 'Project', sortable: false },
 ];
 
 const apiQueryHelper = new ApiQueryHelper().setSort(state.sortBy, state.sortDesc).setPageLimit(state.pageLimit).setFilters([
@@ -150,15 +158,46 @@ const init = async () => {
                 <template #col-name-format="{value, item}">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
-                            :to="getProperRouteLocation({
+                            :to="{
                                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                                params: { serviceAccountId: item.service_account_id },
-                            })"
+                                params: {
+                                    serviceAccountId: item.service_account_id,
+                                    workspaceId: item.workspace_id
+                                },
+                            }"
                     >
                         {{ value }}
                     </p-link>
+                </template>
+                <template #col-workspace_id-format="{value}">
+                    <span class="workspace-id-wrapper">
+                        <workspace-logo-icon :text="userWorkspaceStore.getters.workspaceMap[value]?.name || ''"
+                                             :theme="userWorkspaceStore.getters.workspaceMap[value]?.tags?.theme"
+                                             size="xs"
+                        /><span>{{ userWorkspaceStore.getters.workspaceMap[value]?.name }}</span>
+                    </span>
+                </template>
+                <template #col-project_id-format="{value, item}">
+                    <span class="project-id-wrapper">
+                        <router-link :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: value, workspaceId: item.workspace_id } }"
+                                     target="_blank"
+                        >
+                            <span>{{ state.project[value]?.label }}</span>
+                            <p-i name="ic_arrow-right-up"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                                 class="icon-link"
+                            />
+                        </router-link>
+                    </span>
                 </template>
             </p-data-table>
         </div>
     </p-pane-layout>
 </template>
+
+<style scoped lang="postcss">
+.workspace-id-wrapper {
+    @apply flex gap-2;
+}
+</style>
