@@ -208,7 +208,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                          :editable="!state.isManagedTrustedAccount"
                                          @refresh="handleRefresh"
             />
-            <service-account-auto-sync v-if="state.isTrustedAccount" />
+            <service-account-auto-sync v-if="state.isTrustedAccount"
+                                       @refresh="handleRefresh"
+            />
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
                                       :service-account-type="state.serviceAccountType"

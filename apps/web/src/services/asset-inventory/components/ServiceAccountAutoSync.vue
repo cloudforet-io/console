@@ -12,7 +12,11 @@ import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import AutoSyncState from '@/common/components/badge/AutoSyncState.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ServiceAccountAutoSyncDetail from '@/services/asset-inventory/components/ServiceAccountAutoSyncDetail.vue';
@@ -57,17 +61,16 @@ const handleClickSaveButton = async () => {
             name: serviceAccountPageState.serviceAccountItem.name,
             data: serviceAccountPageState.serviceAccountItem.data,
             tags: serviceAccountPageState.serviceAccountItem.tags,
-            ...(serviceAccountPageFormState.isAutoSyncEnabled && {
-                schedule: {
-                    state: serviceAccountPageFormState.scheduleHours.length ? 'ENABLED' : 'DISABLED',
-                    hours: serviceAccountPageFormState.scheduleHours,
-                },
-                sync_options: {
-                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-                },
-            }),
+            schedule: {
+                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                hours: serviceAccountPageFormState.scheduleHours,
+            },
+            sync_options: {
+                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+            },
         });
+        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -82,6 +85,12 @@ const handleClickSaveButton = async () => {
         <p-heading heading-type="sub"
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
         >
+            <template #title-right-extra>
+                <auto-sync-state :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
+                                 size="lg"
+                                 class="ml-2"
+                />
+            </template>
             <template #extra>
                 <p-button v-if="state.mode === 'READ'"
                           icon-left="ic_edit"
@@ -123,7 +132,6 @@ const handleClickSaveButton = async () => {
     grid-column: span 12 / span 12;
 
     .content-wrapper {
-        min-height: 10rem;
         padding-bottom: 2.5rem;
 
         .button-wrapper {

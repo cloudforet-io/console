@@ -19,6 +19,7 @@ interface Getters {
     scheduleHours: ComputedRef<number[]>;
     isAllValidToCreate: ComputedRef<boolean>;
     supportAutoSync: ComputedRef<boolean>;
+    isOriginAutoSyncEnabled: ComputedRef<boolean>;
 }
 
 interface State {
@@ -51,6 +52,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         scheduleHours: computed(() => formState.scheduleHours),
         isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
+        isOriginAutoSyncEnabled: computed(() => (state.serviceAccountItem?.schedule?.state === 'ENABLED')),
     });
     const actions = {
         initState: () => {
@@ -69,7 +71,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     };
 
     watch(() => state.serviceAccountItem, (item) => {
-        if (item?.schedule || item?.sync_options || item?.plugin_options) {
+        if (getters.isOriginAutoSyncEnabled) {
             formState.isAutoSyncEnabled = true;
             formState.scheduleHours = item?.schedule?.hours ?? [];
             formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
