@@ -12,6 +12,9 @@ import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -68,6 +71,7 @@ const handleClickSaveButton = async () => {
                 },
             }),
         });
+        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     }

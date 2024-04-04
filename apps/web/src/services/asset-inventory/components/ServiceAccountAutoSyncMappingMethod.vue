@@ -52,7 +52,7 @@ const cspAdditionalOptionMap = {
         name: 'Google Cloud Organization',
         workspaceMappingOptions: [
             {
-                label: 'Top-level Organization Units',
+                label: 'Top-level Folders in Google Cloud Organization',
                 value: 'multipleWorkspaces',
             },
             {
@@ -62,7 +62,7 @@ const cspAdditionalOptionMap = {
         ],
         projectGroupMappingOptions: [
             {
-                label: 'Google Cloud Folders',
+                label: 'Folders in Google Cloud Organization',
                 value: 'projectGroups',
             },
         ],
