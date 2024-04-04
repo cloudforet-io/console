@@ -24,22 +24,6 @@ export const useLandingPageStore = defineStore('landing-page-store', () => {
         setLoading: (loading: boolean) => {
             state.loading = loading;
         },
-        // TODO: will be updated
-        // listRoles: async () => {
-        //     try {
-        //         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-        //             query: {
-        //                 filter: [
-        //                     { k: 'state', v: ROLE_STATE.ENABLED, o: 'eq' },
-        //                 ],
-        //             },
-        //         });
-        //         state.roleList = results || [];
-        //     } catch (e) {
-        //         ErrorHandler.handleError(e);
-        //         state.roleList = [];
-        //     }
-        // },
         initState: () => {
             state.loading = false;
         },

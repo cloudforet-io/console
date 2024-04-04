@@ -135,7 +135,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
         .toolset-wrapper {
             @apply flex items-center;
             margin-left: auto;
-            gap: 0.25rem;
+            gap: 0.375rem;
             :deep(.favorite-btn) {
                 &:not(.active) {
                     @apply hidden;
@@ -157,6 +157,7 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     :deep(.p-board-item) {
         padding: 0.75rem 1rem;
         width: 22rem;
+        min-height: 4.25rem;
 
         @screen mobile {
             width: 19.5rem;

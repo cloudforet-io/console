@@ -18,6 +18,7 @@ export const MENU_ITEM_TYPE = {
     DROPDOWN: 'dropdown',
     SLOT: 'slot',
     COLLAPSIBLE: 'collapsible',
+    STARRED: 'starred',
 } as const;
 type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
@@ -41,6 +42,8 @@ export interface LSBItem {
     icon?: LSBIcon;
     titleIcon?: string;
     selectOptions?: SelectOptions;
+    childItems?: LSBItem[];
+    currentPath?: string;
 }
 
 export type LSBMenu = LSBItem[]|LSBItem;

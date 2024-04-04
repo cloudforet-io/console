@@ -81,8 +81,7 @@ const handleClickButton = () => {
 onMounted(async () => {
     try {
         await landingPageStore.setLoading(true);
-        // TODO: will be updated
-        // await landingPageStore.listRoles();
+        await userWorkspaceStore.load();
         await recentStore.fetchRecent({
             type: RECENT_TYPE.WORKSPACE,
             limit: 4,
