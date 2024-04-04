@@ -17,6 +17,7 @@ import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-acco
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -49,6 +50,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
