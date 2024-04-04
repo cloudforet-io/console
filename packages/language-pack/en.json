@@ -556,6 +556,7 @@
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
 				"DATA_SOURCE": "Data Source",
+				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"

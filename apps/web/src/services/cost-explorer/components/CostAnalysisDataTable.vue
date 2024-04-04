@@ -37,7 +37,6 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import CostAnalysisDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTypeDropdown.vue';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -422,7 +421,6 @@ watch(
                 />
             </template>
             <template #toolbox-left>
-                <cost-analysis-data-type-dropdown />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"
@@ -523,7 +521,6 @@ watch(
     .toggle-wrapper {
         display: flex;
         align-items: center;
-        padding-left: 1rem;
         .label {
             @apply text-label-md;
             font-weight: 700;

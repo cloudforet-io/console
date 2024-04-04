@@ -55,7 +55,8 @@ const handleUpdateSelected = (selected: DisplayDataType) => {
 <template>
     <p-select-dropdown :selected="costAnalysisPageState.displayDataType"
                        :menu="state.headerMenuItems"
-                       style-type="transparent"
+                       :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DATA_TYPE')"
+                       style-type="rounded"
                        @update:selected="handleUpdateSelected"
     />
 </template>
