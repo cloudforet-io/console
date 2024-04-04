@@ -106,7 +106,7 @@ const handleSort = async (sortBy, sortDesc) => {
 const handleSync = async () => {
     try {
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
-            trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_secret_id,
+            trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_account_id,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
