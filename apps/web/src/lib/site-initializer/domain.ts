@@ -1,4 +1,4 @@
-export const initDomain = async (store, config): Promise<string|undefined> => {
+export const initDomain = async (store, config): Promise<string> => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
@@ -8,15 +8,10 @@ export const initDomain = async (store, config): Promise<string|undefined> => {
     }
 
     try {
-        await Promise.allSettled([
-            // load domain info
-            store.dispatch('domain/load', domainName),
-            // check if billing menu is accessible from current domain
-            store.dispatch('domain/setBillingEnabled'),
-        ]);
-        return store.state.domain.name;
+        await store.dispatch('domain/load', domainName);
+        return store.state.domain.domainId;
     } catch (e) {
         console.error(e);
-        return undefined;
+        throw new Error('Failed to load domain.');
     }
 };

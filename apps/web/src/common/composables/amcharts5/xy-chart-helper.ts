@@ -5,9 +5,9 @@ import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@am
 import * as am5xy from '@amcharts/amcharts5/xy';
 import bytes from 'bytes';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
-import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -15,7 +15,8 @@ import { DEFAULT_CATEGORY_FIELD_NAME, DEFAULT_DATE_FIELD_NAME } from '@/common/c
 
 import { gray } from '@/styles/colors';
 
-import type { UnitMap } from '@/services/dashboards/widgets/_components/type';
+
+type UnitMap = 'B'|'KB'|'MB'|'GB'|'PB'|'TB';
 
 // Chart
 const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart => {
@@ -54,7 +55,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         strokeOpacity: 1,
         strokeWidth: 1,
         stroke: am5.color(gray[200]),
-        minGridDistance: 20,
+        minGridDistance: 15,
     });
     xRenderer.grid.template.setAll({
         strokeOpacity: 0,
@@ -66,6 +67,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         paddingTop: 6,
     });
     const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        extraMin: 0.01,
         extraMax: 0.01,
         baseInterval: {
             timeUnit: 'month',
@@ -73,11 +75,12 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         },
         renderer: xRenderer,
         dateFormats: {
-            day: 'M/dd',
+            day: 'M/d',
             month: 'MMM',
             year: 'yyyy',
         },
         periodChangeDateFormats: {
+            day: 'M/d',
             month: 'MMM',
         },
         ...dateAxisSettings,
@@ -96,6 +99,15 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         fontSize: 12,
         fill: am5.color(gray[600]),
         paddingRight: 8,
+    });
+    yRenderer.labels.template.adapters.add('text', (text) => {
+        if (text) {
+            const convertedText = text.replace(/,/g, '');
+            const num = Number(convertedText);
+            if (Number.isNaN(num)) return text;
+            return numberFormatter(num, { notation: 'compact' }) ?? '';
+        }
+        return text ?? '';
     });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
@@ -228,15 +240,16 @@ export const createXYColumnSeries = (
 };
 
 // Tooltip
-export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, valueFormatter?: (value: any, data?: any) => string): void => {
     tooltip.label.adapters.add('text', (text, target) => {
         let _text = `[${gray[700]}]{valueX}[/]`;
         chart.series.each((s) => {
             const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+            const seriesColor = s.get('stroke')?.toString() ?? s.get('fill')?.toString();
             let value = target.dataItem?.dataContext?.[fieldName];
             if (value === undefined) value = '--';
-            if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
-            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+            const formatted = valueFormatter ? valueFormatter(value, target.dataItem?.dataContext) : value;
+            _text += `\n[${seriesColor}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${formatted}[/]`;
         });
         return _text;
     });
@@ -269,20 +282,20 @@ export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am
                 value: value ?? 0,
             });
         });
-        let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
+        let _text = `Total: [bold; fontSize: 14px]${numberFormatter(totalValue)}[/]`;
         seriesList.forEach((s) => {
-            const rate = Math.round((s.value / totalValue) * 100);
-            _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
+            const rate = totalValue ? Math.round((s.value / totalValue) * 100) : 0;
+            _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${numberFormatter(s.value)}[/] (${rate}%)`;
         });
         return _text;
     });
 };
 
-export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency): void => {
     let strokeColor;
     let fieldName;
     chart.series.each((series) => {
-        strokeColor = series.get('stroke')?.toString();
+        strokeColor = series.get('stroke')?.toString() ?? series.get('fill')?.toString();
         fieldName = series.get('valueYField') || '';
     });
     tooltip.label.setAll({
@@ -291,7 +304,7 @@ export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     });
     tooltip.label.adapters.add('text', (_, target) => {
         let value = target.dataItem?.dataContext?.[fieldName];
-        if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+        if (currency) value = currencyMoneyFormatter(value, { currency, notation: 'standard' });
         return `[${strokeColor};fontSize: 10px]●[/] {valueX}: [bold]${value}[/]`;
     });
 };

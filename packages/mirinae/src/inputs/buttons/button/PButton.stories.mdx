@@ -171,13 +171,21 @@ export const Template = (args, {argTypes})=>({
         {{
             components:{ PButton },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white; gap: 1rem;">
                     <p-button
                         styleType="primary"
                         :loading="true"
                     >
                         <div class="loading-btn">
-                            Loading
+                            Loading (primary)
+                        </div>
+                    </p-button>
+                    <p-button
+                        styleType="tertiary"
+                        :loading="true"
+                    >
+                        <div class="loading-btn">
+                            Loading (tertiary)
                         </div>
                     </p-button>
                 </div>`,

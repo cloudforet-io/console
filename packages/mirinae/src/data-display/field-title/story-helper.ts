@@ -100,6 +100,24 @@ export const getLabelArgTypes = (): ArgTypes => ({
             options: Object.keys(FIELD_TITLE_COLOR),
         },
     },
+    inline: {
+        name: 'inline',
+        type: { name: 'boolean' },
+        description: 'Whether to display the title in inline mode.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',

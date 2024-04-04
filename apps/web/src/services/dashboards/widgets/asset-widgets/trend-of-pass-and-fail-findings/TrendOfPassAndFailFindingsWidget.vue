@@ -1,95 +1,64 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="trend-of-pass-and-fail-findings"
-                  refresh-on-resize
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               disable-empty-case
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <widget-data-table :loading="state.loading || state.tableLoading"
-                               :fields="state.tableFields"
-                               :items="state.tableData.results"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :color-set="colorSet"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.tableData.more"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ReferenceType } from '@/store/modules/reference/type';
+import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
+import type { ReferenceType } from '@/services/dashboards/stores/all-reference-type-info-store';
+import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
-import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type {
-    WidgetExpose, WidgetProps,
-} from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constant';
 import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
-    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
+    getReferenceTypeOfDataField, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type {
+    WidgetExpose, WidgetProps,
+    WidgetEmit,
+    Legend,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
-interface ChartDataModel extends CloudServiceStatsModel {
-    value: Array<{ key: string, value: number }>;
+interface ChartDataResult {
+    pass_finding_count: number;
+    fail_finding_count: number;
+    date: string;
 }
-interface TableDataModel extends CloudServiceStatsModel {
+interface TableDataModel {
     value: Array<{ date: string; value: number }>;
+    date: string;
 }
 interface FullData {
-    chartData?: { results: ChartDataModel[] };
-    tableData?: { more: boolean, results: TableDataModel[] };
+    chartData: { results: ChartDataResult[] }|null;
+    tableData: { more: boolean, results: TableDataModel[] }|null;
+}
+interface ChartData {
+    date: string;
+    [COMPLIANCE_STATUS_MAP.PASS.name]: number;
+    [COMPLIANCE_STATUS_MAP.FAIL.name]: number;
 }
 
 const DATE_FORMAT = 'YYYY-MM';
@@ -97,6 +66,7 @@ const DATE_FIELD_NAME = 'date';
 const TABLE_COL_MIN_WIDTH = '5rem';
 
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -104,115 +74,112 @@ const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => state.legends?.length ?? 0),
 });
-const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
-    groupByKey: computed<string|undefined>(() => {
-        // ex. additional_info.service -> service
-        if (!state.groupBy) return undefined;
-        const dotIndex = state.groupBy.indexOf('.');
-        if (dotIndex !== -1) return state.groupBy.slice(dotIndex + 1);
-        return state.groupBy;
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed<DateRange>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
+        const range = props.size === WIDGET_SIZE.full ? 11 : 3;
+        const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
+        return { start, end };
     }),
-    chartData: computed<XYChartData[]>(() => refineChartData(state.data?.chartData?.results ?? [])),
+    widgetLocation: undefined,
+});
+
+const state = reactive({
+    loading: true,
+    data: null as FullData | null,
+    chartData: computed<ChartData[]>(() => refineChartData(state.data?.chartData?.results ?? [])),
+    noChartData: computed<boolean>(() => !state.data?.chartData),
     tableLoading: false,
     tableFields: computed<Field[]>(() => {
-        if (!state.groupBy) return [];
-        const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, { type: 'number' }, 'value');
+        if (!widgetState.dataField) return [];
+        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'number' }, 'value');
         const refinedFieldsWithLabel = refinedFields.map((field) => ({
             ...field,
             label: `${field.label}\nFailure count`,
-            width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
+            width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
         }));
-        const groupByLabel = ASSET_GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
+        const dataFieldLabel = Object.values(ASSET_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
         return [
             {
-                label: groupByLabel,
-                name: state.groupByKey,
+                label: dataFieldLabel,
+                name: widgetState.parsedDataField,
                 textOptions: { type: 'reference', referenceType },
-                width: state.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
+                width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
             },
             ...refinedFieldsWithLabel,
         ];
     }),
     tableData: computed<FullData['tableData']>(() => {
         if (!state.data?.tableData) return { more: false, results: [] };
-        const refinedData = getRefinedDateTableData(state.data?.tableData?.results ?? [], state.dateRange, 'value');
+        const refinedData = getRefinedDateTableData(state.data?.tableData?.results ?? [], widgetState.dateRange, 'value');
         return { ...state.data?.tableData, results: refinedData };
     }),
-    dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
-        const range = props.size === WIDGET_SIZE.full ? 11 : 3;
-        const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
-        return { start, end };
-    }),
     legends: [] as Legend[],
-    thisPage: 1,
     disableReferenceColor: computed<boolean>(() => !!props.theme),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Api */
-let chartAnalyzeRequest: CancelTokenSource | undefined;
-let tableAnalyzeRequest: CancelTokenSource | undefined;
+const chartDataApiQueryHelper = new ApiQueryHelper();
+const tableDataApiQueryHelper = new ApiQueryHelper();
+const fetchChartDataAnalyze = getCancellableFetcher<object, FullData['chartData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchTableDataAnalyze = getCancellableFetcher<object, FullData['tableData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchChartData = async (): Promise<FullData['chartData']> => {
-    if (chartAnalyzeRequest) {
-        chartAnalyzeRequest.cancel('Next request has been called.');
-        chartAnalyzeRequest = undefined;
-    }
-    chartAnalyzeRequest = axios.CancelToken.source();
+    state.loading = true;
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
-        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        chartDataApiQueryHelper.setFilters(widgetState.consoleFilters);
+        const { status, response } = await fetchChartDataAnalyze({
+            query_set_id: widgetState.options.cloud_service_query_set,
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.start,
-                end: state.dateRange.end,
-                group_by: ['key', 'unit'],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'data.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'data.fail_finding_count',
                         operator: 'sum',
                     },
                 },
-                field_group: ['key'],
                 sort: [{ key: DATE_FIELD_NAME, desc: false }],
-                ...apiQueryHelper.data,
+                ...chartDataApiQueryHelper.data,
             },
-        }, { cancelToken: chartAnalyzeRequest.token });
-        chartAnalyzeRequest = undefined;
-        return res;
+        });
+        if (status === 'succeed') {
+            state.loading = false;
+            return response;
+        }
+        return state.data?.chartData ?? null;
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.loading = false;
         return { results: [] };
     }
 };
 const fetchTableData = async (): Promise<FullData['tableData']> => {
-    if (tableAnalyzeRequest) {
-        tableAnalyzeRequest.cancel('Next request has been called.');
-        tableAnalyzeRequest = undefined;
-    }
-    tableAnalyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const res = await SpaceConnector.clientV2.inventory.cloudServiceStats.analyze({
+        state.tableLoading = true;
+
+        tableDataApiQueryHelper
+            .setFilters(widgetState.consoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        if (pageSize.value) tableDataApiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+        const { status, response } = await fetchTableDataAnalyze({
+            query_set_id: widgetState.options.cloud_service_query_set,
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.start,
-                end: state.dateRange.end,
-                group_by: ['key', 'unit', state.groupBy],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
+                group_by: [widgetState.dataField],
                 fields: {
                     value: {
-                        key: 'value',
+                        key: 'data.fail_finding_count',
                         operator: 'sum',
                     },
                 },
@@ -221,32 +188,39 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                     { key: DATE_FIELD_NAME, desc: false },
                     { key: '_total_value', desc: true },
                 ],
-                ...apiQueryHelper.data,
+                ...tableDataApiQueryHelper.data,
             },
-        }, { cancelToken: tableAnalyzeRequest.token });
-        tableAnalyzeRequest = undefined;
-        return res;
+        });
+        if (status === 'succeed') {
+            state.tableLoading = false;
+            return response;
+        }
+        return state.data?.tableData ?? null;
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.tableLoading = false;
         return { more: false, results: [] };
     }
 };
 
 /* Util */
-const refineChartData = (data: ChartDataModel[]): XYChartData[] => {
+const refineChartData = (data: ChartDataResult[]): ChartData[] => {
     if (!data?.length) return [];
-    const refinedChartData: XYChartData[] = [];
+    const refinedChartData: ChartData[] = [];
     data.forEach((d) => {
         refinedChartData.push({
             date: d.date,
-            [COMPLIANCE_STATUS_MAP.PASS.name]: d.value.find((v) => v.key === 'fail_finding_count')?.value ?? 0,
-            [COMPLIANCE_STATUS_MAP.FAIL.name]: d.value.find((v) => v.key === 'pass_finding_count')?.value ?? 0,
+            [COMPLIANCE_STATUS_MAP.PASS.name]: d.pass_finding_count ?? 0,
+            [COMPLIANCE_STATUS_MAP.FAIL.name]: d.fail_finding_count ?? 0,
         });
     });
     return refinedChartData;
 };
-const drawChart = (chartData: XYChartData[]) => {
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
+const drawChart = (chartData: ChartData[]) => {
+    // create chart and axis
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
+
+    // set axes
     xAxis.get('baseInterval').timeUnit = 'month';
     xAxis.get('renderer').grid.template.setAll({
         strokeOpacity: 1,
@@ -255,10 +229,13 @@ const drawChart = (chartData: XYChartData[]) => {
     yAxis.get('renderer').setAll({
         minGridDistance: 18,
     });
+
+    // set cursor
     chart.get('cursor')?.lineX.setAll({
         visible: true,
     });
 
+    // set series for each compliance status
     Object.entries(COMPLIANCE_STATUS_MAP).forEach(([k, v]) => {
         const seriesSettings = {
             name: v.label,
@@ -267,63 +244,74 @@ const drawChart = (chartData: XYChartData[]) => {
             fill: v.color,
             stacked: true,
         };
+
+        // create series
         const series = chartHelper.createXYLineSeries(chart, seriesSettings);
+
+        // add series to chart
         chart.series.push(series);
+
+        // set series style
         series.fills.template.setAll({
             opacity: 0.2,
             visible: true,
         });
-        // set data processor
+
+        // set data processor to series
         series.data.processor = chartHelper.createDataProcessor({
             dateFormat: DATE_FORMAT,
             dateFields: [DATE_FIELD_NAME],
         });
+
+        // create tooltip
         const tooltip = chartHelper.createTooltip();
         setXYSharedTooltipTextWithRate(chart, tooltip);
+
+        // set tooltip to series
         series.set('tooltip', tooltip);
+
+        // set data to series
         series.data.setAll(cloneDeep(chartData));
     });
 };
 
 const initWidget = async (data?: FullData): Promise<FullData> => {
-    state.loading = true;
     if (data) {
         state.data = data;
     } else {
         const [chartData, tableData] = await Promise.all([fetchChartData(), fetchTableData()]);
         state.data = { chartData, tableData };
     }
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
-    await nextTick();
-    state.loading = true;
-    state.thisPage = thisPage;
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
+    thisPage.value = _thisPage;
     const [chartData, tableData] = await Promise.all([fetchChartData(), fetchTableData()]);
     state.data = { chartData, tableData };
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 
 /* Event */
-const handleUpdateThisPage = async (thisPage: number) => {
+const handleUpdateThisPage = async (_thisPage: number) => {
     state.tableLoading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data.tableData = await fetchTableData();
     state.tableLoading = false;
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 
 defineExpose<WidgetExpose<FullData>>({
@@ -332,6 +320,42 @@ defineExpose<WidgetExpose<FullData>>({
 });
 </script>
 
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="trend-of-pass-and-fail-findings"
+                  refresh-on-resize
+                  v-on="widgetFrameEventHandlers"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="props.loading || state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <widget-chart-no-data-overlay v-if="state.noChartData && !state.loading" />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading || state.tableLoading"
+                               :fields="state.tableFields"
+                               :items="state.tableData.results"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               :this-page="thisPage"
+                               :show-next-page="state.tableData.more"
+                               disable-row-click
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .trend-of-pass-and-fail-findings {
     .data-container {
@@ -339,6 +363,7 @@ defineExpose<WidgetExpose<FullData>>({
         flex-direction: column;
         height: 100%;
         .chart-wrapper {
+            position: relative;
             height: 185px;
             margin-bottom: 1rem;
             .chart-loader {

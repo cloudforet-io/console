@@ -1,238 +1,113 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="cost-by-region"
-                  @refresh="handleRefresh"
-    >
-        <div class="content-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.chartData"
-                           :loader-backdrop-opacity="1"
-                           loader-type="skeleton"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-                <div class="legend-wrapper">
-                    <span v-for="(legend, idx) in state.chartLegends"
-                          :key="`${legend.name}-${idx}`"
-                          class="circle-wrapper"
-                    >
-                        <span v-if="legend.name"
-                              class="circle"
-                              :style="{background: storeState.providers[legend.name]?.color}"
-                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
-                    </span>
-                </div>
-            </p-data-loader>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data?.results"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends.sync="state.legends"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
-                               @update:thisPage="handleUpdateThisPage"
-            />
-        </div>
-    </widget-frame>
-</template>
-
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
+import { useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import {
-    groupBy, isEqual, sum, uniqWith,
+    isEqual, uniqWith,
 } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
+import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import type { RegionReferenceMap } from '@/store/reference/region-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-// eslint-disable-next-line import/no-cycle
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { Legend, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
+import { getWidgetDataTableRowLocation } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
+import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
+import type {
+    Data,
+    MapChartData,
+} from '@/services/dashboards/widgets/cost-widgets/cost-by-region/cost-by-region-data-hleper';
+import {
+    getRefinedMapChartData,
+} from '@/services/dashboards/widgets/cost-widgets/cost-by-region/cost-by-region-data-hleper';
 
-type Data = CostAnalyzeDataModel['results'];
-interface FullData {
-    results: Data;
-    more: boolean;
-}
-interface CostDataByProvider {
-    [continent: string]: {
-        [provider: string]: number;
-    }
-}
-interface PieChartData {
-    category: string;
-    color: string;
-    provider: string;
-    value: number;
-    pieSettings: {
-        fill: string;
-        stroke: string;
-    }
-}
-interface MapChartData {
-    title: string;
-    continent_code?: string;
-    latitude: number;
-    longitude: number;
-    height: number;
-    width: number;
-    pieChartData: PieChartData[];
-}
 
+type FullData = CostAnalyzeResponse<Data>;
+
+const router = useRouter();
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
+
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    ...toRefs(useWidgetState<FullData>(props)),
+    loading: true,
+    data: null as FullData | null,
     tableFields: computed<Field[]>(() => [
         {
-            label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
+            label: 'Provider', name: COST_DATA_FIELD_MAP.PROVIDER.name, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
         },
         {
-            label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
+            label: 'Region', name: COST_DATA_FIELD_MAP.REGION.name, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
-            label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
+            label: 'Cost', name: 'value_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
-    legends: [] as Legend[],
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
-    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
-    })),
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        params: {},
-        query: {
-            granularity: primitiveToQueryString(state.granularity),
-            group_by: arrayToQueryString([state.groupBy]),
-            period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
-        },
-    })),
-});
-const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
 });
 
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    regions: computed<RegionReferenceMap>(() => allReferenceStore.getters.region),
+});
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-/* Util */
-const getCostDataByProvider = (results: Data): CostDataByProvider => {
-    const data = results.map((d) => ({
-        ...d,
-        continent_code: storeState.regions[d.region_code]?.continent?.continent_code,
-    }));
-    const continentGroupBy = groupBy(data, 'continent_code');
-    const result = {};
-    Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
-        const providerGroupBy = groupBy(cItem, 'provider');
-        Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
-            if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => d.usd_cost_sum));
-                if (result[continent]) result[continent][provider] = providerCost;
-                else result[continent] = { [provider]: providerCost };
-            }
-        });
-    });
-    return result;
-};
-const getRefinedMapChartData = (results?: Data): MapChartData[] => {
-    if (!results?.length) return [];
-    const costDataByProvider = getCostDataByProvider(results);
-    return Object.keys(costDataByProvider).map((continent) => ({
-        title: CONTINENT_INFO[continent]?.continent_label,
-        continent_code: CONTINENT_INFO[continent]?.continent_code,
-        latitude: CONTINENT_INFO[continent]?.latitude,
-        longitude: CONTINENT_INFO[continent]?.longitude,
-        width: 48,
-        height: 48,
-        pieChartData: Object.entries(costDataByProvider[continent]).map(([provider, cost]) => ({
-            category: storeState.providers[provider]?.label || provider,
-            color: storeState.providers[provider]?.color || '',
-            provider,
-            value: cost as number,
-            pieSettings: {
-                fill: storeState.providers[provider]?.color || '',
-                stroke: storeState.providers[provider]?.color || '',
-            },
-        })),
-    }));
-};
 
 /* Api */
-let analyzeRequest: CancelTokenSource | undefined;
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCostAnalyze = getCancellableFetcher<object, FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
-    if (analyzeRequest) {
-        analyzeRequest.cancel('Next request has been called.');
-        analyzeRequest = undefined;
-    }
-    analyzeRequest = axios.CancelToken.source();
     try {
-        const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+        const { status, response } = await fetchCostAnalyze({
+            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy, COST_GROUP_BY.PROVIDER],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
+                granularity: widgetState.granularity,
+                group_by: [widgetState.dataField, COST_DATA_FIELD_MAP.PROVIDER.name],
+                start: widgetState.dateRange.start,
+                end: widgetState.dateRange.end,
                 fields: {
-                    usd_cost_sum: {
-                        key: 'usd_cost',
+                    value_sum: {
+                        key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'usd_cost_sum', desc: true }],
+                sort: [{ key: 'value_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
-        }, { cancelToken: analyzeRequest.token });
-        analyzeRequest = undefined;
-        return { results, more };
+        });
+        if (status === 'succeed') return response;
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };
@@ -246,7 +121,7 @@ const drawChart = (chartData: MapChartData[]) => {
     const pointSeries = chartHelper.createMapPointSeries();
     chart.series.push(pointSeries);
     pointSeries.bullets.push((root, series, dataItem) => {
-        const _chartData = dataItem?.dataContext?.data;
+        const _chartData = (dataItem?.dataContext as any)?.data;
         const pieChart = chartHelper.createPieChart({
             width: 32,
             height: 32,
@@ -262,7 +137,7 @@ const drawChart = (chartData: MapChartData[]) => {
         });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, state.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         return chartHelper.createBullet({
@@ -282,19 +157,16 @@ const drawChart = (chartData: MapChartData[]) => {
 const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<FullData> => {
-    await nextTick();
+const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     state.loading = true;
-    state.thisPage = thisPage;
+    thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -303,31 +175,26 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
-    refreshWidget(thisPage);
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
+    state.data = null;
+    refreshWidget(_thisPage);
 };
-
-const handleRefresh = () => {
-    refreshWidget();
+const handleClickRow = (rowData: WidgetTableData) => {
+    if (!widgetState.dataField) return;
+    const _rowLocation = getWidgetDataTableRowLocation(rowData, widgetState.widgetLocation, [widgetState.dataField, COST_DATA_FIELD_MAP.PROVIDER.name]);
+    if (_rowLocation) window.open(router.resolve(_rowLocation).href, '_blank');
 };
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/provider/load'),
-        store.dispatch('reference/region/load'),
-    ]);
-})();
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getXYChartLegends(state.data.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
         chartHelper.clearChildrenOfRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);
@@ -339,6 +206,50 @@ defineExpose<WidgetExpose<FullData>>({
     refreshWidget,
 });
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="cost-by-region"
+                  v-on="widgetFrameEventHandlers"
+    >
+        <div class="content-wrapper">
+            <p-data-loader class="chart-loader"
+                           :loading="props.loading || state.loading"
+                           :data="state.data"
+                           :loader-backdrop-opacity="1"
+                           loader-type="skeleton"
+                           show-data-from-scratch
+            >
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="legend-wrapper">
+                    <span v-for="(legend, idx) in state.chartLegends"
+                          :key="`${legend.name}-${idx}`"
+                          class="circle-wrapper"
+                    >
+                        <span v-if="legend.name"
+                              class="circle"
+                              :style="{background: storeState.providers[legend.name]?.color}"
+                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
+                    </span>
+                </div>
+            </p-data-loader>
+            <widget-data-table :loading="props.loading || state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data ? state.data.results : []"
+                               :currency="widgetState.currency"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends="state.legends"
+                               :this-page="thisPage"
+                               :show-next-page="state.data ? state.data.more : false"
+                               @update:thisPage="handleUpdateThisPage"
+                               @click-row="handleClickRow"
+            />
+        </div>
+    </widget-frame>
+</template>
+
 <style lang="postcss" scoped>
 .cost-by-region {
     .content-wrapper {
@@ -349,6 +260,7 @@ defineExpose<WidgetExpose<FullData>>({
             @apply col-span-5;
             height: 100%;
             padding-bottom: 1rem;
+            min-height: 22.5rem;
             .chart {
                 @apply border border-gray-200;
                 height: calc(90% - 2px);

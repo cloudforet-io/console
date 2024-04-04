@@ -7,10 +7,7 @@ export const setDomain = (state: DomainState, domainInfo: DomainState): void => 
     state.name = domainInfo.name;
     state.authOptions = domainInfo.authOptions;
     state.extendedAuthType = domainInfo.extendedAuthType;
-};
-
-export const setBillingEnabled = (state: DomainState, billingEnabled: boolean) => {
-    state.billingEnabled = billingEnabled;
+    state.config = domainInfo.config;
 };
 
 export const setExtraMenu = (state: DomainState, extraMenu: ExtraMenuSet) => {

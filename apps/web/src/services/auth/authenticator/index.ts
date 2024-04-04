@@ -1,25 +1,22 @@
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { SpaceRouter } from '@/router';
+import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
-import { setI18nLocale } from '@/translations';
 
-type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 
 abstract class Authenticator {
-    static async signIn(credentials: Record<string, any>, userId?: string, userType?: UserType): Promise<void> {
+    static async signIn(credentials: Record<string, any>, authType: AuthType, verifyCode?: string): Promise<void> {
+        const userWorkspaceStore = useUserWorkspaceStore();
         await store.dispatch('user/signIn', {
             domainId: store.state.domain.domainId,
             credentials,
-            userType: userType || 'USER',
-            userId,
+            authType,
+            verify_code: verifyCode,
         });
-        await Promise.allSettled([
-            store.dispatch('domain/setBillingEnabled'),
-            // INIT REFERENCE STORE
-            store.dispatch('reference/loadAll', { force: true }),
-            setI18nLocale(store.state.user.language),
-        ]);
+        await userWorkspaceStore.load();
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');
     }
@@ -28,9 +25,11 @@ abstract class Authenticator {
         try {
             if (SpaceRouter.router) {
                 await store.dispatch('user/signOut');
+                const userWorkspaceStore = useUserWorkspaceStore();
+                userWorkspaceStore.reset();
+                await store.dispatch('display/hideSignInErrorMessage');
                 LocalStorageAccessor.removeItem('hideNotificationEmailModal');
                 await store.dispatch('error/resetErrorState');
-                await store.dispatch('domain/resetBillingEnabled');
             }
         } catch (e: unknown) {
             console.error('user sign out failed', e);

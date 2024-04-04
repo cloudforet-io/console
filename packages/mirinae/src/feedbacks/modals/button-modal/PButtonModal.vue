@@ -22,15 +22,16 @@
                             <slot v-if="!hideHeader"
                                   name="header"
                             >
-                                <div class="modal-header"
-                                     :class="[`${themeColor}-header`]"
+                                <span class="modal-header"
+                                      :class="[`${themeColor}-header`]"
                                 >
                                     <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
                                          class="header-img"
+                                         color="inherit transparent"
                                     />
                                     {{ headerTitle }}
-                                </div>
+                                </span>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
                                            name="ic_close"
@@ -42,6 +43,7 @@
                             />
                         </h3>
                         <div v-if="!hideBody"
+                             :id="modalBodyId"
                              class="modal-body"
                              :class="allBodyClass"
                         >
@@ -102,9 +104,12 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
+
+import type { TranslateResult } from 'vue-i18n';
 
 import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
@@ -115,6 +120,7 @@ import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+
 
 
 export default defineComponent<ButtonModalProps>({
@@ -154,7 +160,7 @@ export default defineComponent<ButtonModalProps>({
             },
         },
         headerTitle: {
-            type: String,
+            type: String as PropType<string|TranslateResult>,
             default: '',
         },
         hideHeader: {
@@ -192,6 +198,10 @@ export default defineComponent<ButtonModalProps>({
         disabled: {
             type: Boolean,
             default: false,
+        },
+        modalBodyId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
@@ -259,7 +269,6 @@ export default defineComponent<ButtonModalProps>({
 </script>
 <style lang="postcss">
 .p-button-modal {
-    display: inline-block;
     .modal-content {
         @apply bg-white border border-gray-200 rounded-lg;
         display: flex;
@@ -295,6 +304,9 @@ export default defineComponent<ButtonModalProps>({
                 &.alert-header {
                     @apply relative;
                     text-indent: 2rem;
+                    .modal-alert {
+                        @apply text-red-400;
+                    }
                 }
             }
 

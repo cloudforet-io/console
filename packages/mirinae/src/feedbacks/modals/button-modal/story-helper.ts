@@ -276,6 +276,24 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'number',
         },
     },
+    modalBodyId: {
+        name: 'modalBodyId',
+        type: { name: 'string' },
+        description: 'Applied when utilizing the id value of the body, as in the usage within the select-dropdown component',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: {
+            type: 'string',
+        },
+    },
     // model
     'v-model': {
         name: 'v-model',
@@ -364,6 +382,62 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             },
             category: 'slots',
             defaultValue: 'Confirm',
+        },
+    },
+    // events
+    onConfirm: {
+        name: 'confirm',
+        description: 'Emitted when confirm button is clicked.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onCancel: {
+        name: 'cancel',
+        description: 'Emitted when click cancel button or close button',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onReturn: {
+        name: 'return',
+        description: 'Emitted when click reset button',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClose: {
+        name: 'close',
+        description: 'Emitted when close modal',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateVisible: {
+        name: 'update:visible',
+        description: 'Emitted when update visible',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
         },
     },
 });

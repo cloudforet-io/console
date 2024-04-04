@@ -14,6 +14,7 @@
         <p-i v-if="icon"
              class="left-icon"
              :name="icon"
+             :color="iconColor"
              width="1rem"
              height="1rem"
         />
@@ -86,6 +87,7 @@ export interface ContextMenuItemProps {
     highlightTerm?: string;
     readonly?: boolean;
     icon?: string;
+    iconColor?: string;
     imageUrl?: string;
 }
 
@@ -141,6 +143,10 @@ export default defineComponent<ContextMenuItemProps>({
             default: false,
         },
         icon: {
+            type: String,
+            default: undefined,
+        },
+        iconColor: {
             type: String,
             default: undefined,
         },

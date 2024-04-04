@@ -1,4 +1,5 @@
-import type { OperatorType } from '@/component-util/query-search/type';
+import type { OperatorType } from '@spaceone/design-system/types/inputs/search/query-search/type';
+
 import type { ConsoleFilterOperator, DatetimeOperator } from '@/query/type';
 import type { ApiFilterOperator } from '@/space-connector/type';
 

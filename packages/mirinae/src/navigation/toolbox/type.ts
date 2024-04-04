@@ -8,6 +8,7 @@ export interface ToolboxOptions {
     sortBy?: string;
     queryTags?: QueryTag[];
     searchText?: string;
+    sortDesc?: boolean;
 }
 
 export interface ToolboxProps {
@@ -23,6 +24,7 @@ export interface ToolboxProps {
     thisPage?: number;
     pageSize?: number;
     totalCount?: number;
+    hasNextPage?: boolean;
     sortBy?: string;
     pageSizeOptions?: number[];
     sortByOptions?: MenuItem[];

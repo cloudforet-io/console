@@ -8,6 +8,7 @@ const searchSlots = Object.values(getSearchSlotArgTypes());
 
 
 export const contextMenuSlots: [string, string][] = [
+    ['header', 'A slot that replaces the header area of the context menu.'],
     ['menu', 'A slot that replaces the whole context menu. It\'s useful when you want to use context menu\'s container style, no data & loading container only.'],
     ['items', 'A slot that replaces the area for menu items. This is useful when you want to directly combine and use context menu items in a compound component way.'],
     ['bottom', 'A slot that replaces the bottom area of the context menu.'],
@@ -31,6 +32,7 @@ const contextMenuEvents: [string, string][] = [
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
     ['click-done', 'This event is emitted when the done-button(in multi-selectable & show-select-header case) is clicked.'],
     ['click-show-more', 'This event is emitted when the show-more-button is clicked.'],
+    ['clear-selection', 'This event is emitted when the clear-selection is clicked.'],
     ['update:search-text', 'This event is emitted when the input value of search component(in searchable case) is updated. It allows two way binding of searchText prop.'],
 ];
 
@@ -61,6 +63,24 @@ const getArgTypes = (category: string, info: [string, string][]) => {
 export const getContextMenuArgTypes = (): ArgTypes => {
     const contextMenuItemArgTypes = getContextMenuItemArgTypes();
     return {
+        title: {
+            name: 'title',
+            type: { name: 'string' },
+            description: 'Context menu title',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: undefined,
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
         menu: {
             name: 'menu',
             type: { name: 'array' },
@@ -294,6 +314,36 @@ export const getContextMenuArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'boolean',
+            },
+        },
+        beforeSelect: {
+            name: 'beforeSelect',
+            type: { name: 'function' },
+            description: 'A function that is called before selecting an item. If it returns false, the selection is canceled.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'function',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+        },
+        beforeClearSelection: {
+            name: 'beforeClearSelection',
+            type: { name: 'function' },
+            description: 'A function that is called before clearing all selected items. If it returns false, the clearing is canceled.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'function',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
             },
         },
         ...getArgTypes('slots', contextMenuSlots),

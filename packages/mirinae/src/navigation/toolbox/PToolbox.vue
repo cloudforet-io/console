@@ -20,12 +20,19 @@
                                 @search="onSearch"
                 />
             </div>
-            <div class="tools-wrapper">
+            <div v-if="isToolsWrapperVisible"
+                 class="tools-wrapper"
+            >
                 <div v-if="paginationVisible"
                      class="tool"
                 >
-                    <p-text-pagination :this-page="proxyState.thisPage"
+                    <div v-if="$scopedSlots['pagination-area']">
+                        <slot name="pagination-area" />
+                    </div>
+                    <p-text-pagination v-else
+                                       :this-page="proxyState.thisPage"
                                        :all-page="allPage"
+                                       :has-next-page="hasNextPage"
                                        @pageChange="onChangeThisPage"
                     />
                 </div>
@@ -33,21 +40,26 @@
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :items="pageMenu"
+                                       :selected="pageSize"
+                                       :menu="pageMenu"
                                        @select="onChangePageSize"
                     >
-                        {{ proxyState.pageSize }}
+                        <template #dropdown-button>
+                            {{ proxyState.pageSize }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div v-if="sortable"
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :items="sortByOptions"
-                                       :sort-by="sortBy"
+                                       :selected="selectedSortBy"
+                                       :menu="sortByOptions"
                                        @select="onChangeSortBy"
                     >
-                        {{ selectedSortBy }}
+                        <template #dropdown-button>
+                            {{ selectedSortBy }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">
@@ -171,7 +183,11 @@ export default defineComponent<ToolboxProps>({
         },
         totalCount: {
             type: Number,
-            default: 0,
+            default: undefined,
+        },
+        hasNextPage: {
+            type: Boolean,
+            default: false,
         },
         sortBy: {
             type: String,
@@ -217,7 +233,12 @@ export default defineComponent<ToolboxProps>({
         const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
         const state = reactive({
             pageStart: computed(() => ((proxyState.thisPage - 1) * proxyState.pageSize) + 1),
-            allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
+            allPage: computed<number|undefined>(() => {
+                if (props.totalCount !== undefined) {
+                    return Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1;
+                }
+                return undefined;
+            }),
             pageMenu: computed(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map((d) => ({
@@ -246,6 +267,7 @@ export default defineComponent<ToolboxProps>({
                     return defaultConverter(queryTag, props.timezone);
                 };
             }),
+            isToolsWrapperVisible: computed(() => props.paginationVisible || props.pageSizeChangeable || props.sortable || props.exportable || props.refreshable || props.settingsVisible),
         });
 
 
@@ -339,6 +361,7 @@ export default defineComponent<ToolboxProps>({
             display: flex;
         }
         .dropdown-list {
+            min-width: 6.5rem;
             .p-dropdown-btn {
                 min-width: 6rem;
             }

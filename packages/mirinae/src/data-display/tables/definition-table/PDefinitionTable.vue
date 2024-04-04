@@ -20,6 +20,7 @@
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
                               :block="block || item.block"
+                              :custom-key-width="customKeyWidth || undefined"
                               :copy-value="item.copyValue"
                               :copy-value-formatter="item.copyValueFormatter"
                 >
@@ -123,11 +124,18 @@ export default defineComponent<DefinitionTableProps>({
             type: Boolean,
             default: false,
         },
+        customKeyWidth: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
-            isNoData: computed(() => every(state.items, (def) => !def.data)),
+            isNoData: computed(() => every(state.items, (def) => {
+                if (typeof def.data === 'boolean') return false;
+                return !def.data;
+            })),
             skeletons: computed(() => range(props.skeletonRows ?? 5)),
             items: computed(() => makeDefItems(props.fields, props.data)),
         });
@@ -157,6 +165,7 @@ export default defineComponent<DefinitionTableProps>({
         td {
             line-height: 1.8;
             word-break: break-word;
+            overflow-x: auto;
         }
     }
     .def-row {

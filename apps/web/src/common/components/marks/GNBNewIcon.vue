@@ -1,14 +1,11 @@
+<script setup lang="ts">
+</script>
+
 <template>
     <div class="balloon">
         <span class="balloon-text">new</span>
     </div>
 </template>
-
-<script lang="ts">
-export default {
-    name: 'NewIcon',
-};
-</script>
 
 <style lang="postcss" scoped>
 .balloon {

@@ -111,7 +111,9 @@ export default defineComponent<Props>({
             flex-shrink: 0;
         }
         .text {
-            display: inline-flex;
+            > span {
+                display: inline;
+            }
         }
     }
 

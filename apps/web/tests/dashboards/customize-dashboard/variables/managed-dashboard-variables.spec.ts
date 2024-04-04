@@ -33,14 +33,20 @@ test.describe('Managed Dashboard Variables', () => {
 
         await test.step('4. Check if options have been removed from the widget', async () => {
             const widgetElements = await page.locator('.widget-frame').all();
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of widgetElements) {
                 // open edit modal
+                // eslint-disable-next-line no-await-in-loop
                 const buttonCount = await widgetElement.locator('.edit-mode-cover button').count();
+                // eslint-disable-next-line no-await-in-loop
                 await widgetElement.locator(`.edit-mode-cover button:nth-child(${buttonCount - 1})`).click();
+                // eslint-disable-next-line no-await-in-loop
                 await expect(page.locator('.dashboard-widget-edit-modal .widget-options-form')).not.toHaveText('Region');
+                // eslint-disable-next-line no-await-in-loop
                 await expect(page.locator('.dashboard-widget-edit-modal .widget-options-form')).not.toHaveText('Service Account');
 
                 // close edit modal
+                // eslint-disable-next-line no-await-in-loop
                 await page.locator('.dashboard-widget-edit-modal').getByRole('button', { name: 'Cancel' }).click();
             }
         });

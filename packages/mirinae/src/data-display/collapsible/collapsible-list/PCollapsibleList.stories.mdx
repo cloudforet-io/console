@@ -243,6 +243,16 @@ export const Template = (args, { argTypes }) => ({
                 </template>
             </p-collapsible-list>
         </div>
+        <div>
+            <p class="text-xl font-bold mb-4">No Styled Title Slot</p>
+            <p-collapsible-list :items="items">
+                <template #no-styled-title={title}>
+                    <span class="text-xl font-bold text-secondary">
+                        <{{title}}>
+                    </span>
+                </template>
+            </p-collapsible-list>
+        </div>
         <div class="mt-6">
             <p class="text-xl font-bold mb-4">Default Slot</p>
             <p-collapsible-list :items="items" toggle-position="contents">

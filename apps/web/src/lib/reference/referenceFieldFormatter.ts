@@ -1,7 +1,9 @@
 import type { DynamicFieldProps } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
+
+import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import type { Reference, ResourceType } from '@/lib/reference/type';
@@ -16,32 +18,36 @@ type FormatterMap = Record<ResourceType, FieldFormatter>;
  *
  *
  */
+
+useAllReferenceStore(pinia);
+const allReferenceStore = useAllReferenceStore();
+
 const formatterMap: FormatterMap = {
-    'identity.Provider': () => store.getters['reference/provider/fieldItems'],
+    'identity.Provider': () => allReferenceStore.getters.provider,
     'inventory.Server': (data, reference) => ({
         data,
         link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
     }),
     'identity.Project': (data, reference) => ({
-        data: store.getters['reference/projectItems'][data]?.label || data,
+        data: allReferenceStore.getters.project[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'inventory.Collector': (data, reference) => ({
-        data: store.getters['reference/collectorItems'][data]?.label || data,
+        data: allReferenceStore.getters.collector[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'identity.ServiceAccount': (data, reference) => ({
-        data: store.getters['reference/serviceAccountItems'][data]?.label || data,
+        data: allReferenceStore.getters.serviceAccount[data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
     'inventory.Region': (data) => ({
-        data: store.getters['reference/regionItems'][data]?.label || data,
+        data: allReferenceStore.getters.region[data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
         options: {
@@ -49,7 +55,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'secret.Secret': (data) => ({
-        data: store.getters['reference/secretItems'][data]?.label || data,
+        data: allReferenceStore.getters.secret[data]?.label || data,
     }),
 };
 

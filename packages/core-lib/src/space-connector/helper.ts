@@ -19,6 +19,11 @@ class ApiQueryHelper extends QueryHelper {
         return { ...this._data };
     }
 
+    // NOTE: will be deprecated
+    get dataV2(): Query {
+        return this.data;
+    }
+
     setPage(start: number, limit: number): ApiQueryHelper {
         this._data.page = {
             start,
@@ -45,28 +50,33 @@ class ApiQueryHelper extends QueryHelper {
         return this;
     }
 
-    setSort(key: string, desc?: boolean): ApiQueryHelper {
-        this._data.sort = {
-            key,
-            desc: desc ?? this._data.sort?.desc ?? false,
-        };
+    setSort(key?: string, desc?: boolean): ApiQueryHelper {
+        if (key) {
+            const originDesc = this._data.sort?.[0].desc;
+            this._data.sort = [{
+                key,
+                desc: desc ?? originDesc ?? false,
+            }];
+        } else {
+            this._data.sort = undefined;
+        }
+
         return this;
     }
 
-    setMultiSort(sort: Sort[]): ApiQueryHelper {
-        if (!this._data.sort) {
-            this._data.sort = {};
-        }
-        this._data.sort.keys = sort;
+    setMultiSort(sorts: Sort[]): ApiQueryHelper {
+        this._data.sort = sorts;
+        return this;
+    }
+
+    // NOTE: will be deprecated
+    setMultiSortV2(sortList: Sort[]): ApiQueryHelper {
+        this._data.sort = sortList;
         return this;
     }
 
     setSortDesc(desc = false): ApiQueryHelper {
-        if (!this._data.sort) {
-            this._data.sort = {};
-        }
-
-        this._data.sort.desc = desc;
+        if (this._data.sort?.[0]) this._data.sort[0].desc = desc;
         return this;
     }
 

@@ -4,6 +4,7 @@
     >
         <td class="key"
             :class="{'auto-width': autoKeyWidth, 'no-copy-button': disableCopy}"
+            :style="{ minWidth: customKeyWidth }"
         >
             <slot name="key"
                   v-bind="{name, label, data, value: displayData}"
@@ -30,6 +31,9 @@
                     <template v-else-if="dataType === 'array'">
                         <p-text-list :items="displayData" />
                     </template>
+                    <template v-else-if="dataType === 'array_of_object'">
+                        <pre>{{ formatter ? displayData : getArrayOfObjectDisplayData(parsedData) }}</pre>
+                    </template>
                     <template v-else>
                         {{ displayData }}
                     </template>
@@ -54,6 +58,9 @@
                         <template v-else-if="dataType === 'array'">
                             <p-text-list :items="displayData" />
                         </template>
+                        <template v-else-if="dataType === 'array_of_object'">
+                            <pre>{{ formatter ? displayData : getArrayOfObjectDisplayData(parsedData) }}</pre>
+                        </template>
                         <template v-else>
                             {{ displayData }}
                         </template>
@@ -72,6 +79,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -81,10 +89,13 @@ import PTag from '@/data-display/tags/PTag.vue';
 import PTextList from '@/data-display/text-list/PTextList.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 
+type DataType = 'string'|'boolean'|'number'|'object'|'array'|'array_of_object'|'undefined';
 export default defineComponent<DefinitionProps>({
     name: 'PDefinition',
     components: {
-        PTag, PTextList, PCopyButton,
+        PTag,
+        PTextList,
+        PCopyButton,
     },
     props: {
         name: {
@@ -96,7 +107,7 @@ export default defineComponent<DefinitionProps>({
             default: '',
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
+            type: [String, Object, Array, Boolean, Number] as PropType<string|boolean|number|object|undefined>,
             default: undefined,
         },
         disableCopy: {
@@ -123,18 +134,43 @@ export default defineComponent<DefinitionProps>({
             type: Boolean,
             default: false,
         },
+        customKeyWidth: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
             displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
-            dataType: computed(() => {
-                if (Array.isArray(props.data)) return 'array';
-                return typeof props.data;
+            parsedData: computed<any>(() => {
+                let parsed;
+                if (typeof props.data === 'string') {
+                    try {
+                        parsed = JSON.parse(props.data);
+                    } catch (e) {}
+                } else {
+                    parsed = props.data;
+                }
+                return parsed;
+            }),
+            dataType: computed<DataType>(() => {
+                if (Array.isArray(state.parsedData)) {
+                    const hasObject = state.parsedData.some((d) => typeof d === 'object');
+                    if (hasObject) {
+                        return 'array_of_object';
+                    }
+                    return 'array';
+                }
+
+                return typeof state.parsedData as DataType;
             }),
         });
 
+        const getArrayOfObjectDisplayData = (data) => JSON.stringify(data, undefined, 2);
+
         return {
             ...toRefs(state),
+            getArrayOfObjectDisplayData,
         };
     },
 });
@@ -145,30 +181,25 @@ export default defineComponent<DefinitionProps>({
     display: flex;
     > .key {
         @apply font-bold;
-        width: 18rem;
+        min-width: 18rem;
         padding: 0.65rem 1rem 0.35rem 1rem;
         font-size: 0.875rem;
         line-height: 1.25;
 
         &.auto-width {
-            width: auto;
+            min-width: auto;
         }
         &.no-copy-button {
             padding: 0.5rem 1rem;
         }
     }
     > .value-wrapper {
-        max-width: calc(100% - 18rem);
         display: inline-flex;
         align-items: center;
         flex-grow: 1;
         flex-wrap: wrap;
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
-
-        &.auto-width {
-            max-width: none;
-        }
 
         > .value {
             line-height: 1.25;

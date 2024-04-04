@@ -1,18 +1,13 @@
-import { GRANULARITY } from '@/services/dashboards/config';
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { CHART_TYPE, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
+
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatus.vue'),
-    }),
     title: 'Budget Status',
-    labels: ['Cost'],
+    labels: ['Cost', 'Budget'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_STATUS.DESC',
         preview_image: 'widget-img_budgetStatus--thumbnail.png',
@@ -24,17 +19,14 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     sizes: ['sm'],
     options: {
         chart_type: CHART_TYPE.WAFFLE,
-        granularity: GRANULARITY.ACCUMULATED,
-        cost_group_by: 'budget_id',
+        granularity: GRANULARITY.MONTHLY,
     },
-    options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
-        schema: {
-            type: 'object',
-            properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'cost_product', 'region'),
-            order: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'cost_product', 'region'),
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'filters.provider',
+        'filters.project_group',
+        'filters.project',
+    ]),
 };
 
 export default budgetStatusWidgetConfig;

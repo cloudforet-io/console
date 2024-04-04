@@ -82,9 +82,20 @@ export const getDoubleCheckModalArgTypes = (): ArgTypes => {
         loading: buttonModalArgTypes.loading,
 
         // slots
-        defaultSlot: {
-            name: 'default',
-            description: '',
+        middleContentsSlot: {
+            name: 'middle-contents',
+            description: 'Slots located above the Verification area.',
+            defaultValue: null,
+            table: {
+                type: {
+                    summary: null,
+                },
+                category: 'slots',
+            },
+        },
+        bottomContentsSlot: {
+            name: 'middle-contents',
+            description: 'Slots located under the Verification area.',
             defaultValue: null,
             table: {
                 type: {

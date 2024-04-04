@@ -1,8 +1,10 @@
 import type Ajv from 'ajv';
 
+const pemKeyRegex = /^-----BEGIN ([A-Za-z0-9_\-\s]+)-----\r?\n([\s\S]+)\r?\n-----END \1-----$/;
 
 export const addCustomFormats = (ajv: Ajv): void => {
     ajv.addFormat('generate_id', true);
+    ajv.addFormat('pem_key', pemKeyRegex);
 };
 
 

@@ -99,6 +99,24 @@ export const getPopoverArgTypes = () => {
                 type: 'boolean',
             },
         },
+        ignoreOutsideClick: {
+            name: 'ignoreOutsideClick',
+            type: { name: 'boolean' },
+            description: 'If the value is true, do not close the popover even if user click outside the popover.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         // model
         'v-model': {
             name: 'v-model',
@@ -201,7 +219,7 @@ export const getPopoverArgTypes = () => {
                 category: 'events',
             },
         },
-        'onUpdate:isVisible': {
+        'onUpdate:is-visible': {
             name: 'update:is-visible',
             description: 'Emitted when the popover visibility is updated. Event parameter - `visible: boolean`',
             table: {

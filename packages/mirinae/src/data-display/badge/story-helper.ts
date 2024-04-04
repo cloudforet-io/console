@@ -1,6 +1,8 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE } from '@/data-display/badge/type';
+import {
+    BADGE_FONT_WEIGHT, BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE,
+} from '@/data-display/badge/type';
 
 
 export const getBadgesArgTypes = (): ArgTypes => ({
@@ -113,6 +115,25 @@ export const getBadgesArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(BADGE_SHAPE),
+        },
+    },
+    fontWeight: {
+        name: 'fontWeight',
+        type: { name: 'string' },
+        description: 'Font weight of badge',
+        defaultValue: BADGE_FONT_WEIGHT.REGULAR,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: BADGE_FONT_WEIGHT.REGULAR,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(BADGE_FONT_WEIGHT),
         },
     },
     defaultSlot: {

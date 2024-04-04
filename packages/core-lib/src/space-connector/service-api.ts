@@ -1,5 +1,5 @@
 import type {
-    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
+    AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders,
 } from 'axios';
 import axios from 'axios';
 
@@ -27,7 +27,7 @@ export default class ServiceAPI {
         this.setAxiosInterceptors();
     }
 
-    private handleRequestError = async (error: AxiosError): Promise<void> => {
+    private handleResponseError = async (error: AxiosError): Promise<void> => {
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);
@@ -51,11 +51,12 @@ export default class ServiceAPI {
 
     private setAxiosInterceptors(): void {
         // Axios request interceptor
-        this.instance.interceptors.request.use((request: AxiosRequestConfig) => {
-            if (!request.headers) request.headers = {};
+        this.instance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
+            if (!request.headers) request.headers = {} as AxiosRequestHeaders;
 
             // Set the access token
-            request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
+            const auth = request.headers?.Authorization;
+            if (!auth) request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
 
             return request;
         });
@@ -63,7 +64,7 @@ export default class ServiceAPI {
         // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            this.handleRequestError,
+            this.handleResponseError,
         );
     }
 }

@@ -1,15 +1,9 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
     widget_config_id: 'severityStatusByService',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/severity-status-by-service/SeverityStatusByServiceWidget.vue'),
-    }),
     title: 'Severity Status by Service',
     labels: ['Asset'],
     description: {
@@ -22,36 +16,16 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
     },
     sizes: ['full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
-        legend_options: {
-            enabled: true,
-            show_at: 'chart',
-        },
+        data_criteria: 'realtime',
     },
-    options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    // 'service_account', HACK: Re-enable it after backend is ready
-                    'provider',
-                    'region',
-                    'asset_compliance_type',
-                    'asset_account',
-                ),
-            },
-            order: getWidgetFilterSchemaPropertyNames(
-                'project',
-                // 'service_account',
-                'provider',
-                'region',
-                'asset_compliance_type',
-                'asset_account',
-            ),
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cloud_service_query_set',
+        'filters.project_group',
+        'filters.project',
+        'filters.provider',
+        'filters.region',
+        'filters.asset_account',
+    ]),
 };
 
 export default severityStatusByServiceWidgetConfig;

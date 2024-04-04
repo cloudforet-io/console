@@ -61,11 +61,7 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                     >
-                        <favorites-widget class="hidden lg:block col-span-12"
-                                          :extra-params="extraParams"
-                        />
                         <daily-updates class="col-span-12 daily-updates"
-                                       :providers="providers"
                                        :extra-params="extraParams"
                         />
                     </div>
@@ -99,23 +95,21 @@ import { PButton, PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
+import type { DomainModel } from '@/schema/identity/domain/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
-import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
-import FavoritesWidget from '@/services/home-dashboard/modules/FavoritesWidget.vue';
-import PersonalHealthDashboard from '@/services/home-dashboard/modules/PersonalHealthDashboard.vue';
-import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
-import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
-import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
-import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
+import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
+import AllSummary from '@/services/home-dashboard/components/AllSummary.vue';
+import CollectorProgress from '@/services/home-dashboard/components/CollectingProgress.vue';
+import PersonalHealthDashboard from '@/services/home-dashboard/components/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/home-dashboard/components/ResourceMap.vue';
+import ServiceAccounts from '@/services/home-dashboard/components/ServiceAccounts.vue';
+import TopProjects from '@/services/home-dashboard/components/TopProjects.vue';
+import TrustedAdvisor from '@/services/home-dashboard/components/TrustedAdvisor.vue';
 
 interface ExtraParams {
     domain_id?: string;
@@ -132,7 +126,6 @@ export default {
         PersonalHealthDashboard,
         TrustedAdvisor,
         TopProjects,
-        FavoritesWidget,
         DailyUpdates,
         ServiceAccounts,
         CollectorProgress,
@@ -142,14 +135,13 @@ export default {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
-            domainList: [],
+            domainList: [] as DomainModel[],
             selectedDomainId: '',
             extraParams: computed<ExtraParams>(() => {
                 const params: ExtraParams = {};
                 if (state.selectedDomainId) params.domain_id = state.selectedDomainId;
                 return params;
             }),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 
@@ -158,7 +150,7 @@ export default {
 
             state.loading = true;
             try {
-                const { results } = await SpaceConnector.client.identity.domain.list();
+                const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
                 state.domainList = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -175,7 +167,6 @@ export default {
         /** Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
                 getDomainList(),
             ]);
             switchDomain(state.domainList[0]);

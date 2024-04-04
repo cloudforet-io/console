@@ -2,7 +2,7 @@
     /* normal text */
     p {
         padding-bottom: 0.75rem;
-        line-height: 1.5;
+        line-height: 1.7;
         font-size: 0.875rem;
         font-weight: normal;
         &:focus {
@@ -48,16 +48,48 @@
 
     /* bullet list */
     ul {
-        padding-top: 0.75rem;
         padding-left: 1rem;
         list-style-type: disc;
+        p {
+            padding-bottom: 0;
+        }
         > li {
             display: list-item;
             > ul {
-                padding-top: 0;
                 list-style-type: circle;
                 > li > ul {
                     list-style-type: square;
+                }
+            }
+        }
+    }
+
+    /* padding of bullet list */
+    > ul {
+        padding-top: 0.75rem;
+        > li {
+            > ul {
+                padding-bottom: 0.25rem;
+                > li {
+                    > ul {
+                        padding-bottom: 0.25rem;
+                        > li {
+                            ul {
+                                padding-bottom: 0;
+                            }
+                        }
+                    }
+                    &:last-of-type {
+                        > ul {
+                            padding-bottom: 0;
+                        }
+                    }
+                }
+            }
+            &:last-of-type {
+                padding-bottom: 0.75rem;
+                > ul {
+                    padding-bottom: 0;
                 }
             }
         }
@@ -131,6 +163,7 @@
 
     /* horizontal rule */
     hr {
+        @apply border-gray-200;
         padding-top: 0.75rem;
     }
 }

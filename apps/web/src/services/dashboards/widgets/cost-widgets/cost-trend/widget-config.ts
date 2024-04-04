@@ -1,10 +1,7 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const costTrendWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'costTrend',
@@ -17,47 +14,29 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     options: {
-        granularity: 'MONTHLY',
         chart_type: CHART_TYPE.LINE,
         legend_options: {
             enabled: true,
             show_at: 'table',
         },
+        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+        cost_data_type: 'cost',
     },
-    options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
-        fixed_properties: ['cost_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_category',
-                    'cost_resource_group',
-                    'cost_product',
-                    'region',
-                    'cost_type',
-                    'cost_account',
-                ),
-            },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_type',
-                'cost_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_data_field',
+        'cost_data_type',
+        ['granularity', { readonly: true }],
+        'filters.provider',
+        'filters.project_group',
+        'filters.project',
+        'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
+        'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
+    ]),
 };
 
 export default costTrendWidgetConfig;

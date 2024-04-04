@@ -12,7 +12,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilterOperator, ConsoleFilterValue, ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ReferenceMap } from '@/store/reference/type';
 
 interface KeyItem extends MirinaeKeyItem {
     reference?: string;
@@ -75,7 +76,7 @@ const filterToQueryTag = (
 
 interface Options {
     keyItemSets?: KeyItemSet[]|Ref<KeyItemSet[]>|ComputedRef<KeyItemSet[]>;
-    referenceStore?: Record<string, ComputedRef<ReferenceMap>>;
+    referenceStore?: Record<string, ComputedRef<ReferenceMap>>|ReturnType<typeof useAllReferenceStore>['getters'];
 }
 export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
     let keyMap: KeyMap = {};
@@ -166,7 +167,7 @@ export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
         keyItemSets: computed(() => state.keyItemSets),
         filters: computed<ConsoleFilter[]>(() => state.filters),
         queryTags: computed<QueryTag[]>(() => state.queryTags),
-        urlQueryStringFilters: computed<string>(() => ''),
+        urlQueryStringFilters: computed<string[]>(() => queryHelper.setFilters(state.filters).rawQueryStrings),
         setKeyItemSets,
         setFilters,
         getFilters,

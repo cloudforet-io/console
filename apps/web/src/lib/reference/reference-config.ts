@@ -1,3 +1,4 @@
+// NOTE: Deprecated. Use MANAGED_VARIABLE_MODEL_CONFIGS instead.
 export const REFERENCE_TYPE_INFO = {
     project_group: {
         type: 'project_group',
@@ -49,6 +50,11 @@ export const REFERENCE_TYPE_INFO = {
         key: 'service_account_id',
         name: 'Service Account',
     },
+    trusted_account: {
+        type: 'trustedAccount',
+        key: 'trusted_account_id',
+        name: 'Trusted Account',
+    },
     user: {
         type: 'user',
         key: 'user_id',
@@ -58,5 +64,22 @@ export const REFERENCE_TYPE_INFO = {
         type: 'webhook',
         key: 'webhook_id',
         name: 'Webhook',
+    },
+    cost_data_source: {
+        type: 'cost_data_source',
+        key: 'data_source_id',
+        name: 'Data Source',
+        resourceType: 'cost_analysis.DataSource',
+    },
+    cloud_service_query_set: {
+        type: 'cloud_service_query_set',
+        key: 'query_set_id',
+        name: 'Query Set',
+        resourceType: 'inventory.CloudServiceQuerySet',
+    },
+    workspace: {
+        type: 'workspace',
+        key: 'workspace_id',
+        name: 'Workspace',
     },
 } as const;

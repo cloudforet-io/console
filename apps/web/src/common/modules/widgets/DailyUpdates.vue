@@ -14,33 +14,31 @@
         </template>
 
         <template #default>
-            <div v-if="loading"
-                 class="overflow-hidden"
+            <p-data-loader :loading="loading"
+                           :data="data"
+                           loader-type="skeleton"
+                           class="card-wrapper"
+                           :class="{'fixed-height': loading || !data.length}"
             >
-                <div v-for="v in skeletons"
-                     :key="v"
-                     class="flex p-4 items-center"
-                >
-                    <p-skeleton width="2rem"
-                                height="2rem"
-                                class="mr-4 flex-shrink-0"
-                    />
-                    <div class="grid grid-cols-1 gap-1 w-full">
-                        <p-skeleton width="80%"
-                                    height="0.625rem"
+                <template #loader>
+                    <div v-for="v in skeletons"
+                         :key="`skeleton-${v}`"
+                         class="flex p-4 items-center"
+                    >
+                        <p-skeleton width="2rem"
+                                    height="2rem"
+                                    class="mr-4 flex-shrink-0"
                         />
-                        <p-skeleton width="100%"
-                                    height="0.625rem"
-                        />
+                        <div class="grid grid-cols-1 gap-1 w-full">
+                            <p-skeleton width="80%"
+                                        height="0.625rem"
+                            />
+                            <p-skeleton width="100%"
+                                        height="0.625rem"
+                            />
+                        </div>
                     </div>
-                </div>
-            </div>
-            <p-data-loader
-                v-else
-                :loading="loading"
-                :data="data"
-                class="card-wrapper"
-            >
+                </template>
                 <template #no-data>
                     <p-empty
                         v-if="warningData.length === 0"
@@ -103,7 +101,7 @@
                         </router-link>
                     </div>
                 </div>
-                <div v-for="(item, index) in data"
+                <div v-for="(item, index) in commonData"
                      :key="index"
                      class="daily-update-card"
                 >
@@ -149,7 +147,7 @@ import {
     PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { find, range } from 'lodash';
+import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -157,14 +155,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
 
 interface CloudServiceData {
     cloud_service_group: string;
@@ -202,19 +204,26 @@ export default {
         PEmpty,
     },
     props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
         projectId: {
             type: String,
             default: undefined,
         },
     },
     setup(props) {
+        const userWorkspaceStore = useUserWorkspaceStore();
+        const allReferenceStore = useAllReferenceStore();
         const queryHelper = new QueryHelper();
         const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            serverData: [] as CloudServiceData[],
+            providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+            currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
             cloudServiceData: [] as CloudServiceData[],
             data: [] as Item[],
-            warningData: [] as Item[],
+            commonData: computed(() => state.data.filter((d) => !d.isCreateWarning && !d.isDeleteWarning)),
+            warningData: computed(() => state.data.filter((d) => d.isCreateWarning || d.isDeleteWarning)),
             loading: true,
             skeletons: range(4),
         });
@@ -223,11 +232,15 @@ export default {
         const listCloudServiceData = async (): Promise<void> => {
             state.loading = true;
             try {
-                const params: any = {
+                const params: Record<string, string> = {
                     timezone: store.state.user.timezone,
                 };
                 if (props.projectId) params.project_id = props.projectId;
-                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService(params);
+                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService({
+                    ...props.extraParams,
+                    ...params,
+                    workspace_id: state.currentWorkspaceId,
+                });
                 state.cloudServiceData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -288,27 +301,16 @@ export default {
             });
             return results;
         };
-        const getWarningData = (data: Item[]): Item[] => {
-            const warningData: Item[] = [];
-            find(data, (d) => {
-                if (d.isCreateWarning || d.isDeleteWarning) {
-                    warningData.push(d);
-                }
-            });
-            return warningData;
-        };
 
         /* Init */
         const init = async (): Promise<void> => {
             await Promise.allSettled([
                 listCloudServiceData(),
-                store.dispatch('reference/provider/load'),
             ]);
-            const data = getConvertedCloudServiceData(state.cloudServiceData);
-            state.warningData = getWarningData(data);
-            state.data = data.filter((x) => !state.warningData.includes(x));
+            state.data = getConvertedCloudServiceData(state.cloudServiceData);
         };
-        init();
+        const { callApiWithGrantGuard } = useGrantScopeGuard(['WORKSPACE'], init);
+        callApiWithGrantGuard();
 
         return {
             ...toRefs(state),
@@ -369,16 +371,12 @@ export default {
     }
 }
 
-.managed-resources {
-    @apply text-gray-700;
-    font-size: 0.75rem;
-    line-height: 1.2;
-    margin-top: -0.5rem;
-}
-
 .card-wrapper {
     @apply overflow-hidden whitespace-no-wrap w-full rounded-md;
     height: 100%;
+    &.fixed-height {
+        height: 16rem;
+    }
     .daily-update-card {
         @apply flex items-center w-full content-between overflow-hidden;
         padding-left: 1rem;
@@ -430,6 +428,16 @@ export default {
     }
 }
 
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .data-loader-container {
+        .loader-wrapper {
+            .loader {
+                display: block;
+            }
+        }
+    }
+}
 .card-wrapper .daily-update-card-alert {
     @apply flex items-center w-full content-between border rounded-md;
     flex-wrap: wrap;

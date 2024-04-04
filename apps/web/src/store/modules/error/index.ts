@@ -6,6 +6,7 @@ import type { ErrorState } from './type';
 const state: ErrorState = {
     visibleSessionExpiredError: false,
     visibleAuthorizationError: false,
+    grantAccessFailStatus: false,
 };
 
 export default {

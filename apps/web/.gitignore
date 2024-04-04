@@ -10,9 +10,6 @@ dist
 # Tests
 coverage/
 
-# Skaffold
-skaffold-*.yaml
-
 # Playwright
 /test-results/
 /playwright-report/

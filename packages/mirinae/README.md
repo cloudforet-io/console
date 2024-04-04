@@ -114,9 +114,9 @@ export default {
 ### Components with dependencies
 These components require plug-ins `vue-router` and `vue-i18n` installed in your project to function fully. If these plug-ins are not installed, it may not work as intended.
 
-| Plug-in          | Components                           |
-|------------------|--------------------------------------|
-| Vue Router       | - `PAnchor` <br/> - `PBreadcrumbs`   |
+| Plug-in          | Components                            |
+|------------------|---------------------------------------|
+| Vue Router       | - `PLink` <br/> - `PBreadcrumbs`      |
 | Vue I18n         | - `PSearch` <br/> - `PDatetimePicker` |
 
 

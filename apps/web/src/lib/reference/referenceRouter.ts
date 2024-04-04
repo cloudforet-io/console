@@ -7,8 +7,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -138,7 +138,14 @@ const routerMap: RouterMap = {
 export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {
     if (routerMap[reference.resource_type]) {
         const { name, formatter } = routerMap[reference.resource_type];
-        return formatter(name, data, reference, query);
+        const location = formatter(name, data, reference, query);
+        if (reference.workspace_id) {
+            location.params = {
+                ...location.params,
+                workspaceId: reference.workspace_id,
+            };
+        }
+        return location;
     }
     console.error(`[referenceRouter]: ${reference.resource_type} is not supported`);
     return {};

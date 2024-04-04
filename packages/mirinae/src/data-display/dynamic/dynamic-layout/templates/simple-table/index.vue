@@ -33,6 +33,15 @@
                     />
                 </slot>
             </template>
+
+            <template v-for="(_, slot) of $scopedSlots"
+                      #[slot]="scope"
+            >
+                <slot v-if="!dynamicFieldHeaderSlots[slot] && !dynamicFieldSlots[slot]"
+                      :name="slot"
+                      v-bind="scope"
+                />
+            </template>
         </p-data-table>
     </div>
 </template>

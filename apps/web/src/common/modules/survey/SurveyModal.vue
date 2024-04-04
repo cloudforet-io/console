@@ -61,6 +61,10 @@ import { PButtonModal, PSelectCard } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -82,7 +86,7 @@ export default {
             visible: false,
             isSessionExpired: computed(() => store.state.user.isSessionExpired),
             userId: computed(() => store.state.user.userId),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             answerItems1: computed(() => [
                 {
                     name: 1,
@@ -130,11 +134,10 @@ export default {
         /* API */
         const listSurveyConfig = async () => {
             try {
-                const { results } = await SpaceConnector.client.config.userConfig.list({
-                    user_id: state.userId,
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     name: `console:survey:${SURVEY_KEY}`,
                 });
-                state.visible = !results.length;
+                state.visible = !results?.length;
             } catch (e) {
                 state.visible = false;
                 ErrorHandler.handleError(e);
@@ -142,8 +145,7 @@ export default {
         };
         const createSurveyConfig = async () => {
             try {
-                await SpaceConnector.client.config.userConfig.create({
-                    user_id: state.userId,
+                await SpaceConnector.clientV2.config.userConfig.create<UserConfigCreateParameters>({
                     name: `console:survey:${SURVEY_KEY}`,
                     data: {
                         answer1: state.selectedAnswer1,

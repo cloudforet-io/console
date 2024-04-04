@@ -1,7 +1,7 @@
 <template>
     <span>
-        <p-anchor v-if="options.link"
-                  :href="options.link"
+        <p-link v-if="options.link"
+                :href="options.link"
         >
             <p-tag v-for="([objKey, objValue], idx) in Object.entries(dictData)"
                    :key="`tag-${idx}-${objKey}`"
@@ -9,7 +9,7 @@
                    :value-item="{ name: objValue, label: `${options.prefix || ''}${objValue}${options.postfix || ''}` }"
                    :deletable="false"
             />
-        </p-anchor>
+        </p-link>
         <template v-else>
             <p-tag v-for="([objKey, objValue], idx) in Object.entries(dictData)"
                    :key="`tag-${idx}-${objKey}`"
@@ -28,13 +28,13 @@ import {
 
 import type { DictDynamicFieldProps, DictTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/dict/type';
 import PTag from '@/data-display/tags/PTag.vue';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 
 export default defineComponent<DictDynamicFieldProps>({
     name: 'PDynamicFieldDict',
     components: {
         PTag,
-        PAnchor,
+        PLink,
     },
     props: {
         options: {

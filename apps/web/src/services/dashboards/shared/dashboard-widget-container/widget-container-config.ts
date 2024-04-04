@@ -1,5 +1,6 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 export const WIDGET_WIDTH_CRITERIA = 16;
 

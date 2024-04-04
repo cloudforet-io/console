@@ -1,8 +1,228 @@
+<script setup lang="ts">
+import {
+    computed, onUnmounted, reactive, ref, useSlots, watch,
+} from 'vue';
+
+import { reduce } from 'lodash';
+
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import { useListFocus } from '@/hooks/list-focus';
+import { useProxyValue } from '@/hooks/proxy-state';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
+import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
+import PSearch from '@/inputs/search/search/PSearch.vue';
+
+const FOCUS_GROUP_ID = 'context-item';
+
+interface ContextMenuProps {
+    title?: string;
+    menu: MenuItem[];
+    loading?: boolean;
+    selected?: MenuItem[];
+    multiSelectable?: boolean;
+    showSelectMarker?: boolean;
+    itemHeightFixed?: boolean;
+    highlightTerm?: string;
+    noSelectIndication?: boolean;
+    showSelectHeader?: boolean;
+    showClearSelection?: boolean;
+    searchable?: boolean;
+    searchText?: string;
+    readonly?: boolean;
+    resetSelectedOnUnmounted?: boolean;
+    beforeSelect?: (item: MenuItem, index: number, isSelected: boolean) => boolean;
+    beforeClearSelection?: (clearableSelectedItems: MenuItem[], allSelectedItems: MenuItem[]) => boolean;
+}
+interface ContextMenuEmits {
+    (e: 'update:selected', selected: MenuItem[]): void,
+    (e: 'focus', focusedIdx?: number): void,
+    (e: 'blur'): void,
+    (e: 'keyup:up:end'): void,
+    (e: 'keyup:down:end'): void,
+    (e: 'select', item: MenuItem, index: number, isSelected: boolean): void,
+    (e: 'update:search-text', searchText: string): void,
+    (e: 'keyup:esc', mouseEvent: MouseEvent): void,
+    (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
+    (e: 'click-done', mouseEvent: MouseEvent): void,
+    (e: 'click-show-more', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
+    (e: 'clear-selection'): void,
+}
+const props = withDefaults(defineProps<ContextMenuProps>(), {
+    title: undefined,
+    menu: () => [],
+    selected: () => [],
+    highlightTerm: '',
+    searchText: '',
+    readonly: false,
+    resetSelectedOnUnmounted: true,
+    beforeSelect: undefined,
+    beforeClearSelection: undefined,
+});
+const emit = defineEmits<ContextMenuEmits>();
+const slots = useSlots();
+
+const contextMenuRef = ref<HTMLElement|null>(null);
+
+const state = reactive({
+    proxySearchText: props.searchText ?? '',
+    isFocusedOnSearch: false,
+    proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
+    selectedNameMap: computed<Record<string, number>>(() => {
+        const selectedMap = {};
+        state.proxySelected.forEach((item, idx) => {
+            selectedMap[item.name] = idx;
+        });
+        return selectedMap;
+    }),
+    selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
+    selectedCount: computed(() => state.proxySelected.length),
+    clearableSelectedCount: computed(() => state.proxySelected.filter((item) => !item.disabled).length),
+    menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
+    contextMenuHeight: 0,
+    menuTitleHeight: 0,
+    menuMaxHeight: computed<number>(() => state.contextMenuHeight - state.menuTitleHeight),
+});
+
+const {
+    focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
+} = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, (item) => (!item.type || item.type === 'item') && !item.disabled);
+
+/* util */
+const focus = (position?: number) => {
+    if (props.searchable && position === undefined) {
+        state.isFocusedOnSearch = true;
+        return;
+    }
+    const focusedIdx = _focus(position);
+    if (focusedIdx !== undefined) emit('focus', focusedIdx);
+};
+const blur = () => {
+    _blur();
+    emit('blur');
+};
+
+/* event */
+const onKeyUp = (idx?: number) => {
+    // this case is from search element
+    if (idx === undefined) {
+        if (props.searchable) state.isFocusedOnSearch = false;
+        emit('keyup:up:end');
+        return;
+    }
+
+    // event from context menu item
+    const focusedIdx = handleMoveUp(idx);
+    if (focusedIdx === undefined) {
+        // if no items for focus left, focus on search element in searchable case.
+        if (props.searchable) state.isFocusedOnSearch = true;
+        else emit('keyup:up:end');
+    }
+};
+const onKeyDown = (idx?: number) => {
+    // this case is from search element
+    if (idx === undefined) {
+        if (props.searchable) focus(0);
+        return;
+    }
+
+    // event from context menu item
+    const focusedIdx = handleMoveDown(idx);
+    if (focusedIdx === undefined) emit('keyup:down:end');
+};
+const onClickMenu = (item: MenuItem, index) => {
+    if (item.disabled) return;
+    if (props.readonly) return;
+
+    let isSelected = true;
+    if (state.proxySelected.find((d) => d.name === item.name)) isSelected = false;
+
+    if (props.beforeSelect) {
+        const isContinue = props.beforeSelect(item, index, isSelected);
+        if (!isContinue) return;
+    }
+
+    if (props.multiSelectable) {
+        if (state.selectedNameMap[item.name ?? ''] !== undefined) {
+            const indexOfSelected = state.selectedNameMap[item.name ?? ''];
+            state.proxySelected.splice(indexOfSelected, 1);
+            state.proxySelected = [...state.proxySelected];
+        } else {
+            state.proxySelected = [...state.proxySelected, item];
+        }
+    } else {
+        state.proxySelected = [item];
+    }
+
+    emit('select', item, index, isSelected);
+};
+const onClickEsc = (e: MouseEvent) => {
+    emit('keyup:esc', e);
+    blur();
+};
+const handleClickClearSelection = () => {
+    const clearableItems = state.proxySelected.filter((item) => item.disabled);
+    if (props.beforeClearSelection) {
+        const isContinue = props.beforeClearSelection(clearableItems, state.proxySelected);
+        if (!isContinue) return;
+    }
+    state.proxySelected = clearableItems;
+    emit('clear-selection');
+};
+const handleUpdateSearchText = async (value: string) => {
+    state.proxySearchText = value;
+    emit('update:search-text', value);
+};
+
+watch(() => props.searchText, (searchText) => {
+    if (state.proxySearchText === searchText) return;
+    state.proxySearchText = searchText;
+});
+
+watch(() => props.menu, () => {
+    let contextMenuHeight = 0;
+    if (contextMenuRef.value) {
+        const maxHeightValue = contextMenuRef.value?.style?.getPropertyValue('max-height');
+        contextMenuHeight = parseFloat(maxHeightValue?.replace('px', ''));
+    }
+    state.contextMenuHeight = contextMenuHeight;
+    state.menuTitleHeight = contextMenuRef.value?.getElementsByClassName('context-menu-title-wrapper')[0]?.children[0]?.offsetHeight;
+}, { immediate: true });
+
+onUnmounted(() => {
+    if (props.resetSelectedOnUnmounted) state.proxySelected = [];
+});
+
+/* slots */
+const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+    if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+    return res;
+}, {}));
+
+/* exposes */
+defineExpose({
+    focus,
+});
+</script>
+
 <template>
-    <div class="p-context-menu"
+    <div ref="contextMenuRef"
+         class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
-        <div class="menu-container">
+        <div class="context-menu-title-wrapper">
+            <slot name="header">
+                <p v-if="title"
+                   class="context-menu-title"
+                >
+                    {{ props.title }}
+                </p>
+            </slot>
+        </div>
+        <div class="menu-container"
+             :style="{maxHeight: state.menuMaxHeight + 'px'}"
+        >
             <slot v-show="props.menu.length > 0"
                   name="menu"
                   v-bind="{...props}"
@@ -44,7 +264,7 @@
                 <p-text-button v-if="props.showClearSelection && props.multiSelectable"
                                class="clear-all-wrapper"
                                style-type="highlight"
-                               size="sm"
+                               size="md"
                                :readonly="readonly"
                                @click.stop="handleClickClearSelection"
                 >
@@ -62,6 +282,7 @@
                                              :disabled="item.disabled"
                                              :image-url="item.imageUrl"
                                              :icon="item.icon"
+                                             :icon-color="item.iconColor"
                                              :readonly="readonly"
                                              :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
                                              :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
@@ -154,180 +375,6 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import {
-    computed, onUnmounted, reactive, useSlots, watch,
-} from 'vue';
-
-import { reduce } from 'lodash';
-
-import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import { useListFocus } from '@/hooks/list-focus';
-import { useProxyValue } from '@/hooks/proxy-state';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
-import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
-import type { MenuItem } from '@/inputs/context-menu/type';
-import PSearch from '@/inputs/search/search/PSearch.vue';
-
-const FOCUS_GROUP_ID = 'context-item';
-
-interface ContextMenuProps {
-    menu: MenuItem[];
-    loading?: boolean;
-    selected?: MenuItem[];
-    multiSelectable?: boolean;
-    showSelectMarker?: boolean;
-    itemHeightFixed?: boolean;
-    highlightTerm?: string;
-    noSelectIndication?: boolean;
-    showSelectHeader?: boolean;
-    showClearSelection?: boolean;
-    searchable?: boolean;
-    searchText?: string;
-    readonly?: boolean;
-    resetSelectedOnUnmounted?: boolean;
-}
-interface ContextMenuEmits {
-    (e: 'update:selected', selected: MenuItem[]): void,
-    (e: 'focus', focusedIdx?: number): void,
-    (e: 'blur'): void,
-    (e: 'keyup:up:end'): void,
-    (e: 'keyup:down:end'): void,
-    (e: 'select', item: MenuItem, index: number): void,
-    (e: 'update:search-text', searchText: string): void,
-    (e: 'keyup:esc', mouseEvent: MouseEvent): void,
-    (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
-    (e: 'click-done', mouseEvent: MouseEvent): void,
-    (e: 'click-show-more', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
-}
-const props = withDefaults(defineProps<ContextMenuProps>(), {
-    menu: () => [],
-    selected: () => [],
-    highlightTerm: '',
-    searchText: '',
-    readonly: false,
-    resetSelectedOnUnmounted: true,
-});
-const emit = defineEmits<ContextMenuEmits>();
-const slots = useSlots();
-
-const state = reactive({
-    proxySearchText: props.searchText ?? '',
-    isFocusedOnSearch: false,
-    proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
-    selectedNameMap: computed<Record<string, number>>(() => {
-        const selectedMap = {};
-        state.proxySelected.forEach((item, idx) => {
-            selectedMap[item.name] = idx;
-        });
-        return selectedMap;
-    }),
-    selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
-    selectedCount: computed(() => state.proxySelected.length),
-    clearableSelectedCount: computed(() => state.proxySelected.filter((item) => !item.disabled).length),
-    menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
-});
-
-
-const {
-    focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
-} = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, (item) => (!item.type || item.type === 'item') && !item.disabled);
-
-/* util */
-const focus = (position?: number) => {
-    if (props.searchable && position === undefined) {
-        state.isFocusedOnSearch = true;
-        return;
-    }
-    const focusedIdx = _focus(position);
-    if (focusedIdx !== undefined) emit('focus', focusedIdx);
-};
-const blur = () => {
-    _blur();
-    emit('blur');
-};
-
-/* event */
-const onKeyUp = (idx?: number) => {
-    // this case is from search element
-    if (idx === undefined) {
-        if (props.searchable) state.isFocusedOnSearch = false;
-        emit('keyup:up:end');
-        return;
-    }
-
-    // event from context menu item
-    const focusedIdx = handleMoveUp(idx);
-    if (focusedIdx === undefined) {
-        // if no items for focus left, focus on search element in searchable case.
-        if (props.searchable) state.isFocusedOnSearch = true;
-        else emit('keyup:up:end');
-    }
-};
-const onKeyDown = (idx?: number) => {
-    // this case is from search element
-    if (idx === undefined) {
-        if (props.searchable) focus(0);
-        return;
-    }
-
-    // event from context menu item
-    const focusedIdx = handleMoveDown(idx);
-    if (focusedIdx === undefined) emit('keyup:down:end');
-};
-const onClickMenu = (item: MenuItem, index) => {
-    if (item.disabled) return;
-    if (props.readonly) return;
-
-    if (props.multiSelectable) {
-        if (state.selectedNameMap[item.name ?? ''] !== undefined) {
-            const indexOfSelected = state.selectedNameMap[item.name ?? ''];
-            state.proxySelected.splice(indexOfSelected, 1);
-            state.proxySelected = [...state.proxySelected];
-        } else {
-            state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
-            state.proxySelected = [...state.proxySelected];
-        }
-    } else {
-        state.proxySelected = [item];
-    }
-
-    emit('select', item, index);
-};
-const onClickEsc = (e: MouseEvent) => {
-    emit('keyup:esc', e);
-    blur();
-};
-const handleClickClearSelection = () => {
-    state.proxySelected = state.proxySelected.filter((item) => item.disabled);
-};
-const handleUpdateSearchText = async (value: string) => {
-    state.proxySearchText = value;
-    emit('update:search-text', value);
-};
-
-watch(() => props.searchText, (searchText) => {
-    if (state.proxySearchText === searchText) return;
-    state.proxySearchText = searchText;
-});
-
-onUnmounted(() => {
-    if (props.resetSelectedOnUnmounted) state.proxySelected = [];
-});
-
-/* slots */
-const searchSlots = computed(() => reduce(slots, (res, d, name) => {
-    if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
-    return res;
-}, {}));
-
-/* exposes */
-defineExpose({
-    focus,
-});
-</script>
-
 <style lang="postcss">
 .p-context-menu {
     @apply rounded bg-white border border-gray-300;
@@ -340,6 +387,13 @@ defineExpose({
     border-style: solid;
     user-select: none;
     overflow: hidden;
+    .context-menu-title {
+        @apply text-label-xl;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
     > .menu-container {
         min-height: inherit;
         max-height: inherit;
@@ -356,11 +410,12 @@ defineExpose({
             padding: 0.5rem;
         }
         > .clear-all-wrapper {
-            padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+            width: max-content;
+            padding: 0.375rem 0.5rem 0.25rem 0.5rem;
         }
         > .context-header {
             @apply text-gray-500;
-            margin-top: 0.875rem;
+            margin-top: 0.5rem;
             margin-bottom: 0.25rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
@@ -384,6 +439,7 @@ defineExpose({
         }
         > .context-show-more {
             padding: 0.5rem;
+            min-width: 7rem;
         }
         > .bottom-slot-area {
             padding: 0.5rem;

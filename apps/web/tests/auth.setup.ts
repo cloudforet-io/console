@@ -1,4 +1,4 @@
-import { expect, test, test as setup } from '@playwright/test';
+import { test, test as setup } from '@playwright/test';
 
 const authFile = 'playwright/.auth/user.json';
 setup('Authenticate', async ({ page }) => {
@@ -12,10 +12,8 @@ setup('Authenticate', async ({ page }) => {
     });
 
     await test.step('Click the sign in button', async () => {
-        const navigationPromise = page.waitForNavigation();
         await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-        await navigationPromise;
-        await expect(page).toHaveURL(/home-dashboard/);
+        await page.waitForLoadState('networkidle');
     });
 
     await page.context().storageState({ path: authFile });

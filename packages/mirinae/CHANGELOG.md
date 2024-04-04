@@ -3682,7 +3682,7 @@
 
 ### Features
 
-* add PSelectStatus to index.ts ([#585](https://github.com/spaceone-dev/spaceone-design-system/issues/585)) ([0b632b7](https://github.com/spaceone-dev/spaceone-design-system/commit/0b632b73955bf4b6bb7e7daf04b05bdf4897a2bf))
+* add PSelectStatus to alert-info.ts ([#585](https://github.com/spaceone-dev/spaceone-design-system/issues/585)) ([0b632b7](https://github.com/spaceone-dev/spaceone-design-system/commit/0b632b73955bf4b6bb7e7daf04b05bdf4897a2bf))
 
 # [1.1.0-beta.49](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.48...v1.1.0-beta.49) (2021-06-09)
 
@@ -3760,7 +3760,7 @@
 
 ### Bug Fixes
 
-* add PCard to index.ts ([#573](https://github.com/spaceone-dev/spaceone-design-system/issues/573)) ([a27ddae](https://github.com/spaceone-dev/spaceone-design-system/commit/a27ddae8c024ccc598897fa1dbd06a606b6cda13))
+* add PCard to alert-info.ts ([#573](https://github.com/spaceone-dev/spaceone-design-system/issues/573)) ([a27ddae](https://github.com/spaceone-dev/spaceone-design-system/commit/a27ddae8c024ccc598897fa1dbd06a606b6cda13))
 
 # [1.1.0-beta.38](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.37...v1.1.0-beta.38) (2021-06-02)
 

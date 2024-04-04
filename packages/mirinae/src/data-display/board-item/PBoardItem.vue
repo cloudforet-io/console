@@ -41,9 +41,9 @@
             >
                 <div class="overlay-contents">
                     <p-select-dropdown v-if="iconSetList.length > 1"
-                                       :items="iconSetList"
+                                       :menu="iconSetList"
                                        style-type="icon-button"
-                                       button-icon="ic_more"
+                                       button-icon="ic_ellipsis-horizontal"
                                        use-fixed-menu-style
                     >
                         <template #menu-menu>

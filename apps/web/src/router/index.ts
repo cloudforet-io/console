@@ -5,20 +5,41 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { ERROR_ROUTE } from '@/router/error-routes';
+import type { GrantScope } from '@/schema/identity/token/type';
 
-import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { GTag } from '@/lib/gtag';
+import { ERROR_ROUTE, ROUTE_SCOPE } from '@/router/constant';
+import {
+    getCurrentTime,
+    getDecodedDataFromAccessToken,
+    getRouteScope, shouldUpdateScope,
+    processRouteIntegrityCheck,
+    processTokenVerification,
+    processWorkspaceAccessValidation, verifyPageAccessAndRedirect,
+} from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { pinia } from '@/store/pinia';
+
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
+import { GTag } from '@/lib/site-analytics/gtag';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
+const grantAndLoadByCurrentScope = async (scope: GrantScope, workspaceId?: string): Promise<{ failStatus: boolean }> => {
+    const refreshToken = SpaceConnector.getRefreshToken();
+    const grantRequest = {
+        scope,
+        token: refreshToken,
+        workspace_id: workspaceId,
+    };
 
-const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
-
+    await SpaceRouter.router.app?.$store.dispatch('user/grantRoleAndLoadReferenceData', grantRequest);
+    const grantAcessFailStatus = SpaceRouter.router.app?.$store.state.error.grantAccessFailStatus;
+    return {
+        failStatus: !!grantAcessFailStatus,
+    };
+};
 export class SpaceRouter {
     static router: VueRouter;
 
@@ -34,6 +55,8 @@ export class SpaceRouter {
         });
 
         let nextPath: string;
+        const appContextStore = useAppContextStore(pinia);
+        const userWorkspaceStore = useUserWorkspaceStore(pinia);
 
         SpaceRouter.router.onError((error) => {
             console.error(error);
@@ -54,56 +77,62 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
-            nextPath = to.fullPath;
-            const isTokenAlive = SpaceConnector.isTokenAlive;
-            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
-            const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
-            const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
-            let nextLocation;
+            const { rol: prevRole, wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
+            const routeScope = getRouteScope(to);
 
-            // When a user is authenticated
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                // When a user need to reset password and tries to go to other pages, redirect to reset password page
-                if (userNeedPwdReset && to.name !== AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
-                    nextLocation = { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
-                // When a user is already signed in and tries to go to sign in page, redirect to home-dashboard page
-                } else if (to.meta?.isSignInPage) {
-                    nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
-                // When a user tries to go to inaccessible page, redirect to error page
-                } else if (userAccessLevel < routeAccessLevel) {
-                    nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
-                }
-            // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
-            } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                if (!isTokenAlive) {
-                    // When refreshing token is failed, redirect to sign in page
-                    const res = await SpaceConnector.refreshAccessToken(false);
-                    if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
-                }
+            /* Route-Validation-and-Verification Process */
+            let continueProcess: boolean;
+            continueProcess = processTokenVerification(to, next, routeScope);
+            if (!continueProcess) return;
+
+            continueProcess = processRouteIntegrityCheck(to, next);
+            if (!continueProcess) return;
+
+            if (routeScope === ROUTE_SCOPE.WORKSPACE) {
+                continueProcess = await processWorkspaceAccessValidation(to, next, userWorkspaceStore.getters.workspaceList);
+                if (!continueProcess) return;
             }
 
-            // If top notification which indicates authorization error is visible, clear it before moving to next location
-            if (SpaceRouter.router.app?.$store.state.error.visibleAuthorizationError) {
-                SpaceRouter.router.app?.$store.commit('error/setVisibleAuthorizationError', false);
+            /* Grant Scope Process */
+            if (routeScope !== ROUTE_SCOPE.EXCLUDE_AUTH && shouldUpdateScope(prevRole, routeScope, prevWorkspaceId, to.params.workspaceId)) {
+                const { failStatus } = await grantAndLoadByCurrentScope(routeScope, to.params.workspaceId);
+
+                if (failStatus) { // Grant fail
+                    await userWorkspaceStore.load();
+                    next({
+                        name: ERROR_ROUTE._NAME,
+                        params: { statusCode: '404' },
+                    });
+                } else if (routeScope === ROUTE_SCOPE.WORKSPACE) { // Grant success - Workspace
+                    verifyPageAccessAndRedirect(to, next, to.params.workspaceId, SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList']);
+                } else next(); // Grant success - Others (Admin, User)
+            } else { // Grant Process Not Needed
+                appContextStore.setGlobalGrantLoading(false);
+                next();
             }
-            next(nextLocation);
         });
 
         SpaceRouter.router.afterEach((to) => {
             // set target page as GTag page view
             if (GTag.gtag) GTag.setPageView(to);
-
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
+            const isAdminMode = appContextStore.getters.isAdminMode;
+            const routeScope = getRouteScope(to);
 
-            const isDomainOwner = store.getters['user/isDomainOwner'];
-            if (!isDomainOwner) {
+            if (!isAdminMode && routeScope === 'WORKSPACE') {
                 const recent = getRecentConfig(to);
                 if (recent) {
-                    store.dispatch('recent/addItem', {
-                        itemType: recent.itemType,
-                        itemId: recent.itemId,
+                    SpaceConnector.clientV2.config.userConfig.set({
+                        name: `console:recent:${recent.itemType}:${recent.workspaceId}:${recent.itemId}`,
+                        data: {
+                            id: recent.itemId,
+                            workspace_id: recent.workspaceId,
+                            type: recent.itemType,
+                            label: recent.itemId,
+                        },
+                    }).catch((e) => {
+                        console.error(e);
                     });
                 }
             }

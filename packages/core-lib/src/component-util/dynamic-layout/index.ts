@@ -1,14 +1,19 @@
+import type {
+    DynamicField,
+    EnumOptions,
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type {
+    DynamicLayoutType,
+    SearchSchema,
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { forEach } from 'lodash';
 
-import type { EnumOptions } from '@/component-util/dynamic-layout/field-schema';
-import type { DynamicLayoutType } from '@/component-util/dynamic-layout/layout-schema';
-import type { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/component-util/dynamic-layout/type';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@/component-util/query-search/type';
 import type { ApiFilter } from '@/space-connector/type';
 
 interface ExcelDataField {
@@ -16,7 +21,7 @@ interface ExcelDataField {
     name: string;
     type?: 'datetime'|'enum';
     enum_items?: object;
-    reference?: Reference;
+    reference?: DynamicField['reference'];
 }
 
 interface QuerySearchProps {
@@ -33,7 +38,7 @@ interface QuerySearchProps {
  * @param schema
  * @param resourceType
  */
-export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
+export const makeQuerySearchPropsWithSearchSchema = (schema: SearchSchema, resourceType: string, filters?: ApiFilter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
     querySearchProps.keyItemSets = schema.map((s) => ({
@@ -67,17 +72,26 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
     return querySearchProps;
 };
 
+
+/**
+ * @name isTableTypeInDynamicLayoutType
+ * @description returns boolean value that match with dynamic layout type with camelcase.
+ * @param type
+ */
+export const isTableTypeInDynamicLayoutType = (type: DynamicLayoutType): boolean => (['raw-table', 'table', 'query-search-table'].includes(type));
+
+
 /**
  * @name getApiActionByLayoutType
  * @description returns action name that match with dynamic layout type with camelcase.
  * @param type
  */
 export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
-    if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
+    if (isTableTypeInDynamicLayoutType(type)) return 'getData';
     return 'get';
 };
 
-export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
+export const dynamicFieldsToExcelDataFields = (fields: DynamicField[]): ExcelDataField[] => fields.map((d) => {
     const res: ExcelDataField = { key: d.key, name: d.name ?? d.key };
 
     // lis type case will be deprecated
@@ -111,6 +125,7 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 
 export default {
     makeQuerySearchPropsWithSearchSchema,
+    isTableTypeInDynamicLayoutType,
     getApiActionByLayoutType,
     dynamicFieldsToExcelDataFields,
 };

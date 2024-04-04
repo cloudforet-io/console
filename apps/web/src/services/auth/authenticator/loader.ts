@@ -1,11 +1,11 @@
-import { GoogleAuth } from '@/services/auth/sign-in/external/GOOGLE_OAUTH2/authenticator/google-auth';
-import { KbAuth } from '@/services/auth/sign-in/external/KB_SSO/authenticator/kb-auth';
-import { KeycloakAuth } from '@/services/auth/sign-in/external/KEYCLOAK/authenticator/keycloak-auth';
-import { SpaceAuth } from '@/services/auth/sign-in/local/authenticator/space-auth';
+import type { ExtendedAuthType } from '@/store/modules/domain/type';
 
-export const loadAuth = (authType?): any => {
+import { GoogleAuth } from '@/services/auth/authenticator/external/GOOGLE_OAUTH2/authenticator/google-auth';
+import { KeycloakAuth } from '@/services/auth/authenticator/external/KEYCLOAK_OIDC/authenticator/keycloak-auth';
+import { SpaceAuth } from '@/services/auth/authenticator/local/authenticator/space-auth';
+
+export const loadAuth = (authType?:ExtendedAuthType): any => {
     if (authType === 'GOOGLE_OAUTH2') return GoogleAuth;
-    if (authType === 'KEYCLOAK') return KeycloakAuth;
-    if (authType === 'KB_SSO') return KbAuth;
+    if (authType === 'KEYCLOAK_OIDC') return KeycloakAuth;
     return SpaceAuth;
 };

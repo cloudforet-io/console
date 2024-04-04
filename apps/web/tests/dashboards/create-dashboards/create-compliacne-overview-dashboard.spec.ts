@@ -45,25 +45,29 @@ test.describe('Create Compliance Overview Dashboard', () => {
         await test.step('4. Check default variables', async () => {
             const variables = await page.locator('.dashboard-variables-select-dropdown .dashboard-variable-dropdown');
             const labelList: string[] = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await variables.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const variableName = await widgetElement.locator('.variable-label').innerText();
                 labelList.push(variableName);
             }
             expect(labelList).toEqual([
-                'Project', 'Provider', 'Region', 'Compliance Type', 'AWS Account ID (Asset)',
+                'Project', 'Provider', 'Region', 'Compliance Framework', 'AWS Account ID (Asset)',
             ]);
         });
 
         await test.step('5. Check default widget list', async () => {
             const widgetList = await page.locator('.draggable-wrapper .draggable-item');
             const widgetNameList: string[] = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (const widgetElement of await widgetList.all()) {
+                // eslint-disable-next-line no-await-in-loop
                 const widgetName = await widgetElement.locator('.text').innerText();
                 widgetNameList.push(widgetName);
             }
             expect(widgetNameList).toEqual([
-                'Compliance Check Status',
-                'Total Failure and Severity',
+                'Compliance Status',
+                'Total Fail Findings Status',
                 'Count of Pass and Fail Findings by Region',
                 'Count of Fail Findings by Service',
                 'Trend of Pass and Fail Findings by Service',
@@ -80,7 +84,7 @@ test.describe('Create Compliance Overview Dashboard', () => {
 
         await test.step('7. Check the created dashboard', async () => {
             const locatorScope = await page.locator('.p-breadcrumbs > span:nth-child(2) .link');
-            const locatorName = await page.locator('.lnb-menu-item .selected .text');
+            const locatorName = await page.locator('.lsb-menu-item .selected .text');
 
             await expect(locatorScope).toContainText(' Workspace ');
             await expect(locatorName).toContainText(dashboardName);

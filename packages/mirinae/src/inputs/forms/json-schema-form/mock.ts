@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import Fuse from 'fuse.js';
 import { range } from 'lodash';
 
-import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type { ReferenceHandler } from '@/inputs/forms/json-schema-form/type';
 
 export const getDefaultSchema = () => ({
@@ -151,9 +151,34 @@ export const getDefaultSchema = () => ({
             reference: { resource_type: 'friend', reference_key: 'friend' },
             items: {},
         },
+        pem_key: {
+            title: 'PEM Key',
+            type: 'string',
+            format: 'pem_key',
+            default: `-----BEGIN RSA PRIVATE KEY-----
+MIICXgIBAAKBgQDCFENGw33yGihy92pDjZQhl0C36rPJj+CvfSC8+q28hxA161QF
+NUd13wuCTUcq0Qd2qsBe/2hFyc2DCJJg0h1L78+6Z4UMR7EOcpfdUE9Hf3m/hs+F
+UR45uBJeDK1HSFHD8bHKD6kv8FPGfJTotc+2xjJwoYi+1hqp1fIekaxsyQIDAQAB
+AoGBAJR8ZkCUvx5kzv+utdl7T5MnordT1TvoXXJGXK7ZZ+UuvMNUCdN2QPc4sBiA
+QWvLw1cSKt5DsKZ8UETpYPy8pPYnnDEz2dDYiaew9+xEpubyeW2oH4Zx71wqBtOK
+kqwrXa/pzsdfucRRjk6vE6YY7EBBs/g7uanVpdibOVAEsqH1AkEA7DkjVH28WDUg
+f1nqvfn6Kj6CT7nIcE3jGJsZZ7zlZmBmHFDONfLUrXR/Zm3pR5m0tCmBqa5RK95u
+412jt1dPIwJBANJT3v8pnkth48bQo/fKel6eEYyboRtA5/uHuHkZ6FQF7OUkGogc
+mSJluOdc5t6hI1VsLn0QZEjQZMEOWr+wKAMCQQCC4kXJEsHAve77oP6HtG/IiEn7
+kpyUXRNvFsDE0czpJJBvL/aRFUJxuRK91jhjC68sA7NsKMGg5OXb5I5Jj36xAkEA
+gIT7aFPOIFwGgQAQkWNKLvySgKbAZRDeLBacpHMuQdl1DfdntvAyqpAZ0lY0RKmW
+G6aFKaqQfOXKCyWoUiVknQJAXsssyFFci/2ueKlIE1QqIiLSZ8V8OlpFLRnb1pzI
+7U1yQXnTAEKJM560yDjzUpOs1V3cGcGd365tiSMvxLOvTA==
+-----END RSA PRIVATE KEY-----`,
+            examples: [
+                `-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----`,
+            ],
+        },
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider', 'friends'],
-    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider', 'friends', 'pem_key'],
+    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food', 'pem_key'],
 });
 
 export const getDefaultFormData = () => ({
@@ -170,18 +195,18 @@ export const getJsonInputSchema = () => {
     return schema;
 };
 
-const getMenuItem = (): FilterableDropdownMenuItem => ({
+const getMenuItem = (): SelectDropdownMenuItem => ({
     name: faker.datatype.uuid(),
     label: `${faker.random.word()}`, // (${faker.random.word()})`,
     type: 'item',
     // disabled: faker.datatype.boolean(),
 });
-export const getMenuItems = (min = 10, max = 30): FilterableDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
+export const getMenuItems = (min = 10, max = 30): SelectDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
 
 export const getReferenceHandler = (pageSize = 10): ReferenceHandler => {
-    const allItems: FilterableDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
-    return async (inputText, schema, pageStart, pageLimit) => {
-        const allResults = await new Promise<FilterableDropdownMenuItem[]>((resolve) => {
+    const allItems: SelectDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
+    return async (inputText, { pageStart, pageSize: pageLimit }) => {
+        const allResults = await new Promise<SelectDropdownMenuItem[]>((resolve) => {
             setTimeout(() => {
                 let filtered;
                 const trimmed = inputText.trim();

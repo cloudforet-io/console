@@ -6,7 +6,6 @@ on:
     path-ignores:
       - '.github/**'
       - '**/deploy/**'
-      - '**/skaffold.template.yaml'
       - '**/Dockerfile'
       - '**/*.dockerfile'
       - '**/*.dockerignore'
@@ -22,9 +21,12 @@ on:
       - feature-*
     workflow_dispatch:
 
+
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: 'development'
 
     steps:
       - name: Checkout code
@@ -35,7 +37,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Restore cached node_modules
         id: restore-node-cache
@@ -70,9 +72,6 @@ jobs:
 
       - name: Test
         run: npm run test
-
-      - name: Build Apps
-        run: npm run build -- --filter="./apps/*" --parallel --output-logs=new-only
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3

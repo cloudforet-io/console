@@ -9,13 +9,13 @@
                    :target="linkTarget || undefined"
         >
             <slot name="default"
-                  v-bind="{...$props, index: i, item, value: item || ''}"
+                  v-bind="{...$props, index: i, item, value: item}"
             >
-                {{ item || '' }}
+                {{ item }}
             </slot>
             <slot v-if="i < displayItems.length - 1"
                   name="delimiter"
-                  v-bind="{...$props, index: i, item, value: item || ''}"
+                  v-bind="{...$props, index: i, item, value: item}"
             >
                 <span v-if="!isLineBreak"
                       class="delimiter"
@@ -34,12 +34,12 @@ import {
 import { get } from 'lodash';
 
 import type { TextListItem, TextListProps } from '@/data-display/text-list/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
 import { isNotEmpty } from '@/utils/helpers';
 
 export default defineComponent<TextListProps>({
     name: 'PTextList',
-    components: { PAnchor },
+    components: { PLink },
     props: {
         items: {
             type: Array as PropType<TextListItem>,
@@ -64,7 +64,7 @@ export default defineComponent<TextListProps>({
     },
     setup(props) {
         const state = reactive({
-            component: computed(() => (props.link ? PAnchor : 'span')),
+            component: computed(() => (props.link ? PLink : 'span')),
             displayItems: computed(() => props.items.reduce((res, item) => {
                 let data;
                 if (typeof item === 'object' && props.subKey) {
@@ -73,7 +73,7 @@ export default defineComponent<TextListProps>({
 
                 if (isNotEmpty(data)) res.push(data);
                 return res;
-            }, [] as string[])),
+            }, [] as string[]).map((item) => item ?? '')),
             isLineBreak: computed(() => ['<br>', '<br/>'].includes(props.delimiter)),
         });
 

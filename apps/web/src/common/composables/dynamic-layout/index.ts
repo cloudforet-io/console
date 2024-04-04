@@ -4,24 +4,25 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { KeyItem, KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler, makeCloudServiceTagValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import { store } from '@/store';
+import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+useAllReferenceStore(pinia);
+const allReferenceStore = useAllReferenceStore();
 
-import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
-
-const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemSet[] => {
+const getKeyItemSets = (searchKeyGroups: SearchSchema, storeState): KeyItemSet[] => {
     const keyItemSets: KeyItemSet[] = [];
-    schemaList.forEach((schema) => {
+    searchKeyGroups.forEach((schema) => {
         const keyItems: KeyItem[] = [];
         schema.items.forEach((item) => {
             const keyItem: any = {
@@ -48,9 +49,9 @@ const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemS
     });
     return keyItemSets;
 };
-const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[], providers?: ProviderReferenceMap): ValueHandlerMap => {
+const getValueHandlerMap = (searchKeyGroups: SearchSchema, resourceType: string, filters?: ApiFilter[], providers?: ProviderReferenceMap): ValueHandlerMap => {
     const valueHandlerMap: ValueHandlerMap = {};
-    schemaList.forEach((schema) => {
+    searchKeyGroups.forEach((schema) => {
         schema.items.forEach((item) => {
             if (item.enums) {
                 valueHandlerMap[item.key] = makeEnumValueHandler(item.enums);
@@ -76,26 +77,23 @@ const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: str
  * @param filters
  */
 export function useQuerySearchPropsWithSearchSchema(
-    searchSchema: ComputedRef<ConsoleSearchSchema[]>,
+    searchSchema: ComputedRef<SearchSchema>,
     resourceType: string,
     filters?: ComputedRef<ApiFilter[]>,
-): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {
-    (async () => {
-        await store.dispatch('reference/loadAll');
-    })();
+): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap> } {
     const storeState = reactive({
-        Project: computed(() => store.getters['reference/projectItems']),
-        ProjectGroup: computed(() => store.getters['reference/projectGroupItems']),
-        ServiceAccount: computed(() => store.getters['reference/serviceAccountItems']),
-        CloudServiceType: computed(() => store.getters['reference/cloudServiceTypeItems']),
-        Secret: computed(() => store.getters['reference/secretItems']),
-        Collector: computed(() => store.getters['reference/collectorItems']),
-        Provider: computed(() => store.getters['reference/providerItems']),
-        Region: computed(() => store.getters['reference/regionItems']),
-        Plugin: computed(() => store.getters['reference/pluginItems']),
-        User: computed(() => store.getters['reference/userItems']),
-        Protocol: computed(() => store.getters['reference/protocolItems']),
-        Webhook: computed(() => store.getters['reference/webhookItems']),
+        Project: computed(() => allReferenceStore.getters.project),
+        ProjectGroup: computed(() => allReferenceStore.getters.projectGroup),
+        ServiceAccount: computed(() => allReferenceStore.getters.serviceAccount),
+        CloudServiceType: computed(() => allReferenceStore.getters.cloudServiceType),
+        Secret: computed(() => allReferenceStore.getters.secret),
+        Collector: computed(() => allReferenceStore.getters.collector),
+        Provider: computed(() => allReferenceStore.getters.provider),
+        Region: computed(() => allReferenceStore.getters.region),
+        Plugin: computed(() => allReferenceStore.getters.plugin),
+        User: computed(() => allReferenceStore.getters.user),
+        Protocol: computed(() => allReferenceStore.getters.protocol),
+        Webhook: computed(() => allReferenceStore.getters.webhook),
     });
 
     const state = reactive({
@@ -105,17 +103,15 @@ export function useQuerySearchPropsWithSearchSchema(
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    debouncedWatch([() => searchSchema.value, () => store.state.reference.isAllLoaded], (watchValue) => {
-        if (!watchValue) return;
-        const [schema, isAllLoaded] = watchValue;
-        if (isAllLoaded && schema.length) {
+    debouncedWatch(() => searchSchema.value, (schema) => {
+        if (!schema) return;
+        if (schema.length) {
             state.keyItemSets = getKeyItemSets(schema, storeState);
             state.valueHandlerMap = getValueHandlerMap(searchSchema.value, resourceType, filters?.value, storeState.Provider);
         }
     }, { immediate: true, debounce: 200 });
 
     return {
-        isAllLoaded: computed(() => store.state.reference.isAllLoaded),
         keyItemSets: computed(() => state.keyItemSets),
         valueHandlerMap: computed(() => state.valueHandlerMap),
     };

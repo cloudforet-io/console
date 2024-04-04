@@ -12,13 +12,6 @@
     "AM5_CHARTS": "",
     "AM5_MAPS": ""
   },
-  "MOCK": {
-    "ALL": false,
-    "ENDPOINT_V1": "",
-    "ENDPOINT_V2": "",
-    "REFLECTION": false,
-    "SKIP_TOKEN_CHECK": false
-  },
   "ASSET_PATH": {
   },
   "DOMAIN_IMAGE": {
@@ -29,5 +22,5 @@
     { "label": "GitHub", "link": "https://github.com/cloudforet-io" }
   ],
   "CONTACT_LINK": "",
-  "DASHBOARD_ENABLED": false
+  "SMTP_ENABLED": false
 }

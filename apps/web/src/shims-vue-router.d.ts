@@ -12,29 +12,31 @@ import {
     VueRouter,
 } from 'vue-router/types/router';
 
-    import type { AccessLevel } from '@/lib/access-control/config';
-
     import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
   interface RouteLabelFormatter {
     (route: Route): TranslateResult|TranslateResult[];
   }
   interface RouteTranslationIdFormatter {
-    (route: Route): string|string[];
+    (route: Route): string | [id: string, values: Record<string, string|number|boolean>];
   }
   interface RouteBreadcrumbsFormatter {
       (route: Route): Breadcrumb[];
   }
+  interface RouteCopiableFormatter {
+        (route: Route): boolean;
+  }
+  export type RouteScope = 'EXCLUDE_AUTH' | 'USER' | 'WORKSPACE' | 'DOMAIN';
   interface RouteMeta {
+    scope: RouteScope;
     lnbVisible?: boolean;
     centeredLayout?: boolean;
     menuId?: string;
     label?: string|RouteLabelFormatter;
     translationId?: string|RouteTranslationIdFormatter;
     breadcrumbs?: RouteBreadcrumbsFormatter;
-    copiable?: boolean; // for breadcrumbs
+    copiable?: boolean|RouteCopiableFormatter; // for breadcrumbs
     isSignInPage?: boolean;
-    accessLevel?: AccessLevel;
     accessInfo?: AccessInfo;
   }
   export interface RouteConfigSingleView extends OriginRouteConfigSingleView {

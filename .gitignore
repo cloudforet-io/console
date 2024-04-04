@@ -21,6 +21,3 @@ dev/*.env
 
 # Playwright
 user.json
-
-# Skaffold
-skaffold

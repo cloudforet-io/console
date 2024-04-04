@@ -109,7 +109,7 @@
                         @focus="handleFocusMenuItem"
                         @keyup:up:end="focusOnInput()"
                         @keyup:down:end="focusOnContextMenu()"
-                        @click-show-more="showMoreMenu"
+                        @click-show-more="handleClickShowMore"
         />
     </div>
 </template>
@@ -410,6 +410,9 @@ export default defineComponent<TextInputProps>({
                 hideMenu(false);
             }
         };
+        const handleClickShowMore = async () => {
+            await showMoreMenu();
+        };
 
         /* input password & masking */
         const proxyShowPassword = useProxyValue('showPassword', props, emit);
@@ -515,6 +518,7 @@ export default defineComponent<TextInputProps>({
             /* context menu event listeners */
             handleFocusMenuItem,
             handleUpdateSelected,
+            handleClickShowMore,
             /* input password & masking */
             proxyShowPassword,
             handleTogglePassword,

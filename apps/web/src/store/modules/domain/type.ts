@@ -1,12 +1,12 @@
-export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK' | 'KB_SSO';
+export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK_OIDC' | 'KB_SSO';
 
 export interface DomainState {
     domainId?: string;
     name?: string;
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
-    billingEnabled: boolean;
     extraMenu?: ExtraMenuSet;
+    config?: Record<string, any>;
 }
 
 export interface ExtraMenuSet {
@@ -26,4 +26,5 @@ export interface ExtraSubMenu {
 
 export const DOMAIN_CONFIG_TYPE = {
     EXTRA_MENU: 'console:ext-menu',
+    SETTINGS: 'settings',
 } as const;

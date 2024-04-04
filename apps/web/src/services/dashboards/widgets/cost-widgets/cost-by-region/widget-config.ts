@@ -1,15 +1,10 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-by-region/CostByRegionWidget.vue'),
-    }),
     title: 'Cost by Region',
     labels: ['Cost'],
     description: {
@@ -22,8 +17,8 @@ const costByRegionWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.ACCUMULATED,
-        cost_group_by: COST_GROUP_BY.REGION,
+        granularity: GRANULARITY.MONTHLY,
+        cost_data_field: COST_DATA_FIELD_MAP.REGION.name,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
             enabled: true,
@@ -34,34 +29,20 @@ const costByRegionWidgetConfig: WidgetConfig = {
             page_size: 10,
         },
     },
-    options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_account', 'cost_product'),
-        schema: {
-            type: 'object',
-            properties: getWidgetFilterOptionsSchema(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_account',
-            ),
-            order: getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_account',
-            ),
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        ['cost_data_field', { readonly: true }],
+        ['granularity', { fixed: true, readonly: true }],
+        'filters.provider',
+        'filters.project_group',
+        'filters.project',
+        'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
+        'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
+    ]),
 };
 
 export default costByRegionWidgetConfig;

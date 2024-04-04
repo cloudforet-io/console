@@ -21,6 +21,8 @@ export const Template = (args, { argTypes }) => ({
         :all-page="allPage"
         :this-page.sync="thisPage"
         :show-page-number="showPageNumber"
+        :disable-next-page="disableNextPage"
+        :has-next-page="hasNextPage"
     />
 </div>`,
     setup() {
@@ -88,16 +90,42 @@ export const Template = (args, { argTypes }) => ({
 </Canvas>
 
 
-## only this page number
+## Disable Next Page Button
 <Canvas>
-    <Story name="only this page number">
+    <Story name="Disable Next Page Button">
         {{
             components:{ PTextPagination },
             template: `
               <div style="display: flex; align-items:center; justify-content:center;">
               <p-text-pagination
                   :this-page.sync="thisPage"
-                  :disable-next-page="isMax"
+                  :all-page="3"
+                  disable-next-page
+              />
+              </div>
+            `,
+            setup() {
+                const state = reactive({
+                    thisPage: 1,
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Without Total Page Count
+<Canvas>
+    <Story name="Without Total Page Count">
+        {{
+            components:{ PTextPagination },
+            template: `
+              <div style="display: flex; align-items:center; justify-content:center;">
+              <p-text-pagination
+                  :this-page.sync="thisPage"
+                  :has-next-page="!isMax"
               />
               </div>
             `,
@@ -113,6 +141,7 @@ export const Template = (args, { argTypes }) => ({
         }}
     </Story>
 </Canvas>
+
 
 
 ## Custom contents with default slot

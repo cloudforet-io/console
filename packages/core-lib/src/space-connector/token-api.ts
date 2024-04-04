@@ -1,5 +1,5 @@
 import type {
-    AxiosInstance, AxiosResponse,
+    AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders,
 } from 'axios';
 import axios from 'axios';
 import type { JwtPayload } from 'jwt-decode';
@@ -11,9 +11,8 @@ import type {
     SessionTimeoutCallback,
 } from '@/space-connector/type';
 
-const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
-const REFRESH_URL = '/identity/token/refresh';
+const REFRESH_URL = '/identity/token/grant';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
 
 const VERBOSE = false;
@@ -54,26 +53,25 @@ export default class TokenAPI {
     }
 
     loadToken(): void {
-        this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
         this.refreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
 
     flushToken(): void {
-        LocalStorageAccessor.removeItem(ACCESS_TOKEN_KEY);
         LocalStorageAccessor.removeItem(REFRESH_TOKEN_KEY);
         this.accessToken = undefined;
         this.refreshToken = undefined;
     }
 
-    setToken(accessToken: string, refreshToken: string): void {
+    setToken(accessToken: string, refreshToken?: string): void {
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        LocalStorageAccessor.setItem(ACCESS_TOKEN_KEY, accessToken);
-        LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        if (refreshToken) {
+            this.refreshToken = refreshToken;
+            LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        }
         TokenAPI.unsetRefreshingState();
     }
 
-    getRefreshToken(): string|undefined {
+    getRefreshToken(): string|undefined|null {
         return this.refreshToken;
     }
 
@@ -100,8 +98,20 @@ export default class TokenAPI {
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
-                this.setToken(response.data.access_token, response.data.refresh_token);
+                let scope = 'USER';
+                let workspaceId: string|undefined;
+                if (this.accessToken) {
+                    const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.accessToken);
+                    if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
+                    if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
+                    if (rol === 'WORKSPACE_OWNER' || rol === 'WORKSPACE_MEMBER') scope = 'WORKSPACE';
+                    workspaceId = wid;
+                }
+
+                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
+                    grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId,
+                });
+                this.setToken(response.data.access_token);
                 if (VERBOSE) {
                     const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);
                     console.debug('TokenAPI.refreshAccessToken: success');
@@ -125,20 +135,19 @@ export default class TokenAPI {
 
     async getActivatedToken() {
         if (this.accessToken && this.refreshToken) {
-            const isTokenValid = TokenAPI.checkToken();
-            if (isTokenValid) this.accessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY);
-            else await this.refreshAccessToken();
+            const isTokenValid = this.checkToken();
+            if (!isTokenValid) await this.refreshAccessToken();
         }
     }
 
-    static checkToken(): boolean {
-        const storedAccessToken = LocalStorageAccessor.getItem(ACCESS_TOKEN_KEY) || undefined;
-        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
+    checkToken(): boolean {
+        const currentAccessToken = this.accessToken || undefined;
+        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(currentAccessToken);
         const currentTime = TokenAPI.getCurrentTime();
         if (VERBOSE) {
             console.debug(`TokenAPI.checkToken: tokenExpirationTime - currentTime: ${tokenExpirationTime - currentTime}`);
         }
-        return (tokenExpirationTime - currentTime) > 10; // initial difference between token expiration time and current time is 1200
+        return (tokenExpirationTime - currentTime) > 600; // initial difference between token expiration time and current time is 600 seconds
     }
 
     static getTokenExpirationTime(token?: string): number {
@@ -161,12 +170,12 @@ export default class TokenAPI {
 
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the refresh token
-        this.refreshInstance.interceptors.request.use((request) => {
+        this.refreshInstance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
             const storedRefreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY);
             if (!storedRefreshToken) {
                 throw new Error('Session has expired. No stored refresh token.');
             }
-            if (!request.headers) request.headers = {};
+            if (!request.headers) request.headers = {} as AxiosRequestHeaders;
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
             return request;

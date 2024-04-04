@@ -1,15 +1,10 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const costMapWidgetConfig: WidgetConfig = {
     widget_config_id: 'costMap',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-map/CostMapWidget.vue'),
-    }),
     title: 'Cost Map',
     labels: ['Cost'],
     description: {
@@ -23,43 +18,23 @@ const costMapWidgetConfig: WidgetConfig = {
     },
     sizes: ['md', 'full'],
     options: {
-        cost_group_by: COST_GROUP_BY.PROJECT,
-        granularity: GRANULARITY.ACCUMULATED,
+        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+        granularity: GRANULARITY.MONTHLY,
     },
-    options_schema: {
-        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region', 'cost_product', 'cost_account')],
-        fixed_properties: ['cost_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_category',
-                    'cost_resource_group',
-                    'cost_product',
-                    'region',
-                    'cost_type',
-                    'cost_account',
-                ),
-            },
-            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_category',
-                'cost_resource_group',
-                'cost_product',
-                'region',
-                'cost_type',
-                'cost_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_data_field',
+        ['granularity', { fixed: true, readonly: true }],
+        'filters.provider',
+        'filters.project_group',
+        'filters.project',
+        'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
+        'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
+    ]),
 };
 
 export default costMapWidgetConfig;

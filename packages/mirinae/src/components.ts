@@ -49,7 +49,7 @@ export { default as PI } from './foundation/icons/PI.vue';
 
 
 /* Inputs */
-export { default as PAnchor } from './inputs/anchors/PAnchor.vue';
+export { default as PLink } from './inputs/link/PLink.vue';
 export { default as PButton } from './inputs/buttons/button/PButton.vue';
 export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton.vue';
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
@@ -60,7 +60,6 @@ export { default as PCheckbox } from './inputs/checkbox/PCheckbox.vue';
 export { default as PCheckboxGroup } from './inputs/checkbox-group/PCheckboxGroup.vue';
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
 export { default as PDatetimePicker } from './inputs/datetime-picker/PDatetimePicker.vue';
-export { default as PFilterableDropdown } from './inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
 export { default as PFilterableQueryDropdown } from './inputs/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue';
 export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 export { default as PFileUploader } from './inputs/file-uploader/PFileUploader.vue';
@@ -86,7 +85,8 @@ export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHoriz
 export { default as PPaneLayout } from './layouts/pane-layout/PPaneLayout.vue';
 export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
-
+export { default as PCenteredLayout } from './layouts/centered-layout/PCenteredLayout.vue';
+export { default as PCenteredLayoutHeader } from './layouts/centered-layout/centered-layout-header/PCenteredLayoutHeader.vue';
 
 /* Navigation */
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';

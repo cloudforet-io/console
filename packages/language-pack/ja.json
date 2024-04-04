@@ -12,6 +12,7 @@
 		"MAIN": {
 			"CLOSE": "閉じる",
 			"NO": "いいえ",
+			"OK": "はい",
 			"YES": "はい"
 		},
 		"MODAL": {
@@ -21,13 +22,38 @@
 				"DO_NOT_SHOW_AGAIN": "再表示しない",
 				"EDGE": "エッジ",
 				"HEADER": "このサイトでは、ChromeまたはEdgeブラウザを使用することをお勧めします。"
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE_BUTTON": "ワークスペースの作成",
+				"CREATE_WORKSPACE_DESC": "このドメインにはまだワークスペースが作成されていません。"
 			}
 		},
 		"TOP_NOTI": {
+			"NO_WORKSPACE": "あなたはどのワークスペースにも所属していません。管理者にアクセスを要求してください。",
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
 	"AUTH": {
+		"COLLAPSED": {
+			"CLICK_HERE": "こちら",
+			"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
+			"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
+			"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
+			"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
+			"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
+			"EXTENSION_TITLE_1": "メールが届かない場合は、",
+			"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？"
+		},
+		"MFA": {
+			"AUTHENTICATION_CODE": "認証コード",
+			"AUTHENTICATION_CODE_LOWER": "認証コード",
+			"CONFIRM": "確認",
+			"EMAIL_INFO": "{code}が入力されたメールアドレスに送信されました：",
+			"ENTER_CODE": "コードを入力",
+			"GO_BACK": "ログインする",
+			"SUB_TITLE": "マルチファクタ認証を使用してアカウントを確認する必要があります。",
+			"TITLE": "マルチファクタ\n認証"
+		},
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "ログインする",
@@ -38,7 +64,12 @@
 				"TITLE": "パスワードをお忘れですか？",
 				"USER_ID": "ユーザーID"
 			},
-			"INVALID_LINK": "無効なリンクです",
+			"INVALID_LINK": {
+				"EMAIL": "メールアドレス",
+				"HELP_TEXT": "リンクは期限切れか、もはや有効ではありません。\\",
+				"SENT_BUTTON": "再送信'",
+				"TITLE": "無効なリンクです"
+			},
 			"MOBILE": {
 				"MOBILE_GUIDE_MODAL_DESC_1": "デスクトップまたはノートパソコン環境で",
 				"MOBILE_GUIDE_MODAL_DESC_2": "初期パスワードを再設定した後",
@@ -51,17 +82,9 @@
 				"DONE": "パスワードのリセットが完了しました!",
 				"EMAIL": {
 					"DONE": {
-						"CLICK_HERE": "こちら",
 						"COLLAPSED": "メールが届かない場合は、",
 						"DESC_1": "メール送信完了",
 						"DESC_2": "送信されたガイドに従ってパスワードを変更してください。",
-						"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
-						"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
-						"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
-						"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
-						"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
-						"EXTENSION_TITLE_1": "メールが届かない場合は、",
-						"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？",
 						"GO_BACK_TO_CONSOLE": "コンソールログイン",
 						"TITLE": "パスワードリセットメールを送信する"
 					},
@@ -375,6 +398,7 @@
 		"COST_MANAGEMENT": {
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",
+				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "選択したデータソース（{dataSourceName}）には、すでに同じターゲット（{name}）の予算が作成されています。",
 				"ALT_E_DELETE_BUDGET": "予算の削除に失敗しました",
 				"ALT_E_UPDATE_BUDGET": "予算の更新に失敗しました",
 				"ALT_S_CREATE_BUDGET": "予算が正常に作成されました",
@@ -420,13 +444,16 @@
 					"MONTHLY_PLANNING": "月別予算計画",
 					"NOTIFICATIONS_CHANNEL": "通知チャネル",
 					"ORIGINAL_DATA": "原本データー",
+					"PAGE_NOTIFICATION": "この予算の設定は管理者モードでのみ変更できます。",
 					"PERIOD": "期間",
+					"PROVIDER": "プロバイダー",
 					"SET": "設定",
 					"SET_NOTIFICATION_CHANNEL": "通知チャネルの設定",
 					"TARGET": "ターゲット",
 					"TOTAL_AMOUNT": "総予算計画",
 					"TOTAL_BUDGETED_AMOUNT": "総予算(期間）合計",
-					"VIEW_ALL": "すべて表示"
+					"VIEW_ALL": "すべて表示",
+					"VIEW_IN_ADMIN_MODE": "管理者モードで確認"
 				},
 				"FORM": {
 					"AMOUNT_PLAN": {
@@ -451,10 +478,13 @@
 						"ACCOUNT": "アカウント",
 						"ALL": "すべて",
 						"BASE_INFORMATION": "基本情報",
+						"DATA_SOURCE": "データソース",
+						"DATA_SOURCE_PLACEHOLDER": "まずは対象を選択してください。",
 						"LABEL_COST_TYPE": "コストタイプ",
 						"LABEL_CURRENCY": "通貨",
 						"LABEL_NAME": "名前",
 						"LABEL_TARGET": "ターゲット",
+						"NO_DATA_SOURCE": "データソースなし",
 						"PRODUCT": "製品",
 						"PROJECT": "プロジェクト",
 						"PROJECT_GROUP": "プロジェクトグループ",
@@ -462,7 +492,9 @@
 						"REGION": "リージョン",
 						"REQUIRED_COST_TYPE": "一つ以上のコストタイプを選択してください",
 						"REQUIRED_NAME": "名前を入力してください",
-						"REQUIRED_TARGET": "ターゲットを選択してください"
+						"REQUIRED_TARGET": "ターゲットを選択してください",
+						"SPECIFIC_PROVIDER": "特定プロバイダ",
+						"WORKSPACE": "ワークスペース"
 					},
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
@@ -478,14 +510,16 @@
 					"BUDGET": "予算",
 					"BUDGETED": "予算",
 					"BUDGET_NAME": "予算名",
-					"BULK_BUDGET": "一括予算",
 					"COST_TYPE": "コストタイプ",
 					"CREATE": "予算作成",
 					"CREATE_BUDGET": "予算作成",
-					"CREATE_BULK_BUDGET": "予算一括追加",
+					"DATA_SOURCE": "データソース",
 					"DESC": "降順",
+					"MANAGED_BY_ADMIN": "管理者管理",
+					"NO_BUDGET": "予算なし",
 					"OVERSPENT": "予算超過",
 					"PERIOD": "期間",
+					"PROVIDER": "プロバイダー",
 					"SINGLE_BUDGET": "単一予算",
 					"THIS_MONTH": "今月",
 					"TOTAL": "合計",
@@ -498,32 +532,40 @@
 					"MTD": "現在まで",
 					"TOTAL_BUDGET": "総予算",
 					"TOTAL_COST": "トータルコスト"
-				}
+				},
+				"VIEW_ALL": "すべて表示"
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
-				"ADD_MORE": "グループ追加",
+				"ADD_MORE": "もっと見る",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
+				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
+				"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
 				"ALT_E_DELETE_QUERY": "クエリの削除に失敗しました",
 				"ALT_E_EDITED_QUERY": "クエリの編集に失敗しました",
 				"ALT_E_SAVED_QUERY": "クエリの保存に失敗しました",
-				"ALT_S_DELETE_QUERY": "クエリが正常に削除されました",
-				"ALT_S_EDITED_QUERY": "クエリが正常に編集されました",
-				"ALT_S_SAVED_QUERY": "クエリをウィジェットに保存しました",
+				"ALT_S_DELETE_QUERY": "分析は正常に削除されました",
+				"ALT_S_SAVE_AS_QUERY": "新しい分析として保存に成功しました",
+				"ALT_S_SAVE_QUERY": "分析は正常に更新されました",
 				"CHART_TYPE": "チャートタイプ",
-				"CHECK_DELETE_MODAL_DESC": "クエリを削除しますか？",
+				"CHECK_DELETE_MODAL_DESC": "この分析を削除してもよろしいですか？",
 				"CLEAR_ALL": "すべて消去",
 				"COLUMN": "コラム",
 				"COST_ANALYSIS": "コスト分析",
 				"CURRENCY": "通貨",
-				"DAILY": "日別データ",
+				"DAILY": "日別データ (累積データ)",
+				"DATA_SOURCE": "データソース",
 				"DEFAULT": "デフォルト",
+				"DETAIL": {
+					"ORIGINAL_CURRENCY": "元の通貨"
+				},
 				"DONUT": "ドーナツ",
 				"DOWNLOAD": "ダウンロード",
-				"EDIT_QUERY": "クエリの編集",
+				"EDIT_COST_ANALYSIS": "分析ページ名の編集",
 				"END_DATE": "終了日",
-				"FILTER": "フィルター",
+				"FEATURE_UDATED": "機能更新通知",
+				"FILTERS": "フィルター",
 				"FILTER_MODAL_HELP_TEXT_1": "選択されたフィルターがありません",
 				"FILTER_MODAL_HELP_TEXT_2": "リストからフィルタを選択します。",
 				"GRANULARITY": "細部基準",
@@ -533,19 +575,22 @@
 					"UP_TO_LAST_12_MONTHS": "最長12ヶ月(期間内)設定可能"
 				},
 				"HIDE_ALL": "すべて隠す",
+				"INVALID_PERIOD_TEXT": "以前に選択された期間のデータは見つかりませんでした。",
 				"KEEP_MY_SETTING": "上記の設定をマイ設定として保持",
 				"LABEL_ADDITIONAL_FIELD": "追加フィールド",
-				"LABEL_QUERY_NAME": "クエリ名",
+				"LABEL_COST_ANALYSIS_NAME": "コスト分析の名前",
 				"LABEL_TAG": "タグ",
 				"LABEL_VISIBILITY": "公開の可否",
 				"LINE": "ライン",
+				"MODAL_VALIDATION_DUPLICATED": "この名前の分析はすでに存在しています。",
 				"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"MONTHLY": "月別データ",
 				"MORE_FILTERS": "フィルター追加",
-				"MY_QUERY": "マイ・クエリ",
+				"NAME_LABEL": "名前",
 				"NO_FILTERS": "フィルターがありません",
 				"NO_ITEMS": "アイテムがありません",
+				"ORIGINAL_DATA": "原本データー",
 				"PDF": {
 					"CANCEL": "取消",
 					"DOWNLOAD_PDF": "PDFダウンロード",
@@ -554,25 +599,41 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "日付範囲",
+					"LAST_12_MONTHS": "過去12ヶ月間",
 					"LAST_14_DAYS": "過去14日間",
 					"LAST_3_MONTHS": "過去3ヶ月間",
+					"LAST_3_YEARS": "過去3年",
 					"LAST_6_MONTHS": "過去6ヶ月間",
 					"LAST_7_DAYS": "直近7日間",
 					"LAST_MONTH": "直近の月",
 					"LAST_YEAR": "昨年",
-					"THIS_MONTH": "今月"
+					"PERIOD": "期間",
+					"THIS_MONTH": "今月",
+					"THIS_YEAR": "本年"
 				},
 				"PRIVATE": "非公開",
 				"PROJECT": "プロジェクト",
+				"PROVIDERS_TITLE": "サービスプロバイダー",
 				"PUBLIC": "公開",
+				"RELOCATE_DASHBOARD_LABEL": "ダッシュボードに移動",
+				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "新しいダッシュボードメニュー内で、より高度なコストダッシュボードを作成できます。",
+				"RELOCATE_DASHBOARD_NOTI_DISMISS": "閉じる",
+				"RELOCATE_DASHBOARD_NOTI_LEARN_MORE": "詳細を見る",
+				"RELOCATE_DASHBOARD_NOTI_TITLE": "あなたのコストダッシュボードをお探しですか？",
+				"RELOCATE_MODAL_CONFIRM_TEXT": "わかりました",
+				"RELOCATE_MODAL_DESCRIPTION_FIRST": "以前のコストエクスプローラーのダッシュボード機能を新しい独立型サービスである 'ダッシュボード' に統合しました。",
+				"RELOCATE_MODAL_DESCRIPTION_SECOND": "したがって、古いダッシュボードはサポートされなくなりました。 'ダッシュボード' メニューに移動し、拡張されたウィジェットオプション、より優れた視覚効果を持つ高度な変数を探索してください。",
+				"RELOCATE_MODAL_DISMISS_TEXT": "次から表示しない",
+				"RELOCATE_MODAL_TITLE": "完全に新しくなったコストダッシュボード、ぜひ体験してみてください！",
+				"RESET": "初期化",
 				"SAVE": "保存",
 				"SAVED_QUERY": "保存されたクエリ",
 				"SAVE_AS": "名前を付けて保存",
-				"SAVE_QUERY": "クエリーの保存",
+				"SAVE_TO_COST_ANALYSIS_LIBRARY": "コスト分析ライブラリに保存",
 				"SEARCH_PLACEHOLDER": "検索",
 				"SEARCH_TAG_PLACEHOLDER": "検索タグ",
-				"SELECTED_FILTER": "選択したフィルタ",
-				"SET_FILTER": "フィルタの設定",
+				"SELECTED_FILTERS": "選択したフィルタ",
+				"SET_FILTERS": "フィルタの設定",
 				"SET_MORE": "追加設定",
 				"SET_QUERY": "クエリの設定",
 				"SHOW_ALL": "すべて表示",
@@ -585,6 +646,66 @@
 				"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
 				"TOTAL_COST": "トータルコスト",
 				"YEARLY": "年間"
+			},
+			"COST_REPORT": {
+				"ADDITIONAL_RECIPIENTS": "追加の受信者",
+				"ADD_EMAIL": "メールを追加する",
+				"ADMIN_ROLE": "Admin役割",
+				"ALE_E_SEND_REPORT": "再送信に失敗しました",
+				"ALL": "すべて",
+				"ALT_E_RESEND_REPORT": "再送信に失敗しました。レポートの受信者設定を確認してください。",
+				"ALT_E_UPDATE_RECIPIENTS": "レポート受信者の更新に失敗しました",
+				"ALT_E_UPDATE_SETTINGS": "レポート設定の更新に失敗しました",
+				"ALT_S_COPY_REPORT_URL": "レポートリンクが正常にコピーされました",
+				"ALT_S_RESEND_REPORT": "レポートが正常に送信されました",
+				"ALT_S_UPDATE_RECIPIENTS": "レポート受信者が正常に更新されました",
+				"ALT_S_UPDATE_SETTINGS": "レポート設定が正常に更新されました",
+				"APPLY_CUSTOM_RANGE": "適用するカスタム範囲",
+				"COPY": "コピー",
+				"COST": "費用",
+				"COST_REPORT": "コストレポート",
+				"COST_TREND": "コストトレンド",
+				"CURRENCY": "通貨",
+				"CUSTOM": "カスタム",
+				"EMAIL_INVALID": "無効なメール形式です",
+				"GREATER_THAN_OR_EQUAL_TO_1": "1以上で設定してください",
+				"HIDE": "隠す",
+				"ISSUE_DATE": "発行日",
+				"ISSUE_DAY": "発行日(毎月)",
+				"LANGUAGE": "言語",
+				"LAST_12_MONTHS": "過去12ヶ月間",
+				"LAST_12_MONTHS_AVERAGE": "過去12ヶ月の平均",
+				"LAST_DAY_OF_THE_MONTH": "月末",
+				"LESS_THAN_OR_EQUAL_TO_31": "31以内で設定してください",
+				"MANAGE_ROLES": "ロールの管理",
+				"MONTHLY_TOTAL_AMOUNT_SUMMARY": "月別総額の概要",
+				"NO_REPORT": "コストレポートはまだ発行されていません。",
+				"OVERVIEW": "概要",
+				"PERIOD": "期間",
+				"PROVIDER": "プロバイダー",
+				"RECIPIENTS": "受信者",
+				"RECIPIENTS_TOOLTIP": "新しいレポートは、毎月予定されているレポート発行日に、特定のワークスペース内で該当するロールを持つユーザーの通知用メールアドレスに自動的に送信されます。",
+				"REPORTS": "レポート",
+				"REPORT_NUMBER": "レポート番号",
+				"REPORT_RECIPIENTS": "レポート受信者",
+				"REPORT_SETTINGS": "レポート設定",
+				"REQUIRED_FIELD": "必須入力項目です。",
+				"RESEND": "再送信",
+				"RESEND_REPORT": "レポートを再送信する",
+				"SAVE": "保存",
+				"SEE_DETAILS": "詳細を表示",
+				"SETTINGS": "設定",
+				"SHOW_DETAILS": "詳細を表示",
+				"THE_AVERAGE_FOR_SELECTED_PERIOD": "{selected_period}の平均",
+				"THE_AVERAGE_FOR_THE_LAST_12_MONTHS": "過去12ヶ月の平均",
+				"THE_LAST_12_MONTHS": "過去12ヶ月間",
+				"TOTAL_AMOUNT": "合計金額",
+				"TOTAL_COST_FOR_PREVIOUS_MONTH": "{previous_month}期間内の総費用",
+				"UPCOMING_ISSUE_DATE": "今後のレポート発行日",
+				"UPCOMING_REPORT": "今後のレポート",
+				"WORKSPACE": "ワークスペース",
+				"WORKSPACE_OWNER": "Workspace Owner",
+				"WORKSPACE_OWNER_ROLE": "Workspace Ownerの役"
 			},
 			"DASHBOARD": {
 				"AVAILABLE": "使用可能",
@@ -728,8 +849,9 @@
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
 			"HOME": {
-				"COST_ANALYSIS_DESC": "複数のクラウドリソースをグループ別に細分化し、より詳細にコスト分析が可能です。",
-				"COST_BUDGET_DESC": "各プロジェクト別に予算を設定し、リソース使用量を体系的に管理できます。",
+				"CONTACT_BUTTON": "お問い合わ",
+				"COST_ANALYSIS_DESC": "様々なグループ分けオプション、フィルター、粒度設定を使用して、使用状況とコストを探索し、分析を行います。",
+				"COST_BUDGET_DESC": "閾値に基づいて、カスタム予算を設定し、さまざまな通知チャンネルを介して自動的に通知を生成します。",
 				"COST_DASHBOARD": " 費用ダッシュボード",
 				"COST_DASHBOARD_DESC": "様々なウィジェットを費用管理ダッシュボードに追加して、素早くクラウド費用状況を把握できます。",
 				"ENABLE_BUTTON": "コストエクスプローラーの有効化",
@@ -750,7 +872,6 @@
 				"DUPLICATE": "複製",
 				"FILTER_NONE": "なし",
 				"MONTH": "月",
-				"NO_SELECTED_FILTER": "選択されたフィルターがない",
 				"OVERSPENT": "予算超過",
 				"SET_HOME": "ホームとして設定",
 				"VIEW_FILTER": "フィルタの表示"
@@ -759,6 +880,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
 				"SUPPORT_PDF_HELP_TEXT": "この機能は、ご使用のブラウザまたはデバイスではサポートされていません。 {desktop}で{chrome}または{edge}ブラウザを使用して再試行してください。"
@@ -796,6 +918,24 @@
 				"VALUE": "値"
 			}
 		},
+		"CONFIRM_BACK_MODAL": {
+			"CANNOT_CANCEL": "この操作は取り消すことができません。",
+			"TITLE": "中止してもよろしいですか？"
+		},
+		"COST_REPORT": {
+			"COST_REPORT": "コストレポート",
+			"CURRENCY_REFERENCE": "通貨リファレンス",
+			"DETAILS_BY_PRODUCT": "製品別詳細",
+			"DETAILS_BY_PROJECT": "プロジェクト別詳細",
+			"DETAILS_BY_PROVIDER": "プロバイダ別詳細",
+			"DETAILS_BY_SERVICE_ACCOUNT": "サービスアカウント別詳細",
+			"INDEX": "Index",
+			"ISSUE_DATE": "発行日",
+			"REPORT_NUMBER": "レポート番号",
+			"SUBTOTAL": "小計",
+			"TOTAL": "トータルコスト",
+			"TOTAL_AMOUNT_BY_PROVIDER": "プロバイダ別の合計金額"
+		},
 		"CUSTOM_FIELD_MODAL": {
 			"ALPHABETICAL_SORT": "アルファベット順",
 			"ALT_E_UPDATE_COL": "フィールド変更に失敗",
@@ -814,6 +954,7 @@
 			"TAG_COL": "タグフィールド",
 			"TITLE": "フィールドを変更する"
 		},
+		"DELETED": "削除",
 		"EDITOR": {
 			"ALIGN_CENTER": "中央寄せ",
 			"ALIGN_JUSTIFY": "両端揃え",
@@ -829,6 +970,7 @@
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",
 			"GO_BACK": "戻る",
+			"HOME": "ホーム",
 			"NO_RESOURCE_GO_MAIN": "{service}メインに移動",
 			"NO_RESOURCE_MSG": "リソースが見つかりません",
 			"NO_RESOURCE_TITLE": "リソースがありません。"
@@ -837,6 +979,11 @@
 			"ALT_E_DOWNLOAD": "Excelのダウンロードに失敗しました",
 			"ALT_L_READY_FOR_FILE_DOWNLOAD": "ファイルのダウンロードを準備中",
 			"ALT_S_DOWNLOAD_SUCCESS": "１つのエクセルダウンロード完了"
+		},
+		"EXPIRED_PAGE": {
+			"DESCRIPTION": "このリンクは一定の時間後に有効期限が切れるように設定されています。このリンクを共有した人または管理者に連絡してください。",
+			"SIGN_IN": "ログインする",
+			"TITLE": "リンクの有効期限が切れました"
 		},
 		"FNB": {
 			"PRIVACY": "個人情報保護方針",
@@ -847,14 +994,21 @@
 			"ACCOUNT": {
 				"ALT_E_UPDATE": "言語編集に失敗",
 				"ALT_S_UPDATE": "言語編集完了",
+				"ALT_S_UPDATE_CURRENCY": "通貨の更新が正常に完了しました",
 				"GO_TO_MYPAGE": "マイページ",
+				"LABEL_CURRENCY": "通貨",
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
+				"LABEL_ROLE_TYPE": "ロールタイプ",
 				"LABEL_SIGN_OUT": "ログアウト",
 				"LABEL_TIMEZONE": "タイムゾーン",
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
+			},
+			"ADMIN": {
+				"SWITCH_ADMIN": "管理者モードに切り替えました",
+				"SWITCH_WORKSPACE": "管理者モードを終了しました"
 			},
 			"DASHBOARDS": {
 				"CREATE_DASHBOARDS": "新しいダッシュボードを作成する。",
@@ -863,14 +1017,22 @@
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "すべてのクラウドサービス",
+				"ALL_COST_ANALYSIS": "すべてのコスト分析",
+				"ALL_DASHBOARD": "すべてのダッシュボード",
 				"ALL_MENU": "すべてのメニュー",
-				"ALL_PROJECTS": "すべてのプロジェクト",
+				"ALL_PROJECTS": "プロジェクト",
+				"ALL_SECURITY": "オールセキュリティ",
 				"FAVORITES": "お気に入り",
 				"FAVORITES_HELP_TEXT": "よく利用されるページをお気に入りに追加してください",
 				"GO_TO_CLOUD_SERVICE": "クラウドサービス",
 				"GO_TO_PROJECT": "プロジェクト",
 				"MENU": "メニュー",
 				"SHOW_ALL": "すべて表示"
+			},
+			"MY_PAGE": {
+				"BACK_LINK_ADMIN": "Admin Centerに戻る",
+				"BACK_LINK_SHORT": "戻る",
+				"BACK_LINK_WORKSPACE": "ワークスペースに戻る"
 			},
 			"NOTICE": {
 				"DETAIL_LINK": "詳細リンク",
@@ -901,7 +1063,8 @@
 				"NO_RESULT_2": "クラウドサービスまたはメニューに関連する他のキーワードを試してください。",
 				"RECENT_CLOUD_SERVICE": "最近の検索[クラウドサービス]",
 				"RECENT_MENU": "最近の検索[メニュー]",
-				"SERACH": "検索...",
+				"SEARCH": "検索",
+				"SEARCH_PLACEHOLDER": "メニュー、プロジェクト、ダッシュボードなどを検索",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。",
 				"TRY_SEARCH_AGAIN": "より詳しく検索してください。"
 			},
@@ -909,6 +1072,27 @@
 				"LABEL_API_GUIDE": "APIガイド ",
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "ユーザーガイド"
+			},
+			"TOOLBOX": {
+				"ID": "ID"
+			},
+			"TOOLTIP": {
+				"ENABLE_ADMIN_MODE": "管理者モードに切り替える",
+				"EXIT_ADMIN_MODE": "管理者モードを終了する",
+				"EXPAND_GNB_RAIL": "",
+				"FAVORITE": "お気に入り",
+				"HIDE_GNB_RAIL": "",
+				"MINIMIZE_GNB_RAIL": "",
+				"NOTICE": "お知らせ",
+				"NOTIFICATIONS": "通知",
+				"OPEN_GNB_RAIL": "",
+				"PROFILE": "マイページ",
+				"SEARCH": "検索"
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE": "ワークスペースの作成",
+				"MANAGE_WORKSPACE": "ワークスペースの管理",
+				"WORKSPACES": "ワークスペース"
 			}
 		},
 		"HANDBOOK_BUTTON": {
@@ -917,6 +1101,37 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
+		},
+		"MFA_MODAL": {
+			"ALT": {
+				"DESC": "無効化するには、メール認証が必要です。",
+				"DISABLED": "無効化",
+				"EMAIL_INFO": "入力されたメールに認証コードを送信してください。",
+				"TITLE": "MFAを無効化にしますか？",
+				"VERIFIED": "認証済みです"
+			},
+			"ALT_S_SENT_EMAIL": "認証コードがメールで送信されました。",
+			"CHANGE": {
+				"CANCEL": "キャンセル",
+				"CONFIRM_BTN": "新しいメールを入力",
+				"DESC": "新しいメールアドレスへの変更のために、既存のメールでの認証を完了してください。",
+				"TITLE": "メールアドレス変更認証",
+				"TOOLTIP": "新しいメールアドレスを入力せずに閉じると、\nMFAは無効化のままです。"
+			},
+			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
+			"COLLAPSE_TITLE": "認証コードが届きませんか？",
+			"EDIT": {
+				"TITLE": "新しいメールアドレスを入力してください"
+			},
+			"EMAIL": "メールアドレス",
+			"INVALID_CODE": "無効なコードです。もう一度メールを確認してください。",
+			"SEND_CODE": "認証コードを送信",
+			"SEND_NEW_CODE": "再送信",
+			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
+			"SUCCESS": "確認コードが通知メールに送信されました。",
+			"TITLE": "メールアドレス認証",
+			"VERIFICATION_CODE": "認証コード",
+			"VERIFY": "認証"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}に表示されます",
@@ -927,6 +1142,20 @@
 			"RESOURCE": "リソース",
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
+		},
+		"NAVIGATIONS": {
+			"TOP_BAR": {
+				"ALL_WORKSPACE": "すべてのワークスペース",
+				"FILTER_BY_WORKSPACE": "ワークスペースでフィルター",
+				"HELP_TEXT": "探しているものを入力してください。",
+				"NO_RESULT_1": "\"{inputText}\"の検索結果が見つかりませんでした。",
+				"NO_RESULT_2": "別の用語で再試行してください。",
+				"RECENTLY_VIEWED": "最近のアクセス",
+				"SITE_NAVIGATION": "メニューナビゲーション",
+				"WORKSPACE_FILTER_WARNING_DESC": "新しい選択をする前に少なくとも1つのワークスペースの選択を解除してください。",
+				"WORKSPACE_FILTER_WARNING_TITLE": "最大5つのワークスペースでフィルターできます。",
+				"WORKSPACE_SWITCH_LINK": "このワークスペースに切り替え"
+			}
 		},
 		"NOTIFICATION_MODAL": {
 			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
@@ -975,9 +1204,10 @@
 			"TITLE": "個人情報"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "プロジェクト作成",
+			"CREAT_PROJECT": "作成",
+			"CURRENT": "現在",
 			"PLACEHOLDER": "プロジェクト選択",
-			"RELOAD_PROJECT": "プロジェクト読み込む"
+			"RELOAD_PROJECT": "リロード"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッションが期限切れされました",
@@ -1004,6 +1234,8 @@
 			"VALIDATION": "ユーザー名、またはパスワードを確認してください。",
 			"VERSION": "バージョン"
 		},
+		"STARRED": "お気に入り",
+		"STARRED_NO_DATA": "お気に入りがありません。",
 		"TAGS": {
 			"ADD": "追加",
 			"ADD_TAG": "タグの追加",
@@ -1046,7 +1278,7 @@
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
-				"TYPE_TITLE": "データベースタイプ"
+				"TYPE_TITLE": "{service}タイプ"
 			},
 			"BILLING": {
 				"DAY": "日",
@@ -1192,9 +1424,7 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
-			"ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_ALL": "すべて",
-			"FILTER_ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
 			"FILTER_SINGLE_PROJECT": "個別プロジェクト",
@@ -1203,12 +1433,14 @@
 			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコープ",
 			"LABEL_VIWERS": "公開可否",
+			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",
 			"TOOLTIP_EDIT": "編集",
-			"VIEW_ALL": "すべてのダッシュボードを表示"
+			"VIEW_ALL": "すべてのダッシュボードを表示",
+			"WORKSPACE": "ワークスペース"
 		},
 		"CREATE": {
 			"BLANK_DESC": "空のダッシュボードを利用して、最初から作成",
@@ -1216,7 +1448,6 @@
 			"CONTINUE": "次へ",
 			"CREATE": "作成",
 			"CREATE_NEW_DASHBOARD": "新規ダッシュボード作成",
-			"ENTIRE_WORKSPACES": "ワークスペース全体",
 			"GO_BACK": "戻る",
 			"LABEL_DEFAULT_TEMPLATE": "デフォルトテンプレートから選択",
 			"LABEL_EXISTING_DASHBOARD": "既存のダッシュボードから選択",
@@ -1231,14 +1462,16 @@
 			"PUBLIC_DESC": "該当するダッシュボード範囲に「view」アクセス権限を持つすべてのユーザー",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"STEP": "ステップ",
-			"STEP1_DESC": "ダッシュボードの範囲と公開の有無を選択します",
+			"STEP1_DESC": "ダッシュボードの範囲を選択",
 			"STEP2_DESC": "基本テンプレートと既存のダッシュボードを活用し、素早い作成が可能です。",
 			"TITLE": "新規ダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
-			"VALIDATION_TEMPLATE": "テンプレートを選択してください"
+			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
+			"VIEW": "ビュー",
+			"WORKSPACE": "ワークスペース"
 		},
 		"CUSTOMIZE": {
-			"ADD_LABEL": " +　ボタンを追加してラベルを追加できます。 ",
+			"ADD_LABEL": "[+] ボタンをクリックして、ラベルを追加してください",
 			"ADD_WIDGET": {
 				"ADD": "ウィジェットを追加する",
 				"ADD_OPTIONS": "オプションの追加",
@@ -1286,13 +1519,16 @@
 				"DELETE_TITLE": "この変数を削除しますか？",
 				"DESCRIPTION_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
 				"DESCRIPTION_ASSET_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
-				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "クラウドセキュリティと規制コンプライアンスのためのコンプライアンスフレームワークのリスト",
+				"DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK": "クラウドセキュリティと規制コンプライアンスのためのコンプライアンスフレームワークのリスト",
+				"DESCRIPTION_DATA_SOURCE": "クラウド環境内でのデータと情報の中心的なソースで、AWS、Google、Azureなどのクラウドプロバイダからのデータだけでなく、特定の企業やサービスからの統合請求データを含むさまざまなデータソースです。",
 				"DESCRIPTION_GROUP_BY": "特定のオプションに基づいてデータをグループ化し、そのグループのトレンドやパターンを把握することができます。",
 				"DESCRIPTION_PRODUCT": "各クラウドプロバイダーが提供するクラウドコンピューティング製品やサービス",
 				"DESCRIPTION_PROJECT": "プロジェクトにグループ化されたクラウドリソースやサービスの集合体",
+				"DESCRIPTION_PROJECT_GROUP": "프로젝트 그룹으로 그룹화된 클라우드 자원 및 서비스의 모음",
 				"DESCRIPTION_PROVIDER": "AWS、Azure、Googleなどのクラウドサービスプロバイダー",
 				"DESCRIPTION_REGION": "各クラウドプロバイダーがデータセンターを建設した地理的な場所",
 				"DESCRIPTION_SERVICE_ACCOUNT": "各クラウドプロバイダーのコンソールから作成され、『サービスアカウント(service account)』ページに追加されたアカウント",
+				"DESCRIPTION_WORKSPACE": "このドメインに作成されたワークスペースのリスト",
 				"EDIT": "編集",
 				"FILTER_ALL": "すべて",
 				"FILTER_CUSTOM": "カスタム",
@@ -1320,17 +1556,23 @@
 			}
 		},
 		"DETAIL": {
+			"APPLY": "確認",
 			"AUTO": "自動",
+			"BASED_ON": "基準月",
 			"CLONE": "複製",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
+			"CUSTOM_DATE_MODAL_MONTH": "月",
+			"CUSTOM_DATE_MODAL_TITLE": "適用するカスタム範囲",
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"EXPORT": "エクスポート",
+			"OTHER_MONTHS": "他の月",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "フィルタの適用"
 			},
+			"PERIOD": "期間",
 			"PERIOD_CUSTOM": "カスタム",
 			"PERIOD_LAST_14_DAYS": "過去14日間",
 			"PERIOD_LAST_3_MONTHS": "過去3ヶ月間",
@@ -1339,6 +1581,7 @@
 			"PERIOD_LAST_MONTH": "前月",
 			"PERIOD_THIS_MONTH": "今月",
 			"REFRESH": "自動更新",
+			"SELECT_MONTH": "月を選択",
 			"SET_HOME": "ホームダッシュボードとして設定"
 		},
 		"FORM": {
@@ -1360,10 +1603,25 @@
 			"LABEL_PUBLIC": "公開（選択したダッシュボードの範囲に対して「View」アクセス権を持つすべてのユーザー）",
 			"LABEL_VIEWERS": "公開可否",
 			"REQUIRED": "必須入力項目です",
+			"RETURN_TO_INITIAL_SETTINGS": "初期設定に戻る",
+			"UNABLE_TO_ADD_WIDGET": "ウィジェット追加不可",
+			"UNABLE_TO_ADD_WIDGET_DESC": "現在、このドメインには利用可能な{field}がありません。",
+			"UNABLE_TO_ADD_WIDGET_DESC2": "システム管理者にお問い合わせください。",
 			"UPDATE_TITLE": "ダッシュボード名の編集",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "ダッシュボードの名を入力してください。",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "この名前のダッシュボードはすでに存在します。"
+		},
+		"FULL_SCREEN_VIEW": {
+			"APPLY_NON_INHERITED_OPTION_HELP_TEXT": "このウィジェットは、ダッシュボードのフィルターの影響を受けない非継承オプションで保存されます。",
+			"BACK_TO_DASHBOARD": "ダッシュボードに戻る",
+			"CANCEL": "取消",
+			"EDIT_OPTION": "オプション編集",
+			"EDIT_WIDGET_OPTION": "ウィジェット編集",
+			"FULL_SCREEN_VIEW": "フルスクリーン表示",
+			"NON_INHERITED_OPTIONS_INCLUDED": "非継承オプションが含まれています",
+			"NON_INHERIT_OPTION_APPLIED": "非継承オプションが含まれています",
+			"SAVE": "保存"
 		},
 		"LNB": {
 			"ONLY_FAVORITE": "お気に入りだけを表示する"
@@ -1377,12 +1635,6 @@
 			},
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "クラウドプロバイダのRegion別クラウドサービスの使用状況を要約して表示します。"
-			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "選択した期間のAWS CloudFrontのデータ使用量とコストを、'Group by'オプションで集計して表示します。"
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "選択した期間の AWS Data-TransferのRegion別のデータ使用量とコストを表示します。"
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "選択した期間のAWS Data-Transferのコスト推移を表示します。"
@@ -1401,11 +1653,12 @@
 				"DESC": "選択した期間中の予算使用量の上位 200 件を表示します。"
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"AVAILABLE": "使用可能",
-				"BUDGETS": "バジェット",
+				"BUDGETED": "{count}個の予算",
+				"BUDGET_USAGE_IN": "{period}の予算使用状況",
 				"DESC": "総コスト、予算、使用率とともに、総予算消費の概要を表示します。",
-				"TOTAL_BUDGET": "総予算",
-				"TOTAL_SPENT": "総使用量"
+				"EXCEED": "{value}を超えています",
+				"LEFT": "残り {value}",
+				"OUT_OF": "予算の合計 {value}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "選択した期間中のプロジェクトごとの予算使用量と不足予測値を表示します。"
@@ -1413,31 +1666,36 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
-			"COMPLIANCE_CHECK_STATUS": {
-				"CHECKED_SERVICE_ACCOUNT": "確認されたサービスアカウント",
-				"COMPLIANCE_SCORE": "コンプライアンススコア",
+			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "Compliance score",
+				"COMPLIANCE_SCORE_TOOLTIP": "各 'severity' レベルと対応する重みを基に計算されたスコアです。",
 				"DESC": "選択した期間中のコンプライアンスのPass/Failの全体的な状態を表示するウィジェット",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
-				"MORE_THAN_PREV_MONTH": "前月よりも多い",
-				"TOTAL_COMPLIANCE_NUMBER": "総コンプライアンス数"
+				"MORE_THAN_PREV_MONTH": "前月よりも多い"
 			},
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "選択した 'Column Field' に基づき、選択された期間中の地域ごとの費用または使用データを表示します。"
+			},
 			"COST_DONUT": {
-				"DESC": "選択された期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した 'Data Field' を基に、選択された期間中に発生したトータルコストを一目で表示するウィジェット。"
 			},
 			"COST_MAP": {
-				"DESC": "選択した期間の総費用の比率を「Group by」オプションで集計し、上位10-15位を比較できるように表示します。"
+				"DESC": "選択した期間の総費用の比率を「Data Field」オプションで集計し、上位10-15位を比較できるように表示します。"
 			},
 			"COST_PIE": {
-				"DESC": "選択した期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した 'Data Field' を基に、選択された期間中に発生したトータルコストを一目で表示するウィジェット。"
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "選択した「Row Field」と「Column Field」に基づき、選択された期間中の費用または使用データを表示します。"
 			},
 			"COST_TREND": {
-				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した[Data Field]に基づいて、選択された期間までの費用または使用量のトレンドを表示します。"
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した[Data Field]に基づいて、選択された期間までの費用または使用量のトレンドを表示します。"
 			},
 			"COUNT_OF_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのFail findingsの数を'Group By'オプションで集計して表示するウィジェット"
@@ -1456,31 +1714,39 @@
 			"EDIT_WIDGET": "ウィジェットオプションの修正",
 			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "このウィジェットには、ダッシュボードの影響を受けない非継承オプションが含まれています。",
+			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "非継承オプションのリスト:",
 			"MONTHLY_COST": {
-				"CURRENT_MONTH": "直近月発生費用",
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
-				"PREVIOUS_MONTH": "前月発生費用"
+				"PREVIOUS_MONTH": "前月",
+				"SELECTED_MONTH": "選択した月"
 			},
 			"NO_DATA": "データがありません",
+			"NO_SELECTED_ITEM": "オプションのうちの一つを選択する必要があります。",
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "各プロジェクト別のトリガー、認知、安全などを素早く確認できます。"
 			},
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
+			"REALTIME": "リアルタイム",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "選択した期間中に確認された各サービスのコンプライアンスFailureをヒートマップを使用して表示するウィジェット"
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
-			"TOTAL_FAILURE_AND_SEVERITY": {
-				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット",
-				"FAILURE_RATE": "Failure率",
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット"
+			},
+			"TOTAL_FAIL_FINDINGS_STATUS": {
+				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット。",
+				"LESS_THAN_PREV_DAY": "前日よりも少ない",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
+				"LESS_THAN_PREV_YEAR": "前年よりも少ない",
+				"MORE_THAN_PREV_DAY": "前日よりも多い",
 				"MORE_THAN_PREV_MONTH": "前月よりも多い",
-				"SEVERITY": "重要度",
-				"TOTAL_FAILURE_COUNT": "合計の failure 数"
+				"MORE_THAN_PREV_YEAR": "前年よりも多い"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
@@ -1490,6 +1756,69 @@
 		}
 	},
 	"IAM": {
+		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
+		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",
+		"APP": {
+			"ACTION": "作業",
+			"CREATE": "作成",
+			"DELETE": "削除",
+			"DISABLE": "無効化",
+			"EDIT": "編集",
+			"ENABLE": "有効化",
+			"MODAL": {
+				"BTN_REGENERATE": "再生成",
+				"COL_ADMIN_ROLE": "Admin役割",
+				"COL_ADMIN_ROLE_PLACEHOLDER": "役割を選択してください",
+				"COL_APP_ID": "アプリID",
+				"COL_APP_NAME": "アプリ名",
+				"COL_EXPIRED_AT": "有効期限日",
+				"COL_LASTED_AT": "最後にアクセスした日",
+				"COL_NAME": "お名前",
+				"COL_ROLE_ID": "役割ID",
+				"COL_STATE": "状態",
+				"COL_TAG": "タグ",
+				"COL_WORKSPACE_ROLE": "Workspace Ownerの役",
+				"CREATE_TITLE": "アプリを作成する",
+				"DELETE_DESC": "この操作は取り消すことができません。",
+				"DELETE_TITLE": "削除 {app}",
+				"DISABLE_TITLE": "このアプリを無効にしてもよろしいですか？",
+				"EDIT_TITLE": "アプリ情報を編集する",
+				"ENABLE_TITLE": "このアプリを有効にしてもよろしいですか？",
+				"REGENERATE_TITLE": "クライアントシークレットを再生成する"
+			},
+			"REGENERATE": "Client Secretを再生成する",
+			"TITLE": "アプリ"
+		},
+		"DOMAIN_SETTINGS": {
+			"ADMIN_EMAIL": "管理者Email",
+			"ALT_E_UPDATE_ADMIN_EMAIL": "管理者メールの更新に失敗しました",
+			"ALT_E_UPDATE_BRAND_ASSETS": "ブランドアセットの更新に失敗しました",
+			"ALT_E_UPDATE_DISPLAY_NAME": "表示名の更新に失敗しました",
+			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーン/言語の更新に失敗しました",
+			"ALT_S_UPDATE_ADMIN_EMAIL": "管理者メールが正常に更新されました",
+			"ALT_S_UPDATE_BRAND_ASSETS": "ブランドアセットが正常に更新されました",
+			"ALT_S_UPDATE_DISPLAY_NAME": "表示名が正常に更新されました",
+			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語が正常に更新されました",
+			"BASE_INFORMATION": "基本情報",
+			"BRAND_ASSETS": "ブランドアセット",
+			"CHANGE": "変更",
+			"CHANGE_ADMIN_EMAIL": "管理者メールの変更",
+			"DISPLAY_NAME": "表示名",
+			"DOMAIN_ID": "ドメインID",
+			"DOMAIN_NAME": "ドメイン名",
+			"EMAIL_INVALID": "無効なメール形式です",
+			"LANGUAGE": "言語",
+			"SAVE_CHANGE": "変更事項保存",
+			"SAVE_CHANGES": "変更事項保存",
+			"SEND_CODE": "認証コードを送信",
+			"SIGN_IN_PAGE_MAIN_IMAGE_DESCRIPTION": "この画像はサインイン画面に表示され、ブランドを強化するために使用することをお勧めします。\n• 最小 680 × 680 ピクセル\n• PNG、JPEG、GIF、またはSVG ファイル",
+			"SYMBOL_FAVICON_DESCRIPTION": "これはナビゲーションバーとブラウザタブのファビコンに表示されます。\n• 推奨サイズ 168 × 168 ピクセル\n• PNG、JPEG、GIF、またはSVG ファイル",
+			"TIMEZONE": "タイムゾーン",
+			"TIMEZONE_AND_LANGUAGE": "タイムゾーンと言語",
+			"VERIFICATION_CODE": "認証コード",
+			"VERIFICATION_CODE_INVALID": "必須入力項目です。",
+			"WORDTYPE_LOGO_DESCRIPTION": "これはサインイン画面に表示され、あなたのドメイン名を表します。\n• 推奨サイズ 220 × 40 ピクセル\n• PNG、JPEG、GIF、またはSVG ファイル"
+		},
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "取消",
@@ -1530,19 +1859,24 @@
 			"CREATE": "作成",
 			"DELETE": "削除",
 			"DETAIL": {
-				"API_POLICY": "APIポリシー接続",
+				"ALL_PERMISSIONS": "この役割にはフル権限があります。",
+				"API_POLICY": "APIポリシー",
 				"BASE_INFORMATION": "基本情報",
 				"CREATED_AT": "作成日",
 				"DESCRIPTION": "説明",
 				"DETAILS": "詳細情報",
 				"NAME": "名前",
+				"NO_DATA": "データがありません",
 				"PAGE_ACCESS": "ページアクセス権限",
 				"ROLE_TYPE": "ロールタイプ",
 				"SELECTED_DATA": "選択したデータ"
 			},
 			"EDIT": "編集",
 			"FORM": {
+				"ACCESS": "アクセス",
+				"ADMIN_MODE": "Adminモード",
 				"ALL": "全体",
+				"ALL_WORKSPACES": "すべてのワークスペース内のすべてのメニュー",
 				"ALT_E_CREATE_ROLE": "ロール作成失敗",
 				"ALT_E_UPDATE_ROLE": "ロール変更失敗",
 				"ALT_S_CREATE_ROLE": "ロール作成完了",
@@ -1550,7 +1884,13 @@
 				"CANCEL": "キャンセル",
 				"CREATE": "作成",
 				"CREATE_TITLE": "ロール作成",
+				"DEFAULT_API_POLICY_HELP_TEXT": "ロールタイプに対応するAPIポリシーはデフォルトで自動的にリンクされます。",
+				"DESC_ADMIN": "管理者モードを含むすべてのワーク\nスペースへのアクセス権があります。",
+				"DESC_WORKSPACE_MEMBER": "招待されたプロジェクトへのアクセス権限または\n許可されたプロジェクトへのアクセス権限があります。",
+				"DESC_WORKSPACE_OWNER": "指定されたワークスペース内のすべてのプ\nロジェクトへのアクセス権があります。",
+				"EDIT": "編集",
 				"EDIT_TITLE": "ロール修正",
+				"FULL_ACCESS": "管理者ロールにはフルアクセス権限があります。",
 				"MANAGE": "Manage",
 				"MENU": "メニュー",
 				"PERMISSION": "権限",
@@ -1570,8 +1910,8 @@
 				"TOOLTIP_ALERT_DESC_EDIT": "詳細変更",
 				"TOOLTIP_ALERT_NOTE": "ノート(追加/削除)",
 				"TOOLTIP_ALERT_URGENCY": "緊急度変更",
-				"TOOLTIP_API_KEY_ACTION": "APIキー(作業)",
-				"TOOLTIP_API_KEY_CREATE": "APIキー(作成)",
+				"TOOLTIP_API_KEY_ACTION": "Client Secret(作業)",
+				"TOOLTIP_API_KEY_CREATE": "Client Secret(作成)",
 				"TOOLTIP_BUDGET_CREATE": "予算生成",
 				"TOOLTIP_BUDGET_DELETE": "予算の削除",
 				"TOOLTIP_CHANGE_PROJECT": "プロジェクト変更",
@@ -1603,254 +1943,142 @@
 				"VIEW": "View"
 			},
 			"HANDBOOK": {
-				"API_POLICY": "APIポリシー接続",
-				"API_POLICY_CREATE": "新規作成または既存のポリシーを管理してください。",
-				"API_POLICY_DESC": "ポリシーはリソースに接続される際にその権限を定義するオブジェクトです。",
-				"API_POLICY_LINK": "こちら",
-				"PAGE_ACCESS": "ページアクセス権限",
-				"PAGE_ACCESS_DESC": "各サービスの詳細メニューごとに「View」と「Manage」の権限を異なるように付与することができます。",
-				"PAGE_ACCESS_MANAGE": "‘Manage’:",
-				"PAGE_ACCESS_MANAGE_DESC": "選択したサービスメニューに存在する生成、編集、追加などの管理機能を使用することができます。 （各サービス/ページごとに管理機能は異なります。）",
-				"PAGE_ACCESS_VIEW": "‘View’:",
-				"PAGE_ACCESS_VIEW_DESC": "選択したサービスメニューのページにアクセスできます。",
+				"PERMISSION": "権限",
+				"PERMISSION_API_POLICY": "‘APIポリシー’:",
+				"PERMISSION_API_POLICY_DESC": "ポリシーは適用されるリソースを指定できます。その後、アクセスはロールベースのアクセス制御（RBAC）に基づいて付与されます。",
+				"PERMISSION_DESC": "各特定のサービスメニューに対するアクセス制限は、それぞれの役割に設定することができます。",
+				"PERMISSION_PAGE_ACCESS": "‘ページアクセス権限’:",
+				"PERMISSION_PAGE_ACCESS_DESC": "特定のサービスメニューのアクセスがOFFに設定されている場合、その役割を持つユーザーはメニューにアクセスできません。",
 				"ROLE_TYPE": "ロールタイプ",
 				"ROLE_TYPE_ADMIN": "‘Admin’:",
-				"ROLE_TYPE_ADMIN_DESC": "すべてのプロジェクト、プロジェクトグループにアクセスして管理することができます。",
-				"ROLE_TYPE_DESC": "ロールタイプ別にプロジェクト管理権限が異なります。",
-				"ROLE_TYPE_USER": "‘User’:",
-				"ROLE_TYPE_USER_DESC": "ユーザーが直接作成したり招待されたプロジェクトとプロジェクトグループ、そして該当プロジェクトグループの下位プロジェクトにのみアクセスして管理が可能です。"
+				"ROLE_TYPE_ADMIN_DESC": "「スーパーアドミニストレータ」- ドメイン内のすべてのワークスペースにアクセスでき、管理モードにアクセスして全体的な設定を構成できます。",
+				"ROLE_TYPE_DESC": "異なるロールタイプに基づいてドメイン、ワークスペース、およびプロジェクト管理へのアクセスを制限します。",
+				"ROLE_TYPE_WORKSPACE_MEMBER": "‘Workspace Member’:",
+				"ROLE_TYPE_WORKSPACE_MEMBER_DESC": "「ワークスペースのメンバー」- 特定のワークスペース内で招待されたプロジェクトのみにアクセスできる一般ユーザーです。",
+				"ROLE_TYPE_WORKSPACE_OWNER": "‘Workspace Owner’:",
+				"ROLE_TYPE_WORKSPACE_OWNER_DESC": "「ワークスペースの所有者または管理者」- 特定のワークスペースでプロジェクトを追加・管理することができ、ユーザーやアプリの管理も可能です。"
 			},
+			"MANAGED": "管理型",
 			"MODAL": {
-				"DELETE_HELP_TEXT": "次のロールの場合、すでに割り当てられたユーザーがいます。",
+				"DELETE_HELP_TEXT": "以下の役割は一部のユーザーに割り当てられています。この役割を削除するには、まず割り当てられたユーザーから削除する必要があります。",
 				"DELETE_TITLE": "選択した項目を削除しますか？",
 				"DELETE_TITLE_CANNOT": "このロールは削除できません。"
 			},
 			"ROLE": "ロール"
-		}
-	},
-	"IDENTITY": {
-		"SERVICE_ACCOUNT": {
-			"ADD": {
-				"ACCOUNT": "アカウント",
-				"ALT_E_CREATE_ACCOUNT_FORM_INVALID": "入力したデータを確認してください",
-				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
-				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
-				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
-				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
-				"BASE_TITLE": "基本情報",
-				"CANCEL": "キャンセル",
-				"CREDENTIALS_NAME_PLACEHOLDER": "暗号化キー名",
-				"CREDENTIALS_TITLE": "暗号化キー",
-				"CREDENTIAL_HELP_TEXT": " {provider}の暗号化キーをお持ちですか？",
-				"JSON_INVALID": "無効なJsonフォマット",
-				"NAME_DUPLICATED": "重複した名前です。",
-				"NAME_INVALID": "2文字以上を入力してください",
-				"NAME_LABEL": "名前",
-				"PROJECT_CREATE": "プロジェクト作成",
-				"PROJECT_EXIST_DESC": "{project}に{item}が存在します",
-				"PROJECT_NO_DATA": "プロジェクトがありません",
-				"PROJECT_NO_SELECTION": "プロジェクトを選択しない",
-				"PROJECT_OPTIONAL": "オプション",
-				"PROJECT_SELECT_DESC": "サービスアカウントと連動するプロジェクトを選択してください。",
-				"PROJECT_SELECT_ERROR": "連動するプロジェクトの選択/解除ができます。",
-				"PROJECT_TITLE": "プロジェクト",
-				"SAVE": "保存",
-				"SECRET_TYPE_LABEL": "暗号化キーのタイプ",
-				"SEE_MORE": "詳細はこちら",
-				"SERVICE_ACCOUNT": "サービスアカウント",
-				"TAB_INPUT": "直接入力",
-				"TAB_JSON": "JSONで入力",
-				"TAG_ADD": "タグ追加",
-				"TAG_DESC_1": "{name}のタグを設定します",
-				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
-				"TAG_LABEL": "タグ",
-				"TITLE": "サービスアカウントの追加",
-				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
-			},
-			"MAIN": {
-				"ACTION": "作業",
-				"ADD": "追加",
-				"ALT_E_CHANGE_PROJECT": "プロジェクト変更に失敗",
-				"ALT_E_DELETE_ACCOUNT": "アカウント削除に失敗",
-				"ALT_E_RELEASE_PROJECT": "プロジェクト解除に失敗",
-				"ALT_S_CHANGE_PROJECT": "プロジェクトが正常に変更されました。",
-				"ALT_S_DELETE_ACCOUNT": "アカウント削除完了",
-				"ALT_S_RELEASE_PROJECT": "プロジェクト解除完了",
-				"CHANGE_PROJECT": "プロジェクト変更",
-				"CHECK_MODAL_DELETE_DESC": "{account}を完全に削除します",
-				"CHECK_MODAL_DELETE_TITLE": "サービスアカウントの削除",
-				"CONSOLE": "コンソール接続",
-				"DELETE": "削除",
-				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
-				"PROVIDERS_TITLE": "サービスプロバイダー",
-				"TAB_CREDENTIALS": "暗号化キー",
-				"TAB_DETAILS": "詳細情報",
-				"TAB_MEMBER": "関連するメンバー",
-				"TAB_SELECTED_DATA": "選択したデータ",
-				"TAB_TAG": "タグ",
-				"TITLE": "{provider}アカウント"
-			}
 		},
 		"USER": {
-			"ACCOUNT": {
-				"ACCOUNT_N_PROFILE": "アカウント＆情報",
-				"BASE_INFORMATION": "基本情報",
-				"CHANGE_PASSWORD": "パスワード変更",
-				"NOTIFICATION_EMAIL": {
-					"CHANGE": "変更",
-					"HELP_TEXT": "アカウントやシステムに関する重要な情報を受け取るためのメールアドレスを入力してください。",
-					"NOT_VERIFIED": "認証されていません",
-					"SEND_MAIL": "認証コード送信",
-					"SUCCESS": "通知専用メールの認証が完了しました",
-					"TITLE": "お知らせメール",
-					"VERIFIED": "認証済みです",
-					"VERIFY": "認証"
-				},
-				"SAVE_CHANGES": "変更事項を保存"
-			},
-			"API_KEY": {
-				"ALERT_MSG": "JSONか設定ファイルをダウンロードしてください。このページを閉めたらファイルのダウンロードができません。",
-				"ALT_E_CREATE_SCHEDULER": "スケジューラ作成に失敗",
-				"DELETE_MODAL_DESC": "選択したAPI Keyを削除しますか？",
-				"DELETE_MODAL_TITLE": "API Key削除",
-				"DISABLE_MODAL_DESC": "選択したAPI Keyを無効化にしますか？",
-				"DISABLE_MODAL_TITLE": "API Key無効化",
-				"DOWNLOAD_JSON": "JSONダウンロード",
-				"DOWNLOAD_YAML": "YAMLダウンロード",
-				"ENABLE_MODAL_DESC": "選択したAPI Keyを有効化しますか？",
-				"ENABLE_MODAL_TITLE": "API Key有効化",
-				"HIDE": "非表示",
-				"ID": "API Key ID",
-				"MODAL_TITLE": "API Keyが作成されました",
-				"SHOW": "もっと見る",
-				"SPACECTL": "Spacectl (CLI)",
-				"SPACECTL_CONFIG": "spacectl設定",
-				"SPACECTL_DESC": "SpaceONEのCLIツールであるspacectlを利用すれば、SpaceONEで管理するリソースに対するコマンドが実行できます。",
-				"TITLE_INFO": "API KeyはSpaceONEとspaceonectl(CLI)設定に関連するリクエストを認証する固有の識別者です。",
-				"VIEW_MORE": "もっと見る"
-			},
+			"ADD": "作成",
 			"FORM": {
-				"ADD_TITLE": "ユーザー追加",
-				"ALREADY_EXISTS": "すでに存在しています",
+				"ADD_TAG": "タグの追加",
+				"ADD_WORKSPACE": "ユーザーがアクセスできるワークスペース",
+				"ADMIN_ROLE_HELP_TEXT": "新規ユーザーは、管理者モードおよびすべてのワークスペースを含む、全ドメインへの包括的なアクセス権を持ちます",
+				"ALT_E_INVALID_FULL_NAME": "フルなメールを入力し続けてください。",
+				"ALT_ING_SEND_INVITATION_EMAIL": "招待メールが送信され、数分かかることがあります...",
+				"ALT_S_SEND_INVITATION_EMAIL": "ユーザーが正常に招待されました",
 				"ASSIGN_DOMAIN_ROLE": "ドメイン·ロールの割り当てる",
+				"AUTH_TYPE": "認証タイプ",
 				"CHECK_USER_ID": "ユーザ名を確認",
-				"DOMAIN_ADMIN": "ドメイン管理者",
+				"CREATE_ROLE": "ロール作成",
+				"CREATE_WORKSPACE": "ワークスペースの作成",
 				"EMAIL_INVALID": "無効なメール形式です",
-				"EMPTY_SPACE_INVALID": "空白を取り除いてください",
-				"GROUP": "グループ/会社",
-				"LANGUAGE": "言語",
-				"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
-				"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
-				"MOBILE": "連絡先",
+				"GENERATE": "生成",
+				"GENERATE_PLACEHOLDER": "生成またはパスワード入力",
+				"MEMBER": "構成員",
 				"NAME": "お名前",
-				"NAME_PLACEHOLDER": "ユーザ名を入力",
 				"NAME_VALID": "使用可能なIDです",
 				"NOTIFICATION_EMAIL": "お知らせメール",
 				"NOTIFICATION_TOOLTIP": "アカウントやシステムに関する重要な情報を受け取るためのメールアドレスを入力してください。",
-				"NOT_SELECT_ROLE": "ロールが選択されていません",
-				"NO_RESULTS_FOUND": "検索結果が見つかりません",
-				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
-				"ONE_LOWER_CASE_INVALID": "少なくとも１つ以上の小文字を含めなければいけまん",
-				"ONE_NUMBER_INVALID": "少なくとも１つ以上の数字を含めなければいけません",
-				"ONE_UPPER_CASE_INVALID": "少なくとも１つ以上の大文字を含めなければいけません",
+				"NO_DATA": "データがありません",
+				"NO_ROLE": "役割Roleなし",
+				"NO_USER": "ユーザーがいません",
+				"NO_USER_DESC": "ユーザーを追加してください",
+				"NO_WORKSPACE": "ワークスペースなし",
+				"OWNER": "オーナー",
 				"PASSWORD": "パスワード",
-				"PASSWORD_CHECK": "パスワード確認",
-				"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください。",
-				"PASSWORD_HELP_TEXT": "パスワードは、5〜12文字で入力してください。",
-				"PASSWORD_INVALID": "8文字以上で入力してください。",
+				"PASSWORD_SEND_LINK": "ローカルユーザーにパスワードリセットメールを送信",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
+				"ROLE_PLACEHOLDER": "ワークスペースアクセスロールを選択",
+				"ROLE_TITLE": "この役割で招待",
+				"SELECT_ROLE": "役割を選択してください",
+				"SELECT_WORKSPACE": "1つ以上のワークスペースを選択",
 				"TAGS": "タグ",
-				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
-				"TAGS_HELP_TEXT2": "Keyは下線、文字、数字のみ使用可能です",
-				"TIMEZONE": "タイムゾーン",
-				"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。",
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
-				"UPDATE_TITLE": "ユーザー編集",
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "すでに存在しています",
 				"USER_ID_INVALID": "同じIDが存在します。",
-				"USER_ID_NOT_EXIST": "IDがありません"
+				"USER_ID_INVALID_DOMAIN": "{userId}は既にドメイン内に存在します。",
+				"USER_ID_INVALID_WORKSPACE": "{userId}は既にワークスペース内に存在します。",
+				"WITH_ROLE": "役割(Role)"
 			},
-			"HANDBOOK": {
-				"DESC_1": "SpacectlはSpaceONEで管理するリソースに対するコマンドが実行できるコマンドラインツール(CLI)です。\nサポートされる全ての設定及びコマンドに関する詳しい内容は{document}を参照してください。",
-				"DESC_1_DOC": "spacectlドキュメント",
-				"DESC_1_PYTHON_VERSION": "Python 3.8以上",
-				"DESC_1_REQUIREMENTS": "必須要求事項：",
-				"DESC_2-1": "[+ API Key作成]ボタンをクリックしてAPI-Keyを作成した後Spacectl設定をダウンロードしてください。\n注意！）ダウンロードポップアップページを閉じると作成されたAPI Key及びCLI設定がダウンロードできません。",
-				"DESC_2-2": "pipコマンドを利用して最新Spacectlをインストールしてください。",
-				"DESC_2-3": "以前ステップでダウンロードしたSpacectl設定ファイル(YAML)を下のコマンドで設定してください。",
-				"DESC_3-1": "•次のコマンドで利用できる全てのspacectl APIリストが確認できます。",
-				"DESC_3-2": "•サポートされるコマンドリストは[--help]で確認できます。",
-				"DESC_3-3": "Spacectl各コマンドに対する詳しい内容とより多くの情報は{document}を見てください。",
-				"TITLE_1": "1. Spacectlとは？",
-				"TITLE_2": "2. Spacectlインストール及び設定",
-				"TITLE_2-1": "2.1. API-Key作成",
-				"TITLE_2-2": "2.2. Spacectlインストール",
-				"TITLE_2-3": "2.3. 環境設定",
-				"TITLE_3": "3. Spacectl開始"
-			},
+			"INVITE": "招待",
 			"MAIN": {
-				"ACCESS_CONTROL": "アクセス制御",
 				"ACTION": "作業",
-				"ADD": "作成",
 				"ADMINISTRATION": "管理",
 				"ADMINISTRATOR": "管理者",
-				"ALT_E_ADD_USER": "ユーザー追加に失敗",
-				"ALT_E_DELETE_API_KEY": "API Key削除に失敗",
-				"ALT_E_DELETE_USER": "ユーザー削除に失敗",
-				"ALT_E_DISABLE": "ユーザー無効化に失敗",
-				"ALT_E_DISABLE_API_KEY": "API Key無効化に失敗",
-				"ALT_E_ENABLE": "ユーザー有効化に失敗",
-				"ALT_E_ENABLE_API_KEY": "API Key有効かに失敗",
-				"ALT_E_UPDATE_USER": "ユーザー編集に失敗",
-				"ALT_S_ADD_USER": "ユーザー追加完了",
-				"ALT_S_DELETE_API_KEY": "API Key削除完了",
-				"ALT_S_DELETE_USER": "ユーザー削除完了",
-				"ALT_S_DISABLE": "ユーザー無効化完了",
-				"ALT_S_DISABLE_API_KEY": "API Key無効化完了",
-				"ALT_S_ENABLE": "ユーザー有効化完了",
-				"ALT_S_ENABLE_API_KEY": "API Key有効化完了",
-				"ALT_S_UPDATE_USER": "ユーザー更新完了",
-				"API_KEY": "API Key",
-				"API_TABLE_DESC": "API Keyは2個まで作成できます。",
+				"ALT_S_CHANGE_ROLE": "ワークスペースの役割が正常に変更されました",
 				"ASSIGNED_ROLES": "割り当てられたロール",
+				"ASSOCIATED_PROJECTS": "関連プロジェクト",
+				"ASSOCIATED_WORKSPACE": "関連ワークスペース",
+				"BASE_INFORMATION": "基本情報",
 				"CREATED_AT": "作成日",
-				"CREATE_API_KEY": "API Key作成",
 				"DAYS": "日前",
 				"DELETE": "削除",
-				"DELETE_MODAL_DESC": "選択したユーザーを削除しますか？ |選択したユーザーを全部削除しますか？",
-				"DELETE_MODAL_TITLE": "ユーザー削除",
 				"DETAILS": "詳細情報",
 				"DISABLE": "無効化",
-				"DISABLE_MODAL_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
-				"DISABLE_MODAL_TITLE": "ユーザ無効化",
 				"DOMAIN_ID": "ドメイン名",
+				"EDIT": "編集",
 				"ENABLE": "有効化",
-				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
-				"ENABLE_MODAL_TITLE": "ユーザー有効化",
-				"ENDPOINTS": "エンドポイント",
-				"GROUP": "グループ",
+				"INVITED": "招待済み",
 				"LANGUAGE": "言語",
 				"LAST_ACTIVITY": "最終アクセス時間",
-				"MOBILE": "連絡先",
-				"MY_ACCOUNT": "マイアカウント",
+				"MFA": "マルチファクタ認証",
+				"MFA_DESC": "アカウントのセキュリティを向上させるために、マルチファクタ認証オプションを設定してください。",
+				"MODAL": {
+					"ALT_E_ADD_USER": "ユーザー追加に失敗",
+					"ALT_E_DELETE_PROJECT_MEMBER": "メンバー削除に失敗",
+					"ALT_E_DELETE_USER": "ユーザー削除に失敗",
+					"ALT_E_DISABLE_USER": "ユーザー無効化に失敗",
+					"ALT_E_ENABLE_USER": "ユーザー有効化に失敗",
+					"ALT_E_REMOVE_USER": "ユーザーの削除に失敗しました",
+					"ALT_E_UPDATE_USER": "ユーザー編集に失敗",
+					"ALT_S_ADD_USER": "ユーザー追加完了",
+					"ALT_S_DELETE_PROJECT_MEMBER": "メンバー削除完了",
+					"ALT_S_DELETE_USER": "ユーザー削除完了",
+					"ALT_S_DISABLE_USER": "ユーザー無効化完了",
+					"ALT_S_ENABLE_USER": "ユーザー有効化完了",
+					"ALT_S_REMOVE_USER": "このワークスペースからユーザーが正常に削除されました",
+					"ALT_S_UPDATE_USER": "ユーザー更新完了",
+					"CREATE_TITLE": "ユーザー追加",
+					"DELETE_DESC": "選択したユーザーを削除しますか？ |選択したユーザーを全部削除しますか？",
+					"DELETE_PROJECT_MEMBER_TITLE": "このユーザーをプロジェクトから削除してもよろしいですか？",
+					"DELETE_TITLE": "ユーザー削除",
+					"DISABLE_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
+					"DISABLE_TITLE": "ユーザ無効化",
+					"ENABLE_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
+					"ENABLE_TITLE": "ユーザー有効化",
+					"INVITE_TITLE": "ユーザーを{workspace_name}に招待",
+					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
+					"REMOVE_WORKSPACE_TITLE": "このユーザーをワークスペースから削除してもよろしいですか？",
+					"UPDATE_TITLE": "ユーザーを編集"
+				},
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",
 				"NOTIFICATION_EMAIL": "お知らせメール",
+				"NOT_VERIFIED": "認証されていません",
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
-				"ROOT_ACCOUNT": "Root account",
-				"SELECTED_DATA": "選択したデータ",
-				"SPACEONE_ADMIN": "SpaceONE管理者",
-				"SPACEONE_USER": "SpaceONEユーザー",
+				"PROJECT": "プロジェクト ",
+				"PROJECTS": "プロジェクト",
+				"PROJECT_ID": "プロジェクトID",
+				"ROLE": "ロール",
+				"ROLE_NAME": "ロール名",
+				"ROLE_TYPE": "ロールタイプ",
 				"STATE": "状態",
 				"TAB_SELECTED_DATA": "選択したデータ",
 				"TAG": "タグ",
 				"TIMEZONE": "タイムゾーン",
-				"TITLE": "ユーザー",
 				"TODAY": "今日",
-				"UPDATE": "編集",
 				"USER_ID": "ID",
-				"USER_MANAGEMENT": "ユーザー管理",
+				"WORKSPACE": "ワークスペース",
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
@@ -1920,6 +2148,225 @@
 				"TOKEN_INFO": "トークンは修正できません。",
 				"TYPE": "タイプ",
 				"VOICE": "ボイスコール"
+			},
+			"REMOVE": "削除",
+			"TITLE": "ユーザー"
+		},
+		"WORKSPACES": {
+			"ACTION": "作業",
+			"CREATE": "作成",
+			"CREATE_WORKSPACE": "ワークスペースの作成",
+			"CREATE_WORKSPACE_TEXT_LENGTH": "ワークスペース名の最大長は80文字です。",
+			"DELETE": "削除",
+			"DELETE_WORKSPACE": "削除",
+			"DELETE_WORKSPACE_DESC": "この操作は取り消すことができません。",
+			"DETAIL": {
+				"USERS": "ユーザー"
+			},
+			"DISABLE": "無効化",
+			"DISABLE_WORKSPACE": "選択したワークスペースを無効にしてもよろしいですか？",
+			"EDIT": "編集",
+			"EDIT_WORKSPACE": "ワークスペースを編集",
+			"ENABLE": "有効化",
+			"ENABLE_WORKSPACE": "選択したワークスペースを有効にしますか？",
+			"FORM": {
+				"DUPLICATED_NAME": "ワークスペース名が重複しています。",
+				"LABEL_DESC": "説明",
+				"LABEL_NAME": "名前",
+				"LABEL_THEME": "ワークスペースの色",
+				"PLACEHOLDER_DESC": "ワークスペースの説明\"",
+				"PLACEHOLDER_NAME": "ワークスペース名",
+				"REQUIRED_NAME": "名前を入力してください"
+			},
+			"REQUIRED_ENABLE_WORKSPACE": "少なくとも1つのワークスペースを有効にする必要があります。",
+			"WORKSPACES": "ワークスペース"
+		}
+	},
+	"IDENTITY": {
+		"SERVICE_ACCOUNT": {
+			"ADD": {
+				"ACCOUNT": "アカウント",
+				"ALT_E_CREATE_ACCOUNT_FORM_INVALID": "入力したデータを確認してください",
+				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
+				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
+				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
+				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
+				"BASE_TITLE": "基本情報",
+				"CANCEL": "キャンセル",
+				"CREDENTIALS_NAME_PLACEHOLDER": "暗号化キー名",
+				"CREDENTIALS_TITLE": "暗号化キー",
+				"CREDENTIAL_HELP_TEXT": " {provider}の暗号化キーをお持ちですか？",
+				"JSON_INVALID": "無効なJsonフォマット",
+				"NAME_DUPLICATED": "重複した名前です。",
+				"NAME_INVALID": "2文字以上を入力してください",
+				"NAME_LABEL": "名前",
+				"PROJECT_CREATE": "プロジェクト作成",
+				"PROJECT_EXIST_DESC": "{project}に{item}が存在します",
+				"PROJECT_NO_DATA": "プロジェクトがありません",
+				"PROJECT_NO_SELECTION": "プロジェクトを選択しない",
+				"PROJECT_OPTIONAL": "オプション",
+				"PROJECT_SELECT_DESC": "サービスアカウントと連動するプロジェクトを選択してください。",
+				"PROJECT_SELECT_ERROR": "連動するプロジェクトの選択/解除ができます。",
+				"PROJECT_TITLE": "プロジェクト",
+				"SAVE": "保存",
+				"SECRET_TYPE_LABEL": "暗号化キーのタイプ",
+				"SEE_MORE": "詳細はこちら",
+				"SERVICE_ACCOUNT": "サービスアカウント",
+				"TAB_INPUT": "直接入力",
+				"TAB_JSON": "JSONで入力",
+				"TAG_ADD": "タグ追加",
+				"TAG_DESC_1": "{name}のタグを設定します",
+				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
+				"TAG_LABEL": "タグ",
+				"TITLE": "{type} 追加",
+				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
+			},
+			"MAIN": {
+				"ACTION": "作業",
+				"ADD": "追加",
+				"ALT_E_CHANGE_PROJECT": "プロジェクト変更に失敗",
+				"ALT_E_DELETE_ACCOUNT": "アカウント削除に失敗",
+				"ALT_E_RELEASE_PROJECT": "プロジェクト解除に失敗",
+				"ALT_S_CHANGE_PROJECT": "プロジェクトが正常に変更されました。",
+				"ALT_S_DELETE_ACCOUNT": "アカウント削除完了",
+				"ALT_S_RELEASE_PROJECT": "プロジェクト解除完了",
+				"CHANGE_PROJECT": "プロジェクト変更",
+				"CHECK_MODAL_DELETE_DESC": "{account}を完全に削除します",
+				"CHECK_MODAL_DELETE_TITLE": "サービスアカウントの削除",
+				"CONSOLE": "コンソール接続",
+				"CREATE": "作成",
+				"DELETE": "削除",
+				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
+				"PROVIDERS_TITLE": "サービスプロバイダー",
+				"TAB_CREDENTIALS": "暗号化キー",
+				"TAB_DETAILS": "詳細情報",
+				"TAB_MEMBER": "関連するメンバー",
+				"TAB_SELECTED_DATA": "選択したデータ",
+				"TAB_TAG": "タグ",
+				"TITLE": "{provider}アカウント"
+			}
+		},
+		"TAGS_PLACEHOLDER": "key1:value1 key2:value2",
+		"USER": {
+			"API_KEY": {
+				"ALERT_MSG": "JSONか設定ファイルをダウンロードしてください。このページを閉めたらファイルのダウンロードができません。",
+				"ALT_E_CREATE_SCHEDULER": "スケジューラ作成に失敗",
+				"API_KEY": "API Key",
+				"API_TABLE_DESC": "API Keyは2個まで作成できます。",
+				"CREATE_API_KEY": "API Key作成",
+				"DELETE": "削除",
+				"DELETE_MODAL_DESC": "選択したAPI Keyを削除しますか？",
+				"DELETE_MODAL_TITLE": "API Key削除",
+				"DISABLE": "無効化",
+				"DISABLE_MODAL_DESC": "選択したAPI Keyを無効化にしますか？",
+				"DISABLE_MODAL_TITLE": "API Key無効化",
+				"DOWNLOAD_JSON": "JSONダウンロード",
+				"DOWNLOAD_YAML": "YAMLダウンロード",
+				"ENABLE": "有効化",
+				"ENABLE_MODAL_DESC": "選択したAPI Keyを有効化しますか？",
+				"ENABLE_MODAL_TITLE": "API Key有効化",
+				"ENDPOINTS": "エンドポイント",
+				"HIDE": "非表示",
+				"ID": "Client ID",
+				"MODAL_TITLE": "Client Secretが作成されました",
+				"SHOW": "もっと見る",
+				"SPACECTL": "Spacectl (CLI)",
+				"SPACECTL_CONFIG": "spacectl設定",
+				"SPACECTL_DESC": "SpaceONEのCLIツールであるspacectlを利用すれば、SpaceONEで管理するリソースに対するコマンドが実行できます。",
+				"TITLE_INFO": "API KeyはSpaceONEとspaceonectl(CLI)設定に関連するリクエストを認証する固有の識別者です。",
+				"VIEW_MORE": "もっと見る"
+			},
+			"FORM": {
+				"EMPTY_SPACE_INVALID": "空白を取り除いてください",
+				"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
+				"ONE_LOWER_CASE_INVALID": "少なくとも１つ以上の小文字を含めなければいけまん",
+				"ONE_NUMBER_INVALID": "少なくとも１つ以上の数字を含めなければいけません",
+				"ONE_UPPER_CASE_INVALID": "少なくとも１つ以上の大文字を含めなければいけません"
+			},
+			"HANDBOOK": {
+				"DESC_1": "SpacectlはSpaceONEで管理するリソースに対するコマンドが実行できるコマンドラインツール(CLI)です。\nサポートされる全ての設定及びコマンドに関する詳しい内容は{document}を参照してください。",
+				"DESC_1_DOC": "spacectlドキュメント",
+				"DESC_1_PYTHON_VERSION": "Python 3.8以上",
+				"DESC_1_REQUIREMENTS": "必須要求事項：",
+				"DESC_2-1": "[+ API Key作成]ボタンをクリックしてAPI-Keyを作成した後Spacectl設定をダウンロードしてください。\n注意！）ダウンロードポップアップページを閉じると作成されたAPI Key及びCLI設定がダウンロードできません。",
+				"DESC_2-2": "pipコマンドを利用して最新Spacectlをインストールしてください。",
+				"DESC_2-3": "以前ステップでダウンロードしたSpacectl設定ファイル(YAML)を下のコマンドで設定してください。",
+				"DESC_3-1": "•次のコマンドで利用できる全てのspacectl APIリストが確認できます。",
+				"DESC_3-2": "•サポートされるコマンドリストは[--help]で確認できます。",
+				"DESC_3-3": "Spacectl各コマンドに対する詳しい内容とより多くの情報は{document}を見てください。",
+				"TITLE_1": "1. Spacectlとは？",
+				"TITLE_2": "2. Spacectlインストール及び設定",
+				"TITLE_2-1": "2.1. API-Key作成",
+				"TITLE_2-2": "2.2. Spacectlインストール",
+				"TITLE_2-3": "2.3. 環境設定",
+				"TITLE_3": "3. Spacectl開始"
+			},
+			"MAIN": {
+				"ACTION": "作業",
+				"ALT_E_ADD_USER": "ユーザー追加に失敗",
+				"ALT_E_DELETE_API_KEY": "API Key削除に失敗",
+				"ALT_E_DELETE_USER": "ユーザー削除に失敗",
+				"ALT_E_DISABLE": "ユーザー無効化に失敗",
+				"ALT_E_DISABLE_API_KEY": "API Key無効化に失敗",
+				"ALT_E_ENABLE": "ユーザー有効化に失敗",
+				"ALT_E_ENABLE_API_KEY": "API Key有効かに失敗",
+				"ALT_E_REMOVE_USER": "ユーザーの削除に失敗しました",
+				"ALT_E_SAME_PASSWORD": "新しいパスワードは古いパスワードと同じものにすることはできません。",
+				"ALT_E_UPDATE_USER": "ユーザー編集に失敗",
+				"ALT_S_ADD_USER": "ユーザー追加完了",
+				"ALT_S_DELETE_API_KEY": "API Key削除完了",
+				"ALT_S_DELETE_USER": "ユーザー削除完了",
+				"ALT_S_DISABLE": "ユーザー無効化完了",
+				"ALT_S_DISABLE_API_KEY": "API Key無効化完了",
+				"ALT_S_ENABLE": "ユーザー有効化完了",
+				"ALT_S_ENABLE_API_KEY": "API Key有効化完了",
+				"ALT_S_REMOVE_USER": "ユーザーはこのワークスペースから正常に削除されました",
+				"ALT_S_UPDATE_USER": "ユーザー更新完了",
+				"DOMAIN_ID": "ドメイン名"
+			},
+			"NOTIFICATION": {
+				"EDIT": "編集",
+				"FORM": {
+					"ADD_CHANNEL": "{type}チャンネルを追加",
+					"ALL_TIME": "すべての時間",
+					"ALT_E_CREATE_PROJECT_CHANNEL": "プロジェクトチャンネルの作成に失敗",
+					"ALT_E_CREATE_USER_CHANNEL": "ユーザチャネルの作成に失敗",
+					"ALT_E_UPDATE_PROJECT_CHANNEL": "プロジェクトチャンネルの変更に失敗",
+					"ALT_E_UPDATE_TOPIC": "トピックス修正に失敗",
+					"ALT_E_UPDATE_USER_CHANNEL": "ユーザチャンネルの変更に失敗",
+					"ALT_S_CREATE_PROJECT_CHANNEL": "プロジェクトチャンネル作成に成功",
+					"ALT_S_CREATE_USER_CHANNEL": "ユーザチャネル作成に成功",
+					"ALT_S_UPDATE_PROJECT_CHANNEL": "プロジェクトチャンネルの修正に成功",
+					"ALT_S_UPDATE_TOPIC": "トピックス修正成功",
+					"ALT_S_UPDATE_USER_CHANNEL": "ユーザチャンネルの修正に成功",
+					"BASE_INFO": "基本情報",
+					"CHANNEL_NAME": "チャンネル名",
+					"CUSTOM": "時間設定",
+					"LEVEL": "レベル{level}",
+					"NOTIFICATION_LEVEL": "通知レベル",
+					"PHONE_NUMBER": "電話番号",
+					"RECEIVE_ALL": "すべての通知を受信する",
+					"RECEIVE_ON_TOPIC": "選択したトピック通知を受信する",
+					"SAVE_CHANGES": "変更事項を保存",
+					"SCHEDULE": "スケジュール",
+					"SCHEDULE_INFO_MSG": "選択したスケジュールの通知のみ受信されます。",
+					"SETTING": "設定",
+					"SETTING_MODE": "設定方法",
+					"SLACK_TOKEN": "スラックトークン",
+					"TO": "から",
+					"TOPIC": "トピックス",
+					"TOPIC_REQUIRED": "必須項目です"
+				}
+			},
+			"NOTIFICATION_EMAIL": {
+				"CHANGE": "変更",
+				"HELP_TEXT": "アカウントやシステムに関する重要な情報を受け取るためのメールアドレスを入力してください。",
+				"NOT_VERIFIED": "認証されていません",
+				"SEND_MAIL": "認証コード送信",
+				"SUCCESS": "通知専用メールの認証が完了しました",
+				"TITLE": "お知らせメール",
+				"VERIFIED": "認証済みです",
+				"VERIFY": "認証"
 			}
 		}
 	},
@@ -1977,9 +2424,14 @@
 		}
 	},
 	"INVENTORY": {
+		"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "関連するメンバー"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "選択されたデータテーブルは複数のシートとして含まれ、一つのファイルに保存されます。",
+				"TITLE": "エクスポート選択"
 			},
 			"HISTORY": {
 				"ALL_MONTH": "全体月",
@@ -2017,14 +2469,13 @@
 				"HISTORY": "変更履歴"
 			},
 			"MAIN": {
-				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
+				"ALL": "すべて",
 				"ALT_E_CHECK_MODAL": "{action}失敗",
 				"ALT_S_CHECK_MODAL": "{action}完了",
 				"AUTO_PERIOD": "自動（全期間）",
 				"CHECK_MODAL_DELETE_DESC": "本当に削除しますか？",
 				"CHECK_MODAL_DELETE_TITLE": "クラウドサービス削除",
 				"CLOSE": "閉じる",
-				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"FILTER": "フィルター",
 				"FILTERED_BY_DATE": "日付で絞り込み",
@@ -2046,10 +2497,14 @@
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
-				"TITLE": "{provider} クラウドサービス",
-				"TOTAL_RESULT": "検索結果",
+				"TITLE": "クラウドサービス",
 				"USAGE_OVERVIEW": "利用概要",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}の利用状況"
+			},
+			"MAIN_EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "主要クラウドサービスのデータは、複数のファイルとしてダウンロードされます。",
+				"NOTICE_DESCRIPTION": "「全クラウドサービス」を選択した場合、データ量の増加により、ダウンロードにかなりの時間がかかる可能性があります。",
+				"OPTION_TITLE": "全クラウドサービス（推奨されません）"
 			},
 			"PAGE": {
 				"ACTION": "作業",
@@ -2080,6 +2535,7 @@
 			}
 		},
 		"COLLECTOR": {
+			"ACCOUNT": "アカウント",
 			"ADDITIONAL_OPTIONS": "追加オプション",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "コレクター名の変更に失敗しました",
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -2114,9 +2570,11 @@
 				"CREATE_EXIT_MODAL_CONTENT": "この操作は取り消すことができません。",
 				"CREATE_EXIT_MODAL_TITLE": "中止してもよろしいですか？",
 				"CREATE_NEW_COLLECTOR": "新しいコレクターを作成",
+				"EXCLUDE": "除外項目",
 				"FORM_LOAD_FAILED": "追加オプションの読み込みに失敗しました。",
+				"INCLUDE": "含まれる",
 				"LEARN_MORE": "詳細を見る",
-				"LOADING_DESC1": "加オプションを読み込んでいます...",
+				"LOADING_DESC1": "関連オプションを初期化しています...",
 				"LOADING_DESC2": "(お待ちください、約1〜2分かかる場合があります)",
 				"NAME": "名前",
 				"NAME_INVALID_DUPLICATED": "名前が重複しています",
@@ -2153,10 +2611,13 @@
 				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
+				"DETAIL_JOB_LINK": "作業詳細を見る",
 				"EDIT": "編集",
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",
 				"NAME": "名前",
+				"NO_TAG": "タグなし",
+				"PAGE_NOTIFICATION": "このコレクターの設定は管理者モードでのみ行うことができます。",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
 				"REGION": "Region",
@@ -2174,25 +2635,47 @@
 				"TAG": "タグ",
 				"VERSION": "バージョン"
 			},
+			"HISTORY": {
+				"ALL": "すべてを表示",
+				"CANCELED": "キャンセル",
+				"FAILURE": "失敗",
+				"IN_PROGRESS": "進行中",
+				"PENDING": "保留中",
+				"SUCCESS": "成功"
+			},
 			"MAIN": {
 				"ALT_E_EDIT_SCHEDULE": "スケジュールの編集に失敗しました",
 				"ALT_S_EDIT_SCHEDULE": "スケジュールの編集が正常に完了しました",
 				"COLLECTOR_SCHEDULE": "コレクタースケジュール",
 				"COLLECT_DATA": "データ収集",
+				"COLLECT_DATA_MODAL": {
+					"ACCOUNT": "アカウント",
+					"CONFIRM_BUTTON": "今すぐ収集",
+					"DESCRIPTION": "次の関連アカウントからデータを収集します。",
+					"DUPLICATION_DESCRIPTION": "在進行中のデータ収集情報をご確認ください。",
+					"DUPLICATION_TITLE": "データの収集はまだ進行中です。キャンセルして再開しますか？",
+					"DURATION": "期間",
+					"TITLE": "今すぐデータを収集しますか？"
+				},
 				"CREATE": "作成",
 				"CREATE_COLLECTOR": "コレクタ生成",
 				"CURRENT_STATUS": "進行状況",
 				"EDIT_MODAL_TITLE": "スケジュールの編集",
+				"EDIT_SCHEDULE": "編集",
 				"HISTORY": "コレクターの履歴",
 				"IN_PROGRESS": "進行中",
-				"JOB_ERROR": "状態: {date}に収集失敗",
+				"JOB_CANCELED": "キャンセル: {date}",
+				"JOB_FAILURE": "失敗：{date}",
 				"JOB_NONE": "収集記録なし",
 				"JOB_PROGRESS": "進捗率: 進行中",
-				"JOB_SUCCESS": "状態：{date}に収集完了",
+				"JOB_SUCCESS": "完了：{date}",
+				"MANAGED_ITEM_LABEL": "管理者管理",
 				"NO_DATA": "作成されたコレクターはありません。",
+				"NO_JOB": "近のジョブはありません",
 				"NO_SCHEDULE": "スケジュールが設定されていません",
 				"PLUGIN": "プラグイン",
-				"RECENT_JOBS": "過去5日間の最新のデータ収集結果です",
+				"RECENT_JOBS": "最近のコレクタージョブ",
+				"RECENT_JOBS_TOOLTIP": "過去5日間の最新のデータ収集結果です",
 				"RESTART": "再開",
 				"RESTART_COLLECT": "現在、データ収集は進行中です。再開しますか？",
 				"SCHEDULED": "予定された収集:",
@@ -2200,10 +2683,23 @@
 				"SET_SCHEDULE": "設定",
 				"TIMEZONE": "タイムゾーン",
 				"TITLE": "コレクタ",
-				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
+				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する",
+				"VIEW_SCHEDULE": "ビュー",
+				"VIEW_SCHEDULE_MODAL_TITLE": "スケジュールを表示"
 			},
 			"NO_DATA": "データがありません",
-			"NO_OPTIONS": "オプションなし"
+			"NO_JOB": "近のジョブはありません",
+			"NO_OPTIONS": "選択可能なオプションはありません。"
+		},
+		"CREATE_COLLECTOR": "コレクタ生成",
+		"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
+		"EMPTY_CLOUD_SERVICE_RESOURCE": "まだコレクターが作成されていません。",
+		"SECURITY": {
+			"MAIN": {
+				"TITLE": "セキュリティ"
+			},
+			"NOTIFICATION_DESC": "セキュリティの脆弱性を特定するプロセスは、さまざまなコンプライアンスポリシーに基づいています。セキュリティコレクターを作成し、関連リソースを収集して、クラウドのセキュリティ状態を継続的にチェックしてください。",
+			"NOTIFICATION_TITLE": "クラウドのセキュリティ状態をチェックしてください！"
 		},
 		"SERVER": {
 			"MAIN": {
@@ -2318,10 +2814,14 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
+		"ADMINISTRATION_APP": "アプリ",
+		"ADMINISTRATION_DOMAIN_SETTINGS": "ドメイン設定",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",
+		"ADMINISTRATION_PREFERENCE": "環境設定",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
+		"ADMINISTRATION_WORKSPACES": "ワークスペース",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
 		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
@@ -2329,18 +2829,24 @@
 		"ASSET_INVENTORY": "アセット·インベントリー",
 		"ASSET_INVENTORY_CLOUD_SERVICE": "クラウドサービス",
 		"ASSET_INVENTORY_COLLECTOR": "コレクター",
+		"ASSET_INVENTORY_SECURITY": "セキュリティ",
 		"ASSET_INVENTORY_SERVER": "サーバ",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"COST_EXPLORER": "費用管理",
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
+		"COST_EXPLORER_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",
+		"COST_EXPLORER_REPORT": "コストレポート",
+		"COST_EXPLORER_TITLE": "アクティベーションが必要です。",
 		"DASHBOARDS": "ダッシュボード",
 		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
 		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",
+		"DISMISS": "閉じる",
 		"HOME_DASHBOARD": "ホーム",
 		"INFO": "情報",
 		"INFO_NOTICE": "お知らせ",
+		"LEARN_MORE": "詳細はこちら",
 		"MY_PAGE": "マイページ",
 		"MY_PAGE_ACCOUNT": "マイアカウント",
 		"MY_PAGE_ACCOUNT_PROFILE": "アカウント&プロフィール",
@@ -2444,8 +2950,6 @@
 				"HIGH": "高い",
 				"ISSUE": "問題",
 				"LOW": "低い",
-				"MAINTENANCE": "メンテナンス",
-				"MAINTENANCE_WINDOW": "メンテナンス期間",
 				"MONTHLY_TOTAL": "月平均",
 				"MORE_ALERTS_HELP_TEXT": "多くのアラートが作成されました",
 				"NO_ALERT": "アラートがありません",
@@ -2457,8 +2961,7 @@
 				"SCHEDULE": "スケジュール",
 				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動",
 				"TOTAL": "合計",
-				"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る",
-				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": "全てのメンテナンス期間を見る"
+				"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "アラート削除に失敗",
@@ -2549,6 +3052,7 @@
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",
+					"NO_RESPONDER": "応答者なし",
 					"RESPONDER": "受信先",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
@@ -2590,7 +3094,6 @@
 					"ESCALATION_RULES_HELP_TEXT": "少なくとも1以上のルールが必要です。(最大５)",
 					"ESCALATION_RULES_LABEL": "エスカレーションルール",
 					"FINISH_CONDITION_LABEL": "終了条件",
-					"GLOBAL": "グローバル",
 					"GO_CREATE_PROJECT": "プロジェクト作成に移動",
 					"MIN": "分",
 					"NAME_INVALID_TEXT": "名前の最大長さは40文字です。",
@@ -2607,17 +3110,19 @@
 					"REPEAT_ALL": "すべて繰り返す",
 					"REPEAT_LABEL_HELP_TEXT": "上記のすべてのステップにApplyする",
 					"RESOLVED": "完了",
+					"RESOURCE_GROUP": "リソースグループ",
 					"RULE": "ルール",
-					"SCOPE_LABEL": "スコア",
+					"SCOPE": "スコープ",
 					"STEP": "ステップ",
-					"TIME": "時間"
+					"TIME": "時間",
+					"WORKSPACE": "ワークスペース"
 				},
-				"GLOBAL": "グローバル",
 				"PROJECT": "プロジェクト",
 				"RESOLVED": "完了",
 				"SET_AS_DEFAULT": "defaultに設定する",
 				"UPDATE": "編集",
-				"UPDATE_MODAL_TITLE": "エスカレーションポリシー修正"
+				"UPDATE_MODAL_TITLE": "エスカレーションポリシー修正",
+				"WORKSPACE": "ワークスペース"
 			},
 			"MAIN": {
 				"ALERT": "アラート",
@@ -2627,9 +3132,48 @@
 		}
 	},
 	"MY_PAGE": {
+		"ACCOUNT": {
+			"ACCOUNT_N_PROFILE": "アカウント＆情報",
+			"BASE_INFORMATION": "基本情報",
+			"SAVE_CHANGES": "変更事項を保存",
+			"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。"
+		},
+		"ADMIN": "Admin",
+		"MFA": {
+			"BTN_CHANGE": "変更",
+			"BTN_SEND_MAIL": "認証コード送信",
+			"ENABLE_MFA": "MFA有効化",
+			"STATE_NOT_VERIFIED": "認証されていません",
+			"STATE_VERIFIED": "認証済みです",
+			"TITLE": "マルチファクタ認証",
+			"TYPE": "MFAタイプ"
+		},
 		"NOTIFICATION": {
-			"ADD_CHANNEL": "通知チャンネル追加"
-		}
+			"ADD_CHANNEL": "通知チャンネル追加",
+			"ALT_E_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に失敗",
+			"ALT_E_DELETE_USER_CHANNEL": "ユーザーチャンネルの削除に失敗",
+			"ALT_E_DISABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの無効化に失敗",
+			"ALT_E_DISABLE_USER_CHANNEL": "ユーザーのチャンネルの無効化に成功",
+			"ALT_E_ENABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの有効化に失敗",
+			"ALT_E_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に失敗",
+			"ALT_S_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に成功",
+			"ALT_S_DELETE_USER_CHANNEL": "ユーザーチャンネルの削除に成功",
+			"ALT_S_DISABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの無効化に成功",
+			"ALT_S_DISABLE_USER_CHANNEL": "ユーザーのチャンネルの無効化に成功",
+			"ALT_S_ENABLE_PROJECT_CHANNEL": "プロジェクトチャンネルの有効化に成功",
+			"ALT_S_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に成功",
+			"CANNOT_EDIT_TOKEN": "トークンを編集することができません。",
+			"CHANNEL_DELETE_MODAL_TITLE": "この通知チャネルを削除しますか？",
+			"NOTIFICATION": "アラート",
+			"NOTIFICATION_CHANNEL": "通知チャネル",
+			"NO_NOTI_CHANNEL": "通知チャンネルがありません。",
+			"NO_PROTOCOL": "プロトコルがありません。",
+			"SPACEONE_USER_DESC": "プロジェクトメンバーの個人チャンネルに送信します。"
+		},
+		"NOTIFICATION_EMAIL": {
+			"EMAIL_INVALID": "無効なメール形式です"
+		},
+		"SPACEONE_USER": "SpaceONEユーザー"
 	},
 	"PAGE_SCHEMA": {
 		"ACCOUNT": "アカウントID",
@@ -2645,7 +3189,7 @@
 		"CPU_CORE": "コア",
 		"CPU_MODEL": "CPUモデル",
 		"CPU_SOCKET": "CPUソケット",
-		"CREATED_AT": "作成日",
+		"CREATED_AT": "初回収集日",
 		"DELETED_AT": "削除日",
 		"FIELD_DESC": {
 			"TAGS": "(タグ)"
@@ -2677,7 +3221,8 @@
 		"SERVICE_ACCOUNT": "サービスアカウント",
 		"SERVICE_ACCOUNT_TYPE": "アカウントタイプ",
 		"TAGS": "タグ",
-		"UPDATED_AT": "変更日"
+		"UPDATED_AT": "変更日",
+		"WORKSPACE": "ワークスペース"
 	},
 	"PLUGIN": {
 		"COLLECTOR": {
@@ -2819,6 +3364,7 @@
 	},
 	"PROJECT": {
 		"DETAIL": {
+			"ACCESS": "アクセス",
 			"ADD": "追加",
 			"ALERT": {
 				"ACKNOWLEDGED": "確認",
@@ -2840,42 +3386,6 @@
 				"EVENT_RULE": "イベントルール",
 				"FINISH_CONDITION_LABEL": "終了条件",
 				"HIGH_URGENCY_NOTIFICATIONS": "緊急度の高い通知のみ",
-				"MAINTENANCE_WINDOW": {
-					"ACTION": "作業",
-					"ALT_E_CLOSE_MAINTENANCE_WINDOW": "メンテナンス期間を閉じるのに失敗",
-					"ALT_E_CREATE_MAINTENANCE_WINDOW": "メンテナンス期間の作成に失敗",
-					"ALT_E_UPDATE_MAINTENANCE_WINDOW": "メンテナンス期間の編集に失敗",
-					"ALT_S_CLOSE_MAINTENANCE_WINDOW": "メンテナンス期間を閉じるのに成功",
-					"ALT_S_CREATE_MAINTENANCE_WINDOW": "メンテナンス期間の作成に成功",
-					"ALT_S_UPDATE_MAINTENANCE_WINDOW": "メンテナンス期間の編集に成功",
-					"CHECK_MODAL": {
-						"DESC_CLOSE": "選択したメンテナンスページを削除しますか？",
-						"TITLE_CLOSE": "メンテナンス期間を閉じる"
-					},
-					"CLOSE": "閉じる",
-					"CLOSE_NOW": "即時閉じる",
-					"CREATE": "メンテナンス期間の作成",
-					"FORM": {
-						"CREATE_TITLE": "メンテナンス期間の作成",
-						"DAYS": "日",
-						"DESC": "メンテナンス期間中、このプロジェクトに新しい通知は作成できません",
-						"HOURS": "時間",
-						"INVALID_TEXT": "終了日を開始日の前に設定することはできません。",
-						"LABEL_END_TIME": "終了時間",
-						"LABEL_SCHEDULE": "スケジュール",
-						"LABEL_START_TIME": "開始時間",
-						"LABEL_TIMEZONE": "タイムゾーン",
-						"LABEL_TIME_PERIOD": "メンテナンス期間",
-						"LABEL_TITLE": "タイトル",
-						"MINUTES": "分",
-						"REQUIRED": "必須入力項目です",
-						"START_AT_TIME": "予定された時間に開始する",
-						"START_NOW": "今すぐ開始して終了",
-						"UPDATE_TITLE": "メンテナンス期間編集"
-					},
-					"TITLE": "メンテナンス期間",
-					"UPDATE": "編集"
-				},
 				"MANUAL_OPERATION": "手動で行う",
 				"MINUTE": "分",
 				"NAME_LABEL": "名前",
@@ -2909,6 +3419,7 @@
 			"ALT_E_UPDATE_GROUP_MEMBER": "プロジェクトグループメンバーの更新に失敗しました",
 			"ALT_E_UPDATE_MEMBER": "メンバーの更新に失敗しました",
 			"ALT_E_UPDATE_PROJECT": "プロジェクト編集に失敗",
+			"ALT_E_UPDATE_PROJECT_TYPE": "プロジェクトアクセスの更新に失敗しました",
 			"ALT_E_UPDATE_WEBHOOK": "プロジェクト編集に失敗",
 			"ALT_S_ACTIVATE_ALERT": "アラート有効化に成功",
 			"ALT_S_ADD_MEMBER": "メンバー追加完了",
@@ -2921,9 +3432,11 @@
 			"ALT_S_UPDATE_GROUP_MEMBER": "プロジェクトグループメンバーが正常に更新されました",
 			"ALT_S_UPDATE_MEMBER": "メンバーが正常に更新されました",
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
+			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"INVITE_ONLY": "招待のみ",
 			"MEMBER": {
 				"ADD": "追加",
 				"ADD_FROM": "{user_type}から追加する",
@@ -2939,15 +3452,19 @@
 				"INTERNAL_USER": "内部ユーザー",
 				"INVALID": "無効",
 				"INVITE": "招待",
+				"INVITE_MEMBER": "メンバー招待",
 				"KEYCLOAK": "キークローク",
 				"LABEL_HELP_TEXT": "各ラベルはエンターキーで区切れます。（最大5つまで）",
 				"LABEL_LABEL": "ラベル",
 				"LABEL_PLACEHOLDER": "ex. 開発者",
 				"MEMBER": "構成員",
-				"MODAL_INVITE_MEMBER_TITLE": "メンバー招待",
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
+				"PRIVATE_MEMBER_DESC": "設定に基づき、ワークスペースの所有者、プロジェクトグループメンバー、および招待されたワークスペースメンバーのみがこのプロジェクトにアクセスできます {settings}",
+				"PROJECT_SETTINGS": "プロジェクト設定",
+				"PUBLIC_MEMBER_DESC": "このワークスペースのすべてのメンバーは、[settings}]に基づいてこのプロジェクトにアクセスできます。",
+				"REMOVE": "削除",
 				"ROLE": "ロール",
 				"ROLE_HELP_TEXT": "選択したメンバーにロールを割り当ててください。",
 				"ROLE_TOOLTIP": "'Project' タイプの役割のみがここにリストされます。",
@@ -2966,8 +3483,7 @@
 			"MODAL_CREATE_WEBHOOK_NAME_REQUIRED": "お名前を入力してください。",
 			"MODAL_CREATE_WEBHOOK_PLACEHOLDER": "ウェプフク名",
 			"MODAL_CREATE_WEBHOOK_TITLE": "ウェプフク追加",
-			"MODAL_DELETE_MEMBER_CONTENT": "選択したメンバーをプロジェクトから削除しますか？",
-			"MODAL_DELETE_MEMBER_TITLE": "メンバー削除",
+			"MODAL_DELETE_MEMBER_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
 			"MODAL_DELETE_PROJECT_CONTENT": "このプロジェクトを削除しますか？",
 			"MODAL_DELETE_PROJECT_TITLE": "プロジェクト削除",
 			"MODAL_DELETE_WEBHOOK": "削除",
@@ -2991,7 +3507,6 @@
 			"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
-			"NOW_HAPPENING_MAINTENANCE": "現在メンテナンス中です。",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "このプロジェクトのアラートを設定する",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
@@ -3016,9 +3531,8 @@
 				"TRIGGERED": "生成"
 			},
 			"TAB_ALERT": "アラート",
-			"TAB_MAINTENANCE_WINDOW": "メンテナンス期間",
-			"TAB_MEMBER": "メンバー",
 			"TAB_NOTIFICATIONS": "通知",
+			"TAB_PROEJCT_MEMBER": "プロジェクト メンバー",
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
@@ -3032,7 +3546,6 @@
 		"EVENT_RULE": {
 			"ADD": "追加",
 			"ADDITIONAL_INFORMATION": "追加情報",
-			"ADDITIONAL_RESPONDER": "追加受信先",
 			"ADD_EVENT_RULE": "イベントルール追加",
 			"ALL": "すべて",
 			"ALT_E_CREATE_EVENT_RULE": "イベントルール作成に失敗",
@@ -3058,6 +3571,7 @@
 			"EDIT": "編集",
 			"EDIT_EVENT_RULE": "イベントルール編集",
 			"EQUALS": "equals",
+			"ESCALATION_POLICY": "",
 			"EVENT_RULE": "イベントルール",
 			"HIGH": "高い",
 			"LOW": "低い",
@@ -3068,7 +3582,6 @@
 			"OF_THE_FOLLOWING_ARE_MET": "が満足させる場合",
 			"ON": "オン",
 			"PAUSE_NOTIFICATION": "通知停止",
-			"PROJECT_DEPENDENCY": "プロジェクト依存性",
 			"PROJECT_ROUTING": "プロジェクトルーティング",
 			"SAVE": "保存",
 			"SNOOZED_NOTIFICATIONS": "通知なし",
@@ -3080,18 +3593,22 @@
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
+			"ADD_GROUP_MEMBER": "グループメンバーを追加",
 			"ADD_SERVICE_ACCOUNT": "サービスアカウント追加",
-			"ALL_PROJECT": "すべてのプロジェクト",
+			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALT_E_CREATE_PROJECT": "プロジェクト作成に失敗",
 			"ALT_E_CREATE_PROJECT_GROUP": "プロジェクトグループ作成失敗",
 			"ALT_E_DELETE_PROJECT_GROUP": "プロジェクトグループの削除に失敗",
 			"ALT_E_UPDATE_PROJECT": "プロジェクト編集に失敗",
 			"ALT_E_UPDATE_PROJECT_GROUP": "プロジェクトグループの編集に失敗",
+			"ALT_E_UPDATE_PROJECT_GROUP_MEMBER": "プロジェクトグループメンバーの更新に失敗しました",
 			"ALT_S_CREATE_PROJECT": "プロジェクト作成完了",
 			"ALT_S_CREATE_PROJECT_GROUP": "プロジェクトグループ作成完了",
 			"ALT_S_DELETE_PROJECT_GROUP": "プロジェクトグループの削除完了",
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_GROUP": "プロジェクトグループの編集完了",
+			"ALT_S_UPDATE_PROJECT_GROUP_MEMBER": "プロジェクトグループメンバーが正常に更新されました",
+			"CAN_ACCESS_TO_THIS_PROJECT": "このプロジェクトにアクセスできます。",
 			"CLOUD_SERVICES": "クラウドサービス",
 			"COMPUTE": "コンピュート",
 			"CREATE": "作成",
@@ -3105,7 +3622,11 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "クラウドリソースを管理してみましょう！",
 			"EMPTY_PROJECT_MSG": "プロジェクトがありません",
 			"EMPTY_REQUEST_VALID_PERMISSION": "プロジェクト担当者もしくはドメインアドミンに問い合わせください。",
+			"EVERYONE_AT_THIS_WORKSPACE": "このワークスペースの全員",
 			"FAVORITES": "お気に入り",
+			"GROUP_MEMBER": "グループメンバー",
+			"GROUP_MEMBERS_WITH_ACCESS_TO_ALL_SUB_PROJECTS": "グループメンバーはすべてのサブプロジェクトにアクセスできます",
+			"INVITE_ONLY": "招待のみ",
 			"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "プロジェクトグループ名",
@@ -3116,11 +3637,32 @@
 				"DESC": "{deleteAllSubProjects}後にプロジェクトグループを削除してください。",
 				"TITLE": "プロジェクトグループ削除"
 			},
+			"MODAL_MOVE_PROJECT_GROUP": {
+				"MODAL_MOVE_PROJECT_TITLE": "\"{name}\" を移動する",
+				"NO_PARENT_GROUP": "上位プロジェクトグループを選択しない",
+				"NO_PROJECT_GROUP": "プロジェクトグループを選択しない",
+				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "移動先（プロジェクトグループ）を選択してください"
+			},
+			"MODAL_PROJECT_CREATE": {
+				"MODAL_VALIDATION_DUPLICATED": "名前が重複しています",
+				"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
+				"MODAL_VALIDATION_REQUIRED": "名前を入力してください"
+			},
+			"MODAL_PROJECT_GROUP_MEMBER": {
+				"NO_DATA_DESCRIPTION": "ユーザーIDまたは名前を入力してから、「Enter」キーを押してください",
+				"REMOVE": "削除"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
+			"NO_GROUP_MEMBER": "グループメンバーなし",
+			"NO_PROJECT_GROUP_MSG": "このワークスペースにはまだプロジェクトまたはプロジェクトグループが作成されていません。",
+			"ONLY_PEOPLE_INVITED": "招待された人だけ",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
+			"PROJECT": "プロジェクト",
+			"PROJECT_GROUP": "プロジェクトグループ",
 			"PROJECT_GROUPS": "プロジェクトグループ",
+			"PROJECT_GROUP_MEMBER": "プロジェクトグループメンバー",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "作成",
 				"DONE": "完了",

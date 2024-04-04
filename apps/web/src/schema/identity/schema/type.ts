@@ -1,0 +1,1 @@
+export type SchemaType = 'SERVICE_ACCOUNT' | 'TRUSTED_ACCOUNT' | 'SECRET' | 'TRUSTING_SECRET';

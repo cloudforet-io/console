@@ -18,10 +18,11 @@
                 }) }}
             </span>
             <div>
-                <p-anchor v-for="resource in availableResources"
-                          :key="resource.id"
-                          class="legend"
-                          :href="resource.link"
+                <p-link v-for="resource in availableResources"
+                        :key="resource.id"
+                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                        class="legend"
+                        :href="resource.link"
                 >
                     <template #left-extra>
                         <span class="circle"
@@ -29,7 +30,7 @@
                         />
                     </template>
                     {{ legendFormatter(resource) }}
-                </p-anchor>
+                </p-link>
             </div>
         </section>
         <section class="toolbox-section">
@@ -49,8 +50,8 @@
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
-                <p-select-dropdown v-model="selectedStat"
-                                   :items="statItems"
+                <p-select-dropdown :selected.sync="selectedStat"
+                                   :menu="statItems"
                 />
                 <p-icon-button class="ml-4 flex-shrink-0"
                                name="ic_refresh"
@@ -102,26 +103,25 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PAnchor, PSpinner,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { MONITORING_TYPE } from '@/schema/monitoring/data-source/constant';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -130,7 +130,7 @@ import MetricChart from '@/common/components/charts/metric-chart/MetricChart.vue
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { StatisticsType } from '@/common/modules/monitoring/config';
 import {
-    COLORS, MONITORING_TYPE, STATISTICS_TYPE, TIME_RANGE,
+    COLORS, STATISTICS_TYPE, TIME_RANGE,
 } from '@/common/modules/monitoring/config';
 import type {
     AvailableResource,
@@ -152,7 +152,7 @@ export default {
         PSelectDropdown,
         PSelectButtonGroup,
         PIconButton,
-        PAnchor,
+        PLink,
         MetricChart,
         PSpinner,
     },
@@ -255,30 +255,22 @@ export default {
                 state.dataTools = [];
             }
         };
-        let resourceToken: CancelTokenSource | undefined;
+        const fetcher = getCancellableFetcher(SpaceConnector.client.monitoring.metric.list);
         const listMetrics = async () => {
             if (!state.selectedToolId) return;
-            if (resourceToken) {
-                resourceToken.cancel('Next request has been called.');
-                resourceToken = undefined;
-            }
-            resourceToken = axios.CancelToken.source();
             try {
                 state.metrics = [];
 
-                const res = await SpaceConnector.client.monitoring.metric.list({
+                const { status, response } = await fetcher({
                     data_source_id: state.selectedToolId,
                     resources: props.resources.map((d) => d.id),
-                }, {
-                    cancelToken: resourceToken.token,
                 });
-                resourceToken = undefined;
-                state.metrics = sortBy(res.metrics, (m) => m.name);
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
-                    state.metrics = [];
+                if (status === 'succeed') {
+                    state.metrics = sortBy(response.metrics, (m) => m.name);
                 }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.metrics = [];
             }
         };
 
@@ -382,6 +374,7 @@ export default {
         return {
             ...toRefs(state),
             TIME_RANGE,
+            ACTION_ICON,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
             },
@@ -421,8 +414,8 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    /* custom design-system component - p-anchor */
-    :deep(.legend.p-anchor) {
+    /* custom design-system component - p-link */
+    :deep(.legend.p-link) {
         @apply text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;

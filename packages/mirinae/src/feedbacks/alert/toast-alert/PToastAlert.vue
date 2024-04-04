@@ -9,7 +9,6 @@
         <template #body="{item, close}">
             <div class="alert-contents"
                  :class="item.type"
-                 @click="close"
             >
                 <div class="icon-wrapper">
                     <p-i v-if="item.type === 'success'"
@@ -30,6 +29,7 @@
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
+                         color="inherit transparent"
                     />
                     <p-spinner v-if="item.type === 'loading'"
                                class="item-type-icon"
@@ -39,11 +39,11 @@
                      :class="[item.type === 'info' ? 'ml-2' : '']"
                 >
                     <a class="title">{{ item.title }}</a>
-                    <div v-if="item.text"
-                         class="contents"
+                    <span v-if="item.text"
+                          class="contents"
                     >
                         {{ item.text }}
-                    </div>
+                    </span>
                 </div>
                 <div class="button-wrapper">
                     <p-i name="ic_close"
@@ -51,6 +51,7 @@
                          width="1.5rem"
                          height="1.5rem"
                          color="inherit"
+                         @click="close"
                     />
                 </div>
             </div>
@@ -75,10 +76,10 @@ import { safe } from '@/styles/colors.cjs';
  * https://www.npmjs.com/package/vue-notification
  */
 
-interface NoticeAlertProps {
+interface ToastAlertProps {
     group: ToastGroup;
 }
-const props = withDefaults(defineProps<NoticeAlertProps>(), {
+const props = withDefaults(defineProps<ToastAlertProps>(), {
     group: TOAST_GROUP.toastTopCenter,
 });
 const state = reactive({
@@ -112,6 +113,11 @@ const state = reactive({
         max-width: 30rem;
         opacity: 0.9;
         padding: 0.55rem;
+        &.alert {
+            .item-type-icon {
+                @apply text-red-400;
+            }
+        }
     }
 
     .icon-wrapper {
@@ -125,12 +131,12 @@ const state = reactive({
 
     .content-wrapper {
         flex-grow: 1;
+        flex-wrap: wrap;
         .title {
             @apply text-white;
             display: block;
             font-size: 1rem;
             line-height: 1.375;
-            text-transform: capitalize;
         }
         .contents {
             @apply text-gray-300;

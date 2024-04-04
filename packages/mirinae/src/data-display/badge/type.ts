@@ -3,11 +3,15 @@ export const BADGE_TYPE = {
     SOLID_OUTLINE: 'solid-outline',
     SUBTLE: 'subtle',
 } as const;
-export type BadgeType = typeof BADGE_TYPE[keyof typeof BADGE_TYPE];
 
 export const BADGE_SHAPE = {
     ROUND: 'round',
     SQUARE: 'square',
+} as const;
+
+export const BADGE_FONT_WEIGHT = {
+    REGULAR: 'regular',
+    MEDIUM: 'medium',
 } as const;
 
 export const SOLID_STYLE_TYPE = {
@@ -44,14 +48,7 @@ export const BADGE_STYLE_TYPE = {
     ...SUBTLE_STYLE_TYPE,
 } as const;
 
+export type BadgeType = typeof BADGE_TYPE[keyof typeof BADGE_TYPE];
 export type BadgeStyleType = typeof BADGE_STYLE_TYPE[keyof typeof BADGE_STYLE_TYPE];
 export type BadgeShape = typeof BADGE_SHAPE[keyof typeof BADGE_SHAPE];
-
-export interface BadgeProps {
-    badgeType: BadgeType;
-    styleType: BadgeStyleType;
-    textColor?: string;
-    backgroundColor?: string;
-    outlineColor?: string;
-    shape: BadgeShape;
-}
+export type BadgeFontWeight = typeof BADGE_FONT_WEIGHT[keyof typeof BADGE_FONT_WEIGHT];

@@ -24,6 +24,7 @@ export interface SearchKeyOptions {
     enums?: SearchEnums;
     data_type?: SearchDataType;
     icon?: string;
+    reference?: string;
 }
 
 export interface SearchKeyGroup {
@@ -32,7 +33,7 @@ export interface SearchKeyGroup {
     options?: object;
 }
 
-export type SearchSchema = SearchKeyGroup;
+export type SearchSchema = SearchKeyGroup[];
 
 /** Metadata schema types for Dynamic layout */
 export const dynamicLayoutTypes = [
@@ -44,6 +45,9 @@ export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 export interface CommonOptions {
     root_path?: string;
     translation_id?: string;
+    unwind?: {
+        path?: string;
+    }
 }
 
 export interface ItemOptions extends CommonOptions {

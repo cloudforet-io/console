@@ -25,6 +25,7 @@ export const Template = (args, { argTypes }) => ({
                      :disabled="disabled"
                      :predicate="predicate"
                      :invalid="invalid"
+                     :readonly="readonly"
                      @change="onChange"
             >
                 <span v-html="defaultSlot" />
@@ -129,7 +130,43 @@ export const Template = (args, { argTypes }) => ({
         <div>
             <div class="flex flex-col mb-8">
                 <p-radio v-model="selected" disabled>
-                    you can't select disabled radio.
+                    (not selected) you can't select disabled radio.
+                </p-radio>
+                <p-radio :selected="true" disabled>
+                    (selected) selected and disabled radio. you can't select disabled radio.
+                </p-radio>
+            </div>
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: false,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Readonly
+
+<Canvas>
+    <Story name="Readonly">
+        {{
+            components: { PRadio },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-radio v-model="selected" readonly>
+                    (not selected) you can't select readonly radio.
+                </p-radio>
+                <p-radio :selected="true" readonly>
+                    (selected) selected readonly radio shows checked icon but you can't select readonly radio.
                 </p-radio>
             </div>
         </div>

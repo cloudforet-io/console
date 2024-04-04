@@ -1,11 +1,69 @@
+<script setup lang="ts">
+import { computedAsync } from '@vueuse/core';
+import { reactive } from 'vue';
+
+import {
+    PButtonModal, PDivider, PButton,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
+import type { PostModel } from '@/schema/board/post/model';
+import type { FileModel } from '@/schema/file-manager/model';
+
+import { useNoticeStore } from '@/store/notice';
+
+import { isMobile } from '@/lib/helper/cross-browsing-helper';
+
+import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileAttachments } from '@/common/composables/file-attachments';
+
+const props = withDefaults(defineProps<{
+    popupIndex: number|string;
+    item?: PostModel;
+}>(), {
+    item: undefined,
+});
+const noticeStore = useNoticeStore();
+
+const state = reactive({
+    popupVisible: true,
+});
+const files = computedAsync<FileModel[]>(async () => {
+    const notice = props.item;
+    if (!notice) return [];
+    try {
+        const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
+            post_id: notice.post_id,
+        });
+        return result.files;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+});
+const { attachments } = useFileAttachments(files);
+
+const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
+    state.popupVisible = false;
+    if (!props.item) return;
+    if (neverShowPopup) {
+        await noticeStore.updateNoticeReadState(props.item.post_id, false);
+    }
+};
+</script>
+
 <template>
-    <p-button-modal :visible="popupVisible"
+    <p-button-modal :visible="state.popupVisible"
                     :backdrop="false"
                     hide-header
                     hide-header-close-button
                     hide-footer-close-button
-                    size="sm"
-                    :absolute="popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
+                    size="md"
+                    :absolute="props.popupIndex * 1.5 + (isMobile() ? 0.75 : 7.5)"
                     class="notice-popup"
                     @confirm="handleClose"
     >
@@ -14,11 +72,6 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge badge-type="solid-outline"
-                         :style-type="noticeTypeBadgeInfo.style"
-                >
-                    {{ noticeTypeBadgeInfo.label }}
-                </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
@@ -40,93 +93,6 @@
     </p-button-modal>
 </template>
 
-<script lang="ts">
-
-import { computedAsync } from '@vueuse/core';
-import { computed, reactive, toRefs } from 'vue';
-import type { PropType } from 'vue';
-
-import {
-    PButtonModal, PBadge, PDivider, PButton,
-} from '@spaceone/design-system';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-
-import type { FileInfo } from '@/lib/file-manager/type';
-import { isMobile } from '@/lib/helper/cross-browsing-helper';
-
-import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFileAttachments } from '@/common/composables/file-attachments';
-
-import { getPostBadgeInfo } from '@/services/info/notice/helper';
-import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
-
-export default {
-    name: 'NoticePopupItem',
-    components: {
-        PButtonModal,
-        PBadge,
-        PDivider,
-        TextEditorViewer,
-        PButton,
-    },
-    props: {
-        popupIndex: {
-            type: Number,
-            default: undefined,
-        },
-        item: {
-            type: Object as PropType<NoticePostModel>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.post_type)),
-            popupVisible: true,
-        });
-        const files = computedAsync<FileInfo[]>(async () => {
-            const notice = props.item;
-            if (!notice) return [];
-            const result: NoticePostModel = await SpaceConnector.client.board.post.get({
-                board_id: notice.board_id,
-                post_id: notice.post_id,
-            });
-            return result.files;
-        });
-        const { attachments } = useFileAttachments(files);
-
-        const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
-            state.popupVisible = false;
-            if (neverShowPopup) {
-                try {
-                    await SpaceConnector.client.config.userConfig.set({
-                        user_id: store.state.user.userId,
-                        name: `console:board:${props.item.board_id}:${props.item.post_id}`,
-                        data: {
-                            show_popup: false,
-                        },
-                    });
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
-            }
-        };
-
-        return {
-            ...toRefs(state),
-            attachments,
-            handleClose,
-            isMobile,
-            iso8601Formatter,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .notice-popup {
     .notice-popup-title {
@@ -136,7 +102,7 @@ export default {
         @apply flex items-center;
     }
     .notice-popup-author {
-        @apply text-sm ml-1 text-gray-600;
+        @apply text-sm text-gray-600;
     }
 }
 </style>

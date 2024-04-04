@@ -1,13 +1,14 @@
 import { computedAsync } from '@vueuse/core';
 import type { ComputedRef, Ref } from 'vue';
 
+import type { FileModel } from '@/schema/file-manager/model';
+
 import { getDownloadUrl } from '@/lib/file-manager';
-import type { FileInfo } from '@/lib/file-manager/type';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
-export const useFileAttachments = (files: ComputedRef<FileInfo[]>| Ref<FileInfo[]>) => {
-    const attachments = computedAsync<Attachment[]>(async () => {
+export const useFileAttachments = (files: ComputedRef<FileModel[]>| Ref<FileModel[]>) => {
+    const attachments = computedAsync<Attachment[]>(async (): Promise<Attachment[]> => {
         if (files.value.length === 0) return [];
 
         let results;

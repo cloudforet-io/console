@@ -6,7 +6,8 @@ import type { BadgeProps } from '@/data-display/badge/type';
 import { BADGE_SHAPE } from '@/data-display/badge/type';
 import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
+import PLink from '@/inputs/link/PLink.vue';
+import { ACTION_ICON } from '@/inputs/link/type';
 import { commaFormatter, getColor } from '@/utils/helpers';
 
 export default {
@@ -57,8 +58,8 @@ export default {
         badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
         if (options.link) {
-            badgeEl = [h(PAnchor, {
-                attrs: { href: options.link, target: '_blank' },
+            badgeEl = [h(PLink, {
+                attrs: { href: options.link, actionIcon: props.data ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE, newTab: true },
             }, badgeEl)];
         }
 
@@ -69,7 +70,7 @@ export default {
 
 <style lang="postcss">
 .p-dynamic-field-badge {
-    .p-anchor {
+    .p-link {
         font-size: inherit;
     }
 }

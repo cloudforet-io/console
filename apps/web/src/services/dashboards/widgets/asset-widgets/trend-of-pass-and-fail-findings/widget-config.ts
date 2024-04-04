@@ -1,14 +1,10 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { ASSET_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'trendOfPassAndFailFindings',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/TrendOfPassAndFailFindingsWidget.vue'),
-    }),
     title: 'Trend of Pass and Fail Findings',
     labels: ['Asset'],
     description: {
@@ -22,38 +18,21 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        asset_group_by: ASSET_GROUP_BY.SERVICE,
+        asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         pagination_options: {
             enabled: true,
             page_size: 5,
         },
     },
-    options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'asset_compliance_type', 'region', 'asset_account')],
-        fixed_properties: ['asset_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('asset_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    // 'service_account', HACK: Re-enable it after backend is ready
-                    'provider',
-                    'asset_compliance_type',
-                    'region',
-                    'asset_account',
-                ),
-            },
-            order: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                // 'service_account',
-                'provider',
-                'asset_compliance_type',
-                'region',
-                'asset_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cloud_service_query_set',
+        'asset_data_field',
+        'filters.project_group',
+        'filters.project',
+        'filters.provider',
+        'filters.region',
+        'filters.asset_account',
+    ]),
 };
 
 export default trendOfPassAndFailFindingsWidgetConfig;
