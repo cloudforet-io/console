@@ -2,13 +2,12 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout,
-    PHeading,
-    PDataTable,
-    PLink,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -39,34 +38,54 @@ const state = reactive({
     sortBy: 'name',
     sortDesc: true,
     domainId: computed(() => store.state.domain.domainId), // TODO: remove this after backend is ready
+    totalCount: 0,
+    pageLimit: 15,
 });
 const fields = [
     { name: 'name', label: 'Name', sortable: true },
     { name: 'service_account_id', label: 'Account ID', sortable: false },
 ];
 
-const apiQueryHelper = new ApiQueryHelper();
+const apiQueryHelper = new ApiQueryHelper().setSort(state.sortBy, state.sortDesc).setPageLimit(state.pageLimit).setFilters([
+    { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]);
+let apiQuery = apiQueryHelper.data;
 const getAttachedGeneralAccountList = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-            query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).setFilters([
-                { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]).data,
+        const { results, total_count } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+            query: apiQuery,
         });
         state.items = results;
+        state.totalCount = total_count ?? 0;
         if (results) emit('update:attached-general-accounts', results);
     } catch (e) {
         ErrorHandler.handleError(e);
         state.items = [];
+        state.totalCount = 0;
     } finally {
         state.loading = false;
     }
 };
 
-const handleChange = async (sortBy, sortDesc) => {
+const handleChange = async (options?: ToolboxOptions) => {
+    try {
+        const convertOptions = {
+            ...options,
+            sortBy: state.sortBy,
+            sortDesc: state.sortDesc,
+        };
+        apiQuery = getApiQueryWithToolboxOptions(apiQueryHelper, convertOptions) ?? apiQuery;
+        await getAttachedGeneralAccountList();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const handleSort = async (sortBy, sortDesc) => {
     state.sortBy = sortBy;
     state.sortDesc = sortDesc;
     try {
+        apiQuery = getApiQueryWithToolboxOptions(apiQueryHelper, { sortBy, sortDesc }) ?? apiQuery;
         await getAttachedGeneralAccountList();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -86,15 +105,26 @@ const init = async () => {
     <p-pane-layout class="service-account-attached-general-accounts">
         <p-heading heading-type="sub"
                    :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')"
+                   use-total-count
+                   :total-count="state.totalCount"
         />
-        <div class="content-wrapper">
+        <div class="content-wrapper mb-16">
+            <div class="px-4">
+                <p-toolbox :searchable="false"
+                           :total-count="state.totalCount"
+                           :page-size.sync="state.pageLimit"
+                           :page-size-options="[15,30,45]"
+                           @change="handleChange"
+                           @refresh="handleChange()"
+                />
+            </div>
             <p-data-table :fields="fields"
                           :items="state.items"
                           sortable
                           :loading="state.loading"
                           :sort-by="state.sortBy"
                           :sort-desc="state.sortDesc"
-                          @changeSort="handleChange"
+                          @changeSort="handleSort"
             >
                 <template #col-name-format="{value, item}">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
