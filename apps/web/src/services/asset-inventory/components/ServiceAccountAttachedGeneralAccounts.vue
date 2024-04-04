@@ -19,6 +19,8 @@ import { store } from '@/store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -108,8 +110,11 @@ const handleSync = async () => {
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
             trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_account_id,
         });
+        showSuccessMessage('Sync is started.', '');
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleError(e, {
+            title: 'Failed to start sync.',
+        });
     }
 };
 
