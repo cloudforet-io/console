@@ -218,6 +218,7 @@ const handleRouteToServiceAccountDetailPage = () => {
 /* Init */
 (async () => {
     state.providerSchemaLoading = true;
+    serviceAccountPageStore.initState();
     serviceAccountPageStore.setProvider(props.provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     state.providerSchemaLoading = false;
