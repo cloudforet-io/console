@@ -17,4 +17,4 @@ export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
-export type DisplayDataType = 'cost' | 'usage';
+export type DisplayDataType = 'cost' | 'usage' | string;
