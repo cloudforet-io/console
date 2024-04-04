@@ -203,14 +203,14 @@ const handleSync = async () => {
         });
         state.createModal = false;
         serviceAccountPageStore.initState();
-        SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { accountId: state.createdAccountId } }));
+        SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { accountId: state.createdAccountId } }));
+    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
 };
 
 /* Init */

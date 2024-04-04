@@ -16,7 +16,9 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -45,13 +47,16 @@ const props = defineProps<{
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
@@ -157,7 +162,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                             error-icon="ic_cloud-filled"
                 />
             </template>
-            <template v-if="!state.isManagedTrustedAccount"
+            <template v-if="!state.isManagedTrustedAccount || storeState.isAdminMode"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">

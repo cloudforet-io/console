@@ -42,7 +42,7 @@ const state = reactive({
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
         if (!state.isAdminMode) return state.isScheduleHoursValid;
-        return state.isScheduleHoursValid && state.isAdditionalOptionsValid;
+        return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
     }),
 });
 
