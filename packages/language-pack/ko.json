@@ -556,6 +556,7 @@
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DATA_SOURCE": "데이터 소스",
+				"DATA_TYPE": "",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
