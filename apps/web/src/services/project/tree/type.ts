@@ -10,7 +10,7 @@ export interface TreeNode<T extends TreeData = any> {
 interface TreeData {
     to?: Location;
 }
-export interface TreeOpenMap {
+export interface TreeDisplayMap {
     [id: string]: {
         isOpen: boolean;
     }

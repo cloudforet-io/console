@@ -9,18 +9,18 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates
-import type { TreeNode, TreeOpenMap } from '@/services/project/tree/type';
+import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 import TreeItem from './TreeItem.vue';
 
 interface Props {
     treeData: TreeNode[];
-    initialTreeOpenStateMap?: TreeOpenMap;
+    initialTreeDisplayMap?: TreeDisplayMap;
     selectedId?: string;
 }
 
 defineProps<Props>();
-const emit = defineEmits<{(event: 'click-toggle', node: TreeNode): Promise<void>
+const emit = defineEmits<{(event: 'click-toggle', node: TreeNode): Promise<void>|void;
     (e: 'click-item', node: TreeNode): void;
 }>();
 
@@ -37,7 +37,7 @@ const handleClickItem = (item: TreeNode) => {
                    :key="item.id"
                    :node="item"
                    :selected-id="selectedId"
-                   :initial-tree-open-state-map="initialTreeOpenStateMap"
+                   :initial-tree-display-map="initialTreeDisplayMap"
                    @click-toggle="handleClickToggle(item)"
                    @click-item="handleClickItem(item)"
         >
@@ -50,7 +50,7 @@ const handleClickItem = (item: TreeNode) => {
                       #child-content
             >
                 <tree-view :tree-data="item.children"
-                           :initial-tree-open-state-map="initialTreeOpenStateMap"
+                           :initial-tree-display-map="initialTreeDisplayMap"
                            :selected-id="selectedId"
                            @click-toggle="handleClickToggle"
                            @click-item="handleClickItem"
@@ -65,4 +65,10 @@ const handleClickItem = (item: TreeNode) => {
         </tree-item>
     </div>
 </template>
+
+<style scoped lang="postcss">
+.tree-view {
+    width: 100%;
+}
+</style>
 

@@ -10,26 +10,29 @@ import { PI } from '@spaceone/design-system';
 import { indigo, peacock } from '@/styles/colors';
 
 import TreeView from '@/services/project/tree/TreeView.vue';
+import type { TreeNode } from '@/services/project/tree/type';
 import { useProjectTreeData } from '@/services/project/tree/use-project-tree-data';
 
 const {
-    treeData, treeUIMap, fetchData, findSelectedNode,
+    treeData,
+    treeDisplayMap,
+    fetchData,
+    setSelectedNodeId,
 } = useProjectTreeData();
 
 const route = useRoute();
 
 
 const state = reactive({
-    projectTreeData: computed(() => treeData.value),
+    projectTreeData: computed<TreeNode[]>(() => treeData.value),
     selectedTreeId: undefined as string|undefined,
 });
 
 watch(route, () => {
     const selectedTreeId = (route.query.select_pg || route.params.id) as string|undefined;
     if (selectedTreeId) {
-        const itemType = selectedTreeId.startsWith('pg-') ? 'PROJECT_GROUP' : 'PROJECT';
         state.selectedTreeId = selectedTreeId as string;
-        findSelectedNode(selectedTreeId, itemType);
+        setSelectedNodeId(selectedTreeId);
     }
 }, { immediate: true });
 
@@ -38,13 +41,14 @@ watch(route, () => {
 <template>
     <div class="project-main-tree">
         <tree-view :tree-data="state.projectTreeData"
-                   :initial-tree-open-state-map="treeUIMap"
+                   :initial-tree-display-map="treeDisplayMap"
                    :selected-id="state.selectedTreeId"
                    @click-toggle="fetchData"
         >
             <template #content="{ node }">
                 <div class="project-menu-item-content">
-                    <p-i :name="Array.isArray(node.children) ? 'ic_folder-filled' : 'ic_document-filled'"
+                    <p-i class="project-icon"
+                         :name="Array.isArray(node.children) ? 'ic_folder-filled' : 'ic_document-filled'"
                          :color="Array.isArray(node.children) ? indigo[500] : peacock[600]"
                          width="0.875rem"
                          height="0.875rem"
@@ -58,11 +62,18 @@ watch(route, () => {
 
 <style scoped lang="postcss">
 .project-main-tree {
+    width: 100%;
     .project-menu-item-content {
-        @apply flex items-center gap-1;
+        @apply flex items-center gap-1 w-full;
         height: 2rem;
+        .project-icon {
+            min-width: 0.875rem;
+        }
         .text {
-            @apply truncate text-label-md text-gray-900;
+            @apply text-label-md text-gray-900;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }

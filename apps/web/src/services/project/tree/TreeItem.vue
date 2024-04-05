@@ -7,12 +7,12 @@ import type { SetupContext } from 'vue/types/v3-setup-context';
 
 import { PI, PSpinner } from '@spaceone/design-system';
 
-import type { TreeNode, TreeOpenMap } from '@/services/project/tree/type';
+import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 interface Props {
     node: TreeNode;
     selectedId?: string;
-    initialTreeOpenStateMap?: TreeOpenMap;
+    initialTreeDisplayMap?: TreeDisplayMap;
 }
 
 const props = defineProps<Props>();
@@ -28,8 +28,7 @@ const state = reactive({
     toggleIcon: computed(() => (state.isCollapsed ? 'ic_caret-right' : 'ic_caret-down-filled-alt')),
     expandable: isExpandable(slots),
     fetchLoading: false,
-    node: computed(() => props.node),
-    isSelected: computed(() => props.selectedId === state.node.id),
+    isSelected: computed(() => props.selectedId === props.node.id),
 });
 
 const openToggle = () => {
@@ -51,11 +50,11 @@ const handleClickItem = () => {
     emit('click-item', state.node);
 };
 
-watch(() => props.initialTreeOpenStateMap, (treeOpenStateMap) => {
-    if (treeOpenStateMap && treeOpenStateMap[state.node.id]) {
+watch(() => props.initialTreeDisplayMap, (treeOpenStateMap) => {
+    if (treeOpenStateMap && treeOpenStateMap[props.node.id]) {
         openToggle();
     }
-}, { immediate: true });
+});
 
 watch(() => state.isCollapsed, async (collapsed) => {
     if (!collapsed) {
@@ -67,17 +66,17 @@ watch(() => state.isCollapsed, async (collapsed) => {
 
 <template>
     <div class="tree-item">
-        <component :is="state.node.data.to ? 'router-link' : 'div'"
-                   :to="state.node.data.to"
+        <component :is="props.node.data.to ? 'router-link' : 'div'"
+                   :to="props.node.data.to"
                    class="content-wrapper"
-                   :class="{ selected: state.node.id === props.selectedId }"
-                   :style="{ 'padding-left': `${(state.node.depth || 0) * 1}rem`}"
+                   :class="{ selected: props.node.id === props.selectedId }"
+                   :style="{ 'padding-left': `${(props.node.depth || 0) * 1}rem`}"
                    @click.native="handleClickItem"
         >
             <div v-if="state.expandable"
                  class="toggle-icon"
             >
-                <p-spinner v-if="state.node.loading"
+                <p-spinner v-if="props.node.loading"
                            size="sm"
                 />
                 <p-i v-else
@@ -89,7 +88,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
             </div>
             <div class="content-text">
                 <slot name="content"
-                      v-bind="{ node: state.node }"
+                      v-bind="{ node: props.node }"
                 />
             </div>
         </component>
@@ -109,12 +108,16 @@ watch(() => state.isCollapsed, async (collapsed) => {
         @apply flex items-center rounded w-full;
         padding-left: 0.125rem;
 
+        &:hover {
+            @apply bg-blue-100 cursor-pointer;
+        }
+
         &.selected {
             @apply bg-blue-200;
         }
 
-        &:hover {
-            @apply bg-blue-100 cursor-pointer;
+        .content-text {
+            width: calc(100% - 1rem);
         }
     }
 
