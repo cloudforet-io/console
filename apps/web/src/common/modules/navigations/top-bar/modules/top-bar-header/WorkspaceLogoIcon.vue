@@ -21,10 +21,6 @@ const CORPORATE_REGEX = /\(([^)]+)\)/;
 
 const state = reactive({
     theme: computed(() => props.theme),
-    temp: computed(() => {
-        const regex = /\(([^)]+)\)/;
-        return regex.exec(props.text);
-    }),
     logoText: computed(() => {
         const match = props.text.match(CORPORATE_REGEX);
         if (match) {
