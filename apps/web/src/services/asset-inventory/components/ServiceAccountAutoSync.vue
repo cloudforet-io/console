@@ -105,7 +105,9 @@ const handleClickSaveButton = async () => {
              :class="{'ml-4': state.mode === 'READ'}"
         >
             <service-account-auto-sync-detail v-if="state.mode === 'READ'" />
-            <service-account-auto-sync-form v-if="state.mode === 'UPDATE'" />
+            <service-account-auto-sync-form v-if="state.mode === 'UPDATE'"
+                                            mode="UPDATE"
+            />
             <div v-if="state.mode === 'UPDATE'"
                  class="button-wrapper"
             >

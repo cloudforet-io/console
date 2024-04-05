@@ -285,7 +285,9 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
                 />
-                <service-account-auto-sync-form :provider="props.provider" />
+                <service-account-auto-sync-form mode="CREATE"
+                                                :provider="props.provider"
+                />
             </p-pane-layout>
         </div>
 
