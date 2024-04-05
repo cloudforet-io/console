@@ -137,6 +137,7 @@ const tableState = reactive({
         fields.push(...tableState.costFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === GROUP_BY.WORKSPACE) field.reference = { reference_key: 'workspace_id', resource_type: 'identity.Workspace' };
             if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
             if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
             if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
