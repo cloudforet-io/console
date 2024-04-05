@@ -11,15 +11,15 @@ export interface BaseInformationForm {
     tags: Tag;
     projectForm: ProjectForm;
 }
-
 export type ActiveDataType = 'input' | 'json';
+
 export interface CredentialForm {
     hasCredentialKey: boolean;
     selectedSecretSchema: SchemaModel;
-    customSchemaForm: { [key: string]: any; };
-    credentialJson: string;
-    activeDataType: ActiveDataType;
     attachedTrustedAccountId?: string;
+    credentialJson: string;
+    customSchemaForm: { [key: string]: any; };
+    activeDataType: ActiveDataType;
 }
 
 export interface ProjectForm {

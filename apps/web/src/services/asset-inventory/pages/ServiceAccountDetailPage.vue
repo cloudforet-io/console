@@ -13,24 +13,29 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/components/ServiceAccountAttachedGeneralAccounts.vue';
+import ServiceAccountAutoSync from '@/services/asset-inventory/components/ServiceAccountAutoSync.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
+import ServiceAccountEditModal from '@/services/asset-inventory/components/ServiceAccountEditModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const router = useRouter();
@@ -40,18 +45,24 @@ const props = defineProps<{
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
         ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
         : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
     loading: true,
-    item: {} as ServiceAccountModel,
-    serviceAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
+    item: computed(() => serviceAccountPageStore.state.serviceAccountItem),
+    serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
+    isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
     attachedTrustedAccountId: computed(() => state.item?.trusted_account_id),
     providerId: computed(() => state.item?.provider),
@@ -74,6 +85,7 @@ const state = reactive({
     }),
     projectId: computed(() => state.item.project_info?.project_id),
     deleteModalVisible: false,
+    editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
 });
 
@@ -81,18 +93,24 @@ const state = reactive({
 const getAccount = async (serviceAccountId: string) => {
     state.loading = true;
     try {
-        if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
-            state.item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
+        let item;
+        if (state.isTrustedAccount) {
+            item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
                 trusted_account_id: serviceAccountId,
             });
         } else {
-            state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+            item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
                 service_account_id: serviceAccountId,
             });
         }
+        serviceAccountPageStore.$patch((_state) => {
+            _state.state.serviceAccountItem = item;
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.item = {};
+        serviceAccountPageStore.$patch((_state) => {
+            _state.state.serviceAccountItem = {};
+        });
     } finally {
         state.loading = false;
     }
@@ -102,19 +120,29 @@ const getAccount = async (serviceAccountId: string) => {
 const handleOpenDeleteModal = () => {
     state.deleteModalVisible = true;
 };
+
+const handleClickEditButton = () => {
+    state.editModalVisible = true;
+};
 const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
 const handleClickBackbutton = () => {
-    router.push({
+    router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-    });
+    }));
 };
-
+watch(() => state.providerId, async (provider) => {
+    serviceAccountPageStore.setProvider(provider ?? '');
+    await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
+});
 /* Watcher */
-watch(() => props.serviceAccountId, async (serviceAccountId) => {
-    if (serviceAccountId) {
-        state.serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
+watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serviceAccountId, updateVisible]) => {
+    if (serviceAccountId && !updateVisible) {
+        const serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
+        serviceAccountPageStore.$patch((_state) => {
+            _state.state.serviceAccountType = serviceAccountType;
+        });
         await getAccount(serviceAccountId);
     }
 }, { immediate: true });
@@ -134,10 +162,14 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                             error-icon="ic_cloud-filled"
                 />
             </template>
-            <template v-if="!state.isManagedTrustedAccount"
+            <template v-if="!state.isManagedTrustedAccount || storeState.isAdminMode"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
+                    <p-icon-button name="ic_edit-text"
+                                   class="w-full delete-button"
+                                   @click="handleClickEditButton"
+                    />
                     <p-icon-button name="ic_delete"
                                    class="w-full delete-button"
                                    @click="handleOpenDeleteModal"
@@ -167,7 +199,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                               :editable="!state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />
-            <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && props.serviceAccountId"
+            <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
@@ -181,11 +213,19 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                          :editable="!state.isManagedTrustedAccount"
                                          @refresh="handleRefresh"
             />
+            <service-account-auto-sync v-if="state.isTrustedAccount"
+                                       @refresh="handleRefresh"
+            />
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
                                       :service-account-type="state.serviceAccountType"
                                       :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
+        />
+        <service-account-edit-modal v-if="state.item?.name"
+                                    :visible.sync="state.editModalVisible"
+                                    :is-trusted-account="state.isTrustedAccount"
+                                    :service-account="state.item"
         />
     </div>
 </template>

@@ -2190,6 +2190,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "Failed to Create Service Account",
 				"ALT_S_CREATE_ACCOUNT_DESC": "Service Account successfully registered",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "Service Account successfully added ",
+				"AUTO_SYNC_TITLE": "Auto Sync",
 				"BASE_NAME_PLACEHOLDER": "Cloud Account Name",
 				"BASE_TITLE": "Base Information",
 				"CANCEL": "Cancel",
@@ -2218,7 +2219,7 @@
 				"TAG_DESC_1": "Set {name}'s tag.",
 				"TAG_DESC_2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"TAG_LABEL": "Tags",
-				"TITLE": "Add {type}",
+				"TITLE": "Create {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
 			"MAIN": {
@@ -2727,9 +2728,13 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"COMPLETE_MODAL_SYNC": "Sync Now",
+				"TIMEZONE": "Time Zone: {timezone}, Max: 2 Times"
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "Please note that this Trusted Account is currently attached in following accounts.",
-				"TITLE": "Cannot delete this account"
+				"TITLE": "Cannot delete this account because of attached accounts."
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "Account Type",
@@ -2745,11 +2750,15 @@
 				"CONNECT_TO_CONSOLE": "Connect to Console",
 				"CREDENTIALS_LABEL": "Do you want to attach an existing Trusted Account?",
 				"EDIT": "Edit",
+				"EDIT_SERVICE_ACCOUNT_NAME": "Edit Service Account Name",
+				"NAME": "Service Account Name",
 				"NO_CREDENTIALS": "There’s no credentials found.",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "Project is required",
-				"SAVE": "Save",
-				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. "
+				"SAVE": "Save Changes",
+				"SYNC_NOW": "Sync Now",
+				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. ",
+				"UPDATE_SUCCESS": "Auto Sync settings successfully changed."
 			}
 		}
 	},

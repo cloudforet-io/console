@@ -9,6 +9,12 @@ export interface ProviderModel {
     order: number;
     options: Record<string, any>;
     tags: Tags;
+    plugin_info?: {
+        plugin_id: string;
+        version: string;
+        upgrade_mode: 'AUTO'|'MANUAL'
+        metadata: Record<string, any>
+    }
     is_managed: boolean;
     domain_id: string;
     created_at: string;
