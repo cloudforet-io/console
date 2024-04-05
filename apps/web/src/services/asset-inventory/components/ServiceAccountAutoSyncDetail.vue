@@ -32,7 +32,7 @@ const state = reactive({
 <template>
     <div class="service-account-auto-sync-detail">
         <p class="mb-6">
-            {{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}
+            {{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}
         </p>
 
         <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">

@@ -24,8 +24,13 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 
+const props = defineProps<{
+    mode: 'CREATE' | 'UPDATE';
+}>();
+
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isDomainScope: computed(() => serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN'),
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
@@ -42,7 +47,8 @@ const state = reactive({
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
         if (!state.isAdminMode) return state.isScheduleHoursValid;
-        return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
+        if (state.isDomainScope) return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
+        return state.isScheduleHoursValid;
     }),
 });
 
@@ -101,10 +107,10 @@ watch(() => state.isAllValid, (isAllValid) => {
                              show-state-text
                              position="left"
                              @change-toggle="handleChangeToggle"
-            /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
+            /><p>{{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <div v-if="state.isAdminMode">
+            <div v-if="state.isAdminMode && (props.mode === 'CREATE' ? true : state.isDomainScope)">
                 <service-account-auto-sync-mapping-method />
                 <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
                     <p-field-title label="Additional Options"
