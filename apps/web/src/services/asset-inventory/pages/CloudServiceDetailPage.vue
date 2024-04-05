@@ -263,6 +263,10 @@ const getQuery = (schema?) => {
         .setFilters(hiddenFilters.value)
         .addFilter(...searchFilters.value);
 
+    if (props.isSecurityPage) {
+        apiQuery.addFilter({ k: 'provider', v: props.provider, o: '=' }, { k: 'cloud_service_type', v: props.name, o: '=' });
+    }
+
     const fields = schema?.options?.fields || tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
