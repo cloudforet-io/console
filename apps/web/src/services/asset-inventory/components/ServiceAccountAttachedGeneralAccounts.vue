@@ -16,6 +16,7 @@ import type { ServiceAccountListParameters } from '@/schema/identity/service-acc
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<{
 
 const serviceAccountPageStore = useServiceAccountPageStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 
 const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGeneralAccounts: ServiceAccountModel[]): void;
@@ -51,6 +53,13 @@ const state = reactive({
     domainId: computed(() => store.state.domain.domainId), // TODO: remove this after backend is ready
     totalCount: 0,
     pageLimit: 15,
+    isSyncEnabled: computed(() => {
+        const isDomainScope = serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN';
+        const isAdminMode = appContextStore.getters.isAdminMode;
+        if (isDomainScope) {
+            return isAdminMode;
+        } return serviceAccountPageStore.getters.isOriginAutoSyncEnabled;
+    }),
 });
 const fields = [
     { name: 'name', label: 'Account Name' },
@@ -135,7 +144,7 @@ const init = async () => {
                    :total-count="state.totalCount"
         >
             <template #extra>
-                <p-button v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                <p-button v-if="state.isSyncEnabled"
                           style-type="secondary"
                           @click="handleSync"
                 >

@@ -101,7 +101,7 @@ watch(() => state.isAllValid, (isAllValid) => {
                              show-state-text
                              position="left"
                              @change-toggle="handleChangeToggle"
-            /><p>{{ `Automatically synchronize AWS sub-accounts with ${state.domainName}.` }}</p>
+            /><p>{{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
             <div v-if="state.isAdminMode">
