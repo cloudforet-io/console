@@ -40,7 +40,7 @@ export interface WorkspaceTableModel extends WorkspaceModel {
     users?: string;
 }
 
-export const useWorkspacePageStore = defineStore('workspace-page', {
+export const useWorkspacePageStore = defineStore('page-workspace', {
     state: (): WorkspacePageState => ({
         loading: false,
         userLoading: false,
@@ -101,6 +101,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 ErrorHandler.handleError(e);
                 this.workspaces = [];
                 this.totalCount = 0;
+                this.roles = [];
             } finally {
                 this.loading = false;
             }
@@ -117,7 +118,6 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
                 this.userLoading = false;
             }
         },
-        // Role
         async listRoles(params?: RoleListParameters) {
             try {
                 const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);

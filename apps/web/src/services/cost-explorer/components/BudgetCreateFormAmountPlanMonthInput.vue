@@ -9,6 +9,9 @@ import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
@@ -19,12 +22,14 @@ interface Props {
     amount?: number;
     month: string;
     isMonthToDate: boolean;
+    currency?: Currency;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     amount: undefined,
     month: '',
     isMonthToDate: false,
+    currency: CURRENCY.USD,
 });
 
 const emit = defineEmits<{(e: 'update:amount', amount: number|undefined): void;
@@ -89,7 +94,7 @@ watch(() => _amount.value, (amount) => {
                       :invalid="invalidState._amount"
         >
             <template #right-extra>
-                ($)
+                ({{ CURRENCY_SYMBOL[props.currency] }})
             </template>
         </p-text-input>
     </p-field-group>

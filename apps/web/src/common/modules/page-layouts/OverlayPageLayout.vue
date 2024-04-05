@@ -16,7 +16,7 @@ const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 
 const storeState = reactive({
-    isMinimizeGnb: computed(() => gnbGetters.isMinimizeGnb),
+    isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
 });
 </script>
 
@@ -24,7 +24,7 @@ const storeState = reactive({
     <transition name="slide-up">
         <general-page-layout v-if="props.visible"
                              class="overlay-page-layout"
-                             :class="{'is-minimize': storeState.isMinimizeGnb}"
+                             :class="{'is-minimize': storeState.isMinimizeNavRail}"
         >
             <slot />
         </general-page-layout>

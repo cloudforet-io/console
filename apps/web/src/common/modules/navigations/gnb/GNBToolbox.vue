@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PIconButton, PBreadcrumbs, PCopyButton, screens,
+    PIconButton, PBreadcrumbs, PCopyButton, screens, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone, isEmpty } from 'lodash';
@@ -30,20 +30,22 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
-
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 const favoriteStore = useFavoriteStore();
 const appContextStore = useAppContextStore();
+const appContextGetters = appContextStore.getters;
 
 const route = useRoute();
 const { width } = useWindowSize();
 const { breadcrumbs } = useBreadcrumbs();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isAdminMode: computed(() => appContextGetters.isAdminMode),
+    currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
+    isHideNavRail: computed(() => gnbGetters.isHideNavRail),
 });
 const state = reactive({
     beforeWorkspace: computed(() => route.query?.beforeWorkspace as string|undefined),
@@ -56,7 +58,7 @@ const state = reactive({
                 to: {
                     name: ROOT_ROUTE.WORKSPACE._NAME,
                     params: {
-                        workspaceId: userWorkspaceGetters.currentWorkspaceId || state.beforeWorkspace,
+                        workspaceId: storeState.currentWorkspaceId || state.beforeWorkspace,
                     },
                 },
             });
@@ -84,7 +86,8 @@ const state = reactive({
 });
 
 const handleClickMenuButton = () => {
-    gnbStore.setMinimizeGnb(!gnbGetters.isMinimizeGnb);
+    if (!state.isMobileSize) gnbStore.createHideNavRail(!gnbGetters.isHideNavRail);
+    else gnbStore.createMinimizeNavRail(!gnbGetters.isMinimizeNavRail);
 };
 const handleClickBreadcrumbsItem = (item: Breadcrumb) => {
     if (item) gnbStore.setSelectedItem(item);
@@ -103,7 +106,7 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
-    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS) return;
+    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS || state.selectedMenuId === MENU_ID.SECURITY) return;
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
     await gnbStore.fetchCostQuerySet();
 }, { immediate: true });
@@ -112,7 +115,10 @@ watch(() => state.currentMenuId, async () => {
 <template>
     <div class="g-n-b-toolbox">
         <div class="navigation-section">
-            <div class="menu-button-wrapper">
+            <p-tooltip class="menu-button-wrapper"
+                       position="bottom"
+                       :contents="storeState.isHideNavRail ? $t('COMMON.GNB.TOOLTIP.OPEN_GNB_RAIL') : $t('COMMON.GNB.TOOLTIP.HIDE_GNB_RAIL')"
+            >
                 <p-icon-button name="ic_gnb_menu"
                                style-type="transparent"
                                class="menu-button"
@@ -120,7 +126,7 @@ watch(() => state.currentMenuId, async () => {
                                size="md"
                                @click="handleClickMenuButton"
                 />
-            </div>
+            </p-tooltip>
             <p-breadcrumbs :routes="state.routes"
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"

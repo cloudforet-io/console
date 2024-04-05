@@ -20,8 +20,8 @@ import { ERROR_ROUTE } from '@/router/constant';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
+import { useProviderReferenceStore } from '@/store/reference/provider-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -66,10 +66,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const allReferenceStore = useAllReferenceStore();
+const providerReferenceStore = useProviderReferenceStore();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => providerReferenceStore.state.items ?? {}),
 });
 
 const state = reactive({
@@ -278,6 +278,7 @@ const handlePrint = () => {
     await fetchReportData();
     await setI18nLocale(props.language);
     await fetchTableData();
+    await providerReferenceStore.load();
     state.loading = false;
     drawChart();
     setRootTagStyle();

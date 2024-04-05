@@ -8,6 +8,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 
@@ -57,11 +58,14 @@ const state = reactive({
 
         return getAllMonths(month, monthEnd);
     }),
+    currency: computed<Currency>(() => {
+        if (!props.dataSourceId) return CURRENCY.USD;
+        const dataSourceItem:CostDataSourceItems = storeState.costDataSource[props.dataSourceId];
+        return dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
+    }),
     currencyText: computed<string>(() => {
         if (!props.dataSourceId) return '--';
-        const dataSourceItem:CostDataSourceItems = storeState.costDataSource[props.dataSourceId];
-        const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
-        return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
+        return CURRENCY_SYMBOL[state.currency] + CURRENCY[state.currency];
     }),
     monthAmountInputMap: {} as MonthAmountInputMap,
     // autofill
@@ -169,6 +173,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
                 :amount="state.monthAmountInputMap[month].amount"
                 :month="month"
                 :is-month-to-date="index === 0"
+                :currency="state.currency"
                 @update="handleUpdateMonthInput(month, $event)"
             />
         </div>

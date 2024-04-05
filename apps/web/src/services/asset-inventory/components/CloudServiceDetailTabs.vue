@@ -44,6 +44,7 @@ interface Props {
     group: string;
     name: string;
     isServerPage: boolean;
+    isSecurityPage: boolean;
     selectedIndex: number;
     timezone: string;
 }
@@ -57,14 +58,21 @@ const router = useRouter();
 
 /* Tabs */
 const singleItemTabState = reactive({
-    tabs: computed(() => ([
-        { name: 'detail', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
-        { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
-        { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
-        { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
-        { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
-        { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
-    ])),
+    tabs: computed(() => {
+        const defaultTabs = [
+            { name: 'detail', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
+            { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
+            { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
+            { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
+        ];
+        if (!props.isSecurityPage) {
+            defaultTabs.push(
+                { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
+                { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
+            );
+        }
+        return defaultTabs;
+    }),
     activeTab: 'detail',
 });
 
@@ -127,6 +135,7 @@ const monitoringState: MonitoringProps = reactive({
                 :cloud-service-group="props.group"
                 :cloud-service-type="props.name"
                 :is-server-page="props.isServerPage"
+                :is-security-page="props.isSecurityPage"
             />
         </template>
 
@@ -201,6 +210,7 @@ const monitoringState: MonitoringProps = reactive({
                                                   :cloud-service-group="props.group"
                                                   :cloud-service-type="props.name"
                                                   :cloud-service-id-list="tableState.selectedItems.map((item) => item?.cloud_service_id)"
+                                                  :is-security-page="props.isSecurityPage"
             />
         </template>
         <template #monitoring>

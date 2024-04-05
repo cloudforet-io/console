@@ -26,7 +26,7 @@ import type {
 
 
 const projectTreeHelper = useProjectTree();
-export const useProjectPageStore = defineStore('project-page', () => {
+export const useProjectPageStore = defineStore('page-project', () => {
     const _state = reactive({
         currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
     });
@@ -98,14 +98,14 @@ export const useProjectPageStore = defineStore('project-page', () => {
     const setIsInitiated = (val?: boolean) => {
         state.isInitiated = !!val;
     };
-    const setSelectedItem = (item: ProjectGroupTreeItem) => {
-        state.selectedItem = item;
+    const setSelectedItem = (item?: ProjectGroupTreeItem) => {
+        state.selectedItem = item || {};
     };
     const setProjectCount = (count?: number) => {
         state.projectCount = count || 0;
     };
-    const setRootNode = (root: ProjectTreeRoot) => {
-        state.rootNode = root;
+    const setRootNode = (root?: ProjectTreeRoot) => {
+        state.rootNode = root || null;
     };
 
     /* action */

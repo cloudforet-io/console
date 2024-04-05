@@ -39,7 +39,7 @@ const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, str
     return result;
 };
 
-export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => {
+export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => {
     const allReferenceStore = useAllReferenceStore();
     const costQuerySetStore = useCostQuerySetStore();
     const costQuerySetGetters = costQuerySetStore.getters;
@@ -49,9 +49,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         managedGroupByItems: computed<GroupByItem[]>(() => {
-            if (_state.isAdminMode) {
-                return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.PROJECT);
-            }
+            if (_state.isAdminMode) return Object.values(GROUP_BY_ITEM_MAP);
             return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
         }),
     });
@@ -182,9 +180,10 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         // check admin mode
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
             if (_state.isAdminMode) {
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.PROJECT);
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
             } else {
-                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties
+                    .filter((d) => d !== GROUP_BY.WORKSPACE);
             }
         } else {
             state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);

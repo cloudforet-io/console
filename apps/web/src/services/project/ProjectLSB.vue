@@ -6,9 +6,10 @@ import { PI } from '@spaceone/design-system';
 
 import { queryStringToString } from '@/lib/router-query-string';
 
+import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 
+import ProjectFavoriteList from '@/services/project/components/ProjectFavoriteList.vue';
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
 import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -30,6 +31,17 @@ const { favoriteItems, beforeFavoriteRoute, handleDeleteFavorite } = useProjectF
 
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
+};
+const handleBeforeFavoriteRoute = async (item: FavoriteItem) => {
+    await beforeFavoriteRoute(item);
+    if (item.itemType !== FAVORITE_TYPE.PROJECT_GROUP) {
+        router.push({
+            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            params: {
+                id: item.itemId,
+            },
+        }).catch(() => {});
+    }
 };
 
 watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
@@ -59,9 +71,9 @@ watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) 
                 <span>{{ $t('COMMON.STARRED') }}</span>
             </div>
             <div class="collapsible-contents">
-                <favorite-list :items="favoriteItems"
-                               :before-route="beforeFavoriteRoute"
-                               @delete="handleDeleteFavorite"
+                <project-favorite-list :items="favoriteItems"
+                                       :before-route="handleBeforeFavoriteRoute"
+                                       @delete="handleDeleteFavorite"
                 >
                     <template #icon="{item}">
                         <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
@@ -70,7 +82,7 @@ watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) 
                              color="inherit inherit"
                         />
                     </template>
-                </favorite-list>
+                </project-favorite-list>
             </div>
         </div>
         <div class="sidebar-item-wrapper">

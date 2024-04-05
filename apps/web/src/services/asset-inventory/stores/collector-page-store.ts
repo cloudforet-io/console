@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { JobAnalyzeInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 
 
-export const useCollectorPageStore = defineStore('collector-page', () => {
+export const useCollectorPageStore = defineStore('page-collector', () => {
     const appContextStore = useAppContextStore();
     const appContextGetters = appContextStore.getters;
 
