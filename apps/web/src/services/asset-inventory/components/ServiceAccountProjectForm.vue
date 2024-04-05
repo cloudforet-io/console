@@ -75,7 +75,7 @@ export default {
 .service-account-project-form {
     .project-select-dropdown {
         max-width: 30rem;
-        width: 50%;
+        width: 100%;
     }
 
     @screen tablet {

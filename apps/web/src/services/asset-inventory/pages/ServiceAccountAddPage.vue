@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import {
-    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -21,6 +20,7 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { i18n } from '@/translations';
 
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-account-reference-store';
@@ -28,8 +28,10 @@ import type { TrustedAccountReferenceMap } from '@/store/reference/trusted-accou
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import ServiceAccountAutoSyncForm from '@/services/asset-inventory/components/ServiceAccountAutoSyncForm.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
@@ -39,15 +41,21 @@ import {
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageFormState = serviceAccountPageStore.formState;
+const appContextStore = useAppContextStore();
+
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
 }>();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -70,6 +78,9 @@ const state = reactive({
     // TODO: enhance kubernetes provider schema after API done
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    createModal: false,
+    createdAccountId: '',
 });
 
 const formState = reactive({
@@ -78,10 +89,11 @@ const formState = reactive({
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
     credentialForm: {} as CredentialForm,
     isCredentialFormValid: false,
+    isAutoSyncFormValid: computed(() => serviceAccountPageStore.formState.isAutoSyncFormValid),
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-        if (state.isTrustedAccount) return true;
+        if (!formState.isAutoSyncFormValid && state.isTrustedAccount) return false;
         return true;
     }),
     formLoading: false,
@@ -113,8 +125,16 @@ const createAccount = async (): Promise<string|undefined> => {
             data,
             secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
             secret_data: secretData,
-            resource_group: 'WORKSPACE',
+            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
             tags: formState.baseInformationForm.tags,
+            schedule: {
+                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                hours: serviceAccountPageFormState.scheduleHours,
+            },
+            sync_options: {
+                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+            },
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
@@ -154,10 +174,10 @@ const handleSave = async () => {
     try {
         formState.formLoading = true;
         accountId = await createAccount();
+        state.createdAccountId = accountId ?? '';
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
-        const query: Location['query'] = { provider: props.provider };
-        if (props.provider === 'kubernetes') query.kubernetesAccountId = accountId;
-        SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query });
+        if (state.isTrustedAccount && serviceAccountPageFormState.isAutoSyncEnabled) state.createModal = true;
+        else SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -177,9 +197,28 @@ const handleChangeCredentialForm = (credentialForm) => {
     formState.credentialForm = credentialForm;
 };
 
+const handleSync = async () => {
+    try {
+        await SpaceConnector.clientV2.identity.trustedAccount.sync({
+            trusted_account_id: state.createdAccountId,
+        });
+        state.createModal = false;
+        serviceAccountPageStore.initState();
+        SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const handleRouteToServiceAccountDetailPage = () => {
+    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+};
+
 /* Init */
 (async () => {
     state.providerSchemaLoading = true;
+    serviceAccountPageStore.initState();
+    serviceAccountPageStore.setProvider(props.provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     state.providerSchemaLoading = false;
 })();
@@ -241,6 +280,16 @@ const handleChangeCredentialForm = (credentialForm) => {
                     @change="handleChangeCredentialForm"
                 />
             </p-pane-layout>
+            <p-pane-layout v-if="state.isTrustedAccount"
+                           class="form-wrapper"
+            >
+                <p-heading heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
+                />
+                <service-account-auto-sync-form mode="CREATE"
+                                                :provider="props.provider"
+                />
+            </p-pane-layout>
         </div>
 
         <div class="button-wrapper">
@@ -261,6 +310,20 @@ const handleChangeCredentialForm = (credentialForm) => {
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
             </p-button>
         </div>
+        <p-button-modal :header-title="$t('Do you want to sync now?')"
+                        size="sm"
+                        :visible.sync="state.createModal"
+                        @confirm="handleSync"
+                        @cancel="handleRouteToServiceAccountDetailPage"
+                        @close="handleRouteToServiceAccountDetailPage"
+        >
+            <template #close-button>
+                {{ $t('INVENTORY.COLLECTOR.CREATE.CREATE_COMPLETE_MODAL_SKIP') }}
+            </template>
+            <template #confirm-button>
+                {{ $t('INVENTORY.SERVICE_ACCOUNT.CREATE.COMPLETE_MODAL_SYNC') }}
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -271,11 +334,12 @@ const handleChangeCredentialForm = (credentialForm) => {
         gap: 1rem;
 
         .form-wrapper {
+            padding-bottom: 2.5rem;
             .service-account-project-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;
             }
             .service-account-credentials-form {
-                padding: 0.5rem 1rem 2.5rem 1rem;
+                padding: 0.5rem 1rem 0 1rem;
             }
             .service-account-base-information-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;

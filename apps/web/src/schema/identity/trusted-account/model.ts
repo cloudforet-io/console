@@ -6,6 +6,15 @@ export interface TrustedAccountModel {
     name: string;
     data: Record<string, any>;
     provider: string;
+    schedule?: {
+        state: 'ENABLED' | 'DISABLED';
+        hours: number[];
+    };
+    sync_options?: {
+        skip_project_group: boolean;
+        single_workspace_id: string;
+    };
+    plugin_options?: Record<string, any>;
     tags: Tags;
     secret_schema_id: string;
     trusted_secret_id: string;

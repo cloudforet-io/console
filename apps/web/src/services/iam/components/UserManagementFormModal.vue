@@ -279,7 +279,6 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"
-                                         is-edit
                                          is-form-visible
                 />
             </div>
