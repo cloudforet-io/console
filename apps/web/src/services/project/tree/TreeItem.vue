@@ -26,7 +26,6 @@ const emit = defineEmits<{(e: 'click-toggle', node: TreeNode): Promise<void>|voi
 const state = reactive({
     isCollapsed: true,
     toggleIcon: computed(() => (state.isCollapsed ? 'ic_caret-right' : 'ic_caret-down-filled-alt')),
-    expandable: isExpandable(slots),
     fetchLoading: false,
     isSelected: computed(() => props.selectedId === props.node.id),
 });
@@ -73,7 +72,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
                    :style="{ 'padding-left': `${(props.node.depth || 0) * 1}rem`}"
                    @click.native="handleClickItem"
         >
-            <div v-if="state.expandable"
+            <div v-if="isExpandable(slots)"
                  class="toggle-icon"
             >
                 <p-spinner v-if="props.node.loading"
