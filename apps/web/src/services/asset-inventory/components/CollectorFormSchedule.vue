@@ -95,7 +95,7 @@ const state = reactive({
         if (props.disableLoading) return false;
         return collectorFormState.originCollector === null;
     }),
-    isScheduleError: false,
+    isScheduleError: computed<boolean>(() => collectorFormState.isScheduleError),
 });
 
 const updateSelectedHours = () => {
@@ -145,14 +145,20 @@ const handleClickHour = (hour: number) => {
     }
     if (selectedUtcHoursSet.has(utcHour)) {
         selectedUtcHoursSet.delete(utcHour);
-        state.isScheduleError = false;
+        collectorFormStore.$patch({
+            isScheduleError: false,
+        });
     } else {
         if (selectedUtcHoursSet?.size >= 2) {
-            state.isScheduleError = true;
+            collectorFormStore.$patch({
+                isScheduleError: true,
+            });
             return;
         }
         selectedUtcHoursSet.add(utcHour);
-        state.isScheduleError = false;
+        collectorFormStore.$patch({
+            isScheduleError: false,
+        });
     }
 
     updateSelectedHours();
