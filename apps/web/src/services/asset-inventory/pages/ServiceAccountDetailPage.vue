@@ -29,6 +29,7 @@ import ServiceAccountAttachedGeneralAccounts
 import ServiceAccountAutoSync from '@/services/asset-inventory/components/ServiceAccountAutoSync.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
+import ServiceAccountConnectCluster from '@/services/asset-inventory/components/ServiceAccountConnectCluster.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
@@ -74,6 +75,7 @@ const state = reactive({
     }),
     providerKey: computed(() => state.provider?.key),
     providerIcon: computed(() => state.provider?.icon),
+    isKubernetesAgentMode: computed(() => state.providerKey === 'kubernetes'),
     consoleLink: computed(() => {
         try {
             if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
@@ -203,7 +205,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
-            <service-account-credentials :provider="state.providerKey"
+            <service-account-connect-cluster v-if="state.isKubernetesAgentMode" />
+            <service-account-credentials v-else
+                                         :provider="state.providerKey"
                                          :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
                                          :service-account-type="state.serviceAccountType"
@@ -262,6 +266,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             @apply col-span-12;
         }
         .service-account-base-information {
+            @apply col-span-12;
+        }
+        .service-account-connect-cluster {
             @apply col-span-12;
         }
         .service-account-credentials {
