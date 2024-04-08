@@ -1,0 +1,76 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import { PDataLoader, PDefinitionTable, PStatus } from '@spaceone/design-system';
+
+const state = reactive({
+    fields: computed(() => [
+        {
+            label: 'Cluster Name',
+            name: 'cluster_name',
+        },
+        {
+            label: 'Status',
+            name: 'state',
+            disableCopy: true,
+        },
+        {
+            label: 'Created',
+            name: 'created_at',
+            disableCopy: true,
+        },
+    ]),
+    data: computed(() => ({
+        cluster_name: 'cluster-1',
+        state: 'ACTIVE',
+        created_at: '2021-08-01',
+    })),
+});
+
+const connectedStatusFormatter = (value: string) => ({
+    theme: value === 'ENABLED' ? 'green' : 'gray',
+    text: value === 'ENABLED' ? 'Connected' : 'Disconnected',
+});
+
+</script>
+
+<template>
+    <p-data-loader class="service-account-connect-cluster-detail"
+                   :data="state.data"
+                   :loading="false"
+    >
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
+                            style-type="white"
+        >
+            <template #data-state="{value}">
+                <p-status v-bind="connectedStatusFormatter(value)"
+                          class="capitalize"
+                />
+            </template>
+        </p-definition-table>
+    </p-data-loader>
+</template>
+
+<style scoped lang="postcss">
+.service-account-connect-cluster-detail {
+    min-height: 6.8rem;
+    height: 100%;
+
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
+        display: none;
+    }
+
+    /* custom design-system component - p-definition-table */
+    :deep(.p-definition-table) {
+        min-height: auto;
+    }
+
+    .no-data-wrapper {
+        .text {
+            margin-bottom: 1rem;
+        }
+    }
+}
+</style>
