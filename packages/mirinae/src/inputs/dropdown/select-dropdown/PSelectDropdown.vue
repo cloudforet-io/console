@@ -9,6 +9,7 @@ import { debounce, reduce } from 'lodash';
 import { useContextMenuController, useProxyValue } from '@/hooks';
 import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/ignore-window-arrow-keydown-events';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { ContextMenuType } from '@/inputs/context-menu/type';
 import DropdownButton from '@/inputs/dropdown/select-dropdown/components/dropdown-button.vue';
 import type {
     AutocompleteHandler,
@@ -98,6 +99,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
     (e: 'click-show-more'): void;
     (e: 'clear-selection'): void;
     (e: 'click-done', selected: SelectDropdownMenuItem[]|string|number): void;
+    (e: 'click-button', { label, name, type }: {label: string, name: string, type: ContextMenuType}): void;
 }>();
 
 const slots = useSlots();
@@ -250,6 +252,10 @@ const handleClickDone = () => {
     hideMenu();
 };
 
+const handleClickButtonType = (e: {label: string, name: string, type: ContextMenuType}) => {
+    emit('click-button', e);
+};
+
 /* ignore window arrow keydown event */
 useIgnoreWindowArrowKeydownEvents({ predicate: state.proxyVisibleMenu });
 
@@ -345,7 +351,7 @@ defineExpose({ reloadMenu });
                             default: !props.showSelectMarker,
                             [menuPosition]: !useFixedMenuStyle
                         }"
-                        :menu="refinedMenu"
+                        :menu="props.disableHandler ? props.menu : refinedMenu"
                         :loading="props.loading || loading"
                         :readonly="props.readonly"
                         :style="contextMenuStyle"
@@ -362,6 +368,7 @@ defineExpose({ reloadMenu });
                         @click-done="handleClickDone"
                         @click-show-more="handleClickShowMore"
                         @clear-selection="handleClearSelection"
+                        @click-button="handleClickButtonType"
                         @keyup:up:end="focusDropdownButton"
                         @keyup:down:end="focusOnContextMenu()"
                         @keyup:esc="hideMenu"

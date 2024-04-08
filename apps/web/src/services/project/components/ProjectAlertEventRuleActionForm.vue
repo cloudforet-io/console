@@ -23,6 +23,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 const URGENCY = Object.freeze({
     NO_SET: 'NO_SET',
@@ -40,8 +41,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits(['update:actions', 'update:options']);
 
+const projectDetailPageStore = useProjectDetailPageStore();
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
+    currentProjectId: computed<string>(() => projectDetailPageStore.state.projectId || ''),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     userItems: computed(() => Object.keys(state.users).map((k) => ({
         name: k,
@@ -62,11 +65,16 @@ const state = reactive({
         },
     ])),
     escalationPolicies: computed<EscalationPolicyReferenceMap>(() => allReferenceStore.getters.escalationPolicy),
-    escalationPolicyList: computed(() => Object.keys(state.escalationPolicies).map((key) => ({
-        name: state.escalationPolicies[key].key,
-        label: state.escalationPolicies[key].name,
-        scope: state.escalationPolicies[key].data.resource_group,
-    }))),
+    escalationPolicyList: computed(() => {
+        const allowedProjectIds = [state.currentProjectId, '*'];
+        const escalationPolicieListFilteredByProjectId = Object.keys(state.escalationPolicies).filter((key) => allowedProjectIds.includes(state.escalationPolicies[key].data.project_id));
+        return escalationPolicieListFilteredByProjectId
+            .map((key) => ({
+                name: state.escalationPolicies[key].key,
+                label: state.escalationPolicies[key].name,
+                scope: state.escalationPolicies[key].data.resource_group,
+            }));
+    }),
     resourceGroups: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),

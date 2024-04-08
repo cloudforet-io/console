@@ -53,7 +53,7 @@ export default class ErrorHandler {
         } else if (isInstanceOfAPIError(error)) {
             console.error('API Error', error);
         } else {
-            if (errorInfo?.title) showErrorMessage(errorInfo.title, errorInfo?.description);
+            if (errorInfo?.title) showErrorMessage(errorInfo.title, error);
             console.error(error);
         }
     }

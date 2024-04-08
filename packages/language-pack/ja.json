@@ -2204,6 +2204,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
 				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
+				"AUTO_SYNC_TITLE": "",
 				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
 				"BASE_TITLE": "基本情報",
 				"CANCEL": "キャンセル",
@@ -2741,9 +2742,13 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"COMPLETE_MODAL_SYNC": "",
+				"TIMEZONE": ""
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
-				"TITLE": "このアカウントは削除できません。"
+				"TITLE": ""
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",
@@ -2759,11 +2764,15 @@
 				"CONNECT_TO_CONSOLE": "コンソールへの接続",
 				"CREDENTIALS_LABEL": "既存のTrustedAccountにアタッチしますか？",
 				"EDIT": "編集する",
+				"EDIT_SERVICE_ACCOUNT_NAME": "",
+				"NAME": "",
 				"NO_CREDENTIALS": "暗号化キーが見つかりません。",
 				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
 				"REQUIRED": "プロジェクトの追加が必要です",
-				"SAVE": "保存",
-				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。"
+				"SAVE": "変更を保存",
+				"SYNC_NOW": "",
+				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。",
+				"UPDATE_SUCCESS": ""
 			}
 		}
 	},

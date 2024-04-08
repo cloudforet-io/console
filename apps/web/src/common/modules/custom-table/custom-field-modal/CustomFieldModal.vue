@@ -151,6 +151,7 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
     try {
         const options: GetSchemaParams['options'] = {
             include_optional_fields: includeOptionalFields,
+            isAdminMode: appContextGetters.isAdminMode,
         };
         const {
             provider, cloudServiceGroup, cloudServiceType, include_workspace_info,

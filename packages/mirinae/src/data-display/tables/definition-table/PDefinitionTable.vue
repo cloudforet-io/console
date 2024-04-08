@@ -169,8 +169,12 @@ export default defineComponent<DefinitionTableProps>({
         }
     }
     .def-row {
+        td {
+            @apply bg-white;
+        }
+
         td:first-child {
-            @apply border-r-2;
+            margin-right: 0.125rem;
         }
     }
 
@@ -185,7 +189,7 @@ export default defineComponent<DefinitionTableProps>({
             }
         }
         .def-row {
-            &:nth-child(2n+1) {
+            &:nth-child(2n+1) td {
                 background-color: $stripe-bg-color;
             }
             td:first-child {
@@ -195,21 +199,18 @@ export default defineComponent<DefinitionTableProps>({
     }
 
     &.primary {
-        @mixin style-type theme('colors.white'), theme('colors.violet.100'), transparent, theme('colors.white');
+        @mixin style-type theme('colors.white'), theme('colors.violet.100'), transparent, transparent;
     }
     &.white {
-        @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.300'), theme('colors.white');
+        @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.300'), transparent;
 
-        @apply rounded-lg border border-gray-200;
+        @apply border-gray-200;
 
         table {
             tr {
                 @apply border-b;
                 &:first-of-type {
                     @apply rounded-t-lg;
-                }
-                &:last-of-type {
-                    @apply rounded-b-lg border-b-0;
                 }
             }
         }
