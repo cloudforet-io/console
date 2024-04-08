@@ -83,8 +83,8 @@ const state = reactive({
 });
 
 const formState = reactive({
-    baseInformationForm: {} as BaseInformationForm,
-    isBaseInformationFormValid: false,
+    baseInformationForm: computed<Partial<BaseInformationForm>>(() => serviceAccountPageStore.formState.baseInformation),
+    isBaseInformationFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
     credentialForm: {} as CredentialForm,
     isCredentialFormValid: false,
@@ -117,38 +117,44 @@ const createAccount = async (): Promise<string|undefined> => {
     }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
-    if (state.isTrustedAccount) {
-        res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
-            provider: props.provider,
-            name: formState.baseInformationForm.accountName,
-            data,
-            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-            secret_data: secretData,
-            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
-            tags: formState.baseInformationForm.tags,
-            schedule: {
-                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
-                hours: serviceAccountPageFormState.scheduleHours,
-            },
-            sync_options: {
-                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-            },
-        });
-    } else {
-        res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
-            provider: props.provider,
-            name: formState.baseInformationForm.accountName.trim(),
-            data,
-            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-            secret_data: secretData,
-            tags: formState.baseInformationForm.tags,
-            trusted_account_id: attachedTrustedAccountId,
-            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-        });
-    }
+    try {
+        if (!formState.baseInformationForm.accountName || !data || !formState.baseInformationForm.projectForm) throw new Error('Invalid form data: accountName, data, projectForm');
+        if (state.isTrustedAccount) {
+            res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
+                provider: props.provider,
+                name: formState.baseInformationForm.accountName,
+                data,
+                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
+                secret_data: secretData,
+                resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
+                tags: formState.baseInformationForm.tags,
+                schedule: {
+                    state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                    hours: serviceAccountPageFormState.scheduleHours,
+                },
+                sync_options: {
+                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                },
+            });
+        } else {
+            res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
+                provider: props.provider,
+                name: formState.baseInformationForm.accountName.trim(),
+                data,
+                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
+                secret_data: secretData,
+                tags: formState.baseInformationForm.tags,
+                trusted_account_id: attachedTrustedAccountId,
+                project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+            });
+        }
 
-    return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+        return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
 };
 
 const deleteServiceAccount = async (serviceAccountId: string) => {
@@ -261,8 +267,8 @@ const handleRouteToServiceAccountDetailPage = () => {
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
                 />
                 <service-account-base-information-form :schema="state.baseInformationSchema"
-                                                       :is-valid.sync="formState.isBaseInformationFormValid"
                                                        :account-type="formState.accountType"
+                                                       mode="CREATE"
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>

@@ -23,7 +23,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 const props = defineProps<{
     visible: boolean;
-    serviceAccount: ServiceAccountModel;
+    serviceAccount: Partial<TrustedAccountModel & ServiceAccountModel>;
     isTrustedAccount: boolean;
 }>();
 

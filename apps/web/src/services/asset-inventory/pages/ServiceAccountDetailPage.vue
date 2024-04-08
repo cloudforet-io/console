@@ -87,6 +87,7 @@ const state = reactive({
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
+    isEditable: computed(() => !state.isManagedTrustedAccount || storeState.isAdminMode),
 });
 
 /* Api */
@@ -162,7 +163,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                             error-icon="ic_cloud-filled"
                 />
             </template>
-            <template v-if="!state.isManagedTrustedAccount || storeState.isAdminMode"
+            <template v-if="state.isEditable"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
@@ -176,7 +177,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                     />
                 </div>
             </template>
-            <template v-if="!state.isManagedTrustedAccount"
+            <template v-if="state.isEditable"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -191,12 +192,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             </template>
         </p-heading>
         <div class="content-wrapper">
-            <service-account-base-information :provider="state.providerKey"
-                                              :service-account-loading="state.loading"
+            <service-account-base-information :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
-                                              :service-account-type="state.serviceAccountType"
-                                              :service-account-data="state.item"
-                                              :editable="!state.isManagedTrustedAccount"
+                                              :editable="state.isEditable"
                                               @refresh="handleRefresh"
             />
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
@@ -210,7 +208,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                          :service-account-data="state.item"
                                          :project-id="state.projectId"
                                          :attached-trusted-account-id="state.attachedTrustedAccountId"
-                                         :editable="!state.isManagedTrustedAccount"
+                                         :editable="state.isEditable"
                                          @refresh="handleRefresh"
             />
             <service-account-auto-sync v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
