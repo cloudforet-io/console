@@ -104,12 +104,12 @@ const getAccount = async (serviceAccountId: string) => {
             });
         }
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = item;
+            _state.state.originServiceAccountItem = item;
         });
     } catch (e) {
         ErrorHandler.handleError(e);
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = {};
+            _state.state.originServiceAccountItem = {};
         });
     } finally {
         state.loading = false;
