@@ -65,7 +65,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),
         trustedAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT')),
-        trustingSecretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTING_SECRET')),
+        trustingSecretSchema: computed(() => getters.currentProviderSchemaList.filter((schema) => schema.schema_type === 'TRUSTING_SECRET')),
         secretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SECRET')),
         isSupportTrustedAccount: computed(() => {
             const currentProviderData:ProviderModel = getters.currentProviderData?.data;

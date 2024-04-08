@@ -142,6 +142,7 @@ const initForm = () => {
     formState.attachTrustedAccount = false;
     formState.selectedSecretType = state.secretTypes[0];
     formState.credentialJson = '{}';
+    formState.customSchemaForm = {};
     formState.attachedTrustedAccountId = undefined;
     formState.isCustomSchemaFormValid = false;
     tabState.activeTab = 'input';
@@ -187,7 +188,8 @@ const handleCredentialValidate = (isValid) => {
 };
 const handleChangeSecretType = (val: string) => {
     if (formState.selectedSecretType !== val) {
-        initForm();
+        formState.credentialJson = '{}';
+        formState.customSchemaForm = {};
         formState.selectedSecretType = val;
     }
 };
@@ -199,7 +201,8 @@ const handleSelectNoCredentials = (val: boolean) => {
 };
 const handleChangeAttachTrustedAccount = (val: boolean) => {
     if (formState.attachTrustedAccount !== val) {
-        initForm();
+        formState.credentialJson = '{}';
+        formState.customSchemaForm = {};
         formState.attachTrustedAccount = val;
         if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.trusted_account_id;
     }
@@ -236,7 +239,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
 });
 const schemaApiQueryHelper = new ApiQueryHelper();
 const getSecretSchema = async (isTrustingSchema:boolean) => {
-    const trustedAccountRelatedSchemas = storeState.trustedAccountSchema?.related_schemas ?? [];
+    const trustedAccountRelatedSchemas = isTrustingSchema ? serviceAccountSchemaStore.getters.trustingSecretSchema : (storeState.trustedAccountSchema?.related_schemas ?? []);
     const generalAccountRelatedSchemas = storeState.generalAccountSchema?.related_schemas ?? [];
     schemaApiQueryHelper.setFilters([
         { k: 'schema_type', v: isTrustingSchema ? 'TRUSTING_SECRET' : 'SECRET', o: '=' },
