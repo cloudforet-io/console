@@ -64,7 +64,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     titleAccountName: computed(() => {
         if (props.provider && !state.isTrustedAccount && Object.keys(PROVIDER_ACCOUNT_NAME).includes(props.provider)) return PROVIDER_ACCOUNT_NAME[props.provider];
         return ACCOUNT_TYPE_BADGE_OPTION[formState.accountType].label;
@@ -86,8 +86,8 @@ const formState = reactive({
     baseInformationForm: computed<Partial<BaseInformationForm>>(() => serviceAccountPageStore.formState.baseInformation),
     isBaseInformationFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
-    credentialForm: {} as CredentialForm,
-    isCredentialFormValid: false,
+    credentialForm: computed<Partial<CredentialForm>>(() => serviceAccountPageStore.formState.credential),
+    isCredentialFormValid: computed(() => serviceAccountPageStore.formState.isCredentialFormValid),
     isAutoSyncFormValid: computed(() => serviceAccountPageStore.formState.isAutoSyncFormValid),
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
@@ -111,7 +111,7 @@ const createAccount = async (): Promise<string|undefined> => {
     }
     let secretData;
     if (formState.credentialForm.activeDataType === 'json') {
-        secretData = JSON.parse(formState.credentialForm.credentialJson);
+        secretData = JSON.parse(formState.credentialForm.credentialJson ?? '');
     } else if (formState.credentialForm.activeDataType === 'input') {
         secretData = formState.credentialForm.customSchemaForm;
     }
@@ -153,7 +153,7 @@ const createAccount = async (): Promise<string|undefined> => {
         return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return undefined;
+        throw e;
     }
 };
 
@@ -198,9 +198,6 @@ const handleGoBack = () => {
 const handleChangeBaseInformationForm = (baseInformationForm) => {
     formState.baseInformationForm = baseInformationForm;
 };
-const handleChangeCredentialForm = (credentialForm) => {
-    formState.credentialForm = credentialForm;
-};
 
 const handleSync = async () => {
     try {
@@ -225,6 +222,9 @@ const handleRouteToServiceAccountDetailPage = () => {
     serviceAccountPageStore.initState();
     serviceAccountPageStore.setProvider(props.provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
+    serviceAccountPageStore.$patch((_state) => {
+        _state.state.serviceAccountType = props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL;
+    });
     state.providerSchemaLoading = false;
 })();
 
@@ -278,12 +278,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
-                <service-account-credentials-form
-                    :service-account-type="formState.accountType"
-                    :provider="props.provider ?? ''"
-                    :is-valid.sync="formState.isCredentialFormValid"
-                    @change="handleChangeCredentialForm"
-                />
+                <service-account-credentials-form />
             </p-pane-layout>
             <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"
@@ -291,9 +286,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
                 />
-                <service-account-auto-sync-form mode="CREATE"
-                                                :provider="props.provider"
-                />
+                <service-account-auto-sync-form mode="CREATE" />
             </p-pane-layout>
         </div>
 

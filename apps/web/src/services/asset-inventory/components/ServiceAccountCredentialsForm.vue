@@ -20,7 +20,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
@@ -28,28 +27,20 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { ActiveDataType, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
-    serviceAccountType: AccountType;
-    provider?: string;
-    isValid: boolean;
     originForm?: Partial<CredentialForm>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    serviceAccountType: 'GENERAL',
-    provider: undefined,
-    isValid: false,
     originForm: () => ({}),
 });
 
-const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
-    (e: 'change', formData: CredentialForm): void;
-}>();
-
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
 
 interface State {
     showTrustedAccount: ComputedRef<boolean>;
@@ -71,10 +62,11 @@ const storeState = reactive({
     generalAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.generalAccountSchema),
     secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
     providerName: computed(() => serviceAccountSchemaStore.getters.currentProviderData?.name ?? ''),
+    provider: computed(() => serviceAccountPageStore.state.selectedProvider),
 });
 const state = reactive<State>({
     showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchema),
-    isTrustedAccount: computed<boolean>(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    isTrustedAccount: computed<boolean>(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     trustedAccounts: [],
     trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
         name: d.trusted_account_id,
@@ -164,10 +156,10 @@ const checkJsonStringAvailable = (str: string): boolean => {
 /* Api */
 const listTrustAccounts = async () => {
     try {
-        if (!props.provider) return;
+        if (!storeState.provider) return;
         const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>(
             {
-                query: new ApiQueryHelper().setFilters([{ k: 'provider', v: props.provider, o: '=' }]).data,
+                query: new ApiQueryHelper().setFilters([{ k: 'provider', v: storeState.provider, o: '=' }]).data,
             },
         );
         state.trustedAccounts = results ?? [];
@@ -232,10 +224,14 @@ watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
     formState.isCustomSchemaFormValid = true;
 });
 watch(() => formState.formData, (formData) => {
-    emit('change', formData);
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.credential = formData;
+    });
 });
 watch(() => formState.isAllValid, (isAllValid) => {
-    emit('update:isValid', isAllValid);
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.isCredentialFormValid = isAllValid;
+    });
 });
 const schemaApiQueryHelper = new ApiQueryHelper();
 const getSecretSchema = async (isTrustingSchema:boolean) => {
@@ -264,7 +260,7 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
 
 <template>
     <div class="service-account-credentials-form">
-        <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
+        <p-field-group v-if="!state.isTrustedAccount"
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: storeState.providerName })"
                        required
         >
@@ -284,7 +280,7 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
             </div>
         </p-field-group>
         <template v-if="formState.hasCredentialKey">
-            <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED && state.showTrustedAccount"
+            <p-field-group v-if="!state.isTrustedAccount && state.showTrustedAccount"
                            class="mt-6"
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
