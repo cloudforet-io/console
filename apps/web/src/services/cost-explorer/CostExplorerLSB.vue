@@ -22,7 +22,6 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
-import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
@@ -33,7 +32,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
-const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetGetters = costQuerySetStore.getters;
@@ -58,30 +56,15 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     currentPath: computed(() => route.fullPath),
+    favoriteItemMap: computed(() => {
+        const result: Record<string, FavoriteConfig> = {};
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.itemId] = d;
+        });
+        return result;
+    }),
     currentQueryMenuList: computed<LSBMenu>(() => costQuerySetState.costQuerySetList.map((d) => {
-        if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
-            return {
-                type: 'item',
-                id: d.cost_query_set_id,
-                label: d.name,
-                icon: {
-                    name: 'ic_main-filled',
-                    color: gray[500],
-                },
-                to: getProperRouteLocation({
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                    params: {
-                        dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
-                        costQuerySetId: d.cost_query_set_id,
-                    },
-                }),
-                favoriteOptions: {
-                    type: FAVORITE_TYPE.COST_ANALYSIS,
-                    id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(d.data_source_id, d.cost_query_set_id),
-                },
-            };
-        }
-        return {
+        const result: LSBMenu = {
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
@@ -94,42 +77,54 @@ const state = reactive({
             }),
             favoriteOptions: {
                 type: FAVORITE_TYPE.COST_ANALYSIS,
+                id: d.cost_query_set_id,
             },
         };
-    })),
-    queryMenuSet: computed<LSBMenu>(() => [
-        ...filterMenuItems(state.currentQueryMenuList),
-    ]),
-    adminMenuSet: computed<LSBMenu>(() => (!storeState.isAdminMode ? [
-        {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('COMMON.STARRED'),
-            id: STARRED_MENU_ID,
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
-    ] : [])),
-    favoriteItemMap: computed(() => {
-        const result: Record<string, FavoriteConfig> = {};
-        storeState.favoriteItems?.forEach((d) => {
-            result[d.itemId] = d;
-        });
+        if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
+            result.icon = {
+                name: 'ic_main-filled',
+                color: gray[500],
+            };
+            result.favoriteOptions = {
+                type: FAVORITE_TYPE.COST_ANALYSIS,
+                id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(d.data_source_id, d.cost_query_set_id) || d.cost_query_set_id,
+            };
+        }
         return result;
-    }),
+    })),
     starredMenuSet: computed<LSBMenu[]>(() => filterStarredItems(state.currentQueryMenuList)),
-    menuSet: computed<LSBMenu[]>(() => [
-        {
-            type: MENU_ITEM_TYPE.COLLAPSIBLE,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DATA_SOURCE'),
-            id: DATA_SOURCE_MENU_ID,
-        },
-        {
-            type: MENU_ITEM_TYPE.DIVIDER,
-        },
-        ...state.adminMenuSet,
-        ...state.queryMenuSet,
-    ]),
+    queryMenuSet: computed<LSBMenu>(() => filterMenuItems(state.currentQueryMenuList)),
+    menuSet: computed<LSBMenu[]>(() => {
+        const defaultMenuSet: LSBMenu[] = [
+            {
+                type: MENU_ITEM_TYPE.COLLAPSIBLE,
+                label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DATA_SOURCE'),
+                id: DATA_SOURCE_MENU_ID,
+            },
+            { type: MENU_ITEM_TYPE.DIVIDER },
+            {
+                type: MENU_ITEM_TYPE.TOP_TITLE,
+                label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS'),
+            },
+        ];
+
+        if (!storeState.isAdminMode) {
+            defaultMenuSet.unshift(
+                {
+                    type: MENU_ITEM_TYPE.STARRED,
+                    childItems: state.starredMenuSet,
+                    currentPath: state.currentPath,
+                },
+                {
+                    type: MENU_ITEM_TYPE.DIVIDER,
+                },
+            );
+        }
+        return [
+            ...defaultMenuSet,
+            ...state.queryMenuSet,
+        ];
+    }),
 });
 
 const dataSourceState = reactive({
@@ -174,25 +169,8 @@ const handleSelectDataSource = (selected: string) => {
 <template>
     <aside class="sidebar-menu">
         <l-s-b :menu-set="state.menuSet">
-            <template #collapsible-contents="{item: collapsible_item}">
-                <div v-if="collapsible_item?.id === STARRED_MENU_ID">
-                    <div v-if="state.starredMenuSet.length > 0">
-                        <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
-                                                :key="idx"
-                                                :item="menu"
-                                                :idx="idx"
-                                                :current-path="state.currentPath"
-                                                is-hide-favorite
-                        />
-                    </div>
-                    <span v-else
-                          class="no-data"
-                    >
-                        {{ $t('COMMON.STARRED_NO_DATA') }}
-                    </span>
-                </div>
-                <p-select-dropdown v-else
-                                   class="select-options-dropdown"
+            <template #collapsible-contents-data-source-dropdown>
+                <p-select-dropdown class="select-options-dropdown"
                                    :menu="dataSourceState.items"
                                    :selected="dataSourceState.selected"
                                    use-fixed-menu-style
@@ -228,19 +206,6 @@ const handleSelectDataSource = (selected: string) => {
 
 <style scoped lang="postcss">
 .sidebar-menu {
-    .no-data {
-        @apply flex items-start text-gray-500 text-label-md;
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-        gap: 0.125rem;
-    }
-    .show-more {
-        margin-left: 0.5rem;
-    }
-    .select-options-dropdown {
-        padding-right: 0.5rem;
-        padding-left: 0.5rem;
-    }
     .selected-item-postfix {
         @apply text-gray-500;
     }
