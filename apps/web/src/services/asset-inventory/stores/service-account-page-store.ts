@@ -12,6 +12,8 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
+import type { BaseInformationForm } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 interface Getters {
     autoSyncAdditionalOptionsSchema: ComputedRef<JsonSchema|undefined>;
@@ -29,6 +31,17 @@ interface State {
     originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
 }
 
+interface FormState {
+    isBaseInformationFormValid: boolean;
+    baseInformation: Partial<BaseInformationForm>;
+    isAutoSyncFormValid: boolean;
+    isAutoSyncEnabled: boolean;
+    additionalOptions: { [key: string]: any };
+    selectedSingleWorkspace: string;
+    skipProjectGroup: boolean;
+    scheduleHours: number[];
+}
+
 const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
 
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
@@ -40,7 +53,10 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         originServiceAccountItem: {},
     });
 
-    const formState = reactive({
+    const formState = reactive<FormState>({
+        // baseInformation
+        isBaseInformationFormValid: true,
+        baseInformation: {} as Partial<BaseInformationForm>,
         // autoSync
         isAutoSyncFormValid: true,
         isAutoSyncEnabled: false,
@@ -62,6 +78,8 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const actions = {
         initState: () => {
             state.selectedProvider = '';
+            formState.baseInformation = {};
+            formState.isBaseInformationFormValid = true;
             formState.isAutoSyncFormValid = true;
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};

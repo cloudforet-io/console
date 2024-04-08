@@ -12,7 +12,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -20,29 +20,22 @@ import TagsInput from '@/common/components/inputs/TagsInput.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import type { BaseInformationForm, ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 
 interface Props {
     schema: any;
-    isValid: boolean;
-    originForm?: Partial<BaseInformationForm>;
-    accountType?: AccountType;
-    isUpdateMode?: boolean;
+    mode: 'CREATE' | 'UPDATE';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     schema: () => ({}),
-    isValid: false,
-    originForm: () => ({}),
-    accountType: ACCOUNT_TYPE.GENERAL,
-    mode: false,
+    mode: 'CREATE',
 });
 
-const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
-    (e:'change', formData: BaseInformationForm): void;
-}>();
+const serviceAccountPageStore = useServiceAccountPageStore();
 
 const {
     forms: { serviceAccountName },
@@ -53,16 +46,27 @@ const {
     serviceAccountName: '',
 }, {
     serviceAccountName: (val: string) => {
-        if (val.length < 2) {
+        if (val?.length < 2) {
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
         } if (state.serviceAccountNames.includes(val)) {
-            if (props.originForm?.accountName === val) return true;
+            if (state.originForm?.accountName === val) return true;
             return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
         }
         return true;
     },
 });
 const state = reactive({
+    serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
+    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    originServiceAccountData: computed<Partial<TrustedAccountModel & ServiceAccountModel>>(() => serviceAccountPageStore.state.originServiceAccountItem),
+    originForm: computed(() => ({
+        accountName: state.originServiceAccountData?.name,
+        customSchemaForm: state.originServiceAccountData?.data,
+        tags: state.originServiceAccountData?.tags,
+        ...((!state.isTrustedAccount && state.originServiceAccountData && ('project_id' in state.originServiceAccountData)) && {
+            projectForm: { selectedProjectId: state.originServiceAccountData?.project_id ?? '' },
+        }),
+    })),
     serviceAccountNames: [] as string[],
     customSchemaForm: {},
     isCustomSchemaFormValid: undefined,
@@ -77,7 +81,7 @@ const state = reactive({
         tags: state.tags,
     })),
     isAllValid: computed(() => (!invalidState.serviceAccountName
-        && ((props.accountType === ACCOUNT_TYPE.TRUSTED) ? true : state.isProjectFormValid)
+        && (state.isTrustedAccount ? true : state.isProjectFormValid)
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
 });
@@ -121,20 +125,24 @@ const handleChangeProjectForm = (projectForm) => {
 
 /* Watcher */
 watch(() => state.isAllValid, (isAllValid) => {
-    emit('update:isValid', isAllValid);
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.isBaseInformationFormValid = isAllValid;
+    });
 }, { immediate: true });
 watch(() => state.formData, (formData) => {
-    emit('change', formData);
+    serviceAccountPageStore.$patch((_state) => {
+        _state.formState.baseInformation = formData;
+    });
 });
-watch(() => props.originForm, (originForm) => {
-    if (!isEmpty(originForm)) initFormData(originForm);
+watch(() => state.originForm, (originForm) => {
+    if (!isEmpty(originForm) && props.mode === 'UPDATE') initFormData(originForm);
 }, { immediate: true });
 
 </script>
 
 <template>
     <div class="service-account-base-information-form">
-        <p-field-group v-if="!props.isUpdateMode"
+        <p-field-group v-if="props.mode === 'CREATE'"
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
                        :invalid="invalidState.serviceAccountName"
                        :invalid-text="invalidTexts.serviceAccountName"
@@ -156,13 +164,13 @@ watch(() => props.originForm, (originForm) => {
                             :language="$store.state.user.language"
                             @validate="handleAccountValidate"
         />
-        <p-field-group v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
+        <p-field-group v-if="!state.isTrustedAccount"
                        class="project-field"
                        required
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
         >
             <service-account-project-form :is-valid.sync="state.isProjectFormValid"
-                                          :project-id="props.originForm?.projectForm?.selectedProjectId ?? ''"
+                                          :project-id="state.originForm?.projectForm?.selectedProjectId ?? ''"
                                           @change="handleChangeProjectForm"
             />
         </p-field-group>
