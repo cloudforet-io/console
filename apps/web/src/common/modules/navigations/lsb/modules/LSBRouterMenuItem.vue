@@ -2,10 +2,12 @@
 import { reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -69,6 +71,13 @@ const getIconName = (icon: LSBIcon): string => {
                  width="1rem"
                  height="1rem"
                  class="icon"
+            />
+            <p-lazy-img
+                v-if="item.imgIcon"
+                :src="assetUrlConverter(item.imgIcon)"
+                width="1rem"
+                height="1rem"
+                class="icon"
             />
             <span class="text">{{ item.label }}</span>
             <slot name="after-text"
