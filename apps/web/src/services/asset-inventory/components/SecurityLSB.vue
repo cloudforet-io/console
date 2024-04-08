@@ -26,7 +26,8 @@ import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store
 import { useSecurityPageStore } from '@/services/asset-inventory/stores/security-page-store';
 import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
-const { getProperRouteLocation } = useProperRouteLocation();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const gnbStore = useGnbStore();
@@ -62,14 +63,14 @@ const state = reactive({
         },
     }))),
     menuSet: computed<LSBItem[]>(() => {
-        const defaultMenuSet: LSBItem[] = [
+        const defaultMenuSet: LSBItem[] = !isAdminMode.value ? [
             {
                 type: MENU_ITEM_TYPE.STARRED,
                 childItems: state.starredMenuItems,
                 currentPath: state.currentPath,
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
-        ];
+        ] : [];
         storeState.cloudServiceTypeList?.forEach((d, index, array) => {
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,

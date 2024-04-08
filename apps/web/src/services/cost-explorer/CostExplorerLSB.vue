@@ -9,7 +9,6 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -43,12 +42,9 @@ const favoriteGetters = favoriteStore.getters;
 const router = useRouter();
 const route = useRoute();
 
-const { getProperRouteLocation } = useProperRouteLocation();
-
-const appContextStore = useAppContextStore();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
 
 const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     favoriteItems: computed(() => favoriteGetters.costAnalysisItems),
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
@@ -108,7 +104,7 @@ const state = reactive({
             },
         ];
 
-        if (!storeState.isAdminMode) {
+        if (!isAdminMode.value) {
             defaultMenuSet.unshift(
                 {
                     type: MENU_ITEM_TYPE.STARRED,

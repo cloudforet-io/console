@@ -39,7 +39,8 @@ const PROVIDER_MENU_ID = 'provider';
 const CATEGORY_MENU_ID = 'category';
 const REGION_MENU_ID = 'region';
 
-const { getProperRouteLocation } = useProperRouteLocation();
+const { getProperRouteLocation, isAdminMode } = useProperRouteLocation();
+
 const gnbStore = useGnbStore();
 const cloudServicePageStore = useCloudServicePageStore();
 const cloudServicePageState = cloudServicePageStore.$state;
@@ -137,14 +138,14 @@ const state = reactive({
         return results;
     }),
     menuSet: computed<LSBMenu[]>(() => {
-        const defaultMenuSet = [
+        const defaultMenuSet = !isAdminMode.value ? [
             {
                 type: MENU_ITEM_TYPE.STARRED,
                 childItems: state.starredMenuItems,
                 currentPath: state.currentPath,
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
-        ];
+        ] : [];
 
         if (state.isCloudServiceDetailPage) {
             return [
@@ -215,6 +216,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 <template>
     <l-s-b :menu-set="state.menuSet"
            class="cloud-service-l-s-b"
+           :class="{'is-admin-mode': isAdminMode, 'is-detail-page': state.isCloudServiceDetailPage}"
     >
         <template #collapsible-contents-provider>
             <p-radio-group direction="vertical"
@@ -263,6 +265,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             .selected-wrapper {
                 @apply block;
             }
+        }
+    }
+    &.is-admin-mode:not(&.is-detail-page) {
+        &:deep(.menu-wrapper) {
+            padding-top: 0.5rem;
         }
     }
     &:deep(.l-s-b-collapsible-menu-item) {
