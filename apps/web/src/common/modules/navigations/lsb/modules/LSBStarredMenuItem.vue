@@ -19,7 +19,6 @@ const props = withDefaults(defineProps<Props>(), {
             <p-i name="ic_multi-favorite"
                  width="1.5rem"
                  height="1.5rem"
-                 color="inherit transparent"
                  class="start-title-button"
             />
             <span>{{ $t('COMMON.STARRED') }}</span>
@@ -49,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
     gap: 0.5rem;
     .title-wrapper {
         @apply flex items-center;
+        padding-left: 0.125rem;
         gap: 0.25rem;
     }
     .contents-wrapper {
