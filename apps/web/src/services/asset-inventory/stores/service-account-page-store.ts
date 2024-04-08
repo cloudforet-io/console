@@ -46,7 +46,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
-        skipProjectGroup: true,
+        skipProjectGroup: false,
         scheduleHours: [] as number[],
     });
 
@@ -66,7 +66,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};
             formState.selectedSingleWorkspace = '';
-            formState.skipProjectGroup = true;
+            formState.skipProjectGroup = false;
             formState.scheduleHours = [];
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
