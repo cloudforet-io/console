@@ -92,7 +92,7 @@ const formState = reactive({
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-        if (!formState.isAutoSyncFormValid && state.isTrustedAccount) return false;
+        if (!formState.isAutoSyncFormValid && state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider) return false;
         return true;
     }),
     formLoading: false,
@@ -279,7 +279,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                     @change="handleChangeCredentialForm"
                 />
             </p-pane-layout>
-            <p-pane-layout v-if="state.isTrustedAccount"
+            <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"
             >
                 <p-heading heading-type="sub"

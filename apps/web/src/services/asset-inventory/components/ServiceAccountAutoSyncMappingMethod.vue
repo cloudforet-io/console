@@ -109,7 +109,7 @@ watch(() => state.formData, (formData) => {
     });
 });
 
-watch(() => serviceAccountPageState.serviceAccountItem, (item) => {
+watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
     if (item) {
         state.workspaceMapping = item.sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
         state.projectGroupMapping = item.sync_options?.skip_project_group ? 'skip' : 'projectGroups';

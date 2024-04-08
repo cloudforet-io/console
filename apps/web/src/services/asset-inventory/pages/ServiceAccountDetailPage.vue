@@ -60,7 +60,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    item: computed(() => serviceAccountPageStore.state.serviceAccountItem),
+    item: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
@@ -104,12 +104,12 @@ const getAccount = async (serviceAccountId: string) => {
             });
         }
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = item;
+            _state.state.originServiceAccountItem = item;
         });
     } catch (e) {
         ErrorHandler.handleError(e);
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = {};
+            _state.state.originServiceAccountItem = {};
         });
     } finally {
         state.loading = false;
@@ -213,7 +213,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                          :editable="!state.isManagedTrustedAccount"
                                          @refresh="handleRefresh"
             />
-            <service-account-auto-sync v-if="state.isTrustedAccount"
+            <service-account-auto-sync v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                                        @refresh="handleRefresh"
             />
         </div>

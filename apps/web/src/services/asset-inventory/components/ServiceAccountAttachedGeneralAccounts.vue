@@ -54,7 +54,7 @@ const state = reactive({
     totalCount: 0,
     pageLimit: 15,
     isSyncEnabled: computed(() => {
-        const isDomainScope = serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN';
+        const isDomainScope = serviceAccountPageStore.state.originServiceAccountItem.resource_group === 'DOMAIN';
         const isAdminMode = appContextStore.getters.isAdminMode;
         if (isDomainScope) {
             return isAdminMode;
@@ -117,7 +117,7 @@ const handleSort = async (sortBy, sortDesc) => {
 const handleSync = async () => {
     try {
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
-            trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_account_id,
+            trusted_account_id: serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id,
         });
         showSuccessMessage('Sync is started.', '');
     } catch (e) {

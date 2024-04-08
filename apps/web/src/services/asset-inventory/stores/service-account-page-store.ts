@@ -20,20 +20,24 @@ interface Getters {
     isAllValidToCreate: ComputedRef<boolean>;
     supportAutoSync: ComputedRef<boolean>;
     isOriginAutoSyncEnabled: ComputedRef<boolean>;
+    isMainProvider: ComputedRef<boolean>;
 }
 
 interface State {
     selectedProvider: string;
     serviceAccountType: AccountType;
-    serviceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
+    originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
 }
+
+const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
+
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
 
     const state = reactive<State>({
         selectedProvider: '',
         serviceAccountType: ACCOUNT_TYPE.GENERAL,
-        serviceAccountItem: {},
+        originServiceAccountItem: {},
     });
 
     const formState = reactive({
@@ -42,7 +46,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAutoSyncEnabled: false,
         additionalOptions: {},
         selectedSingleWorkspace: '',
-        skipProjectGroup: true,
+        skipProjectGroup: false,
         scheduleHours: [] as number[],
     });
 
@@ -52,7 +56,8 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         scheduleHours: computed(() => formState.scheduleHours),
         isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
-        isOriginAutoSyncEnabled: computed(() => (state.serviceAccountItem?.schedule?.state === 'ENABLED')),
+        isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
+        isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
     });
     const actions = {
         initState: () => {
@@ -61,7 +66,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.isAutoSyncEnabled = false;
             formState.additionalOptions = {};
             formState.selectedSingleWorkspace = '';
-            formState.skipProjectGroup = true;
+            formState.skipProjectGroup = false;
             formState.scheduleHours = [];
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
@@ -70,7 +75,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         },
     };
 
-    watch(() => state.serviceAccountItem, (item) => {
+    watch(() => state.originServiceAccountItem, (item) => {
         if (getters.isOriginAutoSyncEnabled) {
             formState.isAutoSyncEnabled = true;
             formState.scheduleHours = item?.schedule?.hours ?? [];
