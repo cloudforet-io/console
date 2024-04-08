@@ -8,6 +8,8 @@ import { range } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import ServiceAccountAutoSyncMappingMethod
+    from '@/services/asset-inventory/components/ServiceAccountAutoSyncMappingMethod.vue';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
 const serviceAccountPageStore = useServiceAccountPageStore();
@@ -34,6 +36,8 @@ const state = reactive({
         <p class="mb-6">
             {{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}
         </p>
+
+        <service-account-auto-sync-mapping-method mode="READ" />
 
         <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">
             <p-field-title label="Hourly Sync Schedule"

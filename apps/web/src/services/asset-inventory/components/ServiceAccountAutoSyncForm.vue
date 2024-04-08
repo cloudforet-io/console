@@ -110,7 +110,7 @@ watch(() => state.isAllValid, (isAllValid) => {
             /><p>{{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}</p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <div v-if="state.isAdminMode && (props.mode === 'CREATE' ? true : state.isDomainScope)">
+            <div v-if="(props.mode === 'CREATE' ? true : state.isDomainScope)">
                 <service-account-auto-sync-mapping-method />
                 <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
                     <p-field-title label="Additional Options"
