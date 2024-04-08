@@ -57,7 +57,7 @@ interface State {
 const storeState = reactive({
     language: computed(() => store.state.user.language),
     currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
-    trustingSecretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustingSecretSchema),
+    trustingSecretSchemaList: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustingSecretSchemaList),
     trustedAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustedAccountSchema),
     generalAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.generalAccountSchema),
     secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
@@ -65,7 +65,7 @@ const storeState = reactive({
     provider: computed(() => serviceAccountPageStore.state.selectedProvider),
 });
 const state = reactive<State>({
-    showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchema),
+    showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchemaList),
     isTrustedAccount: computed<boolean>(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     trustedAccounts: [],
     trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
@@ -235,7 +235,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
 });
 const schemaApiQueryHelper = new ApiQueryHelper();
 const getSecretSchema = async (isTrustingSchema:boolean) => {
-    const trustedAccountRelatedSchemas = isTrustingSchema ? serviceAccountSchemaStore.getters.trustingSecretSchema : (storeState.trustedAccountSchema?.related_schemas ?? []);
+    const trustedAccountRelatedSchemas = isTrustingSchema ? serviceAccountSchemaStore.getters.trustingSecretSchemaList : (storeState.trustedAccountSchema?.related_schemas ?? []);
     const generalAccountRelatedSchemas = storeState.generalAccountSchema?.related_schemas ?? [];
     schemaApiQueryHelper.setFilters([
         { k: 'schema_type', v: isTrustingSchema ? 'TRUSTING_SECRET' : 'SECRET', o: '=' },
