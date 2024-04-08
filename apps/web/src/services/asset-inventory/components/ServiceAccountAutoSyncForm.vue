@@ -34,7 +34,6 @@ const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
-    domainName: computed(() => store.state.domain.name),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
         return serviceAccountPageStore.formState.scheduleHours.map((utcHour) => dayjs.utc()
@@ -107,7 +106,11 @@ watch(() => state.isAllValid, (isAllValid) => {
                              show-state-text
                              position="left"
                              @change-toggle="handleChangeToggle"
-            /><p>{{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}</p>
+            /><p>
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
+                    provider: serviceAccountPageStore.getters.selectedProviderItem.label,
+                }) }}
+            </p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
             <div v-if="(props.mode === 'CREATE' ? true : state.isDomainScope)">
@@ -128,7 +131,7 @@ watch(() => state.isAllValid, (isAllValid) => {
                     </p-pane-layout>
                 </div>
             </div>
-            <p-field-title label="Hourly Sync Schedule"
+            <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.HOURLY_SYNC_SCHEDULE')"
                            size="lg"
                            class="mb-1"
             />

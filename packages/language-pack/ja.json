@@ -2218,6 +2218,14 @@
 				"TITLE": "{type} 追加",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
+			"AUTO_SYNC": {
+				"HOURLY_SYNC_SCHEDULE": "",
+				"MAIN_DESCRIPTION": "",
+				"MAPPING_METHOD": "",
+				"PROJECT_GROUP_MAPPING": "",
+				"SKIP_PROJECT_GROUP_MAPPING": "",
+				"WORKSPACE_MAPPING": ""
+			},
 			"MAIN": {
 				"ACTION": "作業",
 				"ADD": "追加",

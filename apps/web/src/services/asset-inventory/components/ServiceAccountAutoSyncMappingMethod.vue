@@ -142,8 +142,8 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
 </script>
 
 <template>
-    <div class="service-account-auto-sycn-mapping-method">
-        <p-field-title label="Mapping Method"
+    <div class="service-account-auto-sync-mapping-method">
+        <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAPPING_METHOD')"
                        size="lg"
                        class="mb-2"
         />
@@ -156,7 +156,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
             <template #workspace>
                 <div>
                     <div v-if="props.mode === 'UPDATE'">
-                        <p-field-title label="Workspace Mapping"
+                        <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.WORKSPACE_MAPPING')"
                                        size="md"
                                        class="mb-1"
                         />
@@ -199,7 +199,7 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
             </template>
             <template #project_group>
                 <div v-if="props.mode === 'UPDATE'">
-                    <p-field-title label="Project Group Mapping"
+                    <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.PROJECT_GROUP_MAPPING')"
                                    size="md"
                                    class="mb-1"
                     />
@@ -214,12 +214,12 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                         <p-radio v-model="state.projectGroupMapping"
                                  value="skip"
                         >
-                            {{ $t('Skip project group mapping') }}
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.PROJECT_GROUP_MAPPING') }}
                         </p-radio>
                     </div>
                 </div>
                 <div v-else>
-                    {{ serviceAccountPageFormState.skipProjectGroup ? $t('Skip project group mapping') : state.selectedProjectGroupMappingOptionLabel }}
+                    {{ serviceAccountPageFormState.skipProjectGroup ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.PROJECT_GROUP_MAPPING') : state.selectedProjectGroupMappingOptionLabel }}
                 </div>
             </template>
         </mapping-method>

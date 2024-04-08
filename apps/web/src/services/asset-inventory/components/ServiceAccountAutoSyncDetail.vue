@@ -17,7 +17,6 @@ const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const hoursMatrix: number[] = range(24);
 
 const state = reactive({
-    domainName: computed(() => store.state.domain.name),
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     timezoneAppliedHours: computed<number[]>(() => {
@@ -34,13 +33,15 @@ const state = reactive({
 <template>
     <div class="service-account-auto-sync-detail">
         <p class="mb-6">
-            {{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}
+            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
+                provider: serviceAccountPageStore.getters.selectedProviderItem.label,
+            }) }}
         </p>
 
         <service-account-auto-sync-mapping-method mode="READ" />
 
         <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">
-            <p-field-title label="Hourly Sync Schedule"
+            <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.HOURLY_SYNC_SCHEDULE')"
                            size="lg"
                            class="mb-1"
             />

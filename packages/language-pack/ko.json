@@ -2218,6 +2218,14 @@
 				"TITLE": "{type} 생성",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "특정 Trusted Account를 선택하여 연결하게 될 경우, 해당 어카운트의 리소스에 접근할 수 있습니다. "
 			},
+			"AUTO_SYNC": {
+				"HOURLY_SYNC_SCHEDULE": "",
+				"MAIN_DESCRIPTION": "",
+				"MAPPING_METHOD": "",
+				"PROJECT_GROUP_MAPPING": "",
+				"SKIP_PROJECT_GROUP_MAPPING": "",
+				"WORKSPACE_MAPPING": ""
+			},
 			"MAIN": {
 				"ACTION": "작업",
 				"ADD": "추가",
