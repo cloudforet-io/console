@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
 import {
-    computed, reactive, watch, onMounted,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -48,7 +48,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
-import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
 import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
@@ -136,10 +135,6 @@ const tableState = reactive({
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
-});
-
-const modalState = reactive({
-    addClusterModalVisible: false,
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -260,12 +255,6 @@ const handleDynamicLayoutFetch = (changed) => {
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
-const handleCloseAddClusterModal = () => {
-    router.replace(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-        query: { provider: 'kubernetes' },
-    }));
-};
 
 /** ******* Page Init ******* */
 
@@ -309,13 +298,6 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
     serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
     if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
 })();
-
-onMounted(() => {
-    if (query.kubernetesAccountId) {
-        modalState.addClusterModalVisible = true;
-    }
-});
-
 
 </script>
 
@@ -393,9 +375,6 @@ onMounted(() => {
                             :options="{provider: state.selectedProvider}"
                             @update:visible="handleVisibleCustomFieldModal"
                             @complete="reloadTable"
-        />
-        <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
-                                           @close="handleCloseAddClusterModal"
         />
     </section>
 </template>

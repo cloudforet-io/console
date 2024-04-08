@@ -2,6 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import { PDataLoader, PDefinitionTable, PStatus } from '@spaceone/design-system';
+import type { StatusProps } from '@spaceone/design-system/types/data-display/status/type';
 
 const state = reactive({
     fields: computed(() => [
@@ -27,7 +28,7 @@ const state = reactive({
     })),
 });
 
-const connectedStatusFormatter = (value: string) => ({
+const connectedStatusFormatter = (value: string): StatusProps => ({
     theme: value === 'ENABLED' ? 'green' : 'gray',
     text: value === 'ENABLED' ? 'Connected' : 'Disconnected',
 });
