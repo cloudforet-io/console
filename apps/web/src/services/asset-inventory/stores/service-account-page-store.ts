@@ -20,6 +20,7 @@ interface Getters {
     isAllValidToCreate: ComputedRef<boolean>;
     supportAutoSync: ComputedRef<boolean>;
     isOriginAutoSyncEnabled: ComputedRef<boolean>;
+    isMainProvider: ComputedRef<boolean>;
 }
 
 interface State {
@@ -27,6 +28,9 @@ interface State {
     serviceAccountType: AccountType;
     originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
 }
+
+const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
+
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
 
@@ -53,6 +57,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
         isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
+        isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
     });
     const actions = {
         initState: () => {
