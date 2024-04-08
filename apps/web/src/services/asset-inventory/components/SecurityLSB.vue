@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PDataLoader } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -12,6 +11,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
@@ -33,6 +33,8 @@ const gnbStore = useGnbStore();
 const securityPageStore = useSecurityPageStore();
 const securityPageGetters = securityPageStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const route = useRoute();
 const router = useRouter();
@@ -41,12 +43,33 @@ const storeState = reactive({
     loading: computed(() => securityPageGetters.loading),
     cloudServiceTypeList: computed(() => securityPageGetters.cloudServiceTypeList),
     selectedCloudServiceType: computed(() => securityPageGetters.selectedCloudServiceType),
+    favoriteItems: computed(() => favoriteGetters.securityItems),
 });
 const state = reactive({
-    currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    currentPath: computed(() => route.fullPath),
     pageParams: computed<CloudServiceDetailPageParams|undefined>(() => route.params as unknown as CloudServiceDetailPageParams),
+    starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        label: `[${allReferenceGetters.provider[d.provider].label}] ${d.label}`,
+        id: d.itemId,
+        to: getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME,
+            params: { group: d.parents[0].name, provider: d.provider, name: d.label },
+        }),
+        favoriteOptions: {
+            type: FAVORITE_TYPE.SECURITY,
+            id: d.itemId,
+        },
+    }))),
     menuSet: computed<LSBItem[]>(() => {
-        const defaultMenuSet: LSBItem[] = [];
+        const defaultMenuSet: LSBItem[] = [
+            {
+                type: MENU_ITEM_TYPE.STARRED,
+                childItems: state.starredMenuItems,
+                currentPath: state.currentPath,
+            },
+            { type: MENU_ITEM_TYPE.DIVIDER },
+        ];
         storeState.cloudServiceTypeList?.forEach((d, index, array) => {
             defaultMenuSet.push({
                 type: MENU_ITEM_TYPE.TOP_TITLE,
