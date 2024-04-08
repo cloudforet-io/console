@@ -18,7 +18,6 @@ import type { LSBMenu, LSBIcon } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
     item: LSBMenu;
-    depth?: number;
     isAdminMode?: boolean;
     idx?: number | string;
     currentPath?: string;
@@ -54,7 +53,7 @@ const getIconName = (icon: LSBIcon): string => {
 
 <template>
     <router-link class="l-s-b-router-menu-item "
-                 :class="[{'second-depth': depth === 2, 'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
+                 :class="[{'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
                  :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click.native="$event.stopImmediatePropagation()"
@@ -115,9 +114,6 @@ const getIconName = (icon: LSBIcon): string => {
     outline: 0;
     height: 2rem;
 
-    &.second-depth {
-        padding-left: 1.25rem;
-    }
     &:focus, &:focus-within, &:active {
         @apply bg-white border-secondary1;
         box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);

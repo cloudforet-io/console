@@ -18,13 +18,11 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 interface Props {
     menuData: LSBMenu;
     currentPath: string;
-    depth: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
     menuData: () => ({}) as LSBItem,
     currentPath: undefined,
-    depth: 1,
 });
 const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
 const appContextStore = useAppContextStore();
@@ -69,29 +67,16 @@ const handleSelect = (id: string, selected: string) => {
             <l-s-b-collapsible-menu-item v-else-if="item.type === MENU_ITEM_TYPE.COLLAPSIBLE"
                                          :item="item"
             >
-                <template v-for="(_, slot) of $scopedSlots"
-                          #[slot]="scope"
-                >
-                    <slot :name="slot"
-                          v-bind="scope"
-                    />
+                <template #collapsible-contents>
+                    <slot :name="`collapsible-contents-${item.id}`" />
                 </template>
             </l-s-b-collapsible-menu-item>
             <l-s-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM"
                                     :item="item"
-                                    :depth="depth"
                                     :is-admin-mode="state.isAdminMode"
                                     :idx="idx"
                                     :current-path="currentPath"
-            >
-                <template v-for="(_, slot) of $scopedSlots"
-                          #[slot]="scope"
-                >
-                    <slot :name="slot"
-                          v-bind="scope"
-                    />
-                </template>
-            </l-s-b-router-menu-item>
+            />
         </div>
     </div>
 </template>

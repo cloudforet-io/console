@@ -48,7 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
     gap: 0.5rem;
     .title-wrapper {
         @apply flex items-center;
-        padding-left: 0.125rem;
+        padding-right: 0.875rem;
+        padding-left: 0.375rem;
         gap: 0.25rem;
     }
     .contents-wrapper {
