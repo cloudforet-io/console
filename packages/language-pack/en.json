@@ -2862,7 +2862,6 @@
 		"DASHBOARDS_PROJECT": "Project Dashboard",
 		"DASHBOARDS_WORKSPACE": "Workspace Dashboard",
 		"DISMISS": "Dismiss",
-		"HOME_DASHBOARD": "Home",
 		"INFO": "Info",
 		"INFO_NOTICE": "Notice",
 		"LEARN_MORE": "Learn more",
@@ -2872,7 +2871,8 @@
 		"MY_PAGE_API_KEY": "Access with API & CLI",
 		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
 		"PROJECT": "Project",
-		"PROVIDER": "Provider"
+		"PROVIDER": "Provider",
+		"WORKSPACE_HOME": "Home"
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following member from project? ",
 	"MODAL_DELETE_MEMBER_TITLE": "Delete Member",

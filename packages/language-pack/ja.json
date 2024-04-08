@@ -2862,7 +2862,6 @@
 		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
 		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",
 		"DISMISS": "閉じる",
-		"HOME_DASHBOARD": "ホーム",
 		"INFO": "情報",
 		"INFO_NOTICE": "お知らせ",
 		"LEARN_MORE": "詳細はこちら",
@@ -2872,7 +2871,8 @@
 		"MY_PAGE_API_KEY": "アクセス設定(API&CLI)",
 		"MY_PAGE_NOTIFICATIONS": "お知らせチャンネル",
 		"PROJECT": "プロジェクト",
-		"PROVIDER": "プロバイダー"
+		"PROVIDER": "プロバイダー",
+		"WORKSPACE_HOME": "ホーム"
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "選択したメンバーをプロジェクトから削除しますか？",
 	"MODAL_DELETE_MEMBER_TITLE": "メンバー削除",

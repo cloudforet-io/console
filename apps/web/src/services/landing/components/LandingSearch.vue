@@ -10,8 +10,8 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 const FOCUS_DIRECTION = {
     UPWARD: 'UPWARD',
@@ -54,7 +54,7 @@ const handleSearch = (val) => {
     if (!searchedItem) return;
     landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(searchedItem.workspace_id);
-    router.replace({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: searchedItem.workspace_id } });
+    router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: searchedItem.workspace_id } });
 };
 </script>
 

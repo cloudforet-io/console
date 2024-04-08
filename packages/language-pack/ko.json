@@ -2862,7 +2862,6 @@
 		"DASHBOARDS_PROJECT": "프로젝트 대시보드",
 		"DASHBOARDS_WORKSPACE": "워크스페이스 대시보드",
 		"DISMISS": "닫기",
-		"HOME_DASHBOARD": "홈",
 		"INFO": "정보",
 		"INFO_NOTICE": "공지사항 ",
 		"LEARN_MORE": "더보기",
@@ -2872,7 +2871,8 @@
 		"MY_PAGE_API_KEY": "API & CLI 설정",
 		"MY_PAGE_NOTIFICATIONS": "알림 채널",
 		"PROJECT": "프로젝트",
-		"PROVIDER": "프로바이더"
+		"PROVIDER": "프로바이더",
+		"WORKSPACE_HOME": "홈"
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "선택한 멤버를 프로젝트에서 제거하시겠습니까?",
 	"MODAL_DELETE_MEMBER_TITLE": "멤버 제거 ",

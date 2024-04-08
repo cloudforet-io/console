@@ -7,15 +7,14 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
-import AllSummary from '@/services/home-dashboard/components/AllSummary.vue';
-import CollectorProgress from '@/services/home-dashboard/components/CollectingProgress.vue';
+import AllSummary from '@/services/workspace-home/components/AllSummary.vue';
+import CollectorProgress from '@/services/workspace-home/components/CollectingProgress.vue';
 import PersonalHealthDashboard
-    from '@/services/home-dashboard/components/PersonalHealthDashboard.vue';
-import ResourceMap from '@/services/home-dashboard/components/ResourceMap.vue';
-import ServiceAccounts from '@/services/home-dashboard/components/ServiceAccounts.vue';
-import TopProjects from '@/services/home-dashboard/components/TopProjects.vue';
-import TrustedAdvisor from '@/services/home-dashboard/components/TrustedAdvisor.vue';
-
+    from '@/services/workspace-home/components/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/workspace-home/components/ResourceMap.vue';
+import ServiceAccounts from '@/services/workspace-home/components/ServiceAccounts.vue';
+import TopProjects from '@/services/workspace-home/components/TopProjects.vue';
+import TrustedAdvisor from '@/services/workspace-home/components/TrustedAdvisor.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
@@ -25,7 +24,7 @@ const storeState = reactive({
 
 <template>
     <general-page-layout :key="storeState.currentWorkspaceId"
-                         class="home-dashboard"
+                         class="workspace-home-page"
     >
         <div class="col-span-12 lg:col-span-9
                     widget-wrapper"
@@ -58,7 +57,7 @@ const storeState = reactive({
 </template>
 
 <style lang="postcss" scoped>
-.home-dashboard {
+.workspace-home-page {
     @apply bg-gray-100;
     height: auto;
 
