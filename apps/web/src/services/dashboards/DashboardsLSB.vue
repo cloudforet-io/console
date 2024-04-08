@@ -4,7 +4,6 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -23,8 +22,9 @@ import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
+import { gray } from '@/styles/colors';
+
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 const route = useRoute();
 
@@ -51,6 +51,11 @@ const state = reactive({
         });
         return result;
     }),
+    starredMenuItems: computed<LSBMenu[]>(() => [
+        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceMenuSet) : []),
+        ...filterStarredItems(state.projectMenuSet),
+        ...filterStarredItems(state.privateMenuSet),
+    ]),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.public_dashboard_id,
@@ -81,7 +86,21 @@ const state = reactive({
             id: d.public_dashboard_id,
         },
     }))),
-    projectMenuSet: computed<LSBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
+    projectMenuSet: computed<LSBMenu[]>(() => dashboardGetters.projectItems.map((d) => ({
+        type: MENU_ITEM_TYPE.ITEM,
+        id: d.public_dashboard_id,
+        label: d.name,
+        to: getProperRouteLocation({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: d.public_dashboard_id,
+            },
+        }),
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.public_dashboard_id,
+        },
+    }))),
     privateMenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
         id: d.private_dashboard_id,
@@ -92,6 +111,10 @@ const state = reactive({
                 dashboardId: d.private_dashboard_id,
             },
         }),
+        icon: {
+            name: 'ic_lock-filled',
+            color: gray[500],
+        },
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
             id: d.private_dashboard_id,
@@ -101,7 +124,7 @@ const state = reactive({
         const defaultMenuSet = [
             {
                 type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuSet,
+                childItems: state.starredMenuItems,
                 currentPath: state.currentPath,
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
@@ -117,6 +140,10 @@ const state = reactive({
                 icon: 'ic_dots-4-square',
             },
             { type: MENU_ITEM_TYPE.DIVIDER },
+            {
+                type: MENU_ITEM_TYPE.TOP_TITLE,
+                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'),
+            },
         ];
 
         if (isAdminMode.value) {
@@ -125,81 +152,15 @@ const state = reactive({
                 ...state.domainMenuSet,
             ];
         }
+
         return [
             ...defaultMenuSet,
-            ...(storeState.isWorkspaceOwner ? filterLSBItemsByPagePermission('WORKSPACE', filterMenuItems(state.workspaceMenuSet)) : []),
-            ...filterLSBItemsByPagePermission('PROJECT', filterMenuItems(state.projectMenuSet)),
-            ...filterLSBItemsByPagePermission('PRIVATE', filterMenuItems(state.privateMenuSet)),
+            ...(storeState.isWorkspaceOwner ? filterMenuItems(state.workspaceMenuSet) : []),
+            ...filterMenuItems(state.projectMenuSet),
+            ...filterMenuItems(state.privateMenuSet),
         ];
     }),
-    starredMenuSet: computed<LSBMenu[]>(() => [
-        ...(storeState.isWorkspaceOwner ? filterStarredItems(state.workspaceMenuSet) : []),
-        ...filterStarredItems(state.projectMenuSet),
-        ...filterStarredItems(state.privateMenuSet),
-    ]),
 });
-
-const filterLSBItemsByPagePermission = (scope: DashboardScope, items: LSBMenu[]): LSBMenu[] => {
-    let label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
-    if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PROJECT');
-    else if (scope === 'PRIVATE') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-    const topTitle: LSBMenu = {
-        type: MENU_ITEM_TYPE.TOP_TITLE,
-        label,
-    };
-    if (scope === 'PRIVATE') {
-        topTitle.icon = {
-            name: 'ic_lock-filled',
-            color: 'gray900',
-        };
-    }
-    return [topTitle, ...items];
-};
-
-const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LSBMenu[] => {
-    const dashboardItemsWithGroup = {} as Record<string, PublicDashboardModel[]>;
-    dashboardList.forEach((d) => {
-        const projectGroupLabel: string = storeState.projects[d.project_id]?.label || d.project_id;
-        if (dashboardItemsWithGroup[projectGroupLabel]) {
-            dashboardItemsWithGroup[projectGroupLabel].push(d);
-        } else {
-            dashboardItemsWithGroup[projectGroupLabel] = [d];
-        }
-    });
-
-    // Result to return
-    const result = [] as LSBMenu[];
-
-    // The mapped group items are in the form of an array along with the title, and each item is mapped to LNBItem type and pushed to result.
-    Object.keys(dashboardItemsWithGroup).forEach((d) => {
-        result.push([
-            {
-                type: MENU_ITEM_TYPE.TITLE,
-                label: d,
-                id: d,
-                foldable: true,
-            },
-            ...dashboardItemsWithGroup[d].map((board) => ({
-                type: MENU_ITEM_TYPE.ITEM,
-                id: board.public_dashboard_id,
-                label: board.name,
-                to: getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: {
-                        dashboardId: board.public_dashboard_id,
-                    },
-                }),
-                favoriteOptions: {
-                    type: FAVORITE_TYPE.DASHBOARD,
-                    id: board.public_dashboard_id,
-                },
-            })),
-        ]);
-    });
-
-    // Return LNBMenu type as (LNBItem | LNBItem[])[]
-    return result;
-};
 
 const filterStarredItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
