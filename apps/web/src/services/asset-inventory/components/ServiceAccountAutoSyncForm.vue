@@ -30,7 +30,7 @@ const props = defineProps<{
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isDomainScope: computed(() => serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN'),
+    isDomainScope: computed(() => serviceAccountPageStore.state.originServiceAccountItem.resource_group === 'DOMAIN'),
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),

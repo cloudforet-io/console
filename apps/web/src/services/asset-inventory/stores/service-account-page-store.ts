@@ -25,7 +25,7 @@ interface Getters {
 interface State {
     selectedProvider: string;
     serviceAccountType: AccountType;
-    serviceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
+    originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
 }
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -33,7 +33,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const state = reactive<State>({
         selectedProvider: '',
         serviceAccountType: ACCOUNT_TYPE.GENERAL,
-        serviceAccountItem: {},
+        originServiceAccountItem: {},
     });
 
     const formState = reactive({
@@ -52,7 +52,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         scheduleHours: computed(() => formState.scheduleHours),
         isAllValidToCreate: computed(() => getters.isAutoSyncFormValid),
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
-        isOriginAutoSyncEnabled: computed(() => (state.serviceAccountItem?.schedule?.state === 'ENABLED')),
+        isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
     });
     const actions = {
         initState: () => {
@@ -70,7 +70,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         },
     };
 
-    watch(() => state.serviceAccountItem, (item) => {
+    watch(() => state.originServiceAccountItem, (item) => {
         if (getters.isOriginAutoSyncEnabled) {
             formState.isAutoSyncEnabled = true;
             formState.scheduleHours = item?.schedule?.hours ?? [];

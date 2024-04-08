@@ -54,13 +54,13 @@ const handleClickCancelButton = () => {
     state.mode = 'READ';
 };
 const handleClickSaveButton = async () => {
-    if (!serviceAccountPageState.serviceAccountItem.trusted_account_id) return;
+    if (!serviceAccountPageState.originServiceAccountItem.trusted_account_id) return;
     try {
         await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-            trusted_account_id: serviceAccountPageState.serviceAccountItem.trusted_account_id,
-            name: serviceAccountPageState.serviceAccountItem.name,
-            data: serviceAccountPageState.serviceAccountItem.data,
-            tags: serviceAccountPageState.serviceAccountItem.tags,
+            trusted_account_id: serviceAccountPageState.originServiceAccountItem.trusted_account_id,
+            name: serviceAccountPageState.originServiceAccountItem.name,
+            data: serviceAccountPageState.originServiceAccountItem.data,
+            tags: serviceAccountPageState.originServiceAccountItem.tags,
             schedule: {
                 state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
                 hours: serviceAccountPageFormState.scheduleHours,

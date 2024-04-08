@@ -60,7 +60,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    item: computed(() => serviceAccountPageStore.state.serviceAccountItem),
+    item: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
