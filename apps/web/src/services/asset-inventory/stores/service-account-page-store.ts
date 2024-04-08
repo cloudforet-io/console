@@ -12,7 +12,7 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
-import type { BaseInformationForm } from '@/services/asset-inventory/types/service-account-page-type';
+import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 interface Getters {
@@ -34,6 +34,8 @@ interface State {
 interface FormState {
     isBaseInformationFormValid: boolean;
     baseInformation: Partial<BaseInformationForm>;
+    isCredentialFormValid: boolean;
+    credential: Partial<CredentialForm>;
     isAutoSyncFormValid: boolean;
     isAutoSyncEnabled: boolean;
     additionalOptions: { [key: string]: any };
@@ -56,7 +58,10 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const formState = reactive<FormState>({
         // baseInformation
         isBaseInformationFormValid: true,
-        baseInformation: {} as Partial<BaseInformationForm>,
+        baseInformation: {},
+        // credential
+        isCredentialFormValid: true,
+        credential: {},
         // autoSync
         isAutoSyncFormValid: true,
         isAutoSyncEnabled: false,
