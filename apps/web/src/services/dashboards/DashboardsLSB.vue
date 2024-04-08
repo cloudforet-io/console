@@ -121,13 +121,7 @@ const state = reactive({
         },
     }))),
     menuSet: computed<LSBMenu[]>(() => {
-        const defaultMenuSet = [
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
+        const defaultMenuSet: LSBMenu[] = [
             {
                 type: MENU_ITEM_TYPE.ITEM,
                 label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
@@ -152,6 +146,15 @@ const state = reactive({
                 ...state.domainMenuSet,
             ];
         }
+
+        defaultMenuSet.unshift(
+            {
+                type: MENU_ITEM_TYPE.STARRED,
+                childItems: state.starredMenuItems,
+                currentPath: state.currentPath,
+            },
+            { type: MENU_ITEM_TYPE.DIVIDER },
+        );
 
         return [
             ...defaultMenuSet,
