@@ -2220,10 +2220,12 @@
 			},
 			"AUTO_SYNC": {
 				"HOURLY_SYNC_SCHEDULE": "Hourly Sync Schedule",
+				"LAST_SYNCED": "Last Synced",
 				"MAIN_DESCRIPTION": "Automatically synchronize {provider} account hierarchy with SpaceONE system",
 				"MAPPING_METHOD": "Mapping Method",
 				"PROJECT_GROUP_MAPPING": "Project Group Mapping",
 				"SKIP_PROJECT_GROUP_MAPPING": "Skip project group mapping",
+				"SYNC_TITLE": "Do you want to sync now?",
 				"WORKSPACE_MAPPING": "Workspace Mapping"
 			},
 			"MAIN": {
