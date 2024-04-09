@@ -2186,7 +2186,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "서비스 어카운트 생성 실패",
 				"ALT_S_CREATE_ACCOUNT_DESC": "서비스 어카운트 등록 완료",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "서비스 어카운트 추가 완료",
-				"AUTO_SYNC_TITLE": "",
+				"AUTO_SYNC_TITLE": "자동 동기화",
 				"BASE_NAME_PLACEHOLDER": "서비스 어카운트 이름",
 				"BASE_TITLE": "기본 정보",
 				"CANCEL": "취소",
@@ -2219,12 +2219,12 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "특정 Trusted Account를 선택하여 연결하게 될 경우, 해당 어카운트의 리소스에 접근할 수 있습니다. "
 			},
 			"AUTO_SYNC": {
-				"HOURLY_SYNC_SCHEDULE": "",
-				"MAIN_DESCRIPTION": "",
-				"MAPPING_METHOD": "",
-				"PROJECT_GROUP_MAPPING": "",
-				"SKIP_PROJECT_GROUP_MAPPING": "",
-				"WORKSPACE_MAPPING": ""
+				"HOURLY_SYNC_SCHEDULE": "시간 주기 수집 스케줄 ",
+				"MAIN_DESCRIPTION": "{provider} 계정 계층구조를 SpaceONE 시스템에 자동 매핑 하기 ",
+				"MAPPING_METHOD": "매핑 방식",
+				"PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑",
+				"SKIP_PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑 제외",
+				"WORKSPACE_MAPPING": "워크스페이스 매핑"
 			},
 			"MAIN": {
 				"ACTION": "작업",
@@ -2733,12 +2733,12 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"CREATE": {
-				"COMPLETE_MODAL_SYNC": "",
-				"TIMEZONE": ""
+				"COMPLETE_MODAL_SYNC": "동기화",
+				"TIMEZONE": "타임존: {timezone}, 최대: 2개 시간 선택 가능"
 			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "해당 어카운트는 현재 다음의 어카운트들에 연결되어 있습니다.",
-				"TITLE": ""
+				"TITLE": "연결된 계정이 있어 삭제가 불가합니다."
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "어카운트 타입",
@@ -2754,15 +2754,15 @@
 				"CONNECT_TO_CONSOLE": "콘솔 연결",
 				"CREDENTIALS_LABEL": "Trusted Account를 연결하시겠습니까?",
 				"EDIT": "수정",
-				"EDIT_SERVICE_ACCOUNT_NAME": "",
-				"NAME": "",
+				"EDIT_SERVICE_ACCOUNT_NAME": "서비스 어카운트 이름 수정",
+				"NAME": "서비스 어카운트 이름",
 				"NO_CREDENTIALS": "암호화 키가 등록되어 있지 않습니다.",
 				"PROJECT_REQUIRED_HELP_TEXT": "이제, 서비스 어카운트에 반드시 하나의 프로젝트를 연결해주어야 합니다. \n( 이후, 랜덤으로 생성된 프로젝트가 강제로 연결될 수 있습니다. ) ",
 				"REQUIRED": "프로젝트 추가 필요",
 				"SAVE": "변경 저장 ",
-				"SYNC_NOW": "",
+				"SYNC_NOW": "동기화",
 				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account의 암호화 키는 다른 General Account로부터의 참조를 허용합니다.",
-				"UPDATE_SUCCESS": ""
+				"UPDATE_SUCCESS": "자동 동기화 설정 변경 완료"
 			}
 		}
 	},

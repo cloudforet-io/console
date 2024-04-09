@@ -2186,7 +2186,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
 				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
-				"AUTO_SYNC_TITLE": "",
+				"AUTO_SYNC_TITLE": "オートシンク",
 				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
 				"BASE_TITLE": "基本情報",
 				"CANCEL": "キャンセル",
@@ -2219,12 +2219,12 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"AUTO_SYNC": {
-				"HOURLY_SYNC_SCHEDULE": "",
-				"MAIN_DESCRIPTION": "",
-				"MAPPING_METHOD": "",
-				"PROJECT_GROUP_MAPPING": "",
-				"SKIP_PROJECT_GROUP_MAPPING": "",
-				"WORKSPACE_MAPPING": ""
+				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",
+				"MAIN_DESCRIPTION": "{provider}のアカウント階層をSpaceONEシステムと自動的に同期させます。",
+				"MAPPING_METHOD": "マッピング方法",
+				"PROJECT_GROUP_MAPPING": "プロジェクトグループマッピング",
+				"SKIP_PROJECT_GROUP_MAPPING": "プロジェクトグループマッピングをスキップ",
+				"WORKSPACE_MAPPING": "ワークスペースマッピング "
 			},
 			"MAIN": {
 				"ACTION": "作業",
@@ -2733,12 +2733,12 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"CREATE": {
-				"COMPLETE_MODAL_SYNC": "",
-				"TIMEZONE": ""
+				"COMPLETE_MODAL_SYNC": "今すぐ同期",
+				"TIMEZONE": "タイムゾーン: {timezone}、最大: 2回"
 			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
-				"TITLE": ""
+				"TITLE": "添付されたアカウントがあるため、このアカウントを削除できません。"
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",
@@ -2754,15 +2754,15 @@
 				"CONNECT_TO_CONSOLE": "コンソールへの接続",
 				"CREDENTIALS_LABEL": "既存のTrustedAccountにアタッチしますか？",
 				"EDIT": "編集する",
-				"EDIT_SERVICE_ACCOUNT_NAME": "",
-				"NAME": "",
+				"EDIT_SERVICE_ACCOUNT_NAME": "サービスアカウント名を編集",
+				"NAME": "サービスアカウント名",
 				"NO_CREDENTIALS": "暗号化キーが見つかりません。",
 				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
 				"REQUIRED": "プロジェクトの追加が必要です",
 				"SAVE": "変更を保存",
-				"SYNC_NOW": "",
+				"SYNC_NOW": "今すぐ同期",
 				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。",
-				"UPDATE_SUCCESS": ""
+				"UPDATE_SUCCESS": "オートシンク設定が正常に変更されました。"
 			}
 		}
 	},
