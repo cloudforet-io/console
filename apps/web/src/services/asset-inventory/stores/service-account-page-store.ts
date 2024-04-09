@@ -9,6 +9,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { IdentityJobListParameters } from '@/schema/identity/job/api-verbs/list';
 import type { IdentityJobModel } from '@/schema/identity/job/model';
+import type { IdentityJobStatus } from '@/schema/identity/job/type';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
@@ -30,7 +31,10 @@ interface Getters {
     supportAutoSync: ComputedRef<boolean>;
     isOriginAutoSyncEnabled: ComputedRef<boolean>;
     isMainProvider: ComputedRef<boolean>;
-    lastSynced: ComputedRef<string>;
+    lastSuccessSynced: ComputedRef<string>;
+    lastJob: ComputedRef<IdentityJobModel>;
+    secondToLastJob: ComputedRef<IdentityJobModel>;
+    lastJobStatus: ComputedRef<IdentityJobStatus>;
 }
 
 interface State {
@@ -89,7 +93,10 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
         isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
         isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
-        lastSynced: computed(() => (state.syncJobList ?? []).find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),
+        lastSuccessSynced: computed(() => state.syncJobList.find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),
+        lastJob: computed(() => state.syncJobList[0]),
+        secondToLastJob: computed(() => state.syncJobList[1]),
+        lastJobStatus: computed(() => state.syncJobList[0]?.status),
     });
     const actions = {
         initState: () => {
@@ -129,6 +136,12 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = item?.sync_options?.skip_project_group ?? false;
             formState.additionalOptions = item?.plugin_options ?? {};
+        } else {
+            formState.isAutoSyncEnabled = false;
+            formState.scheduleHours = [];
+            formState.selectedSingleWorkspace = '';
+            formState.skipProjectGroup = false;
+            formState.additionalOptions = {};
         }
     });
     return {
