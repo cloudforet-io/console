@@ -8,6 +8,7 @@ import {
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
+import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
 import ServiceAccountConnectClusterDetail
     from '@/services/asset-inventory/components/ServiceAccountConnectClusterDetail.vue';
 
@@ -26,6 +27,14 @@ const state = reactive({
     title: computed(() => (state.appCreated ? i18n.t('Connected Cluster') : i18n.t('Connect Cluster'))),
     connected: computed(() => true),
 });
+
+const modalState = reactive({
+    addClusterModalVisible: false,
+});
+
+const handleOpenAddClusterModal = () => {
+    modalState.addClusterModalVisible = true;
+};
 
 </script>
 
@@ -74,18 +83,20 @@ const state = reactive({
                         >
                     </template>
                     <p class="empty-text">
-                        A cluster has not been connected yet.
+                        {{ $t('A cluster has not been connected yet.') }}
                     </p>
                     <template #button>
                         <p-button style-type="primary"
                                   icon-left="ic_plus_bold"
+                                  @click="handleOpenAddClusterModal"
                         >
-                            Connect Cluster
+                            {{ $t('Connect Cluster') }}
                         </p-button>
                     </template>
                 </p-empty>
             </div>
         </div>
+        <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible" />
     </p-pane-layout>
 </template>
 
