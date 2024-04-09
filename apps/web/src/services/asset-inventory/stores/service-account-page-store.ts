@@ -4,6 +4,11 @@ import { computed, reactive, watch } from 'vue';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { defineStore } from 'pinia';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { IdentityJobListParameters } from '@/schema/identity/job/api-verbs/list';
+import type { IdentityJobModel } from '@/schema/identity/job/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
@@ -11,6 +16,8 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
@@ -23,12 +30,14 @@ interface Getters {
     supportAutoSync: ComputedRef<boolean>;
     isOriginAutoSyncEnabled: ComputedRef<boolean>;
     isMainProvider: ComputedRef<boolean>;
+    lastSynced: ComputedRef<string>;
 }
 
 interface State {
     selectedProvider: string;
     serviceAccountType: AccountType;
     originServiceAccountItem: Partial<TrustedAccountModel & ServiceAccountModel>; // for detail page
+    syncJobList: IdentityJobModel[];
 }
 
 interface FormState {
@@ -53,6 +62,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         selectedProvider: '',
         serviceAccountType: ACCOUNT_TYPE.GENERAL,
         originServiceAccountItem: {},
+        syncJobList: [],
     });
 
     const formState = reactive<FormState>({
@@ -79,6 +89,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         supportAutoSync: computed(() => !!getters.selectedProviderItem?.data?.options?.support_auto_sync),
         isOriginAutoSyncEnabled: computed(() => (state.originServiceAccountItem?.schedule?.state === 'ENABLED')),
         isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
+        lastSynced: computed(() => (state.syncJobList ?? []).find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),
     });
     const actions = {
         initState: () => {
@@ -91,10 +102,23 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.selectedSingleWorkspace = '';
             formState.skipProjectGroup = false;
             formState.scheduleHours = [];
+            state.syncJobList = [];
         },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
         setFormState: (key:string, data: any) => {
             formState[key] = data;
+        },
+        fetchSyncJobList: async (trustedAccountId: string) => {
+            try {
+                // fetch recent job
+                const { results } = await SpaceConnector.clientV2.identity.job.list<IdentityJobListParameters, ListResponse<IdentityJobModel>>({
+                    trusted_account_id: trustedAccountId,
+                });
+                state.syncJobList = results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.syncJobList = [];
+            }
         },
     };
 
