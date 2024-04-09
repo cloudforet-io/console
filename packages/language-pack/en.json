@@ -2219,12 +2219,14 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
 			"AUTO_SYNC": {
+				"ERROR_FOUND": "Error Found",
 				"HOURLY_SYNC_SCHEDULE": "Hourly Sync Schedule",
 				"LAST_SYNCED": "Last Synced",
 				"MAIN_DESCRIPTION": "Automatically synchronize {provider} account hierarchy with SpaceONE system",
 				"MAPPING_METHOD": "Mapping Method",
 				"PROJECT_GROUP_MAPPING": "Project Group Mapping",
 				"SKIP_PROJECT_GROUP_MAPPING": "Skip project group mapping",
+				"SYNC_ERROR_MODAL_TITLE": "Auto Sync Error Details",
 				"SYNC_TITLE": "Do you want to sync now?",
 				"WORKSPACE_MAPPING": "Workspace Mapping"
 			},
