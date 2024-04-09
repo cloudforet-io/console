@@ -129,6 +129,12 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.selectedSingleWorkspace = item?.sync_options?.single_workspace_id ?? '';
             formState.skipProjectGroup = item?.sync_options?.skip_project_group ?? false;
             formState.additionalOptions = item?.plugin_options ?? {};
+        } else {
+            formState.isAutoSyncEnabled = false;
+            formState.scheduleHours = [];
+            formState.selectedSingleWorkspace = '';
+            formState.skipProjectGroup = false;
+            formState.additionalOptions = {};
         }
     });
     return {

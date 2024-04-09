@@ -38,7 +38,9 @@ const state = reactive({
             }) }}
         </p>
 
-        <service-account-auto-sync-mapping-method mode="READ" />
+        <service-account-auto-sync-mapping-method v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                                                  mode="READ"
+        />
 
         <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled">
             <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.HOURLY_SYNC_SCHEDULE')"
