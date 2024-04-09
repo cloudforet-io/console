@@ -131,7 +131,7 @@ import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/ty
 import { yellow } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import TrustedAdvisorOverall from '@/services/home-dashboard/components/TrustedAdvisorOverall.vue';
+import TrustedAdvisorOverall from '@/services/workspace-home/components/TrustedAdvisorOverall.vue';
 
 enum STATUS {
     error = 'error',

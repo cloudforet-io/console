@@ -19,8 +19,8 @@ import type { MenuId } from '@/lib/menu/config';
 import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const makeAdminRouteName = (routeName: string): string => {
     if (routeName.startsWith('admin.')) return routeName;
@@ -85,7 +85,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
     return true;
 };
 export const processRouteIntegrityCheck = (to: Route, next: NavigationGuardNext): boolean => {
-    const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i, /^\/dashboard(?:\/(?=$))?$/i];
+    const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i, /^\/dashboard(?:\/(?=$))?$/i, /^\/home(?:\/(?=$))?$/i];
     const { rol: prevRole } = getDecodedDataFromAccessToken();
 
     // Abnormal Route Check
@@ -167,7 +167,7 @@ export const verifyPageAccessAndRedirect = (to: Route, next: NavigationGuardNext
         });
     } else {
         next({
-            name: HOME_DASHBOARD_ROUTE._NAME,
+            name: WORKSPACE_HOME_ROUTE._NAME,
             params: { workspaceId },
         });
     }

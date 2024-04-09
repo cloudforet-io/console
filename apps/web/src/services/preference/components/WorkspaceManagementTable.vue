@@ -24,7 +24,6 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { userStateFormatter } from '@/services/iam/composables/refined-table-data';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import {
@@ -34,6 +33,7 @@ import {
 } from '@/services/preference/constants/workspace-constant';
 import type { WorkspaceTableModel } from '@/services/preference/store/workspace-page-store';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 
 interface Props {
@@ -128,7 +128,7 @@ const handleExport = async () => {
 };
 
 const getWorkspaceRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
-    name: HOME_DASHBOARD_ROUTE._NAME,
+    name: WORKSPACE_HOME_ROUTE._NAME,
     params: {
         workspaceId: item?.workspace_id,
     },

@@ -4,18 +4,18 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { MENU_ID } from '@/lib/menu/config';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
-const HomeDashboard = () => import('@/services/home-dashboard/pages/HomeDashboardPage.vue');
+const WorkspaceHome = () => import('@/services/workspace-home/pages/WorkspaceHomePage.vue');
 
 export default {
-    path: 'home-dashboard',
-    name: makeAdminRouteName(HOME_DASHBOARD_ROUTE._NAME),
-    meta: { menuId: MENU_ID.HOME_DASHBOARD },
+    path: 'home',
+    name: makeAdminRouteName(WORKSPACE_HOME_ROUTE._NAME),
+    meta: { menuId: MENU_ID.WORKSPACE_HOME },
     // HACK: redirect to user list page for now
     redirect: () => ({
         name: makeAdminRouteName(IAM_ROUTE.USER._NAME),
     }),
-    component: HomeDashboard,
+    component: WorkspaceHome,
 } as RouteConfig;

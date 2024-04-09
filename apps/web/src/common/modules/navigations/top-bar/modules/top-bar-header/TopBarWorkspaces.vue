@@ -77,7 +77,7 @@ const selectWorkspace = (name: string): void => {
     appContextStore.setGlobalGrantLoading(true);
     const reversedMatched = clone(router.currentRoute.matched).reverse();
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+    const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
 };

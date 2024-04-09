@@ -19,10 +19,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { gray } from '@/styles/colors';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { BOARD_TYPE } from '@/services/landing/constants/landing-constants';
 import { useLandingPageStore } from '@/services/landing/store/landing-page-store';
 import type { WorkspaceBoardSet, BoardType } from '@/services/landing/type/type';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface Props {
     boardSets: WorkspaceBoardSet[],
@@ -52,7 +52,7 @@ const roleTypeImageFormatter = (roleType: RoleType): string => {
 const handleClickBoardItem = (item: WorkspaceBoardSet) => {
     landingPageStore.setLoading(true);
     userWorkspaceStore.setCurrentWorkspace(item.workspace_id);
-    router.replace({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
+    router.replace({ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: item.workspace_id } });
 };
 </script>
 

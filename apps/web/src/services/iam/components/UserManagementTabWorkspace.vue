@@ -34,10 +34,10 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import UserManagementRemoveModal from '@/services/iam/components/UserManagementRemoveModal.vue';
 import { useRoleFormatter } from '@/services/iam/composables/refined-table-data';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 interface WorkspaceItem {
     name: string;
@@ -245,7 +245,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         >
             <template #col-workspace-format="{value}">
                 <span class="workspace-id-wrapper">
-                    <router-link :to="{ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: value.id } }"
+                    <router-link :to="{ name: WORKSPACE_HOME_ROUTE._NAME, params: { workspaceId: value.id } }"
                                  target="_blank"
                     >
                         <span>{{ value.name }}</span>

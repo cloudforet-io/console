@@ -5,6 +5,8 @@ import {
 
 import { PIconButton, PI, PToggleButton } from '@spaceone/design-system';
 
+import { MENU_ID } from '@/lib/menu/config';
+
 import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/iam/types/role-type';
 
 interface Props {
@@ -67,7 +69,7 @@ watch(() => props.menu.isAccessible, (isAccessible) => {
         <div class="right-part"
              :class="props.isSubMenu ? 'sub-menu' : 'menu'"
         >
-            <p-toggle-button :disabled="props.menu.id === 'home-dashboard'"
+            <p-toggle-button :disabled="props.menu.id === MENU_ID.WORKSPACE_HOME"
                              :value="state.toggleState"
                              @change-toggle="handleChangeToggle"
             />
