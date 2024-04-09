@@ -1756,6 +1756,12 @@
 			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
 		}
 	},
+	"HOME": {
+		"INFO_APPS": "",
+		"INFO_CREATE_APP": "アプリを作成する",
+		"INFO_INVITE_USER": "",
+		"INFO_USERS": "ユーザー"
+	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
 		"ALT_E_TAG_FORMAT": "無効な「キー：値」形式です",

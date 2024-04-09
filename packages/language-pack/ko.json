@@ -1756,6 +1756,12 @@
 			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
 		}
 	},
+	"HOME": {
+		"INFO_APPS": "",
+		"INFO_CREATE_APP": "앱 생성",
+		"INFO_INVITE_USER": "",
+		"INFO_USERS": "사용자"
+	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "중복된 ‘key:value’ 입니다.",
 		"ALT_E_TAG_FORMAT": "유효하지 않은 ‘키:값’ 형식 입니다.",
