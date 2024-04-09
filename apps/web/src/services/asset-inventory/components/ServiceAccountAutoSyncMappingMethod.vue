@@ -214,12 +214,12 @@ watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
                         <p-radio v-model="state.projectGroupMapping"
                                  value="skip"
                         >
-                            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.PROJECT_GROUP_MAPPING') }}
+                            {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SKIP_PROJECT_GROUP_MAPPING') }}
                         </p-radio>
                     </div>
                 </div>
                 <div v-else>
-                    {{ serviceAccountPageFormState.skipProjectGroup ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.PROJECT_GROUP_MAPPING') : state.selectedProjectGroupMappingOptionLabel }}
+                    {{ serviceAccountPageFormState.skipProjectGroup ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SKIP_PROJECT_GROUP_MAPPING') : state.selectedProjectGroupMappingOptionLabel }}
                 </div>
             </template>
         </mapping-method>

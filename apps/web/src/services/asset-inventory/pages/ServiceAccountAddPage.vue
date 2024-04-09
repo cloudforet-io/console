@@ -308,7 +308,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
             </p-button>
         </div>
-        <p-button-modal :header-title="$t('Do you want to sync now?')"
+        <p-button-modal :header-title="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SYNC_TITLE')"
                         size="sm"
                         :visible.sync="state.createModal"
                         @confirm="handleSync"
