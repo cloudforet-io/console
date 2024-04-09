@@ -3,12 +3,13 @@
 import { reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PTextEditor } from '@spaceone/design-system';
+import { PButton, PTextEditor, PTextHighlighting } from '@spaceone/design-system';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 interface Props {
     description?: string;
+    highlightingtTerm?: string;
     script?: string|TranslateResult;
     scriptHeight?: string;
 }
@@ -38,9 +39,11 @@ const handleClickCopyButton = (script: any) => {
 <template>
     <div class="service-account-add-cluster-script-field">
         <div class="description-wrapper">
-            <span class="script-description">
-                {{ props.description }}
-            </span>
+            <p-text-highlighting class="script-description"
+                                 :text="props.description"
+                                 :term="props.highlightingtTerm"
+                                 style-type="secondary"
+            />
             <p-button class="copy-button"
                       style-type="tertiary"
                       size="sm"
@@ -63,7 +66,7 @@ const handleClickCopyButton = (script: any) => {
 
 <style lang="postcss" scoped>
 .service-account-add-cluster-script-field {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
     .description-wrapper {
         @apply flex justify-between items-end gap-2;
         margin-bottom: 0.625rem;
