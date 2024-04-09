@@ -2226,6 +2226,7 @@
 				"MAPPING_METHOD": "Mapping Method",
 				"PROJECT_GROUP_MAPPING": "Project Group Mapping",
 				"SKIP_PROJECT_GROUP_MAPPING": "Skip project group mapping",
+				"START_SYNC": "Start syncing. This will take a few minutes.",
 				"SYNC_ERROR_MODAL_TITLE": "Auto Sync Error Details",
 				"SYNC_TITLE": "Do you want to sync now?",
 				"WORKSPACE_MAPPING": "Workspace Mapping"

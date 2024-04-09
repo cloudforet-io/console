@@ -33,7 +33,7 @@ interface Getters {
     isMainProvider: ComputedRef<boolean>;
     lastSuccessSynced: ComputedRef<string>;
     lastJob: ComputedRef<IdentityJobModel>;
-    secondToLastJob: ComputedRef<IdentityJobModel>;
+    secondToLastJob: ComputedRef<Partial<IdentityJobModel>>;
     lastJobStatus: ComputedRef<IdentityJobStatus>;
 }
 
@@ -95,7 +95,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         isMainProvider: computed(() => MAIN_PROVIDER.includes(state.selectedProvider ?? '')),
         lastSuccessSynced: computed(() => state.syncJobList.find((job) => job.status === 'SUCCESS')?.finished_at ?? ''),
         lastJob: computed(() => state.syncJobList[0]),
-        secondToLastJob: computed(() => state.syncJobList[1]),
+        secondToLastJob: computed(() => state.syncJobList.find((job) => ['SUCCESS', 'FAILURE'].includes(job.status)) ?? {}),
         lastJobStatus: computed(() => state.syncJobList[0]?.status),
     });
     const actions = {

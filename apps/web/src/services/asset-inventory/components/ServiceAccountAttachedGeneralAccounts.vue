@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 
 import {
     PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor,
@@ -16,6 +18,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -66,13 +69,14 @@ const state = reactive({
     trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
     timezone: computed(() => store.state.user.timezone),
     lastSuccessSynced: computed(() => serviceAccountPageStore.getters.lastSuccessSynced),
+    errorModalVisible: false,
+    isSyncing: computed(() => ['IN_PROGRESS', 'PENDING'].includes(serviceAccountPageStore.getters.lastJob?.status)),
     lastSyncJob: computed(() => {
-        if (serviceAccountPageStore.getters.lastJob?.status === 'IN_PROGRESS') {
+        if (state.isSyncing) {
             return serviceAccountPageStore.getters.secondToLastJob;
         }
         return serviceAccountPageStore.getters.lastJob;
     }),
-    errorModalVisible: false,
 });
 const fields = [
     { name: 'name', label: 'Account Name' },
@@ -104,6 +108,7 @@ const getAttachedGeneralAccountList = async () => {
 
 const handleChange = async (options?: ToolboxOptions) => {
     try {
+        state.loading = true;
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
@@ -113,6 +118,8 @@ const handleChange = async (options?: ToolboxOptions) => {
         await getAttachedGeneralAccountList();
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -132,11 +139,13 @@ const handleSync = async () => {
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
             trusted_account_id: serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id,
         });
-        showSuccessMessage('Sync is started.', '');
+        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.START_SYNC'), '');
     } catch (e) {
         ErrorHandler.handleError(e, {
             title: 'Failed to start sync.',
         });
+    } finally {
+        if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
     }
 };
 
@@ -151,6 +160,22 @@ const handleCloseErrorModal = () => {
 const init = async () => {
     await getAttachedGeneralAccountList();
 };
+
+let syncCheckInterval;
+watch(() => state.isSyncing, async (isSyncing) => {
+    if (isSyncing) {
+        syncCheckInterval = setInterval(async () => {
+            if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
+        }, 10000);
+    }
+    if (!isSyncing) {
+        if (syncCheckInterval) clearInterval(syncCheckInterval);
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    if (syncCheckInterval) clearInterval(syncCheckInterval);
+});
 
 watch(() => state.trustedAccountId, async (ta) => {
     if (ta) await serviceAccountPageStore.fetchSyncJobList(ta);
@@ -171,6 +196,7 @@ watch(() => state.trustedAccountId, async (ta) => {
             <template #extra>
                 <p-button v-if="state.isSyncEnabled"
                           style-type="secondary"
+                          :loading="state.isSyncing || state.loading"
                           @click="handleSync"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
