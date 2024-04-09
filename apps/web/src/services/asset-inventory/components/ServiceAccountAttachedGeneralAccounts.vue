@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -25,6 +25,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
+import { green, red } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
@@ -63,6 +65,14 @@ const state = reactive({
     }),
     trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
     timezone: computed(() => store.state.user.timezone),
+    lastSuccessSynced: computed(() => serviceAccountPageStore.getters.lastSuccessSynced),
+    lastSyncJob: computed(() => {
+        if (serviceAccountPageStore.getters.lastJob?.status === 'IN_PROGRESS') {
+            return serviceAccountPageStore.getters.secondToLastJob;
+        }
+        return serviceAccountPageStore.getters.lastJob;
+    }),
+    errorModalVisible: false,
 });
 const fields = [
     { name: 'name', label: 'Account Name' },
@@ -130,6 +140,14 @@ const handleSync = async () => {
     }
 };
 
+const handleViewSyncError = () => {
+    state.errorModalVisible = true;
+};
+
+const handleCloseErrorModal = () => {
+    state.errorModalVisible = false;
+};
+
 const init = async () => {
     await getAttachedGeneralAccountList();
 };
@@ -170,10 +188,26 @@ watch(() => state.trustedAccountId, async (ta) => {
         </p-heading>
         <div class="content-wrapper">
             <div class="content-header">
-                <div v-if="serviceAccountPageStore.getters.lastSynced"
+                <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
                      class="left"
                 >
-                    <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}: {{ dayjs(serviceAccountPageStore.getters.lastSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}</span>
+                    <span v-if="state.lastSuccessSynced">{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}: {{
+                        dayjs(state.lastSuccessSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss')
+                    }}</span>
+                    <p-i v-if="['SUCCESS', 'FAILURE'].includes(state.lastSyncJob?.status)"
+                         :name="(state.lastSyncJob?.status === 'FAILURE') ? 'ic_error-filled' : 'ic_check'"
+                         :color="(state.lastSyncJob?.status === 'FAILURE') ? red[400] : green[600]"
+                         width="1rem"
+                         height="1rem"
+                         class="icon-info"
+                    />
+                    <p-button v-if="state.lastSyncJob?.status === 'FAILURE'"
+                              style-type="tertiary"
+                              size="sm"
+                              @click="handleViewSyncError"
+                    >
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
+                    </p-button>
                 </div>
                 <p-toolbox v-if="state.isSyncEnabled"
                            :searchable="false"
@@ -230,6 +264,16 @@ watch(() => state.trustedAccountId, async (ta) => {
                 </template>
             </p-data-table>
         </div>
+        <p-button-modal v-model="state.errorModalVisible"
+                        :header-title="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SYNC_ERROR_MODAL_TITLE')"
+                        hide-footer-close-button
+                        style-type="tertiable"
+                        @confirm="handleCloseErrorModal"
+        >
+            <template #body>
+                <p-text-editor :code="state.lastSyncJob?.error_message" />
+            </template>
+        </p-button-modal>
     </p-pane-layout>
 </template>
 
@@ -248,7 +292,7 @@ watch(() => state.trustedAccountId, async (ta) => {
             @apply flex justify-between items-center px-4;
 
             .left {
-                @apply mb-4 flex;
+                @apply mb-4 flex gap-1 items-center;
                 flex-shrink: 0;
             }
         }
