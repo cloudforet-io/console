@@ -2226,6 +2226,7 @@
 				"MAPPING_METHOD": "매핑 방식",
 				"PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑",
 				"SKIP_PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑 제외",
+				"START_SYNC": "",
 				"SYNC_ERROR_MODAL_TITLE": "",
 				"SYNC_TITLE": "바로 동기화 진행하시겠습니까?",
 				"WORKSPACE_MAPPING": "워크스페이스 매핑"

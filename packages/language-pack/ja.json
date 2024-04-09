@@ -2226,6 +2226,7 @@
 				"MAPPING_METHOD": "マッピング方法",
 				"PROJECT_GROUP_MAPPING": "プロジェクトグループマッピング",
 				"SKIP_PROJECT_GROUP_MAPPING": "プロジェクトグループマッピングをスキップ",
+				"START_SYNC": "",
 				"SYNC_ERROR_MODAL_TITLE": "",
 				"SYNC_TITLE": "今すぐ同期しますか？",
 				"WORKSPACE_MAPPING": "ワークスペースマッピング "
