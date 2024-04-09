@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import dayjs from 'dayjs';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -60,6 +61,8 @@ const state = reactive({
             return isAdminMode;
         } return serviceAccountPageStore.getters.isOriginAutoSyncEnabled;
     }),
+    trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
+    timezone: computed(() => store.state.user.timezone),
 });
 const fields = [
     { name: 'name', label: 'Account Name' },
@@ -131,6 +134,10 @@ const init = async () => {
     await getAttachedGeneralAccountList();
 };
 
+watch(() => state.trustedAccountId, async (ta) => {
+    if (ta) await serviceAccountPageStore.fetchSyncJobList(ta);
+});
+
 (async () => {
     await init();
 })();
@@ -150,11 +157,26 @@ const init = async () => {
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
                 </p-button>
+                <p-toolbox v-else
+                           class="toolbox"
+                           :searchable="false"
+                           :total-count="state.totalCount"
+                           :page-size.sync="state.pageLimit"
+                           :page-size-options="[15,30,45]"
+                           @change="handleChange"
+                           @refresh="handleChange()"
+                />
             </template>
         </p-heading>
-        <div class="content-wrapper mb-16">
-            <div class="px-4">
-                <p-toolbox :searchable="false"
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div v-if="serviceAccountPageStore.getters.lastSynced"
+                     class="left"
+                >
+                    <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}: {{ dayjs(serviceAccountPageStore.getters.lastSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}</span>
+                </div>
+                <p-toolbox v-if="state.isSyncEnabled"
+                           :searchable="false"
                            :total-count="state.totalCount"
                            :page-size.sync="state.pageLimit"
                            :page-size-options="[15,30,45]"
@@ -212,7 +234,29 @@ const init = async () => {
 </template>
 
 <style scoped lang="postcss">
-.workspace-id-wrapper {
-    @apply flex gap-2;
+.service-account-attached-general-accounts {
+    :deep(.toolbox) {
+        .tool {
+            margin-bottom: unset;
+        }
+    }
+
+    .content-wrapper {
+        @apply mb-16 pt-2;
+
+        .content-header {
+            @apply flex justify-between items-center px-4;
+
+            .left {
+                @apply mb-4 flex;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .workspace-id-wrapper {
+        @apply flex gap-2;
+    }
 }
+
 </style>

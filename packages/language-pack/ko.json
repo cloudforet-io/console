@@ -2220,11 +2220,13 @@
 			},
 			"AUTO_SYNC": {
 				"HOURLY_SYNC_SCHEDULE": "시간 주기 수집 스케줄 ",
+				"LAST_SYNCED": "",
 				"MAIN_DESCRIPTION": "{provider} 계정 계층구조를 SpaceONE 시스템에 자동 매핑 하기 ",
 				"MAPPING_METHOD": "매핑 방식",
 				"PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑",
 				"SKIP_PROJECT_GROUP_MAPPING": "프로젝트 그룹 매핑 제외",
-				"WORKSPACE_MAPPING": "워크스페이스 매핑"
+                "SYNC_TITLE": "바로 동기화 진행하시겠습니까?",
+                "WORKSPACE_MAPPING": "워크스페이스 매핑"
 			},
 			"MAIN": {
 				"ACTION": "작업",

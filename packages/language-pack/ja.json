@@ -2220,10 +2220,12 @@
 			},
 			"AUTO_SYNC": {
 				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",
+                "LAST_SYNCED": "",
 				"MAIN_DESCRIPTION": "{provider}のアカウント階層をSpaceONEシステムと自動的に同期させます。",
 				"MAPPING_METHOD": "マッピング方法",
 				"PROJECT_GROUP_MAPPING": "プロジェクトグループマッピング",
 				"SKIP_PROJECT_GROUP_MAPPING": "プロジェクトグループマッピングをスキップ",
+                "SYNC_TITLE": "今すぐ同期しますか？",
 				"WORKSPACE_MAPPING": "ワークスペースマッピング "
 			},
 			"MAIN": {
