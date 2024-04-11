@@ -1,31 +1,37 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PEmpty,
+    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader,
 } from '@spaceone/design-system';
 
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
 import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
 import ServiceAccountConnectClusterDetail
     from '@/services/asset-inventory/components/ServiceAccountConnectClusterDetail.vue';
+import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
 
 interface Props {
     serviceAccountId: string;
-    serviceAccountData: Partial<ServiceAccountModel>;
     loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    serviceAccountData: undefined,
     loading: true,
+});
+const serviceAccountAgentStore = useServiceAccountAgentStore();
+
+const storeState = reactive({
+    loading: computed(() => serviceAccountAgentStore.state.loading),
+    isAgentCreated: computed(() => serviceAccountAgentStore.getters.isAgentCreated),
+    agentData: computed(() => serviceAccountAgentStore.state.agentInfo),
 });
 
 const state = reactive({
-    appCreated: computed(() => props.serviceAccountData?.app_id),
-    title: computed(() => (state.appCreated ? i18n.t('Connected Cluster') : i18n.t('Connect Cluster'))),
+    title: computed(() => (storeState.isAgentCreated ? i18n.t('Connected Cluster') : i18n.t('Connect Cluster'))),
     connected: computed(() => true),
 });
 
@@ -37,6 +43,16 @@ const handleOpenAddClusterModal = () => {
     modalState.addClusterModalVisible = true;
 };
 
+onMounted(async () => {
+    await serviceAccountAgentStore.getAgent(props.serviceAccountId);
+});
+
+onUnmounted(() => {
+    serviceAccountAgentStore.$dispose();
+    serviceAccountAgentStore.$reset();
+});
+
+
 </script>
 
 <template>
@@ -45,7 +61,7 @@ const handleOpenAddClusterModal = () => {
                    :title="state.title"
         >
             <template #extra>
-                <div v-if="state.appCreated"
+                <div v-if="storeState.isAgentCreated"
                      class="button-wrapper"
                 >
                     <p-button :icon-left="state.connected ? 'ic_plugs' : 'ic_plug-filled'"
@@ -66,10 +82,10 @@ const handleOpenAddClusterModal = () => {
                 </div>
             </template>
         </p-heading>
-        <div class="content-wrapper">
-            <service-account-connect-cluster-detail v-if="state.appCreated"
-                                                    :cluster-data="props.serviceAccountData"
-            />
+        <p-data-loader :loading="storeState.loading"
+                       class="content-wrapper"
+        >
+            <service-account-connect-cluster-detail v-if="storeState.isAgentCreated" />
             <div v-else
                  class="not-been-connected-yet"
             >
@@ -96,7 +112,7 @@ const handleOpenAddClusterModal = () => {
                     </template>
                 </p-empty>
             </div>
-        </div>
+        </p-data-loader>
         <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
                                            :service-account-id="props.serviceAccountId"
         />
