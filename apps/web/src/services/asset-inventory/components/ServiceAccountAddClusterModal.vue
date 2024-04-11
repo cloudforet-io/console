@@ -112,9 +112,7 @@ const handleClickCancelButton = () => {
     closeModal();
     goStep(0);
 };
-// const handleClickPreviousButton = () => {
-//     goStep(-1);
-// };
+
 const handleEnterKey = () => {
     if (formState.isValid) handleClickContinueButton();
 };
