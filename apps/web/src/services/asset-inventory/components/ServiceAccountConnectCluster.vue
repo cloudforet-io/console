@@ -47,8 +47,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-    serviceAccountAgentStore.$dispose();
-    serviceAccountAgentStore.$reset();
+    serviceAccountAgentStore.setAgentInfo(undefined);
 });
 
 

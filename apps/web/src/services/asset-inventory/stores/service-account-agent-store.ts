@@ -30,7 +30,7 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
                     service_account_id: serviceAccountId,
                     options,
                 });
-                state.agentInfo = response;
+                setAgentInfo(response);
             } catch (e) {
                 throw new Error('Agent Create Error');
             }
@@ -41,9 +41,9 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
                 const response = await SpaceConnector.clientV2.identity.agent.get<AgentGetParameters, AgentModel>({
                     service_account_id: serviceAccountId,
                 });
-                state.agentInfo = response;
+                setAgentInfo(response);
             } catch (e) {
-                state.agentInfo = undefined;
+                setAgentInfo(undefined);
                 ErrorHandler.handleError(e);
             } finally {
                 setTimeout(() => {
@@ -52,11 +52,19 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
             }
         },
     };
+    const setAgentInfo = (agentInfo: AgentModel|undefined) => {
+        state.agentInfo = agentInfo;
+    };
+
+    const mutations = {
+        setAgentInfo,
+    };
 
 
     return {
         state,
         getters,
         ...actions,
+        ...mutations,
     };
 });
