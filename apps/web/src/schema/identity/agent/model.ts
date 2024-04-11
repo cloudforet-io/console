@@ -20,6 +20,8 @@ export interface AgentModel {
     last_accessed_at: string;
 }
 
-/* options
-*
+/* OpenCost Options
+* - cluster_name
+* - kube-state-metric
+* - prometheus-node-exporter
 * */

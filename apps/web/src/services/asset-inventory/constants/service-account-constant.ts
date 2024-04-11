@@ -12,3 +12,17 @@ export const PROVIDER_ACCOUNT_NAME = {
     azure: 'Subscription',
     kubernetes: 'Cluster',
 } as const;
+
+
+
+
+/* Agent Account - k8s OpenCost Options
+* - cluster_name
+* - kube-state-metric
+* - prometheus-node-exporter
+* */
+export const OPEN_COST_OPTIONS = {
+    cluster_name: 'cluster_name',
+    kube_state_metric: 'kube-state-metric',
+    prometheus_node_exporter: 'prometheus-node-exporter',
+} as const;

@@ -205,7 +205,10 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
-            <service-account-connect-cluster v-if="state.isKubernetesAgentMode" />
+            <service-account-connect-cluster v-if="state.isKubernetesAgentMode"
+                                             :service-account-id="props.serviceAccountId"
+                                             :service-account-data="state.item"
+            />
             <service-account-credentials v-else
                                          :provider="state.providerKey"
                                          :service-account-loading="state.loading"

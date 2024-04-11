@@ -13,8 +13,9 @@ import ServiceAccountConnectClusterDetail
     from '@/services/asset-inventory/components/ServiceAccountConnectClusterDetail.vue';
 
 interface Props {
-    serviceAccountData: ServiceAccountModel;
-    loading: boolean;
+    serviceAccountId: string;
+    serviceAccountData: Partial<ServiceAccountModel>;
+    loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -96,7 +97,9 @@ const handleOpenAddClusterModal = () => {
                 </p-empty>
             </div>
         </div>
-        <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible" />
+        <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
+                                           :service-account-id="props.serviceAccountId"
+        />
     </p-pane-layout>
 </template>
 

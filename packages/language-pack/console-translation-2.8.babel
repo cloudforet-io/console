@@ -43899,27 +43899,6 @@
                                 <name>MAIN</name>
                                 <children>
                                     <concept_node>
-                                        <name>ADD_SERVICE_ACCOUNT</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
                                         <name>ALL</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -44063,27 +44042,6 @@
                                             <translation>
                                                 <language>ko-KR</language>
                                                 <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>EMPTY_CLOUD_SERVICE</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
@@ -48931,48 +48889,6 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>LOADING</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>NOT_NOW_BUTTON</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>PREVIOUS_BUTTON</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
