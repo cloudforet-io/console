@@ -2219,6 +2219,10 @@
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"AUTO_SYNC": {
+				"DELETE_CHECK_MODAL": {
+					"DESC": "信頼されたアカウントが自動同期に設定されているため、削除できません。削除が必要な場合は、まずそのサービスアカウント({serviceAccountName})の自動同期を無効にしてください。",
+					"TITLE": ""
+				},
 				"ERROR_FOUND": "エラー",
 				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",
 				"LAST_SYNCED": "最終同期",
