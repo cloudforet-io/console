@@ -2765,6 +2765,7 @@
 				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
 				"REQUIRED": "プロジェクトの追加が必要です",
 				"SAVE": "変更を保存",
+				"SYNCING": "同期中",
 				"SYNC_NOW": "今すぐ同期",
 				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。",
 				"UPDATE_SUCCESS": "オートシンク設定が正常に変更されました。"

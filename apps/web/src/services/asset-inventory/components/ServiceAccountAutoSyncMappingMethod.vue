@@ -90,7 +90,9 @@ const state = reactive({
     projectGroupMapping: 'projectGroups',
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    mappingItems: computed(() => (state.isAdminMode ? [
+    isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
+    isDomainForm: computed(() => (state.isResourceGroupDomain ?? state.isAdminMode)),
+    mappingItems: computed(() => (state.isDomainForm ? [
         {
             imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
             name: 'provider',
@@ -109,7 +111,7 @@ const state = reactive({
             name: 'project_group',
         },
     ])),
-    formData: computed(() => (state.isAdminMode ? {
+    formData: computed(() => (state.isDomainForm ? {
         selectedSingleWorkspace: state.workspaceMapping === 'singleWorkspace' ? state.selectedWorkspace : '',
         skipProjectGroup: state.projectGroupMapping === 'skip',
     } : {

@@ -297,7 +297,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                         </p-link>
                     </template>
                 </p-heading>
-                <service-account-auto-sync-form mode="CREATE" />
+                <service-account-auto-sync-form />
             </p-pane-layout>
         </div>
 

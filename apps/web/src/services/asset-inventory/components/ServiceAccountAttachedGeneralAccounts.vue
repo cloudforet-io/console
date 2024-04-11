@@ -53,6 +53,7 @@ const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGenera
 const state = reactive({
     project: computed(() => allReferenceStore.getters.project),
     loading: true,
+    syncReqLoading: false,
     items: [] as any,
     sortBy: 'name',
     sortDesc: true,
@@ -136,6 +137,7 @@ const handleSort = async (sortBy, sortDesc) => {
 
 const handleSync = async () => {
     try {
+        state.syncReqLoading = true;
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
             trusted_account_id: serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id,
         });
@@ -146,6 +148,7 @@ const handleSync = async () => {
         });
     } finally {
         if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
+        state.syncReqLoading = false;
     }
 };
 
@@ -196,10 +199,10 @@ watch(() => state.trustedAccountId, async (ta) => {
             <template #extra>
                 <p-button v-if="state.isSyncEnabled"
                           style-type="secondary"
-                          :loading="state.isSyncing || state.loading"
+                          :loading="state.isSyncing || state.syncReqLoading"
                           @click="handleSync"
                 >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                    {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
                 </p-button>
                 <p-toolbox v-else
                            class="toolbox"
@@ -298,6 +301,9 @@ watch(() => state.trustedAccountId, async (ta) => {
         >
             <template #body>
                 <p-text-editor :code="state.lastSyncJob?.error_message" />
+            </template>
+            <template #footer-extra>
+                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}: {{ dayjs(state.lastSyncJob.finished_at).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
         </p-button-modal>
     </p-pane-layout>
