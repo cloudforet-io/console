@@ -34,6 +34,7 @@ import {
 } from '@/lib/helper/config-data-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
@@ -73,15 +74,21 @@ const fetchRecentList = async (currentWorkspaceId: string) => {
         { k: 'data.id', v: 'home-dashboard', o: '!=' },
     ]).setPageLimit(10);
 
-    const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
-        query: recentListApiQuery.data,
-    });
-    state.recentList = (results || []).map((i) => convertRecentToReferenceData({
-        ...i.data,
-        itemType: i.data.type,
-        itemId: i.data.id,
-        workspaceId: storeState.currentWorkspaceId || '',
-    }));
+    try {
+        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+            query: recentListApiQuery.data,
+        });
+        const _recentList = (results || []).map((i) => convertRecentToReferenceData({
+            ...i.data,
+            itemType: i.data.type,
+            itemId: i.data.id,
+            workspaceId: storeState.currentWorkspaceId || '',
+        }));
+        state.recentList = _recentList.filter((i) => !i?.isDeleted);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.recentList = [];
+    }
 };
 
 const convertRecentToReferenceData = (recentConfig: ConfigData) => {
@@ -112,7 +119,9 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
 
 <template>
     <div class="user-config-recent">
-        <p-field-title :label="$t('HOME.CONFIG_RECENT_TITLE')" />
+        <p-field-title :label="$t('HOME.CONFIG_RECENT_TITLE')"
+                       class="header-wrapper"
+        />
         <div class="suggestion-list-wrapper">
             <user-configs-item v-for="(item) in state.recentList"
                                :key="item.itemId"
@@ -124,10 +133,14 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
 
 <style scoped lang="postcss">
 .user-config-recent {
-    padding-top: 1.375rem;
+    .header-wrapper {
+        padding: 1.375rem 1rem;
+    }
     .suggestion-list-wrapper {
         @apply grid grid-cols-2;
-        padding: 1.375rem 0.5rem 0.25rem 0.5rem;
+        padding-right: 1.5rem;
+        padding-bottom: 1.25rem;
+        padding-left: 1.5rem;
     }
 }
 </style>
