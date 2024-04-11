@@ -195,9 +195,8 @@ const onChange = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) escalationPolicyApiQueryHelper.setPageLimit(options.pageLimit);
     if (options.sortBy !== undefined) escalationPolicyApiQueryHelper.setSort(options.sortBy);
     if (options.sortDesc !== undefined) escalationPolicyApiQueryHelper.setSortDesc(options.sortDesc);
-    if (options.queryTags !== undefined) escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
     if (options.queryTags !== undefined) {
-        queryTagsHelper.setQueryTags(options.queryTags);
+        escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.urlQueryStringFilters.value);
     }
 
