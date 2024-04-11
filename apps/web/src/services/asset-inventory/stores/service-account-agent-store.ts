@@ -12,11 +12,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useServiceAccountAgentStore = defineStore('service-account-agent', () => {
     const state = reactive({
+        loading: false,
         agentInfo: undefined as AgentModel|undefined,
     });
 
     const getters = reactive({
         currentAppToken: computed(() => state.agentInfo?.client_secret || ''),
+        isAgentCreated: computed(() => !!state.agentInfo),
         isClusterConnected: computed(() => !!state.agentInfo?.last_accessed_at), // TODO: refactor with 5min
     });
 
@@ -34,13 +36,19 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
             }
         },
         getAgent: async (serviceAccountId: string) => {
+            state.loading = true;
             try {
                 const response = await SpaceConnector.clientV2.identity.agent.get<AgentGetParameters, AgentModel>({
                     service_account_id: serviceAccountId,
                 });
                 state.agentInfo = response;
             } catch (e) {
+                state.agentInfo = undefined;
                 ErrorHandler.handleError(e);
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
             }
         },
     };

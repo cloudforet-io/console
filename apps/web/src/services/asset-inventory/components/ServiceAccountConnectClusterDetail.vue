@@ -4,6 +4,10 @@ import { computed, reactive } from 'vue';
 import { PDataLoader, PDefinitionTable, PStatus } from '@spaceone/design-system';
 import type { StatusProps } from '@spaceone/design-system/types/data-display/status/type';
 
+import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
+
+const serviceAccountAgentStore = useServiceAccountAgentStore();
+
 const state = reactive({
     fields: computed(() => [
         {
@@ -21,11 +25,7 @@ const state = reactive({
             disableCopy: true,
         },
     ]),
-    data: computed(() => ({
-        cluster_name: 'cluster-1',
-        state: 'ACTIVE',
-        created_at: '2021-08-01',
-    })),
+    data: computed(() => serviceAccountAgentStore.state.agentInfo),
 });
 
 const connectedStatusFormatter = (value: string): StatusProps => ({
