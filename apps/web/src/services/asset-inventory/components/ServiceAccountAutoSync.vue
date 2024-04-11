@@ -3,7 +3,7 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PPaneLayout, PHeading,
+    PButton, PPaneLayout, PHeading, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -94,10 +94,20 @@ const handleClickSaveButton = async () => {
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
         >
             <template #title-right-extra>
-                <auto-sync-state :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
+                <auto-sync-state v-if="state.mode==='READ'"
+                                 :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
                                  size="lg"
                                  class="ml-2"
                 />
+                <p-link v-else
+                        :href="serviceAccountPageStore.getters.autoSyncDocsLink"
+                        new-tab
+                        highlight
+                        action-icon="external-link"
+                        class="ml-3"
+                >
+                    Docs
+                </p-link>
             </template>
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable"
