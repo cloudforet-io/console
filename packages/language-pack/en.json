@@ -1756,6 +1756,12 @@
 			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
 		}
 	},
+	"HOME": {
+		"INFO_APPS": "apps",
+		"INFO_CREATE_APP": "Create App",
+		"INFO_INVITE_USER": "Invite User",
+		"INFO_USERS": "users"
+	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",
 		"ALT_E_TAG_FORMAT": "Invalid key:value format",
