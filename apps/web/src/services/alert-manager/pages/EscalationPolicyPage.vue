@@ -55,6 +55,8 @@ interface Item extends Omit<EscalationPolicyModel, 'name'> {
 }
 
 const router = useRouter();
+const { query } = router.currentRoute;
+
 const allReferenceStore = useAllReferenceStore();
 
 /* Search Tag */
@@ -65,14 +67,15 @@ const queryTagsHelper = useQueryTags({
             { name: 'escalation_policy_id', label: 'Escalation Policy' },
             { name: 'name', label: 'Name' },
             { name: 'finish_condition', label: 'Finish Condition' },
-            { name: 'scope', label: 'Scope' },
+            { name: 'resource_group', label: 'Scope' },
             { name: 'project_id', label: 'Project', valueSet: allReferenceStore.getters.project },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }]),
     referenceStore: allReferenceStore.getters,
 });
-queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
+queryTagsHelper.setURLQueryStringFilters(query.filters);
+
 const { keyItemSets } = queryTagsHelper;
 const valueHandlerMap: ValueHandlerMap = {
     escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
@@ -192,6 +195,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) escalationPolicyApiQueryHelper.setPageLimit(options.pageLimit);
     if (options.sortBy !== undefined) escalationPolicyApiQueryHelper.setSort(options.sortBy);
     if (options.sortDesc !== undefined) escalationPolicyApiQueryHelper.setSortDesc(options.sortDesc);
+    if (options.queryTags !== undefined) escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
     if (options.queryTags !== undefined) {
         queryTagsHelper.setQueryTags(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.urlQueryStringFilters.value);
