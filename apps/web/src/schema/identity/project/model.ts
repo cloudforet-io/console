@@ -11,6 +11,9 @@ export interface ProjectModel {
     user_groups: string[];
     created_by: string;
     project_group_id: string;
+    is_managed: boolean;
+    reference_id: string;
+    trusted_account_id: string;
     workspace_id: string;
     domain_id: string;
     created_at: string;
