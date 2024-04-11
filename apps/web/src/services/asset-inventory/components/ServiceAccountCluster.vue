@@ -4,14 +4,15 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader,
+    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
+import type { AgentModel } from '@/schema/identity/agent/model';
 import { i18n } from '@/translations';
 
 import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
-import ServiceAccountConnectClusterDetail
-    from '@/services/asset-inventory/components/ServiceAccountConnectClusterDetail.vue';
+import ServiceAccountClusterDetail
+    from '@/services/asset-inventory/components/ServiceAccountClusterDetail.vue';
 import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
 
 interface Props {
@@ -27,19 +28,46 @@ const serviceAccountAgentStore = useServiceAccountAgentStore();
 const storeState = reactive({
     loading: computed(() => serviceAccountAgentStore.state.loading),
     isAgentCreated: computed(() => serviceAccountAgentStore.getters.isAgentCreated),
+    isClusterConnected: computed(() => serviceAccountAgentStore.getters.isClusterConnected),
+    agentData: computed<AgentModel|undefined>(() => serviceAccountAgentStore.state.agentInfo),
 });
 
 const state = reactive({
     title: computed(() => (storeState.isAgentCreated ? i18n.t('Connected Cluster') : i18n.t('Connect Cluster'))),
-    connected: computed(() => true),
+    isClusterActive: computed(() => (storeState.agentData?.state === 'ENABLED')),
 });
 
 const modalState = reactive({
+    addClusterModalType: 'ADD' as 'ADD' | 'REGENERATE',
     addClusterModalVisible: false,
+    connectionModalVisible: false,
+    deleteClusterModalVislble: false,
 });
 
 const handleOpenAddClusterModal = () => {
+    modalState.addClusterModalType = 'ADD';
     modalState.addClusterModalVisible = true;
+};
+const handleOpenClusterConnectionModal = () => {
+    modalState.connectionModalVisible = true;
+};
+const handleOpenRegenerateClusterModal = async () => {
+    modalState.addClusterModalType = 'REGENERATE';
+    modalState.addClusterModalVisible = true;
+    await serviceAccountAgentStore.regenerateAgent(props.serviceAccountId);
+};
+const handleOpenDeleteClusterModal = () => {
+    modalState.deleteClusterModalVislble = true;
+};
+const handleConfirmClusterConnection = async () => {
+    if (state.isClusterActive) {
+        await serviceAccountAgentStore.disableAgent(props.serviceAccountId);
+    } else {
+        await serviceAccountAgentStore.enableAgent(props.serviceAccountId);
+    }
+};
+const handleConfirmDeleteCluster = async () => {
+    await serviceAccountAgentStore.deleteAgent(props.serviceAccountId);
 };
 
 onMounted(async () => {
@@ -62,18 +90,22 @@ onUnmounted(() => {
                 <div v-if="storeState.isAgentCreated"
                      class="button-wrapper"
                 >
-                    <p-button :icon-left="state.connected ? 'ic_plugs' : 'ic_plug-filled'"
+                    <p-button v-if="storeState.isClusterConnected"
+                              :icon-left="state.isClusterActive ? 'ic_plugs' : 'ic_plug-filled'"
                               style-type="tertiary"
+                              @click="handleOpenClusterConnectionModal"
                     >
-                        {{ state.connected ? $t('Disconnect') : $t('Connect') }}
+                        {{ state.isClusterActive ? $t('Disconnect') : $t('Connect') }}
                     </p-button>
                     <p-button icon-left="ic_renew"
                               style-type="tertiary"
+                              @click="handleOpenRegenerateClusterModal"
                     >
                         {{ $t('Regenerate') }}
                     </p-button>
                     <p-button icon-left="ic_delete"
                               style-type="tertiary"
+                              @click="handleOpenDeleteClusterModal"
                     >
                         {{ $t('Delete') }}
                     </p-button>
@@ -83,7 +115,7 @@ onUnmounted(() => {
         <p-data-loader :loading="storeState.loading"
                        class="content-wrapper"
         >
-            <service-account-connect-cluster-detail v-if="storeState.isAgentCreated" />
+            <service-account-cluster-detail v-if="storeState.isAgentCreated" />
             <div v-else
                  class="not-been-connected-yet"
             >
@@ -112,7 +144,22 @@ onUnmounted(() => {
             </div>
         </p-data-loader>
         <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
+                                           :type="modalState.addClusterModalType"
                                            :service-account-id="props.serviceAccountId"
+        />
+        <p-button-modal class="cluster-connection-modal"
+                        size="sm"
+                        :visible.sync="modalState.connectionModalVisible"
+                        :theme-color="state.isClusterActive ? 'alert' : 'primary'"
+                        :header-title="state.isClusterActive ? $t('Are you sure you want to disconnect your cluster?') : $t('Are you sure you want to connect your cluster?')"
+                        @confirm="handleConfirmClusterConnection"
+        />
+        <p-double-check-modal class="cluster-delete-modal"
+                              size="sm"
+                              :visible.sync="modalState.deleteClusterModalVislble"
+                              :header-title="$t('Delete Connected Cluster')"
+                              :verification-text="storeState.agentData?.options.cluster_name"
+                              @confirm="handleConfirmDeleteCluster"
         />
     </p-pane-layout>
 </template>

@@ -5,7 +5,11 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AgentCreateParameters } from '@/schema/identity/agent/api-verbs/create';
+import type { AgentDeleteParameters } from '@/schema/identity/agent/api-verbs/delete';
+import type { AgentDisableParameters } from '@/schema/identity/agent/api-verbs/disable';
+import type { AgentEnableParameters } from '@/schema/identity/agent/api-verbs/enable';
 import type { AgentGetParameters } from '@/schema/identity/agent/api-verbs/get';
+import type { AgentRegenerateParameters } from '@/schema/identity/agent/api-verbs/regenerate';
 import type { AgentModel } from '@/schema/identity/agent/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +29,7 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
 
     const actions = {
         createAgent: async (serviceAccountId: string, options: AgentModel['options']) => {
+            state.loading = true;
             try {
                 const response = await SpaceConnector.clientV2.identity.agent.create<AgentCreateParameters, AgentModel>({
                     service_account_id: serviceAccountId,
@@ -33,6 +38,10 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
                 setAgentInfo(response);
             } catch (e) {
                 throw new Error('Agent Create Error');
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
             }
         },
         getAgent: async (serviceAccountId: string) => {
@@ -44,6 +53,74 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
                 setAgentInfo(response);
             } catch (e) {
                 setAgentInfo(undefined);
+                ErrorHandler.handleError(e);
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
+            }
+        },
+        enableAgent: async (serviceAccountId: string) => {
+            state.loading = true;
+            try {
+                const response = await SpaceConnector.clientV2.identity.agent.enable<AgentEnableParameters, AgentModel>({
+                    service_account_id: serviceAccountId,
+                });
+                setAgentInfo(response);
+                // TODO: maybe throw error and handle message in component
+            } catch (e) {
+                // TODO: maybe throw error and handle message in component
+                ErrorHandler.handleError(e);
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
+            }
+        },
+        disableAgent: async (serviceAccountId: string) => {
+            state.loading = true;
+            try {
+                const response = await SpaceConnector.clientV2.identity.agent.disable<AgentDisableParameters, AgentModel>({
+                    service_account_id: serviceAccountId,
+                });
+                setAgentInfo(response);
+                // TODO: maybe throw error and handle message in component
+            } catch (e) {
+                // TODO: maybe throw error and handle message in component
+                ErrorHandler.handleError(e);
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
+            }
+        },
+        deleteAgent: async (serviceAccountId: string) => {
+            state.loading = true;
+            try {
+                await SpaceConnector.clientV2.identity.agent.delete<AgentDeleteParameters, AgentModel>({
+                    service_account_id: serviceAccountId,
+                });
+                setAgentInfo(undefined);
+                // TODO: maybe throw error and handle message in component
+            } catch (e) {
+                // TODO: maybe throw error and handle message in component
+                ErrorHandler.handleError(e);
+            } finally {
+                setTimeout(() => {
+                    state.loading = false;
+                }, 1000);
+            }
+        },
+        regenerateAgent: async (serviceAccountId: string) => {
+            state.loading = true;
+            try {
+                const response = await SpaceConnector.clientV2.identity.agent.regenerate<AgentRegenerateParameters, AgentModel>({
+                    service_account_id: serviceAccountId,
+                });
+                setAgentInfo(response);
+                // TODO: maybe throw error and handle message in component
+            } catch (e) {
+                // TODO: maybe throw error and handle message in component
                 ErrorHandler.handleError(e);
             } finally {
                 setTimeout(() => {

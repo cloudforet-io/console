@@ -25,10 +25,12 @@ import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/s
 interface Props {
     visible: boolean;
     serviceAccountId: string;
+    addClusterModalType: 'ADD' | 'REGENERATE'
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    addClusterModalType: 'ADD',
 });
 const emit = defineEmits<{(e: 'update:visible'): void;
     (e: 'close'): void;
@@ -37,6 +39,7 @@ const serviceAccountAgentStore = useServiceAccountAgentStore();
 
 const storeState = reactive({
     appToken: computed(() => serviceAccountAgentStore.getters.currentAppToken),
+    loading: computed(() => serviceAccountAgentStore.state.loading),
 });
 
 const state = reactive({
@@ -79,7 +82,6 @@ const formState = reactive({
 });
 
 const scriptState = reactive({
-    loading: false,
     optionGuideScript: computed<Record<string, string>>(() => ({
         [OPEN_COST_OPTIONS.kube_state_metric]: i18n.t('kubectl get daemonsets --all-namespaces | grep kube-state-metrics') as string,
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: i18n.t('kubectl get daemonsets --all-namespaces | grep node-exporter') as string,
@@ -131,7 +133,6 @@ const goStep = (n?: number) => {
     else state.step += 1;
 };
 const createAgentApp = async () => {
-    scriptState.loading = true;
     const options: AgentModel['options'] = {
         cluster_name: formState.clusterName,
         ...formState.selectedClusterOptions,
@@ -143,10 +144,6 @@ const createAgentApp = async () => {
         ErrorHandler.handleError(e);
         showErrorMessage(e.message, e);
         formState.commonValidForDelay = true;
-    } finally {
-        setTimeout(() => {
-            scriptState.loading = false;
-        }, 1000);
     }
 };
 
@@ -290,7 +287,7 @@ watch(() => state.step, () => {
                          class="third-section"
                     >
                         <p-data-loader class="script-loader"
-                                       :loading="scriptState.loading"
+                                       :loading="storeState.loading"
                                        :data="true"
                                        loader-backdrop-color="0"
                         >
@@ -314,7 +311,7 @@ watch(() => state.step, () => {
                     <p-button class="continue-button"
                               :style-type="state.step === 3 ? 'primary' : 'substitutive'"
                               :icon-right="state.step === 3 ? undefined :'ic_arrow-right'"
-                              :disabled="!formState.isValid || !formState.commonValidForDelay || scriptState.loading"
+                              :disabled="!formState.isValid || !formState.commonValidForDelay || storeState.loading"
                               @click="handleClickContinueButton"
                     >
                         {{ state.step === 3 ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.DONE_BUTTON') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}

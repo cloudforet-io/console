@@ -29,7 +29,7 @@ import ServiceAccountAttachedGeneralAccounts
 import ServiceAccountAutoSync from '@/services/asset-inventory/components/ServiceAccountAutoSync.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
-import ServiceAccountConnectCluster from '@/services/asset-inventory/components/ServiceAccountConnectCluster.vue';
+import ServiceAccountCluster from '@/services/asset-inventory/components/ServiceAccountCluster.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
@@ -205,8 +205,8 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
-            <service-account-connect-cluster v-if="state.isKubernetesAgentMode"
-                                             :service-account-id="props.serviceAccountId"
+            <service-account-cluster v-if="state.isKubernetesAgentMode"
+                                     :service-account-id="props.serviceAccountId"
             />
             <service-account-credentials v-else
                                          :provider="state.providerKey"
