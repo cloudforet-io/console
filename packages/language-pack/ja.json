@@ -1759,6 +1759,8 @@
 	"HOME": {
 		"BOOKMARK_ADD_LINK": "",
 		"BOOKMARK_TITLE": "",
+		"CONFIG_RECENT_TITLE": "日付順に並べ替え",
+		"CONFIG_STARRED_TITLE": "お気に入り",
 		"INFO_APPS": "",
 		"INFO_CREATE_APP": "アプリを作成する",
 		"INFO_INVITE_USER": "",
