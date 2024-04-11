@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal,
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -285,7 +285,18 @@ const handleRouteToServiceAccountDetailPage = () => {
             >
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
-                />
+                >
+                    <template #title-right-extra>
+                        <p-link :href="serviceAccountPageStore.getters.autoSyncDocsLink"
+                                new-tab
+                                highlight
+                                action-icon="external-link"
+                                class="ml-3"
+                        >
+                            Docs
+                        </p-link>
+                    </template>
+                </p-heading>
                 <service-account-auto-sync-form mode="CREATE" />
             </p-pane-layout>
         </div>

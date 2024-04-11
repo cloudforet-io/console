@@ -14,7 +14,9 @@ import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 
@@ -35,6 +37,7 @@ interface Getters {
     lastJob: ComputedRef<IdentityJobModel>;
     secondToLastJob: ComputedRef<Partial<IdentityJobModel>>;
     lastJobStatus: ComputedRef<IdentityJobStatus>;
+    autoSyncDocsLink: ComputedRef<string>;
 }
 
 interface State {
@@ -61,6 +64,12 @@ const MAIN_PROVIDER = ['aws', 'google_cloud', 'azure'];
 
 export const useServiceAccountPageStore = defineStore('page-service-account', () => {
     const allReferenceStore = useAllReferenceStore();
+    const appContextStore = useAppContextStore();
+
+    const _storeState = reactive({
+        language: computed(() => store.state.user.language),
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
 
     const state = reactive<State>({
         selectedProvider: '',
@@ -97,6 +106,13 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         lastJob: computed(() => state.syncJobList[0]),
         secondToLastJob: computed(() => state.syncJobList.find((job) => ['SUCCESS', 'FAILURE'].includes(job.status)) ?? {}),
         lastJobStatus: computed(() => state.syncJobList[0]?.status),
+        autoSyncDocsLink: computed(() => {
+            const language = _storeState.language === 'ko' ? 'ko/' : '';
+            if (_storeState.isAdminMode) {
+                return `https://cloudforet.io/${language}docs/guides/admin-mode/service-account/`;
+            }
+            return `https://cloudforet.io/${language}docs/guides/asset-inventory/service-account/`;
+        }),
     });
     const actions = {
         initState: () => {
