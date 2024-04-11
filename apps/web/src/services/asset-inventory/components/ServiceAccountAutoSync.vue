@@ -30,6 +30,14 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 
+interface Props {
+    editable: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    editable: false,
+});
+
 interface State {
     loading: boolean;
     isTrustedAccount: ComputedRef<boolean>;
@@ -92,7 +100,7 @@ const handleClickSaveButton = async () => {
                 />
             </template>
             <template #extra>
-                <p-button v-if="state.mode === 'READ'"
+                <p-button v-if="state.mode === 'READ' && props.editable"
                           icon-left="ic_edit"
                           style-type="secondary"
                           @click="handleClickEditButton"

@@ -205,6 +205,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                          @refresh="handleRefresh"
             />
             <service-account-auto-sync v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
+                                       :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
         </div>

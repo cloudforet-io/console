@@ -126,18 +126,25 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                 name: field.name,
                 type: 'text',
             })),
-            ...((!options.isTrustedAccount && [{
-                key: 'project_id',
-                name: 'Project',
-                type: 'text',
-                options: {
-                    sortable: false,
+            ...((!options.isTrustedAccount && [
+                {
+                    key: 'project_id',
+                    name: 'Project',
+                    type: 'text',
+                    options: {
+                        sortable: false,
+                    },
+                    reference: {
+                        resource_type: 'identity.Project',
+                        reference_key: 'project_id',
+                    },
                 },
-                reference: {
-                    resource_type: 'identity.Project',
-                    reference_key: 'project_id',
+                {
+                    key: 'is_managed',
+                    name: 'Auto Sync',
+                    type: 'text',
                 },
-            }]) || []),
+            ]) || []),
             {
                 key: 'created_at',
                 name: 'Created',
