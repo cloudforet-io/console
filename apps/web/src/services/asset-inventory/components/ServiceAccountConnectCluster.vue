@@ -27,7 +27,6 @@ const serviceAccountAgentStore = useServiceAccountAgentStore();
 const storeState = reactive({
     loading: computed(() => serviceAccountAgentStore.state.loading),
     isAgentCreated: computed(() => serviceAccountAgentStore.getters.isAgentCreated),
-    agentData: computed(() => serviceAccountAgentStore.state.agentInfo),
 });
 
 const state = reactive({
