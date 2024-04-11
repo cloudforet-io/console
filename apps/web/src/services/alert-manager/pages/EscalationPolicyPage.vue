@@ -88,7 +88,8 @@ const valueHandlerMap: ValueHandlerMap = {
 /* Api Query */
 const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
-    .setPage(1, 15);
+    .setPage(1, 15)
+    .setFiltersAsRawQueryString(query.filters);
 
 /* States */
 const tableState = reactive({
@@ -196,6 +197,7 @@ const onChange = async (options: ToolboxOptions = {}) => {
     if (options.sortBy !== undefined) escalationPolicyApiQueryHelper.setSort(options.sortBy);
     if (options.sortDesc !== undefined) escalationPolicyApiQueryHelper.setSortDesc(options.sortDesc);
     if (options.queryTags !== undefined) {
+        queryTagsHelper.setQueryTags(options.queryTags);
         escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.urlQueryStringFilters.value);
     }
