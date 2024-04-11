@@ -73,6 +73,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     providerList: computed<ProviderItem[]>(() => {
         const _providerList = Object.values(state.providers) as ProviderItem[];
@@ -158,7 +159,7 @@ const getQuery = () => {
     if (fields) {
         apiQuery.setOnly(
             ...fields.map((d) => d.key),
-            tableState.isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
+            ...(tableState.isTrustedAccount ? ['trusted_account_id'] : ['service_account_id', 'trusted_account_id']),
             'tags',
         );
     }
@@ -363,6 +364,12 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                 <template #col-schedule.state-format="{value}">
                     <auto-sync-state v-if="value"
                                      :state="value"
+                    />
+                </template>
+                <template #col-is_managed-format="{item}">
+                    <auto-sync-state v-if="item.trusted_account_id"
+                                     :state="state.trustedAccounts[item.trusted_account_id]?.data?.schedule?.state"
+                                     size="xs "
                     />
                 </template>
             </p-dynamic-layout>
