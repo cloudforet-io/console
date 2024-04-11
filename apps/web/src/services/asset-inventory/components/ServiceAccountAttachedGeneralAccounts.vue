@@ -302,6 +302,9 @@ watch(() => state.trustedAccountId, async (ta) => {
             <template #body>
                 <p-text-editor :code="state.lastSyncJob?.error_message" />
             </template>
+            <template #footer-extra>
+                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}: {{ dayjs(state.lastSyncJob.finished_at).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
         </p-button-modal>
     </p-pane-layout>
 </template>
