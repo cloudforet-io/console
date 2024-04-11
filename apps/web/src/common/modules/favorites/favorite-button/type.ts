@@ -30,6 +30,7 @@ export interface FavoriteItem extends FavoriteConfig {
     icon?: string;
     provider?: string;
     parents?: { name?: string; label?: TranslateResult }[];
+    isDeleted?: boolean;
 }
 
 export interface FavoriteHasLoaded {

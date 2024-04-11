@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { PFieldTitle } from '@spaceone/design-system';
-
 import UserConfigRecent from '@/services/workspace-home/components/UserConfigRecent.vue';
+import UserConfigStarred from '@/services/workspace-home/components/UserConfigStarred.vue';
 </script>
 
 <template>
     <div class="user-configs">
         <user-config-recent class="box-wrapper" />
-        <div class="box-wrapper starred">
-            <p-field-title :label="$t('HOME.CONFIG_STARRED_TITLE')" />
-        </div>
+        <user-config-starred class="box-wrapper" />
     </div>
 </template>
 
@@ -19,7 +16,7 @@ import UserConfigRecent from '@/services/workspace-home/components/UserConfigRec
     gap: 1rem;
     .box-wrapper {
         @apply border border-gray-200 text-label-md ;
-        padding: 1rem;
+        height: 15.875rem;
         border-radius: 0.375rem;
         flex: 1;
     }
