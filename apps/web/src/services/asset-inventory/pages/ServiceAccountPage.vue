@@ -369,7 +369,7 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                 <template #col-is_managed-format="{item}">
                     <auto-sync-state v-if="item.trusted_account_id"
                                      :state="state.trustedAccounts[item.trusted_account_id]?.data?.schedule?.state"
-                                     size="xs "
+                                     size="xs"
                     />
                 </template>
             </p-dynamic-layout>
