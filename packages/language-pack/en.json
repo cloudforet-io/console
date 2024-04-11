@@ -1026,7 +1026,7 @@
 				"FAVORITES_HELP_TEXT": "Add frequently visited pages to your favorites.",
 				"GO_TO_CLOUD_SERVICE": "Go to Cloud Service",
 				"GO_TO_PROJECT": "Go to Project",
-				"MENU": "MENU",
+				"MENU": "Menu",
 				"SHOW_ALL": "Show all"
 			},
 			"MY_PAGE": {
@@ -1760,6 +1760,7 @@
 		"BOOKMARK_ADD_LINK": "Add Link",
 		"BOOKMARK_TITLE": "Added Link",
 		"CONFIG_RECENT_TITLE": "Most recent",
+		"CONFIG_STARRED_ALL": "All",
 		"CONFIG_STARRED_TITLE": "Starred",
 		"INFO_APPS": "apps",
 		"INFO_CREATE_APP": "Create App",
