@@ -202,7 +202,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                           :loading="state.isSyncing || state.syncReqLoading"
                           @click="handleSync"
                 >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                    {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
                 </p-button>
                 <p-toolbox v-else
                            class="toolbox"
