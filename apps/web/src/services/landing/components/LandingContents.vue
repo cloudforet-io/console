@@ -53,7 +53,7 @@ const storeState = reactive({
     favoriteList: computed<FavoriteItem[]>(() => sortBy(favoriteGetters.workspaceItems, 'label')),
     recentWorkspace: computed<RecentConfig[]>(() => recentState.recentMenuList.map((i) => ({
         itemType: i.data.type,
-        workspace_id: i.data.workspace_id,
+        workspaceId: i.data.workspace_id,
         itemId: i.data.id,
     }))),
 });

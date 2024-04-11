@@ -10,6 +10,7 @@ export const RECENT_TYPE = {
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     COST_ANALYSIS: 'COST_ANALYSIS',
+    SECURITY: 'SECURITY',
     WORKSPACE: 'WORKSPACE',
 } as const;
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
@@ -26,7 +27,7 @@ export const recentNSearchTabMap = {
 
 export interface RecentConfig {
     itemType: RecentType;
-    workspace_id: string;
+    workspaceId: string;
     itemId: string;
 }
 
