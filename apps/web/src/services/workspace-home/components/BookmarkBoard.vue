@@ -9,8 +9,8 @@ import { blue, gray } from '@/styles/colors';
 
 interface Props {
     boardSets: BoardSet[];
-    isFullMode: boolean;
-    isFolderBoard: boolean;
+    isFullMode?: boolean;
+    isFolderBoard?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

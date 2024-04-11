@@ -45,6 +45,7 @@ const state = reactive({
                         class="bookmark-board-wrapper folder"
         />
         <bookmark-board :board-sets="state.boardSets"
+                        is-full-mode
                         class="bookmark-board-wrapper"
         />
     </div>
