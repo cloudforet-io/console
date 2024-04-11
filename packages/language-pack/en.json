@@ -1757,6 +1757,8 @@
 		}
 	},
 	"HOME": {
+		"BOOKMARK_ADD_LINK": "Add Link",
+		"BOOKMARK_TITLE": "Added Link",
 		"INFO_APPS": "apps",
 		"INFO_CREATE_APP": "Create App",
 		"INFO_INVITE_USER": "Invite User",
