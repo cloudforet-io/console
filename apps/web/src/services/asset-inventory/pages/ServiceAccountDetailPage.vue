@@ -215,6 +215,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                       :attached-general-accounts="state.attachedGeneralAccounts"
         />
         <service-account-edit-modal v-if="state.item?.name"
+                                    :key="state.item?.name"
                                     :visible.sync="state.editModalVisible"
                                     :is-trusted-account="state.isTrustedAccount"
                                     :service-account="state.item"
