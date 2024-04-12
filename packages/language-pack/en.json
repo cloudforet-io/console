@@ -2731,14 +2731,18 @@
 			"AGENT": {
 				"ACTIVATE": "Activate",
 				"ACTIVATE_MODAL_TEXT": "Are you sure you want to activate your cluster?",
-				"CLUSTER_DETAIL_HEADER": "Connected Cluster",
+				"ACTIVE": "Active",
+				"CLUSTER_DETAIL_HEADER": "Cluster Details",
 				"CONNECT_CLUSTER": "Connect Cluster",
 				"CONNECT_CLUSTER_HEADER": "Connect Cluster",
 				"DEACTIVATE": "Deactivate",
 				"DEACTIVATE_MODAL_TEXT": "Are you sure you want to deactivate your cluster?",
+				"DELETE": "Delete",
 				"DELETE_CLUSTER_MODAL_TEXT": "Delete Connected Cluster",
 				"DELETE_WARNING": "If you delete your account, you will lose all of your data.",
-				"DISCONNECTED_CLUSTER_TEXT": "A cluster has not been connected yet."
+				"DISCONNECTED_CLUSTER_TEXT": "A cluster has not been connected yet.",
+				"INACTIVE": "Inactive",
+				"RECONNECT": "Reconnect"
 			},
 			"CLUSTER_MODAL": {
 				"CANCEL": "Cancel",

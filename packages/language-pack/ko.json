@@ -2731,14 +2731,18 @@
 			"AGENT": {
 				"ACTIVATE": "",
 				"ACTIVATE_MODAL_TEXT": "",
+				"ACTIVE": "",
 				"CLUSTER_DETAIL_HEADER": "",
 				"CONNECT_CLUSTER": "",
 				"CONNECT_CLUSTER_HEADER": "",
 				"DEACTIVATE": "",
 				"DEACTIVATE_MODAL_TEXT": "",
+				"DELETE": "",
 				"DELETE_CLUSTER_MODAL_TEXT": "",
 				"DELETE_WARNING": "",
-				"DISCONNECTED_CLUSTER_TEXT": ""
+				"DISCONNECTED_CLUSTER_TEXT": "",
+				"INACTIVE": "",
+				"RECONNECT": ""
 			},
 			"CLUSTER_MODAL": {
 				"CANCEL": "",
