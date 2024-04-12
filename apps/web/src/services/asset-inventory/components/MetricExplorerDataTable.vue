@@ -1,29 +1,33 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PToolboxTable, PTextPagination, PSelectDropdown,
+    PToolboxTable, PTextPagination,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+
 import {
-    getMetricExplorerDataTableDateFields,
+    getMetricExplorerDataTableDateFields, getRefinedMetricDataAnalyzeQueryGroupBy,
     getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
-    groupByFields: computed<DataTableFieldType[]>(() => metricExplorerPageState.selectedGroupByList.map((d) => ({
-        name: d,
-        label: d,
-    }))),
+    groupByFields: computed<DataTableFieldType[]>(() => metricExplorerPageGetters.groupByItems.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.name))),
     dateFields: computed<DataTableFieldType[]>(() => getMetricExplorerDataTableDateFields(
         metricExplorerPageState.granularity,
         metricExplorerPageState.period ?? {},
@@ -41,7 +45,35 @@ const state = reactive({
 
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
-const analyzeMetricData = async () => ({ more: false, results: [] });
+const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
+const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
+    try {
+        analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
+        const { status, response } = await fetcher({
+            metric_id: metricExplorerPageState.metricId as string,
+            query: {
+                granularity: metricExplorerPageState.granularity,
+                group_by: getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedGroupByList),
+                start: metricExplorerPageState.period?.start,
+                end: metricExplorerPageState.period?.end,
+                fields: {
+                    count: {
+                        key: 'value',
+                        operator: metricExplorerPageState.selectedOperator,
+                    },
+                },
+                sort: [{ key: '_total_count', desc: true }],
+                field_group: ['date'],
+                ...analyzeApiQueryHelper.data,
+            },
+        });
+        if (status === 'succeed') return response;
+        return { more: false, results: [] };
+    } catch (e) {
+        state.loading = false;
+        return { more: false, results: [] };
+    }
+};
 
 /* Event */
 const handleChange = async (options: any = {}) => {
@@ -56,7 +88,22 @@ const handleUpdateThisPage = async () => {
     state.more = more ?? false;
 };
 
-// TODO: watch granularity, period and analyze data
+watch(
+    [
+        () => metricExplorerPageState.metricId,
+        () => metricExplorerPageState.period,
+        () => metricExplorerPageState.selectedOperator,
+        () => metricExplorerPageState.selectedChartGroupBy,
+    ],
+    async ([metricId]) => {
+        if (!metricId) return;
+        state.thisPage = 1;
+        const { results, more } = await analyzeMetricData();
+        state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period);
+        state.more = more ?? false;
+    },
+    { immediate: true, deep: true },
+);
 </script>
 
 <template>
@@ -75,11 +122,6 @@ const handleUpdateThisPage = async () => {
                                :disable-next-page="state.loading"
                                :has-next-page="state.more"
                                @update:thisPage="handleUpdateThisPage"
-            />
-        </template>
-        <template #toolbox-left>
-            <p-select-dropdown :menu="[]"
-                               selection-label="Order by"
             />
         </template>
         <template #col-format="{value}">

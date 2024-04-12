@@ -3,8 +3,10 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import type { Granularity, Period } from '@/services/asset-inventory/types/metric-explorer-type';
+import { GRANULARITY, STATIC_GROUP_BY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import type {
+    Granularity, Period, MetricDataAnalyzeResult, StaticGroupBy,
+} from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 export const getMetricExplorerDataTableDateFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
@@ -28,7 +30,7 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         if (now.isAfter(today, timeUnit)) break;
         dateFields.push({
-            name: `value_sum.${index}.value`, // TODO: update after API response changed
+            name: `count.${index}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             sortable: true,
@@ -39,16 +41,16 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     return defaultFields.concat(dateFields);
 };
 
-export const getRefinedMetricExplorerTableData = (results = [], granularity: Granularity, period: Period) => {
+export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResult[] = [], granularity: Granularity, period: Period): MetricDataAnalyzeResult[] => {
     const timeUnit = granularity === GRANULARITY.MONTHLY ? 'month' : 'day';
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
 
     const _results = cloneDeep(results);
-    const refinedTableData = [];
+    const refinedTableData: MetricDataAnalyzeResult[] = [];
     const today = dayjs.utc();
     _results.forEach((d) => {
-        let target = cloneDeep(d.value_sum); // TODO: update after API response changed
+        let target = cloneDeep(d.count);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
             if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
@@ -59,8 +61,16 @@ export const getRefinedMetricExplorerTableData = (results = [], granularity: Gra
         target = sortBy(target, ['date']);
         refinedTableData.push({
             ...d,
-            value_sum: target,
+            count: target,
         });
     });
     return refinedTableData;
+};
+
+export const getRefinedMetricDataAnalyzeQueryGroupBy = (groupBy: Array<string|StaticGroupBy>): string[] => {
+    if (!groupBy.length) return [];
+    return groupBy.map((d) => {
+        if (Object.values(STATIC_GROUP_BY).includes(d)) return d;
+        return `labels.${d}`;
+    });
 };
