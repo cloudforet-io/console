@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor, PTooltip,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -197,22 +197,17 @@ watch(() => state.trustedAccountId, async (ta) => {
                    :total-count="state.totalCount"
         >
             <template #extra>
-                <p-button v-if="state.isSyncEnabled"
-                          style-type="secondary"
-                          :loading="state.isSyncing || state.syncReqLoading"
-                          @click="handleSync"
+                <p-tooltip :contents="!state.isSyncEnabled ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DISABLED_SYNC_DESC') : ''"
+                           position="left"
                 >
-                    {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
-                </p-button>
-                <p-toolbox v-else
-                           class="toolbox"
-                           :searchable="false"
-                           :total-count="state.totalCount"
-                           :page-size.sync="state.pageLimit"
-                           :page-size-options="[15,30,45]"
-                           @change="handleChange"
-                           @refresh="handleChange()"
-                />
+                    <p-button :disabled="!state.isSyncEnabled"
+                              style-type="secondary"
+                              :loading="state.isSyncing || state.syncReqLoading"
+                              @click="handleSync"
+                    >
+                        {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                    </p-button>
+                </p-tooltip>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -238,8 +233,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
                     </p-button>
                 </div>
-                <p-toolbox v-if="state.isSyncEnabled"
-                           :searchable="false"
+                <p-toolbox :searchable="false"
                            :total-count="state.totalCount"
                            :page-size.sync="state.pageLimit"
                            :page-size-options="[15,30,45]"
