@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PDataLoader, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
+    PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
@@ -302,25 +302,22 @@ watch(() => props.visible, (visible) => {
                     <div v-else-if="state.step === 3"
                          class="third-section"
                     >
-                        <p-data-loader class="script-loader"
-                                       :loading="storeState.loading"
-                                       :data="true"
-                                       loader-backdrop-color="0"
-                        >
-                            <template #loader>
-                                <div class="custom-loader">
-                                    <p-spinner style-type="gray"
-                                               size="xl"
-                                    />
-                                    <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LOADING') }}</p>
-                                </div>
-                            </template>
-                            <service-account-add-cluster-script-field class="generated-script"
+                        <div class="script-wrapper">
+                            <div v-if="storeState.loading"
+                                 class="loader"
+                            >
+                                <p-spinner style-type="gray"
+                                           size="xl"
+                                />
+                                <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LOADING') }}</p>
+                            </div>
+                            <service-account-add-cluster-script-field v-else
+                                                                      class="generated-script"
                                                                       :script="scriptState.thirdScript"
                                                                       :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_THIRD')"
                                                                       script-height="9.5rem"
                             />
-                        </p-data-loader>
+                        </div>
                     </div>
                 </div>
                 <div class="button-wrapper">
@@ -425,10 +422,10 @@ watch(() => props.visible, (visible) => {
             .third-section {
                 max-height: 23rem;
 
-                .script-loader {
+                .script-wrapper {
                     height: 23rem;
-                    .custom-loader {
-                        @apply flex flex-col items-center gap-3 text-paragraph-md text-gray-500;
+                    .loader {
+                        @apply flex flex-col items-center justify-center gap-3 text-paragraph-md text-gray-500 h-full;
                     }
 
                     .generated-script {
