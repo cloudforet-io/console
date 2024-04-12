@@ -2226,7 +2226,7 @@
 			"AUTO_SYNC": {
 				"DELETE_CHECK_MODAL": {
 					"DESC": "Trusted 서비스 어카운트 자동 동기화가 설정되어 있어 삭제가 불가합니다. 삭제 필요 시, 먼저 해당 서비스 어카운트({serviceAccountName})의 자동 동기화를 해제 하십시오.",
-					"TITLE": ""
+					"TITLE": "삭제 불가"
 				},
 				"ERROR_FOUND": "오류 확인",
 				"HOURLY_SYNC_SCHEDULE": "시간 주기 수집 스케줄 ",

@@ -175,7 +175,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                     />
                 </div>
             </template>
-            <template v-if="state.isEditable"
+            <template v-if="state.isEditable && state.consoleLink"
                       #extra
             >
                 <p-button style-type="tertiary"
