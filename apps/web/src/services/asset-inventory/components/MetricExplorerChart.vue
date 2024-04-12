@@ -25,7 +25,7 @@ import MetricExplorerLineChart from '@/services/asset-inventory/components/Metri
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
+    getMetricChartLegends, getRefinedMetricDataAnalyzeQueryGroupBy, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
@@ -46,7 +46,7 @@ const state = reactive({
         { chartType: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
         { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     ]),
-    selectedChartType: CHART_TYPE.COLUMN as ChartType,
+    selectedChartType: CHART_TYPE.LINE as ChartType,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
@@ -62,16 +62,16 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
             metric_id: metricExplorerPageState.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
-                group_by: metricExplorerPageState.selectedChartGroupBy ? [metricExplorerPageState.selectedChartGroupBy] : [],
+                group_by: getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy),
                 start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
-                    value: {
-                        key: 'cost', // TODO: change key after api change
+                    count: {
+                        key: 'value',
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: '_total_value', desc: true }],
+                sort: [{ key: '_total_count', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },
@@ -96,7 +96,7 @@ const setChartData = debounce(async (fetchData = false) => {
     const _period = metricExplorerPageState.period as Period;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
 
-    state.legends = getLegends(state.selectedChartType, rawData, _groupBy);
+    state.legends = getMetricChartLegends(state.selectedChartType, rawData, _groupBy);
     if (state.selectedChartType === CHART_TYPE.LINE) {
         state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
     } else {

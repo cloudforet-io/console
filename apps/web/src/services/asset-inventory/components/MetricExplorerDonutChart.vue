@@ -43,7 +43,10 @@ const drawChart = () => {
     const series = chartHelper.createPieSeries(seriesSettings);
     series.labels.template.set('forceHidden', false);
     series.ticks.template.set('forceHidden', false);
-
+    series.labels.template.setAll({
+        text: '{category} ({valuePercentTotal.formatNumber("0.00")}%)',
+        fontSize: 14,
+    });
     series.labels.template.adapters.add('y', (y, target) => {
         const dataItem = target.dataItem;
         if (dataItem) {

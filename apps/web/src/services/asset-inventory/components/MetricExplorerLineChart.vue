@@ -71,7 +71,7 @@ const drawChart = () => {
 
         // set data processor on series
         series.data.processor = chartHelper.createDataProcessor({
-            dateFormat: metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'YYYY-MM-DD' : 'YYYY-MM',
+            dateFormat: metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'yyyy-MM-dd' : 'yyyy-MM',
             dateFields: [DATE_FIELD_NAME],
         });
 
