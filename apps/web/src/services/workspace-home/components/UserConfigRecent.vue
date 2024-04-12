@@ -91,7 +91,7 @@ const fetchRecentList = async (currentWorkspaceId: string) => {
     }
 };
 
-const convertRecentToReferenceData = (recentConfig: ConfigData) => {
+const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
         return convertDashboardConfigToReferenceData([recentConfig], [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems, ...dashboardGetters.privateItems])[0];

@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const state = reactive({
-    iconColor: computed(() => {
+    iconColor: computed<string|undefined>(() => {
         if (props.item?.itemType === FAVORITE_TYPE.PROJECT) {
             return peacock[700];
         }
