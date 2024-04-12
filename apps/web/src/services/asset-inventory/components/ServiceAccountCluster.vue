@@ -65,6 +65,7 @@ const handleConfirmClusterConnection = async () => {
     } else {
         await serviceAccountAgentStore.enableAgent(props.serviceAccountId);
     }
+    modalState.connectionModalVisible = false;
 };
 const handleConfirmDeleteCluster = async () => {
     await serviceAccountAgentStore.deleteAgent(props.serviceAccountId);
