@@ -88,12 +88,13 @@ const scriptState = reactive({
         [OPEN_COST_OPTIONS.kube_state_metric]: 'kubectl get daemonsets --all-namespaces | grep kube-state-metrics',
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: 'kubectl get daemonsets --all-namespaces | grep node-exporter',
     })),
-    helmScript: computed(() => ['helm version\n', 'helm repo add sp1-agent https://github.com.~\nhelm repo update sp1-agent\n']),
-    thirdScript: computed(() => 'helm repo add sp1-agent https://github.com.~'
-        + `\nhelm repo updacurl -H "Authorization: Bearer ${storeState.appToken}"`
-        + '\n"https://extension/service-account/agent/kubernetes?service_account_id=sa-xxxx"'
-        + '\n| helm upgrade -i sp1-agent spaceone-agent/k8s-monitoring -n '
-        + '\nspaceone-agent --create-namespace -f -te sp1-agent\n'),
+    helmScript: computed(() => ['helm version\n', 'helm repo add spaceone-agent https://cloudforet-io.github.io/charts\nhelm repo update spaceone-agent']),
+    thirdScript: computed(() => "curl -X 'GET' \\\n"
+        + `  'https://console-v2.api.dev.spaceone.dev/console-api/extension/agent/kubernetes?service_account_id=${props.serviceAccountId}' \\\n`
+        + "  -H 'accept: application/json' \\\n"
+        + `  -H 'Authorization: Bearer ${storeState.appToken}' > agent.yaml && \\\n`
+        + '  helm upgrade -i spaceone-agent spaceone-agent/k8s-monitoring -n spaceone-agent --create-namespace -f agent.yaml && \\\n'
+        + '  rm agent.yaml'),
 });
 
 
