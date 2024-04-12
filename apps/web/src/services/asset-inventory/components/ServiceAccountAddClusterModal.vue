@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PIconModal, PButton, PProgressBar, PFieldGroup, PTextInput, PI, PDataLoader, PSpinner, PLink, PDivider, PRadioGroup, PRadio, PCollapsibleToggle,
@@ -152,6 +154,13 @@ watch(() => state.step, () => {
         formState.commonValidForDelay = true;
     }, 1500);
 }, { immediate: true });
+
+watch(() => props.visible, (visible) => {
+    if (visible) {
+        if (props.addClusterModalType === 'ADD') state.step = 1;
+        if (props.addClusterModalType === 'REGENERATE') state.step = 3;
+    }
+});
 
 </script>
 
