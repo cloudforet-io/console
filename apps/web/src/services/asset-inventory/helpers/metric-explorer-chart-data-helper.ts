@@ -6,10 +6,10 @@ import {
     gray, transparent, violet, white,
 } from '@/styles/colors';
 
-import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { CHART_TYPE, GRANULARITY, STATIC_GROUP_BY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData, RealtimeChartData, ChartType,
+    XYChartData, RealtimeChartData, ChartType, StaticGroupBy,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -46,7 +46,7 @@ const getTreemapChartColor = (idx: number) => {
     return [backgroundColor, fontColor];
 };
 
-export const getLegends = (chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
+export const getMetricChartLegends = (chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
@@ -54,7 +54,7 @@ export const getLegends = (chartType: ChartType, rawData: AnalyzeResponse<Metric
         }
         const legends: Legend[] = [];
         rawData.results?.forEach((d, idx) => {
-            if (d.value) {
+            if (d.count) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 if (!_name) {
@@ -101,9 +101,9 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d.value?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCost = d.value?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCost = d.count?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);
@@ -126,17 +126,23 @@ export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<Metri
         if (_groupBy) {
             chartData.push({
                 category: d[_groupBy] || 'Unknown',
-                value: d._total_value || 0,
+                value: d._total_count || 0,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });
         } else {
             chartData.push({
-                value: d._total_value || 0,
+                value: d._total_count || 0,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });
         }
     });
     return chartData;
+};
+
+export const getRefinedMetricDataAnalyzeQueryGroupBy = (groupBy?: string | StaticGroupBy): string[] => {
+    if (!groupBy) return [];
+    if (Object.values(STATIC_GROUP_BY).includes(groupBy)) return [groupBy];
+    return [`labels.${groupBy}`];
 };
