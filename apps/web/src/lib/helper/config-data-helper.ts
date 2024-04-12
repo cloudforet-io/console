@@ -17,7 +17,7 @@ import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
-type Config = FavoriteConfig;
+type Config = FavoriteConfig & RecentConfig;
 
 export interface ConfigData extends Config {
     [key: string]: any;
@@ -272,7 +272,7 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
     return results.filter((result) => result);
 };
 
-export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|RecentConfig[]|null, menuList: WorkspaceModel[]): ReferenceData[] => {
+export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|null, menuList: WorkspaceModel[]): ReferenceData[] => {
     const results: ReferenceData[] = [];
     if (!config) return results;
 

@@ -3,6 +3,7 @@ import type { TranslateResult } from 'vue-i18n';
 export const FAVORITE_TYPE = {
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
+    CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',

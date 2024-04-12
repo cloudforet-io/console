@@ -18,7 +18,7 @@ import type {
 } from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
 
 interface Props {
-    items: SuggestionItem[] | FavoriteMenuItem [];
+    items: SuggestionItem[] | FavoriteMenuItem[];
     inputText?: string;
     isFocused?: boolean;
     focusingDirection?: FocusingDirection;
