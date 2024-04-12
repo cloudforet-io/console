@@ -142,6 +142,9 @@ const createAgentApp = async () => {
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
         goStep();
+        formState.clusterName = '';
+        formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] = undefined;
+        formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
         showErrorMessage(e.message, e);
