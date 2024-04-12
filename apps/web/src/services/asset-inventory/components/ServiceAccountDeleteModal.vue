@@ -26,13 +26,15 @@ import { RECENT_TYPE } from '@/common/modules/navigations/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
-const props = withDefaults(defineProps<{
+interface Props {
     visible: boolean;
     serviceAccountType: AccountType;
     serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
     attachedGeneralAccounts: ServiceAccountModel[];
+    isAgentMode?: boolean;
+}
 
-}>(), {
+const props = withDefaults(defineProps<Props>(), {
     visible: false,
     serviceAccountType: 'GENERAL',
     serviceAccountData: undefined,
@@ -50,6 +52,7 @@ const state = reactive({
         { label: 'Service Account ID', name: 'service_account_id' },
     ],
     isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
+    accountDeleteWarningInAgentMode: computed(() => i18n.t('If you delete your account, you will lose all of your data.')),
 });
 
 /* Api */
@@ -91,7 +94,15 @@ const handleConfirmDelete = async () => {
                               :verification-text="props.serviceAccountData?.name ?? ''"
                               modal-size="sm"
                               @confirm="handleConfirmDelete"
-        />
+        >
+            <template v-if="props.isAgentMode"
+                      #middle-contents
+            >
+                <div class="warning-wrapper">
+                    <span>{{ state.accountDeleteWarningInAgentMode }}</span>
+                </div>
+            </template>
+        </p-double-check-modal>
         <p-button-modal v-if="state.proxyVisible && !!props.attachedGeneralAccounts.length"
                         :visible.sync="state.proxyVisible"
                         :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
@@ -115,6 +126,13 @@ const handleConfirmDelete = async () => {
             display: block;
             margin-bottom: 1rem;
         }
+    }
+    .warning-wrapper {
+        @apply bg-yellow-100 rounded text-label-lg font-bold text-yellow-700;
+        width: 26rem;
+        height: 3.75rem;
+        padding: 0.625rem 1rem;
+        margin-bottom: 1rem;
     }
 }
 </style>

@@ -1,4 +1,3 @@
-import type { Tags } from '@/schema/_common/model';
 import type { AppStatusType } from '@/schema/identity/app/type';
 
 export interface AgentModel {
@@ -8,11 +7,11 @@ export interface AgentModel {
     name: string;
     state: AppStatusType;
     is_managed: boolean;
-    tags: Tags;
     client_id: string;
     role_id: string;
     app_id: string;
     service_account_id: string;
+    project_id: string;
     workspace_id: string;
     domain_id: string;
     created_at: string;

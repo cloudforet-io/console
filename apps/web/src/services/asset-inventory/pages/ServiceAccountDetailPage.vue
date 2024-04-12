@@ -227,6 +227,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                       :service-account-type="state.serviceAccountType"
                                       :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
+                                      :is-agent-mode="state.isKubernetesAgentMode"
         />
         <service-account-edit-modal v-if="state.item?.name"
                                     :visible.sync="state.editModalVisible"
