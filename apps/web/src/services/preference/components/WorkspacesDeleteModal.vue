@@ -2,7 +2,7 @@
 
 import { computed, reactive } from 'vue';
 
-import { PDoubleCheckModal, PButtonModal } from '@spaceone/design-system';
+import { PDoubleCheckModal, PButtonModal, PLink } from '@spaceone/design-system';
 
 
 
