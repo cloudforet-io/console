@@ -189,7 +189,7 @@ watch(() => state.serviceAccountData, async (serviceAccountData) => {
     }
 }, { immediate: true });
 watch(() => state.attachedTrustedAccountId, (attachedTrustedAccountId) => {
-    state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
+    if (!state.isTrustedAccount) state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
 }, { immediate: true });
 </script>
 

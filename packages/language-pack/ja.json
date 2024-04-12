@@ -2226,7 +2226,7 @@
 			"AUTO_SYNC": {
 				"DELETE_CHECK_MODAL": {
 					"DESC": "信頼されたアカウントが自動同期に設定されているため、削除できません。削除が必要な場合は、まずそのサービスアカウント({serviceAccountName})の自動同期を無効にしてください。",
-					"TITLE": ""
+					"TITLE": "削除できません"
 				},
 				"ERROR_FOUND": "エラー",
 				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",

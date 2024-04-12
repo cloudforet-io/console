@@ -59,6 +59,7 @@ const handleClickEditButton = () => {
     state.mode = 'UPDATE';
 };
 const handleClickCancelButton = () => {
+    serviceAccountPageStore.initToOriginServiceAccountItem();
     state.mode = 'READ';
 };
 const handleClickSaveButton = async () => {
