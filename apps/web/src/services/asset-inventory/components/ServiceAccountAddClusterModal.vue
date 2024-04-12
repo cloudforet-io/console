@@ -83,8 +83,8 @@ const formState = reactive({
 
 const scriptState = reactive({
     optionGuideScript: computed<Record<string, string>>(() => ({
-        [OPEN_COST_OPTIONS.kube_state_metric]: i18n.t('kubectl get daemonsets --all-namespaces | grep kube-state-metrics') as string,
-        [OPEN_COST_OPTIONS.prometheus_node_exporter]: i18n.t('kubectl get daemonsets --all-namespaces | grep node-exporter') as string,
+        [OPEN_COST_OPTIONS.kube_state_metric]: 'kubectl get daemonsets --all-namespaces | grep kube-state-metrics',
+        [OPEN_COST_OPTIONS.prometheus_node_exporter]: 'kubectl get daemonsets --all-namespaces | grep node-exporter',
     })),
     helmScript: computed(() => ['helm version\n', 'helm repo add sp1-agent https://github.com.~\nhelm repo update sp1-agent\n']),
     thirdScript: computed(() => 'helm repo add sp1-agent https://github.com.~'
@@ -177,12 +177,12 @@ watch(() => state.step, () => {
                     <div v-if="state.step === 1"
                          class="first-section"
                     >
-                        <p-field-group :label="$t('Cluster Name')"
+                        <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
                                        required
                         >
                             <p-text-input class="cluster-name-input"
                                           :value.sync="formState.clusterName"
-                                          :placeholder="$t('Cluster Name')"
+                                          :placeholder="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
                                           @keyup.enter="handleEnterKey"
                             />
                         </p-field-group>
@@ -195,10 +195,10 @@ watch(() => state.step, () => {
                             />
                             <div class="description">
                                 <p class="mb-2">
-                                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.INFORMATION') }}
+                                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME_INFORMATION') }}
                                 </p>
                                 <p>
-                                    {{ $t('Find out how Kubernetes cluster kubectl passes and modifies configuration information.') }}
+                                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIND_OUT_INFORMATION') }}
                                 </p>
                                 <p-link :href="'https://kubernetes.io/docs/reference/kubectl/quick-reference/#kubectl-context-and-configuration'"
                                         highlight
@@ -209,7 +209,7 @@ watch(() => state.step, () => {
                             </div>
                         </div>
                         <p-divider class="divider" />
-                        <p-field-group :label="$t('Checklist - before connecting cluster')"
+                        <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CHECKLIST_OPTION_LABEL')"
                                        required
                         >
                             <div class="checklist-wrapper">
@@ -254,17 +254,21 @@ watch(() => state.step, () => {
                                 >
                                     <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metric]"
                                                                               highlightingt-term="kube-state-metric"
-                                                                              :description="$t('To find out the kube-state-metrics, enter the command below:')"
+                                                                              :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
                                                                               script-height="3.5rem"
                                     />
                                     <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
                                                                               highlightingt-term="prometheus-node-exporter"
-                                                                              :description="$t('To find out the prometheus-node-exporter, enter the command below:')"
+                                                                              :description="$t('NVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
                                                                               script-height="3.5rem"
                                     />
                                 </div>
                                 <p-collapsible-toggle :is-collapsed.sync="state.guideCollapsed">
-                                    {{ state.guideCollapsed ? $t('Learn how to find out') : $t('hide') }}
+                                    {{
+                                        state.guideCollapsed ?
+                                            $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT')
+                                            : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT')
+                                    }}
                                 </p-collapsible-toggle>
                             </div>
                         </p-field-group>
@@ -321,7 +325,7 @@ watch(() => state.step, () => {
                               style-type="transparent"
                               @click="handleClickCancelButton"
                     >
-                        {{ $t('Cancel') }}
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CANCEL') }}
                     </p-button>
                 </div>
             </div>

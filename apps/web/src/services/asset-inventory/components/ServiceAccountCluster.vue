@@ -33,7 +33,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    title: computed(() => (storeState.isAgentCreated ? i18n.t('Connected Cluster') : i18n.t('Connect Cluster'))),
+    title: computed(() => (storeState.isAgentCreated ? i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CLUSTER_DETAIL_HEADER') : i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER_HEADER'))),
     isClusterActive: computed(() => (storeState.agentData?.state === 'ENABLED')),
 });
 
@@ -95,7 +95,7 @@ onUnmounted(() => {
                               style-type="tertiary"
                               @click="handleOpenClusterConnectionModal"
                     >
-                        {{ state.isClusterActive ? $t('Disconnect') : $t('Connect') }}
+                        {{ state.isClusterActive ? $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DEACTIVATE') : $t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVATE') }}
                     </p-button>
                     <p-button icon-left="ic_renew"
                               style-type="tertiary"
@@ -130,14 +130,14 @@ onUnmounted(() => {
                         >
                     </template>
                     <p class="empty-text">
-                        {{ $t('A cluster has not been connected yet.') }}
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DISCONNECTED_CLUSTER_TEXT') }}
                     </p>
                     <template #button>
                         <p-button style-type="primary"
                                   icon-left="ic_plus_bold"
                                   @click="handleOpenAddClusterModal"
                         >
-                            {{ $t('Connect Cluster') }}
+                            {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER') }}
                         </p-button>
                     </template>
                 </p-empty>
@@ -151,13 +151,13 @@ onUnmounted(() => {
                         size="sm"
                         :visible.sync="modalState.connectionModalVisible"
                         :theme-color="state.isClusterActive ? 'alert' : 'primary'"
-                        :header-title="state.isClusterActive ? $t('Are you sure you want to disconnect your cluster?') : $t('Are you sure you want to connect your cluster?')"
+                        :header-title="state.isClusterActive ? $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DEACTIVATE_MODAL_TEXT') : $t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVATE_MODAL_TEXT')"
                         @confirm="handleConfirmClusterConnection"
         />
         <p-double-check-modal class="cluster-delete-modal"
                               size="sm"
                               :visible.sync="modalState.deleteClusterModalVislble"
-                              :header-title="$t('Delete Connected Cluster')"
+                              :header-title="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_CLUSTER_MODAL_TEXT')"
                               :verification-text="storeState.agentData?.options.cluster_name"
                               @confirm="handleConfirmDeleteCluster"
         />

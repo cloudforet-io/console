@@ -52,7 +52,7 @@ const state = reactive({
         { label: 'Service Account ID', name: 'service_account_id' },
     ],
     isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
-    accountDeleteWarningInAgentMode: computed(() => i18n.t('If you delete your account, you will lose all of your data.')),
+    accountDeleteWarningInAgentMode: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_WARNING')),
 });
 
 /* Api */
