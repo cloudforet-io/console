@@ -123,7 +123,9 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                  height="1.5rem"
                  class="start-title-button"
             />
-            <p-field-title :label="$t('HOME.CONFIG_STARRED_TITLE')" />
+            <p-field-title :label="$t('HOME.CONFIG_STARRED_TITLE')"
+                           size="lg"
+            />
             <div class="filters-wrapper">
                 <p-select-dropdown
                     class="sort-key-select-dropdown"

@@ -120,6 +120,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
 <template>
     <div class="user-config-recent">
         <p-field-title :label="$t('HOME.CONFIG_RECENT_TITLE')"
+                       size="lg"
                        class="header-wrapper"
         />
         <div class="suggestion-list-wrapper">
