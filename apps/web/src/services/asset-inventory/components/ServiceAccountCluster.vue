@@ -68,6 +68,7 @@ const handleConfirmClusterConnection = async () => {
 };
 const handleConfirmDeleteCluster = async () => {
     await serviceAccountAgentStore.deleteAgent(props.serviceAccountId);
+    modalState.deleteClusterModalVislble = false;
 };
 
 onMounted(async () => {
