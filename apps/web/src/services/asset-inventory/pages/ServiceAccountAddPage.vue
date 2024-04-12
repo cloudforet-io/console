@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal,
@@ -7,7 +8,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { SpaceRouter } from '@/router';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
@@ -56,7 +56,7 @@ const props = defineProps<{
     serviceAccountType?: AccountType;
 }>();
 const { getProperRouteLocation } = useProperRouteLocation();
-
+const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -75,7 +75,6 @@ const state = reactive({
     ),
     providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
     description: computed(() => state.providerSchemaData?.options?.help),
-    // TODO: enhance kubernetes provider schema after API done
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -177,7 +176,12 @@ const handleSave = async () => {
         state.createdAccountId = accountId ?? '';
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
         if (state.isTrustedAccount && serviceAccountPageFormState.isAutoSyncEnabled) state.createModal = true;
-        else SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+        else if (props.provider === 'kubernetes') {
+            router.push(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                params: { serviceAccountId: accountId as string },
+            }));
+        } else router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -186,9 +190,9 @@ const handleSave = async () => {
     }
 };
 const handleGoBack = () => {
-    const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
-    if (nextPath) SpaceRouter.router.push(nextPath);
-    else SpaceRouter.router.back();
+    const nextPath = router.currentRoute.query.nextPath as string|undefined;
+    if (nextPath) router.push(nextPath);
+    else router.back();
 };
 const handleChangeBaseInformationForm = (baseInformationForm) => {
     formState.baseInformationForm = baseInformationForm;
@@ -204,14 +208,14 @@ const handleSync = async () => {
         });
         state.createModal = false;
         serviceAccountPageStore.initState();
-        SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+        router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
 };
 
 /* Init */
