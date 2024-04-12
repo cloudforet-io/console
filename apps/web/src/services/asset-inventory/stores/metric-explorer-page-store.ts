@@ -13,14 +13,21 @@ import type { MetricModel } from '@/schema/inventory/metric/model';
 import type { NamespaceGetParameters } from '@/schema/inventory/namespace/api-verbs/get';
 import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
     Granularity, MetricNamespace, Operator, Period, RelativePeriod,
+    StaticGroupBy,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
+    const appContextStore = useAppContextStore();
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         namespaceListloading: false,
         metricListLoading: false,
@@ -43,15 +50,15 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const getters = reactive({
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
             if (!state.metric?.label_keys?.length) return [];
-            return state.metric.label_keys.map((label) => ({
-                name: label.key,
-                label: label.name,
+            const staticFields: StaticGroupBy[] = ['unit', 'project_id'];
+            if (_state.isAdminMode) staticFields.push('workspace_id');
+
+            const labelFields: string[] = state.metric?.label_keys || [];
+            return [...staticFields, ...labelFields].map((d) => ({
+                name: d, label: d,
             }));
         }),
-        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => state.selectedGroupByList.map((groupBy) => ({
-            name: groupBy,
-            label: state.metric?.label_keys?.find((label) => label.key === groupBy)?.name ?? groupBy,
-        }))),
+        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => getters.groupByItems.filter((d) => state.selectedGroupByList.includes(d.name))),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
