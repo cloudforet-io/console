@@ -3,10 +3,18 @@ import { computed, reactive } from 'vue';
 
 import { PDataLoader, PDefinitionTable, PStatus } from '@spaceone/design-system';
 import type { StatusProps } from '@spaceone/design-system/types/data-display/status/type';
+import dayjs from 'dayjs';
+
+import { store } from '@/store';
 
 import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
 
 const serviceAccountAgentStore = useServiceAccountAgentStore();
+
+const storeState = reactive({
+    agentInfo: computed(() => serviceAccountAgentStore.state.agentInfo),
+    timezone: computed<string>(() => store.state.user.timezone),
+});
 
 const state = reactive({
     fields: computed(() => [
@@ -25,7 +33,11 @@ const state = reactive({
             disableCopy: true,
         },
     ]),
-    data: computed(() => serviceAccountAgentStore.state.agentInfo),
+    data: computed(() => ({
+        cluster_name: storeState.agentInfo?.options?.cluster_name,
+        state: storeState.agentInfo?.state,
+        created_at: storeState.agentInfo?.created_at,
+    })),
 });
 
 const connectedStatusFormatter = (value: string): StatusProps => ({
@@ -48,6 +60,9 @@ const connectedStatusFormatter = (value: string): StatusProps => ({
                 <p-status v-bind="connectedStatusFormatter(value)"
                           class="capitalize"
                 />
+            </template>
+            <template #data-created_at="item">
+                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
         </p-definition-table>
     </p-data-loader>
