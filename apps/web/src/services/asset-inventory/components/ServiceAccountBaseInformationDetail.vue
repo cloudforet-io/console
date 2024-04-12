@@ -2,15 +2,17 @@
 import { computed, reactive, watch } from 'vue';
 
 import { PDynamicLayout } from '@spaceone/design-system';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import dayjs from 'dayjs';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
+import type { ItemLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const props = defineProps<{
@@ -24,7 +26,8 @@ const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
-    detailSchema: {} as Partial<DynamicLayout>,
+    timezone: computed<string>(() => store.state.user.timezone),
+    detailSchema: {} as ItemLayout,
     fieldHandler: [],
     baseInformationData: computed(() => {
         const accountType = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED ? 'Trusted Account' : 'General Account';
@@ -51,7 +54,7 @@ watch(() => props.provider, async (provider) => {
 
         const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
         const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
-        if (detailSchema?.details[0]) state.detailSchema = detailSchema?.details[0];
+        if (detailSchema) state.detailSchema = detailSchema;
     }
 });
 </script>
@@ -65,7 +68,11 @@ watch(() => props.provider, async (provider) => {
                               loading: !state.detailSchema?.type || props.loading
                           }"
                           :field-handler="fieldHandler"
-        />
+        >
+            <template #data-created_at="item">
+                {{ dayjs(item.data).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+        </p-dynamic-layout>
     </div>
 </template>
 

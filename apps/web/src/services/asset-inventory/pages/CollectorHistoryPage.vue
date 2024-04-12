@@ -8,13 +8,13 @@ import {
     PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -112,6 +112,7 @@ const { queryTags, filters: searchFilters } = queryTagsHelper;
 const apiQueryHelper = new ApiQueryHelper();
 
 const getQuery = () => {
+    apiQueryHelper.setPage(state.pageStart, state.pageSize);
     apiQueryHelper.setFilters(searchFilters.value);
 
     let statusValues: string[] = [];

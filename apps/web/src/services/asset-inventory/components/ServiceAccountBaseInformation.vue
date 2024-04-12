@@ -76,10 +76,9 @@ const state = reactive<State>({
         accountName: props.serviceAccountData?.name,
         customSchemaForm: props.serviceAccountData?.data,
         tags: props.serviceAccountData?.tags,
-        ...((state.isTrustedAccount && ('project_id' in props.serviceAccountData)) && {
-            selectedProjectId: props.serviceAccountData?.project_id ?? '',
+        ...((!state.isTrustedAccount && props.serviceAccountData && ('project_id' in props.serviceAccountData)) && {
+            projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
         }),
-        projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
     })),
 });
 
@@ -101,14 +100,14 @@ const updateServiceAccount = async () => {
         state.loading = true;
         if (state.isTrustedAccount) {
             await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-                trusted_account_id: props.serviceAccountId,
+                trusted_account_id: props.serviceAccountId ?? '',
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,
             });
         } else {
             await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
-                service_account_id: props.serviceAccountId,
+                service_account_id: props.serviceAccountId ?? '',
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,
@@ -157,26 +156,11 @@ watch(() => props.provider, async (provider) => {
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable"
                           icon-left="ic_edit"
-                          style-type="transparent"
+                          style-type="secondary"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="state.mode === 'UPDATE'"
-                     class="button-wrapper"
-                >
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!state.isFormValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
-                    </p-button>
-                </div>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -187,12 +171,30 @@ watch(() => props.provider, async (provider) => {
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
+                                                   :is-update-mode="state.mode === 'UPDATE'"
                                                    :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"
                                                    :account-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
+            <div v-if="state.mode === 'UPDATE'"
+                 class="button-wrapper"
+            >
+                <p-button style-type="tertiary"
+                          class="mr-4"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="state.loading"
+                          :disabled="!state.isFormValid"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -205,6 +207,9 @@ watch(() => props.provider, async (provider) => {
         .service-account-base-information-form {
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+        .button-wrapper {
+            padding-left: 1rem;
         }
     }
 }

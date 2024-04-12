@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { indigo } from '@/styles/colors';
 
 
-export type ProviderItem = Required<Pick<ReferenceItem<ProviderModel>, 'key'|'label'|'name'|'icon'|'color'|'linkTemplate'>>;
+export type ProviderItem = Required<Pick<ReferenceItem<ProviderModel>, 'key'|'label'|'name'|'icon'|'color'|'data'>>;
 export type ProviderReferenceMap = ReferenceMap<ProviderItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
@@ -61,7 +61,7 @@ export const useProviderReferenceStore = defineStore('reference-provider', () =>
         try {
             const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters, ListResponse<ProviderModel>>({
                 query: {
-                    only: ['provider', 'name', 'icon', 'alias', 'color', 'options'],
+                    only: ['provider', 'name', 'icon', 'alias', 'color', 'options', 'plugin_info'],
                 },
             }, { timeout: 3000 });
 
@@ -72,7 +72,7 @@ export const useProviderReferenceStore = defineStore('reference-provider', () =>
                     name: providerInfo.name,
                     icon: assetUrlConverter(providerInfo.icon),
                     color: providerInfo.color || indigo[400],
-                    linkTemplate: providerInfo.tags?.external_link_template,
+                    data: providerInfo,
                 };
             });
             state.items = referenceMap;
@@ -91,7 +91,7 @@ export const useProviderReferenceStore = defineStore('reference-provider', () =>
                 name: providerInfo.name,
                 icon: assetUrlConverter(providerInfo.icon),
                 color: providerInfo.color || indigo[400],
-                linkTemplate: providerInfo.tags?.external_link_template,
+                data: providerInfo,
             },
         };
     };

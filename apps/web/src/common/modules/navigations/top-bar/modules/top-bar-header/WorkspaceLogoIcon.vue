@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import type { TopBarLogoIconTheme } from '@/common/modules/navigations/top-bar/types/type';
@@ -31,7 +30,6 @@ const state = reactive({
     isLogoStartsWithEnglish: computed(() => ENGLISH_REGEX.test(state.logoText)),
     isLogoStartsWithCorporate: computed(() => CORPORATE_REGEX.test(state.logoText)),
 });
-
 </script>
 
 <template>
@@ -94,7 +92,7 @@ const state = reactive({
     }
     &.corporate-logo {
         @apply text-display-md;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
     }
 }
 .blue {

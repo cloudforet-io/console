@@ -556,6 +556,7 @@
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DATA_SOURCE": "데이터 소스",
+				"DATA_TYPE": "",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
@@ -2212,6 +2213,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "서비스 어카운트 생성 실패",
 				"ALT_S_CREATE_ACCOUNT_DESC": "서비스 어카운트 등록 완료",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "서비스 어카운트 추가 완료",
+				"AUTO_SYNC_TITLE": "",
 				"BASE_NAME_PLACEHOLDER": "서비스 어카운트 이름",
 				"BASE_TITLE": "기본 정보",
 				"CANCEL": "취소",
@@ -2240,7 +2242,7 @@
 				"TAG_DESC_1": "{name}의 태그를 설정합니다.",
 				"TAG_DESC_2": "키는 문자, 숫자 및 밑줄만 사용할 수 있습니다.",
 				"TAG_LABEL": "태그",
-				"TITLE": "{type} 추가",
+				"TITLE": "{type} 생성",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "특정 Trusted Account를 선택하여 연결하게 될 경우, 해당 어카운트의 리소스에 접근할 수 있습니다. "
 			},
 			"MAIN": {
@@ -2560,6 +2562,7 @@
 			"ACCOUNT": "어카운트",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
+			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
 			"ALT_E_DELETE_COLLECTOR": "컬렉터 삭제 실패",
 			"ALT_E_GET_COLLECTOR": "컬렉터 가져오기 실패",
@@ -2749,9 +2752,13 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"CREATE": {
+				"COMPLETE_MODAL_SYNC": "",
+				"TIMEZONE": ""
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "해당 어카운트는 현재 다음의 어카운트들에 연결되어 있습니다.",
-				"TITLE": "본 어카운트는 삭제가 불가합니다"
+				"TITLE": ""
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "어카운트 타입",
@@ -2767,11 +2774,15 @@
 				"CONNECT_TO_CONSOLE": "콘솔 연결",
 				"CREDENTIALS_LABEL": "Trusted Account를 연결하시겠습니까?",
 				"EDIT": "수정",
+				"EDIT_SERVICE_ACCOUNT_NAME": "",
+				"NAME": "",
 				"NO_CREDENTIALS": "암호화 키가 등록되어 있지 않습니다.",
 				"PROJECT_REQUIRED_HELP_TEXT": "이제, 서비스 어카운트에 반드시 하나의 프로젝트를 연결해주어야 합니다. \n( 이후, 랜덤으로 생성된 프로젝트가 강제로 연결될 수 있습니다. ) ",
 				"REQUIRED": "프로젝트 추가 필요",
-				"SAVE": "저장",
-				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account의 암호화 키는 다른 General Account로부터의 참조를 허용합니다."
+				"SAVE": "변경 저장 ",
+				"SYNC_NOW": "",
+				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account의 암호화 키는 다른 General Account로부터의 참조를 허용합니다.",
+				"UPDATE_SUCCESS": ""
 			}
 		}
 	},
