@@ -102,13 +102,13 @@ onUnmounted(() => {
                               style-type="tertiary"
                               @click="handleOpenRegenerateClusterModal"
                     >
-                        {{ $t('Regenerate') }}
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
                     </p-button>
                     <p-button icon-left="ic_delete"
                               style-type="tertiary"
                               @click="handleOpenDeleteClusterModal"
                     >
-                        {{ $t('Delete') }}
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE') }}
                     </p-button>
                 </div>
             </template>

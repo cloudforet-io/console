@@ -6,6 +6,7 @@ import type { StatusProps } from '@spaceone/design-system/types/data-display/sta
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
 
@@ -35,14 +36,14 @@ const state = reactive({
     ]),
     data: computed(() => ({
         cluster_name: storeState.agentInfo?.options?.cluster_name,
-        state: storeState.agentInfo?.state,
+        state: storeState.agentInfo?.last_accessed_at ? storeState.agentInfo?.state : 'DISABLED',
         created_at: storeState.agentInfo?.created_at,
     })),
 });
 
 const connectedStatusFormatter = (value: string): StatusProps => ({
     theme: value === 'ENABLED' ? 'green' : 'gray',
-    text: value === 'ENABLED' ? 'Connected' : 'Disconnected',
+    text: value === 'ENABLED' ? i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVE') : i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.INACTIVE'),
 });
 
 </script>
