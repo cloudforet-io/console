@@ -50,6 +50,8 @@ const state = reactive({
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
+            // NOTE: only for project group case (not in group by but in filters)
+            if (d === GROUP_BY.PROJECT_GROUP) return { name: d, label: 'Project Group' };
             const targetItem = costAnalysisPageGetters.defaultGroupByItems.find((item) => item.name === d);
             if (targetItem) return targetItem;
             return { name: d, label: d };

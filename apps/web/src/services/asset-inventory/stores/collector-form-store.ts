@@ -53,6 +53,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         selectedServiceAccountFilterOption: 'include' as ServiceAccountFilterOption,
         options: {} as CollectorOptions,
         versions: [] as string[],
+        isScheduleError: false,
     }),
     getters: {
         collectorId(): string|undefined {
@@ -114,6 +115,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         resetSchedule(hoursOnly = false) {
             this.scheduleHours = this.originCollector?.schedule?.hours ?? [];
+            this.isScheduleError = false;
             if (!hoursOnly) this.schedulePower = this.originCollector?.schedule?.state === 'ENABLED' ?? false;
         },
         resetSchedulePower() {

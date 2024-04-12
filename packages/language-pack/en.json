@@ -556,6 +556,7 @@
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
 				"DATA_SOURCE": "Data Source",
+				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"
@@ -2539,6 +2540,7 @@
 			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
+			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
 			"ALT_E_DELETE_COLLECTOR": "Failed to Delete Collector",
 			"ALT_E_GET_COLLECTOR": "Failed to Get Collector",

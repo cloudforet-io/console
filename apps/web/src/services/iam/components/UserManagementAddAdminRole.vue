@@ -127,13 +127,14 @@ const fetchListRoles = async (inputText: string) => {
 const fetchListWorkspaces = async (inputText: string) => {
     workspaceState.loading = true;
 
-    workspaceListApiQueryHelper.setFilters([{
-        k: 'name',
-        v: inputText,
-        o: '',
-    }]);
+    workspaceListApiQueryHelper.setFilters([
+        { k: 'name', v: inputText, o: '' },
+        { k: 'state', v: 'ENABLED', o: '' },
+    ]);
     try {
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
+        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
+            query: workspaceListApiQueryHelper.data,
+        });
         workspaceState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.workspace_id,
