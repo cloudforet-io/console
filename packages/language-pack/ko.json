@@ -556,6 +556,7 @@
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DATA_SOURCE": "데이터 소스",
+				"DATA_TYPE": "",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
@@ -1079,9 +1080,13 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Admin 모드로 전환",
 				"EXIT_ADMIN_MODE": "Admin 모드 종료",
+				"EXPAND_GNB_RAIL": "",
 				"FAVORITE": "즐겨찾기 ",
+				"HIDE_GNB_RAIL": "",
+				"MINIMIZE_GNB_RAIL": "",
 				"NOTICE": "공지사항 ",
 				"NOTIFICATIONS": "알람",
+				"OPEN_GNB_RAIL": "",
 				"PROFILE": "마이페이지",
 				"SEARCH": "검색"
 			},
@@ -1231,7 +1236,7 @@
 			"VERSION": "버전 "
 		},
 		"STARRED": "즐겨찾기",
-		"STARRED_NO_DATA": "로 추가한 목록이 이곳에 표시됩니다.",
+		"STARRED_NO_DATA": "즐겨찾기 없음",
 		"TAGS": {
 			"ADD": "추가",
 			"ADD_TAG": "태그 추가",
@@ -2552,6 +2557,7 @@
 			"ACCOUNT": "어카운트",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
+			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
 			"ALT_E_DELETE_COLLECTOR": "컬렉터 삭제 실패",
 			"ALT_E_GET_COLLECTOR": "컬렉터 가져오기 실패",
@@ -3594,6 +3600,7 @@
 			"EDIT": "편집",
 			"EDIT_EVENT_RULE": "이벤트 규칙 편집",
 			"EQUALS": "같음(equals)",
+			"ESCALATION_POLICY": "에스컬레이션 정책",
 			"EVENT_RULE": "이벤트 규칙",
 			"HIGH": "높음",
 			"LOW": "낮음",
@@ -3617,7 +3624,7 @@
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
 			"ADD_GROUP_MEMBER": "그룹 멤버 추가",
 			"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가 ",
-			"ALL_PROJECTS": "프로젝트 ",
+			"ALL_PROJECTS": "모든 프로젝트",
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
 			"ALT_E_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 실패",
 			"ALT_E_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 실패",

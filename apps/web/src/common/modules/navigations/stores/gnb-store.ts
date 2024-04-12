@@ -5,6 +5,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import { store } from '@/store';
@@ -22,7 +24,8 @@ interface GnbStoreState {
     selectedItem: Breadcrumb;
     id?: string;
     favoriteItem?: FavoriteOptions;
-    isMinimizeGnb?: boolean;
+    isHideNavRail?: boolean;
+    isMinimizeNavRail?: boolean;
     costQuerySets: CostQuerySetModel[];
 }
 
@@ -31,6 +34,7 @@ export const useGnbStore = defineStore('gnb', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
 
     const _getters = reactive({
+        userId: computed(() => store.state.user.userId),
         costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
         currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId as string),
     });
@@ -40,8 +44,9 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: {} as Breadcrumb,
         id: '',
         favoriteItem: {} as FavoriteOptions,
-        isMinimizeGnb: false,
         costQuerySets: [] as CostQuerySetModel[],
+        isHideNavRail: false,
+        isMinimizeNavRail: false,
     });
 
     const getters = reactive({
@@ -49,8 +54,9 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: computed<Breadcrumb>(() => state.selectedItem),
         id: computed<string|undefined>(() => state.id),
         favoriteItem: computed<FavoriteOptions|undefined>(() => state.favoriteItem),
-        isMinimizeGnb: computed<boolean|undefined>(() => state.isMinimizeGnb),
         costQuerySets: computed<CostQuerySetModel[]>(() => state.costQuerySets),
+        isHideNavRail: computed<boolean|undefined>(() => state.isHideNavRail),
+        isMinimizeNavRail: computed<boolean|undefined>(() => state.isMinimizeNavRail),
     });
 
     const actions = {
@@ -66,8 +72,40 @@ export const useGnbStore = defineStore('gnb', () => {
         setFavoriteItemId: (favoriteItem?: FavoriteOptions) => {
             state.favoriteItem = favoriteItem;
         },
-        setMinimizeGnb: (isMinimizeGnb?: boolean) => {
-            state.isMinimizeGnb = isMinimizeGnb;
+        fetchNavRailStatus: async () => {
+            try {
+                const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
+                    name: 'console:gnb:navRail',
+                });
+                state.isMinimizeNavRail = response.data.isMinimizeNavRail;
+                state.isHideNavRail = response.data.isHideNavRail;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.isMinimizeNavRail = undefined;
+                state.isHideNavRail = undefined;
+            }
+        },
+        createMinimizeNavRail: async (isMinimizeNavRail?: boolean) => {
+            state.isMinimizeNavRail = isMinimizeNavRail;
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set({
+                    name: 'console:gnb:navRail',
+                    data: { isMinimizeNavRail },
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        createHideNavRail: async (isHideNavRail?: boolean) => {
+            state.isHideNavRail = isHideNavRail;
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set({
+                    name: 'console:gnb:navRail',
+                    data: { isHideNavRail },
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
         },
         fetchCostQuerySet: async () => {
             const costQuerySetPromiseResults = await Promise.allSettled(

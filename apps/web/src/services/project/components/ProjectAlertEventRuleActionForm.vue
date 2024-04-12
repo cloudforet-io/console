@@ -2,22 +2,28 @@
 import {
     computed, reactive,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown,
+    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown, PBadge, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
-import { i18n as _i18n } from '@/translations';
+import { i18n, i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import { alertResourceGroupBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 const URGENCY = Object.freeze({
     NO_SET: 'NO_SET',
@@ -35,8 +41,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits(['update:actions', 'update:options']);
 
+const projectDetailPageStore = useProjectDetailPageStore();
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
+    currentProjectId: computed<string>(() => projectDetailPageStore.state.projectId || ''),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     userItems: computed(() => Object.keys(state.users).map((k) => ({
         name: k,
@@ -56,6 +64,21 @@ const state = reactive({
             label: _i18n.t('PROJECT.EVENT_RULE.LOW'),
         },
     ])),
+    escalationPolicies: computed<EscalationPolicyReferenceMap>(() => allReferenceStore.getters.escalationPolicy),
+    escalationPolicyList: computed(() => {
+        const allowedProjectIds = [state.currentProjectId, '*'];
+        const escalationPolicieListFilteredByProjectId = Object.keys(state.escalationPolicies).filter((key) => allowedProjectIds.includes(state.escalationPolicies[key].data.project_id));
+        return escalationPolicieListFilteredByProjectId
+            .map((key) => ({
+                name: state.escalationPolicies[key].key,
+                label: state.escalationPolicies[key].name,
+                scope: state.escalationPolicies[key].data.resource_group,
+            }));
+    }),
+    resourceGroups: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
+        WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
+        PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
+    })),
     proxyActions: useProxyValue<EventRuleActions>('actions', props, emit),
     proxyOptions: useProxyValue<EventRuleOptions>('options', props, emit),
     routingProjects: computed<string[]>({
@@ -95,6 +118,18 @@ const state = reactive({
             };
         },
     }),
+    selectedEscalationPolicy: computed<MenuItem[]>({
+        get() {
+            const escalationPolicy = props.actions?.change_escalation_policy;
+            return escalationPolicy ? [{ name: escalationPolicy, label: escalationPolicy }] : [];
+        },
+        set(items) {
+            state.proxyActions = {
+                ...state.proxyActions,
+                change_escalation_policy: items[0]?.name,
+            };
+        },
+    }),
     additionalInfoTags: computed({
         get() { return props.actions?.add_additional_info; },
         set(tags) {
@@ -128,6 +163,7 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
 const handleStopProcessingChange = (value: boolean) => {
     state.stopProcessing = value;
 };
+
 </script>
 
 <template>
@@ -192,6 +228,50 @@ const handleStopProcessingChange = (value: boolean) => {
                                    reset-selected-on-unmounted
                 />
             </div>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.ESCALATION_POLICY') }}
+                </p>
+                <p-select-dropdown class="escalation-dropdown"
+                                   :menu="state.escalationPolicyList"
+                                   :selected.sync="state.selectedEscalationPolicy"
+                                   show-delete-all-button
+                                   reset-selected-on-unmounted
+                >
+                    <template #dropdown-button="item">
+                        <span v-if="state.escalationPolicyList.find((policy) => policy.name === item.name)"
+                              class="escalation-policy-menu-item"
+                        >
+                            <span class="escalation-policy-label">
+                                {{ state.escalationPolicyList.find((policy) => policy.name === item.name)?.label }}
+                            </span>
+                            <p-badge class="scope-badge"
+                                     :style-type="alertResourceGroupBadgeStyleTypeFormatter(state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope)"
+                                     badge-type="subtle"
+                            >
+                                {{ state.resourceGroups[state.escalationPolicyList.find((policy) => policy.name === item.name)?.scope] }}
+                            </p-badge>
+                        </span>
+                        <span v-else
+                              class="escalation-policy-label placeholder"
+                        >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
+                    </template>
+                    <template #menu-item--format="{ item }">
+                        <p-tooltip class="escalation-policy-menu-item"
+                                   :contents="item.label"
+                                   position="bottom"
+                        >
+                            <span class="escalation-policy-label">{{ item.label }}</span>
+                            <p-badge class="scope-badge"
+                                     :style-type="alertResourceGroupBadgeStyleTypeFormatter(item.scope)"
+                                     badge-type="subtle"
+                            >
+                                {{ state.resourceGroups[item.scope] }}
+                            </p-badge>
+                        </p-tooltip>
+                    </template>
+                </p-select-dropdown>
+            </div>
             <div class="form-box additional-information">
                 <tags-input-group show-header
                                   :tags="state.additionalInfoTags"
@@ -251,6 +331,24 @@ const handleStopProcessingChange = (value: boolean) => {
             }
         }
 
+        .escalation-dropdown {
+
+            .escalation-policy-menu-item {
+                @apply flex justify-between items-center gap-2;
+
+                .escalation-policy-label {
+                    white-space: normal;
+                    word-break: normal;
+                }
+                .placeholder {
+                    @apply text-gray-600;
+                }
+                .scope-badge {
+                    @apply flex-shrink-0;
+                }
+            }
+        }
+
         /* customize tags-input-group */
         :deep(&.additional-information) {
             display: block;
@@ -264,7 +362,7 @@ const handleStopProcessingChange = (value: boolean) => {
             }
         }
 
-        .project-select-dropdown, .user-search-dropdown {
+        .project-select-dropdown, .user-search-dropdown, .escalation-dropdown {
             width: 60%;
         }
     }
@@ -282,7 +380,7 @@ const handleStopProcessingChange = (value: boolean) => {
                 .p-radio {
                     display: none;
                 }
-                .user-search-dropdown {
+                .user-search-dropdown, .escalation-dropdown {
                     display: block;
                 }
             }
@@ -298,7 +396,7 @@ const handleStopProcessingChange = (value: boolean) => {
                 .label {
                     padding-bottom: 0.75rem;
                 }
-                .project-select-dropdown, .user-search-dropdown {
+                .project-select-dropdown, .user-search-dropdown, .escalation-dropdown {
                     width: 100%;
                 }
             }

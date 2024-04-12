@@ -16,7 +16,6 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 interface WorkspacePageState {
     loading: boolean;
     userLoading: boolean;
@@ -119,7 +118,6 @@ export const useWorkspacePageStore = defineStore('page-workspace', {
                 this.userLoading = false;
             }
         },
-        // Role
         async listRoles(params?: RoleListParameters) {
             try {
                 const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);

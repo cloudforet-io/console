@@ -8,6 +8,7 @@ const palette = {
     pointViolet: '#7545FF',
     gray: {
         100: '#F7F7F7',
+        150: '#EDEDEF',
         200: '#DDDDDF',
         300: '#C2C2C6',
         400: '#A7A9B2',
@@ -74,6 +75,7 @@ const palette = {
     },
     violet: {
         100: '#F8F8FC',
+        150: '#F0EFFD',
         200: '#E1E0FA',
         300: '#B7AFED',
         400: '#897CD6',

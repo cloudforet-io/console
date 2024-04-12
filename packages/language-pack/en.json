@@ -556,6 +556,7 @@
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
 				"DATA_SOURCE": "Data Source",
+				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"
@@ -1079,9 +1080,13 @@
 			"TOOLTIP": {
 				"ENABLE_ADMIN_MODE": "Switch to Admin Mode",
 				"EXIT_ADMIN_MODE": "Exit Admin Mode",
+				"EXPAND_GNB_RAIL": "Expand menu",
 				"FAVORITE": "Favorites",
+				"HIDE_GNB_RAIL": "Close menu",
+				"MINIMIZE_GNB_RAIL": "Minimize menu",
 				"NOTICE": "Notice",
 				"NOTIFICATIONS": "Notifications",
+				"OPEN_GNB_RAIL": "Open menu",
 				"PROFILE": "My Page",
 				"SEARCH": "Search"
 			},
@@ -1231,7 +1236,7 @@
 			"VERSION": "Version"
 		},
 		"STARRED": "Starred",
-		"STARRED_NO_DATA": "Items will be displayed here.",
+		"STARRED_NO_DATA": "No starred items",
 		"TAGS": {
 			"ADD": "Add",
 			"ADD_TAG": "Add Tags",
@@ -2552,6 +2557,7 @@
 			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
+			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
 			"ALT_E_DELETE_COLLECTOR": "Failed to Delete Collector",
 			"ALT_E_GET_COLLECTOR": "Failed to Get Collector",
@@ -3594,6 +3600,7 @@
 			"EDIT": "Edit",
 			"EDIT_EVENT_RULE": "Edit Event Rule",
 			"EQUALS": "equals",
+			"ESCALATION_POLICY": "Escalation Policy",
 			"EVENT_RULE": "Event Rule",
 			"HIGH": "High",
 			"LOW": "Low",
@@ -3617,7 +3624,7 @@
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
 			"ADD_GROUP_MEMBER": "Add Group Member",
 			"ADD_SERVICE_ACCOUNT": "Add service account",
-			"ALL_PROJECTS": "Project",
+			"ALL_PROJECTS": "All Projects",
 			"ALT_E_CREATE_PROJECT": "Failed to Create Project",
 			"ALT_E_CREATE_PROJECT_GROUP": "Failed to Create Project Group",
 			"ALT_E_DELETE_PROJECT_GROUP": "Failed to Delete Project Group",
