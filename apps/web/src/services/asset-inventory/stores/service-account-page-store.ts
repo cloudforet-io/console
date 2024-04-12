@@ -127,6 +127,13 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
             formState.scheduleHours = [];
             state.syncJobList = [];
         },
+        initToOriginServiceAccountItem: () => {
+            formState.isAutoSyncEnabled = state.originServiceAccountItem?.schedule?.state === 'ENABLED';
+            formState.scheduleHours = state.originServiceAccountItem?.schedule?.hours ?? [];
+            formState.selectedSingleWorkspace = state.originServiceAccountItem?.sync_options?.single_workspace_id ?? '';
+            formState.skipProjectGroup = state.originServiceAccountItem?.sync_options?.skip_project_group ?? false;
+            formState.additionalOptions = state.originServiceAccountItem?.plugin_options ?? {};
+        },
         setProvider: (provider: string) => { state.selectedProvider = provider; },
         setFormState: (key:string, data: any) => {
             formState[key] = data;
