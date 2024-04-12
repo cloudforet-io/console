@@ -20,8 +20,8 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const storeState = reactive({
-    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
-    hasAdminOrWorkspaceOwnerRole: computed(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
+    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    hasAdminOrWorkspaceOwnerRole: computed<boolean>(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });

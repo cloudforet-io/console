@@ -15,7 +15,7 @@ import UserConfigStarred from '@/services/workspace-home/components/UserConfigSt
     @apply flex;
     gap: 1rem;
     .box-wrapper {
-        @apply border border-gray-200 text-label-md ;
+        @apply border border-gray-200 text-label-md;
         height: 15.875rem;
         border-radius: 0.375rem;
         flex: 1;

@@ -91,7 +91,7 @@ const fetchRecentList = async (currentWorkspaceId: string) => {
     }
 };
 
-const convertRecentToReferenceData = (recentConfig: ConfigData) => {
+const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData => {
     const { itemType } = recentConfig;
     if (itemType === RECENT_TYPE.DASHBOARD) {
         return convertDashboardConfigToReferenceData([recentConfig], [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems, ...dashboardGetters.privateItems])[0];
@@ -120,6 +120,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
 <template>
     <div class="user-config-recent">
         <p-field-title :label="$t('HOME.CONFIG_RECENT_TITLE')"
+                       size="lg"
                        class="header-wrapper"
         />
         <div class="suggestion-list-wrapper">

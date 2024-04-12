@@ -35,9 +35,9 @@ const storeState = reactive({
     .page-contents {
         @apply flex flex-col;
         max-width: 87rem;
+        padding: 0 0 2rem 0;
         margin-right: auto;
         margin-left: auto;
-        padding: 0;
         .section {
             margin-top: 1rem;
         }

@@ -35,7 +35,9 @@ const handleClickFullModeButton = () => {
 
 <template>
     <div class="bookmark-header">
-        <p-field-title :label="$t('HOME.BOOKMARK_TITLE')" />
+        <p-field-title :label="$t('HOME.BOOKMARK_TITLE')"
+                       size="lg"
+        />
         <div v-if="!state.proxyIsFullMode"
              class="bookmark-folders-wrapper"
         >
