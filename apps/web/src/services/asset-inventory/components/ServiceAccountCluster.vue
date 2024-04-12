@@ -146,6 +146,7 @@ onUnmounted(() => {
         <service-account-add-cluster-modal :visible.sync="modalState.addClusterModalVisible"
                                            :type="modalState.addClusterModalType"
                                            :service-account-id="props.serviceAccountId"
+                                           :add-cluster-modal-type="modalState.addClusterModalType"
         />
         <p-button-modal class="cluster-connection-modal"
                         size="sm"
@@ -155,10 +156,10 @@ onUnmounted(() => {
                         @confirm="handleConfirmClusterConnection"
         />
         <p-double-check-modal class="cluster-delete-modal"
-                              size="sm"
+                              modal-size="sm"
                               :visible.sync="modalState.deleteClusterModalVislble"
                               :header-title="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_CLUSTER_MODAL_TEXT')"
-                              :verification-text="storeState.agentData?.options.cluster_name"
+                              :verification-text="storeState.agentData?.options?.cluster_name"
                               @confirm="handleConfirmDeleteCluster"
         />
     </p-pane-layout>

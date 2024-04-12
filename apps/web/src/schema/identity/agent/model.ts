@@ -4,7 +4,6 @@ export interface AgentModel {
     agent_id: string;
     options: Record<string, any>;
     client_secret?: string;
-    name: string;
     state: AppStatusType;
     is_managed: boolean;
     client_id: string;
