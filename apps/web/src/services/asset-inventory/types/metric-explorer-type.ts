@@ -4,6 +4,7 @@ import type { ManipulateType } from 'dayjs';
 
 import type {
     GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,
+    STATIC_GROUP_BY,
 } from '@/services/asset-inventory/constants/metric-explorer-constant';
 
 
@@ -19,6 +20,8 @@ export type RelativePeriod = {
 };
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
+
+export type StaticGroupBy = typeof STATIC_GROUP_BY[keyof typeof STATIC_GROUP_BY];
 
 export type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 
@@ -41,8 +44,8 @@ export interface Legend {
 
 export type MetricDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    value?: Array<{ date: string; value: number; }>;
-    _total_value?: number;
+    count?: Array<{ date: string; value: number; }>;
+    _total_count?: number;
 };
 
 export interface XYChartData {
