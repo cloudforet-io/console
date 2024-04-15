@@ -2736,7 +2736,8 @@
 			"SHOWING_TOP_15": "Showing Top 15",
 			"SHOW_ALL": "Show all",
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
-			"TOTAL_COUNT": "Total Count"
+			"TOTAL_COUNT": "Total Count",
+			"UNIT": "Unit"
 		},
 		"SECURITY": {
 			"MAIN": {

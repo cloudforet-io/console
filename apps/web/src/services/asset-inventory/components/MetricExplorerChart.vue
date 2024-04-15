@@ -25,8 +25,11 @@ import MetricExplorerLineChart from '@/services/asset-inventory/components/Metri
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getMetricChartLegends, getRefinedMetricDataAnalyzeQueryGroupBy, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
+    getMetricChartLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
+import {
+    getRefinedMetricDataAnalyzeQueryGroupBy,
+} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
     ChartType, Legend, MetricDataAnalyzeResult, Period,
@@ -58,12 +61,13 @@ const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeRespon
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
+        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy) : [];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageState.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
-                group_by: getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy),
-                start: metricExplorerPageState.period?.start,
+                group_by: _groupBy,
+                start: state.isRealtimeChart ? metricExplorerPageState.period?.end : metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
                     count: {
@@ -130,7 +134,12 @@ watch([
     if (!metricId) return;
     await setChartData(true);
 }, { immediate: true });
-setChartData();
+watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
+    if (refresh) {
+        await setChartData();
+        metricExplorerPageStore.setRefreshMetricData(false);
+    }
+}, { immediate: false });
 </script>
 
 <template>
