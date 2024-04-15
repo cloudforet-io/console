@@ -102,6 +102,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setSelectedOperator = (operator: Operator) => {
         state.selectedOperator = operator;
     };
+    const setSelectedNamespace = (namespace: NamespaceModel|undefined) => {
+        state.selectedNamespace = namespace;
+    };
 
     /* Actions */
     const reset = () => {
@@ -185,6 +188,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setFilters,
         setMetricId,
         setSelectedOperator,
+        setSelectedNamespace,
     };
 
     return {

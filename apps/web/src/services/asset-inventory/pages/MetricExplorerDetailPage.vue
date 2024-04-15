@@ -52,11 +52,9 @@ watch(() => props.id, async (metricId) => {
 }, { immediate: true });
 
 watch(() => metricExplorerPageStore.state.namespaces, async (namespaces) => {
-    metricExplorerPageStore.$patch((_store) => {
-        const metric = _store.state.metric;
-        const namespace = namespaces.find((d) => d.namespace_id === metric?.namespace_id);
-        if (namespace) _store.state.selectedNamespace = namespace;
-    });
+    const metric = metricExplorerPageStore.state.metric;
+    const namespace = namespaces.find((d) => d.namespace_id === metric?.namespace_id);
+    if (namespace) metricExplorerPageStore.setSelectedNamespace(namespace);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 });
 </script>
