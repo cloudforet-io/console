@@ -7,6 +7,7 @@ import {
     PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor, PTooltip,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
@@ -81,7 +82,7 @@ const state = reactive({
         }
         return serviceAccountPageStore.getters.lastJob;
     }),
-    fields: computed(() => {
+    fields: computed<DataTableFieldType[]>(() => {
         const generalAccountField = getAccountFields(serviceAccountSchemaStore.getters.generalAccountSchema);
         return [
             { name: 'name', label: 'Account Name' },
