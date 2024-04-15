@@ -154,13 +154,13 @@ const goStep = (n?: number) => {
 };
 const createAgentApp = async () => {
     const options: AgentModel['options'] = {
-        cluster_name: formState.clusterName,
+        cluster_name: clusterName.value,
         ...formState.selectedClusterOptions,
     };
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
         goStep();
-        formState.clusterName = '';
+        setForm('clusterName', '');
         formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] = undefined;
         formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     } catch (e: any) {
@@ -189,7 +189,6 @@ watch(() => props.visible, (visible) => {
     <p-icon-modal class="service-account-add-cluster-modal"
                   :visible.sync="state.proxyVisible"
                   icon-name="img_musly-navigating-kubernetes"
-                  hide-button
     >
         <template #custom-header>
             <p class="title">
@@ -197,170 +196,168 @@ watch(() => props.visible, (visible) => {
             </p>
         </template>
         <template #body>
-            <div class="cluster-content-wrapper">
-                <div class="add-cluster-form"
-                     :class="{ 'third-section-form': state.step === 3 }"
+            <div :class="{ 'add-cluster-form': true, 'third-section-form': state.step === 3 }">
+                <p-progress-bar :percentage="(state.step/3)*100"
+                                :color="violet[400]"
+                />
+                <div v-if="state.step === 1"
+                     class="first-section"
                 >
-                    <p-progress-bar :percentage="(state.step/3)*100"
-                                    :color="violet[400]"
-                    />
-                    <div v-if="state.step === 1"
-                         class="first-section"
+                    <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
+                                   :invalid="invalidState.clusterName"
+                                   :invalid-text="invalidTexts.clusterName"
+                                   required
                     >
-                        <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
-                                       :invalid="invalidState.clusterName"
-                                       :invalid-text="invalidTexts.clusterName"
-                                       required
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input class="cluster-name-input"
-                                              :value="clusterName"
-                                              :invalid="invalid"
-                                              :placeholder="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
-                                              @keyup.enter="handleEnterKey"
-                                              @update:value="setForm('clusterName', $event)"
-                                />
-                            </template>
-                        </p-field-group>
+                        <template #default="{invalid}">
+                            <p-text-input class="cluster-name-input"
+                                          :value="clusterName"
+                                          :invalid="invalid"
+                                          :placeholder="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
+                                          @keyup.enter="handleEnterKey"
+                                          @update:value="setForm('clusterName', $event)"
+                            />
+                        </template>
+                    </p-field-group>
 
-                        <div class="information">
-                            <p-i class="info-icon"
-                                 name="ic_info-circle"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                            />
-                            <div class="description">
-                                <p class="mb-2">
-                                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME_INFORMATION') }}
-                                </p>
-                                <p>
-                                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIND_OUT_INFORMATION') }}
-                                </p>
-                                <p-link :href="'https://kubernetes.io/docs/reference/kubectl/quick-reference/#kubectl-context-and-configuration'"
-                                        highlight
-                                        :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                                >
-                                    {{ $t('Find out') }}
-                                </p-link>
-                            </div>
-                        </div>
-                        <p-divider class="divider" />
-                        <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CHECKLIST_OPTION_LABEL')"
-                                       required
-                        >
-                            <div class="checklist-wrapper">
-                                <div class="checklist">
-                                    <span class="text">
-                                        Is
-                                        <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metric }}</span>
-                                        installed?
-                                    </span>
-                                    <p-radio-group>
-                                        <p-radio v-for="(options, index) in state.clusterOptions"
-                                                 :key="`${OPEN_COST_OPTIONS.kube_state_metric}-${index}`"
-                                                 :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric]"
-                                                 :value="options.value"
-                                                 @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metric, options.value)"
-                                        >
-                                            {{ options.label }}
-                                        </p-radio>
-                                    </p-radio-group>
-                                </div>
-                                <div class="checklist">
-                                    <span class="text">
-                                        Is
-                                        <span class="code">{{ OPEN_COST_OPTIONS.prometheus_node_exporter }}</span>
-                                        installed?
-                                    </span>
-                                    <p-radio-group>
-                                        <p-radio v-for="(options, index) in state.clusterOptions"
-                                                 :key="`${OPEN_COST_OPTIONS.prometheus_node_exporter}-${index}`"
-                                                 :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter]"
-                                                 :value="options.value"
-                                                 @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.prometheus_node_exporter, options.value)"
-                                        >
-                                            {{ options.label }}
-                                        </p-radio>
-                                    </p-radio-group>
-                                </div>
-                            </div>
-                            <div class="lean-guide">
-                                <div v-if="!state.guideCollapsed"
-                                     class="guide-content"
-                                >
-                                    <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metric]"
-                                                                              highlightingt-term="kube-state-metric"
-                                                                              :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
-                                                                              script-height="3.5rem"
-                                    />
-                                    <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
-                                                                              highlightingt-term="prometheus-node-exporter"
-                                                                              :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
-                                                                              script-height="3.5rem"
-                                    />
-                                </div>
-                                <p-collapsible-toggle :is-collapsed.sync="state.guideCollapsed">
-                                    {{
-                                        state.guideCollapsed ?
-                                            $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT')
-                                            : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT')
-                                    }}
-                                </p-collapsible-toggle>
-                            </div>
-                        </p-field-group>
-                    </div>
-                    <div v-else-if="state.step === 2"
-                         class="second-section"
-                    >
-                        <div class="script-wrapper">
-                            <service-account-add-cluster-script-field :script="scriptState.helmScript[0]"
-                                                                      :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_FIRST')"
-                                                                      script-height="3.5rem"
-                            />
-                            <service-account-add-cluster-script-field :script="scriptState.helmScript[1]"
-                                                                      :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_SECOND')"
-                                                                      script-height="5rem"
-                            />
-                        </div>
-                    </div>
-                    <div v-else-if="state.step === 3"
-                         class="third-section"
-                    >
-                        <div class="script-wrapper">
-                            <div v-if="storeState.loading"
-                                 class="loader"
+                    <div class="information">
+                        <p-i class="info-icon"
+                             name="ic_info-circle"
+                             width="0.875rem"
+                             height="0.875rem"
+                        />
+                        <div class="description">
+                            <p class="mb-2">
+                                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME_INFORMATION') }}
+                            </p>
+                            <p>
+                                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIND_OUT_INFORMATION') }}
+                            </p>
+                            <p-link :href="'https://kubernetes.io/docs/reference/kubectl/quick-reference/#kubectl-context-and-configuration'"
+                                    highlight
+                                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             >
-                                <p-spinner style-type="gray"
-                                           size="xl"
-                                />
-                                <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LOADING') }}</p>
-                            </div>
-                            <service-account-add-cluster-script-field v-else
-                                                                      class="generated-script"
-                                                                      :script="scriptState.thirdScript"
-                                                                      :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_THIRD')"
-                                                                      script-height="9.5rem"
-                            />
+                                {{ $t('Find out') }}
+                            </p-link>
                         </div>
                     </div>
-                </div>
-                <div class="button-wrapper">
-                    <p-button class="continue-button"
-                              :style-type="state.step === 3 ? 'primary' : 'substitutive'"
-                              :icon-right="state.step === 3 ? undefined :'ic_arrow-right'"
-                              :disabled="!formState.isValid || !formState.commonValidForDelay || storeState.loading"
-                              @click="handleClickContinueButton"
+                    <p-divider class="divider" />
+                    <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CHECKLIST_OPTION_LABEL')"
+                                   required
                     >
-                        {{ state.step === 3 ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.DONE_BUTTON') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}
-                    </p-button>
-                    <p-button v-if="state.step !== 3"
-                              class="not-now-button"
-                              style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CANCEL') }}
-                    </p-button>
+                        <div class="checklist-wrapper">
+                            <div class="checklist">
+                                <span class="text">
+                                    Is
+                                    <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metric }}</span>
+                                    installed?
+                                </span>
+                                <p-radio-group>
+                                    <p-radio v-for="(options, index) in state.clusterOptions"
+                                             :key="`${OPEN_COST_OPTIONS.kube_state_metric}-${index}`"
+                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric]"
+                                             :value="options.value"
+                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metric, options.value)"
+                                    >
+                                        {{ options.label }}
+                                    </p-radio>
+                                </p-radio-group>
+                            </div>
+                            <div class="checklist">
+                                <span class="text">
+                                    Is
+                                    <span class="code">{{ OPEN_COST_OPTIONS.prometheus_node_exporter }}</span>
+                                    installed?
+                                </span>
+                                <p-radio-group>
+                                    <p-radio v-for="(options, index) in state.clusterOptions"
+                                             :key="`${OPEN_COST_OPTIONS.prometheus_node_exporter}-${index}`"
+                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter]"
+                                             :value="options.value"
+                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.prometheus_node_exporter, options.value)"
+                                    >
+                                        {{ options.label }}
+                                    </p-radio>
+                                </p-radio-group>
+                            </div>
+                        </div>
+                        <div class="lean-guide">
+                            <div v-if="!state.guideCollapsed"
+                                 class="guide-content"
+                            >
+                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metric]"
+                                                                          highlightingt-term="kube-state-metric"
+                                                                          :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
+                                                                          script-height="3.5rem"
+                                />
+                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
+                                                                          highlightingt-term="prometheus-node-exporter"
+                                                                          :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
+                                                                          script-height="3.5rem"
+                                />
+                            </div>
+                            <p-collapsible-toggle :is-collapsed.sync="state.guideCollapsed">
+                                {{
+                                    state.guideCollapsed ?
+                                        $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT')
+                                        : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT')
+                                }}
+                            </p-collapsible-toggle>
+                        </div>
+                    </p-field-group>
                 </div>
+                <div v-else-if="state.step === 2"
+                     class="second-section"
+                >
+                    <div class="script-wrapper">
+                        <service-account-add-cluster-script-field :script="scriptState.helmScript[0]"
+                                                                  :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_FIRST')"
+                                                                  script-height="3.5rem"
+                        />
+                        <service-account-add-cluster-script-field :script="scriptState.helmScript[1]"
+                                                                  :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_SECOND')"
+                                                                  script-height="5rem"
+                        />
+                    </div>
+                </div>
+                <div v-else-if="state.step === 3"
+                     class="third-section"
+                >
+                    <div class="script-wrapper">
+                        <div v-if="storeState.loading"
+                             class="loader"
+                        >
+                            <p-spinner style-type="gray"
+                                       size="xl"
+                            />
+                            <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LOADING') }}</p>
+                        </div>
+                        <service-account-add-cluster-script-field v-else
+                                                                  class="generated-script"
+                                                                  :script="scriptState.thirdScript"
+                                                                  :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_THIRD')"
+                                                                  script-height="9.5rem"
+                        />
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template #custom-button>
+            <div class="button-wrapper">
+                <p-button class="continue-button"
+                          :style-type="state.step === 3 ? 'primary' : 'substitutive'"
+                          :icon-right="state.step === 3 ? undefined :'ic_arrow-right'"
+                          :disabled="!formState.isValid || !formState.commonValidForDelay || storeState.loading"
+                          @click="handleClickContinueButton"
+                >
+                    {{ state.step === 3 ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.DONE_BUTTON') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONTINUE_BUTTON') }}
+                </p-button>
+                <p-button v-if="state.step !== 3"
+                          class="not-now-button"
+                          style-type="transparent"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CANCEL') }}
+                </p-button>
             </div>
         </template>
     </p-icon-modal>
@@ -376,98 +373,96 @@ watch(() => props.visible, (visible) => {
         white-space: pre-line;
     }
 
-    .cluster-content-wrapper {
+    .add-cluster-form {
+        @apply bg-violet-100 flex-shrink;
         text-align: left;
+        height: 27.625rem;
+        max-height: calc(100vh - 28.125rem);
+        overflow: scroll;
+        border-radius: 0.375rem;
+        &.third-section-form {
+            height: 30.125rem;
+            max-height: calc(100vh - 25.625rem);
+        }
 
-        .add-cluster-form {
-            @apply bg-violet-100;
-            height: 27.625rem;
-            max-height: 27.625rem;
-            margin-bottom: 1.5rem;
-            overflow: scroll;
-            border-radius: 0.375rem;
-            &.third-section-form {
-                height: 30.125rem;
-                max-height: 30.125rem;
+        .first-section {
+            padding: 1.625rem 1rem 1rem;
+
+            .cluster-name-input {
+                @apply w-full;
             }
 
-            .first-section {
-                padding: 1.625rem 1rem 1rem;
-
-                .cluster-name-input {
-                    @apply w-full;
+            .information {
+                @apply flex gap-2;
+                .info-icon {
+                    min-width: 0.875rem;
+                    margin-top: 0.25rem;
                 }
-
-                .information {
-                    @apply flex gap-2;
-                    .info-icon {
-                        min-width: 0.875rem;
-                        margin-top: 0.25rem;
-                    }
-                    .description {
-                        @apply text-paragraph-md text-gray-700;
-                    }
-                }
-                .divider {
-                    margin: 1rem 0;
-                }
-                .checklist-wrapper {
-                    @apply flex flex-col gap-1;
-                    margin-top: 0.5rem;
-                    .checklist {
-                        @apply flex justify-between items-center rounded-lg border border-gray-200 bg-white;
-                        height: 2.8125rem;
-                        padding: 0.75rem;
-
-                        .text {
-                            @apply text-label-md text-gray-900;
-                        }
-                        .code {
-                            @apply text-code-md text-red-600 rounded bg-gray-100 border border-gray-200;
-                            height: 1.3125rem;
-                            padding: 0 0.375rem;
-                            margin: 0 0.375rem;
-                        }
-                    }
-                }
-                .lean-guide {
-                    margin-top: 0.75rem;
+                .description {
+                    @apply text-paragraph-md text-gray-700;
                 }
             }
-            .second-section {
-                padding: 2.125rem 1rem 1.5rem;
-                max-height: 23rem;
+            .divider {
+                margin: 1rem 0;
+            }
+            .checklist-wrapper {
+                @apply flex flex-col gap-1;
+                margin-top: 0.5rem;
+                .checklist {
+                    @apply flex justify-between items-center rounded-lg border border-gray-200 bg-white;
+                    height: 2.8125rem;
+                    padding: 0.75rem;
+
+                    .text {
+                        @apply text-label-md text-gray-900;
+                    }
+                    .code {
+                        @apply text-code-md text-red-600 rounded bg-gray-100 border border-gray-200;
+                        height: 1.3125rem;
+                        padding: 0 0.375rem;
+                        margin: 0 0.375rem;
+                    }
+                }
+            }
+            .lean-guide {
+                margin-top: 0.75rem;
+            }
+        }
+        .second-section {
+            padding: 2.125rem 1rem 1.5rem;
+            max-height: 23rem;
+            height: 23rem;
+
+            .script-wrapper {
+                padding-bottom: 1rem;
+            }
+        }
+        .third-section {
+            max-height: 23rem;
+
+            .script-wrapper {
                 height: 23rem;
-
-                .script-wrapper {
-                    padding-bottom: 1rem;
+                .loader {
+                    @apply flex flex-col items-center justify-center gap-3 text-paragraph-md text-gray-500 h-full;
                 }
-            }
-            .third-section {
-                max-height: 23rem;
 
-                .script-wrapper {
-                    height: 23rem;
-                    .loader {
-                        @apply flex flex-col items-center justify-center gap-3 text-paragraph-md text-gray-500 h-full;
-                    }
-
-                    .generated-script {
-                        padding: 2.125rem 1rem 1.5rem;
-                    }
+                .generated-script {
+                    padding: 2.125rem 1rem 1.5rem;
                 }
             }
         }
+    }
 
-        .button-wrapper {
-            @apply flex flex-col gap-2;
+    .button-wrapper {
+        @apply flex flex-col gap-2;
+        min-height: 7rem;
+        padding-top: 1.5rem;
 
-            .continue-button {
-                height: 2.5rem;
-            }
-            .not-now-button {
-                height: 2.5rem;
-            }
+        .continue-button {
+            height: 2.5rem;
+        }
+        .not-now-button {
+            height: 2.5rem;
         }
     }
 }
