@@ -74,7 +74,10 @@ const updateServiceAccountName = async () => {
             name: serviceAccountName.value,
         });
     }
-    serviceAccountPageStore.setName(results.name);
+    serviceAccountPageStore.$patch((store) => {
+        store.state.originServiceAccountItem.name = results.name;
+    });
+    state.proxyVisible = false;
 };
 
 
@@ -82,7 +85,6 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         await updateServiceAccountName();
-        state.proxyVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));

@@ -138,7 +138,6 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
         setFormState: (key:string, data: any) => {
             formState[key] = data;
         },
-        setName: (name: string) => { state.originServiceAccountItem.name = name; },
         fetchSyncJobList: async (trustedAccountId: string) => {
             try {
                 // fetch recent job
