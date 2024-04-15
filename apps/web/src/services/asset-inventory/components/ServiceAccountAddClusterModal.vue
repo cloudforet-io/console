@@ -73,9 +73,9 @@ const formState = reactive({
         [OPEN_COST_OPTIONS.kube_state_metric]: undefined,
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
-    firstStepValid: computed(() => !invalidState.clusterName
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
+    firstStepValid: computed(() => !invalidState.clusterName && invalidState.clusterName !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
     isValid: computed(() => {
         if (state.step === 1) return formState.firstStepValid;
@@ -155,7 +155,8 @@ const goStep = (n?: number) => {
 const createAgentApp = async () => {
     const options: AgentModel['options'] = {
         cluster_name: clusterName.value,
-        ...formState.selectedClusterOptions,
+        kube_state_metric: formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric],
+        prometheus_node_exporter: formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter],
     };
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
