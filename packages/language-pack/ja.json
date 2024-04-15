@@ -2736,7 +2736,8 @@
 			"SHOWING_TOP_15": "上位15表示中",
 			"SHOW_ALL": "すべて表示",
 			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
-			"TOTAL_COUNT": ""
+			"TOTAL_COUNT": "",
+			"UNIT": ""
 		},
 		"SECURITY": {
 			"MAIN": {
