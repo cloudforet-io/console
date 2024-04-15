@@ -41,13 +41,18 @@ const modalState = reactive({
 const workspaceListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
-const refreshWorkspaceList = async () => {
+const refreshWorkspaceList = async (isInit?: boolean) => {
     workspacePageStore.$patch({ loading: true });
     workspaceListApiQueryHelper
         .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
         .setFilters(workspacePageStore.searchFilters);
     try {
         await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
+        if (isInit) {
+            const idx = workspacePageState.workspaces.findIndex((workspace) => workspace.workspace_id === route.query.selectedWorkspaceId);
+            workspacePageStore.$patch({ selectedIndices: [idx] });
+            handleSelectAction(route.query.modalType as string);
+        }
     } finally {
         workspacePageStore.$patch({ loading: false });
     }
@@ -101,8 +106,7 @@ const handleSelectAction = (name: string) => {
     }
 };
 
-
-const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN'], refreshWorkspaceList);
+const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN'], () => refreshWorkspaceList(true));
 callApiWithGrantGuard();
 
 onMounted(() => {

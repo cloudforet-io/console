@@ -38,6 +38,7 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -61,21 +62,21 @@ const state = reactive({
     appsTotalCount: undefined as number|undefined,
 });
 
-const handleClickInviteButton = () => {
-    router.push({ name: IAM_ROUTE.USER._NAME });
-    userPageStore.$patch((_state) => {
-        _state.modal.type = USER_MODAL_TYPE.INVITE;
-        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
-        _state.modal.themeColor = 'primary';
-        _state.modal.visible.add = true;
-        _state.modal = cloneDeep(_state.modal);
-    });
+const handleActionButton = (type: string) => {
+    if (type === 'invite') {
+        inviteWorkspaceUser();
+        return;
+    }
+    const workspaceId = state.selectedWorkspace.workspace_id;
+    enterAdminMode();
+    if (type === 'edit' || type === 'delete') {
+        actionWorkspace(type, workspaceId);
+    } else if (type === 'create') {
+        createApp();
+    }
 };
-const handleClickCreateButton = () => {
+const enterAdminMode = () => {
     appContextStore.enterAdminMode();
-    router.push({
-        name: makeAdminRouteName(IAM_ROUTE.APP._NAME),
-    });
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',
@@ -83,10 +84,34 @@ const handleClickCreateButton = () => {
         duration: 2000,
         speed: 1,
     });
+};
+const actionWorkspace = (type: string, workspaceId: string) => {
+    router.push({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        query: {
+            modalType: type,
+            selectedWorkspaceId: workspaceId,
+        },
+    });
+};
+const createApp = () => {
+    router.push({
+        name: makeAdminRouteName(IAM_ROUTE.APP._NAME),
+    });
     appPageStore.$patch((_state) => {
         _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
         _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
         _state.modal.visible.form = true;
+        _state.modal = cloneDeep(_state.modal);
+    });
+};
+const inviteWorkspaceUser = () => {
+    router.push({ name: IAM_ROUTE.USER._NAME });
+    userPageStore.$patch((_state) => {
+        _state.modal.type = USER_MODAL_TYPE.INVITE;
+        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
+        _state.modal.themeColor = 'primary';
+        _state.modal.visible.add = true;
         _state.modal = cloneDeep(_state.modal);
     });
 };
@@ -142,12 +167,14 @@ onMounted(async () => {
                                    name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
+                                   @click="handleActionButton('edit')"
                     />
                     <p-icon-button v-if="storeState.isDomainAdmin"
                                    name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
                                    class="delete-button"
+                                   @click="handleActionButton('delete')"
                     />
                 </span>
             </template>
@@ -156,14 +183,14 @@ onMounted(async () => {
                     <p-button v-if="state.isWorkspaceOwner"
                               style-type="tertiary"
                               icon-left="ic_service_user"
-                              @click="handleClickInviteButton"
+                              @click="handleActionButton('invite')"
                     >
                         {{ $t('HOME.INFO_INVITE_USER') }}
                     </p-button>
                     <p-button v-if="storeState.isDomainAdmin"
                               style-type="tertiary"
                               icon-left="ic_service_app"
-                              @click="handleClickCreateButton"
+                              @click="handleActionButton('create')"
                     >
                         {{ $t('HOME.INFO_CREATE_APP') }}
                     </p-button>
