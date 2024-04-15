@@ -124,8 +124,11 @@ watch(
                                @update:thisPage="handleUpdateThisPage"
             />
         </template>
-        <template #col-format="{value}">
+        <template #col-format="{field, value}">
             <span v-if="state.loading" />
+            <span v-else-if="field.name === 'totalCount'">
+                {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
+            </span>
             <span v-else>
                 {{ value }}
             </span>

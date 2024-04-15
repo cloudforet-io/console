@@ -75,7 +75,7 @@ export const getMetricChartLegends = (chartType: ChartType, rawData: AnalyzeResp
         return legends;
     }
     if (rawData.results?.length) {
-        return [{ name: 'total', label: 'Total Cost', disabled: false }];
+        return [{ name: 'totalCount', label: 'Total Count', disabled: false }];
     }
     return [];
 };
@@ -103,7 +103,7 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
                 }
                 chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCost = d.count?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);
@@ -132,6 +132,7 @@ export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<Metri
             });
         } else {
             chartData.push({
+                category: 'Total Count',
                 value: d._total_count || 0,
                 background_color: backgroundColor,
                 font_color: fontColor,
