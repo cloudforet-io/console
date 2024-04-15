@@ -32,9 +32,13 @@ const state = reactive({
 
 /* Event */
 const handleClickCopyButton = (script: any) => {
+    if (state.isCopied) return;
     copyAnyData(script);
     setTimeout(() => {
         state.isCopied = true;
+        setTimeout(() => {
+            state.isCopied = false;
+        }, 1500);
     }, 800);
 };
 
