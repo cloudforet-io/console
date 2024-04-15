@@ -14,9 +14,9 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
+import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Legend, XYChartData } from '@/services/asset-inventory/types/metric-explorer-type';
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
 interface Props {
