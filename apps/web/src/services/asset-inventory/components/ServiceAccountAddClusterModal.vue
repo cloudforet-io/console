@@ -272,7 +272,7 @@ watch(() => props.visible, (visible) => {
                                     />
                                     <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
                                                                               highlightingt-term="prometheus-node-exporter"
-                                                                              :description="$t('NVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
+                                                                              :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
                                                                               script-height="3.5rem"
                                     />
                                 </div>

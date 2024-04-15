@@ -10,7 +10,6 @@ export const ACCOUNT_TYPE_BADGE_OPTION = {
 export const PROVIDER_ACCOUNT_NAME = {
     google_cloud: 'Project',
     azure: 'Subscription',
-    kubernetes: 'Cluster',
 } as const;
 
 

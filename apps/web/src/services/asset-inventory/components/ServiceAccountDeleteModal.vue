@@ -161,7 +161,7 @@ const handleConfirmDelete = async () => {
     }
     .warning-wrapper {
         @apply bg-yellow-100 rounded text-label-lg font-bold text-yellow-700;
-        width: 26rem;
+        width: 100%;
         height: 3.75rem;
         padding: 0.625rem 1rem;
         margin-bottom: 1rem;

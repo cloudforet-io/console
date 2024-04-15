@@ -204,7 +204,8 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             <service-account-cluster v-if="state.isKubernetesAgentMode"
                                      :service-account-id="props.serviceAccountId"
             />
-            <service-account-credentials :service-account-loading="state.loading"
+            <service-account-credentials v-else
+                                         :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
                                          :editable="state.isEditable"
                                          @refresh="handleRefresh"

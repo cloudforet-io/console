@@ -2769,6 +2769,7 @@
 				"CLUSTER_NAME": "Cluster Name",
 				"CLUSTER_NAME_INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
 				"CONTINUE_BUTTON": "Continue",
+				"COPIED": "Copied",
 				"COPY_CODE": "Copy Code",
 				"DONE_BUTTON": "Done",
 				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
