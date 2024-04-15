@@ -130,7 +130,12 @@ watch([
     if (!metricId) return;
     await setChartData(true);
 }, { immediate: true });
-setChartData();
+watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
+    if (refresh) {
+        await setChartData();
+        metricExplorerPageStore.setRefreshMetricData(false);
+    }
+}, { immediate: false });
 </script>
 
 <template>

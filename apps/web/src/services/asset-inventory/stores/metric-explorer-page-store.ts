@@ -32,6 +32,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         namespaceListloading: false,
         metricListLoading: false,
         metricLoading: false,
+        refreshMetricData: false,
         metricId: undefined as string|undefined,
         metric: undefined as MetricModel|undefined,
         namespaces: [] as NamespaceModel[],
@@ -101,6 +102,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     };
     const setSelectedOperator = (operator: Operator) => {
         state.selectedOperator = operator;
+    };
+    const setRefreshMetricData = (refreshMetricData: boolean) => {
+        state.refreshMetricData = refreshMetricData;
     };
 
     /* Actions */
@@ -185,6 +189,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setFilters,
         setMetricId,
         setSelectedOperator,
+        setRefreshMetricData,
     };
 
     return {
