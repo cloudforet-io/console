@@ -217,7 +217,7 @@ const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
 /** API for Excel export * */
 const exportServiceAccountData = async () => {
     await downloadExcel({
-        url: '/identity/service-account/list',
+        url: `/identity/${tableState.isTrustedAccount ? 'trusted-account' : 'service-account'}/list`,
         param: { query: getQuery() },
         fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
         file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
