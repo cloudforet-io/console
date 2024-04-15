@@ -29,7 +29,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
     const state = reactive({
-        namespaceListloading: false,
+        namespaceListLoading: false,
         metricListLoading: false,
         metricLoading: false,
         refreshMetricData: false,
@@ -124,18 +124,18 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedOperator = OPERATOR.SUM;
     };
     const loadNamespaces = async () => {
-        state.namespaceListloading = true;
+        state.namespaceListLoading = true;
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.namespace.list);
         try {
             const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
             if (status === 'succeed') {
                 state.namespaces = response.results || [];
-                state.namespaceListloading = false;
+                state.namespaceListLoading = false;
             }
         } catch (e) {
             console.error(e);
             state.namespaces = [];
-            state.namespaceListloading = false;
+            state.namespaceListLoading = false;
         }
     };
     const loadMetrics = async (namespaceId: string) => {
