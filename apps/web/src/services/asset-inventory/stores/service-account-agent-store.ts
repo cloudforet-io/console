@@ -36,8 +36,8 @@ export const useServiceAccountAgentStore = defineStore('service-account-agent', 
                     options,
                 });
                 setAgentInfo(response);
-            } catch (e) {
-                throw new Error('Agent Create Error');
+            } catch (e: any) {
+                throw new Error('Agent Create Error', e);
             } finally {
                 setTimeout(() => {
                     state.loading = false;
