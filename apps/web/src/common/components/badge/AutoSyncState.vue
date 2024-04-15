@@ -4,12 +4,12 @@ import { computed, reactive } from 'vue';
 import { PI, PTooltip } from '@spaceone/design-system';
 
 interface AutoSyncStateProps {
-    state: 'ENABLED' | 'DISABLED'
+    state?: 'ENABLED' | 'DISABLED'
     size?: 'lg' | 'md' | 'sm' | 'xs'
 }
 
 const props = withDefaults(defineProps<AutoSyncStateProps>(), {
-    autoSyncState: 'ENABLED',
+    state: 'ENABLED',
     size: 'md',
 });
 
