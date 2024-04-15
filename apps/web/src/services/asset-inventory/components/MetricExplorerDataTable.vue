@@ -16,8 +16,10 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import {
-    getMetricExplorerDataTableDateFields, getRefinedMetricDataAnalyzeQueryGroupBy,
-    getRefinedMetricExplorerTableData,
+    getRefinedMetricDataAnalyzeQueryGroupBy,
+} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
+import {
+    getMetricExplorerDataTableDateFields, getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -52,11 +54,12 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
             .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const _groupBy = metricExplorerPageState.selectedGroupByList.map((groupBy) => getRefinedMetricDataAnalyzeQueryGroupBy(groupBy));
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageState.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
-                group_by: getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedGroupByList),
+                group_by: _groupBy,
                 start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
