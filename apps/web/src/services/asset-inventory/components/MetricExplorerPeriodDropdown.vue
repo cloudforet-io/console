@@ -12,6 +12,7 @@ import { isEqual, range } from 'lodash';
 import { i18n } from '@/translations';
 
 import CustomDateModal from '@/common/components/custom-date-modal/CustomDateModal.vue';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import {
     GRANULARITY,
@@ -28,6 +29,13 @@ import type {
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+interface Props {
+    selectedPeriodLabel: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    selectedPeriodLabel: '',
+});
+const emit = defineEmits<{(e: 'update:selected-period-label', value: boolean): void; }>();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const state = reactive({
@@ -95,6 +103,7 @@ const state = reactive({
     }),
     selectedPeriod: METRIC_PERIOD_MENU.LAST_6_MONTHS as MetricPeriodMenu,
     customDateModalVisible: false,
+    proxySelectedPeriodLabel: useProxyValue('selectedPeriodLabel', props, emit),
 });
 
 /* Util */
@@ -138,6 +147,9 @@ watch(() => metricExplorerPageState.granularity, (granularity) => {
         setSelectedPeriodItemByGranularity(granularity);
     }
 }, { immediate: false });
+watch(() => state.selectedPeriod, (selectedPeriod) => {
+    state.proxySelectedPeriodLabel = state.periodMenuItems.find((d) => d.name === selectedPeriod)?.label || '';
+}, { immediate: true });
 </script>
 
 <template>
