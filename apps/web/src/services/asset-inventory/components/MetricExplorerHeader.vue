@@ -21,7 +21,7 @@ const state = reactive({
             type: 'item',
             name: 'saveAs',
             icon: 'ic_disk-edit-filled',
-            label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
+            label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
         },
     ])),
 });

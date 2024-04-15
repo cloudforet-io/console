@@ -14,7 +14,7 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     const dateFields: DataTableFieldType[] = [];
     if (!hasGroupBy) {
         defaultFields.push({
-            name: 'total', label: ' ',
+            name: 'totalCount', label: ' ',
         });
     }
     let timeUnit: TimeUnit = 'month';

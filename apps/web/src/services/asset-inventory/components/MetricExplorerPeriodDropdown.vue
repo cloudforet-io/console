@@ -141,7 +141,7 @@ watch(() => metricExplorerPageState.granularity, (granularity) => {
 </script>
 
 <template>
-    <div class="cost-analysis-period-select-dropdown">
+    <div>
         <p-select-dropdown :menu="state.periodMenuItems"
                            :selection-label="$t('INVENTORY.METRIC_EXPLORER.PERIOD.PERIOD')"
                            disable-proxy

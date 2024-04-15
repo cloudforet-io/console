@@ -2735,7 +2735,8 @@
 			"SAVE_AS": "Save as",
 			"SHOWING_TOP_15": "Showing Top 15",
 			"SHOW_ALL": "Show all",
-			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items."
+			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
+			"TOTAL_COUNT": "Total Count"
 		},
 		"SECURITY": {
 			"MAIN": {

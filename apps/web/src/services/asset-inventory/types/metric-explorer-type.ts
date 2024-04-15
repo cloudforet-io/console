@@ -50,7 +50,7 @@ export type MetricDataAnalyzeResult = {
 
 export interface XYChartData {
     date: string;
-    totalCost?: number;
+    totalCount?: number;
     [key: string]: any;
 }
 
