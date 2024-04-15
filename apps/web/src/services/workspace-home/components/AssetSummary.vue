@@ -50,23 +50,14 @@ const state = reactive({
 });
 
 const handleClickArrowButton = (type: string, direction: string) => {
-    if (!providerEl.value || !dailyUpdateEl.value) return;
-    if (direction === 'right') {
-        state.pageStart[type] += 1;
+    const element = type === 'provider' ? providerEl.value : dailyUpdateEl.value;
+    if (!element) return;
 
-        if (type === 'provider') {
-            providerEl.value.style.marginLeft = `-${state.pageStart.provider * 576}px`;
-        } else {
-            dailyUpdateEl.value.style.marginLeft = `-${state.pageStart.dailyUpdate * 576}px`;
-        }
-    } else {
-        state.pageStart[type] -= 1;
-        if (type === 'provider') {
-            providerEl.value.style.marginLeft = `${state.pageStart.provider * 576}px`;
-        } else {
-            dailyUpdateEl.value.style.marginLeft = `${state.pageStart.dailyUpdate * 576}px`;
-        }
-    }
+    const increment = direction === 'right' ? 1 : -1;
+    state.pageStart[type] += increment;
+
+    const marginLeft = state.pageStart[type] * 576;
+    element.style.marginLeft = direction === 'right' ? `-${marginLeft}px` : `${marginLeft}px`;
 };
 const getApiParameter = (type) => {
     apiQueryHelper.setSort('count', true);
