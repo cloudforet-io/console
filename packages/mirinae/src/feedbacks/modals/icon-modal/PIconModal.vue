@@ -42,13 +42,16 @@
                         <div class="body-wrapper">
                             <slot name="body" />
                         </div>
-                        <p-button v-if="!props.hideButton"
-                                  class="button"
-                                  :style-type="props.buttonStyleType"
-                                  @click="handleClickButton"
+                        <slot v-if="!props.hideButton"
+                              name="custom-button"
                         >
-                            {{ props.buttonText }}
-                        </p-button>
+                            <p-button class="button"
+                                      :style-type="props.buttonStyleType"
+                                      @click="handleClickButton"
+                            >
+                                {{ props.buttonText }}
+                            </p-button>
+                        </slot>
                     </div>
                 </div>
             </article>
