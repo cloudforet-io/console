@@ -2769,6 +2769,7 @@
 				"CLUSTER_NAME": "",
 				"CLUSTER_NAME_INFORMATION": "helm 설치 및 클러스터 연결을 위해 먼저 쿠버네티스 클러스터 이름을 \n알려주세요.",
 				"CONTINUE_BUTTON": "계속하기",
+				"COPIED": "",
 				"COPY_CODE": "코드 복사",
 				"DONE_BUTTON": "완료",
 				"FIND_OUT_INFORMATION": "",
