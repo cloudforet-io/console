@@ -51,7 +51,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const getters = reactive({
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
             if (!state.metric?.label_keys?.length) return [];
-            const staticFields: StaticGroupBy[] = ['unit', 'project_id'];
+            const staticFields: StaticGroupBy[] = ['project_id'];
             if (_state.isAdminMode) staticFields.push('workspace_id');
 
             const labelFields: string[] = state.metric?.label_keys || [];
