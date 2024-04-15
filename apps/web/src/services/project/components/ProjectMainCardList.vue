@@ -281,18 +281,26 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                 <div>
                                     <div class="provider-icon-wrapper">
                                         <div class="provider">
-                                            <router-link v-for="(provider, index) in getDistinctProviders(item.project_id)"
-                                                         :key="index"
-                                                         :to="{
-                                                             name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                                                             query: { provider: getProvider(provider) ? provider : null },
-                                                         }"
-                                                         class="icon-link"
-                                                         :style="{
-                                                             backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`
-                                                         }"
-                                            />
+                                            <template v-for="(provider, index) in getDistinctProviders(item.project_id)">
+                                                <router-link
+                                                    v-if="index < 5"
+                                                    :key="index"
+                                                    :to="{
+                                                        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                                                        query: { provider: getProvider(provider) ? provider : null },
+                                                    }"
+                                                    class="icon-link"
+                                                    :style="{
+                                                        backgroundImage: `url('${getProvider(provider).icon || require('@/assets/images/ic_cloud-filled.svg')}')`
+                                                    }"
+                                                />
+                                            </template>
                                         </div>
+                                        <span v-if="getDistinctProviders(item.project_id).length > 5"
+                                              class="provider-more-text"
+                                        >
+                                            ...
+                                        </span>
                                         <router-link v-if="getDistinctProviders(item.project_id).length !== 0"
                                                      class="icon-wrapper"
                                                      :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
@@ -446,6 +454,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
         justify-content: space-between;
         align-items: center;
         overflow: hidden;
+        gap: 0.37rem;
         .provider-icon-wrapper {
             @apply flex-shrink inline-flex items-center truncate;
             .provider {
@@ -461,17 +470,24 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                     @apply bg-blue-300;
                 }
             }
+            .provider-more-text {
+                @apply text-label-sm text-gray-500;
+                cursor: default;
+                font-weight: normal;
+                padding-right: 0.5rem;
+            }
             &:hover {
                 @apply text-secondary font-bold;
             }
             .icon-link {
-                @apply flex-shrink-0 inline-block mr-2;
+                @apply flex-shrink-0 inline-block;
                 height: 1.25rem;
                 width: 1.25rem;
                 background-repeat: no-repeat;
                 background-size: 100%;
                 background-position: center;
                 line-height: 1.25rem;
+                margin-right: 0.37rem;
                 &:hover {
                     opacity: 50%;
                 }

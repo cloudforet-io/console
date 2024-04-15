@@ -556,6 +556,7 @@
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DATA_SOURCE": "데이터 소스",
+				"DATA_TYPE": "",
 				"DEFAULT": "기본",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "원본 통화"
@@ -2539,6 +2540,7 @@
 			"ACCOUNT": "어카운트",
 			"ADDITIONAL_OPTIONS": "추가 옵션",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "컬렉터 이름 수정 실패",
+			"ALT_E_COLLECTOR_SCHEDULE": "스케줄은 최대 2개까지만 선택이 가능합니다. ",
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
 			"ALT_E_DELETE_COLLECTOR": "컬렉터 삭제 실패",
 			"ALT_E_GET_COLLECTOR": "컬렉터 가져오기 실패",
