@@ -27,11 +27,15 @@ const state = reactive({
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
     },
+    isCopied: false,
 });
 
 /* Event */
 const handleClickCopyButton = (script: any) => {
     copyAnyData(script);
+    setTimeout(() => {
+        state.isCopied = true;
+    }, 800);
 };
 
 </script>
@@ -44,13 +48,13 @@ const handleClickCopyButton = (script: any) => {
                                  :term="props.highlightingtTerm"
                                  style-type="secondary"
             />
-            <p-button class="copy-button"
+            <p-button :class="{'copy-button': true, 'copied': state.isCopied}"
                       style-type="tertiary"
                       size="sm"
-                      icon-left="ic_copy"
+                      :icon-left="state.isCopied ? 'ic_check' :'ic_copy'"
                       @click="handleClickCopyButton(props.script)"
             >
-                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.COPY_CODE') }}
+                {{ state.isCopied ? $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.COPIED') : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.COPY_CODE') }}
             </p-button>
         </div>
         <div class="script-wrapper"
@@ -76,6 +80,10 @@ const handleClickCopyButton = (script: any) => {
         }
         .copy-button {
             min-width: 6rem;
+
+            &.copied {
+                @apply bg-gray-200;
+            }
         }
     }
     .script-wrapper {
