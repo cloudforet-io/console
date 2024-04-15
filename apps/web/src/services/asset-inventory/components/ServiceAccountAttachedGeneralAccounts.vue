@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import dayjs from 'dayjs';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -15,6 +18,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -24,6 +28,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
+
+import { green, red } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
@@ -47,6 +53,7 @@ const emit = defineEmits<{(e: 'update:attached-general-accounts', attachedGenera
 const state = reactive({
     project: computed(() => allReferenceStore.getters.project),
     loading: true,
+    syncReqLoading: false,
     items: [] as any,
     sortBy: 'name',
     sortDesc: true,
@@ -54,11 +61,22 @@ const state = reactive({
     totalCount: 0,
     pageLimit: 15,
     isSyncEnabled: computed(() => {
-        const isDomainScope = serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN';
+        const isDomainScope = serviceAccountPageStore.state.originServiceAccountItem.resource_group === 'DOMAIN';
         const isAdminMode = appContextStore.getters.isAdminMode;
         if (isDomainScope) {
             return isAdminMode;
         } return serviceAccountPageStore.getters.isOriginAutoSyncEnabled;
+    }),
+    trustedAccountId: computed(() => serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id),
+    timezone: computed(() => store.state.user.timezone),
+    lastSuccessSynced: computed(() => serviceAccountPageStore.getters.lastSuccessSynced),
+    errorModalVisible: false,
+    isSyncing: computed(() => ['IN_PROGRESS', 'PENDING'].includes(serviceAccountPageStore.getters.lastJob?.status)),
+    lastSyncJob: computed(() => {
+        if (state.isSyncing) {
+            return serviceAccountPageStore.getters.secondToLastJob;
+        }
+        return serviceAccountPageStore.getters.lastJob;
     }),
 });
 const fields = [
@@ -91,6 +109,7 @@ const getAttachedGeneralAccountList = async () => {
 
 const handleChange = async (options?: ToolboxOptions) => {
     try {
+        state.loading = true;
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
@@ -100,6 +119,8 @@ const handleChange = async (options?: ToolboxOptions) => {
         await getAttachedGeneralAccountList();
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -116,20 +137,52 @@ const handleSort = async (sortBy, sortDesc) => {
 
 const handleSync = async () => {
     try {
+        state.syncReqLoading = true;
         await SpaceConnector.clientV2.identity.trustedAccount.sync({
-            trusted_account_id: serviceAccountPageStore.state.serviceAccountItem.trusted_account_id,
+            trusted_account_id: serviceAccountPageStore.state.originServiceAccountItem.trusted_account_id,
         });
-        showSuccessMessage('Sync is started.', '');
+        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.START_SYNC'), '');
     } catch (e) {
         ErrorHandler.handleError(e, {
             title: 'Failed to start sync.',
         });
+    } finally {
+        if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
+        state.syncReqLoading = false;
     }
+};
+
+const handleViewSyncError = () => {
+    state.errorModalVisible = true;
+};
+
+const handleCloseErrorModal = () => {
+    state.errorModalVisible = false;
 };
 
 const init = async () => {
     await getAttachedGeneralAccountList();
 };
+
+let syncCheckInterval;
+watch(() => state.isSyncing, async (isSyncing) => {
+    if (isSyncing) {
+        syncCheckInterval = setInterval(async () => {
+            if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
+        }, 10000);
+    }
+    if (!isSyncing) {
+        if (syncCheckInterval) clearInterval(syncCheckInterval);
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    if (syncCheckInterval) clearInterval(syncCheckInterval);
+});
+
+watch(() => state.trustedAccountId, async (ta) => {
+    if (ta) await serviceAccountPageStore.fetchSyncJobList(ta);
+});
 
 (async () => {
     await init();
@@ -146,15 +199,47 @@ const init = async () => {
             <template #extra>
                 <p-button v-if="state.isSyncEnabled"
                           style-type="secondary"
+                          :loading="state.isSyncing || state.syncReqLoading"
                           @click="handleSync"
                 >
-                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                    {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
                 </p-button>
+                <p-toolbox v-else
+                           class="toolbox"
+                           :searchable="false"
+                           :total-count="state.totalCount"
+                           :page-size.sync="state.pageLimit"
+                           :page-size-options="[15,30,45]"
+                           @change="handleChange"
+                           @refresh="handleChange()"
+                />
             </template>
         </p-heading>
-        <div class="content-wrapper mb-16">
-            <div class="px-4">
-                <p-toolbox :searchable="false"
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div v-if="serviceAccountPageStore.getters.isOriginAutoSyncEnabled"
+                     class="left"
+                >
+                    <span v-if="state.lastSuccessSynced">{{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.LAST_SYNCED') }}: {{
+                        dayjs(state.lastSuccessSynced).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss')
+                    }}</span>
+                    <p-i v-if="['SUCCESS', 'FAILURE'].includes(state.lastSyncJob?.status)"
+                         :name="(state.lastSyncJob?.status === 'FAILURE') ? 'ic_error-filled' : 'ic_check'"
+                         :color="(state.lastSyncJob?.status === 'FAILURE') ? red[400] : green[600]"
+                         width="1rem"
+                         height="1rem"
+                         class="icon-info"
+                    />
+                    <p-button v-if="state.lastSyncJob?.status === 'FAILURE'"
+                              style-type="tertiary"
+                              size="sm"
+                              @click="handleViewSyncError"
+                    >
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
+                    </p-button>
+                </div>
+                <p-toolbox v-if="state.isSyncEnabled"
+                           :searchable="false"
                            :total-count="state.totalCount"
                            :page-size.sync="state.pageLimit"
                            :page-size-options="[15,30,45]"
@@ -208,11 +293,46 @@ const init = async () => {
                 </template>
             </p-data-table>
         </div>
+        <p-button-modal v-model="state.errorModalVisible"
+                        :header-title="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SYNC_ERROR_MODAL_TITLE')"
+                        hide-footer-close-button
+                        style-type="tertiable"
+                        @confirm="handleCloseErrorModal"
+        >
+            <template #body>
+                <p-text-editor :code="state.lastSyncJob?.error_message" />
+            </template>
+            <template #footer-extra>
+                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISHED') }}: {{ dayjs(state.lastSyncJob.finished_at).tz(state.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+        </p-button-modal>
     </p-pane-layout>
 </template>
 
 <style scoped lang="postcss">
-.workspace-id-wrapper {
-    @apply flex gap-2;
+.service-account-attached-general-accounts {
+    :deep(.toolbox) {
+        .tool {
+            margin-bottom: unset;
+        }
+    }
+
+    .content-wrapper {
+        @apply mb-16 pt-2;
+
+        .content-header {
+            @apply flex justify-between items-center px-4;
+
+            .left {
+                @apply mb-4 flex gap-1 items-center;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .workspace-id-wrapper {
+        @apply flex gap-2;
+    }
 }
+
 </style>

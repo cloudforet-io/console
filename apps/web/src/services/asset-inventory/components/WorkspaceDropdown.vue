@@ -124,6 +124,7 @@ watch(() => state.searchText, debounce(async (searchText) => {
                        :menu="state.workspaceMenuList"
                        :placeholder="$t('Select a workspace')"
                        :loading="state.loading"
+                       :selected="state.selected"
                        disable-handler
                        use-fixed-menu-style
                        is-filterable

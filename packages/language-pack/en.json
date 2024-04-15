@@ -2223,6 +2223,23 @@
 				"TITLE": "Create {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
+			"AUTO_SYNC": {
+				"DELETE_CHECK_MODAL": {
+					"DESC": "It cannot be deleted due to the trusted account which is set to be auto-synced. If necessary, disable the auto sync for that service account ({serviceAccountName}) in order to delete it.",
+					"TITLE": "Unable to delete it"
+				},
+				"ERROR_FOUND": "Error Found",
+				"HOURLY_SYNC_SCHEDULE": "Hourly Sync Schedule",
+				"LAST_SYNCED": "Last Synced",
+				"MAIN_DESCRIPTION": "Automatically synchronize {provider} account hierarchy with SpaceONE system",
+				"MAPPING_METHOD": "Mapping Method",
+				"PROJECT_GROUP_MAPPING": "Project Group Mapping",
+				"SKIP_PROJECT_GROUP_MAPPING": "Skip project group mapping",
+				"START_SYNC": "Start syncing. This will take a few minutes.",
+				"SYNC_ERROR_MODAL_TITLE": "Auto Sync Error Details",
+				"SYNC_TITLE": "Do you want to sync now?",
+				"WORKSPACE_MAPPING": "Workspace Mapping"
+			},
 			"MAIN": {
 				"ACTION": "Action",
 				"ADD": "Add",
@@ -2795,6 +2812,7 @@
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "Project is required",
 				"SAVE": "Save Changes",
+				"SYNCING": "Syncing",
 				"SYNC_NOW": "Sync Now",
 				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. ",
 				"UPDATE_SUCCESS": "Auto Sync settings successfully changed."

@@ -9,11 +9,14 @@ export interface ServiceAccountModel {
     options?: Record<string, any>;
     tags: Tags;
     secret_schema_id: string;
+    is_managed: boolean;
+    reference_id: string;
     secret_id: string;
     trusted_account_id: string;
     project_id: string;
     workspace_id: string;
     domain_id: string;
     created_at: string;
+    last_synced_at: string;
 }
 
