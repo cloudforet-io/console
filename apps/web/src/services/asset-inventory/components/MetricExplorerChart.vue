@@ -62,7 +62,7 @@ const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeRespon
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
-        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy) : [];
+        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy)] : [];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageState.metricId as string,
             query: {
