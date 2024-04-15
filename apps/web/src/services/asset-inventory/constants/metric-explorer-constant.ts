@@ -4,7 +4,6 @@ export const GRANULARITY = {
 } as const;
 
 export const STATIC_GROUP_BY = {
-    UNIT: 'unit',
     PROJECT_ID: 'project_id',
     WORKSPACE_ID: 'workspace_id',
 } as const;

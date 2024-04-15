@@ -6,7 +6,7 @@ import {
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PSelectButton } from '@spaceone/design-system';
-import { cloneDeep, debounce } from 'lodash';
+import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -53,6 +53,7 @@ const state = reactive({
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
+    isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
 });
 
 /* Api */
@@ -61,7 +62,7 @@ const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeRespon
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
-        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy) : [];
+        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy)] : [];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageState.metricId as string,
             query: {
@@ -83,28 +84,24 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         if (status === 'succeed') return response;
         return { more: false, results: [] };
     } catch (e) {
-        state.loading = false;
         return { more: false, results: [] };
     }
 };
-const setChartData = debounce(async (fetchData = false) => {
+const setChartData = debounce(async () => {
     state.loading = true;
 
-    let rawData = cloneDeep(state.data);
-    if (!rawData || fetchData) {
-        rawData = await analyzeMetricData();
-        state.data = rawData;
-    }
+    const rawData = await analyzeMetricData();
+    state.data = rawData;
 
     const _granularity = metricExplorerPageState.granularity;
     const _period = metricExplorerPageState.period as Period;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
 
     state.legends = getMetricChartLegends(state.selectedChartType, rawData, _groupBy);
-    if (state.selectedChartType === CHART_TYPE.LINE) {
-        state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
-    } else {
+    if (state.isRealtimeChart) {
         state.chartData = getRefinedMetricRealtimeChartData(rawData, _groupBy);
+    } else {
+        state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
     }
     state.loading = false;
 }, 300);
@@ -132,7 +129,7 @@ watch([
     () => metricExplorerPageState.selectedChartGroupBy,
 ], async ([metricId]) => {
     if (!metricId) return;
-    await setChartData(true);
+    await setChartData();
 }, { immediate: true });
 watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
