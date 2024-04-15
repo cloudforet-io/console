@@ -2774,7 +2774,7 @@
 				"DONE_BUTTON": "Done",
 				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
 				"FIRST_TITLE": "You can totally do this!\nA few setups are required.",
-				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "'To find out the kube-state-metrics, enter the command below:",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "To find out the kube-state-metrics, enter the command below:",
 				"LOADING": "Waiting for new key...",
 				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "hide",
 				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "Learn how to find out",
