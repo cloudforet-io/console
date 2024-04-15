@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { violet } from '@/styles/colors';
@@ -72,7 +73,7 @@ const formState = reactive({
         [OPEN_COST_OPTIONS.kube_state_metric]: undefined,
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
-    firstStepValid: computed(() => formState.clusterName.length > 0
+    firstStepValid: computed(() => !invalidState.clusterName
         && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] !== undefined
         && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
@@ -81,6 +82,22 @@ const formState = reactive({
         // TODO: apply loading state
         return true;
     }),
+});
+
+const {
+    forms: { clusterName },
+    invalidState,
+    invalidTexts,
+    setForm,
+} = useFormValidator({
+    clusterName: formState.clusterName,
+}, {
+    clusterName: (val: string) => {
+        if (val?.length < 2) {
+            return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
+        }
+        return true;
+    },
 });
 
 const scriptState = reactive({
@@ -191,13 +208,19 @@ watch(() => props.visible, (visible) => {
                          class="first-section"
                     >
                         <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
+                                       :invalid="invalidState.clusterName"
+                                       :invalid-text="invalidTexts.clusterName"
                                        required
                         >
-                            <p-text-input class="cluster-name-input"
-                                          :value.sync="formState.clusterName"
-                                          :placeholder="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
-                                          @keyup.enter="handleEnterKey"
-                            />
+                            <template #default="{invalid}">
+                                <p-text-input class="cluster-name-input"
+                                              :value="clusterName"
+                                              :invalid="invalid"
+                                              :placeholder="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CLUSTER_NAME')"
+                                              @keyup.enter="handleEnterKey"
+                                              @update:value="setForm('clusterName', $event)"
+                                />
+                            </template>
                         </p-field-group>
 
                         <div class="information">
