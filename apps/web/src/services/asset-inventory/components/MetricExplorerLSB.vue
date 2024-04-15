@@ -204,6 +204,10 @@ const handleSearchMetric = (keyword: string) => {
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
     namespaceState.selectedNamespace = namespace;
+    metricExplorerPageStore.$patch((_store) => {
+        const selectedNamespace = namespaceState.namespaces.find((item) => item.namespace_id === namespace.name);
+        if (selectedNamespace) _store.state.selectedNamespace = selectedNamespace;
+    });
 };
 const handleClickBackToNamespace = () => {
     namespaceState.selectedNamespace = undefined;

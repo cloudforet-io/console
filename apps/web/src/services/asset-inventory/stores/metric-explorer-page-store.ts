@@ -18,7 +18,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
-    Granularity, MetricNamespace, Operator, Period, RelativePeriod,
+    Granularity, Operator, Period, RelativePeriod,
     StaticGroupBy,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -36,7 +36,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metric: undefined as MetricModel|undefined,
         namespaces: [] as NamespaceModel[],
         metricList: [] as MetricModel[],
-        selectedNamespace: undefined as MetricNamespace|undefined,
+        selectedNamespace: undefined as NamespaceModel|undefined,
         // query section
         granularity: GRANULARITY.MONTHLY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
