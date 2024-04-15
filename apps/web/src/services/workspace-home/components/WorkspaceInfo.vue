@@ -57,8 +57,8 @@ const storeState = reactive({
 const state = reactive({
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
-    workspaceUserCnt: undefined as number|undefined,
-    appsCnt: undefined as number|undefined,
+    workspaceUserTotalCount: undefined as number|undefined,
+    appsTotalCount: undefined as number|undefined,
 });
 
 const handleClickInviteButton = () => {
@@ -98,7 +98,7 @@ const fetchWorkspaceUserList = async () => {
             workspace_id: state.selectedWorkspace.workspace_id,
             query: listQueryHelper.data,
         });
-        state.workspaceUserCnt = total_count || undefined;
+        state.workspaceUserTotalCount = total_count || undefined;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
@@ -108,7 +108,7 @@ const fetchAppList = async () => {
         const { total_count } = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>({
             query: listQueryHelper.data,
         });
-        state.appsCnt = total_count || undefined;
+        state.appsTotalCount = total_count || undefined;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
@@ -182,7 +182,7 @@ onMounted(async () => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.workspaceUserCnt }} {{ $t('HOME.INFO_USERS') }}</span>
+                <span>{{ state.workspaceUserTotalCount }} {{ $t('HOME.INFO_USERS') }}</span>
             </div>
             <p-i v-if="storeState.isDomainAdmin"
                  name="ic_dot"
@@ -199,7 +199,7 @@ onMounted(async () => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.appsCnt }} {{ $t('HOME.INFO_APPS') }}</span>
+                <span>{{ state.appsTotalCount }} {{ $t('HOME.INFO_APPS') }}</span>
             </div>
         </div>
     </div>
