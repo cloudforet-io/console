@@ -59,6 +59,9 @@ const dashboardGetters = dashboardStore.getters;
 const gnbStore = useGnbStore();
 const gnbStoreGetters = gnbStore.getters;
 
+const emit = defineEmits<{(e: 'click-favorite'): void;
+}>();
+
 const storeState = reactive({
     favoriteMenuList: computed(() => favoriteStoreGetters.favoriteMenuList),
     favoriteWorkspaceMenuList: computed(() => favoriteStoreGetters.workspaceItems),
@@ -98,6 +101,7 @@ const handleClickFavoriteButton = async (event: MouseEvent) => {
         };
         await favoriteStore.createFavorite(convertFavoriteToReferenceData(params as ConfigData));
     }
+    emit('click-favorite');
 };
 const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     const { itemType } = favoriteConfig;

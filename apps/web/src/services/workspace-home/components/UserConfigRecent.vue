@@ -72,7 +72,7 @@ const fetchRecentList = async (currentWorkspaceId: string) => {
         { k: 'data.id', v: MENU_ID.WORKSPACE_HOME, o: '!=' },
         // NOTE: Code corresponding to data stored as 'home-dashboard'
         { k: 'data.id', v: 'home-dashboard', o: '!=' },
-    ]).setPageLimit(10);
+    ]);
 
     try {
         const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
@@ -84,7 +84,7 @@ const fetchRecentList = async (currentWorkspaceId: string) => {
             itemId: i.data.id,
             workspaceId: storeState.currentWorkspaceId || '',
         }));
-        state.recentList = _recentList.filter((i) => !i?.isDeleted);
+        state.recentList = _recentList.filter((i) => i && !i?.isDeleted).splice(0, 10);
     } catch (e) {
         ErrorHandler.handleError(e);
         state.recentList = [];
@@ -124,9 +124,10 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                        class="header-wrapper"
         />
         <div class="suggestion-list-wrapper">
-            <user-configs-item v-for="(item) in state.recentList"
-                               :key="item.itemId"
+            <user-configs-item v-for="(item, idx) in state.recentList"
+                               :key="`recent-list-${idx}`"
                                :item="item"
+                               is-hidden-favorite-button
             />
         </div>
     </div>

@@ -143,6 +143,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             <user-configs-item v-for="(item) in state.slicedFavoriteMenuList"
                                :key="item.itemId"
                                :item="item"
+                               @click-favorite="fetchFavoriteList"
             />
         </div>
     </div>
