@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { PLazyImg } from '@spaceone/design-system';
 
-import type { ProviderItem } from '@/store/reference/provider-reference-store';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import type { ProviderResourceDataItem } from '@/services/workspace-home/types/workspace-home-type';
+
 interface Props {
-    item?: ProviderItem;
+    item?: ProviderResourceDataItem;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,15 +31,15 @@ const props = withDefaults(defineProps<Props>(), {
         <div class="data-wrapper">
             <p class="data-row">
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_SERVER') }}</span>
-                <span>0</span>
+                <span>{{ numberFormatter(props.item.server) || 0 }}</span>
             </p>
             <p class="data-row">
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_DATABASE') }}</span>
-                <span>0</span>
+                <span>{{ numberFormatter(props.item.database) || 0 }}</span>
             </p>
             <p class="data-row">
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_STORAGE') }}</span>
-                <span>0</span>
+                <span>{{ byteFormatter(props.item.storage) || 0 }}</span>
             </p>
         </div>
     </div>
@@ -45,7 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <style scoped lang="postcss">
 .asset-summary-item {
-    @apply flex flex-col bg-gray-100 border-l-4 border-gray-200;
+    @apply flex flex-col bg-gray-100 border-l-4 border-gray-200 cursor-default;
     min-width: 11.5rem;
     width: 11.5rem;
     height: 7.875rem;
