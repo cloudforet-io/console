@@ -29,6 +29,7 @@ import ServiceAccountAttachedGeneralAccounts
 import ServiceAccountAutoSync from '@/services/asset-inventory/components/ServiceAccountAutoSync.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
+import ServiceAccountCluster from '@/services/asset-inventory/components/ServiceAccountCluster.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
@@ -73,6 +74,7 @@ const state = reactive({
     }),
     providerKey: computed(() => state.provider?.key),
     providerIcon: computed(() => state.provider?.icon),
+    isKubernetesAgentMode: computed(() => state.providerKey === 'kubernetes'),
     consoleLink: computed(() => {
         try {
             if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
@@ -136,8 +138,8 @@ watch(() => state.providerId, async (provider) => {
     await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
 });
 /* Watcher */
-watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serviceAccountId, updateVisible]) => {
-    if (serviceAccountId && !updateVisible) {
+watch(() => props.serviceAccountId, async (serviceAccountId) => {
+    if (serviceAccountId) {
         const serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
         serviceAccountPageStore.$patch((_state) => {
             _state.state.serviceAccountType = serviceAccountType;
@@ -199,7 +201,11 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
-            <service-account-credentials :service-account-loading="state.loading"
+            <service-account-cluster v-if="state.isKubernetesAgentMode"
+                                     :service-account-id="props.serviceAccountId"
+            />
+            <service-account-credentials v-else
+                                         :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
                                          :editable="state.isEditable"
                                          @refresh="handleRefresh"
@@ -213,6 +219,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                       :service-account-type="state.serviceAccountType"
                                       :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
+                                      :is-agent-mode="state.isKubernetesAgentMode"
         />
         <service-account-edit-modal v-if="state.item?.name"
                                     :key="state.item?.name"
@@ -255,6 +262,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             @apply col-span-12;
         }
         .service-account-base-information {
+            @apply col-span-12;
+        }
+        .service-account-connect-cluster {
             @apply col-span-12;
         }
         .service-account-credentials {

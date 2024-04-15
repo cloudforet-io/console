@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import type Vue from 'vue';
 import {
-    computed, reactive, watch, getCurrentInstance,
+    computed, reactive, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab, PLazyImg,
@@ -19,7 +19,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
@@ -53,15 +52,16 @@ import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
+import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const { width } = useWindowSize();
 
-
-const vm = getCurrentInstance()?.proxy as Vue;
-const { query } = SpaceRouter.router.currentRoute;
+const router = useRouter();
+const route = useRoute();
+const { query } = router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
@@ -86,6 +86,7 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone || 'UTC'),
     grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    isAgentModeAccount: computed(() => state.selectedProvider === 'kubernetes'),
 });
 
 /** States for Dynamic Layout(search table type) * */
@@ -111,7 +112,11 @@ const tableState = reactive({
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: computed<QuerySearchTableLayout|undefined>(() => (tableState.isTrustedAccount
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
-    schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
+    schemaOptions: computed<DynamicLayoutOptions>(() => {
+        // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
+        const _schemaOptions = tableState.schema?.options ?? {};
+        return state.isAgentModeAccount ? convertAgentModeOptions(_schemaOptions) : _schemaOptions;
+    }),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => {
         if (state.isAdminMode) {
@@ -119,6 +124,7 @@ const tableState = reactive({
                 { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
             ];
         }
+        if (state.selectedProvider === 'kubernetes') return [{ name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label }];
         return [
             { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
@@ -229,10 +235,10 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 
 /** Add & Delete Service Accounts Action (Dropdown) * */
 const clickAddServiceAccount = () => {
-    SpaceRouter.router.push(getProperRouteLocation({
+    router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
         params: { provider: state.selectedProvider, serviceAccountType: state.isAdminMode ? ACCOUNT_TYPE.TRUSTED : tableState.selectedAccountType },
-        query: { nextPath: vm.$route.fullPath },
+        query: { nextPath: route.fullPath },
     }));
 };
 
@@ -243,7 +249,7 @@ const handleClickSettings = () => {
 const handleSelectServiceAccountType = (accountType: AccountType) => { serviceAccountSchemaState.selectedAccountType = accountType; };
 const handleClickRow = (index) => {
     const item = tableState.items[index];
-    SpaceRouter.router.push(getProperRouteLocation({
+    router.push(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
         params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
     }));
@@ -255,6 +261,7 @@ const handleDynamicLayoutFetch = (changed) => {
 const handleVisibleCustomFieldModal = (visible) => {
     tableState.visibleCustomFieldModal = visible;
 };
+
 /** ******* Page Init ******* */
 
 const reloadTable = async () => {
@@ -297,6 +304,7 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
     serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
     if (state.selectedProvider) await serviceAccountSchemaStore.setProviderSchema(state.selectedProvider);
 })();
+
 </script>
 
 <template>

@@ -2748,6 +2748,44 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"AGENT": {
+				"ACTIVATE": "",
+				"ACTIVATE_MODAL_TEXT": "",
+				"ACTIVE": "",
+				"CLUSTER_DETAIL_HEADER": "",
+				"CONNECT_CLUSTER": "",
+				"CONNECT_CLUSTER_HEADER": "",
+				"DEACTIVATE": "",
+				"DEACTIVATE_MODAL_TEXT": "",
+				"DELETE": "",
+				"DELETE_CLUSTER_MODAL_TEXT": "",
+				"DELETE_WARNING": "",
+				"DISCONNECTED_CLUSTER_TEXT": "",
+				"INACTIVE": "",
+				"RECONNECT": ""
+			},
+			"CLUSTER_MODAL": {
+				"CANCEL": "",
+				"CHECKLIST_OPTION_LABEL": "",
+				"CLUSTER_NAME": "",
+				"CLUSTER_NAME_INFORMATION": "",
+				"CONTINUE_BUTTON": "",
+				"COPIED": "",
+				"COPY_CODE": "",
+				"DONE_BUTTON": "",
+				"FIND_OUT_INFORMATION": "",
+				"FIRST_TITLE": "",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "",
+				"LOADING": "",
+				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "",
+				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "",
+				"PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE": "",
+				"SCRIPT_GUIDE_FIRST": "",
+				"SCRIPT_GUIDE_SECOND": "",
+				"SCRIPT_GUIDE_THIRD": "",
+				"SECOND_TITLE": "",
+				"THIRD_TITLE": ""
+			},
 			"CREATE": {
 				"COMPLETE_MODAL_SYNC": "今すぐ同期",
 				"TIMEZONE": "タイムゾーン: {timezone}、最大: 2回"

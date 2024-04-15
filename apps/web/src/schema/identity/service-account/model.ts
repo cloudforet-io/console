@@ -5,6 +5,8 @@ export interface ServiceAccountModel {
     name: string;
     data: Record<string, any>;
     provider: string;
+    app_id?: string;
+    options?: Record<string, any>;
     tags: Tags;
     secret_schema_id: string;
     is_managed: boolean;
