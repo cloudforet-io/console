@@ -130,7 +130,7 @@ const handleRefresh = () => {
 };
 const handleClickBackbutton = () => {
     router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
     }));
 };
 watch(() => state.providerId, async (provider) => {
