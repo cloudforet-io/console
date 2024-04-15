@@ -11,6 +11,7 @@ import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
 import WorkspaceInfo from '@/services/workspace-home/components/WorkspaceInfo.vue';
 
 const userWorkspaceStore = useUserWorkspaceStore();
+
 const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
