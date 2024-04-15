@@ -52,6 +52,7 @@ import {
     ACCOUNT_TYPE_BADGE_OPTION,
     PROVIDER_ACCOUNT_NAME,
 } from '@/services/asset-inventory/constants/service-account-constant';
+import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
 import type { QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -70,7 +71,6 @@ const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     trustedAccounts: computed(() => allReferenceStore.getters.trustedAccount),
@@ -86,6 +86,7 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone || 'UTC'),
     grantLoading: computed(() => appContextStore.getters.globalGrantLoading),
     currentGrantInfo: computed(() => store.getters['user/getCurrentGrantInfo']),
+    isAgentModeAccount: computed(() => state.selectedProvider === 'kubernetes'),
 });
 
 /** States for Dynamic Layout(search table type) * */
@@ -111,7 +112,11 @@ const tableState = reactive({
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: computed<QuerySearchTableLayout|undefined>(() => (tableState.isTrustedAccount
         ? serviceAccountSchemaState.trustedAccountTableSchema : serviceAccountSchemaState.generalAccountTableSchema)),
-    schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
+    schemaOptions: computed<DynamicLayoutOptions>(() => {
+        // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
+        const _schemaOptions = tableState.schema?.options ?? {};
+        return state.isAgentModeAccount ? convertAgentModeOptions(_schemaOptions) : _schemaOptions;
+    }),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => {
         if (state.isAdminMode) {
