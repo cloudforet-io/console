@@ -20,6 +20,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
 const props = defineProps<{
     visible: boolean;
@@ -29,6 +32,8 @@ const props = defineProps<{
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
+const serviceAccountPageStore = useServiceAccountPageStore();
+
 const {
     forms: { serviceAccountName },
     invalidState,
@@ -52,20 +57,27 @@ const state = reactive({
     serviceAccountNames: [] as string[],
     isAllValid: false,
     loading: false,
+    proxyVisible: useProxyValue('visible', props, emits),
 });
 
+
 const updateServiceAccountName = async () => {
+    let results: ServiceAccountModel|TrustedAccountModel;
     if (props.isTrustedAccount) {
-        await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+        results = await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccount.trusted_account_id ?? '',
             name: serviceAccountName.value,
         });
     } else {
-        await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+        results = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
             service_account_id: props.serviceAccount.service_account_id ?? '',
             name: serviceAccountName.value,
         });
     }
+    serviceAccountPageStore.$patch((store) => {
+        store.state.originServiceAccountItem.name = results.name;
+    });
+    state.proxyVisible = false;
 };
 
 
@@ -73,16 +85,12 @@ const handleConfirm = async () => {
     try {
         state.loading = true;
         await updateServiceAccountName();
-        emits('update:visible', false);
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
     } finally {
         state.loading = false;
     }
-};
-const handleUpdateVisible = (visible: boolean) => {
-    emits('update:visible', visible);
 };
 
 const listServiceAccounts = async () => {
@@ -113,13 +121,12 @@ const listServiceAccounts = async () => {
 </script>
 
 <template>
-    <p-button-modal :visible="props.visible"
+    <p-button-modal :visible.sync="state.proxyVisible"
                     :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT_SERVICE_ACCOUNT_NAME')"
                     :disabled="invalidState.serviceAccountName"
                     size="sm"
                     :loading="state.loading"
                     @confirm="handleConfirm"
-                    @update:visible="handleUpdateVisible"
     >
         <template #body>
             <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NAME')"

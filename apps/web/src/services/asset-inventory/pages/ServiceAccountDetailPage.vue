@@ -138,8 +138,8 @@ watch(() => state.providerId, async (provider) => {
     await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
 });
 /* Watcher */
-watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serviceAccountId, updateVisible]) => {
-    if (serviceAccountId && !updateVisible) {
+watch(() => props.serviceAccountId, async (serviceAccountId) => {
+    if (serviceAccountId) {
         const serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
         serviceAccountPageStore.$patch((_state) => {
             _state.state.serviceAccountType = serviceAccountType;
