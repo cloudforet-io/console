@@ -4,9 +4,10 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor,
+    PPaneLayout, PHeading, PDataTable, PLink, PToolbox, PButton, PI, PButtonModal, PTextEditor, PTooltip,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
@@ -31,8 +32,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { green, red } from '@/styles/colors';
 
+import { getAccountFields } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const props = withDefaults(defineProps<{
@@ -44,6 +47,7 @@ const props = withDefaults(defineProps<{
 });
 
 const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
@@ -78,13 +82,20 @@ const state = reactive({
         }
         return serviceAccountPageStore.getters.lastJob;
     }),
+    fields: computed<DataTableFieldType[]>(() => {
+        const generalAccountField = getAccountFields(serviceAccountSchemaStore.getters.generalAccountSchema);
+        return [
+            { name: 'name', label: 'Account Name' },
+            ...generalAccountField.map((field) => ({
+                label: field.name,
+                name: field.key,
+                type: 'text',
+            })),
+            { name: 'workspace_id', label: 'Workspace', sortable: false },
+            { name: 'project_id', label: 'Project', sortable: false },
+        ];
+    }),
 });
-const fields = [
-    { name: 'name', label: 'Account Name' },
-    { name: 'service_account_id', label: 'Account ID', sortable: false },
-    { name: 'workspace_id', label: 'Workspace', sortable: false },
-    { name: 'project_id', label: 'Project', sortable: false },
-];
 
 const apiQueryHelper = new ApiQueryHelper().setSort(state.sortBy, state.sortDesc).setPageLimit(state.pageLimit).setFilters([
     { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]);
@@ -197,22 +208,17 @@ watch(() => state.trustedAccountId, async (ta) => {
                    :total-count="state.totalCount"
         >
             <template #extra>
-                <p-button v-if="state.isSyncEnabled"
-                          style-type="secondary"
-                          :loading="state.isSyncing || state.syncReqLoading"
-                          @click="handleSync"
+                <p-tooltip :contents="!state.isSyncEnabled ? $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.DISABLED_SYNC_DESC') : ''"
+                           position="left"
                 >
-                    {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
-                </p-button>
-                <p-toolbox v-else
-                           class="toolbox"
-                           :searchable="false"
-                           :total-count="state.totalCount"
-                           :page-size.sync="state.pageLimit"
-                           :page-size-options="[15,30,45]"
-                           @change="handleChange"
-                           @refresh="handleChange()"
-                />
+                    <p-button :disabled="!state.isSyncEnabled"
+                              style-type="secondary"
+                              :loading="state.isSyncing || state.syncReqLoading"
+                              @click="handleSync"
+                    >
+                        {{ (state.isSyncing || state.syncReqLoading) ? $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNCING') : $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SYNC_NOW') }}
+                    </p-button>
+                </p-tooltip>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -238,8 +244,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.ERROR_FOUND') }}
                     </p-button>
                 </div>
-                <p-toolbox v-if="state.isSyncEnabled"
-                           :searchable="false"
+                <p-toolbox :searchable="false"
                            :total-count="state.totalCount"
                            :page-size.sync="state.pageLimit"
                            :page-size-options="[15,30,45]"
@@ -247,7 +252,7 @@ watch(() => state.trustedAccountId, async (ta) => {
                            @refresh="handleChange()"
                 />
             </div>
-            <p-data-table :fields="fields"
+            <p-data-table :fields="state.fields"
                           :items="state.items"
                           sortable
                           :loading="state.loading"
