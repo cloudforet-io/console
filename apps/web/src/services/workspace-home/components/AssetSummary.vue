@@ -125,10 +125,12 @@ const fetchCloudServiceResources = async () => {
 };
 
 watch(() => storeState.providerMap, () => {
+    if (!storeState.currentWorkspaceId) return;
     fetchCloudServiceResources();
 }, { immediate: true });
 
 onMounted(() => {
+    if (!storeState.currentWorkspaceId) return;
     fetchDailyUpdatesList();
 });
 </script>

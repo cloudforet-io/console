@@ -9,7 +9,7 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const WorkspaceHome = () => import('@/services/workspace-home/pages/WorkspaceHomePage.vue');
 
-export default {
+const adminWorkspaceHomeRoutes: RouteConfig = {
     path: 'home',
     name: makeAdminRouteName(WORKSPACE_HOME_ROUTE._NAME),
     meta: { menuId: MENU_ID.WORKSPACE_HOME },
@@ -18,4 +18,5 @@ export default {
         name: makeAdminRouteName(IAM_ROUTE.USER._NAME),
     }),
     component: WorkspaceHome,
-} as RouteConfig;
+};
+export default adminWorkspaceHomeRoutes;

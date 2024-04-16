@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Vue, { computed, onMounted, reactive } from 'vue';
+import Vue, {
+    computed, onMounted, reactive,
+} from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -24,7 +26,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { UserState } from '@/store/modules/user/type';
+import type { RoleInfo } from '@/store/modules/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -50,13 +52,15 @@ const router = useRouter();
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    getCurrentRoleInfo: computed<UserState>(() => store.getters['user/getCurrentRoleInfo']),
-    hasAdminOrWorkspaceOwnerRole: computed<boolean>(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
+    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
 });
 const state = reactive({
+    pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
+    accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
     workspaceUserTotalCount: undefined as number|undefined,
     appsTotalCount: undefined as number|undefined,
@@ -67,15 +71,14 @@ const handleActionButton = (type: string) => {
         inviteWorkspaceUser();
         return;
     }
-    const workspaceId = state.selectedWorkspace.workspace_id;
-    enterAdminMode();
-    if (type === 'edit' || type === 'delete') {
-        actionWorkspace(type, workspaceId);
-    } else if (type === 'create') {
+    if (type === 'create') {
         createApp();
+        return;
     }
+    const workspaceId = state.selectedWorkspace.workspace_id;
+    actionWorkspace(type, workspaceId);
 };
-const enterAdminMode = () => {
+const actionWorkspace = (type: string, workspaceId: string) => {
     appContextStore.enterAdminMode();
     Vue.notify({
         group: 'toastTopCenter',
@@ -84,8 +87,6 @@ const enterAdminMode = () => {
         duration: 2000,
         speed: 1,
     });
-};
-const actionWorkspace = (type: string, workspaceId: string) => {
     router.push({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
@@ -95,9 +96,7 @@ const actionWorkspace = (type: string, workspaceId: string) => {
     });
 };
 const createApp = () => {
-    router.push({
-        name: makeAdminRouteName(IAM_ROUTE.APP._NAME),
-    });
+    router.push({ name: IAM_ROUTE.APP._NAME });
     appPageStore.$patch((_state) => {
         _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
         _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
@@ -131,6 +130,7 @@ const fetchWorkspaceUserList = async () => {
 const fetchAppList = async () => {
     try {
         const { total_count } = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>({
+            workspace_id: state.selectedWorkspace.workspace_id,
             query: listQueryHelper.data,
         });
         state.appsTotalCount = total_count || undefined;
@@ -140,8 +140,13 @@ const fetchAppList = async () => {
 };
 
 onMounted(async () => {
-    await fetchWorkspaceUserList();
-    await fetchAppList();
+    if (!state.selectedWorkspace.workspace_id) return;
+    if (state.accessUserMenu) {
+        await fetchWorkspaceUserList();
+    }
+    if (state.accessAppMenu) {
+        await fetchAppList();
+    }
 });
 </script>
 
@@ -180,14 +185,14 @@ onMounted(async () => {
             </template>
             <template #extra>
                 <div class="extra-wrapper">
-                    <p-button v-if="state.isWorkspaceOwner"
+                    <p-button v-if="state.accessUserMenu"
                               style-type="tertiary"
                               icon-left="ic_service_user"
                               @click="handleActionButton('invite')"
                     >
                         {{ $t('HOME.INFO_INVITE_USER') }}
                     </p-button>
-                    <p-button v-if="storeState.isDomainAdmin"
+                    <p-button v-if="state.accessAppMenu"
                               style-type="tertiary"
                               icon-left="ic_service_app"
                               @click="handleActionButton('create')"
@@ -201,7 +206,7 @@ onMounted(async () => {
               class="desc"
         >{{ state.selectedWorkspace.tags?.description }}</span>
         <div class="info-cnt-wrapper">
-            <div v-if="state.isWorkspaceOwner"
+            <div v-if="state.accessUserMenu"
                  class="info-cnt"
             >
                 <p-i name="ic_service_user"
@@ -209,16 +214,16 @@ onMounted(async () => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.workspaceUserTotalCount }} {{ $t('HOME.INFO_USERS') }}</span>
+                <span>{{ state.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}</span>
             </div>
-            <p-i v-if="storeState.isDomainAdmin"
+            <p-i v-if="state.accessAppMenu && state.accessUserMenu"
                  name="ic_dot"
                  width="0.125rem"
                  height="0.125rem"
                  :color="gray[500]"
                  class="dot"
             />
-            <div v-if="storeState.isDomainAdmin"
+            <div v-if="state.accessAppMenu"
                  class="info-cnt"
             >
                 <p-i name="ic_service_app"
@@ -226,7 +231,7 @@ onMounted(async () => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.appsTotalCount }} {{ $t('HOME.INFO_APPS') }}</span>
+                <span>{{ state.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}</span>
             </div>
         </div>
     </div>
