@@ -3,6 +3,8 @@ import { computed, reactive } from 'vue';
 
 import { PI, PTooltip } from '@spaceone/design-system';
 
+import { gray, peacock } from '@/styles/colors';
+
 interface AutoSyncStateProps {
     state?: 'ENABLED' | 'DISABLED'
     size?: 'lg' | 'md' | 'sm' | 'xs'
@@ -43,6 +45,7 @@ const state = reactive({
         >
             <p-i :width="state.iconSize"
                  :height="state.iconSize"
+                 :color="'ENABLED' === props.state ? peacock[800] : gray[700]"
                  name="ic_automation"
             /><span v-if="state.isLabelVisible"
                     class="state"
