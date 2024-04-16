@@ -117,6 +117,7 @@ export const useServiceAccountPageStore = defineStore('page-service-account', ()
     const actions = {
         initState: () => {
             state.selectedProvider = '';
+            state.originServiceAccountItem = {};
             formState.baseInformation = {};
             formState.isBaseInformationFormValid = true;
             formState.isAutoSyncFormValid = true;

@@ -91,7 +91,8 @@ const state = reactive({
     selectedWorkspaceItem: computed(() => userWorkspaceStore.getters.workspaceMap[state.selectedWorkspace] ?? {}),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isResourceGroupDomain: computed(() => serviceAccountPageState.originServiceAccountItem.resource_group === 'DOMAIN'),
-    isDomainForm: computed(() => (state.isResourceGroupDomain ?? state.isAdminMode)),
+    isCreatePage: computed(() => serviceAccountPageState.originServiceAccountItem?.resource_group === undefined),
+    isDomainForm: computed(() => (state.isCreatePage ? state.isAdminMode : state.isResourceGroupDomain)),
     mappingItems: computed(() => (state.isDomainForm ? [
         {
             imageUrl: serviceAccountPageStore.getters.selectedProviderItem?.icon,
