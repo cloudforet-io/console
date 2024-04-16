@@ -83,7 +83,7 @@ const handleConfirm = async () => {
                                class="input-form"
                                required
                 >
-                    <p-text-input v-model="name"
+                    <p-text-input :value="name"
                                   :invalid="invalidState.name"
                                   class="text-input"
                                   block
