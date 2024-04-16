@@ -11,6 +11,7 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import ProjectFavoriteList from '@/services/project/components/ProjectFavoriteList.vue';
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
+import ProjectMainTree from '@/services/project/components/ProjectMainTree.vue';
 import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
@@ -90,6 +91,7 @@ watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) 
                 :key="projectPageState.projectTreeKey"
                 :init-group-id="state.initGroupId"
             />
+            <project-main-tree />
         </div>
     </aside>
 </template>
