@@ -129,12 +129,12 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         setGeneralAccountDetailSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, false);
+            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: false });
         },
         setTrustedAccountDetailSchema: async () => {
-            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
+            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, true);
+            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: true, isAdminMode: _isAdminMode.value });
         },
     };
 

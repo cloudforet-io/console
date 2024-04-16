@@ -141,6 +141,7 @@ const tableState = reactive({
     }),
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
     isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
+    adminModeFilter: computed(() => (state.isAdminMode ? [{ k: 'resource_group', v: 'DOMAIN', o: '=' }] : [])),
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -159,6 +160,7 @@ const getQuery = () => {
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
+            ...tableState.adminModeFilter,
             ...tableState.searchFilters,
         ]);
     const fields = tableState.schema?.options?.fields;
