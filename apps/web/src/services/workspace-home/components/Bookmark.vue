@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const bookmarkStore = useBookmarkStore();
 
 const storeState = reactive({
-    // TODO: will be changed to data
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     bookmarkList: computed(() => [
         {
             icon: '', title: 'BookmarkBookmark 1', id: '1', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
@@ -43,6 +50,11 @@ const state = reactive({
     }))),
     isFullMode: false,
 });
+
+watch(() => storeState.currentWorkspaceId, async () => {
+    if (!storeState.currentWorkspaceId) return;
+    await bookmarkStore.fetchBookmarkList();
+}, { immediate: true });
 </script>
 
 <template>
