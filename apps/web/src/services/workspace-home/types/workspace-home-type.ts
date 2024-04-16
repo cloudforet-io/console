@@ -1,10 +1,13 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
-import type { WORKSPACE_HOME_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type { WORKSPACE_HOME_DATA_TYPE, BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 export type WorkspaceHomeDataType = typeof WORKSPACE_HOME_DATA_TYPE[keyof typeof WORKSPACE_HOME_DATA_TYPE];
 
+// summary
 export interface CloudServiceData {
     cloud_service_group: string;
     cloud_service_type: string;
@@ -23,3 +26,14 @@ export type ProviderResourceDataItem = ProviderItem & {
     storage?: number;
 };
 export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
+
+// bookmark
+export interface BookmarkItem {
+    id: string;
+    name?: string;
+    label?: TranslateResult;
+    folder?: string;
+    icon?: string;
+}
+export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
+
