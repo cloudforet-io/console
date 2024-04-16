@@ -1758,6 +1758,7 @@
 		}
 	},
 	"HOME": {
+		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
 		"ASSET_SUMMARY_CREATED": "Created",
 		"ASSET_SUMMARY_DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
 		"ASSET_SUMMARY_DAILY_UPDATE_TITLE": "Daily Updates",
@@ -1768,6 +1769,7 @@
 		"ASSET_SUMMARY_STORAGE": "Storage",
 		"ASSET_SUMMARY_TITLE": "Asset Summary",
 		"BOOKMARK_ADD_LINK": "Add Link",
+		"BOOKMARK_CREATE_FOLDER": "Create Folder",
 		"BOOKMARK_TITLE": "Added Link",
 		"CONFIG_RECENT_TITLE": "Most recent",
 		"CONFIG_STARRED_ALL": "All",
@@ -1776,6 +1778,7 @@
 		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
 		"COST_SUMMARY_TITLE": "Cost Summary",
 		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
+		"FORM_NAME": "Name",
 		"INFO_APPS": "apps",
 		"INFO_CREATE_APP": "Create App",
 		"INFO_INVITE_USER": "Invite User",
