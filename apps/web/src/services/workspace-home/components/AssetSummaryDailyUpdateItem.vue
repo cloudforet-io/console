@@ -75,7 +75,8 @@ const props = withDefaults(defineProps<Props>(), {
         @apply text-label-md;
         flex: 1;
         .total-count {
-            @apply font-medium; }
+            @apply font-medium;
+        }
     }
     .data-row {
         @apply text-paragraph-sm;
