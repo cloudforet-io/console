@@ -22,6 +22,6 @@ export const PROVIDER_ACCOUNT_NAME = {
 * */
 export const OPEN_COST_OPTIONS = {
     cluster_name: 'cluster_name',
-    kube_state_metric: 'kube-state-metric',
+    kube_state_metrics: 'kube-state-metrics',
     prometheus_node_exporter: 'prometheus-node-exporter',
 } as const;

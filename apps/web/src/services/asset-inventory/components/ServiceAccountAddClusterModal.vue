@@ -70,11 +70,11 @@ const state = reactive({
 const formState = reactive({
     clusterName: '',
     selectedClusterOptions: {
-        [OPEN_COST_OPTIONS.kube_state_metric]: undefined,
+        [OPEN_COST_OPTIONS.kube_state_metrics]: undefined,
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
     firstStepValid: computed(() => !invalidState.clusterName && invalidState.clusterName !== undefined
-            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
             && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
     isValid: computed(() => {
@@ -102,7 +102,7 @@ const {
 
 const scriptState = reactive({
     optionGuideScript: computed<Record<string, string>>(() => ({
-        [OPEN_COST_OPTIONS.kube_state_metric]: 'kubectl get daemonsets --all-namespaces | grep kube-state-metrics',
+        [OPEN_COST_OPTIONS.kube_state_metrics]: 'kubectl get deployments --all-namespaces | grep kube-state-metrics',
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: 'kubectl get daemonsets --all-namespaces | grep node-exporter',
     })),
     helmScript: computed(() => ['helm version\n', 'helm repo add spaceone-agent https://cloudforet-io.github.io/charts\nhelm repo update spaceone-agent']),
@@ -155,14 +155,14 @@ const goStep = (n?: number) => {
 const createAgentApp = async () => {
     const options: AgentModel['options'] = {
         cluster_name: clusterName.value,
-        kube_state_metric: formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric],
+        kube_state_metrics: formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics],
         prometheus_node_exporter: formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter],
     };
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
         goStep();
         setForm('clusterName', '');
-        formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] = undefined;
+        formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] = undefined;
         formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -249,15 +249,15 @@ watch(() => props.visible, (visible) => {
                             <div class="checklist">
                                 <span class="text">
                                     Is
-                                    <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metric }}</span>
+                                    <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metrics }}</span>
                                     installed?
                                 </span>
                                 <p-radio-group>
                                     <p-radio v-for="(options, index) in state.clusterOptions"
-                                             :key="`${OPEN_COST_OPTIONS.kube_state_metric}-${index}`"
-                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric]"
+                                             :key="`${OPEN_COST_OPTIONS.kube_state_metrics}-${index}`"
+                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics]"
                                              :value="options.value"
-                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metric, options.value)"
+                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metrics, options.value)"
                                     >
                                         {{ options.label }}
                                     </p-radio>
@@ -285,7 +285,7 @@ watch(() => props.visible, (visible) => {
                             <div v-if="!state.guideCollapsed"
                                  class="guide-content"
                             >
-                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metric]"
+                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metrics]"
                                                                           highlightingt-term="kube-state-metric"
                                                                           :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
                                                                           script-height="3.5rem"
