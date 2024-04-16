@@ -2736,7 +2736,8 @@
 			"SHOWING_TOP_15": "상위 15개 데이터",
 			"SHOW_ALL": "전체 보기",
 			"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
-			"TOTAL_COUNT": ""
+			"TOTAL_COUNT": "",
+			"UNIT": ""
 		},
 		"SECURITY": {
 			"MAIN": {

@@ -7,29 +7,36 @@ import {
 } from 'vue';
 
 import {
-    PButton, PPopover, PBadge,
+    PButton, PPopover, PBadge, PIconButton,
 } from '@spaceone/design-system';
 
 import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
 import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
 import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-const filtersPopperRef = ref<any|null>(null);
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
+const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: 0,
+    selectedPeriodLabel: '',
 });
 
 /* event */
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
+};
+const handleClickRefresh = () => {
+    metricExplorerPageStore.setRefreshMetricData(true);
 };
 </script>
 
@@ -41,7 +48,7 @@ const handleClickFilter = () => {
             <div class="left-part">
                 <metric-explorer-operator-dropdown />
                 <metric-explorer-granularity-dropdown />
-                <metric-explorer-period-dropdown />
+                <metric-explorer-period-dropdown :selected-period-label.sync="state.selectedPeriodLabel" />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -71,6 +78,15 @@ const handleClickFilter = () => {
                     </template>
                 </p-popover>
             </div>
+            <div class="right-part">
+                <span class="period-label-text">{{ state.selectedPeriodLabel }}</span>
+                <p-icon-button name="ic_renew"
+                               style-type="tertiary"
+                               shape="square"
+                               :disabled="metricExplorerPageState.refreshMetricData"
+                               @click="handleClickRefresh"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -85,6 +101,14 @@ const handleClickFilter = () => {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        .right-part {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            .period-label-text {
+                @apply text-label-md text-gray-700;
+            }
         }
         .filters-button {
             .filters-badge {

@@ -50,7 +50,7 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    loading: computed(() => metricExplorerPageStore.state.namespaceListloading || metricExplorerPageStore.state.metricListLoading),
+    loading: computed(() => metricExplorerPageStore.state.namespaceListLoading || metricExplorerPageStore.state.metricListLoading),
     currentMetric: computed<MetricModel|undefined>(() => (state.isDetailPage ? metricExplorerPageStore.state.metric : undefined)),
     providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),

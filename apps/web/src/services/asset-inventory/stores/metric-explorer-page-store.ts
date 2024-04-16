@@ -29,9 +29,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     });
     const state = reactive({
-        namespaceListloading: false,
+        namespaceListLoading: false,
         metricListLoading: false,
         metricLoading: false,
+        refreshMetricData: false,
         metricId: undefined as string|undefined,
         metric: undefined as MetricModel|undefined,
         namespaces: [] as NamespaceModel[],
@@ -50,7 +51,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const getters = reactive({
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
             if (!state.metric?.label_keys?.length) return [];
-            const staticFields: StaticGroupBy[] = ['unit', 'project_id'];
+            const staticFields: StaticGroupBy[] = ['project_id'];
             if (_state.isAdminMode) staticFields.push('workspace_id');
 
             const labelFields: string[] = state.metric?.label_keys || [];
@@ -105,6 +106,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setSelectedNamespace = (namespace: NamespaceModel|undefined) => {
         state.selectedNamespace = namespace;
     };
+    const setRefreshMetricData = (refreshMetricData: boolean) => {
+        state.refreshMetricData = refreshMetricData;
+    };
 
     /* Actions */
     const reset = () => {
@@ -123,18 +127,18 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedOperator = OPERATOR.SUM;
     };
     const loadNamespaces = async () => {
-        state.namespaceListloading = true;
+        state.namespaceListLoading = true;
         const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.namespace.list);
         try {
             const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
             if (status === 'succeed') {
                 state.namespaces = response.results || [];
-                state.namespaceListloading = false;
+                state.namespaceListLoading = false;
             }
         } catch (e) {
             console.error(e);
             state.namespaces = [];
-            state.namespaceListloading = false;
+            state.namespaceListLoading = false;
         }
     };
     const loadMetrics = async (namespaceId: string) => {
@@ -189,6 +193,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setMetricId,
         setSelectedOperator,
         setSelectedNamespace,
+        setRefreshMetricData,
     };
 
     return {

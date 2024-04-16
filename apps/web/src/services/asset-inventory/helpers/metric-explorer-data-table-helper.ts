@@ -3,9 +3,9 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { GRANULARITY, STATIC_GROUP_BY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
-    Granularity, Period, MetricDataAnalyzeResult, StaticGroupBy,
+    Granularity, Period, MetricDataAnalyzeResult,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -65,12 +65,4 @@ export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResu
         });
     });
     return refinedTableData;
-};
-
-export const getRefinedMetricDataAnalyzeQueryGroupBy = (groupBy: Array<string|StaticGroupBy>): string[] => {
-    if (!groupBy.length) return [];
-    return groupBy.map((d) => {
-        if (Object.values(STATIC_GROUP_BY).includes(d)) return d;
-        return `labels.${d}`;
-    });
 };

@@ -6,6 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -15,8 +16,10 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import {
-    getMetricExplorerDataTableDateFields, getRefinedMetricDataAnalyzeQueryGroupBy,
-    getRefinedMetricExplorerTableData,
+    getRefinedMetricDataAnalyzeQueryGroupBy,
+} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
+import {
+    getMetricExplorerDataTableDateFields, getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -48,12 +51,15 @@ const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
-        analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
+        analyzeApiQueryHelper
+            .setFilters(metricExplorerPageGetters.consoleFilters)
+            .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const _groupBy = metricExplorerPageState.selectedGroupByList.map((groupBy) => getRefinedMetricDataAnalyzeQueryGroupBy(groupBy));
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageState.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
-                group_by: getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedGroupByList),
+                group_by: _groupBy,
                 start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
@@ -70,22 +76,24 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         if (status === 'succeed') return response;
         return { more: false, results: [] };
     } catch (e) {
-        state.loading = false;
         return { more: false, results: [] };
     }
+};
+const setDataTableData = async () => {
+    state.loading = true;
+    const { results, more } = await analyzeMetricData();
+    state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+    state.more = more ?? false;
+    state.loading = false;
 };
 
 /* Event */
 const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
-    const { results, more } = await analyzeMetricData();
-    state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
-    state.more = more ?? false;
+    await setDataTableData();
 };
 const handleUpdateThisPage = async () => {
-    const { results, more } = await analyzeMetricData();
-    state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
-    state.more = more ?? false;
+    await setDataTableData();
 };
 
 watch(
@@ -98,12 +106,16 @@ watch(
     async ([metricId]) => {
         if (!metricId) return;
         state.thisPage = 1;
-        const { results, more } = await analyzeMetricData();
-        state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period);
-        state.more = more ?? false;
+        await setDataTableData();
     },
     { immediate: true, deep: true },
 );
+watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
+    if (refresh) {
+        await setDataTableData();
+        metricExplorerPageStore.setRefreshMetricData(false);
+    }
+}, { immediate: false });
 </script>
 
 <template>

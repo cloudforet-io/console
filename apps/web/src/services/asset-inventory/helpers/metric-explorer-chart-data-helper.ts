@@ -6,10 +6,10 @@ import {
     gray, transparent, violet, white,
 } from '@/styles/colors';
 
-import { CHART_TYPE, GRANULARITY, STATIC_GROUP_BY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
-    XYChartData, RealtimeChartData, ChartType, StaticGroupBy,
+    XYChartData, RealtimeChartData, ChartType,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -140,10 +140,4 @@ export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<Metri
         }
     });
     return chartData;
-};
-
-export const getRefinedMetricDataAnalyzeQueryGroupBy = (groupBy?: string | StaticGroupBy): string[] => {
-    if (!groupBy) return [];
-    if (Object.values(STATIC_GROUP_BY).includes(groupBy)) return [groupBy];
-    return [`labels.${groupBy}`];
 };
