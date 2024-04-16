@@ -107,6 +107,7 @@ const fetchFavoriteList = async (selectedItem?: string) => {
 };
 
 watch(() => dropdownState.selectedItem, async (selectedItem) => {
+    if (!storeState.currentWorkspaceId) return;
     await fetchFavoriteList(selectedItem);
 }, { immediate: true });
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
