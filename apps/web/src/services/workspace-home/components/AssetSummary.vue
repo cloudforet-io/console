@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, ref, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -124,15 +124,11 @@ const fetchCloudServiceResources = async () => {
     }
 };
 
-watch(() => storeState.providerMap, () => {
-    if (!storeState.currentWorkspaceId) return;
-    fetchCloudServiceResources();
+watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async ([currentWorkspaceId]) => {
+    if (!currentWorkspaceId) return;
+    await fetchDailyUpdatesList();
+    await fetchCloudServiceResources();
 }, { immediate: true });
-
-onMounted(() => {
-    if (!storeState.currentWorkspaceId) return;
-    fetchDailyUpdatesList();
-});
 </script>
 
 <template>
