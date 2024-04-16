@@ -9,6 +9,7 @@ import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vu
 import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
+import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -50,6 +51,9 @@ watch(() => storeState.currentWorkspaceId, async () => {
                         class="bookmark-board-wrapper"
         />
         <bookmark-folder-form-modal :bookmark-folder-list="storeState.bookmarkFolderList" />
+        <bookmark-link-form-modal :bookmark-folder-list="storeState.bookmarkFolderList"
+                                  :bookmark-list="storeState.bookmarkList"
+        />
     </div>
 </template>
 

@@ -9,7 +9,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     isFullMode: boolean,
@@ -33,8 +33,8 @@ const state = reactive({
 const handleClickFullModeButton = () => {
     state.proxyIsFullMode = !state.proxyIsFullMode;
 };
-const handleClickCreateFolderButton = () => {
-    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
+const handleClickCreateButton = (type: BookmarkModalType) => {
+    bookmarkStore.setModalType(type);
 };
 </script>
 
@@ -64,12 +64,12 @@ const handleClickCreateFolderButton = () => {
                            style-type="tertiary"
                            shape="square"
                            size="sm"
-                           @click="handleClickCreateFolderButton"
+                           @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.FOLDER)"
             />
             <p-text-button v-else
                            icon-left="ic_plus"
                            class="create-folder-button"
-                           @click="handleClickCreateFolderButton"
+                           @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.FOLDER)"
             >
                 {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
             </p-text-button>
@@ -77,6 +77,7 @@ const handleClickCreateFolderButton = () => {
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
                       :style-type="!state.proxyIsFullMode ? 'tertiary' : 'substitutive'"
+                      @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.LINK)"
             >
                 {{ $t('HOME.BOOKMARK_ADD_LINK') }}
             </p-button>

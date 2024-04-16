@@ -48,8 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
                      class="image-wrapper"
                 >
                     <p-lazy-img
-                        v-if="board.imgIcon"
-                        :src="assetUrlConverter(board.imgIcon)"
+                        v-if="board.icon"
+                        :src="assetUrlConverter(board.icon)"
                         width="1.5rem"
                         height="1.5rem"
                         class="icon"
@@ -63,7 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
                 </div>
                 <div class="text-wrapper">
                     <p class="bookmark-label">
-                        {{ board.title }}
+                        {{ board.name }}
                     </p>
                     <p v-if="props.isFullMode"
                        class="bookmark-link"
