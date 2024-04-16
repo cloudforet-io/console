@@ -1,35 +1,40 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import {
-    PButton, PDivider, PFieldTitle, PIconButton,
+    PButton, PDivider, PFieldTitle, PIconButton, PTextButton,
 } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
+
 interface Props {
     isFullMode: boolean,
+    bookmarkFolderList?: BookmarkItem[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
     isFullMode: false,
+    bookmarkFolderList: undefined,
 });
+
+const bookmarkStore = useBookmarkStore();
 
 const emit = defineEmits<{(event: 'update:isFullMode', value: boolean): void}>();
 
 const state = reactive({
-    // TODO: will be changed to data
-    buttons: computed(() => [
-        { label: 'tab1', value: 'tab1' },
-        { label: 'tab2', value: 'tab2' },
-        { label: 'tab3', value: 'tab3' },
-    ]),
     activeButton: 'my-bookmark',
     proxyIsFullMode: useProxyValue('isFullMode', props, emit),
 });
 
 const handleClickFullModeButton = () => {
     state.proxyIsFullMode = !state.proxyIsFullMode;
+};
+const handleClickCreateFolderButton = () => {
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
 };
 </script>
 
@@ -42,23 +47,32 @@ const handleClickFullModeButton = () => {
              class="bookmark-folders-wrapper"
         >
             <div class="bookmark-folders">
-                <p-button v-for="(item, idx) in state.buttons"
+                <p-button v-for="(item, idx) in props.bookmarkFolderList"
                           :key="idx"
                           icon-left="ic_folder-filled"
                           style-type="tertiary"
                           class="folders-button"
                 >
-                    {{ item.label }}
+                    {{ item.name }}
                 </p-button>
             </div>
             <p-divider vertical
                        class="divider"
             />
-            <p-icon-button name="ic_plus"
+            <p-icon-button v-if="props.bookmarkFolderList.length > 0"
+                           name="ic_plus"
                            style-type="tertiary"
                            shape="square"
                            size="sm"
+                           @click="handleClickCreateFolderButton"
             />
+            <p-text-button v-else
+                           icon-left="ic_plus"
+                           class="create-folder-button"
+                           @click="handleClickCreateFolderButton"
+            >
+                {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
+            </p-text-button>
         </div>
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
@@ -106,6 +120,9 @@ const handleClickFullModeButton = () => {
         }
         .divider {
             height: 1.25rem;
+        }
+        .create-folder-button {
+            padding-left: 0;
         }
     }
     .toolbox-wrapper {

@@ -1,40 +1,25 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
+import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const bookmarkStore = useBookmarkStore();
+const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    // TODO: will be changed to data
-    bookmarkList: computed(() => [
-        {
-            icon: '', title: 'BookmarkBookmark 1', id: '1', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 2', id: '2', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 3', id: '3', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 4', id: '4', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 5', id: '5', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 6', id: '6', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 7', id: '7', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 8', id: '8', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-    ]),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
+    bookmarkFolderList: computed(() => bookmarkGetters.bookmarkFolderList),
+    bookmarkList: computed(() => bookmarkGetters.bookmarkList),
 });
 const state = reactive({
     boardSets: computed<BoardSet[]>(() => storeState.bookmarkList.map((d) => ({
@@ -43,20 +28,28 @@ const state = reactive({
     }))),
     isFullMode: false,
 });
+
+watch(() => storeState.currentWorkspaceId, async () => {
+    if (!storeState.currentWorkspaceId) return;
+    await bookmarkStore.fetchBookmarkList();
+}, { immediate: true });
 </script>
 
 <template>
     <div class="bookmark"
          :class="{ 'full-mode': state.isFullMode }"
     >
-        <bookmark-header :is-full-mode.sync="state.isFullMode" />
+        <bookmark-header :is-full-mode.sync="state.isFullMode"
+                         :bookmark-folder-list="storeState.bookmarkFolderList"
+        />
         <bookmark-full-mode v-if="state.isFullMode"
-                            :bookmark-list="storeState.bookmarkList"
+                            :bookmark-list="storeState.bookmarkFolderList"
         />
         <bookmark-board v-else
                         :board-sets="state.boardSets"
                         class="bookmark-board-wrapper"
         />
+        <bookmark-folder-form-modal :bookmark-folder-list="storeState.bookmarkFolderList" />
     </div>
 </template>
 

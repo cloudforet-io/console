@@ -1758,6 +1758,7 @@
 		}
 	},
 	"HOME": {
+		"ALT_E_DUPLICATED_NAME": "이름이 중복되었습니다. ",
 		"ASSET_SUMMARY_CREATED": "생성일",
 		"ASSET_SUMMARY_DAILY_UPDATE_DESC": "00:00 ~ 현재 (로컬 시간 기준) ",
 		"ASSET_SUMMARY_DAILY_UPDATE_TITLE": "오늘의 리소스 업데이트 ",
@@ -1768,6 +1769,7 @@
 		"ASSET_SUMMARY_STORAGE": "저장소",
 		"ASSET_SUMMARY_TITLE": "",
 		"BOOKMARK_ADD_LINK": "",
+		"BOOKMARK_CREATE_FOLDER": "",
 		"BOOKMARK_TITLE": "",
 		"CONFIG_RECENT_TITLE": "최신순으로 정렬",
 		"CONFIG_STARRED_ALL": "모두",
@@ -1776,6 +1778,7 @@
 		"COST_SUMMARY_GO_TO_REPORT": "",
 		"COST_SUMMARY_TITLE": "",
 		"COST_SUMMARY_TOTAL_SPEND": "",
+		"FORM_NAME": "이름 ",
 		"INFO_APPS": "",
 		"INFO_CREATE_APP": "앱 생성",
 		"INFO_INVITE_USER": "",

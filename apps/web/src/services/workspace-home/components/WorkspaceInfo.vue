@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Vue, {
-    computed, onMounted, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -139,15 +139,15 @@ const fetchAppList = async () => {
     }
 };
 
-onMounted(async () => {
-    if (!state.selectedWorkspace.workspace_id) return;
+watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
+    if (!workspace_id) return;
     if (state.accessUserMenu) {
         await fetchWorkspaceUserList();
     }
     if (state.accessAppMenu) {
         await fetchAppList();
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
