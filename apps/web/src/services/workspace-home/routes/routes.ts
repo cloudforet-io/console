@@ -6,9 +6,10 @@ import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-con
 
 const WorkspaceHome = () => import('@/services/workspace-home/pages/WorkspaceHomePage.vue');
 
-export default {
+const workspaceHomeRoute: RouteConfig = {
     path: 'home',
     name: WORKSPACE_HOME_ROUTE._NAME,
     meta: { menuId: MENU_ID.WORKSPACE_HOME },
     component: WorkspaceHome,
-} as RouteConfig;
+};
+export default workspaceHomeRoute;
