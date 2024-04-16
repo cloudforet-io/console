@@ -60,8 +60,7 @@ const state = reactive({
 <template>
     <div class="metric-explorer-content">
         <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')" />
-        <p-divider />
-        <p-pane-layout style="margin-top: 1.5rem;">
+        <p-pane-layout>
             <div class="contents">
                 <p class="title">
                     {{ $t('Get stared with Metric Explorer') }}
