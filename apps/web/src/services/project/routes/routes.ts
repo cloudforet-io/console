@@ -29,7 +29,7 @@ export default {
     component: ProjectContainer,
     children: [
         {
-            path: '/',
+            path: ':projectGroupId?',
             name: PROJECT_ROUTE._NAME,
             meta: {
                 menuId: MENU_ID.PROJECT,
@@ -39,16 +39,16 @@ export default {
             component: ProjectMainPage,
         },
         {
-            path: ':id',
+            path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            // redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                    // redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailPage,
                     children: [
