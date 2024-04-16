@@ -13,35 +13,12 @@ import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const bookmarkStore = useBookmarkStore();
+const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    bookmarkList: computed(() => [
-        {
-            icon: '', title: 'BookmarkBookmark 1', id: '1', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 2', id: '2', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 3', id: '3', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 4', id: '4', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 5', id: '5', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 6', id: '6', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 7', id: '7', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-        {
-            icon: '', title: 'Bookmark 8', id: '8', link: 'https://grafana.com/grafana/dashboards/17982-demo-dashboard/',
-        },
-    ]),
+    bookmarkFolderList: computed(() => bookmarkGetters.bookmarkFolderList),
+    bookmarkList: computed(() => bookmarkGetters.bookmarkList),
 });
 const state = reactive({
     boardSets: computed<BoardSet[]>(() => storeState.bookmarkList.map((d) => ({
@@ -61,9 +38,11 @@ watch(() => storeState.currentWorkspaceId, async () => {
     <div class="bookmark"
          :class="{ 'full-mode': state.isFullMode }"
     >
-        <bookmark-header :is-full-mode.sync="state.isFullMode" />
+        <bookmark-header :is-full-mode.sync="state.isFullMode"
+                         :bookmark-folder-list="storeState.bookmarkFolderList"
+        />
         <bookmark-full-mode v-if="state.isFullMode"
-                            :bookmark-list="storeState.bookmarkList"
+                            :bookmark-list="storeState.bookmarkFolderList"
         />
         <bookmark-board v-else
                         :board-sets="state.boardSets"
