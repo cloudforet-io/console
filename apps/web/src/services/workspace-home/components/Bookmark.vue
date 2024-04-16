@@ -6,6 +6,7 @@ import type { BoardSet } from '@spaceone/design-system/types/data-display/board/
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
+import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
@@ -48,6 +49,7 @@ watch(() => storeState.currentWorkspaceId, async () => {
                         :board-sets="state.boardSets"
                         class="bookmark-board-wrapper"
         />
+        <bookmark-folder-form-modal :bookmark-folder-list="storeState.bookmarkFolderList" />
     </div>
 </template>
 
