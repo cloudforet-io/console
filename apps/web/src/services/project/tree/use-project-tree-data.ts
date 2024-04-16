@@ -8,8 +8,8 @@ import type { Location } from 'vue-router';
 import { get } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProjectGroupReferenceMap, ProjectGroupReferenceItem } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
@@ -163,6 +163,46 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         const itemType = id.startsWith('pg-') ? 'PROJECT_GROUP' : 'PROJECT';
         await findSelectedNode(id, itemType);
     });
+
+    /* For Name-Changed ProjectGroup or Project */
+    watch(
+        [() => storeState.project, () => storeState.projectGroup],
+        ([, newProjectGroups], [, oldProjectGroups]) => {
+            // Check Changed Project
+            // Object.entries(newProjects).forEach(([id, newProject]) => {
+            //     if (oldProjects[id] && newProject.name !== oldProjects[id].name) {
+            //         updateTreeNode(id, newProject);
+            //     }
+            // });
+
+            // Check Changed Project Group
+            Object.entries(newProjectGroups).forEach(([id, newGroup]) => {
+                if (oldProjectGroups[id] && newGroup.name !== oldProjectGroups[id].name) {
+                    updateTreeNode(id, newGroup);
+                }
+            });
+        },
+        { deep: true },
+    );
+
+    const updateTreeNode = (id: string, newData: ProjectGroupReferenceItem|ProjectReferenceItem) => {
+        const node = findNodeById(state.treeData, id);
+        if (node) {
+            node.data.name = newData.name;
+        }
+    };
+
+    const findNodeById = (nodes: TreeNode[], nodeId: string): TreeNode|undefined => nodes.reduce((acc: TreeNode|undefined, node: TreeNode) => {
+        if (acc) return acc;
+        if (node.id === nodeId) {
+            return node;
+        }
+        if (node.children) {
+            return findNodeById(node.children, nodeId);
+        }
+        return undefined;
+    }, undefined);
+
 
     return {
         treeData: toRef(state, 'treeData'),
