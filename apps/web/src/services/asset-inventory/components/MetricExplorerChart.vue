@@ -143,17 +143,18 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     <div class="metric-explorer-chart">
         <div class="left-part">
             <div class="chart-type-button-wrapper">
-                <span class="showing-top-text">{{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}</span>
-                <p-select-button v-for="item in state.chartTypeItems"
-                                 :key="`chart-select-button-${item.chartType}`"
-                                 :selected="state.selectedChartType"
-                                 :value="item.chartType"
-                                 :icon-name="item.icon"
-                                 layout="icon-only"
-                                 style-type="gray"
-                                 size="sm"
-                                 @change="handleSelectChartType"
-                />
+                <span class="period-text">
+                    <p-select-button v-for="item in state.chartTypeItems"
+                                     :key="`chart-select-button-${item.chartType}`"
+                                     :selected="state.selectedChartType"
+                                     :value="item.chartType"
+                                     :icon-name="item.icon"
+                                     layout="icon-only"
+                                     style-type="gray"
+                                     size="sm"
+                                     @change="handleSelectChartType"
+                    />
+                </span>
             </div>
             <div class="chart-wrapper">
                 <metric-explorer-line-chart
