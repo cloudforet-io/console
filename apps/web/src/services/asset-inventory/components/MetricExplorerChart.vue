@@ -6,7 +6,7 @@ import {
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PSelectButton } from '@spaceone/design-system';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -54,6 +54,11 @@ const state = reactive({
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
     isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
+    periodText: computed<string>(() => {
+        if (isEmpty(metricExplorerPageState.period)) return '';
+        if (state.isRealtimeChart) return metricExplorerPageState.period.end || '';
+        return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+    }),
 });
 
 /* Api */
@@ -144,17 +149,18 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         <div class="left-part">
             <div class="chart-type-button-wrapper">
                 <span class="period-text">
-                    <p-select-button v-for="item in state.chartTypeItems"
-                                     :key="`chart-select-button-${item.chartType}`"
-                                     :selected="state.selectedChartType"
-                                     :value="item.chartType"
-                                     :icon-name="item.icon"
-                                     layout="icon-only"
-                                     style-type="gray"
-                                     size="sm"
-                                     @change="handleSelectChartType"
-                    />
+                    {{ state.periodText }}
                 </span>
+                <p-select-button v-for="item in state.chartTypeItems"
+                                 :key="`chart-select-button-${item.chartType}`"
+                                 :selected="state.selectedChartType"
+                                 :value="item.chartType"
+                                 :icon-name="item.icon"
+                                 layout="icon-only"
+                                 style-type="gray"
+                                 size="sm"
+                                 @change="handleSelectChartType"
+                />
             </div>
             <div class="chart-wrapper">
                 <metric-explorer-line-chart
@@ -188,6 +194,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         <div class="right-part">
             <metric-explorer-chart-legends :legends.sync="state.legends"
                                            :loading="state.loading"
+                                           :more="state.data?.more"
                                            :chart-type="state.selectedChartType"
                                            @toggle-series="handleToggleSeries"
                                            @show-all-series="handleAllSeries('show')"
@@ -212,7 +219,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
             gap: 0.375rem;
             align-items: center;
         }
-        .showing-top-text {
+        .period-text {
             @apply text-label-md text-gray-500;
             font-weight: 400;
             padding-right: 0.125rem;
