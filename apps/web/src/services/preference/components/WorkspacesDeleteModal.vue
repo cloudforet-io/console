@@ -51,7 +51,7 @@ const handleConfirm = async () => {
         state.proxyVisible = false;
         emit('refresh');
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleError(e, true);
     }
 };
 

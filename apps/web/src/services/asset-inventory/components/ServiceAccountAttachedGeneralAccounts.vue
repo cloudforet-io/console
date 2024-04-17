@@ -154,9 +154,7 @@ const handleSync = async () => {
         });
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.START_SYNC'), '');
     } catch (e) {
-        ErrorHandler.handleError(e, {
-            title: 'Failed to start sync.',
-        });
+        ErrorHandler.handleError(e, true);
     } finally {
         if (state.trustedAccountId) await serviceAccountPageStore.fetchSyncJobList(state.trustedAccountId);
         state.syncReqLoading = false;
