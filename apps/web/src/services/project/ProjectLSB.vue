@@ -3,66 +3,89 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
+import { PTextInput, PTextHighlighting, PEmpty } from '@spaceone/design-system';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
+
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-// import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
-// import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
-// import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
-import type { LSBMenu } from '@/common/modules/navigations/lsb/type';
+import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
+import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-// import ProjectFavoriteList from '@/services/project/components/ProjectFavoriteList.vue';
-// import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
+import { gray, indigo, peacock } from '@/styles/colors';
+
 import ProjectMainTree from '@/services/project/components/ProjectMainTree.vue';
-// import { useProjectFavorite } from '@/services/project/composables/use-project-favorite';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-// import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-// import type { ProjectGroupTreeItem } from '@/services/project/types/project-tree-type';
 
 const route = useRoute();
-// const router = useRouter();
-
-// const projectPageStore = useProjectPageStore();
-// const projectPageState = projectPageStore.state;
-// const favoriteStore = useFavoriteStore();
-// const favoriteGetters = favoriteStore.getters;
+const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 
-// const storeState = reactive({
-//     favoriteItems: computed(() => [
-//         ...favoriteGetters.menuItems,
-//         ...favoriteGetters.projectGroupItems,
-//         ...favoriteGetters.dashboardItems, // need to be filtered by projectId
-//     ]),
-// });
+const storeState = reactive({
+    projectItems: computed<ProjectReferenceItem[]>(() => Object.values(allReferenceStore.getters.project)),
+    favoriteItems: computed(() => favoriteGetters.favoriteMenuList.filter((favoriteMenu) => {
+        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT) return true;
+        if (favoriteMenu.itemType === FAVORITE_TYPE.PROJECT_GROUP) return true;
+        if (favoriteMenu.itemType === FAVORITE_TYPE.DASHBOARD && favoriteMenu.itemId.startsWith('project-')) return true;
+        return false;
+    })),
+});
 
 const state = reactive({
     initGroupId: computed(() => route.params.projectGroupId as string|undefined),
     isCollapsed: false,
-    currentPath: computed(() => route.fullPath),
 
-    // starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
-    //     const icon = '';
-    //     // project dashboard
-    //     return {
-    //         type: MENU_ITEM_TYPE.ITEM,
-    //         label: '',
-    //         id: d.name,
-    //         imgIcon: icon,
-    //         to: getProperRouteLocation({
-    //             name: PROJECT_ROUTE.DETAIL._NAME,
-    //         }),
-    //         favoriteOptions: {
-    //             type: FAVORITE_TYPE.CLOUD_SERVICE,
-    //             id: d.name,
-    //         },
-    //     };
-    // })),
+    projectKeyword: '',
+    currentPath: computed(() => route.fullPath),
+    starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
+        if (d.itemType === FAVORITE_TYPE.DASHBOARD) {
+            return {
+                type: MENU_ITEM_TYPE.ITEM,
+                label: d.label,
+                id: d.name,
+                icon: { name: 'ic_service_dashboard', color: gray[600] },
+                to: getProperRouteLocation({
+                    name: PROJECT_ROUTE.DETAIL._NAME,
+                    params: { id: d.itemId },
+                }),
+                favoriteOptions: { type: FAVORITE_TYPE.DASHBOARD, id: d.name },
+            };
+        } if (d.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
+            return {
+                type: MENU_ITEM_TYPE.ITEM,
+                label: d.label,
+                id: d.name,
+                icon: { name: 'ic_folder-filled', color: indigo[500] },
+                to: getProperRouteLocation({
+                    name: PROJECT_ROUTE._NAME,
+                    params: { projectGroupId: d.itemId },
+                }),
+                favoriteOptions: { type: FAVORITE_TYPE.PROJECT_GROUP, id: d.name },
+            };
+        }
+        return {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: d.label,
+            id: d.name,
+            icon: { name: 'ic_document-filled', color: peacock[600] },
+            to: getProperRouteLocation({
+                name: PROJECT_ROUTE.DETAIL._NAME,
+                params: { id: d.itemId },
+            }),
+            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
+        };
+    })),
     menuSet: computed<LSBMenu[]>(() => {
         const defaultMenuset = [
             {
                 type: MENU_ITEM_TYPE.STARRED,
-                childItems: [],
+                childItems: state.starredMenuItems,
                 currentPath: state.currentPath,
             },
             {
@@ -91,33 +114,19 @@ const state = reactive({
             ...defaultMenuset,
         ];
     }),
+    projectFiteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
+        .map((project) => ({
+            type: MENU_ITEM_TYPE.ITEM,
+            label: project.name,
+            id: project.key,
+            icon: { name: 'ic_document-filled', color: peacock[600] },
+            to: getProperRouteLocation({
+                name: PROJECT_ROUTE.DETAIL._NAME,
+                params: { id: project.key },
+            }),
+            favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
+        }))),
 });
-
-// const { favoriteItems, beforeFavoriteRoute, handleDeleteFavorite } = useProjectFavorite();
-//
-// const handleClickCollapsibleTitle = () => {
-//     state.isCollapsed = !state.isCollapsed;
-// };
-// const handleBeforeFavoriteRoute = async (item: FavoriteItem) => {
-//     await beforeFavoriteRoute(item);
-//     if (item.itemType !== FAVORITE_TYPE.PROJECT_GROUP) {
-//         router.push({
-//             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-//             params: {
-//                 id: item.itemId,
-//             },
-//         }).catch(() => {});
-//     }
-// };
-//
-// watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
-//     router.push({
-//         name: PROJECT_ROUTE._NAME,
-//         query: {
-//             select_pg: selectedItem.node?.data.id || null,
-//         },
-//     }).catch(() => {});
-// });
 </script>
 
 <template>
@@ -125,81 +134,50 @@ const state = reactive({
            :menu-set="state.menuSet"
     >
         <template #collapsible-contents-project>
-            <project-main-tree />
+            <p-text-input v-model="state.projectKeyword"
+                          class="project-search"
+                          placeholder="Search project"
+            />
+            <template v-if="state.projectKeyword">
+                <l-s-b-router-menu-item v-for="(_item, idx) of state.projectFiteredByKeyword"
+                                        :key="idx"
+                                        :item="_item"
+                                        :idx="`search-${idx}`"
+                                        :current-path="state.currentPath"
+                                        is-hide-favorite
+                >
+                    <p-text-highlighting class="search-result-text"
+                                         :term="state.projectKeyword"
+                                         :text="_item.label"
+                    />
+                </l-s-b-router-menu-item>
+                <p-empty v-if="state.projectKeyword && !state.projectFiteredByKeyword.length"
+                         class="search-empty"
+                >
+                    <span>
+                        {{ $t('PROJECT.LANDING.SEARCH_EMPTY_TEXT') }}
+                    </span>
+                </p-empty>
+            </template>
+            <project-main-tree v-else />
         </template>
     </l-s-b>
-<!--    <aside class="sidebar-container">-->
-<!--        <div class="sidebar-item-wrapper"-->
-<!--             :class="{ 'is-collapsed': state.isCollapsed }"-->
-<!--        >-->
-<!--            <div class="collapsible-title"-->
-<!--                 @click="handleClickCollapsibleTitle"-->
-<!--            >-->
-<!--                <p-i name="ic_chevron-down"-->
-<!--                     width="1.25rem"-->
-<!--                     height="1.25rem"-->
-<!--                     color="inherit transparent"-->
-<!--                     class="arrow-button"-->
-<!--                />-->
-<!--                <span>{{ $t('COMMON.STARRED') }}</span>-->
-<!--            </div>-->
-<!--            <div class="collapsible-contents">-->
-<!--                <project-favorite-list :items="favoriteItems"-->
-<!--                                       :before-route="handleBeforeFavoriteRoute"-->
-<!--                                       @delete="handleDeleteFavorite"-->
-<!--                >-->
-<!--                    <template #icon="{item}">-->
-<!--                        <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"-->
-<!--                             width="1rem"-->
-<!--                             height="1rem"-->
-<!--                             color="inherit inherit"-->
-<!--                        />-->
-<!--                    </template>-->
-<!--                </project-favorite-list>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="sidebar-item-wrapper">-->
-<!--            <project-main-project-tree-->
-<!--                :key="projectPageState.projectTreeKey"-->
-<!--                :init-group-id="state.initGroupId"-->
-<!--            />-->
-<!--        </div>-->
-<!--    </aside>-->
 </template>
 
 <style scoped lang="postcss">
-.sidebar-container {
-    @apply h-full relative;
-    overflow: auto;
-    padding: 1rem 0.5rem 2rem;
-    .sidebar-item-wrapper {
-        @apply flex flex-col text-label-md;
-        .collapsible-title {
-            @apply flex items-center font-bold;
-            .arrow-button {
-                transition: transform 0.3s ease-in-out;
-            }
-        }
-        .collapsible-contents {
-            margin-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            opacity: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        &.is-collapsed {
-            .collapsible-title {
-                .arrow-button {
-                    transform: rotate(-90deg);
-                }
-            }
-            .collapsible-contents {
-                height: 0;
-                margin: 0;
-                padding: 0;
-                opacity: 0;
-                transition: opacity 0s ease;
-            }
-        }
+.project-l-s-b {
+    .project-search {
+        @apply w-full;
+        margin-bottom: 0.5rem;
+    }
+    .search-result-text {
+        @apply overflow-hidden whitespace-no-wrap;
+        text-overflow: ellipsis;
+    }
+    .search-empty {
+        @apply text-paragraph-md;
+        white-space: pre;
+        margin-top: 0.75rem;
     }
 }
 </style>
