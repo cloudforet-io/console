@@ -33,7 +33,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 
 const storeState = reactive({
-    metricList: computed(() => metricExplorerPageStore.state.metricList),
+    metricNameList: computed(() => metricExplorerPageStore.state.metricList.map((metric) => metric.name)),
 });
 
 const state = reactive({
@@ -57,8 +57,7 @@ const {
 }, {
     name: (value: string) => {
         if (!value.length) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.REQUIRED_FIELD');
-        const isDuplicated = storeState.metricList.find((metric) => metric.name === value);
-        if (isDuplicated) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.DUPLICATED');
+        if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.DUPLICATED');
         return true;
     },
     code: (value: string) => {
