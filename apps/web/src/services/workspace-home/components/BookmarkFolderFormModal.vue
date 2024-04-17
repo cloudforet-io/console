@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
@@ -25,6 +25,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
+    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
     type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
 });
 const state = reactive({
@@ -43,6 +44,7 @@ const {
     name: '',
 }, {
     name(value: string) {
+        if (storeState.activeFolderName === value) return '';
         const duplicatedName = props.bookmarkFolderList?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('HOME.ALT_E_DUPLICATED_NAME');
@@ -64,16 +66,20 @@ const handleConfirm = async () => {
         state.loading = false;
     }
 };
+
+watch(() => storeState.activeFolderName, () => {
+    setForm('name', storeState.activeFolderName || '');
+}, { immediate: true });
 </script>
 
 <template>
     <p-button-modal class="bookmark-folder-form-modal"
-                    :header-title="$t('HOME.BOOKMARK_CREATE_FOLDER')"
+                    :header-title="storeState.activeFolderName ? $t('HOME.BOOKMARK_EDIT_FOLDER') : $t('HOME.BOOKMARK_CREATE_FOLDER')"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.type === BOOKMARK_MODAL_TYPE.FOLDER"
-                    :disabled="name === '' || invalidState.name"
+                    :disabled="(name === '' || invalidState.name) || storeState.activeFolderName === name"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -95,6 +101,11 @@ const handleConfirm = async () => {
                     />
                 </p-field-group>
             </div>
+        </template>
+        <template v-if="storeState.activeFolderName"
+                  #confirm-button
+        >
+            <span>{{ $t('HOME.BOOKMARK_EDIT') }}</span>
         </template>
     </p-button-modal>
 </template>

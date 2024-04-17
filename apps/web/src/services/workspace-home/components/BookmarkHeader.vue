@@ -21,14 +21,15 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    activeFolderName: computed(() => bookmarkGetters.activeFolderName),
-    isFullMode: computed(() => bookmarkGetters.isFullMode),
+    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
+    isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
+    isFileFullMode: computed<boolean>(() => bookmarkGetters.isFileFullMode),
 });
 
 const handleClickFullModeButton = () => {
     bookmarkStore.setFullMode(!storeState.isFullMode);
 };
-const handleClickCreateButton = (type: BookmarkModalType) => {
+const handleClickActionButton = (type: BookmarkModalType) => {
     bookmarkStore.setModalType(type);
 };
 const handleClickFolder = (idx: number, name: string) => {
@@ -50,9 +51,39 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
 
 <template>
     <div class="bookmark-header">
-        <p-field-title :label="$t('HOME.BOOKMARK_TITLE')"
+        <p-field-title :label="storeState.isFileFullMode ? storeState.activeFolderName : $t('HOME.BOOKMARK_TITLE')"
                        size="lg"
-        />
+        >
+            <template v-if="storeState.isFileFullMode"
+                      #left
+            >
+                <p-icon-button name="ic_arrow-left"
+                               style-type="transparent"
+                               size="sm"
+                               @click="bookmarkStore.setFileFullMode(false)"
+                />
+                <div class="folder-icon-wrapper">
+                    <p-i name="ic_folder-filled"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                </div>
+            </template>
+            <template v-if="storeState.isFileFullMode"
+                      #right
+            >
+                <div class="title-right-wrapper">
+                    <p-icon-button name="ic_edit-text"
+                                   size="sm"
+                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   size="sm"
+                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE)"
+                    />
+                </div>
+            </template>
+        </p-field-title>
         <div v-if="!storeState.isFullMode"
              class="bookmark-folders-wrapper"
         >
@@ -86,12 +117,12 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                            style-type="tertiary"
                            shape="square"
                            size="sm"
-                           @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
             />
             <p-text-button v-else
                            icon-left="ic_plus"
                            class="create-folder-button"
-                           @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
             >
                 {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
             </p-text-button>
@@ -99,7 +130,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
                       :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
-                      @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.LINK)"
+                      @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK)"
             >
                 {{ $t('HOME.BOOKMARK_ADD_LINK') }}
             </p-button>
@@ -157,6 +188,22 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
         @apply flex;
         margin-left: auto;
         gap: 0.5rem;
+    }
+
+    /* custom design-system component - p-field-title */
+    :deep(.p-field-title) {
+        .title-wrapper {
+            @apply items-center;
+            gap: 0.375rem;
+            .folder-icon-wrapper {
+                @apply flex items-center justify-center bg-blue-200 rounded;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+            .title-right-wrapper {
+                @apply flex text-gray-900;
+            }
+        }
     }
 }
 </style>

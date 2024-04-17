@@ -1,3 +1,5 @@
+import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
@@ -36,4 +38,4 @@ export interface BookmarkItem {
     isShowMore?: boolean;
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
-
+export type BookmarkBoardSet = BookmarkItem & BoardSet;

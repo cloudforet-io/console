@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
-
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
@@ -11,7 +9,7 @@ import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullM
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
 import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
@@ -25,7 +23,7 @@ const storeState = reactive({
     isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
 });
 const state = reactive({
-    boardSets: computed<BoardSet[]>(() => storeState.bookmarkList.map((d) => ({
+    boardSets: computed<BookmarkBoardSet[]>(() => storeState.bookmarkList.map((d) => ({
         ...d,
         rounded: true,
     }))),
@@ -44,7 +42,8 @@ watch(() => storeState.currentWorkspaceId, async () => {
     >
         <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
         <bookmark-full-mode v-if="storeState.isFullMode"
-                            :bookmark-list="storeState.bookmarkFolderList"
+                            :bookmark-folder-list="storeState.bookmarkFolderList"
+                            :bookmark-list="storeState.bookmarkList"
         />
         <bookmark-board v-else
                         :board-sets="state.boardSets"

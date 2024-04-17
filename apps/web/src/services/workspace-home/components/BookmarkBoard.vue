@@ -1,16 +1,21 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
+
 import { PBoard, PLazyImg, PI } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+
+import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { blue, gray } from '@/styles/colors';
 
+import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    boardSets: BoardSet[];
+    boardSets: BookmarkBoardSet[];
     isFullMode?: boolean;
     isFolderBoard?: boolean;
 }
@@ -23,17 +28,42 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 
+const state = reactive({
+    boardSets: computed<BookmarkBoardSet[]>(() => {
+        const result: BookmarkBoardSet[] = props.boardSets;
+        if (!props.isFullMode && result.length === 13) {
+            result.push({
+                name: i18n.t('HOME.TOGGLE_MORE') as string,
+                icon: 'ic_ellipsis-horizontal',
+                isShowMore: true,
+                rounded: true,
+            });
+        }
+        return result;
+    }),
+});
+
 const handleClickItem = (item) => {
-    if (!item.isShowMore) {
-        window.open(item.link, '_blank');
+    if (props.isFolderBoard) {
+        if (item.icon) {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
+        } else {
+            const idx = state.boardSets.findIndex((i) => i.name === item.name);
+            bookmarkStore.setFileFullMode(true);
+            bookmarkStore.setActiveButtonIdx(idx - 1);
+        }
         return;
     }
-    bookmarkStore.setFullMode(true);
+    if (item.icon) {
+        bookmarkStore.setFullMode(true);
+    } else {
+        window.open(item.link, '_blank');
+    }
 };
 </script>
 
 <template>
-    <p-board :board-sets="props.boardSets"
+    <p-board :board-sets="state.boardSets"
              selectable
              :style-type="BOARD_STYLE_TYPE.cards"
              class="bookmark-board"
@@ -44,7 +74,7 @@ const handleClickItem = (item) => {
                 <div v-if="props.isFolderBoard"
                      class="image-wrapper"
                 >
-                    <p-i v-if="board.isCreate"
+                    <p-i v-if="board.icon"
                          name="ic_plus"
                          width="1.25rem"
                          height="1.25rem"
