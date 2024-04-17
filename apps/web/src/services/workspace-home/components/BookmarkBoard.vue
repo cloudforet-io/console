@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
     isFullMode: false,
     isFolderBoard: false,
 });
+
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
@@ -22,11 +22,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
+const bookmarkGetters = bookmarkStore.getters;
 
 const emit = defineEmits<{(event: 'update:isFullMode', value: boolean): void}>();
 
+const storeState = reactive({
+    activeFolderName: computed(() => bookmarkGetters.activeFolderName),
+});
 const state = reactive({
-    activeButtonIdx: undefined as number | undefined,
     proxyIsFullMode: useProxyValue('isFullMode', props, emit),
 });
 
@@ -37,18 +40,20 @@ const handleClickCreateButton = (type: BookmarkModalType) => {
     bookmarkStore.setModalType(type);
 };
 const handleClickFolder = (idx: number, name: string) => {
-    if (state.activeButtonIdx === idx) {
-        state.activeButtonIdx = undefined;
-        bookmarkStore.fetchBookmarkList(undefined);
+    if (storeState.activeFolderName === name) {
+        bookmarkStore.setActiveButtonIdx(undefined);
         return;
     }
-    state.activeButtonIdx = idx;
-    bookmarkStore.fetchBookmarkList(name);
+    bookmarkStore.setActiveButtonIdx(idx);
 };
 const handleClickDeleteFolder = (name: string, e) => {
     e.stopPropagation();
     bookmarkStore.deleteBookmarkFolder(name);
 };
+
+watch(() => storeState.activeFolderName, (activeFolderName) => {
+    bookmarkStore.fetchBookmarkList(activeFolderName);
+}, { immediate: true });
 </script>
 
 <template>
@@ -64,10 +69,10 @@ const handleClickDeleteFolder = (name: string, e) => {
                           :key="idx"
                           style-type="tertiary"
                           class="folders-button"
-                          :class="{'active': state.activeButtonIdx === idx}"
+                          :class="{'active': storeState.activeFolderName === item.name}"
                           @click="handleClickFolder(idx, item.name)"
                 >
-                    <p-icon-button v-if="state.activeButtonIdx === idx"
+                    <p-icon-button v-if="storeState.activeFolderName === item.name"
                                    name="ic_close"
                                    style-type="transparent"
                                    size="sm"
