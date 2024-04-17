@@ -55,9 +55,9 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
 
         const referenceMap: MetricReferenceMap = {};
         try {
-            const response = await SpaceConnector.clientV2.identity.metric.list<MetricListParameters, ListResponse<MetricModel>>({
+            const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
                 query: {
-                    only: ['metric_id', 'name', 'provider', 'category', 'namespace_id'],
+                    only: ['metric_id', 'name', 'namespace_id'],
                 },
             }, { timeout: 3000 });
 
@@ -67,7 +67,6 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                     label: metricInfo.name,
                     name: metricInfo.name,
                     data: {
-                        category: metricInfo.category,
                         namespace_id: metricInfo.namespace_id,
                     },
                 };
@@ -87,7 +86,6 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                 label: metricInfo.name,
                 name: metricInfo.name,
                 data: {
-                    category: metricInfo.category,
                     namespace_id: metricInfo.namespace_id,
                 },
             },
