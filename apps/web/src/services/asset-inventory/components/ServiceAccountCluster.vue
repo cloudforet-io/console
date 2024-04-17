@@ -93,7 +93,6 @@ onUnmounted(() => {
                      class="button-wrapper"
                 >
                     <p-button v-if="storeState.isClusterConnected"
-                              :icon-left="state.isClusterActive ? 'ic_plugs' : 'ic_plug-filled'"
                               style-type="tertiary"
                               @click="handleOpenClusterConnectionModal"
                     >
