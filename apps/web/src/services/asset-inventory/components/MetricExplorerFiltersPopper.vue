@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import {
-    PSelectDropdown, PTextButton,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { PSelectDropdown, PTextButton } from '@spaceone/design-system';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
 import { VariableModel } from '@/lib/variable-models';
@@ -14,6 +13,9 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    getRefinedMetricDataAnalyzeQueryGroupBy,
+} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
@@ -21,8 +23,6 @@ const props = defineProps<{
     visible: boolean;
 }>();
 
-const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
-};
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
@@ -42,23 +42,19 @@ const state = reactive({
 /* Util */
 const getMenuHandler = (groupBy: string): AutocompleteHandler => {
     try {
-        let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
-        if (!variableModels) {
-            variableModels = new VariableModel(({
-                type: 'RESOURCE_VALUE',
-                resource_type: 'inventory.CloudService',
-                reference_key: groupBy,
-                name: groupBy,
-            }));
-        }
+        const variableModels = new VariableModel(({
+            type: 'RESOURCE_VALUE',
+            resource_type: 'inventory.MetricData',
+            reference_key: getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
+            name: groupBy,
+        }));
         const handler = getVariableModelMenuHandler(variableModels);
 
         return async (...args) => {
             if (!groupBy) return { results: [] };
             try {
                 state.loading = true;
-                const results = await handler(...args);
-                return results;
+                return await handler(...args);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return { results: [] };
@@ -126,13 +122,12 @@ watch(() => props.visible, (visible) => {
             show-select-marker
             use-fixed-menu-style
             selection-highlight
-            :init-selected-with-handler="props.visible && !!GROUP_BY_TO_VAR_MODELS[groupBy.name]"
+            :init-selected-with-handler="props.visible"
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
             :page-size="10"
             @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
         />
-        <!--add more button-->
         <p-text-button icon-left="ic_refresh"
                        style-type="highlight"
                        class="reset-button"
