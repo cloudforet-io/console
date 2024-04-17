@@ -72,6 +72,7 @@ const handleConfirm = async () => {
             link: link.value,
             folder: state.selectedFolder,
         });
+        await bookmarkStore.setActiveButtonIdx(state.selectedFolderIdx);
         await handleClose();
     } finally {
         state.loading = false;

@@ -11,6 +11,7 @@ import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullM
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
 import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
@@ -19,15 +20,15 @@ const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    bookmarkFolderList: computed(() => bookmarkGetters.bookmarkFolderList),
-    bookmarkList: computed(() => bookmarkGetters.bookmarkList),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkFolderList),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
+    isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
 });
 const state = reactive({
     boardSets: computed<BoardSet[]>(() => storeState.bookmarkList.map((d) => ({
         ...d,
         rounded: true,
     }))),
-    isFullMode: false,
 });
 
 watch(() => storeState.currentWorkspaceId, async () => {
@@ -39,12 +40,10 @@ watch(() => storeState.currentWorkspaceId, async () => {
 
 <template>
     <div class="bookmark"
-         :class="{ 'full-mode': state.isFullMode }"
+         :class="{ 'full-mode': storeState.isFullMode }"
     >
-        <bookmark-header :is-full-mode.sync="state.isFullMode"
-                         :bookmark-folder-list="storeState.bookmarkFolderList"
-        />
-        <bookmark-full-mode v-if="state.isFullMode"
+        <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
+        <bookmark-full-mode v-if="storeState.isFullMode"
                             :bookmark-list="storeState.bookmarkFolderList"
         />
         <bookmark-board v-else

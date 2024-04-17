@@ -1,54 +1,51 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
 } from '@spaceone/design-system';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    isFullMode: boolean,
     bookmarkFolderList?: BookmarkItem[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    isFullMode: false,
     bookmarkFolderList: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
+const bookmarkGetters = bookmarkStore.getters;
 
-const emit = defineEmits<{(event: 'update:isFullMode', value: boolean): void}>();
-
-const state = reactive({
-    activeButtonIdx: undefined as number | undefined,
-    proxyIsFullMode: useProxyValue('isFullMode', props, emit),
+const storeState = reactive({
+    activeFolderName: computed(() => bookmarkGetters.activeFolderName),
+    isFullMode: computed(() => bookmarkGetters.isFullMode),
 });
 
 const handleClickFullModeButton = () => {
-    state.proxyIsFullMode = !state.proxyIsFullMode;
+    bookmarkStore.setFullMode(!storeState.isFullMode);
 };
 const handleClickCreateButton = (type: BookmarkModalType) => {
     bookmarkStore.setModalType(type);
 };
 const handleClickFolder = (idx: number, name: string) => {
-    if (state.activeButtonIdx === idx) {
-        state.activeButtonIdx = undefined;
-        bookmarkStore.fetchBookmarkList(undefined);
+    if (storeState.activeFolderName === name) {
+        bookmarkStore.setActiveButtonIdx(undefined);
         return;
     }
-    state.activeButtonIdx = idx;
-    bookmarkStore.fetchBookmarkList(name);
+    bookmarkStore.setActiveButtonIdx(idx);
 };
 const handleClickDeleteFolder = (name: string, e) => {
     e.stopPropagation();
     bookmarkStore.deleteBookmarkFolder(name);
 };
+
+watch(() => storeState.activeFolderName, (activeFolderName) => {
+    bookmarkStore.fetchBookmarkList(activeFolderName);
+}, { immediate: true });
 </script>
 
 <template>
@@ -56,7 +53,7 @@ const handleClickDeleteFolder = (name: string, e) => {
         <p-field-title :label="$t('HOME.BOOKMARK_TITLE')"
                        size="lg"
         />
-        <div v-if="!state.proxyIsFullMode"
+        <div v-if="!storeState.isFullMode"
              class="bookmark-folders-wrapper"
         >
             <div class="bookmark-folders">
@@ -64,10 +61,10 @@ const handleClickDeleteFolder = (name: string, e) => {
                           :key="idx"
                           style-type="tertiary"
                           class="folders-button"
-                          :class="{'active': state.activeButtonIdx === idx}"
+                          :class="{'active': storeState.activeFolderName === item.name}"
                           @click="handleClickFolder(idx, item.name)"
                 >
-                    <p-icon-button v-if="state.activeButtonIdx === idx"
+                    <p-icon-button v-if="storeState.activeFolderName === item.name"
                                    name="ic_close"
                                    style-type="transparent"
                                    size="sm"
@@ -101,12 +98,12 @@ const handleClickDeleteFolder = (name: string, e) => {
         </div>
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
-                      :style-type="!state.proxyIsFullMode ? 'tertiary' : 'substitutive'"
+                      :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
                       @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.LINK)"
             >
                 {{ $t('HOME.BOOKMARK_ADD_LINK') }}
             </p-button>
-            <p-icon-button v-if="!state.proxyIsFullMode"
+            <p-icon-button v-if="!storeState.isFullMode"
                            name="ic_chevron-down"
                            shape="square"
                            size="md"
