@@ -115,8 +115,8 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         },
     } : {
         name: PROJECT_ROUTE._NAME,
-        query: {
-            select_pg: item.id,
+        params: {
+            projectGroupId: item.id,
         },
     });
     const setOpenStateById = async (nodeId: string) => {

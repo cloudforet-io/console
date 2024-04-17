@@ -29,7 +29,7 @@ const state = reactive({
 });
 
 watch(route, () => {
-    const selectedTreeId = (route.query.select_pg || route.params.id) as string|undefined;
+    const selectedTreeId = (route.params.projectGroupId || route.params.id) as string|undefined;
     if (selectedTreeId) {
         state.selectedTreeId = selectedTreeId as string;
         setSelectedNodeId(selectedTreeId);

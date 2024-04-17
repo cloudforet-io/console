@@ -130,9 +130,9 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     }
 };
 
-watch(() => route.query, async (after, before) => {
-    if (after?.select_pg !== before?.select_pg && !Array.isArray(after.select_pg)) {
-        await projectPageStore.selectNode(after.select_pg);
+watch(() => route.params, async (after, before) => {
+    if (after?.projectGroupId !== before?.projectGroupId) {
+        await projectPageStore.selectNode(after.projectGroupId);
     }
 });
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
