@@ -145,7 +145,7 @@ const state = reactive({
         }
 
         .desc-wrapper {
-            @apply flex flex-col items-center text-paragraph-md;
+            @apply flex flex-col items-center text-paragraph-md text-center;
         }
 
         .card-group {
@@ -164,7 +164,7 @@ const state = reactive({
                 }
 
                 .card-title {
-                    @apply font-bold text-paragraph-md font-bold;
+                    @apply font-bold text-paragraph-md;
                     margin-top: 0.5rem;
                 }
 
@@ -208,6 +208,26 @@ const state = reactive({
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@screen tablet {
+    .metric-explorer-content {
+        .contents {
+            .card-group {
+                @apply flex gap-4 justify-center flex-wrap;
+            }
+        }
+    }
+}
+
+@screen mobile {
+    .metric-explorer-content {
+        .contents {
+            .card-group {
+                @apply flex-col gap-4;
             }
         }
     }
