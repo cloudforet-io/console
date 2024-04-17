@@ -3729,6 +3729,7 @@
 				"EDIT": "Edit"
 			},
 			"SEARCH": "Search ",
+			"SEARCH_EMPTY_TEXT": "No results found\nTry again with diffrent term",
 			"SEARCH_PROJECT_GROUP": "Project Group",
 			"SERVER": "Server",
 			"SERVICE_ACCOUNTS": "Service Accounts",
