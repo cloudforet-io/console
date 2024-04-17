@@ -73,6 +73,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             });
             return results;
         }),
+        isManagedMetric: computed<boolean>(() => state.metric?.is_managed || false),
     });
 
     /* Mutations */

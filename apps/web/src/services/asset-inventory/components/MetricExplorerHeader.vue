@@ -7,13 +7,27 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
+import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import MetricExplorerSaveAsModal from '@/services/asset-inventory/components/MetricExplorerSaveAsModal.vue';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
 
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     metricSaveAsModalVisible: false,
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
@@ -41,6 +55,18 @@ onClickOutside(rightPartRef, hideContextMenu);
 
 /* Event */
 const handleSaveQuerySet = async () => {
+    if (!metricExplorerPageState.metric) return;
+    try {
+        await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
+            metric_id: metricExplorerPageState.metric.metric_id,
+            query_options: {
+                ...metricExplorerPageState.metric.query_options, // TODO: Implement query options
+            },
+        });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_SAVE_METRIC'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_SAVE_AS_METRIC'));
+    }
 };
 const handleClickMoreMenuButton = () => {
     if (visibleContextMenu.value) hideContextMenu();
@@ -57,7 +83,7 @@ const handleClickSaveAsButton = () => {
             <div ref="rightPartRef"
                  class="right-part"
             >
-                <template v-if="true">
+                <template v-if="!metricExplorerPageGetters.isManagedMetric">
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
@@ -90,6 +116,7 @@ const handleClickSaveAsButton = () => {
                     </p-button>
                 </template>
             </div>
+            <metric-explorer-save-as-modal :visible.sync="state.metricSaveAsModalVisible" />
         </template>
     </p-heading>
 </template>
