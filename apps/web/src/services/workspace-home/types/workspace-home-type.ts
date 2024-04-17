@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
@@ -31,9 +29,9 @@ export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
 export interface BookmarkItem {
     id: string;
     name?: string;
-    label?: TranslateResult;
     folder?: string;
     icon?: string;
+    link?: string;
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
 

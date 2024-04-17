@@ -26,13 +26,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const state = reactive({
         bookmarkData: [] as BookmarkItem[],
         modal: {
-            loading: false,
             type: undefined as BookmarkModalType|undefined,
-            visible: {
-                folder: false,
-                link: false,
-                delete: false,
-            },
         },
     });
 
@@ -42,8 +36,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     });
 
     const getters = reactive({
-        bookmarkFolderList: computed(() => state.bookmarkData.filter((i) => !i.folder)),
-        bookmarkList: computed(() => state.bookmarkData.filter((i) => i.folder)),
+        bookmarkFolderList: computed(() => state.bookmarkData.filter((i) => !i.link)),
+        bookmarkList: computed(() => state.bookmarkData.filter((i) => i.link)),
         modal: computed(() => state.modal),
     });
 
@@ -83,6 +77,25 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
+                throw e;
+            }
+        },
+        createBookmarkLink: async ({ name, link, folder }: { name: string, link: string, folder?: string}) => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
+                    name: `console:bookmark:${folder}:${name}`,
+                    data: {
+                        workspaceId: _getters.currentWorkspaceId,
+                        name,
+                        folder,
+                        link,
+                    },
+                });
+                await actions.fetchBookmarkList();
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.bookmarkData = [];
+                throw e;
             }
         },
     };

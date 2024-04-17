@@ -7,7 +7,6 @@ import {
 
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -26,8 +25,10 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    loading: computed<boolean>(() => bookmarkGetters.modal.loading),
     type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modal.type),
+});
+const state = reactive({
+    loading: false,
 });
 
 const {
@@ -37,6 +38,7 @@ const {
     setForm,
     invalidState,
     invalidTexts,
+    initForm,
 } = useFormValidator({
     name: '',
 }, {
@@ -51,13 +53,15 @@ const {
 
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
+    initForm();
 };
 const handleConfirm = async () => {
+    state.loading = true;
     try {
         await bookmarkStore.createBookmarkFolder(name.value);
         await handleClose();
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
+    } finally {
+        state.loading = false;
     }
 };
 </script>
@@ -70,7 +74,7 @@ const handleConfirm = async () => {
                     :backdrop="true"
                     :visible="storeState.type === BOOKMARK_MODAL_TYPE.FOLDER"
                     :disabled="name === '' || invalidState.name"
-                    :loading="storeState.loading"
+                    :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
