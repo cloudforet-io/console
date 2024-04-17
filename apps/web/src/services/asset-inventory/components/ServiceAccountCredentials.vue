@@ -97,7 +97,6 @@ const setGeneralSecret = async () => {
         } else if (state.credentialForm.activeDataType === 'input') {
             data = state.credentialForm.customSchemaForm;
         }
-
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
             secret_data: data,
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
@@ -117,7 +116,6 @@ const updateTrustedSecretData = async () => {
         } else if (state.credentialForm.activeDataType === 'input') {
             data = state.credentialForm.customSchemaForm;
         }
-
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
@@ -214,26 +212,11 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
                           icon-left="ic_edit"
-                          style-type="transparent"
+                          style-type="secondary"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="state.mode === 'UPDATE'"
-                     class="button-wrapper"
-                >
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!state.isFormValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
-                    </p-button>
-                </div>
             </template>
         </p-heading>
         <div class="content-wrapper">
@@ -251,6 +234,23 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
                                               :origin-form="state.originCredentialForm"
                                               @change="handleChangeCredentialForm"
             />
+            <div v-if="state.mode === 'UPDATE'"
+                 class="button-wrapper"
+            >
+                <p-button style-type="tertiary"
+                          class="mr-4"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="state.loading"
+                          :disabled="!state.isFormValid"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -264,6 +264,11 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
         .service-account-credentials-form {
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+
+        .button-wrapper {
+            padding-left: 1rem;
+            margin-top: 2rem;
         }
     }
 }

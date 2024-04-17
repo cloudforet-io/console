@@ -7,6 +7,7 @@
         </p-heading>
         <p-definition-table :fields="fields"
                             :data="rootData"
+                            :style-type="options?.styleType"
                             :loading="loading"
                             v-on="$listeners"
         >

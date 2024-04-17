@@ -56,7 +56,7 @@ export const useEscalationPolicyReferenceStore = defineStore('reference-escalati
         try {
             const response = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, ListResponse<EscalationPolicyModel>>({
                 query: {
-                    only: ['escalation_policy_id', 'name', 'resource_group'],
+                    only: ['escalation_policy_id', 'name', 'resource_group', 'project_id'],
                 },
             }, { timeout: 3000 });
 

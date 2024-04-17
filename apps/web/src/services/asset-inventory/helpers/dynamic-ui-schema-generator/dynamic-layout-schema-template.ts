@@ -1,87 +1,19 @@
 import type { SearchSchema } from '@spaceone/design-system/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@spaceone/design-system/src/data-display/tables/definition-table/config';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
+import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
-export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount: boolean): { details: Partial<DynamicLayout>[] } => ({
-    details: [
-        {
-            name: 'Base Information',
-            type: 'item',
-            options: {
-                translation_id: 'PAGE_SCHEMA.BASE_INFO',
-                fields: [
-                    {
-                        key: 'account_type',
-                        name: 'Account Type',
-                        type: 'text',
-                    },
-                    ...((isTrustedAccount && [{
-                        key: 'resource_group',
-                        name: 'Scope',
-                        type: 'enum',
-                        options: {
-                            items: {
-                                WORKSPACE: {
-                                    name: 'Workspace',
-                                    type: 'badge',
-                                    options: {
-                                        text_color: 'violet.600',
-                                        background_color: 'violet.200',
-                                    },
-                                },
-                                DOMAIN: {
-                                    name: 'Domain',
-                                    type: 'badge',
-                                    options: {
-                                        text_color: 'gray.900',
-                                        background_color: 'gray.200',
-                                    },
-                                },
-                            },
-                        },
-                    }]) || []) as DynamicField[],
-                    ...fields.map((field) => ({
-                        key: field.key,
-                        name: field.name,
-                        type: 'text',
-                    })),
-                    ...((!isTrustedAccount && [{
-                        key: 'project_id',
-                        name: 'Project',
-                        type: 'text',
-                        options: {
-                            translation_id: 'PAGE_SCHEMA.PROJECT',
-                        },
-                        reference: {
-                            resource_type: 'identity.Project',
-                            reference_key: 'project_id',
-                        },
-                    }]) || []),
-                    {
-                        key: 'tags',
-                        name: 'Tags',
-                        type: 'dict',
-                        options: {
-                            translation_id: 'PAGE_SCHEMA.TAGS',
-                            disable_copy: true,
-                        },
-                    },
-                ],
-            },
-        },
-    ],
-});
-
-export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: boolean): DynamicLayout => ({
-    name: 'Base Table',
-    type: 'query-search-table',
+export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount: boolean): ItemLayout => ({
+    name: 'Base Information',
+    type: 'item',
     options: {
-        search: [],
+        translation_id: 'PAGE_SCHEMA.BASE_INFO',
+        styleType: DEFINITION_TABLE_STYLE_TYPE.white,
         fields: [
             {
-                key: 'name',
-                name: 'Name',
+                key: 'account_type',
+                name: 'Account Type',
                 type: 'text',
             },
             ...((isTrustedAccount && [{
@@ -94,8 +26,8 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                             name: 'Workspace',
                             type: 'badge',
                             options: {
-                                text_color: 'violet.600',
-                                background_color: 'violet.200',
+                                text_color: 'green.700',
+                                background_color: 'green.200',
                             },
                         },
                         DOMAIN: {
@@ -108,13 +40,93 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                         },
                     },
                 },
-            }]) || []),
+            }]) || []) as DynamicField[],
             ...fields.map((field) => ({
                 key: field.key,
                 name: field.name,
                 type: 'text',
             })),
             ...((!isTrustedAccount && [{
+                key: 'project_id',
+                name: 'Project',
+                type: 'text',
+                options: {
+                    translation_id: 'PAGE_SCHEMA.PROJECT',
+                },
+                reference: {
+                    resource_type: 'identity.Project',
+                    reference_key: 'project_id',
+                },
+            }]) || []),
+            {
+                key: 'created_at',
+                name: 'Created',
+                type: 'text',
+            },
+            {
+                key: 'tags',
+                name: 'Tags',
+                type: 'dict',
+                options: {
+                    translation_id: 'PAGE_SCHEMA.TAGS',
+                    disable_copy: true,
+                },
+            },
+        ],
+    },
+});
+
+export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
+    isTrustedAccount: boolean,
+    isAdminMode?: boolean,
+}): QuerySearchTableLayout => ({
+    name: 'Base Table',
+    type: 'query-search-table',
+    options: {
+        search: [],
+        fields: [
+            {
+                key: 'name',
+                name: 'Name',
+                type: 'text',
+            },
+            ...((options.isTrustedAccount && [
+                ...((!options.isAdminMode && [{
+                    key: 'resource_group',
+                    name: 'Scope',
+                    type: 'enum',
+                    options: {
+                        items: {
+                            WORKSPACE: {
+                                name: 'Workspace',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'green.700',
+                                    background_color: 'green.200',
+                                },
+                            },
+                            DOMAIN: {
+                                name: 'Domain',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'gray.900',
+                                    background_color: 'gray.200',
+                                },
+                            },
+                        },
+                    },
+                }]) || []),
+                {
+                    key: 'schedule.state',
+                    name: 'Auto Sync',
+                    type: 'text',
+                }]) || []),
+            ...dynamicFields.map((field) => ({
+                key: field.key,
+                name: field.name,
+                type: 'text',
+            })),
+            ...((!options.isTrustedAccount && [{
                 key: 'project_id',
                 name: 'Project',
                 type: 'text',

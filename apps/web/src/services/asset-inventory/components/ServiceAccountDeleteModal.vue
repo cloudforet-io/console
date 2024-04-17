@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButtonModal, PDataTable, PDoubleCheckModal,
+    PButtonModal, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -18,11 +18,13 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 
 const props = withDefaults(defineProps<{
     visible: boolean;
@@ -37,7 +39,8 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
-
+const serviceAccountPageStore = useServiceAccountPageStore();
+const { getProperRouteLocation } = useProperRouteLocation();
 const recentStore = useRecentStore();
 
 const state = reactive({
@@ -76,7 +79,7 @@ const deleteServiceAccount = async () => {
 /* Event */
 const handleConfirmDelete = async () => {
     await deleteServiceAccount();
-    await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.providerId } });
+    await SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: serviceAccountPageStore.state.selectedProvider } }));
 };
 </script>
 
@@ -93,16 +96,12 @@ const handleConfirmDelete = async () => {
                         :visible.sync="state.proxyVisible"
                         :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
                         theme-color="alert"
-                        :hide-header-close-button="true"
-                        :hide-footer-confirm-button="true"
+                        size="sm"
+                        :hide-footer-close-button="true"
+                        @confirm="() => state.proxyVisible = false"
         >
-            <template #body>
-                <span class="help-text">{{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.NOTE') }}</span>
-                <p-data-table :fields="state.fields"
-                              :items="props.attachedGeneralAccounts"
-                              :sortable="false"
-                              :selectable="false"
-                />
+            <template #confirm-button>
+                {{ $t('APP.MAIN.OK') }}
             </template>
         </p-button-modal>
     </div>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import { PFieldGroup, PJsonSchemaForm, PTextInput } from '@spaceone/design-system';
+import {
+    PFieldGroup, PJsonSchemaForm, PTextInput,
+} from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,8 +15,8 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import type { AccountType } from '@/schema/identity/service-account/type';
 import { i18n } from '@/translations';
 
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
+import TagsInput from '@/common/components/inputs/TagsInput.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
@@ -27,6 +29,7 @@ interface Props {
     isValid: boolean;
     originForm?: Partial<BaseInformationForm>;
     accountType?: AccountType;
+    isUpdateMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     isValid: false,
     originForm: () => ({}),
     accountType: ACCOUNT_TYPE.GENERAL,
+    mode: false,
 });
 
 const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
@@ -130,7 +134,8 @@ watch(() => props.originForm, (originForm) => {
 
 <template>
     <div class="service-account-base-information-form">
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
+        <p-field-group v-if="!props.isUpdateMode"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_LABEL')"
                        :invalid="invalidState.serviceAccountName"
                        :invalid-text="invalidTexts.serviceAccountName"
                        :required="true"
@@ -152,58 +157,64 @@ watch(() => props.originForm, (originForm) => {
                             @validate="handleAccountValidate"
         />
         <p-field-group v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
+                       class="project-field"
                        required
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
-                       class="account-tags"
         >
             <service-account-project-form :is-valid.sync="state.isProjectFormValid"
-                                          :project-id="props.originForm?.projectForm?.selectedProjectId"
+                                          :project-id="props.originForm?.projectForm?.selectedProjectId ?? ''"
                                           @change="handleChangeProjectForm"
             />
         </p-field-group>
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
-                       :help-text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.BASE_INFO_HELP_TEXT')"
-                       class="account-tags"
-        >
-            <tags-input-group :tags="state.tags"
-                              show-validation
-                              :is-valid.sync="state.isTagsValid"
-                              @update-tags="handleUpdateTags"
+        <div class="account-tags">
+            <tags-input :tags="state.tags"
+                        @update:tags="handleUpdateTags"
             />
-        </p-field-group>
+        </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .service-account-base-information-form {
+    .account-tags {
+        width: 100%;
+        max-width: 30rem;
+        margin-bottom: 2rem;
+    }
+
     /* custom design-system component - p-text-input */
     :deep(.account-name-input) {
         .input-container {
             max-width: 30rem;
-            width: 50%;
+            width: 100%;
         }
     }
 
     /* custom design-system component - p-field-group */
-    :deep(.account-tags) {
-        .help-msg {
-            font-size: 0.875rem;
-            white-space: pre-line;
-        }
+    :deep(.project-field) {
+        margin-bottom: 1.5rem;
     }
 
     /* custom design-system component - p-json-schema-form */
     :deep(.p-json-schema-form) {
+        .p-field-group {
+            margin-bottom: 1.5rem;
+        }
+
         .p-text-input {
             width: 100%;
             .input-container {
                 max-width: 30rem;
-                width: 50%;
+                width: 100%;
             }
         }
     }
 
     @screen tablet {
+        .account-tags {
+            width: 100%;
+        }
+
         /* custom design-system component - p-text-input */
         :deep(.account-name-input) {
             .input-container {
