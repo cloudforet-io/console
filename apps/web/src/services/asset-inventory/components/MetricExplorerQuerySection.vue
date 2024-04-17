@@ -28,7 +28,6 @@ const state = reactive({
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: 0,
-    selectedPeriodLabel: '',
 });
 
 /* event */
@@ -48,7 +47,7 @@ const handleClickRefresh = () => {
             <div class="left-part">
                 <metric-explorer-operator-dropdown />
                 <metric-explorer-granularity-dropdown />
-                <metric-explorer-period-dropdown :selected-period-label.sync="state.selectedPeriodLabel" />
+                <metric-explorer-period-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -79,7 +78,6 @@ const handleClickRefresh = () => {
                 </p-popover>
             </div>
             <div class="right-part">
-                <span class="period-label-text">{{ state.selectedPeriodLabel }}</span>
                 <p-icon-button name="ic_renew"
                                style-type="tertiary"
                                shape="square"
