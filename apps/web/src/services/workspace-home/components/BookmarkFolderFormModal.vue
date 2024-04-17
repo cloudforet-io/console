@@ -25,7 +25,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modal.type),
+    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
 });
 const state = reactive({
     loading: false,
