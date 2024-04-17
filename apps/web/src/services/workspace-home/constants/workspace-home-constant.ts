@@ -8,5 +8,6 @@ export const WORKSPACE_HOME_DATA_TYPE = {
 export const BOOKMARK_MODAL_TYPE = {
     FOLDER: 'folder',
     LINK: 'link',
-    DELETE: 'delete',
+    DELETE_FOLDER: 'deleteFolder',
+    DELETE_LINK: 'deleteLink',
 } as const;
