@@ -5,36 +5,28 @@ import {
     PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
 } from '@spaceone/design-system';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    isFullMode: boolean,
     bookmarkFolderList?: BookmarkItem[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    isFullMode: false,
     bookmarkFolderList: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
-const emit = defineEmits<{(event: 'update:isFullMode', value: boolean): void}>();
-
 const storeState = reactive({
     activeFolderName: computed(() => bookmarkGetters.activeFolderName),
-});
-const state = reactive({
-    proxyIsFullMode: useProxyValue('isFullMode', props, emit),
+    isFullMode: computed(() => bookmarkGetters.isFullMode),
 });
 
 const handleClickFullModeButton = () => {
-    state.proxyIsFullMode = !state.proxyIsFullMode;
+    bookmarkStore.setFullMode(!storeState.isFullMode);
 };
 const handleClickCreateButton = (type: BookmarkModalType) => {
     bookmarkStore.setModalType(type);
@@ -61,7 +53,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
         <p-field-title :label="$t('HOME.BOOKMARK_TITLE')"
                        size="lg"
         />
-        <div v-if="!state.proxyIsFullMode"
+        <div v-if="!storeState.isFullMode"
              class="bookmark-folders-wrapper"
         >
             <div class="bookmark-folders">
@@ -106,12 +98,12 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
         </div>
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
-                      :style-type="!state.proxyIsFullMode ? 'tertiary' : 'substitutive'"
+                      :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
                       @click="handleClickCreateButton(BOOKMARK_MODAL_TYPE.LINK)"
             >
                 {{ $t('HOME.BOOKMARK_ADD_LINK') }}
             </p-button>
-            <p-icon-button v-if="!state.proxyIsFullMode"
+            <p-icon-button v-if="!storeState.isFullMode"
                            name="ic_chevron-down"
                            shape="square"
                            size="md"

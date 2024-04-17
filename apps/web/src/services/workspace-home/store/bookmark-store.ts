@@ -27,6 +27,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         bookmarkFolderData: [] as BookmarkItem[],
         bookmarkData: [] as BookmarkItem[],
         activeFolderIndex: undefined as number|undefined,
+        isFullMode: false,
         modal: {
             type: undefined as BookmarkModalType|undefined,
         },
@@ -41,6 +42,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         bookmarkFolderList: computed<BookmarkItem[]>(() => state.bookmarkFolderData.filter((i) => !i.link)),
         bookmarkList: computed<BookmarkItem[]>(() => state.bookmarkData.filter((i) => i.link)),
         activeFolderName: computed<string|undefined>(() => (state.activeFolderIndex !== undefined ? state.bookmarkFolderData[state.activeFolderIndex].name : undefined)),
+        isFullMode: computed<boolean>(() => state.isFullMode),
         modalType: computed<BookmarkModalType|undefined>(() => state.modal.type),
     });
 
@@ -50,6 +52,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         setActiveButtonIdx: (idx?: number) => {
             state.activeFolderIndex = idx;
+        },
+        setFullMode: (isFullMode: boolean) => {
+            state.isFullMode = isFullMode;
         },
     };
 

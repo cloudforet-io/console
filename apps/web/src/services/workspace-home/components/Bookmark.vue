@@ -21,13 +21,13 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     bookmarkFolderList: computed(() => bookmarkGetters.bookmarkFolderList),
     bookmarkList: computed(() => bookmarkGetters.bookmarkList),
+    isFullMode: computed(() => bookmarkGetters.isFullMode),
 });
 const state = reactive({
     boardSets: computed<BoardSet[]>(() => storeState.bookmarkList.map((d) => ({
         ...d,
         rounded: true,
     }))),
-    isFullMode: false,
 });
 
 watch(() => storeState.currentWorkspaceId, async () => {
@@ -39,12 +39,10 @@ watch(() => storeState.currentWorkspaceId, async () => {
 
 <template>
     <div class="bookmark"
-         :class="{ 'full-mode': state.isFullMode }"
+         :class="{ 'full-mode': storeState.isFullMode }"
     >
-        <bookmark-header :is-full-mode.sync="state.isFullMode"
-                         :bookmark-folder-list="storeState.bookmarkFolderList"
-        />
-        <bookmark-full-mode v-if="state.isFullMode"
+        <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
+        <bookmark-full-mode v-if="storeState.isFullMode"
                             :bookmark-list="storeState.bookmarkFolderList"
         />
         <bookmark-board v-else
