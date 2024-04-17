@@ -115,7 +115,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                console.log({ results });
                 const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
                     const imgIcon = await fetchFavicon(item.data.link);
                     return {

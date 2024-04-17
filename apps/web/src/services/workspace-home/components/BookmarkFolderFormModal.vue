@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
@@ -41,9 +41,10 @@ const {
     invalidTexts,
     initForm,
 } = useFormValidator({
-    name: storeState.activeFolderName || '',
+    name: '',
 }, {
     name(value: string) {
+        if (storeState.activeFolderName === value) return '';
         const duplicatedName = props.bookmarkFolderList?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('HOME.ALT_E_DUPLICATED_NAME');
@@ -65,6 +66,10 @@ const handleConfirm = async () => {
         state.loading = false;
     }
 };
+
+watch(() => storeState.activeFolderName, () => {
+    setForm('name', storeState.activeFolderName || '');
+}, { immediate: true });
 </script>
 
 <template>
@@ -74,7 +79,7 @@ const handleConfirm = async () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.type === BOOKMARK_MODAL_TYPE.FOLDER"
-                    :disabled="name === '' || invalidState.name"
+                    :disabled="(name === '' || invalidState.name) || storeState.activeFolderName === name"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
