@@ -27,11 +27,12 @@ export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
 
 // bookmark
 export interface BookmarkItem {
-    id: string;
+    id?: string;
     name?: string;
     folder?: string;
     icon?: string;
     link?: string;
+    isShowMore?: boolean;
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
 

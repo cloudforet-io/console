@@ -1785,7 +1785,8 @@
 		"INFO_APPS": "apps",
 		"INFO_CREATE_APP": "Create App",
 		"INFO_INVITE_USER": "Invite User",
-		"INFO_USERS": "users"
+		"INFO_USERS": "users",
+		"TOGGLE_MORE": "show more"
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",

@@ -7,6 +7,8 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { blue, gray } from '@/styles/colors';
 
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+
 interface Props {
     boardSets: BoardSet[];
     isFullMode?: boolean;
@@ -19,6 +21,15 @@ const props = withDefaults(defineProps<Props>(), {
     isFolderBoard: false,
 });
 
+const bookmarkStore = useBookmarkStore();
+
+const handleClickItem = (item) => {
+    if (!item.isShowMore) {
+        window.open(item.link, '_blank');
+        return;
+    }
+    bookmarkStore.setFullMode(true);
+};
 </script>
 
 <template>
@@ -26,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
              selectable
              :style-type="BOARD_STYLE_TYPE.cards"
              class="bookmark-board"
+             @item-click="handleClickItem"
     >
         <template #item-content="{board}">
             <div class="board-item">
@@ -55,6 +67,15 @@ const props = withDefaults(defineProps<Props>(), {
                         height="1.5rem"
                         class="icon"
                     />
+                    <div v-else-if="board.isShowMore"
+                         class="show-more"
+                    >
+                        <p-i name="ic_ellipsis-horizontal"
+                             width="1.25rem"
+                             height="1.25rem"
+                             :color="gray[700]"
+                        />
+                    </div>
                     <p-i v-else
                          name="ic_globe-filled"
                          width="1.5rem"
@@ -101,6 +122,11 @@ const props = withDefaults(defineProps<Props>(), {
                 width: 2.5rem;
                 height: 2.5rem;
                 border-radius: 0.75rem;
+                .show-more {
+                    @apply flex items-center justify-center bg-gray-100 rounded-xl;
+                    width: 2.5rem;
+                    height: 2.5rem;
+                }
             }
             .text-wrapper {
                 max-width: calc(100% - 3rem);

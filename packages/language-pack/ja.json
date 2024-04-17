@@ -1785,7 +1785,8 @@
 		"INFO_APPS": "",
 		"INFO_CREATE_APP": "アプリを作成する",
 		"INFO_INVITE_USER": "",
-		"INFO_USERS": "ユーザー"
+		"INFO_USERS": "ユーザー",
+		"TOGGLE_MORE": "もっと見る"
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",
