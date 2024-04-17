@@ -36,8 +36,8 @@ export const useFavoriteStore = defineStore('favorite', () => {
     });
 
     const state = reactive<FavoriteState>({
-        favoriteMenuList: [] as UserConfigModel[],
-        favoriteWorkspaceMenuList: [] as UserConfigModel[],
+        favoriteMenuList: [] as UserConfigModel<ReferenceData>[],
+        favoriteWorkspaceMenuList: [] as UserConfigModel<ReferenceData>[],
         total_count: 0,
     });
 
@@ -61,7 +61,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
                 { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
             ]);
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<ReferenceData>>>({
                     query: favoriteListApiQuery.data,
                 });
                 state.favoriteMenuList = results ?? [];
@@ -77,7 +77,7 @@ export const useFavoriteStore = defineStore('favorite', () => {
                 { k: 'name', v: `console:favorite:${FAVORITE_TYPE.WORKSPACE}`, o: '' },
             ]);
             try {
-                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<ReferenceData>>>({
                     query: favoriteListApiQuery.data,
                 });
                 state.favoriteWorkspaceMenuList = results ?? [];
