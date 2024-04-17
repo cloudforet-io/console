@@ -42,6 +42,7 @@ const {
         name, link,
     },
     setForm,
+    initForm,
 } = useFormValidator({
     name: '',
     link: '',
@@ -50,8 +51,7 @@ const {
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
     state.selectedFolderIdx = undefined;
-    setForm('name', '');
-    setForm('link', '');
+    initForm();
 };
 const handleDeselectButton = () => {
     state.selectedFolderIdx = undefined;

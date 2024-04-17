@@ -38,6 +38,7 @@ const {
     setForm,
     invalidState,
     invalidTexts,
+    initForm,
 } = useFormValidator({
     name: '',
 }, {
@@ -52,7 +53,7 @@ const {
 
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
-    setForm('name', '');
+    initForm();
 };
 const handleConfirm = async () => {
     state.loading = true;
