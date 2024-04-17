@@ -21,8 +21,9 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    activeFolderName: computed(() => bookmarkGetters.activeFolderName),
-    isFullMode: computed(() => bookmarkGetters.isFullMode),
+    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
+    isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
+    isFileFullMode: computed<boolean>(() => bookmarkGetters.isFileFullMode),
 });
 
 const handleClickFullModeButton = () => {

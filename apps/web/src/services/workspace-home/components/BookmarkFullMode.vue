@@ -1,36 +1,26 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
-
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
+import type { BookmarkItem, BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    // TODO: will be changed to real type
-    bookmarkList: any;
+    bookmarkList: BookmarkItem[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    bookmarkList: [],
-});
-
-const storeState = reactive({
-    // TODO: will be changed to data
-    bookmarkFolderList: computed(() => [
-        { title: 'Create Folder', id: '1', isCreate: true },
-        { title: 'Folder 1', id: '1' },
-        { title: 'Folder 2', id: '2' },
-        { title: 'Folder 3', id: '3' },
-        { title: 'Folder 4', id: '4' },
-    ]),
+    bookmarkList: undefined,
 });
 
 const state = reactive({
-    folderBoardSets: computed<BoardSet[]>(() => storeState.bookmarkFolderList.map((d) => ({
-        ...d,
-        rounded: true,
-    }))),
-    boardSets: computed<BoardSet[]>(() => props.bookmarkList.map((d) => ({
+    folderBoardSets: computed<BookmarkBoardSet[]>(() => {
+        const _results = props.bookmarkList as BookmarkBoardSet[];
+        return _results.map((d) => ({
+            ...d,
+            rounded: true,
+        }));
+    }),
+    boardSets: computed<BookmarkBoardSet[]>(() => props.bookmarkList.map((d) => ({
         ...d,
         rounded: true,
     }))),

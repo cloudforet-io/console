@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { PBoard, PLazyImg, PI } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { blue, gray } from '@/styles/colors';
 
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import type { BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    boardSets: BoardSet[];
+    boardSets: BookmarkBoardSet[];
     isFullMode?: boolean;
     isFolderBoard?: boolean;
 }
