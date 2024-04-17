@@ -2769,12 +2769,13 @@
 				"CHECKLIST_OPTION_LABEL": "クラスター接続前のチェックリスト",
 				"CLUSTER_NAME": "Cluster Name",
 				"CLUSTER_NAME_INFORMATION": "helm インストールとクラスター接続のために、まず Kubernetes クラスター名を教えてください。",
+				"CONNECT_CLUSTER_WARNING": "システムにSpaceONE Helmリポジトリがインストールされている必要があります。",
 				"CONTINUE_BUTTON": "次へ",
 				"COPIED": "コピーしました",
 				"COPY_CODE": "コードをコピー",
 				"DONE_BUTTON": "完了",
 				"FIND_OUT_INFORMATION": "Kubernetesクラスターでkubectlが構成情報を伝達および修正する方法を調べてください。",
-				"FIRST_TITLE": "これは絶対にやらなければなりません！\n いくつかのセットアップが必要です。",
+				"FIRST_TITLE": "クラスターの基本情報に関する\n追加作業が必要です。",
 				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "以下のコマンドを入力すると、kube-state-metricsを見つけることができます。",
 				"LOADING": "新しいキーを待っています...",
 				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "隠す",
@@ -2784,7 +2785,8 @@
 				"SCRIPT_GUIDE_SECOND": "SpaceONE Helm リポジトリを作成するには、\n次のコマンドを実行してください。",
 				"SCRIPT_GUIDE_THIRD": "クラウドシェルまたはターミナルに以下のコードをコピーして貼り付けてください。",
 				"SECOND_TITLE": "これで、以下のガイドに従って\nシステムにHelmをインストールしてください。",
-				"THIRD_TITLE": "もうすぐです！\nKubernetesクラスターに接続してください。"
+				"THIRD_TITLE": "これが最後のステップです。\nKubernetes クラスターに接続してください。",
+				"THIRD_TITLE_RECONNECT": "Kubernetes クラスターに再接続してください。"
 			},
 			"CREATE": {
 				"COMPLETE_MODAL_SYNC": "今すぐ同期",
