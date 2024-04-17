@@ -31,6 +31,7 @@ export interface BookmarkItem {
     name?: string;
     folder?: string;
     icon?: string;
+    imgIcon?: string;
     link?: string;
     isShowMore?: boolean;
 }

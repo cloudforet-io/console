@@ -50,7 +50,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         bookmarkList: computed<BookmarkItem[]>(() => {
             const result = state.bookmarkData.filter((i) => i.link);
             if (result.length === 13) {
-                result.push({ name: i18n.t('HOME.TOGGLE_MORE') as string, isShowMore: true });
+                result.push({ name: i18n.t('HOME.TOGGLE_MORE') as string, icon: 'ic_ellipsis-horizontal', isShowMore: true });
             }
             return result;
         }),
@@ -112,10 +112,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     query: bookmarkListApiQuery.data,
                 });
                 const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
-                    const icon = await fetchFavicon(item.data.link);
+                    const imgIcon = await fetchFavicon(item.data.link);
                     return {
                         ...item.data as BookmarkItem,
-                        icon: icon || undefined,
+                        imgIcon: imgIcon || undefined,
                     };
                 });
 

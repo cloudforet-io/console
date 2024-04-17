@@ -61,16 +61,16 @@ const handleClickItem = (item) => {
                      class="image-wrapper"
                 >
                     <p-lazy-img
-                        v-if="board.icon"
-                        :src="assetUrlConverter(board.icon)"
+                        v-if="board.imgIcon"
+                        :src="assetUrlConverter(board.imgIcon)"
                         width="1.5rem"
                         height="1.5rem"
                         class="icon"
                     />
-                    <div v-else-if="board.isShowMore"
+                    <div v-else-if="board.icon"
                          class="show-more"
                     >
-                        <p-i name="ic_ellipsis-horizontal"
+                        <p-i :name="board.icon"
                              width="1.25rem"
                              height="1.25rem"
                              :color="gray[700]"
