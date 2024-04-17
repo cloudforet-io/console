@@ -2785,7 +2785,7 @@
 				"SCRIPT_GUIDE_SECOND": "To create the SpaceONE Helm repository, \nplease run the following command:",
 				"SCRIPT_GUIDE_THIRD": "Copy and paste the following code into your cloud shell or terminal.",
 				"SECOND_TITLE": "Install Helm on your system \nby following the instructions below.",
-				"THIRD_TITLE": "This is the final step. \nPlease connect to the Kubernetes cluster.",
+				"THIRD_TITLE": "This is the final step. \nConnect to the Kubernetes cluster.",
 				"THIRD_TITLE_RECONNECT": "Reconnect to the Kubernetes cluster."
 			},
 			"CREATE": {
