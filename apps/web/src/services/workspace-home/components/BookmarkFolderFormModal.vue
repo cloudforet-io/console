@@ -25,6 +25,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
+    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
     type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
 });
 const state = reactive({
@@ -40,7 +41,7 @@ const {
     invalidTexts,
     initForm,
 } = useFormValidator({
-    name: '',
+    name: storeState.activeFolderName || '',
 }, {
     name(value: string) {
         const duplicatedName = props.bookmarkFolderList?.find((item) => item.name === value);
@@ -68,7 +69,7 @@ const handleConfirm = async () => {
 
 <template>
     <p-button-modal class="bookmark-folder-form-modal"
-                    :header-title="$t('HOME.BOOKMARK_CREATE_FOLDER')"
+                    :header-title="storeState.activeFolderName ? $t('HOME.BOOKMARK_EDIT_FOLDER') : $t('HOME.BOOKMARK_CREATE_FOLDER')"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
@@ -95,6 +96,11 @@ const handleConfirm = async () => {
                     />
                 </p-field-group>
             </div>
+        </template>
+        <template v-if="storeState.activeFolderName"
+                  #confirm-button
+        >
+            <span>{{ $t('HOME.BOOKMARK_EDIT') }}</span>
         </template>
     </p-button-modal>
 </template>
