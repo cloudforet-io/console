@@ -3730,6 +3730,7 @@
 				"EDIT": "編集"
 			},
 			"SEARCH": "検索",
+			"SEARCH_EMPTY_TEXT": "",
 			"SEARCH_PROJECT_GROUP": "プロジェクトグループ",
 			"SERVER": "サーバ",
 			"SERVICE_ACCOUNTS": "サービスアカウント",
