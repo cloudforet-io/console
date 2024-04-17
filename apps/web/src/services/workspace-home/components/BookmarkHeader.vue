@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 import {
-    PButton, PDivider, PFieldTitle, PIconButton, PTextButton,
+    PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
 } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -26,7 +26,7 @@ const bookmarkStore = useBookmarkStore();
 const emit = defineEmits<{(event: 'update:isFullMode', value: boolean): void}>();
 
 const state = reactive({
-    activeButton: 'my-bookmark',
+    activeButtonIdx: undefined as number | undefined,
     proxyIsFullMode: useProxyValue('isFullMode', props, emit),
 });
 
@@ -35,6 +35,19 @@ const handleClickFullModeButton = () => {
 };
 const handleClickCreateButton = (type: BookmarkModalType) => {
     bookmarkStore.setModalType(type);
+};
+const handleClickFolder = (idx: number, name: string) => {
+    if (state.activeButtonIdx === idx) {
+        state.activeButtonIdx = undefined;
+        bookmarkStore.fetchBookmarkList(undefined);
+        return;
+    }
+    state.activeButtonIdx = idx;
+    bookmarkStore.fetchBookmarkList(name);
+};
+const handleClickDeleteFolder = (name: string, e) => {
+    e.stopPropagation();
+    bookmarkStore.deleteBookmarkFolder(name);
 };
 </script>
 
@@ -49,11 +62,23 @@ const handleClickCreateButton = (type: BookmarkModalType) => {
             <div class="bookmark-folders">
                 <p-button v-for="(item, idx) in props.bookmarkFolderList"
                           :key="idx"
-                          icon-left="ic_folder-filled"
                           style-type="tertiary"
                           class="folders-button"
+                          :class="{'active': state.activeButtonIdx === idx}"
+                          @click="handleClickFolder(idx, item.name)"
                 >
-                    {{ item.name }}
+                    <p-icon-button v-if="state.activeButtonIdx === idx"
+                                   name="ic_close"
+                                   style-type="transparent"
+                                   size="sm"
+                                   @click="handleClickDeleteFolder(item.name, $event)"
+                    />
+                    <p-i v-else
+                         name="ic_folder-filled"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                    <span>{{ item.name }}</span>
                 </p-button>
             </div>
             <p-divider vertical
@@ -113,10 +138,15 @@ const handleClickCreateButton = (type: BookmarkModalType) => {
             @apply flex;
             gap: 0.25rem;
             .folders-button {
-                @apply font-normal text-label-md bg-gray-150;
+                @apply flex items-center font-normal text-label-md bg-gray-150;
+                min-width: initial;
                 height: 1.625rem;
                 padding: 0.25rem 0.625rem;
                 border: none;
+                gap: 0.25rem;
+                &.active {
+                    @apply bg-blue-300;
+                }
             }
         }
         .divider {

@@ -32,6 +32,7 @@ const state = reactive({
 
 watch(() => storeState.currentWorkspaceId, async () => {
     if (!storeState.currentWorkspaceId) return;
+    await bookmarkStore.fetchBookmarkFolderList();
     await bookmarkStore.fetchBookmarkList();
 }, { immediate: true });
 </script>
