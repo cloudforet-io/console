@@ -7,7 +7,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PPopover, PBadge, PIconButton,
+    PButton, PPopover, PBadge, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
 import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
@@ -20,6 +20,7 @@ import type { Granularity } from '@/services/asset-inventory/types/metric-explor
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -76,6 +77,14 @@ const handleClickRefresh = () => {
                         />
                     </template>
                 </p-popover>
+                <p-divider class="menu-divider"
+                           vertical
+                />
+                <p-button style-type="secondary"
+                          icon-left="ic_editor-code"
+                >
+                    {{ metricExplorerPageGetters.isManagedMetric ? $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') : $t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY') }}
+                </p-button>
             </div>
             <div class="right-part">
                 <p-icon-button name="ic_renew"
@@ -99,6 +108,10 @@ const handleClickRefresh = () => {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            .menu-divider {
+                height: 1.5rem;
+                margin: 0 0.5rem;
+            }
         }
         .right-part {
             display: flex;

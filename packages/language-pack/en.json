@@ -2707,6 +2707,9 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
+			"ALT_E_SAVE_AS_METRIC": "Failed to save metric",
+			"ALT_S_SAVE_AS_METRIC": "Successfully saved as a new metric",
+			"ALT_S_SAVE_METRIC": "Successfully saved metric",
 			"COMMON": "Common",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "Add Custom Metric with Query",
@@ -2717,6 +2720,8 @@
 				"UNIT": "Unit"
 			},
 			"DAILY": "Daily",
+			"EDIT_METRIC_NAME": "Edit Metric Name",
+			"EDIT_QUERY": "Edit Query",
 			"EMPTY_TEXT": "No results found \nTry again with different term",
 			"FILTERS": "Filters",
 			"GRANULARITY": "Granularity",
@@ -2725,6 +2730,9 @@
 			"METRIC_EXPLORER": "Metric Explorer",
 			"METRIC_EXPLORER_HOME": "Metric Explorer Home",
 			"MONTHLY": "Monthly",
+			"NAME": "Name",
+			"NAME_DUPLICATED": "Name is duplicated.",
+			"NAME_REQUIRED": "Please enter name.",
 			"NO_ITEMS": "No Items",
 			"NO_LEGENDS": "There are no legends for this chart type",
 			"OPERATOR": "Operator",
@@ -2744,11 +2752,13 @@
 			"RESET": "Reset",
 			"SAVE": "Save",
 			"SAVE_AS": "Save as",
+			"SAVE_TO_CUSTOM_METRIC": "Save to Custom Metric",
 			"SHOWING_TOP_15": "Showing Top 15",
 			"SHOW_ALL": "Show all",
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 			"TOTAL_COUNT": "Total Count",
-			"UNIT": "Unit"
+			"UNIT": "Unit",
+			"VIEW_QUERY": "View Query"
 		},
 		"SECURITY": {
 			"MAIN": {

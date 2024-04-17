@@ -2707,6 +2707,9 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
+			"ALT_E_SAVE_AS_METRIC": "",
+			"ALT_S_SAVE_AS_METRIC": "",
+			"ALT_S_SAVE_METRIC": "",
 			"COMMON": "",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "",
@@ -2717,6 +2720,8 @@
 				"UNIT": ""
 			},
 			"DAILY": "日別データ",
+			"EDIT_METRIC_NAME": "",
+			"EDIT_QUERY": "",
 			"EMPTY_TEXT": "",
 			"FILTERS": "フィルター",
 			"GRANULARITY": "細部基準",
@@ -2725,6 +2730,9 @@
 			"METRIC_EXPLORER": "",
 			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "月別データ",
+			"NAME": "名前",
+			"NAME_DUPLICATED": "重複した名前です。",
+			"NAME_REQUIRED": "名前を入力してください",
 			"NO_ITEMS": "アイテムがありません",
 			"NO_LEGENDS": "",
 			"OPERATOR": "",
@@ -2744,11 +2752,13 @@
 			"RESET": "初期化",
 			"SAVE": "保存",
 			"SAVE_AS": "名前を付けて保存",
+			"SAVE_TO_CUSTOM_METRIC": "",
 			"SHOWING_TOP_15": "上位15表示中",
 			"SHOW_ALL": "すべて表示",
 			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
 			"TOTAL_COUNT": "",
-			"UNIT": ""
+			"UNIT": "",
+			"VIEW_QUERY": "クエリの表示"
 		},
 		"SECURITY": {
 			"MAIN": {
