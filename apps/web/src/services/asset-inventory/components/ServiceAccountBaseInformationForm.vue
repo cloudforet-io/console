@@ -80,7 +80,7 @@ const state = reactive({
         projectForm: state.projectForm,
         tags: state.tags,
     })),
-    isAllValid: computed(() => (!invalidState.serviceAccountName
+    isAllValid: computed(() => ((invalidState.serviceAccountName === false)
         && (state.isTrustedAccount ? true : state.isProjectFormValid)
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
