@@ -16,6 +16,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { fetchFavicon } from '@/services/workspace-home/composables/use-bookmark';
 import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 export const useBookmarkStore = defineStore('bookmark', () => {
@@ -39,12 +40,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const getters = reactive({
         bookmarkFolderList: computed<BookmarkItem[]>(() => state.bookmarkFolderData.filter((i) => !i.link)),
         bookmarkList: computed<BookmarkItem[]>(() => state.bookmarkData.filter((i) => i.link)),
+        activeFolderName: computed<string|undefined>(() => (state.activeFolderIndex !== undefined ? state.bookmarkFolderData[state.activeFolderIndex].name : undefined)),
         modalType: computed<BookmarkModalType|undefined>(() => state.modal.type),
     });
 
     const mutations = {
         setModalType: (type?: BookmarkModalType) => {
             state.modal.type = type;
+        },
+        setActiveButtonIdx: (idx?: number) => {
+            state.activeFolderIndex = idx;
         },
     };
 
@@ -84,7 +89,15 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                state.bookmarkData = (results ?? []).map((i) => i.data as BookmarkItem);
+                const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
+                    const icon = await fetchFavicon(item.data.link);
+                    return {
+                        ...item.data as BookmarkItem,
+                        icon: icon || undefined,
+                    };
+                });
+
+                state.bookmarkData = await Promise.all(promises);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
@@ -117,7 +130,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         link,
                     },
                 });
-                await actions.fetchBookmarkList();
+                await actions.fetchBookmarkList(folder);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
