@@ -21,10 +21,12 @@ interface Props {
     loading: boolean;
     legends: Legend[];
     chartType?: ChartType;
+    more?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
     chartType: undefined,
+    more: false,
 });
 const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'hide-all-series'): void;
@@ -103,10 +105,10 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                        :data="legends"
                        class="legend-wrapper"
         >
-            <p v-if="legends.length > 15"
+            <p v-if="props.more"
                class="too-many-text"
             >
-                {{ $t('INVENTORY.METRIC_EXPLORER.TOO_MANY_ITEMS') }}
+                {{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}
             </p>
             <div v-for="(legend, idx) in legends"
                  :key="`legend-${legend.name}-${idx}`"
