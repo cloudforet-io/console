@@ -9,6 +9,8 @@ const ProjectContainer = () => import('@/services/project/ProjectContainer.vue')
 const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
+const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
+
 const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
@@ -41,14 +43,21 @@ export default {
         {
             path: 'detail/:id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            // redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+            redirect: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
+                    path: 'dashboard',
+                    name: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
+                    meta: { lsbVisible: true },
+                    props: true,
+                    component: ProjectDashboardPage,
+                },
+                {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    // redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailPage,
                     children: [

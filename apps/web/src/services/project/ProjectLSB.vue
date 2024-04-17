@@ -114,7 +114,7 @@ const state = reactive({
             ...defaultMenuset,
         ];
     }),
-    projectFiteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
+    projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
         .map((project) => ({
             type: MENU_ITEM_TYPE.ITEM,
             label: project.name,
@@ -139,7 +139,7 @@ const state = reactive({
                           placeholder="Search project"
             />
             <template v-if="state.projectKeyword">
-                <l-s-b-router-menu-item v-for="(_item, idx) of state.projectFiteredByKeyword"
+                <l-s-b-router-menu-item v-for="(_item, idx) of state.projectFilteredByKeyword"
                                         :key="idx"
                                         :item="_item"
                                         :idx="`search-${idx}`"
@@ -151,7 +151,7 @@ const state = reactive({
                                          :text="_item.label"
                     />
                 </l-s-b-router-menu-item>
-                <p-empty v-if="state.projectKeyword && !state.projectFiteredByKeyword.length"
+                <p-empty v-if="state.projectKeyword && !state.projectFilteredByKeyword.length"
                          class="search-empty"
                 >
                     <span>
