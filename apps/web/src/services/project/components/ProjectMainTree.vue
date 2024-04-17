@@ -7,6 +7,9 @@ import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+
 import { indigo, peacock } from '@/styles/colors';
 
 import TreeView from '@/services/project/tree/TreeView.vue';
@@ -47,13 +50,20 @@ watch(route, () => {
         >
             <template #content="{ node }">
                 <div class="project-menu-item-content">
-                    <p-i class="project-icon"
-                         :name="Array.isArray(node.children) ? 'ic_folder-filled' : 'ic_document-filled'"
-                         :color="Array.isArray(node.children) ? indigo[500] : peacock[600]"
-                         width="0.875rem"
-                         height="0.875rem"
+                    <div class="contents-wrapper">
+                        <p-i class="project-icon"
+                             :name="Array.isArray(node.children) ? 'ic_folder-filled' : 'ic_document-filled'"
+                             :color="Array.isArray(node.children) ? indigo[500] : peacock[600]"
+                             width="0.875rem"
+                             height="0.875rem"
+                        />
+                        <span class="text">{{ node.data.name }}</span>
+                    </div>
+                    <favorite-button :item-id="node.id"
+                                     :favorite-type="Array.isArray(node.children) ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECTs"
+                                     scale="0.8"
+                                     class="favorite-button"
                     />
-                    <span class="text">{{ node.data.name }}</span>
                 </div>
             </template>
         </tree-view>
@@ -64,16 +74,36 @@ watch(route, () => {
 .project-main-tree {
     width: 100%;
     .project-menu-item-content {
-        @apply flex items-center gap-1 w-full;
+        @apply flex items-center justify-between w-full;
         height: 2rem;
-        .project-icon {
-            min-width: 0.875rem;
+        .contents-wrapper {
+            @apply flex items-center gap-1 w-full;
+
+            .project-icon {
+                min-width: 0.875rem;
+            }
+            .text {
+                @apply text-label-md text-gray-900;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
-        .text {
-            @apply text-label-md text-gray-900;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
+        .favorite-button {
+            display: none;
+            min-width: 1.5rem;
+            height: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        &:hover {
+            .contents-wrapper {
+                width: calc(100% - 1.5rem);
+            }
+            .favorite-button {
+                display: block;
+            }
         }
     }
 }

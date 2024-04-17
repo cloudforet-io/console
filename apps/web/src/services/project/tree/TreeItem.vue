@@ -69,7 +69,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
                    :to="props.node.data.to"
                    class="content-wrapper"
                    :class="{ selected: props.node.id === props.selectedId }"
-                   :style="{ 'padding-left': `${(props.node.depth || 0) * 1}rem`}"
+                   :style="{ 'padding-left': `${0.125 + (props.node.depth || 0) * 1}rem`}"
                    @click.native="handleClickItem"
         >
             <div v-if="isExpandable(slots)"
@@ -85,7 +85,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
                      @click.prevent="handleClickToggle"
                 />
             </div>
-            <div class="content-text">
+            <div :class="{'content-text': true, 'expandable': isExpandable(slots)}">
                 <slot name="content"
                       v-bind="{ node: props.node }"
                 />
@@ -106,6 +106,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
     .content-wrapper {
         @apply flex items-center rounded w-full;
         padding-left: 0.125rem;
+        padding-right: 0.5rem;
 
         &:hover {
             @apply bg-blue-100 cursor-pointer;
@@ -116,7 +117,11 @@ watch(() => state.isCollapsed, async (collapsed) => {
         }
 
         .content-text {
-            width: calc(100% - 1rem);
+            @apply w-full;
+
+            &.expandable {
+                width: calc(100% - 1rem);
+            }
         }
     }
 
