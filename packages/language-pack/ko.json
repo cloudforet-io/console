@@ -2705,6 +2705,14 @@
 			"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 			"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
 			"COMMON": "",
+			"CUSTOM_METRIC": {
+				"ADD_TITLE": "",
+				"DUPLICATED": "",
+				"NAME": "이름",
+				"REQUIRED_FIELD": "필수 입력 항목입니다.",
+				"SUCCESSFULLY_ADDED": "",
+				"UNIT": ""
+			},
 			"DAILY": "일별 데이터",
 			"EMPTY_TEXT": "",
 			"FILTERS": "필터",
