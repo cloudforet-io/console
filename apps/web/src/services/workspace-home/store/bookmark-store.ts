@@ -11,14 +11,13 @@ import type { UserConfigListParameters } from '@/schema/config/user-config/api-v
 import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { fetchFavicon } from '@/services/workspace-home/composables/use-bookmark';
-import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
@@ -29,6 +28,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         bookmarkData: [] as BookmarkItem[],
         activeFolderIndex: undefined as number|undefined,
         isFullMode: false,
+        isFileFullMode: false,
         modal: {
             type: undefined as BookmarkModalType|undefined,
         },
@@ -40,22 +40,11 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     });
 
     const getters = reactive({
-        bookmarkFolderList: computed<BookmarkItem[]>(() => {
-            const result = state.bookmarkFolderData.filter((i) => !i.link);
-            if (result.length === 10) {
-                result.push({ name: 'More', isShowMore: true });
-            }
-            return result;
-        }),
-        bookmarkList: computed<BookmarkItem[]>(() => {
-            const result = state.bookmarkData.filter((i) => i.link);
-            if (result.length === 13) {
-                result.push({ name: i18n.t('HOME.TOGGLE_MORE') as string, icon: 'ic_ellipsis-horizontal', isShowMore: true });
-            }
-            return result;
-        }),
+        bookmarkFolderList: computed<BookmarkItem[]>(() => state.bookmarkFolderData.filter((i) => !i.link)),
+        bookmarkList: computed<BookmarkItem[]>(() => state.bookmarkData.filter((i) => i.link)),
         activeFolderName: computed<string|undefined>(() => (state.activeFolderIndex !== undefined ? state.bookmarkFolderData[state.activeFolderIndex].name : undefined)),
         isFullMode: computed<boolean>(() => state.isFullMode),
+        isFileFullMode: computed<boolean>(() => state.isFileFullMode),
         modalType: computed<BookmarkModalType|undefined>(() => state.modal.type),
     });
 
@@ -68,6 +57,18 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         setFullMode: (isFullMode: boolean) => {
             state.isFullMode = isFullMode;
+            if (!state.isFullMode) {
+                state.activeFolderIndex = undefined;
+                actions.fetchBookmarkList();
+            } else {
+                state.isFileFullMode = false;
+            }
+        },
+        setFileFullMode: (isFullMode: boolean) => {
+            state.isFileFullMode = isFullMode;
+            if (!isFullMode) {
+                state.activeFolderIndex = undefined;
+            }
         },
     };
 
@@ -105,12 +106,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             if (name) {
                 bookmarkListApiQuery.addFilter({ k: 'data.folder', v: name, o: '' });
             } else {
-                bookmarkListApiQuery.addFilter({ k: 'data.folder', v: null, o: '' });
+                bookmarkListApiQuery.addFilter(
+                    { k: 'data.folder', v: null, o: '' },
+                    { k: 'data.link', v: null, o: '!=' },
+                );
             }
             try {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
+                console.log({ results });
                 const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
                     const imgIcon = await fetchFavicon(item.data.link);
                     return {

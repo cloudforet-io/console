@@ -42,7 +42,8 @@ watch(() => storeState.currentWorkspaceId, async () => {
     >
         <bookmark-header :bookmark-folder-list="storeState.bookmarkFolderList" />
         <bookmark-full-mode v-if="storeState.isFullMode"
-                            :bookmark-list="storeState.bookmarkFolderList"
+                            :bookmark-folder-list="storeState.bookmarkFolderList"
+                            :bookmark-list="storeState.bookmarkList"
         />
         <bookmark-board v-else
                         :board-sets="state.boardSets"
