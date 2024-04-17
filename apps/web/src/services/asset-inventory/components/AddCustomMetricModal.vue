@@ -50,6 +50,7 @@ const {
     invalidTexts,
     isAllValid,
     setForm,
+    initForm,
 } = useFormValidator({
     name: '',
     unit: '',
@@ -73,7 +74,7 @@ const {
 
 /* Event */
 const handleClose = () => {
-    resetForm();
+    initForm();
     state.proxyVisible = false;
 };
 
@@ -89,19 +90,12 @@ const handleConfirm = async () => {
             namespace_id: metricExplorerPageStore.state.selectedNamespace?.namespace_id || '',
         };
         await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>(createParameters);
-        resetForm();
+        initForm();
         state.proxyVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.SUCCESSFULLY_ADDED'), '');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
-};
-
-/* Method */
-const resetForm = () => {
-    setForm('name', '');
-    setForm('unit', '');
-    setForm('code', '');
 };
 
 </script>
