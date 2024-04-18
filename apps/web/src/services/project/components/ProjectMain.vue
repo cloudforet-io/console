@@ -49,6 +49,7 @@ const state = reactive({
             id: d.key,
             name: d.name,
             parentId: d.data.groupInfo?.id,
+            projectType: d.data.projectType,
         }));
         return allProjectList.filter((item) => item.parentId === state.currentProjectGroupId);
     }),

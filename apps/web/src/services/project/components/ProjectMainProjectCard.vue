@@ -111,7 +111,8 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
                     <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
                 </router-link>
             </div>
-            <p-badge badge-type="subtle"
+            <p-badge v-if="item.projectType === 'PRIVATE'"
+                     badge-type="subtle"
                      style-type="gray100"
             >
                 <p-i name="ic_lock-filled"
@@ -121,17 +122,6 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
                 />
                 {{ $t('PROJECT.LANDING.INVITE_ONLY') }}
             </p-badge>
-            <!--                            <p-badge v-if="item.project_type === 'PRIVATE'"-->
-            <!--                                     badge-type="subtle"-->
-            <!--                                     style-type="gray100"-->
-            <!--                            >-->
-            <!--                                <p-i name="ic_lock-filled"-->
-            <!--                                     scale="0.8"-->
-            <!--                                     color="inherit"-->
-            <!--                                     class="badge-icon"-->
-            <!--                                />-->
-            <!--                                {{ $t('PROJECT.LANDING.INVITE_ONLY') }}-->
-            <!--                            </p-badge>-->
         </div>
     </div>
 </template>
