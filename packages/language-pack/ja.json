@@ -2774,6 +2774,7 @@
 				"COPIED": "コピーしました",
 				"COPY_CODE": "コードをコピー",
 				"DONE_BUTTON": "完了",
+				"FIND_OUT": "詳しく調べる",
 				"FIND_OUT_INFORMATION": "Kubernetesクラスターでkubectlが構成情報を伝達および修正する方法を調べてください。",
 				"FIRST_TITLE": "クラスターの基本情報に関する\n追加作業が必要です。",
 				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "以下のコマンドを入力すると、kube-state-metricsを見つけることができます。",

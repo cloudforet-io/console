@@ -242,7 +242,7 @@ watch(() => props.visible, (visible) => {
                                     highlight
                                     :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             >
-                                {{ $t('Find out') }}
+                                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIND_OUT') }}
                             </p-link>
                         </div>
                     </div>
