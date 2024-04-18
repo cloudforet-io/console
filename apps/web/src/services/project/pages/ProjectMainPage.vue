@@ -3,7 +3,6 @@ import { onClickOutside } from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
@@ -23,14 +22,12 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
-import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
+import ProjectMain from '@/services/project/components/ProjectMain.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
-
-const route = useRoute();
 
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
@@ -130,11 +127,11 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     }
 };
 
-watch(() => route.params, async (after, before) => {
-    if (after?.projectGroupId !== before?.projectGroupId) {
-        await projectPageStore.selectNode(after.projectGroupId);
-    }
-});
+// watch(() => route.params, async (after, before) => {
+//     if (after?.projectGroupId !== before?.projectGroupId) {
+//         await projectPageStore.selectNode(after.projectGroupId);
+//     }
+// });
 watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
     gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
@@ -202,10 +199,11 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                 </div>
             </template>
         </p-heading>
-        <project-main-card-list
-            class="card-container"
-            :parent-groups="storeState.parentGroups"
-        />
+        <project-main />
+        <!--        <project-main-card-list-->
+        <!--            class="card-container"-->
+        <!--            :parent-groups="storeState.parentGroups"-->
+        <!--        />-->
 
         <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
         <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
