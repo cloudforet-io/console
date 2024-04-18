@@ -8,11 +8,13 @@ import type { BookmarkItem, BookmarkBoardSet } from '@/services/workspace-home/t
 interface Props {
     bookmarkFolderList: BookmarkItem[];
     bookmarkList: BookmarkItem[];
+    height?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
     bookmarkList: undefined,
+    height: undefined,
 });
 
 const bookmarkStore = useBookmarkStore();
@@ -23,15 +25,15 @@ const storeState = reactive({
 });
 const state = reactive({
     folderBoardSets: computed<BookmarkBoardSet[]>(() => {
-        const _results = props.bookmarkFolderList as BookmarkBoardSet[];
-        _results.unshift({
+        const createFolderItem: BookmarkBoardSet = {
             name: 'create Folder',
             icon: 'ic_plus',
-        });
-        return _results.map((d) => ({
-            ...d,
             rounded: true,
-        }));
+        };
+        return [createFolderItem, ...props.bookmarkFolderList.map((folder) => ({
+            ...folder,
+            rounded: true,
+        }))];
     }),
     boardSets: computed<BookmarkBoardSet[]>(() => props.bookmarkList.map((d) => ({
         ...d,
@@ -42,11 +44,14 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="bookmark-full-mode">
+    <div class="bookmark-full-mode"
+         :style="{ maxHeight: `${props.height}px` }"
+    >
         <bookmark-board v-if="!storeState.isFileFullMode"
                         :board-sets="state.folderBoardSets"
                         is-folder-board
-                        class="bookmark-board-wrapper folder"
+                        is-full-mode
+                        class="bookmark-board-wrapper"
         />
         <bookmark-board :board-sets="state.boardSets"
                         is-full-mode
@@ -57,35 +62,14 @@ const state = reactive({
 
 <style scoped lang="postcss">
 .bookmark-full-mode {
-    @apply flex flex-col text-label-md;
+    @apply flex flex-col text-label-md overflow-y-auto;
     width: 100%;
+    min-height: 15.875rem;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     gap: 1.25rem;
     .bookmark-board-wrapper {
         @apply grid-cols-4;
-
-        &.folder {
-            /* custom design-system component - p-board-item */
-            :deep(.p-board-item) {
-                .board-item {
-                    .image-wrapper {
-                        @apply bg-blue-200;
-                    }
-                }
-            }
-        }
-
-        /* custom design-system component - p-board-item */
-        :deep(.p-board-item) {
-            @apply border-gray-200;
-            padding: 0.5rem;
-            .board-item {
-                .image-wrapper {
-                    @apply bg-gray-100;
-                }
-            }
-        }
     }
 }
 </style>

@@ -39,3 +39,9 @@ export interface BookmarkItem {
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
 export type BookmarkBoardSet = BookmarkItem & BoardSet;
+
+export type BookmarkModalStateType = {
+    type?: BookmarkModalType;
+    isNew?: boolean;
+    isEdit?: boolean;
+};
