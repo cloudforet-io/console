@@ -2722,6 +2722,18 @@
 			"GRANULARITY": "Granularity",
 			"GROUP_BY": "Group By",
 			"HIDE_ALL": "Hide all",
+			"MAIN": {
+				"ANALYZE_DATA": "Analyze Data",
+				"ANALYZE_DATA_DESC": "Use the group-by, filter, and chart features to analyze your assets thoroughly.",
+				"CONFIGURE_ALERTS": "Configure Alerts",
+				"CONFIGURE_ALERTS_DESC": "Set Alerts to identify unusual behavior or patterns in the usage of resources.",
+				"LEARN_MORE": "Learn More",
+				"LOCATE_METRICS": "Locate Metrics",
+				"LOCATE_METRICS_DESC": "Start by selecting a namespace from the left sidebar, then choose a metric to view.",
+				"RECENTLY_VISITED": "Recently Visited",
+				"TITLE": "Get stared with Metric Explorer",
+				"UPCOMING": "Upcoming"
+			},
 			"METRIC_EXPLORER": "Metric Explorer",
 			"METRIC_EXPLORER_HOME": "Metric Explorer Home",
 			"MONTHLY": "Monthly",

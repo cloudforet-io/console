@@ -2722,6 +2722,18 @@
 			"GRANULARITY": "細部基準",
 			"GROUP_BY": "グループ別統計",
 			"HIDE_ALL": "すべて隠す",
+			"MAIN": {
+				"ANALYZE_DATA": "",
+				"ANALYZE_DATA_DESC": "",
+				"CONFIGURE_ALERTS": "",
+				"CONFIGURE_ALERTS_DESC": "",
+				"LEARN_MORE": "",
+				"LOCATE_METRICS": "",
+				"LOCATE_METRICS_DESC": "",
+				"RECENTLY_VISITED": "",
+				"TITLE": "",
+				"UPCOMING": ""
+			},
 			"METRIC_EXPLORER": "",
 			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "月別データ",
