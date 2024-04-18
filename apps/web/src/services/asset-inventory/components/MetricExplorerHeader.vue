@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu,
@@ -42,6 +43,12 @@ const state = reactive({
             label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
         },
     ])),
+    pageTitle: computed<string|TranslateResult>(() => {
+        if (metricExplorerPageState.metric) {
+            return metricExplorerPageState.metric.name;
+        }
+        return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
+    }),
 });
 
 const {
@@ -106,7 +113,7 @@ const handleDeleteMetric = async () => {
 </script>
 
 <template>
-    <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')">
+    <p-heading :title="state.pageTitle">
         <template #title-right-extra>
             <div v-if="!metricExplorerPageGetters.isManagedMetric"
                  class="title-right-extra icon-wrapper"
