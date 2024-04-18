@@ -2769,13 +2769,14 @@
 				"CHECKLIST_OPTION_LABEL": "Checklist - before connecting cluster",
 				"CLUSTER_NAME": "Cluster Name",
 				"CLUSTER_NAME_INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
+				"CONNECT_CLUSTER_WARNING": "You must have the SpaceONE Helm repository on your system before continuing.",
 				"CONTINUE_BUTTON": "Continue",
 				"COPIED": "Copied",
 				"COPY_CODE": "Copy Code",
 				"DONE_BUTTON": "Done",
 				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
-				"FIRST_TITLE": "You can totally do this!\nA few setups are required.",
-				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "'To find out the kube-state-metrics, enter the command below:",
+				"FIRST_TITLE": "To connect your cluster, \nyou need a few setups.",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "To find out the kube-state-metrics, enter the command below:",
 				"LOADING": "Waiting for new key...",
 				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "hide",
 				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "Learn how to find out",
@@ -2784,7 +2785,8 @@
 				"SCRIPT_GUIDE_SECOND": "To create the SpaceONE Helm repository, \nplease run the following command:",
 				"SCRIPT_GUIDE_THIRD": "Copy and paste the following code into your cloud shell or terminal.",
 				"SECOND_TITLE": "Install Helm on your system \nby following the instructions below.",
-				"THIRD_TITLE": "You’re almost there!\nConnect to the Kubernetes cluster."
+				"THIRD_TITLE": "This is the final step. \nConnect to the Kubernetes cluster.",
+				"THIRD_TITLE_RECONNECT": "Reconnect to the Kubernetes cluster."
 			},
 			"CREATE": {
 				"COMPLETE_MODAL_SYNC": "Sync Now",

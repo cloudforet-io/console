@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { violet } from '@/styles/colors';
+import { red, violet } from '@/styles/colors';
 
 import ServiceAccountAddClusterScriptField from '@/services/asset-inventory/components/ServiceAccountAddClusterScriptField.vue';
 import { OPEN_COST_OPTIONS } from '@/services/asset-inventory/constants/service-account-constant';
@@ -51,7 +51,10 @@ const state = reactive({
     title: computed(() => {
         if (state.step === 1) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.FIRST_TITLE');
         if (state.step === 2) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SECOND_TITLE');
-        if (state.step === 3) return i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.THIRD_TITLE');
+        if (state.step === 3) {
+            return props.addClusterModalType === 'ADD'
+                ? i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.THIRD_TITLE') : i18n.t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.THIRD_TITLE_RECONNECT');
+        }
         return '';
     }),
     clusterOptions: computed(() => [
@@ -70,12 +73,12 @@ const state = reactive({
 const formState = reactive({
     clusterName: '',
     selectedClusterOptions: {
-        [OPEN_COST_OPTIONS.kube_state_metric]: undefined,
+        [OPEN_COST_OPTIONS.kube_state_metrics]: undefined,
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: undefined,
     },
-    firstStepValid: computed(() => !invalidState.clusterName
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] !== undefined
-        && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
+    firstStepValid: computed(() => !invalidState.clusterName && invalidState.clusterName !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] !== undefined
+            && formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] !== undefined),
     commonValidForDelay: false,
     isValid: computed(() => {
         if (state.step === 1) return formState.firstStepValid;
@@ -102,7 +105,7 @@ const {
 
 const scriptState = reactive({
     optionGuideScript: computed<Record<string, string>>(() => ({
-        [OPEN_COST_OPTIONS.kube_state_metric]: 'kubectl get daemonsets --all-namespaces | grep kube-state-metrics',
+        [OPEN_COST_OPTIONS.kube_state_metrics]: 'kubectl get deployments --all-namespaces | grep kube-state-metrics',
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: 'kubectl get daemonsets --all-namespaces | grep node-exporter',
     })),
     helmScript: computed(() => ['helm version\n', 'helm repo add spaceone-agent https://cloudforet-io.github.io/charts\nhelm repo update spaceone-agent']),
@@ -144,6 +147,9 @@ const handleSelectClusterOptions = (key: string, value: boolean) => {
 
 /* Method */
 const closeModal = () => {
+    setForm('clusterName', undefined);
+    formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] = undefined;
+    formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     state.proxyVisible = false;
     emit('close');
 };
@@ -155,14 +161,12 @@ const goStep = (n?: number) => {
 const createAgentApp = async () => {
     const options: AgentModel['options'] = {
         cluster_name: clusterName.value,
-        ...formState.selectedClusterOptions,
+        kube_state_metrics: formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics],
+        prometheus_node_exporter: formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter],
     };
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
         goStep();
-        setForm('clusterName', '');
-        formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric] = undefined;
-        formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
         showErrorMessage(e.message, e);
@@ -248,15 +252,15 @@ watch(() => props.visible, (visible) => {
                             <div class="checklist">
                                 <span class="text">
                                     Is
-                                    <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metric }}</span>
+                                    <span class="code">{{ OPEN_COST_OPTIONS.kube_state_metrics }}</span>
                                     installed?
                                 </span>
                                 <p-radio-group>
                                     <p-radio v-for="(options, index) in state.clusterOptions"
-                                             :key="`${OPEN_COST_OPTIONS.kube_state_metric}-${index}`"
-                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metric]"
+                                             :key="`${OPEN_COST_OPTIONS.kube_state_metrics}-${index}`"
+                                             :selected="formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics]"
                                              :value="options.value"
-                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metric, options.value)"
+                                             @click="handleSelectClusterOptions(OPEN_COST_OPTIONS.kube_state_metrics, options.value)"
                                     >
                                         {{ options.label }}
                                     </p-radio>
@@ -284,7 +288,7 @@ watch(() => props.visible, (visible) => {
                             <div v-if="!state.guideCollapsed"
                                  class="guide-content"
                             >
-                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metric]"
+                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metrics]"
                                                                           highlightingt-term="kube-state-metric"
                                                                           :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
                                                                           script-height="3.5rem"
@@ -309,14 +313,23 @@ watch(() => props.visible, (visible) => {
                      class="second-section"
                 >
                     <div class="script-wrapper">
-                        <service-account-add-cluster-script-field :script="scriptState.helmScript[0]"
-                                                                  :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_FIRST')"
-                                                                  script-height="3.5rem"
-                        />
+                        <!--                        <service-account-add-cluster-script-field :script="scriptState.helmScript[0]"-->
+                        <!--                                                                  :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_FIRST')"-->
+                        <!--                                                                  script-height="3.5rem"-->
+                        <!--                        />-->
                         <service-account-add-cluster-script-field :script="scriptState.helmScript[1]"
                                                                   :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.SCRIPT_GUIDE_SECOND')"
                                                                   script-height="5rem"
                         />
+                    </div>
+                    <div class="create-agent-warning-contents">
+                        <p-i class="warning-icon"
+                             name="ic_error-filled"
+                             :color="red[400]"
+                        />
+                        <p class="warning-text">
+                            {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONNECT_CLUSTER_WARNING') }}
+                        </p>
                     </div>
                 </div>
                 <div v-else-if="state.step === 3"
@@ -435,6 +448,15 @@ watch(() => props.visible, (visible) => {
 
             .script-wrapper {
                 padding-bottom: 1rem;
+            }
+
+            .create-agent-warning-contents {
+                @apply w-full bg-red-100 flex gap-1 rounded;
+                padding: 0.625rem 1rem;
+
+                .warning-text {
+                    @apply text-paragraph-md text-gray-900;
+                }
             }
         }
         .third-section {

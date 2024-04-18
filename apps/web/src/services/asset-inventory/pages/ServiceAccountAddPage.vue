@@ -314,7 +314,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                       :loading="formState.formLoading"
                       @click="handleSave"
             >
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.CREATE') }}
             </p-button>
             <p-button class="text-button"
                       style-type="tertiary"
