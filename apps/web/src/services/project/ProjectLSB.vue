@@ -3,7 +3,9 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
-import { PTextInput, PTextHighlighting, PEmpty } from '@spaceone/design-system';
+import {
+    PTextInput, PTextHighlighting, PEmpty, PBadge,
+} from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -118,7 +120,7 @@ const state = reactive({
             hideFavorite: true,
         },
         {
-            type: MENU_ITEM_TYPE.ITEM,
+            type: MENU_ITEM_TYPE.SLOT,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
             id: 'project-alert',
             to: {
@@ -209,7 +211,16 @@ const state = reactive({
         <template #slot-project-alert="menu">
             <l-s-b-router-menu-item :item="menu"
                                     :idx="menu?.id"
-            />
+            >
+                <template #after-text>
+                    <p-badge style-type="primary3"
+                             badge-type="subtle"
+                             class="ml-1"
+                    >
+                        7
+                    </p-badge>
+                </template>
+            </l-s-b-router-menu-item>
         </template>
     </l-s-b>
 </template>
