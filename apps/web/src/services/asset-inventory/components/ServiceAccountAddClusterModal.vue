@@ -147,6 +147,9 @@ const handleSelectClusterOptions = (key: string, value: boolean) => {
 
 /* Method */
 const closeModal = () => {
+    setForm('clusterName', undefined);
+    formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] = undefined;
+    formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     state.proxyVisible = false;
     emit('close');
 };
@@ -164,9 +167,6 @@ const createAgentApp = async () => {
     try {
         await serviceAccountAgentStore.createAgent(props.serviceAccountId, options);
         goStep();
-        setForm('clusterName', '');
-        formState.selectedClusterOptions[OPEN_COST_OPTIONS.kube_state_metrics] = undefined;
-        formState.selectedClusterOptions[OPEN_COST_OPTIONS.prometheus_node_exporter] = undefined;
     } catch (e: any) {
         ErrorHandler.handleError(e);
         showErrorMessage(e.message, e);
