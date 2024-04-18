@@ -3,9 +3,12 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDivider, PHeading, PPaneLayout, PButton, PCard, PI, PLazyImg,
+    PDivider, PHeading, PPaneLayout, PButton, PCard, PI, PLazyImg, PBadge,
 } from '@spaceone/design-system';
 
+import MetricImgAlert from '@/assets/images/metric/img_alert.png';
+import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';
+import MetricImgVisualization from '@/assets/images/metric/img_visualization.png';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -15,7 +18,11 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
+
+
 
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -31,22 +38,22 @@ const storeState = reactive({
 const state = reactive({
     cardList: computed(() => [
         {
-            title: i18n.t('메트릭 그리기'),
-            alt: 'metric drawing',
-            desc: i18n.t('여러 메트릭 및 리소스를 사용하여 차트 만들기'),
-            img: '/src/assets/images/metric/metric_feature_1.png',
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS'),
+            alt: 'metric',
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS_DESC'),
+            img: MetricImgHowToUse,
         },
         {
-            title: i18n.t('얼럿 만들기'),
-            alt: 'alert making',
-            desc: i18n.t('메트릭과 리소스 정보를 바탕으로 얼럿 만들기'),
-            img: '/src/assets/images/metric/metric_feature_2.png',
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA'),
+            alt: 'analyze',
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA_DESC'),
+            img: MetricImgVisualization,
         },
         {
-            title: i18n.t('제3의 기능'),
-            alt: 'third feature',
-            desc: i18n.t('자랑해야만하는 feature 3개를 상단에 팍팍 박아줍니다'),
-            img: '/src/assets/images/metric/metric_feature_2.png',
+            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS'),
+            alt: 'alert',
+            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS_DESC'),
+            img: MetricImgAlert,
         },
     ]),
     recentList: [] as RecentItem[],
@@ -91,12 +98,8 @@ const fetchRecentList = async () => {
         <p-pane-layout>
             <div class="contents">
                 <p class="title">
-                    {{ $t('Get stared with Metric Explorer') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.TITLE') }}
                 </p>
-                <div class="desc-wrapper">
-                    <p>{{ $t('To begin, select a namespace and then a metric in the left sidebar.') }}</p>
-                    <p>{{ $t('For further details, see below.') }}</p>
-                </div>
                 <div class="card-group">
                     <div v-for="(card, idx) in state.cardList"
                          :key="card.title + idx"
@@ -107,7 +110,12 @@ const fetchRecentList = async () => {
                              class="image"
                         >
                         <p class="card-title">
-                            {{ card.title }}
+                            {{ card.title }} <p-badge v-if="card.alt === 'alert'"
+                                                      badge-type="subtle"
+                                                      style-type="indigo100"
+                            >
+                                {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.UPCOMING') }}
+                            </p-badge>
                         </p>
                         <p class="card-desc">
                             {{ card.desc }}
@@ -118,13 +126,13 @@ const fetchRecentList = async () => {
                           icon-right="ic_external-link"
                           style="margin-top: 0.5rem; margin-bottom: 3rem;"
                 >
-                    {{ $t('Learn More about Metric Explorer') }}
+                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.LEARN_MORE') }}
                 </p-button>
                 <p-divider v-if="state.recentMetricCardList.length" />
                 <div v-if="state.recentMetricCardList.length"
                      class="bottom-area"
                 >
-                    <header>{{ $t('Recently Visited') }}</header>
+                    <header>{{ $t('INVENTORY.METRIC_EXPLORER.MAIN.RECENTLY_VISITED') }}</header>
                     <div class="recent-card-wrapper">
                         <p-card v-for="recent in state.recentMetricCardList"
                                 :key="recent.id"
@@ -187,13 +195,14 @@ const fetchRecentList = async () => {
                 width: 11.875rem;
 
                 .image {
-                    width: 100%;
-                    height: 6.25rem;
+                    @apply border border-gray-200 rounded-md;
+                    width: 11.875rem;
                     object-fit: contain;
                 }
 
                 .card-title {
                     @apply font-bold text-paragraph-md;
+                    white-space: nowrap;
                     margin-top: 0.5rem;
                 }
 
