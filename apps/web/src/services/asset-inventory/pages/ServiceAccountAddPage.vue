@@ -283,7 +283,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
-                <service-account-credentials-form />
+                <service-account-credentials-form create-mode />
             </p-pane-layout>
             <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"
