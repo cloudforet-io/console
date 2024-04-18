@@ -2191,7 +2191,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
 				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
-				"AUTO_SYNC_TITLE": "",
+				"AUTO_SYNC_TITLE": "オートシンク",
 				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
 				"BASE_TITLE": "基本情報",
 				"CANCEL": "キャンセル",
@@ -2222,6 +2222,24 @@
 				"TAG_LABEL": "タグ",
 				"TITLE": "{type} 追加",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
+			},
+			"AUTO_SYNC": {
+				"DELETE_CHECK_MODAL": {
+					"DESC": "信頼されたアカウントが自動同期に設定されているため、削除できません。削除が必要な場合は、まずそのサービスアカウント({serviceAccountName})の自動同期を無効にしてください。",
+					"TITLE": "削除できません"
+				},
+				"DISABLED_SYNC_DESC": "全体の範囲の場合、「今すぐ同期」機能は管理者モードでのみ使用可能です。",
+				"ERROR_FOUND": "エラー",
+				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",
+				"LAST_SYNCED": "最終同期",
+				"MAIN_DESCRIPTION": "{provider}のアカウント階層をSpaceONEシステムと自動的に同期させます。",
+				"MAPPING_METHOD": "マッピング方法",
+				"PROJECT_GROUP_MAPPING": "プロジェクトグループマッピング",
+				"SKIP_PROJECT_GROUP_MAPPING": "プロジェクトグループマッピングをスキップ",
+				"START_SYNC": "同期を開始します。これには数分かかります。",
+				"SYNC_ERROR_MODAL_TITLE": "自動同期エラーの詳細",
+				"SYNC_TITLE": "今すぐ同期しますか？",
+				"WORKSPACE_MAPPING": "ワークスペースマッピング "
 			},
 			"MAIN": {
 				"ACTION": "作業",
@@ -2730,13 +2748,51 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"AGENT": {
+				"ACTIVATE": "",
+				"ACTIVATE_MODAL_TEXT": "",
+				"ACTIVE": "",
+				"CLUSTER_DETAIL_HEADER": "",
+				"CONNECT_CLUSTER": "",
+				"CONNECT_CLUSTER_HEADER": "",
+				"DEACTIVATE": "",
+				"DEACTIVATE_MODAL_TEXT": "",
+				"DELETE": "",
+				"DELETE_CLUSTER_MODAL_TEXT": "",
+				"DELETE_WARNING": "",
+				"DISCONNECTED_CLUSTER_TEXT": "",
+				"INACTIVE": "",
+				"RECONNECT": ""
+			},
+			"CLUSTER_MODAL": {
+				"CANCEL": "",
+				"CHECKLIST_OPTION_LABEL": "",
+				"CLUSTER_NAME": "",
+				"CLUSTER_NAME_INFORMATION": "",
+				"CONTINUE_BUTTON": "",
+				"COPIED": "",
+				"COPY_CODE": "",
+				"DONE_BUTTON": "",
+				"FIND_OUT_INFORMATION": "",
+				"FIRST_TITLE": "",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "",
+				"LOADING": "",
+				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "",
+				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "",
+				"PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE": "",
+				"SCRIPT_GUIDE_FIRST": "",
+				"SCRIPT_GUIDE_SECOND": "",
+				"SCRIPT_GUIDE_THIRD": "",
+				"SECOND_TITLE": "",
+				"THIRD_TITLE": ""
+			},
 			"CREATE": {
-				"COMPLETE_MODAL_SYNC": "",
-				"TIMEZONE": ""
+				"COMPLETE_MODAL_SYNC": "今すぐ同期",
+				"TIMEZONE": "タイムゾーン: {timezone}、最大: 2回"
 			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
-				"TITLE": ""
+				"TITLE": "添付されたアカウントがあるため、このアカウントを削除できません。"
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",
@@ -2752,15 +2808,16 @@
 				"CONNECT_TO_CONSOLE": "コンソールへの接続",
 				"CREDENTIALS_LABEL": "既存のTrustedAccountにアタッチしますか？",
 				"EDIT": "編集する",
-				"EDIT_SERVICE_ACCOUNT_NAME": "",
-				"NAME": "",
+				"EDIT_SERVICE_ACCOUNT_NAME": "サービスアカウント名を編集",
+				"NAME": "サービスアカウント名",
 				"NO_CREDENTIALS": "暗号化キーが見つかりません。",
 				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
 				"REQUIRED": "プロジェクトの追加が必要です",
 				"SAVE": "変更を保存",
-				"SYNC_NOW": "",
+				"SYNCING": "同期中",
+				"SYNC_NOW": "今すぐ同期",
 				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。",
-				"UPDATE_SUCCESS": ""
+				"UPDATE_SUCCESS": "オートシンク設定が正常に変更されました。"
 			}
 		}
 	},

@@ -59,6 +59,24 @@ export const getIconModalArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    iconColor: {
+        name: 'iconColor',
+        type: { name: 'string' },
+        description: 'Values can be given in the order of stroke and fill. Consider space as a delimiter. Giving one thing applies to both. e.g. "inherit transparent"',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
     emoji: {
         name: 'emoji',
         type: { name: 'string' },
@@ -168,7 +186,37 @@ export const getIconModalArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    hideButton: {
+        name: 'hideButton',
+        type: { name: 'boolean' },
+        description: 'Whether to use default button or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // slots
+    customHeader: {
+        name: 'customHeader',
+        description: 'Slot for custom header content',
+        defaultValue: 'Title',
+        table: {
+            type: {
+                summary: 'Title',
+            },
+            category: 'slots',
+            defaultValue: 'Title',
+        },
+    },
     body: {
         name: 'body',
         description: 'Slot for body content',

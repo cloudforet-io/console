@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
+import type { TranslateResult } from 'vue-i18n';
+
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import type { ModalSizeType } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
@@ -11,7 +13,7 @@ import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 interface Props {
     modalSize?: ModalSizeType;
     visible?: boolean;
-    headerTitle?: string;
+    headerTitle?: string|TranslateResult;
     verificationText?: string;
     loading?: boolean;
 }

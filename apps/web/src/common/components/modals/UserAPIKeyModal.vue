@@ -13,6 +13,8 @@ import type { AppModel } from '@/schema/identity/app/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { violet } from '@/styles/colors';
+
 import { useEndpointStore } from '@/services/my-page/stores/endpoint-store';
 
 enum FileType {
@@ -93,6 +95,7 @@ watch(() => props.visible, async (visible) => {
 <template>
     <p-icon-modal :visible.sync="state.proxyVisible"
                   icon-name="ic_check-circle"
+                  :icon-color="violet[800]"
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
                   :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"

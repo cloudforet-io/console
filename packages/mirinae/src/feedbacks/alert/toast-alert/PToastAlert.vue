@@ -130,8 +130,9 @@ const state = reactive({
     }
 
     .content-wrapper {
+        width: calc(100% - 3.5rem);
         flex-grow: 1;
-        flex-wrap: wrap;
+        flex-shrink: 1;
         .title {
             @apply text-white;
             display: block;
