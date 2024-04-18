@@ -2774,6 +2774,7 @@
 				"COPIED": "Copied",
 				"COPY_CODE": "Copy Code",
 				"DONE_BUTTON": "Done",
+				"FIND_OUT": "Find out",
 				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
 				"FIRST_TITLE": "To connect your cluster, \nyou need a few setups.",
 				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "To find out the kube-state-metrics, enter the command below:",
