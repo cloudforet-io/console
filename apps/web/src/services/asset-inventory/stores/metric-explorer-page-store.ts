@@ -159,12 +159,12 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         }
     };
     const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
-    const loadMetric = async () => {
-        if (!state.metricId) return;
+    const loadMetric = async (metricId?: string) => {
+        if (!state.metricId && !metricId) return;
         state.metricLoading = true;
         try {
             const { status, response } = await loadMetricFetcher<MetricGetParameters, MetricModel>({
-                metric_id: state.metricId,
+                metric_id: state.metricId || metricId,
             });
             if (status === 'succeed') {
                 state.metric = response;
