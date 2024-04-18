@@ -9,6 +9,7 @@ import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-r
 import type { ProviderItem, ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { peacock } from '@/styles/colors';
@@ -24,10 +25,13 @@ interface Props {
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
     projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    favoriteItems: computed(() => favoriteGetters.projectItems),
 });
 
 const state = reactive({
@@ -35,6 +39,7 @@ const state = reactive({
         if (!props.item.parentId) return '';
         return storeState.projectGroup[props.item.parentId].name;
     }),
+    isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
 });
 const getProvider = (name: string): ProviderItem => storeState.providers[name] || {};
 
@@ -55,7 +60,7 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
                     </span>
                 </div>
 
-                <favorite-button class="favorite-button"
+                <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
                                  :item-id="props.item.id"
                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                 />

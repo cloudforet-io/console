@@ -1,11 +1,13 @@
 <script setup lang="ts">
 
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import { indigo } from '@/styles/colors';
@@ -20,6 +22,17 @@ interface Props {
 const props = defineProps<Props>();
 const router = useRouter();
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
+const storeState = reactive({
+    favoriteItems: computed(() => favoriteGetters.projectGroupItems),
+});
+
+const state = reactive({
+    isStarred: computed(() => storeState.favoriteItems.some((item) => item.itemId === props.item.id)),
+});
+
 const handleSelectProjectGroup = () => {
     router.push(getProperRouteLocation({
         name: PROJECT_ROUTE._NAME,
@@ -45,7 +58,7 @@ const handleSelectProjectGroup = () => {
         <favorite-button :item-id="props.item.id"
                          :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                          scale="0.8"
-                         class="favorite-button"
+                         :class="{'favorite-button': true, 'starred': state.isStarred }"
         />
     </div>
 </template>
