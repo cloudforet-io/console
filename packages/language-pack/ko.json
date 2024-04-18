@@ -2719,7 +2719,9 @@
 				"NAME": "이름",
 				"REQUIRED_FIELD": "필수 입력 항목입니다.",
 				"SUCCESSFULLY_ADDED": "",
-				"UNIT": ""
+				"UNIT": "",
+				"UPDATE_TITLE": "",
+				"VIEW_TITLE": ""
 			},
 			"DAILY": "일별 데이터",
 			"DELETE_METRIC": "",

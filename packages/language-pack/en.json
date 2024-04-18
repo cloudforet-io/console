@@ -2719,7 +2719,9 @@
 				"NAME": "Name",
 				"REQUIRED_FIELD": "Required field",
 				"SUCCESSFULLY_ADDED": "Custom metric Successfully created",
-				"UNIT": "Unit"
+				"UNIT": "Unit",
+				"UPDATE_TITLE": "Edit Query",
+				"VIEW_TITLE": "View Query"
 			},
 			"DAILY": "Daily",
 			"DELETE_METRIC": "Delete Metric",
