@@ -114,15 +114,22 @@ onMounted(async () => {
                 <div class="card-contents">
                     <div class="project-card">
                         <div class="main-contents">
-                            <div class="title">
-                                <p-i name="ic_document-filled"
-                                     :color="peacock[600]"
-                                     width="1rem"
-                                     height="1rem"
+                            <div class="title-wrapper">
+                                <div class="title">
+                                    <p-i name="ic_document-filled"
+                                         :color="peacock[600]"
+                                         width="1rem"
+                                         height="1rem"
+                                    />
+                                    <span class="text">
+                                        Community Connector
+                                    </span>
+                                </div>
+
+                                <favorite-button class="favorite-button"
+                                                 item-id="project-1a7eb5453099"
+                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
-                                <span class="text">
-                                    Community Connector
-                                </span>
                             </div>
                             <span class="project-group">
                                 SpaceONE Project Group
@@ -250,9 +257,12 @@ onMounted(async () => {
                     padding: 1rem 1rem 0.5rem;
 
                     .main-contents {
-                        .title {
-                            @apply flex gap-1 items-center text-label-lg text-gray-900;
-                            margin-bottom: 0.25rem;
+                        .title-wrapper {
+                            @apply flex items-center justify-between;
+                            .title {
+                                @apply flex gap-1 items-center text-label-lg text-gray-900;
+                                margin-bottom: 0.25rem;
+                            }
                         }
                         .project-group {
                             @apply text-label-md text-gray-600;
