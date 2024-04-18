@@ -3,7 +3,11 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 
-import { PTextInput, PTextHighlighting, PEmpty } from '@spaceone/design-system';
+import {
+    PTextInput, PTextHighlighting, PEmpty, PBadge,
+} from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
@@ -78,38 +82,84 @@ const state = reactive({
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: d.name },
         };
     })),
+    isProjectLandingPage: computed(() => route.name === PROJECT_ROUTE._NAME),
+    projectLandingMenuSet: computed(() => [
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: 'All Projects',
+            icon: 'ic_dots-4-square',
+            to: getProperRouteLocation({
+                name: PROJECT_ROUTE._NAME,
+            }),
+            hideFavorite: true,
+        },
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+        {
+            type: MENU_ITEM_TYPE.COLLAPSIBLE,
+            label: 'Project',
+            id: 'project',
+        },
+    ]),
+    defaultMenuSet: computed(() => [
+        {
+            type: MENU_ITEM_TYPE.TOP_TITLE,
+            label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
+        },
+        {
+            type: MENU_ITEM_TYPE.DIVIDER,
+        },
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
+            id: 'project-member',
+            to: {
+                name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+            },
+            hideFavorite: true,
+        },
+        {
+            type: MENU_ITEM_TYPE.SLOT,
+            label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
+            id: 'project-alert',
+            to: {
+                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
+            },
+        },
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+            id: 'project-notification',
+            to: {
+                name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+            },
+        },
+        {
+            type: MENU_ITEM_TYPE.ITEM,
+            label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
+            id: 'project-tag',
+            to: {
+                name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+            },
+        },
+    ]),
     menuSet: computed<LSBMenu[]>(() => {
-        const defaultMenuset = [
+        const baseMenuSet = [
             {
                 type: MENU_ITEM_TYPE.STARRED,
                 childItems: state.starredMenuItems,
                 currentPath: state.currentPath,
             },
-            {
-                type: MENU_ITEM_TYPE.DIVIDER,
-            },
-            {
-                type: MENU_ITEM_TYPE.ITEM,
-                label: 'All Projects',
-                icon: 'ic_dots-4-square',
-                to: getProperRouteLocation({
-                    name: PROJECT_ROUTE._NAME,
-                }),
-                hideFavorite: true,
-            },
-            {
-                type: MENU_ITEM_TYPE.DIVIDER,
-            },
-            {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: 'Project',
-                id: 'project',
-            },
+            { type: MENU_ITEM_TYPE.DIVIDER },
         ];
-
-        return [
-            ...defaultMenuset,
-        ];
+        return (state.isProjectLandingPage ? [
+            ...baseMenuSet,
+            ...state.projectLandingMenuSet,
+        ] : [
+            ...baseMenuSet,
+            ...state.defaultMenuSet,
+        ]);
     }),
     projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
         .map((project) => ({
@@ -157,6 +207,20 @@ const state = reactive({
                 </p-empty>
             </template>
             <project-main-tree v-else />
+        </template>
+        <template #slot-project-alert="menu">
+            <l-s-b-router-menu-item :item="menu"
+                                    :idx="menu?.id"
+            >
+                <template #after-text>
+                    <p-badge style-type="primary3"
+                             badge-type="subtle"
+                             class="ml-1"
+                    >
+                        7
+                    </p-badge>
+                </template>
+            </l-s-b-router-menu-item>
         </template>
     </l-s-b>
 </template>
