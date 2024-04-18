@@ -2707,7 +2707,9 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 			"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
+			"ALT_E_DELETE_METRIC": "",
 			"ALT_E_SAVE_AS_METRIC": "",
+			"ALT_S_DELETE_METRIC": "",
 			"ALT_S_SAVE_AS_METRIC": "",
 			"ALT_S_SAVE_METRIC": "",
 			"COMMON": "",
@@ -2720,6 +2722,8 @@
 				"UNIT": ""
 			},
 			"DAILY": "日別データ",
+			"DELETE_METRIC": "",
+			"DELETE_MODAL_DESC": "",
 			"EDIT_METRIC_NAME": "",
 			"EDIT_QUERY": "",
 			"EMPTY_TEXT": "",

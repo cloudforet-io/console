@@ -2707,7 +2707,9 @@
 		"METRIC_EXPLORER": {
 			"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 			"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
+			"ALT_E_DELETE_METRIC": "Failed to delete metric",
 			"ALT_E_SAVE_AS_METRIC": "Failed to save metric",
+			"ALT_S_DELETE_METRIC": "Metric successfully deleted",
 			"ALT_S_SAVE_AS_METRIC": "Successfully saved as a new metric",
 			"ALT_S_SAVE_METRIC": "Successfully saved metric",
 			"COMMON": "Common",
@@ -2720,6 +2722,8 @@
 				"UNIT": "Unit"
 			},
 			"DAILY": "Daily",
+			"DELETE_METRIC": "Delete Metric",
+			"DELETE_MODAL_DESC": "Are you sure you want to delete metric?",
 			"EDIT_METRIC_NAME": "Edit Metric Name",
 			"EDIT_QUERY": "Edit Query",
 			"EMPTY_TEXT": "No results found \nTry again with different term",
