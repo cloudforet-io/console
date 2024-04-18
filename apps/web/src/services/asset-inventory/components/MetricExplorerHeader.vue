@@ -108,7 +108,7 @@ const handleDeleteMetric = async () => {
 <template>
     <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')">
         <template #title-right-extra>
-            <div v-if="true"
+            <div v-if="!metricExplorerPageGetters.isManagedMetric"
                  class="title-right-extra icon-wrapper"
             >
                 <p-icon-button name="ic_edit-text"
