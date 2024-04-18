@@ -15,8 +15,10 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import MetricExplorerEditNameModal from '@/services/asset-inventory/components/MetricExplorerEditNameModal.vue';
 import MetricExplorerSaveAsModal from '@/services/asset-inventory/components/MetricExplorerSaveAsModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
@@ -30,6 +32,8 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     metricSaveAsModalVisible: false,
+    metricEditNameModalVisible: false,
+    metricDeleteModalVisible: false,
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -53,6 +57,20 @@ const {
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
+/* Api */
+const deleteMetric = async () => {
+    if (!metricExplorerPageState.metric) return;
+    try {
+        await SpaceConnector.clientV2.inventory.metric.delete({
+            metric_id: metricExplorerPageState.metric.metric_id,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
+        // TODO: go to namespace list
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
+    }
+};
+
 /* Event */
 const handleSaveQuerySet = async () => {
     if (!metricExplorerPageState.metric) return;
@@ -75,10 +93,40 @@ const handleClickMoreMenuButton = () => {
 const handleClickSaveAsButton = () => {
     state.metricSaveAsModalVisible = true;
 };
+const handleClickEditMetricName = () => {
+    state.metricEditNameModalVisible = true;
+};
+const handleClickDeleteMetric = () => {
+    state.metricDeleteModalVisible = true;
+};
+const handleDeleteMetric = async () => {
+    await deleteMetric();
+    state.metricDeleteModalVisible = false;
+};
 </script>
 
 <template>
     <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')">
+        <template #title-right-extra>
+            <div v-if="true"
+                 class="title-right-extra icon-wrapper"
+            >
+                <p-icon-button name="ic_edit-text"
+                               size="md"
+                               @click.stop="handleClickEditMetricName"
+                />
+                <p-icon-button name="ic_delete"
+                               size="md"
+                               @click.stop="handleClickDeleteMetric"
+                />
+            </div>
+            <metric-explorer-edit-name-modal :visible.sync="state.metricEditNameModalVisible" />
+            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC')"
+                          :visible.sync="state.metricDeleteModalVisible"
+                          :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
+                          @confirm="handleDeleteMetric"
+            />
+        </template>
         <template #extra>
             <div ref="rightPartRef"
                  class="right-part"
@@ -122,6 +170,10 @@ const handleClickSaveAsButton = () => {
 </template>
 
 <style lang="postcss" scoped>
+.title-right-extra {
+    @apply flex-shrink-0 inline-flex items-center;
+    margin-bottom: -0.25rem;
+}
 .right-part {
     @apply relative;
     display: flex;
