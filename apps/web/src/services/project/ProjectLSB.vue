@@ -38,9 +38,6 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    initGroupId: computed(() => route.params.projectGroupId as string|undefined),
-    isCollapsed: false,
-
     projectKeyword: '',
     currentPath: computed(() => route.fullPath),
     starredMenuItems: computed<LSBItem[]>(() => storeState.favoriteItems.map((d) => {
