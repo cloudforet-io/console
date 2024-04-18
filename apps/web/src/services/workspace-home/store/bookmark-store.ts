@@ -59,10 +59,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             state.isFullMode = isFullMode;
             if (!state.isFullMode) {
                 state.activeFolderIndex = undefined;
-                actions.fetchBookmarkList();
             } else {
                 state.isFileFullMode = false;
             }
+            actions.fetchBookmarkList();
         },
         setFileFullMode: (isFullMode: boolean) => {
             state.isFileFullMode = isFullMode;
@@ -72,20 +72,21 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
     };
 
-    const bookmarkListApiQuery = new ApiQueryHelper()
-        .setSort('updated_at', true);
 
     const actions = {
         fetchBookmarkFolderList: async () => {
-            bookmarkListApiQuery
+            const bookmarkListApiQuery = new ApiQueryHelper()
+                .setSort('updated_at', true)
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '=' },
-                ])
-                .setPageLimit(10);
+                ]);
             try {
+                if (!state.isFullMode) {
+                    bookmarkListApiQuery.setPageLimit(10);
+                }
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
@@ -96,13 +97,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
         },
         fetchBookmarkList: async (name?: string) => {
-            bookmarkListApiQuery
+            const bookmarkListApiQuery = new ApiQueryHelper()
+                .setSort('updated_at', true)
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
                     { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
-                ])
-                .setPageLimit(13);
+                ]);
+            if (!state.isFullMode) {
+                bookmarkListApiQuery.setPageLimit(13);
+            }
             if (name) {
                 bookmarkListApiQuery.addFilter({ k: 'data.folder', v: name, o: '' });
             } else {

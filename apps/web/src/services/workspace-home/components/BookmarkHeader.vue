@@ -39,10 +39,6 @@ const handleClickFolder = (idx: number, name: string) => {
     }
     bookmarkStore.setActiveButtonIdx(idx);
 };
-const handleClickDeleteFolder = (name: string, e) => {
-    e.stopPropagation();
-    bookmarkStore.deleteBookmarkFolder(name);
-};
 
 watch(() => storeState.activeFolderName, (activeFolderName) => {
     bookmarkStore.fetchBookmarkList(activeFolderName);
@@ -79,7 +75,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                     />
                     <p-icon-button name="ic_delete"
                                    size="sm"
-                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE)"
+                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
                     />
                 </div>
             </template>
@@ -99,7 +95,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                                    name="ic_close"
                                    style-type="transparent"
                                    size="sm"
-                                   @click="handleClickDeleteFolder(item.name, $event)"
+                                   @click.stop="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
                     />
                     <p-i v-else
                          name="ic_folder-filled"
