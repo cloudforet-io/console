@@ -3501,6 +3501,9 @@
 			"ALT_S_UPDATE_PROJECT": "プロジェクト編集完了",
 			"ALT_S_UPDATE_PROJECT_TYPE": "プロジェクトアクセスが正常に更新されました",
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
+			"DASHBOARD": {
+				"DASHBOARD": "ダッシュボード"
+			},
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"INVITE_ONLY": "招待のみ",
@@ -3599,7 +3602,7 @@
 			},
 			"TAB_ALERT": "アラート",
 			"TAB_NOTIFICATIONS": "通知",
-			"TAB_PROEJCT_MEMBER": "プロジェクト メンバー",
+			"TAB_PROJECT_MEMBER": "プロジェクト メンバー",
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
