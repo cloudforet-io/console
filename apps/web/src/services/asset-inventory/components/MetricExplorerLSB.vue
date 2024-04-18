@@ -31,7 +31,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray, yellow } from '@/styles/colors';
 
-import AddCustomMetricModal from '@/services/asset-inventory/components/AddCustomMetricModal.vue';
+import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
@@ -406,7 +406,9 @@ onMounted(async () => {
                 </div>
             </p-data-loader>
         </template>
-        <add-custom-metric-modal :visible.sync="metricState.addCustomMetricModalVisible" />
+        <metric-explorer-query-form-modal :visible.sync="metricState.addCustomMetricModalVisible"
+                                          mode="CREATE"
+        />
     </l-s-b>
 </template>
 
