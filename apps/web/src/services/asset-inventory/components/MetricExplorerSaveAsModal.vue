@@ -64,9 +64,9 @@ const saveQuery = async () => {
     try {
         const newMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
             name: metricName.value,
-            namespace_id: metricExplorerPageState.selectedNamespace?.namespace_id || '',
+            namespace_id: metricExplorerPageState.metric?.namespace_id || '',
             unit: metricExplorerPageState.metric?.unit,
-            metric_type: METRIC_TYPE.GAUGE,
+            metric_type: metricExplorerPageState.metric.metric_type || METRIC_TYPE.GAUGE,
             resource_type: 'inventory.CloudService',
             query_options: {
                 ...metricExplorerPageState.metric.query_options, // TODO: Implement query options
