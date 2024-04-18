@@ -14,6 +14,7 @@ import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/M
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
 import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
 import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
+import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -27,6 +28,7 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
     filtersPopoverVisible: false,
+    queryFormModalVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: 0,
 });
@@ -37,6 +39,9 @@ const handleClickFilter = () => {
 };
 const handleClickRefresh = () => {
     metricExplorerPageStore.setRefreshMetricData(true);
+};
+const handleOpenQueryFormModal = () => {
+    state.queryFormModalVisible = true;
 };
 </script>
 
@@ -82,8 +87,9 @@ const handleClickRefresh = () => {
                 />
                 <p-button style-type="secondary"
                           icon-left="ic_editor-code"
+                          @click="handleOpenQueryFormModal"
                 >
-                    {{ metricExplorerPageGetters.isManagedMetric ? $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') : $t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY') }}
+                    {{ metricExplorerPageGetters.isManagedMetric ? $t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY') : $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') }}
                 </p-button>
             </div>
             <div class="right-part">
@@ -95,6 +101,9 @@ const handleClickRefresh = () => {
                 />
             </div>
         </div>
+        <metric-explorer-query-form-modal :visible.sync="state.queryFormModalVisible"
+                                          :mode="metricExplorerPageGetters.isManagedMetric ? 'VIEW' : 'UPDATE'"
+        />
     </div>
 </template>
 

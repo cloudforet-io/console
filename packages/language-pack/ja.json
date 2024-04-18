@@ -2719,7 +2719,9 @@
 				"NAME": "名前",
 				"REQUIRED_FIELD": "必須入力項目です。",
 				"SUCCESSFULLY_ADDED": "",
-				"UNIT": ""
+				"UNIT": "",
+				"UPDATE_TITLE": "",
+				"VIEW_TITLE": ""
 			},
 			"DAILY": "日別データ",
 			"DELETE_METRIC": "",

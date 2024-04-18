@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PTextEditor,
@@ -21,23 +21,38 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
+
+type Mode = 'CREATE' | 'UPDATE' | 'VIEW';
 interface Props {
     visible?: boolean;
+    mode?: Mode;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    mode: 'VIEW',
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
-    metricNameList: computed(() => metricExplorerPageStore.state.metricList.map((metric) => metric.name)),
+    metricNameList: computed(() => metricExplorerPageState.metricList.map((metric) => metric.name)),
 });
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
+    modalTitle: computed(() => {
+        switch (props.mode) {
+        case 'CREATE':
+            return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
+        case 'UPDATE':
+            return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
+        default:
+            return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.VIEW_TITLE');
+        }
+    }),
 });
 
 const {
@@ -98,12 +113,19 @@ const handleConfirm = async () => {
     }
 };
 
+watch(() => state.proxyVisible, (visible) => {
+    if (visible && props.mode !== 'CREATE') {
+        setForm('code', JSON.stringify(metricExplorerPageState.metric?.query_options));
+    } else {
+        initForm();
+    }
+});
 </script>
 
 <template>
     <p-button-modal class="add-custom-metric-modal"
                     :visible.sync="state.proxyVisible"
-                    :header-title="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE')"
+                    :header-title="state.modalTitle"
                     size="lg"
                     :disabled="!isAllValid"
                     @confirm="handleConfirm"
@@ -111,25 +133,28 @@ const handleConfirm = async () => {
                     @close="handleClose"
     >
         <template #body>
-            <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.NAME')"
-                           required
-                           :invalid="invalidState.name"
-                           :invalid-text="invalidTexts.name"
-            >
-                <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              @update:value="setForm('name', $event)"
-                />
-            </p-field-group>
-            <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UNIT')">
-                <p-text-input :value="unit"
-                              @update:value="setForm('unit', $event)"
-                />
-            </p-field-group>
+            <template v-if="props.mode !== 'VIEW'">
+                <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.NAME')"
+                               required
+                               :invalid="invalidState.name"
+                               :invalid-text="invalidTexts.name"
+                >
+                    <p-text-input :value="name"
+                                  :invalid="invalidState.name"
+                                  @update:value="setForm('name', $event)"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UNIT')">
+                    <p-text-input :value="unit"
+                                  @update:value="setForm('unit', $event)"
+                    />
+                </p-field-group>
+            </template>
             <p-field-group class="query-field"
                            required
             >
                 <p-text-editor :code="code"
+                               :read-only="props.mode === 'VIEW'"
                                @update:code="setForm('code', $event)"
                 />
             </p-field-group>
