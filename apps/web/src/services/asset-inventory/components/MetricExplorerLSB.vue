@@ -235,6 +235,7 @@ watch(() => route.params, (params) => {
 
 onMounted(async () => {
     await metricExplorerPageStore.loadNamespaces();
+    if (state.isDetailPage) await metricExplorerPageStore.loadMetric(route.params.id);
     if (storeState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
             label: namespaceState.namespaces.find((item) => item.namespace_id === storeState.currentMetric?.namespace_id).name,
