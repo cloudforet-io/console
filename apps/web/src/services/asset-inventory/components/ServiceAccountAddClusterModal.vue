@@ -11,6 +11,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { AgentModel } from '@/schema/identity/agent/model';
 import { i18n } from '@/translations';
 
+import config from '@/lib/config';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -104,13 +105,14 @@ const {
 });
 
 const scriptState = reactive({
+    endPoint: computed(() => config.get('CONSOLE_API_V2.ENDPOINT')),
     optionGuideScript: computed<Record<string, string>>(() => ({
         [OPEN_COST_OPTIONS.kube_state_metrics]: 'kubectl get deployments --all-namespaces | grep kube-state-metrics',
         [OPEN_COST_OPTIONS.prometheus_node_exporter]: 'kubectl get daemonsets --all-namespaces | grep node-exporter',
     })),
     helmScript: computed(() => ['helm version\n', 'helm repo add spaceone-agent https://cloudforet-io.github.io/charts\nhelm repo update spaceone-agent']),
     thirdScript: computed(() => "curl -X 'GET' \\\n"
-        + `  'https://console-v2.api.dev.spaceone.dev/console-api/extension/agent/kubernetes?service_account_id=${props.serviceAccountId}' \\\n`
+        + `  '${scriptState.endPoint}/console-api/extension/agent/kubernetes?service_account_id=${props.serviceAccountId}' \\\n`
         + "  -H 'accept: application/json' \\\n"
         + `  -H 'Authorization: Bearer ${storeState.appToken}' > agent.yaml && \\\n`
         + '  helm upgrade -i spaceone-agent spaceone-agent/k8s-monitoring -n spaceone-agent --create-namespace -f agent.yaml && \\\n'
