@@ -7,6 +7,8 @@ import {
 
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -82,10 +84,11 @@ const handleConfirm = async () => {
                 link: link.value,
                 folder: state.selectedFolder?.id,
             });
+            showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
         if (storeState.isFullMode && state.selectedFolder?.id) {
             await bookmarkStore.setFileFullMode(true, state.selectedFolder);
-        } else {
+        } else if (!state.selectedFolder?.id) {
             await bookmarkStore.setFullMode(true);
         }
         await bookmarkStore.setSelectedBookmark(state.selectedFolder);
@@ -111,7 +114,7 @@ watch(() => storeState.modal.type, (type) => {
 
 <template>
     <p-button-modal class="bookmark-link-form-modal"
-                    :header-title="$t('HOME.BOOKMARK_ADD_LINK')"
+                    :header-title="storeState.modal.isEdit ? $t('HOME.BOOKMARK_EDIT_LINK') : $t('HOME.BOOKMARK_ADD_LINK')"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
@@ -184,6 +187,10 @@ watch(() => storeState.modal.type, (type) => {
                 </p-field-group>
             </div>
         </template>
+        <template #confirm-button>
+            <span v-if="storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_EDIT') }}</span>
+            <span v-else>{{ $t('HOME.BOOKMARK_ADD') }}</span>
+        </template>v
     </p-button-modal>
 </template>
 
