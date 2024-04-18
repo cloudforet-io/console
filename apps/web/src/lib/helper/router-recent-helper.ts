@@ -70,6 +70,12 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         return { itemType: RECENT_TYPE.COST_ANALYSIS, workspaceId, itemId: costQuerySetId };
     }
 
+    if (to.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) {
+        const metricExplorerId = to?.params?.id;
+        if (!metricExplorerId) return undefined;
+        return { itemType: RECENT_TYPE.METRIC_EXPLORER, workspaceId, itemId: metricExplorerId };
+    }
+
     /* MENU */
 
     const menu = to.meta?.menuId && MENU_INFO_MAP[to.meta?.menuId as MenuId];

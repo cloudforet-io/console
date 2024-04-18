@@ -1,11 +1,32 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PDivider, PHeading, PPaneLayout, PButton, PCard, PI, PLazyImg,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
+
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
+import type { RecentItem } from '@/common/modules/navigations/type';
+import { RECENT_TYPE } from '@/common/modules/navigations/type';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
+const recentStore = useRecentStore();
+const userWorkspaceStore = useUserWorkspaceStore();
+const allReferenceStore = useAllReferenceStore();
+const router = useRouter();
+
+const storeState = reactive({
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    namespace: computed(() => allReferenceStore.getters.namespace),
+    metric: computed(() => allReferenceStore.getters.metric),
+});
 
 const state = reactive({
     cardList: computed(() => [
@@ -28,33 +49,40 @@ const state = reactive({
             img: '/src/assets/images/metric/metric_feature_2.png',
         },
     ]),
-    recentMetricCardList: computed(() => [{
-        id: '1',
-        icon: '',
-        label: 'AWS / EC2 / Instance /',
-        metricName: 'countbyRegion',
-    }, {
-        id: '2',
-        icon: '',
-        label: 'AWS / EC2 / Instance /',
-        metricName: 'countbyRegion',
-    }, {
-        id: '3',
-        icon: '',
-        label: 'AWS / EC2 / Instance /',
-        metricName: 'countbyRegion',
-    }, {
-        id: '4',
-        icon: '',
-        label: 'AWS / EC2 / Instance /',
-        metricName: 'countbyRegion',
-    }, {
-        id: '5',
-        icon: '',
-        label: 'AWS / EC2 / Instance /',
-        metricName: 'countbyRegion',
-    }]),
+    recentList: [] as RecentItem[],
+    recentMetricCardList: computed(() => state.recentList.map((recent) => {
+        const metric = storeState.metric[recent.data.id];
+        const namespace = storeState.namespace[metric?.data?.namespace_id ?? ''];
+        return ({
+            id: recent.data.id,
+            icon: '',
+            label: namespace?.label ?? '',
+            metricName: metric?.label ?? '',
+        });
+    })),
 });
+
+const handleRouteToMetricDetail = (metricId: string) => {
+    router.push({
+        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        params: {
+            id: metricId,
+        },
+    });
+};
+
+const fetchRecentList = async () => {
+    const recentList = await recentStore.fetchRecent({
+        type: RECENT_TYPE.METRIC_EXPLORER,
+        workspaceIds: [storeState.currentWorkspaceId ?? ''],
+        limit: 10,
+    });
+    state.recentList = recentList;
+};
+
+(async () => {
+    await fetchRecentList();
+})();
 </script>
 
 <template>
@@ -102,6 +130,7 @@ const state = reactive({
                                 :key="recent.id"
                                 :header="false"
                                 class="recent-card"
+                                @click.native="handleRouteToMetricDetail(recent.id)"
                         >
                             <div class="card-contents">
                                 <span class="icon">
@@ -186,11 +215,11 @@ const state = reactive({
 
             .recent-card-wrapper {
                 @apply grid gap-2;
-                grid-template-columns: repeat(auto-fill, 16.25rem);
+                grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
                 grid-template-rows: auto;
 
                 .recent-card {
-                    width: 16.25rem;
+                    min-width: 11.25rem;
                     height: 100%;
                     padding: 0.25rem 0.125rem;
                     cursor: pointer;
