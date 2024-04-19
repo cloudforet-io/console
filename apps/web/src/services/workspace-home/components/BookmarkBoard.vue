@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
                          :color="blue[800]"
                     />
                     <p-i v-else
-                         name="ic_folder-filled"
+                         name="ic_folder"
                          width="1.25rem"
                          height="1.25rem"
                          :color="blue[800]"

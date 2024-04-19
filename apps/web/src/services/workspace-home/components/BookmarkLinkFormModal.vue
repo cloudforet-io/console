@@ -158,7 +158,7 @@ watch(() => storeState.modal.type, (type) => {
                                      :value="idx"
                             >
                                 <span class="radio-item">
-                                    <p-i name="ic_folder-filled"
+                                    <p-i name="ic_folder"
                                          color="inherit"
                                          width="1.25rem"
                                          height="1.25rem"
