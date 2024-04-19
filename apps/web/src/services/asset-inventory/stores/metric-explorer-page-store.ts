@@ -16,6 +16,7 @@ import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { getRefinedMetricDataAnalyzeQueryGroupBy } from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod,
@@ -65,7 +66,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
                 if (filterItems.length) {
                     results.push({
-                        k: category,
+                        k: getRefinedMetricDataAnalyzeQueryGroupBy(category),
                         v: filterItems,
                         o: '=',
                     });
