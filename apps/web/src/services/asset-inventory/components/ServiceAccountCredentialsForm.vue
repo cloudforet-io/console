@@ -33,10 +33,12 @@ import type { ActiveDataType, CredentialForm } from '@/services/asset-inventory/
 
 interface Props {
     originForm?: Partial<CredentialForm>;
+    createMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     originForm: () => ({}),
+    createMode: false,
 });
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
@@ -254,6 +256,11 @@ const getSecretSchema = async (isTrustingSchema:boolean) => {
 
 watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
     getSecretSchema(attachTrustedAccount);
+}, { immediate: true });
+
+
+watch([() => storeState.secretSchema, () => state.isTrustedAccount], () => {
+    if (props.createMode) getSecretSchema(formState.attachTrustedAccount);
 }, { immediate: true });
 
 </script>
