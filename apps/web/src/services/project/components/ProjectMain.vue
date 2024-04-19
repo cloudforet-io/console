@@ -39,24 +39,36 @@ const state = reactive({
     serviceAccountList: [] as ServiceAccountModel[],
     currentProjectGroupList: computed<ProjectCardItemType[]>(() => {
         const allProjectGroupList: ProjectCardItemType[] = Object.values(storeState.projectGroup).map((d) => ({
+            type: 'projectGroup',
             id: d.key,
             name: d.name,
             parentId: d.data.parentGroupInfo?.id as string|undefined,
         }));
-        return allProjectGroupList.filter((item) => item.parentId === state.currentProjectGroupId);
+        return allProjectGroupList.filter((projectGroup) => projectGroup.parentId === state.currentProjectGroupId);
     }),
     currentProjectList: computed<ProjectCardItemType[]>(() => {
         const allProjectList: ProjectCardItemType[] = Object.values(storeState.project).map((d) => ({
+            type: 'project',
             id: d.key,
             name: d.name,
             parentId: d.data.groupInfo?.id,
             projectType: d.data.projectType,
         }));
-        return allProjectList.filter((item) => item.parentId === state.currentProjectGroupId).slice(state.pageSize * (state.pageStart - 1), state.pageSize * state.pageStart);
+        return allProjectList.filter((project) => project.parentId === state.currentProjectGroupId);
     }),
-    filteredCurrentProjectGroupList: computed(() => state.currentProjectGroupList.filter((item) => item.name.includes(state.searchText))),
-    filteredCurrentProjectList: computed(() => state.currentProjectList.filter((item) => item.name.includes(state.searchText))),
-    pageSize: 24,
+    filteredCardList: computed<ProjectCardItemType[]>(() => {
+        const projectGroupListFilteredByKeyword = state.currentProjectGroupList.filter((item) => item.name.includes(state.searchText));
+        const projectListFilteredByKeyword = state.currentProjectList.filter((item) => item.name.includes(state.searchText));
+        return [...projectGroupListFilteredByKeyword, ...projectListFilteredByKeyword];
+    }),
+    paginatedCardList: computed(() => {
+        const paginatedList = getPaginatedItems(state.filteredCardList);
+        return {
+            projectGroup: paginatedList.filter((item) => item.type === 'projectGroup'),
+            project: paginatedList.filter((item) => item.type === 'project'),
+        };
+    }),
+    pageSize: 48,
     pageStart: 1,
     searchText: '',
     searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
@@ -73,13 +85,11 @@ const handleChange = async (options?: any) => {
     if (options?.pageStart !== undefined) {
         state.pageStart = options.pageStart;
     }
-
-    console.debug(options);
-    // await fetchAll();
 };
 
 /* Utill */
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
+const getPaginatedItems = (items: ProjectCardItemType[]) => items.slice(state.pageStart - 1, state.pageSize + state.pageStart - 1);
 
 const listServiceAccount = async () => {
     try {
@@ -106,48 +116,21 @@ onMounted(async () => {
     <div class="project-main">
         <p-toolbox class="project-tool-box"
                    :page-size="state.pageSize"
-                   :total-count="storeState.project.length"
+                   :total-count="state.filteredCardList.length"
                    @change="handleChange"
                    @refresh="handleChange()"
         />
-        <div v-if="state.searchText"
-             class="search-result-contents"
-        >
-            <p class="search-result-label">
+        <div class="project-contents">
+            <p v-if="state.searchText"
+               class="search-result-label"
+            >
                 {{ state.searchResultLabelText }}
             </p>
-            <div class="result-wrapper">
-                <div class="card-contents mb-6">
-                    <project-main-project-group-card v-for="(projectGroup, idx) in state.filteredCurrentProjectGroupList"
-                                                     :key="`project-group-${idx}`"
-                                                     :item="projectGroup"
-                                                     :search-keyword="state.searchText"
-                    />
-                </div>
-                <div class="card-contents">
-                    <project-main-project-card v-for="(project, idx) in state.filteredCurrentProjectList"
-                                               :key="`project-${idx}`"
-                                               :item="project"
-                                               :service-account-provider-list="getDistinctProviders(project.id)"
-                                               :search-keyword="state.searchText"
-                    />
-                </div>
-                <p-empty v-if="!state.filteredCurrentProjectGroupList.length && !state.filteredCurrentProjectList.length"
-                         show-image
-                >
-                    <div class="empty-content">
-                        <p>{{ $t('Looks like there is no result') }}</p>
-                    </div>
-                </p-empty>
-            </div>
-        </div>
-        <div v-else
-             class="project-contents"
-        >
-            <div v-if="state.currentProjectGroupList.length"
+            <div v-if="state.paginatedCardList.projectGroup.length"
                  class="contents-wrapper"
             >
-                <p-field-title class="content-title"
+                <p-field-title v-if="!state.searchText"
+                               class="content-title"
                                :label="$t('Project Group')"
                 >
                     <template #right>
@@ -155,17 +138,17 @@ onMounted(async () => {
                     </template>
                 </p-field-title>
                 <div class="card-contents">
-                    <project-main-project-group-card v-for="(projectGroup, idx) in state.currentProjectGroupList"
+                    <project-main-project-group-card v-for="(projectGroup, idx) in state.paginatedCardList.projectGroup"
                                                      :key="`project-group-${idx}`"
                                                      :item="projectGroup"
                     />
                 </div>
             </div>
 
-            <div v-if="state.currentProjectList.length"
+            <div v-if="state.paginatedCardList.project.length"
                  class="contents-wrapper"
             >
-                <p-field-title v-if="state.currentProjectList.length"
+                <p-field-title v-if="!state.searchText"
                                class="content-title"
                                :label="$t('Project')"
                 >
@@ -174,13 +157,22 @@ onMounted(async () => {
                     </template>
                 </p-field-title>
                 <div class="card-contents">
-                    <project-main-project-card v-for="(project, idx) in state.currentProjectList"
+                    <project-main-project-card v-for="(project, idx) in state.paginatedCardList.project"
                                                :key="`project-${idx}`"
                                                :item="project"
                                                :service-account-provider-list="getDistinctProviders(project.id)"
                     />
                 </div>
             </div>
+
+            <p-empty v-if="!state.filteredCardList.length"
+                     show-image
+                     class="empty-contents"
+            >
+                <div class="empty-text">
+                    <p>{{ $t('Looks like there is no result') }}</p>
+                </div>
+            </p-empty>
         </div>
     </div>
 </template>
@@ -211,8 +203,11 @@ onMounted(async () => {
         gap: 1rem;
         grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
     }
-    .empty-content {
-        width: 20rem;
+    .empty-contents {
+        margin-top: 4rem;
+        .empty-text {
+            width: 20rem;
+        }
     }
 }
 </style>
