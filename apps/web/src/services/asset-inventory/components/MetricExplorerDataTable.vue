@@ -112,10 +112,8 @@ const handleUpdateThisPage = async () => {
 };
 const handleExport = async () => {
     try {
-        const { results } = await analyzeMetricData();
-        const refinedData = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
         await downloadExcel({
-            data: refinedData,
+            data: state.items,
             fields: state.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.metricExplorer,
         });
