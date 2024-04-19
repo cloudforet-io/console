@@ -218,7 +218,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                 </p-empty>
             </div>
         </div>
-        <p-divider />
+        <p-divider class="divider" />
         <p-link highlight
                 action-icon="internal-link"
                 class="link"
@@ -307,6 +307,9 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
             height: 10rem;
             margin-left: 1.5rem;
         }
+    }
+    .divider {
+        @apply bg-gray-150;
     }
     .link {
         @apply flex items-center justify-center text-label-md;

@@ -97,7 +97,7 @@ const handleGoBackButton = () => {
                                    @click.stop="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
                     />
                     <p-i v-else
-                         name="ic_folder-filled"
+                         name="ic_folder"
                          width="0.875rem"
                          height="0.875rem"
                     />

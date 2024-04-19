@@ -54,7 +54,7 @@ watch(() => storeState.currentWorkspaceId, async () => {
                             :bookmark-list="storeState.bookmarkList"
                             :height="state.contentHeight"
         />
-        <bookmark-board v-else
+        <bookmark-board v-else-if="storeState.bookmarkList.length > 0"
                         :board-sets="state.boardSets"
                         class="bookmark-board-wrapper"
         />

@@ -72,7 +72,7 @@ const handleClose = () => {
                      :class="{'is-folder': state.isFolder}"
                 >
                     <p-i v-if="state.isFolder"
-                         name="ic_folder-filled"
+                         name="ic_folder"
                          width="0.875rem"
                          height="0.875rem"
                     />
