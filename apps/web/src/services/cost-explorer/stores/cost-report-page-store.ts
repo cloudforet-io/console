@@ -13,20 +13,12 @@ import type { CostReportGetParameters } from '@/schema/cost-analysis/cost-report
 import type { CostReportGetUrlParameters } from '@/schema/cost-analysis/cost-report/api-verbs/get-url';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel, CostReportDataLinkInfoModel } from '@/schema/cost-analysis/cost-report/model';
-import type { RoleType } from '@/schema/identity/role/type';
 
 import type { Currency } from '@/store/modules/settings/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-interface CostReportItem extends CostReportModel {
-    recipients?: {
-        role_types: RoleType[];
-        emails: string[];
-    };
-    report_url?: string;
-}
+import type { CostReportItem } from '@/services/cost-explorer/types/cost-report-data-type';
 
 export const useCostReportPageStore = defineStore('page-cost-report', () => {
     const state = reactive({
