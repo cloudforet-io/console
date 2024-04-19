@@ -23,6 +23,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -35,6 +36,7 @@ interface GNBMenuType extends DisplayMenu {
     disabled?: boolean;
 }
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
 
@@ -95,9 +97,9 @@ const handleMouseEvent = (value: boolean) => {
 const handleMenuDescription = (value?: boolean) => {
     state.isMenuDescription = value;
     if (value) {
-        router.push({
+        router.push(getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
-        });
+        }));
     }
 };
 const handleMinimizedGnbRail = () => {
