@@ -72,6 +72,10 @@ const state = reactive({
     pageStart: 1,
     searchText: '',
     searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
+    placeholer: computed(() => {
+        const defaultPlaceholder = i18n.t('Search project or project group') as string;
+        return defaultPlaceholder;
+    }),
 });
 
 /* Event */
@@ -117,6 +121,7 @@ onMounted(async () => {
         <p-toolbox class="project-tool-box"
                    :page-size="state.pageSize"
                    :total-count="state.filteredCardList.length"
+                   :placeholder="state.placeholer"
                    @change="handleChange"
                    @refresh="handleChange()"
         />
@@ -170,7 +175,7 @@ onMounted(async () => {
                      class="empty-contents"
             >
                 <div class="empty-text">
-                    <p>{{ $t('Looks like there is no result') }}</p>
+                    <p>{{ state.searchText ? $t('Looks like there is no result') : $t('Looks like you don’t have any project. Create one by clicking the "Create" button.') }}</p>
                 </div>
             </p-empty>
         </div>
