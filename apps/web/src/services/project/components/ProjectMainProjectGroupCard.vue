@@ -3,7 +3,7 @@
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTextHighlighting } from '@spaceone/design-system';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -17,6 +17,7 @@ import type { ProjectCardItemType } from '@/services/project/types/project-type'
 
 interface Props {
     item: ProjectCardItemType;
+    searchKeyword?: string;
 }
 
 const props = defineProps<Props>();
@@ -53,7 +54,10 @@ const handleSelectProjectGroup = () => {
                  width="1rem"
                  height="1rem"
             />
-            <span class="project-group-name">{{ props.item.name }}</span>
+            <p-text-highlighting class="project-group-name"
+                                 :text="props.item.name"
+                                 :term="props.searchKeyword"
+            />
         </div>
         <favorite-button :item-id="props.item.id"
                          :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"

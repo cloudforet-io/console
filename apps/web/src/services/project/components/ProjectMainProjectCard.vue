@@ -2,7 +2,7 @@
 
 import { computed, reactive } from 'vue';
 
-import { PI, PBadge } from '@spaceone/design-system';
+import { PI, PBadge, PTextHighlighting } from '@spaceone/design-system';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -20,6 +20,7 @@ import type { ProjectCardItemType } from '@/services/project/types/project-type'
 interface Props {
     item: ProjectCardItemType;
     serviceAccountProviderList: string[];
+    searchKeyword?: string;
 }
 
 const props = defineProps<Props>();
@@ -55,9 +56,10 @@ const getProvider = (name: string): ProviderItem => storeState.providers[name] |
                          width="1rem"
                          height="1rem"
                     />
-                    <span class="text">
-                        {{ props.item.name }}
-                    </span>
+                    <p-text-highlighting class="text"
+                                         :text="props.item.name"
+                                         :term="props.searchKeyword"
+                    />
                 </div>
 
                 <favorite-button :class="{'favorite-button': true, 'starred': state.isStarred }"
