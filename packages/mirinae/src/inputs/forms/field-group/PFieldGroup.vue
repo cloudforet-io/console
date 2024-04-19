@@ -49,7 +49,7 @@ import PFieldTitle from '@/data-display/field-title/PFieldTitle.vue';
 
 interface PFieldGroup {
     label?: string|TranslateResult;
-    helpText?: string;
+    helpText?: string|TranslateResult;
     invalidText?: string;
     validText?: string;
     invalid?: boolean;

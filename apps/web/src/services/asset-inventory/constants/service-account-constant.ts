@@ -10,5 +10,18 @@ export const ACCOUNT_TYPE_BADGE_OPTION = {
 export const PROVIDER_ACCOUNT_NAME = {
     google_cloud: 'Project',
     azure: 'Subscription',
-    kubernetes: 'Cluster',
+} as const;
+
+
+
+
+/* Agent Account - k8s OpenCost Options
+* - cluster_name
+* - kube-state-metric
+* - prometheus-node-exporter
+* */
+export const OPEN_COST_OPTIONS = {
+    cluster_name: 'cluster_name',
+    kube_state_metrics: 'kube-state-metrics',
+    prometheus_node_exporter: 'prometheus-node-exporter',
 } as const;

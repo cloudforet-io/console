@@ -3,7 +3,7 @@ import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PPaneLayout, PHeading,
+    PButton, PPaneLayout, PHeading, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -30,6 +30,14 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageState = serviceAccountPageStore.state;
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 
+interface Props {
+    editable: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    editable: false,
+});
+
 interface State {
     loading: boolean;
     isTrustedAccount: ComputedRef<boolean>;
@@ -51,16 +59,17 @@ const handleClickEditButton = () => {
     state.mode = 'UPDATE';
 };
 const handleClickCancelButton = () => {
+    serviceAccountPageStore.initToOriginServiceAccountItem();
     state.mode = 'READ';
 };
 const handleClickSaveButton = async () => {
-    if (!serviceAccountPageState.serviceAccountItem.trusted_account_id) return;
+    if (!serviceAccountPageState.originServiceAccountItem.trusted_account_id) return;
     try {
         await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-            trusted_account_id: serviceAccountPageState.serviceAccountItem.trusted_account_id,
-            name: serviceAccountPageState.serviceAccountItem.name,
-            data: serviceAccountPageState.serviceAccountItem.data,
-            tags: serviceAccountPageState.serviceAccountItem.tags,
+            trusted_account_id: serviceAccountPageState.originServiceAccountItem.trusted_account_id,
+            name: serviceAccountPageState.originServiceAccountItem.name,
+            data: serviceAccountPageState.originServiceAccountItem.data,
+            tags: serviceAccountPageState.originServiceAccountItem.tags,
             schedule: {
                 state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
                 hours: serviceAccountPageFormState.scheduleHours,
@@ -86,13 +95,23 @@ const handleClickSaveButton = async () => {
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
         >
             <template #title-right-extra>
-                <auto-sync-state :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
+                <auto-sync-state v-if="state.mode==='READ'"
+                                 :state="serviceAccountPageStore.getters.isOriginAutoSyncEnabled ? 'ENABLED' : 'DISABLED'"
                                  size="lg"
                                  class="ml-2"
                 />
+                <p-link v-else
+                        :href="serviceAccountPageStore.getters.autoSyncDocsLink"
+                        new-tab
+                        highlight
+                        action-icon="external-link"
+                        class="ml-3"
+                >
+                    Docs
+                </p-link>
             </template>
             <template #extra>
-                <p-button v-if="state.mode === 'READ'"
+                <p-button v-if="state.mode === 'READ' && props.editable"
                           icon-left="ic_edit"
                           style-type="secondary"
                           @click="handleClickEditButton"
@@ -105,9 +124,7 @@ const handleClickSaveButton = async () => {
              :class="{'ml-4': state.mode === 'READ'}"
         >
             <service-account-auto-sync-detail v-if="state.mode === 'READ'" />
-            <service-account-auto-sync-form v-if="state.mode === 'UPDATE'"
-                                            mode="UPDATE"
-            />
+            <service-account-auto-sync-form v-if="state.mode === 'UPDATE'" />
             <div v-if="state.mode === 'UPDATE'"
                  class="button-wrapper"
             >

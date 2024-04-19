@@ -4,7 +4,10 @@ import type { DynamicField } from '@spaceone/design-system/types/data-display/dy
 
 import type { ItemLayout, QuerySearchTableLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
-export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount: boolean): ItemLayout => ({
+export const getDefaultDetailSchema = (fields: DynamicField[], options: {
+    isTrustedAccount: boolean,
+    isAdminMode?: boolean,
+}): ItemLayout => ({
     name: 'Base Information',
     type: 'item',
     options: {
@@ -16,37 +19,39 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
                 name: 'Account Type',
                 type: 'text',
             },
-            ...((isTrustedAccount && [{
-                key: 'resource_group',
-                name: 'Scope',
-                type: 'enum',
-                options: {
-                    items: {
-                        WORKSPACE: {
-                            name: 'Workspace',
-                            type: 'badge',
-                            options: {
-                                text_color: 'green.700',
-                                background_color: 'green.200',
+            ...((options.isTrustedAccount && [
+                ...((!options.isAdminMode && [{
+                    key: 'resource_group',
+                    name: 'Scope',
+                    type: 'enum',
+                    options: {
+                        items: {
+                            WORKSPACE: {
+                                name: 'Workspace',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'green.700',
+                                    background_color: 'green.200',
+                                },
                             },
-                        },
-                        DOMAIN: {
-                            name: 'Domain',
-                            type: 'badge',
-                            options: {
-                                text_color: 'gray.900',
-                                background_color: 'gray.200',
+                            DOMAIN: {
+                                name: 'Domain',
+                                type: 'badge',
+                                options: {
+                                    text_color: 'gray.900',
+                                    background_color: 'gray.200',
+                                },
                             },
                         },
                     },
-                },
-            }]) || []) as DynamicField[],
+                }]) || []) as DynamicField[],
+            ]) || []),
             ...fields.map((field) => ({
                 key: field.key,
                 name: field.name,
                 type: 'text',
             })),
-            ...((!isTrustedAccount && [{
+            ...((!options.isTrustedAccount && [{
                 key: 'project_id',
                 name: 'Project',
                 type: 'text',
@@ -126,18 +131,25 @@ export const getDefaultTableSchema = (dynamicFields: DynamicField[], options: {
                 name: field.name,
                 type: 'text',
             })),
-            ...((!options.isTrustedAccount && [{
-                key: 'project_id',
-                name: 'Project',
-                type: 'text',
-                options: {
-                    sortable: false,
+            ...((!options.isTrustedAccount && [
+                {
+                    key: 'project_id',
+                    name: 'Project',
+                    type: 'text',
+                    options: {
+                        sortable: false,
+                    },
+                    reference: {
+                        resource_type: 'identity.Project',
+                        reference_key: 'project_id',
+                    },
                 },
-                reference: {
-                    resource_type: 'identity.Project',
-                    reference_key: 'project_id',
+                {
+                    key: 'is_managed',
+                    name: 'Auto Sync',
+                    type: 'text',
                 },
-            }]) || []),
+            ]) || []),
             {
                 key: 'created_at',
                 name: 'Created',

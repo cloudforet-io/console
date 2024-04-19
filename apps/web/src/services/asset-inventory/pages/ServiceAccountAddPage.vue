@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal,
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout, PButtonModal, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { SpaceRouter } from '@/router';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
@@ -56,7 +56,7 @@ const props = defineProps<{
     serviceAccountType?: AccountType;
 }>();
 const { getProperRouteLocation } = useProperRouteLocation();
-
+const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
@@ -64,7 +64,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     titleAccountName: computed(() => {
         if (props.provider && !state.isTrustedAccount && Object.keys(PROVIDER_ACCOUNT_NAME).includes(props.provider)) return PROVIDER_ACCOUNT_NAME[props.provider];
         return ACCOUNT_TYPE_BADGE_OPTION[formState.accountType].label;
@@ -75,7 +75,7 @@ const state = reactive({
     ),
     providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
     description: computed(() => state.providerSchemaData?.options?.help),
-    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
+    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length) && props.provider !== 'kubernetes',
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     createModal: false,
@@ -83,16 +83,16 @@ const state = reactive({
 });
 
 const formState = reactive({
-    baseInformationForm: {} as BaseInformationForm,
-    isBaseInformationFormValid: false,
+    baseInformationForm: computed<Partial<BaseInformationForm>>(() => serviceAccountPageStore.formState.baseInformation),
+    isBaseInformationFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
-    credentialForm: {} as CredentialForm,
-    isCredentialFormValid: false,
+    credentialForm: computed<Partial<CredentialForm>>(() => serviceAccountPageStore.formState.credential),
+    isCredentialFormValid: computed(() => serviceAccountPageStore.formState.isCredentialFormValid),
     isAutoSyncFormValid: computed(() => serviceAccountPageStore.formState.isAutoSyncFormValid),
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-        if (!formState.isAutoSyncFormValid && state.isTrustedAccount) return false;
+        if (!formState.isAutoSyncFormValid && state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider) return false;
         return true;
     }),
     formLoading: false,
@@ -111,44 +111,50 @@ const createAccount = async (): Promise<string|undefined> => {
     }
     let secretData;
     if (formState.credentialForm.activeDataType === 'json') {
-        secretData = JSON.parse(formState.credentialForm.credentialJson);
+        secretData = JSON.parse(formState.credentialForm.credentialJson ?? '');
     } else if (formState.credentialForm.activeDataType === 'input') {
         secretData = formState.credentialForm.customSchemaForm;
     }
 
     const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
-    if (state.isTrustedAccount) {
-        res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
-            provider: props.provider,
-            name: formState.baseInformationForm.accountName,
-            data,
-            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
-            secret_data: secretData,
-            resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
-            tags: formState.baseInformationForm.tags,
-            schedule: {
-                state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
-                hours: serviceAccountPageFormState.scheduleHours,
-            },
-            sync_options: {
-                skip_project_group: serviceAccountPageFormState.skipProjectGroup,
-                single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
-            },
-        });
-    } else {
-        res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
-            provider: props.provider,
-            name: formState.baseInformationForm.accountName.trim(),
-            data,
-            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-            secret_data: secretData,
-            tags: formState.baseInformationForm.tags,
-            trusted_account_id: attachedTrustedAccountId,
-            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-        });
-    }
+    try {
+        if (!formState.baseInformationForm.accountName || !data || !formState.baseInformationForm.projectForm) throw new Error('Invalid form data: accountName, data, projectForm');
+        if (state.isTrustedAccount) {
+            res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
+                provider: props.provider,
+                name: formState.baseInformationForm.accountName,
+                data,
+                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
+                secret_data: secretData,
+                resource_group: state.isAdminMode ? 'DOMAIN' : 'WORKSPACE',
+                tags: formState.baseInformationForm.tags,
+                schedule: {
+                    state: serviceAccountPageFormState.isAutoSyncEnabled ? 'ENABLED' : 'DISABLED',
+                    hours: serviceAccountPageFormState.scheduleHours,
+                },
+                sync_options: {
+                    skip_project_group: serviceAccountPageFormState.skipProjectGroup,
+                    single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
+                },
+            });
+        } else {
+            res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
+                provider: props.provider,
+                name: formState.baseInformationForm.accountName.trim(),
+                data,
+                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
+                secret_data: secretData,
+                tags: formState.baseInformationForm.tags,
+                trusted_account_id: attachedTrustedAccountId,
+                project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+            });
+        }
 
-    return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+        return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        throw e;
+    }
 };
 
 const deleteServiceAccount = async (serviceAccountId: string) => {
@@ -176,7 +182,12 @@ const handleSave = async () => {
         state.createdAccountId = accountId ?? '';
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
         if (state.isTrustedAccount && serviceAccountPageFormState.isAutoSyncEnabled) state.createModal = true;
-        else SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+        else if (props.provider === 'kubernetes') {
+            router.push(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
+                params: { serviceAccountId: accountId as string },
+            }));
+        } else router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -185,15 +196,12 @@ const handleSave = async () => {
     }
 };
 const handleGoBack = () => {
-    const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
-    if (nextPath) SpaceRouter.router.push(nextPath);
-    else SpaceRouter.router.back();
+    const nextPath = router.currentRoute.query.nextPath as string|undefined;
+    if (nextPath) router.push(nextPath);
+    else router.back();
 };
 const handleChangeBaseInformationForm = (baseInformationForm) => {
     formState.baseInformationForm = baseInformationForm;
-};
-const handleChangeCredentialForm = (credentialForm) => {
-    formState.credentialForm = credentialForm;
 };
 
 const handleSync = async () => {
@@ -203,14 +211,14 @@ const handleSync = async () => {
         });
         state.createModal = false;
         serviceAccountPageStore.initState();
-        SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+        router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
 const handleRouteToServiceAccountDetailPage = () => {
-    SpaceRouter.router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME, params: { serviceAccountId: state.createdAccountId } }));
 };
 
 /* Init */
@@ -219,6 +227,9 @@ const handleRouteToServiceAccountDetailPage = () => {
     serviceAccountPageStore.initState();
     serviceAccountPageStore.setProvider(props.provider ?? '');
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
+    serviceAccountPageStore.$patch((_state) => {
+        _state.state.serviceAccountType = props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL;
+    });
     state.providerSchemaLoading = false;
 })();
 
@@ -261,8 +272,8 @@ const handleRouteToServiceAccountDetailPage = () => {
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
                 />
                 <service-account-base-information-form :schema="state.baseInformationSchema"
-                                                       :is-valid.sync="formState.isBaseInformationFormValid"
                                                        :account-type="formState.accountType"
+                                                       mode="CREATE"
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
@@ -272,22 +283,26 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
-                <service-account-credentials-form
-                    :service-account-type="formState.accountType"
-                    :provider="props.provider ?? ''"
-                    :is-valid.sync="formState.isCredentialFormValid"
-                    @change="handleChangeCredentialForm"
-                />
+                <service-account-credentials-form />
             </p-pane-layout>
-            <p-pane-layout v-if="state.isTrustedAccount"
+            <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"
             >
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.AUTO_SYNC_TITLE')"
-                />
-                <service-account-auto-sync-form mode="CREATE"
-                                                :provider="props.provider"
-                />
+                >
+                    <template #title-right-extra>
+                        <p-link :href="serviceAccountPageStore.getters.autoSyncDocsLink"
+                                new-tab
+                                highlight
+                                action-icon="external-link"
+                                class="ml-3"
+                        >
+                            Docs
+                        </p-link>
+                    </template>
+                </p-heading>
+                <service-account-auto-sync-form />
             </p-pane-layout>
         </div>
 
@@ -299,7 +314,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                       :loading="formState.formLoading"
                       @click="handleSave"
             >
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.CREATE') }}
             </p-button>
             <p-button class="text-button"
                       style-type="tertiary"
@@ -309,7 +324,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
             </p-button>
         </div>
-        <p-button-modal :header-title="$t('Do you want to sync now?')"
+        <p-button-modal :header-title="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.SYNC_TITLE')"
                         size="sm"
                         :visible.sync="state.createModal"
                         @confirm="handleSync"

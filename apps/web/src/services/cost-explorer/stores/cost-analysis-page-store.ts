@@ -22,6 +22,7 @@ import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {
     RelativePeriod, Granularity, GroupBy, Period,
+    DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -61,6 +62,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         relativePeriod: undefined as RelativePeriod|undefined,
         filters: {} as Record<string, string[]>,
         enabledFiltersProperties: undefined as string[]|undefined,
+        displayDataType: 'cost' as DisplayDataType,
     });
     const getters = reactive({
         selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
@@ -146,6 +148,9 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
     const setRelativePeriod = (relativePeriod?: RelativePeriod) => {
         state.relativePeriod = relativePeriod;
     };
+    const setDisplayDataType = (dataType: DisplayDataType) => {
+        state.displayDataType = dataType;
+    };
 
     /* Actions */
     const reset = () => {
@@ -156,6 +161,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         state.relativePeriod = undefined;
         state.filters = {};
         state.enabledFiltersProperties = undefined;
+        state.displayDataType = 'cost';
     };
     const setQueryOptions = (options?: CostQuerySetModel['options']) => {
         reset();
@@ -248,6 +254,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
         setGroupBy,
         setPeriod,
         setRelativePeriod,
+        setDisplayDataType,
     };
 
     return {

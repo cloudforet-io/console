@@ -556,6 +556,7 @@
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
 				"DATA_SOURCE": "Data Source",
+				"DATA_TYPE": "Data Type",
 				"DEFAULT": "Default",
 				"DETAIL": {
 					"ORIGINAL_CURRENCY": "Original Currency"
@@ -2236,6 +2237,24 @@
 				"TITLE": "Create {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
+			"AUTO_SYNC": {
+				"DELETE_CHECK_MODAL": {
+					"DESC": "It cannot be deleted due to the trusted account which is set to be auto-synced. If necessary, disable the auto sync for that service account ({serviceAccountName}) in order to delete it.",
+					"TITLE": "Unable to delete it"
+				},
+				"DISABLED_SYNC_DESC": "The 'Sync Now' function is only available in Admin mode due to its domain-wide scope.",
+				"ERROR_FOUND": "Error Found",
+				"HOURLY_SYNC_SCHEDULE": "Hourly Sync Schedule",
+				"LAST_SYNCED": "Last Synced",
+				"MAIN_DESCRIPTION": "Automatically synchronize {provider} account hierarchy with SpaceONE system",
+				"MAPPING_METHOD": "Mapping Method",
+				"PROJECT_GROUP_MAPPING": "Project Group Mapping",
+				"SKIP_PROJECT_GROUP_MAPPING": "Skip project group mapping",
+				"START_SYNC": "Start syncing. This will take a few minutes.",
+				"SYNC_ERROR_MODAL_TITLE": "Auto Sync Error Details",
+				"SYNC_TITLE": "Do you want to sync now?",
+				"WORKSPACE_MAPPING": "Workspace Mapping"
+			},
 			"MAIN": {
 				"ACTION": "Action",
 				"ADD": "Add",
@@ -2553,6 +2572,7 @@
 			"ACCOUNT": "Account",
 			"ADDITIONAL_OPTIONS": "Additional Options",
 			"ALT_E_CHANGE_COLLECTOR_NAME": "Failed to Change Collector Name",
+			"ALT_E_COLLECTOR_SCHEDULE": "You can set a schedule with a maximum of 2 times (a day). ",
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
 			"ALT_E_DELETE_COLLECTOR": "Failed to Delete Collector",
 			"ALT_E_GET_COLLECTOR": "Failed to Get Collector",
@@ -2742,6 +2762,47 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"AGENT": {
+				"ACTIVATE": "Activate",
+				"ACTIVATE_MODAL_TEXT": "Are you sure you want to activate your cluster?",
+				"ACTIVE": "Active",
+				"CLUSTER_DETAIL_HEADER": "Cluster Details",
+				"CONNECT_CLUSTER": "Connect Cluster",
+				"CONNECT_CLUSTER_HEADER": "Connect Cluster",
+				"DEACTIVATE": "Deactivate",
+				"DEACTIVATE_MODAL_TEXT": "Are you sure you want to deactivate your cluster?",
+				"DELETE": "Delete",
+				"DELETE_CLUSTER_MODAL_TEXT": "Delete Connected Cluster",
+				"DELETE_WARNING": "If you delete your account, you will lose all of your data.",
+				"DISCONNECTED_CLUSTER_TEXT": "A cluster has not been connected yet.",
+				"INACTIVE": "Inactive",
+				"RECONNECT": "Reconnect"
+			},
+			"CLUSTER_MODAL": {
+				"CANCEL": "Cancel",
+				"CHECKLIST_OPTION_LABEL": "Checklist - before connecting cluster",
+				"CLUSTER_NAME": "Cluster Name",
+				"CLUSTER_NAME_INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
+				"CONNECT_CLUSTER_WARNING": "You must have the SpaceONE Helm repository on your system before continuing.",
+				"CONTINUE_BUTTON": "Continue",
+				"COPIED": "Copied",
+				"COPY_CODE": "Copy Code",
+				"DONE_BUTTON": "Done",
+				"FIND_OUT": "Find out",
+				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
+				"FIRST_TITLE": "To connect your cluster, \nyou need a few setups.",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "To find out the kube-state-metrics, enter the command below:",
+				"LOADING": "Waiting for new key...",
+				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "hide",
+				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "Learn how to find out",
+				"PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE": "To find out the prometheus-node-exporter, enter the command below:",
+				"SCRIPT_GUIDE_FIRST": "Check the version run the following command:",
+				"SCRIPT_GUIDE_SECOND": "To create the SpaceONE Helm repository, \nplease run the following command:",
+				"SCRIPT_GUIDE_THIRD": "Copy and paste the following code into your cloud shell or terminal.",
+				"SECOND_TITLE": "Install Helm on your system \nby following the instructions below.",
+				"THIRD_TITLE": "This is the final step. \nConnect to the Kubernetes cluster.",
+				"THIRD_TITLE_RECONNECT": "Reconnect to the Kubernetes cluster."
+			},
 			"CREATE": {
 				"COMPLETE_MODAL_SYNC": "Sync Now",
 				"TIMEZONE": "Time Zone: {timezone}, Max: 2 Times"
@@ -2770,6 +2831,7 @@
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "Project is required",
 				"SAVE": "Save Changes",
+				"SYNCING": "Syncing",
 				"SYNC_NOW": "Sync Now",
 				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. ",
 				"UPDATE_SUCCESS": "Auto Sync settings successfully changed."

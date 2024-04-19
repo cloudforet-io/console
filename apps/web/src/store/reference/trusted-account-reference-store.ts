@@ -18,7 +18,7 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type TrustedAccountItem = Required<Pick<ReferenceItem<TrustedAccountModel>, 'key'|'label'|'name'>>;
+export type TrustedAccountItem = Required<Pick<ReferenceItem<TrustedAccountModel>, 'key'|'label'|'name'|'data'>>;
 export type TrustedAccountReferenceMap = ReferenceMap<TrustedAccountItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
@@ -56,7 +56,7 @@ export const useTrustedAccountReferenceStore = defineStore('reference-trusted-ac
         try {
             const response = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
                 query: {
-                    only: ['trusted_account_id', 'name', 'resource_group'],
+                    only: ['trusted_account_id', 'name', 'resource_group', 'schedule'],
                 },
             }, { timeout: 3000 });
 
@@ -65,6 +65,7 @@ export const useTrustedAccountReferenceStore = defineStore('reference-trusted-ac
                     key: trustedAccountInfo.trusted_account_id,
                     label: trustedAccountInfo.name,
                     name: trustedAccountInfo.name,
+                    data: trustedAccountInfo,
                 };
             });
             state.items = referenceMap;
@@ -81,6 +82,7 @@ export const useTrustedAccountReferenceStore = defineStore('reference-trusted-ac
                 key: trustedAccountInfo.trusted_account_id,
                 label: trustedAccountInfo.name,
                 name: trustedAccountInfo.name,
+                data: trustedAccountInfo,
             },
         };
     };
