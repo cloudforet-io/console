@@ -2733,6 +2733,18 @@
 			"GRANULARITY": "세부 기준",
 			"GROUP_BY": "그룹별 통계",
 			"HIDE_ALL": "전체 숨김",
+			"MAIN": {
+				"ANALYZE_DATA": "",
+				"ANALYZE_DATA_DESC": "",
+				"CONFIGURE_ALERTS": "",
+				"CONFIGURE_ALERTS_DESC": "",
+				"LEARN_MORE": "",
+				"LOCATE_METRICS": "",
+				"LOCATE_METRICS_DESC": "",
+				"RECENTLY_VISITED": "",
+				"TITLE": "",
+				"UPCOMING": ""
+			},
 			"METRIC_EXPLORER": "",
 			"METRIC_EXPLORER_HOME": "",
 			"MONTHLY": "월별 데이터",
