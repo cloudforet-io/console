@@ -15,10 +15,9 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 import { store } from '@/store';
 
 import { CostReportDetailPath } from '@/router/constant';
-import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
+import { getRouteScope } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -37,7 +36,6 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
-import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
 const route = useRoute();
@@ -58,7 +56,6 @@ const state = reactive({
 });
 
 const appContextStore = useAppContextStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -91,15 +88,6 @@ watch(() => route.path, () => {
         && state.routeScope !== 'EXCLUDE_AUTH'
         && !state.isEmailVerified
         && !LocalStorageAccessor.getItem('hideNotificationEmailModal');
-}, { immediate: true });
-
-
-watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
-        if (userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin']) {
-            router.push({ name: LANDING_ROUTE._NAME }).catch(() => false);
-        }
-    }
 }, { immediate: true });
 
 watch(() => state.userId, (userId) => {
