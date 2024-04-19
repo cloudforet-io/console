@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
@@ -21,7 +21,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
+    filterByFolder: computed<string|undefined>(() => bookmarkGetters.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkGetters.isFileFullMode),
 });
@@ -29,25 +29,24 @@ const storeState = reactive({
 const handleClickFullModeButton = () => {
     bookmarkStore.setFullMode(!storeState.isFullMode);
 };
-const handleClickActionButton = (type: BookmarkModalType) => {
-    bookmarkStore.setModalType(type);
+const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
+    bookmarkStore.setModalType(type, isEdit, isNew);
 };
-const handleClickFolder = (idx: number, name: string) => {
-    if (storeState.activeFolderName === name) {
-        bookmarkStore.setActiveButtonIdx(undefined);
+const handleClickFolder = (item: BookmarkItem) => {
+    if (storeState.filterByFolder === item.name) {
+        bookmarkStore.setSelectedBookmark(undefined);
         return;
     }
-    bookmarkStore.setActiveButtonIdx(idx);
+    bookmarkStore.setSelectedBookmark(item);
 };
-
-watch(() => storeState.activeFolderName, (activeFolderName) => {
-    bookmarkStore.fetchBookmarkList(activeFolderName);
-}, { immediate: true });
+const handleGoBackButton = () => {
+    bookmarkStore.setFileFullMode(false);
+};
 </script>
 
 <template>
     <div class="bookmark-header">
-        <p-field-title :label="storeState.isFileFullMode ? storeState.activeFolderName : $t('HOME.BOOKMARK_TITLE')"
+        <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARK_TITLE')"
                        size="lg"
         >
             <template v-if="storeState.isFileFullMode"
@@ -56,7 +55,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                 <p-icon-button name="ic_arrow-left"
                                style-type="transparent"
                                size="sm"
-                               @click="bookmarkStore.setFileFullMode(false)"
+                               @click="handleGoBackButton"
                 />
                 <div class="folder-icon-wrapper">
                     <p-i name="ic_folder-filled"
@@ -71,7 +70,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                 <div class="title-right-wrapper">
                     <p-icon-button name="ic_edit-text"
                                    size="sm"
-                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                                   @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER, true)"
                     />
                     <p-icon-button name="ic_delete"
                                    size="sm"
@@ -88,10 +87,10 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
                           :key="idx"
                           style-type="tertiary"
                           class="folders-button"
-                          :class="{'active': storeState.activeFolderName === item.name}"
-                          @click="handleClickFolder(idx, item.name)"
+                          :class="{'active': storeState.filterByFolder === item.name}"
+                          @click="handleClickFolder(item)"
                 >
-                    <p-icon-button v-if="storeState.activeFolderName === item.name"
+                    <p-icon-button v-if="storeState.filterByFolder === item.name"
                                    name="ic_close"
                                    style-type="transparent"
                                    size="sm"
@@ -126,7 +125,7 @@ watch(() => storeState.activeFolderName, (activeFolderName) => {
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
                       :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
-                      @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK)"
+                      @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
             >
                 {{ $t('HOME.BOOKMARK_ADD_LINK') }}
             </p-button>

@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton,
-    PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
+    PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkList?: BookmarkItem[],
@@ -29,12 +30,15 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
+    modal: computed<BookmarkModalStateType>(() => bookmarkGetters.modal),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkGetters.selectedBookmark),
+    isFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFullMode),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFileFullMode),
 });
 const state = reactive({
     loading: false,
     selectedFolderIdx: undefined as number|undefined,
-    selectedFolder: computed<string|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx]?.name : undefined)),
+    selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
 });
 
 const {
@@ -67,26 +71,54 @@ const handleClickNewFolderButton = async () => {
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        await bookmarkStore.createBookmarkLink({
-            name: name.value,
-            link: link.value,
-            folder: state.selectedFolder,
-        });
-        await bookmarkStore.setActiveButtonIdx(state.selectedFolderIdx);
+        if (storeState.modal.isEdit) {
+            await bookmarkStore.updateBookmarkLink({
+                id: storeState.selectedBookmark?.id || '',
+                name: name.value,
+                link: link.value,
+                folder: state.selectedFolder?.id,
+            });
+        } else {
+            await bookmarkStore.createBookmarkLink({
+                name: name.value,
+                link: link.value,
+                folder: state.selectedFolder?.id,
+            });
+            showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
+        }
+        if (storeState.isFullMode && state.selectedFolder?.id) {
+            await bookmarkStore.setFileFullMode(true, state.selectedFolder);
+        } else if (!state.selectedFolder?.id) {
+            await bookmarkStore.setFullMode(true);
+        }
+        await bookmarkStore.setSelectedBookmark(state.selectedFolder);
         await handleClose();
     } finally {
         state.loading = false;
     }
 };
+
+watch(() => storeState.modal.type, (type) => {
+    if (type !== BOOKMARK_MODAL_TYPE.LINK) return;
+    if (storeState.modal.isEdit) {
+        setForm('name', storeState.selectedBookmark?.name || '');
+        setForm('link', storeState.selectedBookmark?.link || '');
+        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
+        return;
+    }
+    if (!storeState.modal.isNew && storeState.selectedBookmark) {
+        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <p-button-modal class="bookmark-link-form-modal"
-                    :header-title="$t('HOME.BOOKMARK_ADD_LINK')"
+                    :header-title="storeState.modal.isEdit ? $t('HOME.BOOKMARK_EDIT_LINK') : $t('HOME.BOOKMARK_ADD_LINK')"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :visible="storeState.type === BOOKMARK_MODAL_TYPE.LINK"
+                    :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.LINK"
                     :disabled="name === ''"
                     :loading="state.loading"
                     @confirm="handleConfirm"
@@ -155,6 +187,10 @@ const handleConfirm = async () => {
                 </p-field-group>
             </div>
         </template>
+        <template #confirm-button>
+            <span v-if="storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_EDIT') }}</span>
+            <span v-else>{{ $t('HOME.BOOKMARK_ADD') }}</span>
+        </template>v
     </p-button-modal>
 </template>
 

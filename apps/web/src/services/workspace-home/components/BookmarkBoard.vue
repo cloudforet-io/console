@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onBeforeUnmount, onMounted, reactive, ref,
+} from 'vue';
 
-import { PBoard, PLazyImg, PI } from '@spaceone/design-system';
+import {
+    PBoard, PLazyImg, PI, PIconButton, PContextMenu,
+} from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
@@ -12,7 +18,7 @@ import { blue, gray } from '@/styles/colors';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkBoardSet, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     boardSets: BookmarkBoardSet[];
@@ -28,6 +34,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 
+const boardItemEl = ref<HTMLElement | null>(null);
+
 const state = reactive({
     boardSets: computed<BookmarkBoardSet[]>(() => {
         const result: BookmarkBoardSet[] = props.boardSets;
@@ -41,16 +49,65 @@ const state = reactive({
         }
         return result;
     }),
+    menuItems: computed<MenuItem[]>(() => {
+        const defaultSets: MenuItem[] = [
+            {
+                icon: 'ic_edit',
+                name: 'edit',
+                label: i18n.t('HOME.BOOKMARK_EDIT'),
+            },
+            {
+                icon: 'ic_delete',
+                name: 'delete',
+                label: i18n.t('HOME.BOOKMARK_REMOVE'),
+            },
+        ];
+        if (props.isFolderBoard) {
+            return [
+                {
+                    icon: 'ic_plus',
+                    name: 'add',
+                    label: i18n.t('HOME.BOOKMARK_ADD_LINK'),
+                },
+                { type: CONTEXT_MENU_TYPE.divider },
+                ...defaultSets,
+            ];
+        }
+        return defaultSets;
+    }),
+    menuVisible: false,
 });
 
+const handleClickDropdownButton = (item: BookmarkItem) => {
+    state.menuVisible = !state.menuVisible;
+    bookmarkStore.setSelectedBookmark(item, true);
+};
+const handleSelectDropdownMenu = (item: MenuItem) => {
+    if (item.name === 'edit') {
+        if (props.isFolderBoard) {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER, true);
+        } else {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK, true);
+        }
+        return;
+    }
+    if (item.name === 'delete') {
+        if (props.isFolderBoard) {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
+        } else {
+            bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.DELETE_LINK);
+        }
+        return;
+    }
+
+    bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.LINK, false);
+};
 const handleClickItem = (item) => {
     if (props.isFolderBoard) {
         if (item.icon) {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER);
         } else {
-            const idx = state.boardSets.findIndex((i) => i.name === item.name);
-            bookmarkStore.setFileFullMode(true);
-            bookmarkStore.setActiveButtonIdx(idx - 1);
+            bookmarkStore.setFileFullMode(true, item);
         }
         return;
     }
@@ -60,6 +117,22 @@ const handleClickItem = (item) => {
         window.open(item.link, '_blank');
     }
 };
+
+const handleClickOutside = (event) => {
+    if (!props.isFullMode) return;
+    if (!event.relatedTarget) {
+        state.menuVisible = false;
+    }
+};
+
+
+onMounted(() => {
+    document.addEventListener('focusout', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('focusout', handleClickOutside);
+});
 </script>
 
 <template>
@@ -67,10 +140,13 @@ const handleClickItem = (item) => {
              selectable
              :style-type="BOARD_STYLE_TYPE.cards"
              class="bookmark-board"
+             :class="{'full-mode': props.isFullMode, 'folder': props.isFolderBoard}"
              @item-click="handleClickItem"
     >
         <template #item-content="{board}">
-            <div class="board-item">
+            <div ref="boardItemEl"
+                 class="board-item"
+            >
                 <div v-if="props.isFolderBoard"
                      class="image-wrapper"
                 >
@@ -95,6 +171,8 @@ const handleClickItem = (item) => {
                         :src="assetUrlConverter(board.imgIcon)"
                         width="1.5rem"
                         height="1.5rem"
+                        error-icon="ic_globe-filled"
+                        :error-icon-color="gray[500]"
                         class="icon"
                     />
                     <div v-else-if="board.icon"
@@ -106,12 +184,6 @@ const handleClickItem = (item) => {
                              :color="gray[700]"
                         />
                     </div>
-                    <p-i v-else
-                         name="ic_globe-filled"
-                         width="1.5rem"
-                         height="1.5rem"
-                         :color="gray[500]"
-                    />
                 </div>
                 <div class="text-wrapper">
                     <p class="bookmark-label">
@@ -123,6 +195,21 @@ const handleClickItem = (item) => {
                         {{ board.link }}
                     </p>
                 </div>
+                <div v-if="(props.isFolderBoard && !board.icon) || !props.isFolderBoard"
+                     class="toolsets-wrapper"
+                >
+                    <p-icon-button name="ic_ellipsis-horizontal"
+                                   size="md"
+                                   :color="blue[600]"
+                                   @click.stop="handleClickDropdownButton(board)"
+                    />
+                    <p-context-menu v-if="state.menuVisible"
+                                    :menu="state.menuItems"
+                                    class="toolsets-context-menu"
+                                    no-select-indication
+                                    @select="handleSelectDropdownMenu"
+                    />
+                </div>
             </div>
         </template>
     </p-board>
@@ -132,6 +219,40 @@ const handleClickItem = (item) => {
 .bookmark-board {
     @apply grid gap-2 text-label-md;
 
+    &.folder {
+        /* custom design-system component - p-board-item */
+        :deep(.p-board-item) {
+            .board-item {
+                .image-wrapper {
+                    @apply bg-blue-200;
+                }
+            }
+        }
+    }
+
+    &.full-mode {
+        /* custom design-system component - p-board-item */
+        :deep(.p-board-item) {
+            @apply border-gray-200;
+            padding: 0.5rem;
+            .board-item {
+                .image-wrapper {
+                    @apply bg-gray-100;
+                }
+            }
+
+            &:hover {
+                @apply border-blue-500;
+                .toolsets-wrapper {
+                    @apply block;
+                }
+                .board-item .text-wrapper {
+                    max-width: calc(100% - 5rem);
+                }
+            }
+        }
+    }
+
     /* custom design-system component - p-board-item */
     :deep(.p-board-item) {
         @apply relative border-gray-150;
@@ -140,6 +261,10 @@ const handleClickItem = (item) => {
         padding: 0.5rem 0.75rem 0.5rem 0.5rem;
         border-radius: 0.75rem;
         box-shadow: none;
+        &:hover {
+            @apply bg-white border border-blue-500;
+            box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
+        }
         .content {
             width: 100%;
         }
@@ -166,6 +291,25 @@ const handleClickItem = (item) => {
                 .bookmark-link {
                     @apply text-label-sm text-gray-500 truncate;
                 }
+            }
+        }
+
+        .toolsets-wrapper {
+            @apply absolute hidden bg-blue-300 rounded-full;
+            top: 0.75rem;
+            right: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+
+            /* custom design-system component - p-icon-button */
+            :deep(.p-icon-button) {
+                @apply relative;
+            }
+            .toolsets-context-menu {
+                @apply absolute;
+                right: 0;
+                min-width: 7.25rem;
+                z-index: 10;
             }
         }
     }

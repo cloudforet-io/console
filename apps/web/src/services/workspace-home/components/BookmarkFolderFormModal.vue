@@ -11,7 +11,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -25,11 +25,14 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
-    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
+    filterByFolder: computed<string|undefined>(() => bookmarkGetters.filterByFolder),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkGetters.selectedBookmark),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFileFullMode),
+    modal: computed<BookmarkModalStateType>(() => bookmarkGetters.modal),
 });
 const state = reactive({
     loading: false,
+    bookmark: computed<string|undefined>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
 });
 
 const {
@@ -44,7 +47,7 @@ const {
     name: '',
 }, {
     name(value: string) {
-        if (storeState.activeFolderName === value) return '';
+        if (state.bookmark === value) return '';
         const duplicatedName = props.bookmarkFolderList?.find((item) => item.name === value);
         if (duplicatedName) {
             return i18n.t('HOME.ALT_E_DUPLICATED_NAME');
@@ -60,26 +63,41 @@ const handleClose = () => {
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        await bookmarkStore.createBookmarkFolder(name.value);
+        if (storeState.modal.isEdit) {
+            await bookmarkStore.updateBookmarkFolder({
+                id: storeState.selectedBookmark?.id,
+                name: name.value,
+            });
+            if (storeState.isFileFullMode) {
+                await bookmarkStore.setSelectedBookmark({
+                    ...storeState.selectedBookmark,
+                    name: name.value,
+                });
+            }
+        } else {
+            await bookmarkStore.createBookmarkFolder(name.value);
+        }
         await handleClose();
     } finally {
         state.loading = false;
     }
 };
 
-watch(() => storeState.activeFolderName, () => {
-    setForm('name', storeState.activeFolderName || '');
+watch(() => storeState.modal.isEdit, (isEditModal) => {
+    if (isEditModal) {
+        setForm('name', state.bookmark || '');
+    }
 }, { immediate: true });
 </script>
 
 <template>
     <p-button-modal class="bookmark-folder-form-modal"
-                    :header-title="storeState.activeFolderName ? $t('HOME.BOOKMARK_EDIT_FOLDER') : $t('HOME.BOOKMARK_CREATE_FOLDER')"
+                    :header-title="storeState.modal.isEdit ? $t('HOME.BOOKMARK_EDIT_FOLDER') : $t('HOME.BOOKMARK_CREATE_FOLDER')"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :visible="storeState.type === BOOKMARK_MODAL_TYPE.FOLDER"
-                    :disabled="(name === '' || invalidState.name) || storeState.activeFolderName === name"
+                    :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
+                    :disabled="(name === '' || invalidState.name) || state.bookmark === name"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -102,10 +120,9 @@ watch(() => storeState.activeFolderName, () => {
                 </p-field-group>
             </div>
         </template>
-        <template v-if="storeState.activeFolderName"
-                  #confirm-button
-        >
-            <span>{{ $t('HOME.BOOKMARK_EDIT') }}</span>
+        <template #confirm-button>
+            <span v-if="storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_EDIT') }}</span>
+            <span v-else>{{ $t('HOME.BOOKMARK_CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

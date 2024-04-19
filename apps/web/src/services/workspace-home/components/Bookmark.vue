@@ -10,8 +10,9 @@ import BookmarkFolderFormModal from '@/services/workspace-home/components/Bookma
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
 import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
+import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceStoreGetters = userWorkspaceStore.getters;
@@ -25,6 +26,7 @@ const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
+    modalType: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modal.type),
 });
 const state = reactive({
     boardSets: computed<BookmarkBoardSet[]>(() => storeState.bookmarkList.map((d) => ({
@@ -56,11 +58,16 @@ watch(() => storeState.currentWorkspaceId, async () => {
                         :board-sets="state.boardSets"
                         class="bookmark-board-wrapper"
         />
-        <bookmark-folder-form-modal :bookmark-folder-list="storeState.bookmarkFolderList" />
-        <bookmark-link-form-modal :bookmark-folder-list="storeState.bookmarkFolderList"
+        <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
+                                    :bookmark-folder-list="storeState.bookmarkFolderList"
+        />
+        <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
+                                  :bookmark-folder-list="storeState.bookmarkFolderList"
                                   :bookmark-list="storeState.bookmarkList"
         />
-        <bookmark-delete-modal />
+        <bookmark-delete-modal
+            v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK"
+        />
     </div>
 </template>
 

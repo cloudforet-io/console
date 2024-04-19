@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PButtonModal, PI } from '@spaceone/design-system';
+import { PButtonModal, PI, PLazyImg } from '@spaceone/design-system';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import { gray } from '@/styles/colors';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const storeState = reactive({
-    activeFolderName: computed<string|undefined>(() => bookmarkGetters.activeFolderName),
-    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modalType),
+    bookmarkFolderList: computed<BookmarkItem[]|undefined>(() => bookmarkGetters.bookmarkFolderList),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkGetters.selectedBookmark),
+    type: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modal.type),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFileFullMode),
 });
 const state = reactive({
     loading: false,
@@ -20,7 +26,28 @@ const state = reactive({
     isLink: computed<boolean>(() => storeState.type === BOOKMARK_MODAL_TYPE.DELETE_LINK),
 });
 
-const handleConfirm = () => {};
+const handleConfirm = async () => {
+    state.loading = true;
+    try {
+        if (state.isFolder) {
+            await bookmarkStore.deleteBookmarkFolder(storeState.selectedBookmark?.id);
+        } else {
+            await bookmarkStore.deleteBookmarkLink(storeState.selectedBookmark?.id);
+        }
+        if (storeState.isFileFullMode) {
+            if (state.isFolder) {
+                bookmarkStore.setFullMode(true);
+                bookmarkStore.setSelectedBookmark(undefined);
+            } else {
+                const folder = storeState.bookmarkFolderList?.find((i) => i.id === storeState.selectedBookmark?.folder);
+                bookmarkStore.setSelectedBookmark(folder);
+            }
+        }
+        await handleClose();
+    } finally {
+        state.loading = false;
+    }
+};
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
 };
@@ -49,8 +76,17 @@ const handleClose = () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
+                    <p-lazy-img
+                        v-else
+                        :src="assetUrlConverter(storeState.selectedBookmark?.imgIcon)"
+                        width="1.5rem"
+                        height="1.5rem"
+                        error-icon="ic_globe-filled"
+                        :error-icon-color="gray[500]"
+                        class="icon"
+                    />
                 </div>
-                <span>{{ state.isFolder ? storeState.activeFolderName : '' }}</span>
+                <span>{{ storeState.selectedBookmark?.name }}</span>
             </div>
         </template>
         <template #confirm-button>
