@@ -4,7 +4,7 @@ import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PFieldTitle,
+    PFieldTitle, PToolbox, PEmpty,
 } from '@spaceone/design-system';
 import { uniq } from 'lodash';
 
@@ -13,6 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
@@ -51,15 +52,34 @@ const state = reactive({
             parentId: d.data.groupInfo?.id,
             projectType: d.data.projectType,
         }));
-        return allProjectList.filter((item) => item.parentId === state.currentProjectGroupId);
+        return allProjectList.filter((item) => item.parentId === state.currentProjectGroupId).slice(state.pageSize * (state.pageStart - 1), state.pageSize * state.pageStart);
     }),
+    filteredCurrentProjectGroupList: computed(() => state.currentProjectGroupList.filter((item) => item.name.includes(state.searchText))),
+    filteredCurrentProjectList: computed(() => state.currentProjectList.filter((item) => item.name.includes(state.searchText))),
+    pageSize: 24,
+    pageStart: 1,
+    searchText: '',
+    searchResultLabelText: computed(() => `${i18n.t('Search Result for')} "${state.searchText}"`),
 });
 
+/* Event */
+const handleChange = async (options?: any) => {
+    if (options?.searchText !== undefined) {
+        state.searchText = options.searchText;
+    }
+    if (options?.pageLimit !== undefined) {
+        state.pageSize = options.pageLimit;
+    }
+    if (options?.pageStart !== undefined) {
+        state.pageStart = options.pageStart;
+    }
 
+    console.debug(options);
+    // await fetchAll();
+};
 
 /* Utill */
 const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
-
 
 const listServiceAccount = async () => {
     try {
@@ -84,7 +104,46 @@ onMounted(async () => {
 
 <template>
     <div class="project-main">
-        <div class="project-contents">
+        <p-toolbox class="project-tool-box"
+                   :page-size="state.pageSize"
+                   :total-count="storeState.project.length"
+                   @change="handleChange"
+                   @refresh="handleChange()"
+        />
+        <div v-if="state.searchText"
+             class="search-result-contents"
+        >
+            <p class="search-result-label">
+                {{ state.searchResultLabelText }}
+            </p>
+            <div class="result-wrapper">
+                <div class="card-contents mb-6">
+                    <project-main-project-group-card v-for="(projectGroup, idx) in state.filteredCurrentProjectGroupList"
+                                                     :key="`project-group-${idx}`"
+                                                     :item="projectGroup"
+                                                     :search-keyword="state.searchText"
+                    />
+                </div>
+                <div class="card-contents">
+                    <project-main-project-card v-for="(project, idx) in state.filteredCurrentProjectList"
+                                               :key="`project-${idx}`"
+                                               :item="project"
+                                               :service-account-provider-list="getDistinctProviders(project.id)"
+                                               :search-keyword="state.searchText"
+                    />
+                </div>
+                <p-empty v-if="!state.filteredCurrentProjectGroupList.length && !state.filteredCurrentProjectList.length"
+                         show-image
+                >
+                    <div class="empty-content">
+                        <p>{{ $t('Looks like there is no result') }}</p>
+                    </div>
+                </p-empty>
+            </div>
+        </div>
+        <div v-else
+             class="project-contents"
+        >
             <div v-if="state.currentProjectGroupList.length"
                  class="contents-wrapper"
             >
@@ -129,6 +188,15 @@ onMounted(async () => {
 <style scoped lang="postcss">
 .project-main {
 
+    .project-tool-box {
+        margin-bottom: 0.5rem;
+    }
+
+    .search-result-label {
+        @apply text-label-md font-bold text-gray-900;
+        margin-bottom: 1.5rem;
+    }
+
     .project-contents {
         .contents-wrapper {
             margin-bottom: 1.5rem;
@@ -136,13 +204,15 @@ onMounted(async () => {
             .content-title {
                 margin-bottom: 0.5rem;
             }
-
-            .card-contents {
-                @apply grid;
-                gap: 1rem;
-                grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
-            }
         }
+    }
+    .card-contents {
+        @apply grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+    }
+    .empty-content {
+        width: 20rem;
     }
 }
 </style>
