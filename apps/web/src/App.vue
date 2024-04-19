@@ -18,14 +18,12 @@ import { CostReportDetailPath } from '@/router/constant';
 import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
-import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -60,7 +58,6 @@ const state = reactive({
 });
 
 const appContextStore = useAppContextStore();
-const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -98,7 +95,7 @@ watch(() => route.path, () => {
 
 watch(() => route.name, (routeName) => {
     if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
-        state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
+        state.hasNoWorkspace = router.push({ name: LANDING_ROUTE._NAME }).catch(() => false);
     }
 }, { immediate: true });
 
@@ -187,7 +184,6 @@ watch(() => state.userId, (userId) => {
                           button-type="primary"
                           @clickButton="goToSignIn"
             />
-            <has-no-workspace-modal :visible.sync="state.hasNoWorkspace" />
             <notification-email-modal
                 v-if="state.smtpEnabled"
                 :user-id="state.userId"
