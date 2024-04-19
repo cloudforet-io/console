@@ -15,6 +15,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import {
     getRefinedMetricDataAnalyzeQueryGroupBy,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
@@ -40,6 +46,15 @@ const state = reactive({
         ...state.groupByFields,
         ...state.dateFields,
     ]),
+    excelFields: computed<ExcelDataField[]>(() => {
+        const fields: DataTableFieldType[] = [];
+        if (metricExplorerPageGetters.selectedGroupByItems.length) fields.push(...state.groupByFields);
+        fields.push(...state.dateFields);
+        return fields.map((d) => {
+            const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            return field;
+        });
+    }),
     items: [] as any[],
     thisPage: 1,
     pageSize: 15,
@@ -95,6 +110,17 @@ const handleChange = async (options: any = {}) => {
 const handleUpdateThisPage = async () => {
     await setDataTableData();
 };
+const handleExport = async () => {
+    try {
+        await downloadExcel({
+            data: state.items,
+            fields: state.excelFields,
+            file_name_prefix: FILE_NAME_PREFIX.metricExplorer,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 watch(
     [
@@ -102,6 +128,7 @@ watch(
         () => metricExplorerPageState.period,
         () => metricExplorerPageState.selectedOperator,
         () => metricExplorerPageState.selectedChartGroupBy,
+        () => metricExplorerPageGetters.consoleFilters,
     ],
     async ([metricId]) => {
         if (!metricId) return;
@@ -128,6 +155,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
+                     @export="handleExport"
     >
         <template #pagination-area>
             <p-text-pagination :this-page.sync="state.thisPage"

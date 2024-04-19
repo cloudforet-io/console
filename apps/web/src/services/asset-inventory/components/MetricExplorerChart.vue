@@ -132,6 +132,7 @@ watch([
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,
+    () => metricExplorerPageGetters.consoleFilters,
 ], async ([metricId]) => {
     if (!metricId) return;
     await setChartData();
