@@ -18,6 +18,7 @@ import { CostReportDetailPath } from '@/router/constant';
 import { getRouteScope, makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -53,11 +54,11 @@ const state = reactive({
     email: computed<string>(() => store.state.user.email),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    hasNoWorkspace: false,
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
 });
 
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -95,7 +96,9 @@ watch(() => route.path, () => {
 
 watch(() => route.name, (routeName) => {
     if (routeName && routeName !== makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME) && state.routeScope !== 'EXCLUDE_AUTH') {
-        state.hasNoWorkspace = router.push({ name: LANDING_ROUTE._NAME }).catch(() => false);
+        if (userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin']) {
+            router.push({ name: LANDING_ROUTE._NAME }).catch(() => false);
+        }
     }
 }, { immediate: true });
 
