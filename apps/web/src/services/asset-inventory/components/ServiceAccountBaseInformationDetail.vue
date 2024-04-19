@@ -5,7 +5,6 @@ import { PDynamicLayout } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -13,26 +12,27 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 import type { ItemLayout } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const props = defineProps<{
-    provider?: string;
-    serviceAccountData?: Record<string, any>;
-    serviceAccountType: AccountType;
     loading?: boolean;
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
+const serviceAccountPageState = serviceAccountPageStore.state;
 const userWorkspaceStore = useUserWorkspaceStore();
 
 const state = reactive({
     timezone: computed<string>(() => store.state.user.timezone),
     detailSchema: {} as ItemLayout,
     fieldHandler: [],
+    isTrustedAccount: computed(() => serviceAccountPageState.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     baseInformationData: computed(() => {
-        const accountType = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED ? 'Trusted Account' : 'General Account';
+        const accountType = state.isTrustedAccount ? 'Trusted Account' : 'General Account';
         return ({
-            ...props.serviceAccountData,
+            ...serviceAccountPageState.originServiceAccountItem,
             account_type: accountType,
         } ?? {});
     }),
@@ -46,17 +46,16 @@ const fieldHandler = (field) => {
     return {};
 };
 
-watch(() => props.provider, async (provider) => {
+watch(() => serviceAccountPageState.selectedProvider, async (provider) => {
     if (provider) {
         await serviceAccountSchemaStore.setProviderSchema(provider);
         await serviceAccountSchemaStore.setGeneralAccountDetailSchema();
         await serviceAccountSchemaStore.setTrustedAccountDetailSchema();
 
-        const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
-        const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
+        const detailSchema = state.isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
         if (detailSchema) state.detailSchema = detailSchema;
     }
-});
+}, { immediate: true });
 </script>
 
 <template>

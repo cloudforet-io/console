@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PPaneLayout, PHeading,
@@ -8,13 +8,10 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
-import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
@@ -27,73 +24,47 @@ import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
-    provider?: string;
     serviceAccountId?: string;
     editable: boolean;
     serviceAccountLoading: boolean;
-    serviceAccountType: AccountType;
-    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    provider: undefined,
     serviceAccountId: undefined,
     editable: false,
     serviceAccountLoading: false,
-    serviceAccountType: ACCOUNT_TYPE.GENERAL,
-    serviceAccountData: undefined,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void; }>();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const serviceAccountPageStore = useServiceAccountPageStore();
 
 interface State {
     loading: boolean;
     isTrustedAccount: ComputedRef<boolean>;
-    providerData: Partial<ProviderModel>;
     mode: PageMode;
-    isFormValid: boolean|undefined;
+    isFormValid: ComputedRef<boolean|undefined>;
     baseInformationSchema: ComputedRef<Partial<SchemaModel>>;
-    baseInformationForm: Partial<BaseInformationForm>;
-    originBaseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
+    baseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
 }
 const state = reactive<State>({
     loading: false,
-    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
-    providerData: {},
+    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     mode: 'READ',
-    isFormValid: undefined,
+    isFormValid: computed(() => serviceAccountPageStore.formState.isBaseInformationFormValid),
     // baseInformationSchema: {},
     baseInformationSchema: computed(() => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema)),
-    baseInformationForm: {},
-    originBaseInformationForm: computed(() => ({
-        accountName: props.serviceAccountData?.name,
-        customSchemaForm: props.serviceAccountData?.data,
-        tags: props.serviceAccountData?.tags,
-        ...((!state.isTrustedAccount && props.serviceAccountData && ('project_id' in props.serviceAccountData)) && {
-            projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
-        }),
-    })),
+    baseInformationForm: computed(() => serviceAccountPageStore.formState.baseInformation),
 });
 
 /* Api */
-const getProvider = async () => {
-    try {
-        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
-            provider: props.provider ?? '',
-            workspace_id: undefined,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.providerData = {};
-    }
-};
 
 const updateServiceAccount = async () => {
     try {
@@ -139,13 +110,6 @@ const handleChangeForm = (form) => {
     state.baseInformationForm = form;
 };
 
-/* Watcher */
-watch(() => props.provider, async (provider) => {
-    if (provider) {
-        await getProvider();
-    }
-});
-
 </script>
 
 <template>
@@ -165,17 +129,11 @@ watch(() => props.provider, async (provider) => {
         </p-heading>
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="state.mode === 'READ'"
-                                                     :provider="props.provider"
-                                                     :service-account-data="props.serviceAccountData"
-                                                     :service-account-type="props.serviceAccountType"
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
-                                                   :is-update-mode="state.mode === 'UPDATE'"
+                                                   mode="UPDATE"
                                                    :schema="state.baseInformationSchema.schema"
-                                                   :is-valid.sync="state.isFormValid"
-                                                   :origin-form="state.originBaseInformationForm"
-                                                   :account-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
             <div v-if="state.mode === 'UPDATE'"
