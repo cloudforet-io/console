@@ -2191,6 +2191,7 @@
 				"ALT_E_CREATE_ACCOUNT_TITLE": "サービスアカウントの作成に失敗",
 				"ALT_S_CREATE_ACCOUNT_DESC": "サービス·アカウントの登録に成功しました。",
 				"ALT_S_CREATE_ACCOUNT_TITLE": "サービスアカウントの追加完了",
+				"AUTO_SYNC_TITLE": "オートシンク",
 				"BASE_NAME_PLACEHOLDER": "サービスアカウント名",
 				"BASE_TITLE": "基本情報",
 				"CANCEL": "キャンセル",
@@ -2221,6 +2222,24 @@
 				"TAG_LABEL": "タグ",
 				"TITLE": "{type} 追加",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
+			},
+			"AUTO_SYNC": {
+				"DELETE_CHECK_MODAL": {
+					"DESC": "信頼されたアカウントが自動同期に設定されているため、削除できません。削除が必要な場合は、まずそのサービスアカウント({serviceAccountName})の自動同期を無効にしてください。",
+					"TITLE": "削除できません"
+				},
+				"DISABLED_SYNC_DESC": "全体の範囲の場合、「今すぐ同期」機能は管理者モードでのみ使用可能です。",
+				"ERROR_FOUND": "エラー",
+				"HOURLY_SYNC_SCHEDULE": "毎時同期スケジュール",
+				"LAST_SYNCED": "最終同期",
+				"MAIN_DESCRIPTION": "{provider}のアカウント階層をSpaceONEシステムと自動的に同期させます。",
+				"MAPPING_METHOD": "マッピング方法",
+				"PROJECT_GROUP_MAPPING": "プロジェクトグループマッピング",
+				"SKIP_PROJECT_GROUP_MAPPING": "プロジェクトグループマッピングをスキップ",
+				"START_SYNC": "同期を開始します。これには数分かかります。",
+				"SYNC_ERROR_MODAL_TITLE": "自動同期エラーの詳細",
+				"SYNC_TITLE": "今すぐ同期しますか？",
+				"WORKSPACE_MAPPING": "ワークスペースマッピング "
 			},
 			"MAIN": {
 				"ACTION": "作業",
@@ -2729,9 +2748,54 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"AGENT": {
+				"ACTIVATE": "有性化",
+				"ACTIVATE_MODAL_TEXT": "クラスターを有性化しますか？",
+				"ACTIVE": "Active",
+				"CLUSTER_DETAIL_HEADER": "クラスター詳細情報",
+				"CONNECT_CLUSTER": "クラスター接続",
+				"CONNECT_CLUSTER_HEADER": "クラスター接続",
+				"DEACTIVATE": "無効化",
+				"DEACTIVATE_MODAL_TEXT": "クラスターを無効化しますか？",
+				"DELETE": "削除",
+				"DELETE_CLUSTER_MODAL_TEXT": "接続されたクラスターを削除",
+				"DELETE_WARNING": "サービスアカウントを削除すると、収集されたすべてのデータが削除されます.",
+				"DISCONNECTED_CLUSTER_TEXT": "クラスターはまだ接続されていません.",
+				"INACTIVE": "Inactive",
+				"RECONNECT": "再接続"
+			},
+			"CLUSTER_MODAL": {
+				"CANCEL": "キャンセル",
+				"CHECKLIST_OPTION_LABEL": "クラスター接続前のチェックリスト",
+				"CLUSTER_NAME": "Cluster Name",
+				"CLUSTER_NAME_INFORMATION": "helm インストールとクラスター接続のために、まず Kubernetes クラスター名を教えてください。",
+				"CONNECT_CLUSTER_WARNING": "システムにSpaceONE Helmリポジトリがインストールされている必要があります。",
+				"CONTINUE_BUTTON": "次へ",
+				"COPIED": "コピーしました",
+				"COPY_CODE": "コードをコピー",
+				"DONE_BUTTON": "完了",
+				"FIND_OUT": "詳しく調べる",
+				"FIND_OUT_INFORMATION": "Kubernetesクラスターでkubectlが構成情報を伝達および修正する方法を調べてください。",
+				"FIRST_TITLE": "クラスターの基本情報に関する\n追加作業が必要です。",
+				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "以下のコマンドを入力すると、kube-state-metricsを見つけることができます。",
+				"LOADING": "新しいキーを待っています...",
+				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "隠す",
+				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "詳しく調べる",
+				"PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE": "以下のコマンドを入力すると、prometheus-node-exporterを見つけることができます。",
+				"SCRIPT_GUIDE_FIRST": "バージョンを確認するために、次のコマンドを実行してください。",
+				"SCRIPT_GUIDE_SECOND": "SpaceONE Helm リポジトリを作成するには、\n次のコマンドを実行してください。",
+				"SCRIPT_GUIDE_THIRD": "クラウドシェルまたはターミナルに以下のコードをコピーして貼り付けてください。",
+				"SECOND_TITLE": "これで、以下のガイドに従って\nシステムにHelmをインストールしてください。",
+				"THIRD_TITLE": "これが最後のステップです。\nKubernetes クラスターに接続してください。",
+				"THIRD_TITLE_RECONNECT": "Kubernetes クラスターに再接続してください。"
+			},
+			"CREATE": {
+				"COMPLETE_MODAL_SYNC": "今すぐ同期",
+				"TIMEZONE": "タイムゾーン: {timezone}、最大: 2回"
+			},
 			"DELETE_CHECK_MODAL": {
 				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
-				"TITLE": "このアカウントは削除できません。"
+				"TITLE": "添付されたアカウントがあるため、このアカウントを削除できません。"
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",
@@ -2747,11 +2811,16 @@
 				"CONNECT_TO_CONSOLE": "コンソールへの接続",
 				"CREDENTIALS_LABEL": "既存のTrustedAccountにアタッチしますか？",
 				"EDIT": "編集する",
+				"EDIT_SERVICE_ACCOUNT_NAME": "サービスアカウント名を編集",
+				"NAME": "サービスアカウント名",
 				"NO_CREDENTIALS": "暗号化キーが見つかりません。",
 				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
 				"REQUIRED": "プロジェクトの追加が必要です",
-				"SAVE": "保存",
-				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。"
+				"SAVE": "変更を保存",
+				"SYNCING": "同期中",
+				"SYNC_NOW": "今すぐ同期",
+				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。",
+				"UPDATE_SUCCESS": "オートシンク設定が正常に変更されました。"
 			}
 		}
 	},
@@ -3573,7 +3642,7 @@
 			"EDIT": "編集",
 			"EDIT_EVENT_RULE": "イベントルール編集",
 			"EQUALS": "equals",
-			"ESCALATION_POLICY": "",
+			"ESCALATION_POLICY": "エスカレーションポリシー",
 			"EVENT_RULE": "イベントルール",
 			"HIGH": "高い",
 			"LOW": "低い",

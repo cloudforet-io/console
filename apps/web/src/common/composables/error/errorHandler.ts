@@ -19,11 +19,6 @@ interface GlobalErrorHandlers {
     authorizationErrorHandler: () => void;
 }
 
-interface ErrorInfo {
-    title: TranslateResult;
-    description?: TranslateResult;
-}
-
 export default class ErrorHandler {
     private static authenticationErrorHandler;
 
@@ -34,7 +29,7 @@ export default class ErrorHandler {
         ErrorHandler.authorizationErrorHandler = authorizationErrorHandler;
     }
 
-    static handleError(error: unknown, errorInfo?: ErrorInfo) {
+    static handleError(error: unknown, toast = false) {
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
@@ -51,9 +46,9 @@ export default class ErrorHandler {
         } else if (isInstanceOfNoSearchResourceError(error)) {
             SpaceRouter.router.push(error.redirectUrl);
         } else if (isInstanceOfAPIError(error)) {
+            if (toast) showErrorMessage(error.code, error.message);
             console.error('API Error', error);
         } else {
-            if (errorInfo?.title) showErrorMessage(errorInfo.title, errorInfo?.description);
             console.error(error);
         }
     }

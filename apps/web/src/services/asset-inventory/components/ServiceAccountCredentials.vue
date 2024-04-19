@@ -16,7 +16,6 @@ import type {
 } from '@/schema/identity/service-account/api-verbs/update-secret-data';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
 import type {
     TrustedAccountUpdateSecretDataParameters,
 } from '@/schema/identity/trusted-account/api-verbs/update-secret-data';
@@ -36,44 +35,37 @@ import ServiceAccountCredentialsDetail
     from '@/services/asset-inventory/components/ServiceAccountCredentialsDetail.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
+import { useServiceAccountPageStore } from '@/services/asset-inventory/stores/service-account-page-store';
 import type {
     PageMode, CredentialForm,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
-    provider?: string;
     serviceAccountId?: string;
-    serviceAccountType: AccountType;
-    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
     serviceAccountLoading: boolean;
-    projectId?: string;
-    attachedTrustedAccountId?: string;
     editable: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    provider: undefined,
     serviceAccountId: undefined,
-    serviceAccountType: ACCOUNT_TYPE.GENERAL,
-    serviceAccountData: undefined,
     serviceAccountLoading: true,
-    projectId: undefined,
-    attachedTrustedAccountId: undefined,
     editable: false,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void; }>();
+const serviceAccountPageStore = useServiceAccountPageStore();
 
 const state = reactive({
     loading: true,
     mode: 'READ' as PageMode,
-    isFormValid: undefined,
+    isFormValid: computed(() => serviceAccountPageStore.formState.isCredentialFormValid),
     credentialData: undefined as SecretModel|TrustedSecretModel|undefined,
-    credentialForm: {} as CredentialForm,
+    credentialForm: computed(() => serviceAccountPageStore.formState.credential),
+    serviceAccountData: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     originCredentialForm: {} as Partial<CredentialForm>,
-    originAttachedTrustedAccountId: computed(() => (props.attachedTrustedAccountId)),
-    hasTrustedSecret: computed(() => (!!props.serviceAccountData?.trusted_account_id)),
-    isTrustedAccount: computed(() => (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED)),
+    attachedTrustedAccountId: computed(() => state.serviceAccountData?.trusted_account_id),
+    hasTrustedSecret: computed(() => (!!state.attachedTrustedAccountId)),
+    isTrustedAccount: computed(() => serviceAccountPageStore.state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
 });
 
 /* Api */
@@ -97,7 +89,6 @@ const setGeneralSecret = async () => {
         } else if (state.credentialForm.activeDataType === 'input') {
             data = state.credentialForm.customSchemaForm;
         }
-
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
             secret_data: data,
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
@@ -117,7 +108,6 @@ const updateTrustedSecretData = async () => {
         } else if (state.credentialForm.activeDataType === 'input') {
             data = state.credentialForm.customSchemaForm;
         }
-
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
             trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
@@ -143,7 +133,7 @@ const handleClickSaveButton = async () => {
     if (state.credentialForm.customSchemaForm?.private_key) {
         state.credentialForm.customSchemaForm.private_key = state.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
     }
-    if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
+    if (!state.isTrustedAccount) {
         if (!state.credentialForm.hasCredentialKey) {
             if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
         } else {
@@ -154,9 +144,6 @@ const handleClickSaveButton = async () => {
     }
     state.mode = 'READ';
     emit('refresh');
-};
-const handleChangeCredentialForm = (credentialForm) => {
-    state.credentialForm = credentialForm;
 };
 
 const getSecretSchema = async () => {
@@ -176,15 +163,15 @@ const getSecretSchema = async () => {
 };
 
 const getSecretData = async () => {
-    if (!props.serviceAccountData) return;
+    if (!state.serviceAccountData) return;
     try {
-        if ((state.isTrustedAccount || state.hasTrustedSecret) && 'trusted_secret_id' in props.serviceAccountData) {
+        if ((state.isTrustedAccount || state.hasTrustedSecret) && 'trusted_secret_id' in state.serviceAccountData) {
             state.credentialData = await SpaceConnector.clientV2.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
-                trusted_secret_id: props.serviceAccountData?.trusted_secret_id ?? '',
+                trusted_secret_id: state.serviceAccountData?.trusted_secret_id ?? '',
             });
-        } else if ('secret_id' in props.serviceAccountData) {
+        } else if ('secret_id' in state.serviceAccountData) {
             state.credentialData = await SpaceConnector.clientV2.secret.secret.get<SecretGetParameters, SecretModel>({
-                secret_id: props.serviceAccountData.secret_id ?? '',
+                secret_id: state.serviceAccountData.secret_id ?? '',
             });
         }
     } catch (e) {
@@ -195,14 +182,14 @@ const getSecretData = async () => {
     }
 };
 
-watch(() => props.serviceAccountData, async (serviceAccountData) => {
+watch(() => state.serviceAccountData, async (serviceAccountData) => {
     if (serviceAccountData && !props.serviceAccountLoading) {
         await getSecretData();
         if (state.credentialData) await getSecretSchema();
     }
 }, { immediate: true });
-watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
-    state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
+watch(() => state.attachedTrustedAccountId, (attachedTrustedAccountId) => {
+    if (!state.isTrustedAccount) state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
 }, { immediate: true });
 </script>
 
@@ -214,43 +201,40 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
             <template #extra>
                 <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
                           icon-left="ic_edit"
-                          style-type="transparent"
+                          style-type="secondary"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="state.mode === 'UPDATE'"
-                     class="button-wrapper"
-                >
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!state.isFormValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
-                    </p-button>
-                </div>
             </template>
         </p-heading>
         <div class="content-wrapper">
             <service-account-credentials-detail v-show="state.mode === 'READ'"
                                                 :credential-data="state.credentialData"
-                                                :attached-trusted-account-id="props.attachedTrustedAccountId"
+                                                :attached-trusted-account-id="state.attachedTrustedAccountId"
                                                 :loading="props.serviceAccountLoading || state.loading"
                                                 @edit="handleClickEditButton"
             />
             <service-account-credentials-form v-if="state.mode === 'UPDATE'"
-                                              edit-mode="UPDATE"
-                                              :service-account-type="serviceAccountType"
-                                              :provider="provider"
-                                              :is-valid.sync="state.isFormValid"
                                               :origin-form="state.originCredentialForm"
-                                              @change="handleChangeCredentialForm"
             />
+            <div v-if="state.mode === 'UPDATE'"
+                 class="button-wrapper"
+            >
+                <p-button style-type="tertiary"
+                          class="mr-4"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          :loading="state.loading"
+                          :disabled="!state.isFormValid"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                </p-button>
+            </div>
         </div>
     </p-pane-layout>
 </template>
@@ -264,6 +248,11 @@ watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
         .service-account-credentials-form {
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+
+        .button-wrapper {
+            padding-left: 1rem;
+            margin-top: 2rem;
         }
     }
 }

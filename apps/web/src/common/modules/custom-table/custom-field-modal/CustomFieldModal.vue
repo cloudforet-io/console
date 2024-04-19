@@ -23,6 +23,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
+import { convertAgentModeOptions } from '@/services/asset-inventory/helpers/agent-mode-helper';
 import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 import type {
     GetSchemaParams,
@@ -151,6 +152,7 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
     try {
         const options: GetSchemaParams['options'] = {
             include_optional_fields: includeOptionalFields,
+            isAdminMode: appContextGetters.isAdminMode,
         };
         const {
             provider, cloudServiceGroup, cloudServiceType, include_workspace_info,
@@ -170,6 +172,8 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
                 resourceType: props.resourceType,
                 options,
             });
+            // NOTE: Temporary hard coding for agent mode, before separating or adding more agent.
+            if (props.options?.provider === 'kubernetes') res.options = convertAgentModeOptions(res.options ?? {});
         } else {
             res = await SpaceConnector.client.addOns.pageSchema.get({
                 resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,

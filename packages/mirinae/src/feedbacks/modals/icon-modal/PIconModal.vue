@@ -17,7 +17,7 @@
                         <p-i v-if="props.iconName"
                              class="block"
                              :name="props.iconName"
-                             :color="primaryDark"
+                             :color="props.iconColor"
                              width="5rem"
                              height="5rem"
                         />
@@ -27,6 +27,7 @@
                         <div class="header-wrapper"
                              :class="props.size"
                         >
+                            <slot name="custom-header" />
                             <p v-if="props.headerTitle"
                                class="header-title"
                             >
@@ -38,17 +39,19 @@
                                 {{ props.headerDesc }}
                             </span>
                         </div>
-                        <div v-if="props.size === 'md'"
-                             class="body-wrapper"
-                        >
+                        <div class="body-wrapper">
                             <slot name="body" />
                         </div>
-                        <p-button
-                            :style-type="props.buttonStyleType"
-                            @click="handleClickButton"
+                        <slot v-if="!props.hideButton"
+                              name="custom-button"
                         >
-                            {{ props.buttonText }}
-                        </p-button>
+                            <p-button class="button"
+                                      :style-type="props.buttonStyleType"
+                                      @click="handleClickButton"
+                            >
+                                {{ props.buttonText }}
+                            </p-button>
+                        </slot>
                     </div>
                 </div>
             </article>
@@ -64,26 +67,31 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-import { primaryDark } from '@/styles/colors.cjs';
-
 const PI = () => import('@/foundation/icons/PI.vue');
 
 interface IconModalProps {
     size?: string;
     visible?: boolean;
     iconName?: string;
+    iconColor?: string;
     emoji?: string;
     headerTitle?: string;
     headerDesc?: string;
     buttonText: string;
     buttonStyleType?: string;
     backdrop?: boolean;
+    hideButton?: boolean;
 }
 const props = withDefaults(defineProps<IconModalProps>(), {
     size: 'sm',
     buttonText: 'close',
     buttonStyleType: BUTTON_STYLE.tertiary,
     backdrop: true,
+    iconName: undefined,
+    iconColor: undefined,
+    emoji: undefined,
+    headerTitle: undefined,
+    headerDesc: undefined,
 });
 const emit = defineEmits<{(e: 'clickButton'): void;}>();
 const state = reactive({
@@ -106,13 +114,13 @@ const handleClickButton = () => {
         > .modal-wrapper {
             width: calc(100vw - 1.5rem);
             min-width: 17rem;
-            max-width: 32rem;
+            max-width: 36rem;
             min-height: 12.875rem;
             max-height: calc(100vh - 4rem);
             > .content-wrapper {
                 @apply bg-white mx-auto rounded-lg;
                 text-align: center;
-                padding: 2.875rem 2rem 3.5rem;
+                padding: 2.875rem 2rem 2.5rem;
                 width: 100%;
                 min-height: 10.5rem;
 
@@ -175,9 +183,12 @@ const handleClickButton = () => {
                 }
 
                 > .body-wrapper {
-                    margin-bottom: 1.5rem;
                     overflow: auto;
                     max-height: $body-max-height;
+                }
+
+                > .button {
+                    margin-top: 1.5rem;
                 }
             }
             &.md {

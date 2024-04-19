@@ -82,6 +82,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.SERVER },
             { id: MENU_ID.SECURITY },
             { id: MENU_ID.COLLECTOR },
+            { id: MENU_ID.SERVICE_ACCOUNT },
         ],
     },
     {

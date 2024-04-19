@@ -20,9 +20,15 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
 
     const getters = reactive({
         workspaceList: computed<WorkspaceModel[]>(() => state.items || []),
+        workspaceMap: computed(() => {
+            const map = {};
+            getters.workspaceList.forEach((workspace) => {
+                map[workspace.workspace_id] = workspace;
+            });
+            return map;
+        }),
         currentWorkspace: computed<WorkspaceModel|undefined>(() => state.currentItem),
         currentWorkspaceId: computed<string|undefined>(() => state.currentItem?.workspace_id),
-
     });
 
     const actions = {
