@@ -218,28 +218,13 @@ onBeforeUnmount(() => {
 <style scoped lang="postcss">
 .bookmark-board {
     @apply grid gap-2 text-label-md;
-
-    &.folder {
-        /* custom design-system component - p-board-item */
-        :deep(.p-board-item) {
-            .board-item {
-                .image-wrapper {
-                    @apply bg-blue-200;
-                }
-            }
-        }
-    }
+    padding-top: 1rem;
 
     &.full-mode {
         /* custom design-system component - p-board-item */
         :deep(.p-board-item) {
             @apply border-gray-200;
             padding: 0.5rem;
-            .board-item {
-                .image-wrapper {
-                    @apply bg-gray-100;
-                }
-            }
 
             &:hover {
                 @apply border-blue-500;
@@ -249,6 +234,19 @@ onBeforeUnmount(() => {
                 .board-item .text-wrapper {
                     max-width: calc(100% - 5rem);
                 }
+            }
+        }
+
+        &:not(.folder) {
+            padding-top: 0;
+            .image-wrapper {
+                @apply bg-gray-100;
+            }
+        }
+
+        &.folder {
+            .image-wrapper {
+                @apply bg-blue-200;
             }
         }
     }

@@ -16,6 +16,7 @@ import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
     gap: 1rem;
     .box-wrapper {
         @apply bg-white border border-gray-200 text-label-md;
+        width: calc(50% - 0.5rem);
         max-width: 43rem;
         padding-top: 1.375rem;
         border-radius: 0.375rem;
