@@ -2,6 +2,7 @@
 import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu,
@@ -18,15 +19,19 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import MetricExplorerEditNameModal from '@/services/asset-inventory/components/MetricExplorerEditNameModal.vue';
 import MetricExplorerSaveAsModal from '@/services/asset-inventory/components/MetricExplorerSaveAsModal.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
@@ -72,7 +77,17 @@ const deleteMetric = async () => {
             metric_id: metricExplorerPageState.metric.metric_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
-        // TODO: go to namespace list
+        const otherMetricId = metricExplorerPageState.metricList[0]?.metric_id;
+        if (otherMetricId) {
+            await router.replace(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                params: { id: otherMetricId },
+            }));
+        } else {
+            await router.replace(getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+            }));
+        }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
     }
