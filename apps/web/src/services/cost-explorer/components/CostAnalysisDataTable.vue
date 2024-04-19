@@ -163,7 +163,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.selectedDisplayDataType === 'usage') {
+        if (state.isIncludedUsageTypeInGroupBy && costAnalysisPageState.displayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
