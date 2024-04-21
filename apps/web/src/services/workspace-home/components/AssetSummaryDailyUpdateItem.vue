@@ -1,59 +1,125 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
+import type { Location } from 'vue-router';
+
 import { PLazyImg, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CloudServiceData } from '@/services/workspace-home/types/workspace-home-type';
 
+interface CloudServiceItem {
+    cloudServiceGroup: string;
+    cloudServiceType: string;
+    icon?: string;
+    isCreateWarning?: boolean;
+    isDeleteWarning?: boolean;
+    totalCount: number;
+    createdCount: number;
+    deletedCount: number;
+    createdHref?: Location;
+    deletedHref?: Location;
+}
+
 interface Props {
-    item?: CloudServiceData;
+    item: CloudServiceData;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
+    item: () => ({} as CloudServiceData),
+});
+
+const queryHelper = new QueryHelper();
+
+const state = reactive({
+    dailyUpdateItem: computed<CloudServiceItem>(() => ({
+        cloudServiceGroup: props.item.cloud_service_group,
+        cloudServiceType: props.item.cloud_service_type,
+        icon: props.item.icon,
+        isCreateWarning: props.item.create_warning,
+        isDeleteWarning: props.item.delete_warning,
+        totalCount: props.item.total_count,
+        createdCount: props.item.created_count,
+        deletedCount: props.item.deleted_count,
+        createdHref: {
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: props.item.provider,
+                group: props.item.cloud_service_group,
+                name: props.item.cloud_service_type,
+            },
+            query: {
+                filters: queryHelper.setFilters([
+                    { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                ]).rawQueryStrings,
+            },
+        },
+        deletedHref: {
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: {
+                provider: props.item.provider,
+                group: props.item.cloud_service_group,
+                name: props.item.cloud_service_type,
+            },
+            query: {
+                filters: queryHelper.setFilters([
+                    { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
+                    { k: 'state', v: 'DELETED', o: '=' },
+                ]).rawQueryStrings,
+            },
+        },
+    })),
 });
 </script>
 
 <template>
     <div class="asset-summary-daily-update-item"
-         :class="{'is-warning': props.item.create_warning || props.item.delete_warning}"
+         :class="{'is-warning': state.dailyUpdateItem.isCreateWarning || state.dailyUpdateItem.isDeleteWarning}"
     >
         <p-lazy-img
-            v-if="props.item.icon"
-            :src="assetUrlConverter(props.item.icon)"
+            v-if="state.dailyUpdateItem.icon"
+            :src="assetUrlConverter(state.dailyUpdateItem.icon)"
             width="1.25rem"
             height="1.25rem"
             class="icon"
         />
-        <span class="title">{{ props.item.cloud_service_group }}/{{ props.item.cloud_service_type }}
-            <span class="total-count">({{ props.item.total_count }})</span>
+        <span class="title">{{ state.dailyUpdateItem.cloudServiceGroup }}/{{ state.dailyUpdateItem.cloudServiceType }}
+            <span class="total-count">({{ state.dailyUpdateItem.totalCount }})</span>
         </span>
-        <div v-if="props.item.created_count"
+        <div v-if="state.dailyUpdateItem.createdCount"
              class="data-row created"
         >
             <span class="text-wrapper">
-                <p-i v-if="props.item.create_warning"
+                <p-i v-if="state.dailyUpdateItem.isCreateWarning"
                      name="ic_warning-filled"
                      width="0.75rem"
                      height="0.75rem"
                      class="warning-icon"
                 />
-                <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED') }}</span>
-                <span>{{ props.item.created_count }}</span>
+                <router-link :to="state.dailyUpdateItem.createdHref">
+                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED') }}</span>
+                    <span>{{ state.dailyUpdateItem.createdCount }}</span>
+                </router-link>
             </span>
         </div>
-        <div v-if="props.item.deleted_count"
+        <div v-if="state.dailyUpdateItem.deletedCount"
              class="data-row deleted"
         >
             <span class="text-wrapper">
-                <p-i v-if="props.item.delete_warning"
+                <p-i v-if="state.dailyUpdateItem.isDeleteWarning"
                      name="ic_warning-filled"
                      width="0.75rem"
                      height="0.75rem"
                      class="warning-icon"
                 />
-                <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED') }}</span>
-                <span>{{ props.item.deleted_count }}</span>
+                <router-link :to="state.dailyUpdateItem.deletedHref">
+                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED') }}</span>
+                    <span>{{ state.dailyUpdateItem.deletedCount }}</span>
+                </router-link>
             </span>
         </div>
     </div>
