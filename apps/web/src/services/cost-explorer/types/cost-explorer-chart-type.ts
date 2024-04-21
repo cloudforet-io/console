@@ -12,7 +12,7 @@ export interface XYChartData {
 }
 export interface Legend {
     name: string;
-    label: string | TranslateResult;
+    label?: string | TranslateResult;
     color?: string;
     disabled?: boolean;
 }
