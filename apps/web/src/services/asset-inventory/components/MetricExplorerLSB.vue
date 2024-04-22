@@ -264,7 +264,7 @@ onMounted(async () => {
             </span>
         </template>
         <template #slot-namespace>
-            <p-data-loader :loading="storeState.loading"
+            <p-data-loader :loading="false"
                            :loader-backdrop-opacity="0.5"
                            :loader-backdrop-color="gray[100]"
                            class="namespace-data-loader"
@@ -337,7 +337,7 @@ onMounted(async () => {
             </p-data-loader>
         </template>
         <template #slot-metric>
-            <p-data-loader :loading="storeState.loading"
+            <p-data-loader :loading="false"
                            :loader-backdrop-opacity="0.5"
                            :loader-backdrop-color="gray[100]"
                            class="metric-data-loader"
