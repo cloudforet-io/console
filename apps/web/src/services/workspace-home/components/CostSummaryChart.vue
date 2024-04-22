@@ -66,6 +66,7 @@ const drawChart = () => {
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
     xAxis.get('dateFormats').month = 'YYYY-MM';
+    xAxis.get('periodChangeDateFormats').month = 'YYYY-MM';
 
     // hide zoom button
     chart.zoomOutButton.set('forceHidden', true);
