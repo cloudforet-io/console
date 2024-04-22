@@ -93,7 +93,7 @@ const state = reactive({
             ...customItem,
         ];
     }),
-    selectedPeriod: METRIC_PERIOD_MENU.LAST_6_MONTHS as MetricPeriodMenu,
+    selectedPeriod: METRIC_PERIOD_MENU.CURRENT_MONTH as MetricPeriodMenu,
     customDateModalVisible: false,
 });
 

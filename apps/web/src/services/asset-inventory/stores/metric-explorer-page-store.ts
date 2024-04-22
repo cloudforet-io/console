@@ -40,9 +40,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricList: [] as MetricModel[],
         selectedNamespace: undefined as NamespaceModel|undefined,
         // query section
-        granularity: GRANULARITY.MONTHLY as Granularity,
-        period: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0] as Period|undefined,
-        relativePeriod: getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1] as RelativePeriod|undefined,
+        granularity: GRANULARITY.DAILY as Granularity,
+        period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
+        relativePeriod: getInitialPeriodByGranularity(GRANULARITY.DAILY)[1] as RelativePeriod|undefined,
         enabledFiltersProperties: undefined as string[]|undefined,
         filters: {} as Record<string, string[]>,
         selectedGroupByList: [] as string[],
