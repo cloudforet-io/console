@@ -33,7 +33,6 @@ import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 interface NamespaceSubItemType {
@@ -45,12 +44,10 @@ interface NamespaceSubItemType {
 const route = useRoute();
 const router = useRouter();
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    loading: computed(() => metricExplorerPageStore.state.namespaceListLoading || metricExplorerPageStore.state.metricListLoading),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
