@@ -19,8 +19,8 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type NamespaceItem = Required<Pick<ReferenceItem<Partial<NamespaceModel>>, 'key'|'label'|'name'|'provider'|'data'>>;
-export type NamespaceReferenceMap = ReferenceMap<NamespaceItem>;
+export type NamespaceReferenceItem = Required<Pick<ReferenceItem<Partial<NamespaceModel>>, 'key'|'label'|'name'|'provider'|'data'>>;
+export type NamespaceReferenceMap = ReferenceMap<NamespaceReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
