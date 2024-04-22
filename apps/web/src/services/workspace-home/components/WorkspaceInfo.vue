@@ -5,7 +5,7 @@ import Vue, {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PButton, PHeading, PI, PIconButton,
+    PButton, PHeading, PI, PIconButton, PTextButton,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -67,12 +67,12 @@ const state = reactive({
 });
 
 const handleActionButton = (type: string) => {
-    if (type === 'invite') {
-        inviteWorkspaceUser();
+    if (type === 'invite' || type === 'user') {
+        routerToWorkspaceUser(type === 'invite');
         return;
     }
-    if (type === 'create') {
-        createApp();
+    if (type === 'create' || type === 'app') {
+        routerToCreateApp(type === 'create');
         return;
     }
     const workspaceId = state.selectedWorkspace.workspace_id;
@@ -95,24 +95,28 @@ const actionWorkspace = (type: string, workspaceId: string) => {
         },
     });
 };
-const createApp = () => {
+const routerToCreateApp = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.APP._NAME });
-    appPageStore.$patch((_state) => {
-        _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
-        _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
-        _state.modal.visible.form = true;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    if (isOpenModal) {
+        appPageStore.$patch((_state) => {
+            _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
+            _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
+            _state.modal.visible.form = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
+    }
 };
-const inviteWorkspaceUser = () => {
+const routerToWorkspaceUser = (isOpenModal: boolean) => {
     router.push({ name: IAM_ROUTE.USER._NAME });
-    userPageStore.$patch((_state) => {
-        _state.modal.type = USER_MODAL_TYPE.INVITE;
-        _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
-        _state.modal.themeColor = 'primary';
-        _state.modal.visible.add = true;
-        _state.modal = cloneDeep(_state.modal);
-    });
+    if (isOpenModal) {
+        userPageStore.$patch((_state) => {
+            _state.modal.type = USER_MODAL_TYPE.INVITE;
+            _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE', { workspace_name: userWorkspaceStore.getters.currentWorkspace?.name }) as string;
+            _state.modal.themeColor = 'primary';
+            _state.modal.visible.add = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
+    }
 };
 
 const listQueryHelper = new ApiQueryHelper().setCountOnly();
@@ -214,7 +218,9 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}</span>
+                <p-text-button @click="handleActionButton('user')">
+                    {{ state.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
+                </p-text-button>
             </div>
             <p-i v-if="state.accessAppMenu && state.accessUserMenu"
                  name="ic_dot"
@@ -231,7 +237,9 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
                      height="0.875rem"
                      color="inherit"
                 />
-                <span>{{ state.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}</span>
+                <p-text-button @click="handleActionButton('app')">
+                    {{ state.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
+                </p-text-button>
             </div>
         </div>
     </div>

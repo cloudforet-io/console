@@ -1,5 +1,16 @@
 <script setup lang="ts">
+import Vue from 'vue';
+import { useRouter } from 'vue-router/composables';
+
 import { PEmpty, PButton } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 interface Props {
     isDomainAdmin: boolean;
@@ -9,8 +20,25 @@ const props = withDefaults(defineProps<Props>(), {
     isDomainAdmin: false,
 });
 
-const handleCreateWorkspace = () => {
+const appContextStore = useAppContextStore();
 
+const router = useRouter();
+
+const handleCreateWorkspace = () => {
+    appContextStore.enterAdminMode();
+    window.open(router.resolve({
+        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+        query: {
+            hasNoWorkpspace: 'true',
+        },
+    }).href, '_blank');
+    Vue.notify({
+        group: 'toastTopCenter',
+        type: 'info',
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
+        duration: 2000,
+        speed: 1,
+    });
 };
 </script>
 
