@@ -24,13 +24,13 @@ import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/works
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
+const workspaceHomePageState = workspaceHomePageStore.state;
 const bookmarkStore = useBookmarkStore();
 
 const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageGetters.recentList),
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
 });
 const state = reactive({
     pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),

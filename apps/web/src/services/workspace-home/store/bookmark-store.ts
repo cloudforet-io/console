@@ -43,7 +43,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
     const getters = reactive({
-        bookmarkFolderList: computed<BookmarkItem[]>(() => state.bookmarkFolderData),
         bookmarkList: computed<BookmarkItem[]>(() => {
             let filteredList: BookmarkItem[] = [];
             if (state.filterByFolder) {
@@ -56,11 +55,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
             return state.isFullMode ? filteredList : filteredList.slice(0, 13);
         }),
-        filterByFolder: computed<string|undefined>(() => state.filterByFolder),
-        selectedBookmark: computed<BookmarkItem|undefined>(() => state.selectedBookmark),
-        isFullMode: computed<boolean>(() => state.isFullMode),
-        isFileFullMode: computed<boolean>(() => state.isFileFullMode),
-        modal: computed<BookmarkModalStateType>(() => state.modal),
     });
 
     const mutations = {

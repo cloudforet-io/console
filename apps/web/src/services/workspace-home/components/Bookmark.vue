@@ -13,15 +13,16 @@ import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store
 import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 const bookmarkStore = useBookmarkStore();
+const bookmarkState = bookmarkStore.state;
 const bookmarkGetters = bookmarkStore.getters;
 
 const { height } = useWindowSize();
 
 const storeState = reactive({
-    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkFolderList),
+    bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
-    isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
-    modalType: computed<BookmarkModalType|undefined>(() => bookmarkGetters.modal.type),
+    isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
+    modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 });
 const state = reactive({
     boardSets: computed<BookmarkBoardSet[]>(() => storeState.bookmarkList.map((d) => ({

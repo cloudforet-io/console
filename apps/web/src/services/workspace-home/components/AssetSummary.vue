@@ -66,16 +66,16 @@ const state = reactive({
         if (state.isNoServiceAccounts) {
             result = {
                 to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                title: i18n.t('HOME.NO_ACCOUNT') as string,
-                desc: i18n.t('HOME.NO_ACCOUNT_DESC') as string,
-                buttonText: i18n.t('HOME.NO_ACCOUNT_ADD_NEW') as string,
+                title: i18n.t('HOME.NO_ACCOUNT'),
+                desc: i18n.t('HOME.NO_ACCOUNT_DESC'),
+                buttonText: i18n.t('HOME.NO_ACCOUNT_ADD_NEW'),
             };
         } else {
             result = {
                 to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
-                title: i18n.t('HOME.NO_COLLECTOR') as string,
-                buttonText: i18n.t('HOME.NO_COLLECTOR_DESC') as string,
-                desc: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW') as string,
+                title: i18n.t('HOME.NO_COLLECTOR'),
+                buttonText: i18n.t('HOME.NO_COLLECTOR_DESC'),
+                desc: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW'),
             };
         }
         return result;

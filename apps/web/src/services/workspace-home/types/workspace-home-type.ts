@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
@@ -49,7 +51,7 @@ export type BookmarkModalStateType = {
 
 export interface EmptyData {
     to?: { name: string };
-    title: string;
-    buttonText?: string;
-    desc: string;
+    title: string | TranslateResult;
+    buttonText?: string | TranslateResult;
+    desc: string | TranslateResult;
 }

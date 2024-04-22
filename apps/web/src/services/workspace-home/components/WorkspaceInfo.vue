@@ -48,7 +48,7 @@ const userPageStore = useUserPageStore();
 const appPageStore = useAppPageStore();
 const appContextStore = useAppContextStore();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const router = useRouter();
 
@@ -56,8 +56,8 @@ const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageGetters.workspaceUserTotalCount),
-    appsTotalCount: computed<number|undefined>(() => workspaceHomePageGetters.appsTotalCount),
+    workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageState.workspaceUserTotalCount),
+    appsTotalCount: computed<number|undefined>(() => workspaceHomePageState.appsTotalCount),
 });
 const state = reactive({
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),

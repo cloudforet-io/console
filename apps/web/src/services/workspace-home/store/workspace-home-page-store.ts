@@ -44,15 +44,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
 
-    const getters = reactive({
-        recentList: computed<UserConfigModel[]>(() => state.recentList),
-        favoriteMenuList: computed<FavoriteItem[]>(() => state.favoriteMenuList),
-        workspaceUserTotalCount: computed<number|undefined>(() => state.workspaceUserTotalCount),
-        appsTotalCount: computed<number|undefined>(() => state.appsTotalCount),
-        costReportConfig: computed<CostReportConfigModel|null|undefined>(() => state.costReportConfig),
-        dataSource: computed<CostDataSourceModel[]>(() => state.dataSource),
-    });
-
     const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
     const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
     const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);
@@ -109,8 +100,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     query: listCountQueryHelper.data,
                 });
                 state.workspaceUserTotalCount = total_count || undefined;
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         fetchAppList: async () => {
@@ -120,8 +111,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     query: listCountQueryHelper.data,
                 });
                 state.appsTotalCount = total_count || undefined;
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         fetchCostReportConfig: async () => {
@@ -137,18 +128,22 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             }
         },
         fetchDataSource: async () => {
-            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
-                query: {
-                    sort: [{ key: 'workspace_id', desc: false }],
-                },
-            });
-            state.dataSource = response?.results || [];
+            try {
+                const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                    query: {
+                        sort: [{ key: 'workspace_id', desc: false }],
+                    },
+                });
+                state.dataSource = response?.results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.dataSource = [];
+            }
         },
     };
 
     return {
         state,
-        getters,
         ...actions,
     };
 });

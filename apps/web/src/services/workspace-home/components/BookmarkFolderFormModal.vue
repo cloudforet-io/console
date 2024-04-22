@@ -22,13 +22,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
-const bookmarkGetters = bookmarkStore.getters;
+const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
-    filterByFolder: computed<string|undefined>(() => bookmarkGetters.filterByFolder),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkGetters.selectedBookmark),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFileFullMode),
-    modal: computed<BookmarkModalStateType>(() => bookmarkGetters.modal),
+    filterByFolder: computed<string|undefined>(() => bookmarkState.filterByFolder),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
 });
 const state = reactive({
     loading: false,

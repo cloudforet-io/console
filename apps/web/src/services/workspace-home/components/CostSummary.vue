@@ -39,13 +39,12 @@ import type { EmptyData } from '@/services/workspace-home/types/workspace-home-t
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
-
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const storeState = reactive({
-    costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageGetters.costReportConfig),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageGetters.recentList),
-    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageGetters.dataSource),
+    costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
 });
 const state = reactive({
     loading: false,
@@ -65,16 +64,16 @@ const state = reactive({
         if (storeState.dataSource.length === 0) {
             result = {
                 to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
-                title: i18n.t('HOME.ACTIVATION_REQUIRED') as string,
-                buttonText: i18n.t('HOME.ACTIVATION_REQUIRED_DESC') as string,
-                desc: i18n.t('HOME.LEARN_MORE') as string,
+                title: i18n.t('HOME.ACTIVATION_REQUIRED'),
+                buttonText: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
+                desc: i18n.t('HOME.LEARN_MORE'),
             };
         } else {
             result = {
                 to: { name: COST_EXPLORER_ROUTE.COST_REPORT._NAME },
-                title: i18n.t('HOME.NO_COST_DATA') as string,
-                desc: i18n.t('HOME.NO_COST_DATA_DESC') as string,
-                buttonText: i18n.t('HOME.COST_SUMMARY_GO_TO_REPORT') as string,
+                title: i18n.t('HOME.NO_COST_DATA'),
+                desc: i18n.t('HOME.NO_COST_DATA_DESC'),
+                buttonText: i18n.t('HOME.COST_SUMMARY_GO_TO_REPORT'),
             };
         }
         return result;
