@@ -8,6 +8,7 @@ const ProjectContainer = () => import('@/services/project/ProjectContainer.vue')
 
 const ProjectMainPage = () => import('@/services/project/pages/ProjectMainPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
+const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 
 const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
 
@@ -45,7 +46,7 @@ export default {
             name: PROJECT_ROUTE.DETAIL._NAME,
             redirect: PROJECT_ROUTE.DETAIL.DASHBOARD._NAME,
             props: true,
-            component: { template: '<keep-alive><router-view /></keep-alive>' },
+            component: ProjectDetailPage,
             children: [
                 {
                     path: 'dashboard',
@@ -59,7 +60,7 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
                     redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
-                    component: ProjectDetailPage,
+                    component: ProjectDetailTabPage,
                     children: [
                         {
                             path: 'summary',

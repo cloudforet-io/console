@@ -6,14 +6,12 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PButtonModal, PDataLoader, PHeading, PIconButton, PTab, PI,
+    PBadge, PButtonModal, PHeading, PIconButton, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
 import type { ProjectModel } from '@/schema/identity/project/model';
@@ -28,17 +26,13 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import BetaMark from '@/common/components/marks/BetaMark.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
-
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
@@ -52,7 +46,6 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
-const { getProperRouteLocation } = useProperRouteLocation();
 
 const gnbStore = useGnbStore();
 const appContextStore = useAppContextStore();
@@ -72,7 +65,7 @@ const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 const state = reactive({
-    item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
+    item: computed<ProjectModel|undefined>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
@@ -108,34 +101,6 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
-});
-
-/** Tabs */
-const singleItemTabState = reactive({
-    tabs: computed<TabItem[]>(() => [
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
-            keepAlive: true,
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-        },
-        {
-            name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-        },
-    ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
 });
 
 // Member modal
@@ -196,11 +161,6 @@ const handleConfirmProjectGroupMoveModal = () => {
     projectDetailPageStore.getProject();
 };
 
-const onChangeTab = (activeTab) => {
-    if (activeTab === route.name) return;
-    router.replace(getProperRouteLocation({ name: activeTab }));
-};
-
 /* Watchers */
 watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
@@ -211,10 +171,6 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
     }
 });
 
-watch(() => route.name, () => {
-    const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-}, { immediate: true });
 
 watch([
     () => props.id,
@@ -223,9 +179,6 @@ watch([
     if (!globalGrantLoading) projectDetailPageStore.setProjectId(id);
 }, { immediate: true });
 
-watch([() => singleItemTabState.activeTab, () => state.item], () => {
-    gnbStore.setBreadcrumbs(state.pageNavigation);
-});
 watch(() => projectDetailPageState.projectId, (projectId) => {
     gnbStore.setId(projectId);
 }, { immediate: true });
@@ -240,72 +193,47 @@ onUnmounted(() => {
 
 <template>
     <div class="project-detail-page">
-        <p-data-loader class="page-inner"
-                       :loading="projectDetailPageState.loading"
-                       :loader-backdrop-color="BACKGROUND_COLOR"
-        >
-            <div v-if="state.item"
-                 class="top-wrapper"
+        <div class="top-wrapper">
+            <p-heading :title="state.item?.name"
+                       show-back-button
+                       @click-back-button="$router.go(-1)"
             >
-                <p-heading :title="state.item?.name"
-                           show-back-button
-                           @click-back-button="$router.go(-1)"
-                >
-                    <template #title-right-extra>
-                        <div class="button-wrapper">
-                            <template v-if="projectPageState.isWorkspaceOwner">
-                                <p-icon-button name="ic_settings"
-                                               class="edit-btn"
-                                               size="md"
-                                               @click="projectPageStore.openProjectFormModal()"
+                <template #title-right-extra>
+                    <div class="button-wrapper">
+                        <template v-if="projectPageState.isWorkspaceOwner">
+                            <p-icon-button name="ic_settings"
+                                           class="edit-btn"
+                                           size="md"
+                                           @click="projectPageStore.openProjectFormModal()"
+                            />
+                            <p-icon-button name="ic_move"
+                                           style-type="transparent"
+                                           @click="handleOpenProjectGroupMoveModal"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           class="delete-btn"
+                                           size="md"
+                                           @click="openProjectDeleteForm"
+                            />
+                        </template>
+                        <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                                 style-type="gray200"
+                                 badge-type="subtle"
+                        >
+                            <div class="badge-content-wrapper">
+                                <p-i name="ic_lock-filled"
+                                     width="0.75rem"
+                                     height="0.75rem"
+                                     color="inherit"
                                 />
-                                <p-icon-button name="ic_move"
-                                               style-type="transparent"
-                                               @click="handleOpenProjectGroupMoveModal"
-                                />
-                                <p-icon-button name="ic_delete"
-                                               class="delete-btn"
-                                               size="md"
-                                               @click="openProjectDeleteForm"
-                                />
-                            </template>
-                            <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                                     style-type="gray200"
-                                     badge-type="subtle"
-                            >
-                                <div class="badge-content-wrapper">
-                                    <p-i name="ic_lock-filled"
-                                         width="0.75rem"
-                                         height="0.75rem"
-                                         color="inherit"
-                                    />
-                                    <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
-                                </div>
-                            </p-badge>
-                        </div>
-                    </template>
-                </p-heading>
-            </div>
-
-            <p-tab v-if="state.item"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-                   @change="onChangeTab"
-            >
-                <keep-alive>
-                    <router-view />
-                </keep-alive>
-                <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
-                             style-type="primary3"
-                             badge-type="subtle"
-                    >
-                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
-                    </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
+                                <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
+                            </div>
+                        </p-badge>
+                    </div>
                 </template>
-            </p-tab>
-        </p-data-loader>
+            </p-heading>
+            <keep-alive><router-view /></keep-alive>
+        </div>
 
         <p-button-modal :header-title="formState.headerTitle"
                         :centered="true"
@@ -346,14 +274,6 @@ onUnmounted(() => {
     height: 100%;
     margin-top: -0.25rem;
 }
-.page-inner {
-    height: 100%;
-    max-width: 1368px;
-}
-.p-heading {
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-}
 .top-wrapper {
     @apply mb-8 flex flex-wrap items-center;
     .button-wrapper {
@@ -364,17 +284,6 @@ onUnmounted(() => {
             align-content: center;
             gap: 0.25rem;
         }
-    }
-}
-
-.p-tab {
-    @apply rounded-lg;
-}
-
-/* custom design-system component - p-data-loader */
-:deep(.p-data-loader) {
-    .data-wrapper {
-        overflow-y: unset;
     }
 }
 </style>
