@@ -203,7 +203,7 @@ onUnmounted(() => {
                              :color="peacock[600]"
                              width="1.25rem"
                              height="1.25rem"
-                        />{{ state.item?.name }}
+                        /><span class="title-text">{{ state.item?.name }}</span>
                     </div>
                     <div class="button-wrapper">
                         <template v-if="projectPageState.isWorkspaceOwner">
@@ -287,6 +287,11 @@ onUnmounted(() => {
         padding: 0.75rem 1rem;
         .title-wrapper {
             @apply text-label-lg font-bold text-peacock-800 truncate;
+
+            .title-text {
+                margin-left: 0.375rem;
+                line-height: 1.25rem;
+            }
         }
 
         .button-wrapper {
