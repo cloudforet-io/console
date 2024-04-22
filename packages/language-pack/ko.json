@@ -2751,6 +2751,7 @@
 			"NAME": "이름",
 			"NAME_DUPLICATED": "중복된 이름입니다.",
 			"NAME_REQUIRED": "이름을 입력해 주세요.",
+			"NO_DATA": "",
 			"NO_ITEMS": "아이템이 없습니다",
 			"NO_LEGENDS": "",
 			"OPERATOR": "",
