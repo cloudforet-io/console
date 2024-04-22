@@ -7,7 +7,6 @@ export const PROJECT_ROUTE = Object.freeze({
         DASHBOARD: { _NAME: `${MENU_ID.PROJECT}.detail.dashboard` },
         TAB: {
             _NAME: `${MENU_ID.PROJECT}.detail.tab`,
-            SUMMARY: { _NAME: `${MENU_ID.PROJECT}.detail.tab.summary` },
             MEMBER: { _NAME: `${MENU_ID.PROJECT}.detail.tab.member` },
             ALERT: {
                 _NAME: `${MENU_ID.PROJECT}.detail.tab.alert`,
