@@ -65,8 +65,8 @@ const state = reactive({
             result = {
                 to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
                 title: i18n.t('HOME.ACTIVATION_REQUIRED'),
-                buttonText: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
-                desc: i18n.t('HOME.LEARN_MORE'),
+                desc: i18n.t('HOME.ACTIVATION_REQUIRED_DESC'),
+                buttonText: i18n.t('HOME.LEARN_MORE'),
             };
         } else {
             result = {
