@@ -18,12 +18,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
-const bookmarkGetters = bookmarkStore.getters;
+const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
-    filterByFolder: computed<string|undefined>(() => bookmarkGetters.filterByFolder),
-    isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
-    isFileFullMode: computed<boolean>(() => bookmarkGetters.isFileFullMode),
+    filterByFolder: computed<string|undefined>(() => bookmarkState.filterByFolder),
+    isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
+    isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
 });
 
 const handleClickFullModeButton = () => {

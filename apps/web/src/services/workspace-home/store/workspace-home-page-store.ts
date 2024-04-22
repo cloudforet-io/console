@@ -10,6 +10,7 @@ import type { UserConfigListParameters } from '@/schema/config/user-config/api-v
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
@@ -35,19 +36,12 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         workspaceUserTotalCount: undefined as number|undefined,
         appsTotalCount: undefined as number|undefined,
         costReportConfig: null as CostReportConfigModel|null|undefined,
+        dataSource: [] as CostDataSourceModel[],
     });
 
     const _getters = reactive({
         userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    });
-
-    const getters = reactive({
-        recentList: computed<UserConfigModel[]>(() => state.recentList),
-        favoriteMenuList: computed<FavoriteItem[]>(() => state.favoriteMenuList),
-        workspaceUserTotalCount: computed<number|undefined>(() => state.workspaceUserTotalCount),
-        appsTotalCount: computed<number|undefined>(() => state.appsTotalCount),
-        costReportConfig: computed<CostReportConfigModel|null|undefined>(() => state.costReportConfig),
     });
 
     const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
@@ -106,8 +100,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     query: listCountQueryHelper.data,
                 });
                 state.workspaceUserTotalCount = total_count || undefined;
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         fetchAppList: async () => {
@@ -117,8 +111,8 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                     query: listCountQueryHelper.data,
                 });
                 state.appsTotalCount = total_count || undefined;
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, e.message);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         fetchCostReportConfig: async () => {
@@ -133,11 +127,23 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 state.costReportConfig = undefined;
             }
         },
+        fetchDataSource: async () => {
+            try {
+                const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                    query: {
+                        sort: [{ key: 'workspace_id', desc: false }],
+                    },
+                });
+                state.dataSource = response?.results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.dataSource = [];
+            }
+        },
     };
 
     return {
         state,
-        getters,
         ...actions,
     };
 });

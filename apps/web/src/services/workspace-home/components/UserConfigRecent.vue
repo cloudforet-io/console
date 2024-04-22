@@ -43,7 +43,7 @@ const allReferenceGetters = allReferenceStore.getters;
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
@@ -52,7 +52,7 @@ const storeState = reactive({
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceGetters.cloudServiceType),
     projects: computed<ProjectReferenceMap>(() => allReferenceGetters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceGetters.projectGroup),
-    recentList: computed<UserConfigModel[]>(() => workspaceHomePageGetters.recentList),
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
 });
 const state = reactive({
     recentList: computed<ReferenceData[]>(() => {

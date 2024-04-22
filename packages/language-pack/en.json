@@ -1758,6 +1758,8 @@
 		}
 	},
 	"HOME": {
+		"ACTIVATION_REQUIRED": "Activation Required",
+		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
 		"ALT_S_ADD_LINK": "Link successfully Added ",
 		"ASSET_SUMMARY_CREATED": "Created",
@@ -1796,7 +1798,22 @@
 		"INFO_CREATE_APP": "Create App",
 		"INFO_INVITE_USER": "Invite User",
 		"INFO_USERS": "users",
-		"TOGGLE_MORE": "show more"
+		"LEARN_MORE": "Learn more",
+		"NO_ACCOUNT": "No Service Accounts",
+		"NO_ACCOUNT_ADD_NEW": "Add Service Accounts",
+		"NO_ACCOUNT_DESC": "No service account has been added in this workspace.",
+		"NO_COLLECTOR": "No collector has been set up yet",
+		"NO_COLLECTOR_CREATE_NEW": "Create New Collector",
+		"NO_COLLECTOR_DESC": "Create or use suitable collectors to \nstart collecting resources.",
+		"NO_COST_DATA": "No Cost Data",
+		"NO_COST_DATA_DESC": "Cost summary is displayed\nbased on Cost Report.",
+		"NO_STARRED": "No starred page",
+		"NO_STARRED_DESC1": "Add frequently visited pages to here.",
+		"NO_STARRED_DESC2": "Explore one of these commonly visited services.",
+		"TOGGLE_MORE": "show more",
+		"WELCOME_BUTTON": "Explore Now",
+		"WELCOME_DESC": "Start to manage your multi cloud resources and costs.",
+		"WELCOME_TITLE": "Welcome, {name}"
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",

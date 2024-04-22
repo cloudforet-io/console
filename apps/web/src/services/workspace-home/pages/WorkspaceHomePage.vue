@@ -3,6 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
@@ -15,17 +16,21 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import Bookmark from '@/services/workspace-home/components/Bookmark.vue';
 import Summaries from '@/services/workspace-home/components/Summaries.vue';
 import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
+import Welcome from '@/services/workspace-home/components/Welcome.vue';
 import WorkspaceInfo from '@/services/workspace-home/components/WorkspaceInfo.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 const bookmarkStore = useBookmarkStore();
 
 const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
-    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
 });
 const state = reactive({
     pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
@@ -39,6 +44,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
     await workspaceHomePageStore.fetchFavoriteList();
     await workspaceHomePageStore.fetchCostReportConfig();
+    await workspaceHomePageStore.fetchDataSource();
     await bookmarkStore.fetchBookmarkFolderList();
     await bookmarkStore.fetchBookmarkList();
     if (state.accessUserMenu) {
@@ -58,8 +64,11 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             <workspace-info :access-user-menu="state.accessAppMenu"
                             :access-app-menu="state.accessAppMenu"
             />
+            <welcome v-if="storeState.recentList.length === 0" />
             <bookmark />
-            <user-configs class="section" />
+            <user-configs v-if="storeState.recentList.length !== 0"
+                          class="section"
+            />
             <summaries class="section" />
         </div>
     </general-page-layout>

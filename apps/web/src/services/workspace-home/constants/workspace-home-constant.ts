@@ -11,3 +11,8 @@ export const BOOKMARK_MODAL_TYPE = {
     DELETE_FOLDER: 'deleteFolder',
     DELETE_LINK: 'deleteLink',
 } as const;
+
+export const SUMMARY_DATA_TYPE = {
+    ASSET: 'Asset',
+    COST: 'cost',
+} as const;

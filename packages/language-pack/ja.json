@@ -1758,6 +1758,8 @@
 		}
 	},
 	"HOME": {
+		"ACTIVATION_REQUIRED": "",
+		"ACTIVATION_REQUIRED_DESC": "",
 		"ALT_E_DUPLICATED_NAME": "",
 		"ALT_S_ADD_LINK": "",
 		"ASSET_SUMMARY_CREATED": "作成日",
@@ -1796,7 +1798,22 @@
 		"INFO_CREATE_APP": "アプリを作成する",
 		"INFO_INVITE_USER": "",
 		"INFO_USERS": "ユーザー",
-		"TOGGLE_MORE": "もっと見る"
+		"LEARN_MORE": "詳細はこちら",
+		"NO_ACCOUNT": "サービスアカウントがありません。",
+		"NO_ACCOUNT_ADD_NEW": "サービスアカウントの追加",
+		"NO_ACCOUNT_DESC": "",
+		"NO_COLLECTOR": "",
+		"NO_COLLECTOR_CREATE_NEW": "新しいコレクターを作成",
+		"NO_COLLECTOR_DESC": "",
+		"NO_COST_DATA": "",
+		"NO_COST_DATA_DESC": "",
+		"NO_STARRED": "",
+		"NO_STARRED_DESC1": "",
+		"NO_STARRED_DESC2": "",
+		"TOGGLE_MORE": "もっと見る",
+		"WELCOME_BUTTON": "",
+		"WELCOME_DESC": "",
+		"WELCOME_TITLE": ""
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",

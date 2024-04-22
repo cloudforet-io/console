@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PFieldTitle, PSelectDropdown, PI, PPagination,
+    PFieldTitle, PSelectDropdown, PI, PPagination, PTextButton,
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -13,6 +14,8 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
@@ -20,6 +23,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageGetters = workspaceHomePageStore.getters;
+
+const router = useRouter();
 
 const storeState = reactive({
     favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageGetters.favoriteMenuList),
@@ -98,18 +103,44 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
                 />
             </div>
         </div>
-        <div class="suggestion-list-wrapper">
+        <div v-if="storeState.favoriteMenuList.length > 0"
+             class="suggestion-list-wrapper"
+        >
             <user-configs-item v-for="(item) in state.slicedFavoriteMenuList"
                                :key="item.itemId"
                                :item="item"
                                @click-favorite="workspaceHomePageStore.fetchFavoriteList()"
             />
         </div>
+        <div v-else
+             class="empty"
+        >
+            <span class="title">{{ $t('HOME.NO_STARRED') }}</span>
+            <div class="desc-wrapper">
+                <p>{{ $t('HOME.NO_STARRED_DESC1') }}</p>
+                <p>{{ $t('HOME.NO_STARRED_DESC2') }}</p>
+            </div>
+            <div class="route-buttons">
+                <p-text-button style-type="highlight"
+                               @click="router.push({ name: DASHBOARDS_ROUTE._NAME })"
+                >
+                    <span>{{ $t('MENU.DASHBOARDS') }}</span>
+                </p-text-button>
+                <span>/</span>
+                <p-text-button style-type="highlight"
+                               @click="router.push({ name: PROJECT_ROUTE._NAME })"
+                >
+                    <span>{{ $t('MENU.PROJECT') }}</span>
+                </p-text-button>
+                <!-- TODO: add Metric Explorer after merged -->
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .user-config-starred {
+    @apply flex flex-col;
     .header-wrapper {
         @apply flex items-center;
         padding: 1rem;
@@ -131,6 +162,21 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
         padding-right: 1.5rem;
         padding-bottom: 1.25rem;
         padding-left: 1.5rem;
+    }
+    .empty {
+        @apply flex flex-col items-center justify-center;
+        gap: 0.75rem;
+        flex: 1;
+        .title {
+            @apply text-label-xl text-gray-800;
+        }
+        .desc-wrapper {
+            @apply flex flex-col items-center text-paragraph-md text-gray-700;
+        }
+        .route-buttons {
+            @apply flex;
+            gap: 0.5rem;
+        }
     }
 }
 </style>

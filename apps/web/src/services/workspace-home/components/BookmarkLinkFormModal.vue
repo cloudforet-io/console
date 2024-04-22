@@ -27,13 +27,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
-const bookmarkGetters = bookmarkStore.getters;
+const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
-    modal: computed<BookmarkModalStateType>(() => bookmarkGetters.modal),
-    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkGetters.selectedBookmark),
-    isFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFullMode),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkGetters.isFileFullMode),
+    modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
+    isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
+    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
     loading: false,

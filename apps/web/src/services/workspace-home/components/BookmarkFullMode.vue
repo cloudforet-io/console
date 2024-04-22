@@ -18,10 +18,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
-const bookmarkGetters = bookmarkStore.getters;
+const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
-    isFileFullMode: computed<boolean>(() => bookmarkGetters.isFileFullMode),
+    isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
     folderBoardSets: computed<BookmarkBoardSet[]>(() => {

@@ -1,9 +1,11 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
-import type { WORKSPACE_HOME_DATA_TYPE, BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type { WORKSPACE_HOME_DATA_TYPE, BOOKMARK_MODAL_TYPE, SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 export type WorkspaceHomeDataType = typeof WORKSPACE_HOME_DATA_TYPE[keyof typeof WORKSPACE_HOME_DATA_TYPE];
 
@@ -12,7 +14,7 @@ export interface CloudServiceData {
     cloud_service_group: string;
     cloud_service_type: string;
     total_count: number;
-    icon: string;
+    icon?: string;
     provider: string;
     created_count: number;
     deleted_count: number;
@@ -26,6 +28,7 @@ export type ProviderResourceDataItem = ProviderItem & {
     storage?: number;
 };
 export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
+export type SummaryDataType = typeof SUMMARY_DATA_TYPE[keyof typeof SUMMARY_DATA_TYPE];
 
 // bookmark
 export interface BookmarkItem {
@@ -45,3 +48,10 @@ export type BookmarkModalStateType = {
     isNew?: boolean;
     isEdit?: boolean;
 };
+
+export interface EmptyData {
+    to?: { name: string };
+    title: string | TranslateResult;
+    buttonText?: string | TranslateResult;
+    desc: string | TranslateResult;
+}
