@@ -3,6 +3,7 @@ import { onClickOutside } from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PContextMenu, useContextMenuController, PIconButton,
@@ -38,10 +39,10 @@ const projectPageState = projectPageStore.state;
 
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
+const route = useRoute();
 
 const storeState = reactive({
     userId: computed(() => store.state.user.userId),
-    groupId: computed(() => projectPageGetters.groupId),
     groupName: computed(() => projectPageGetters.groupName),
     selectedItem: computed(() => projectPageState.selectedItem),
     selectedNodeData: computed(() => projectPageGetters.selectedNodeData),
@@ -54,6 +55,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
+    currentProjectGroupId: computed(() => route.params.projectGroupId),
     projectGroupNavigation: computed(() => {
         const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
         if (storeState.selectedNodeData && storeState.groupName) {
@@ -74,10 +76,18 @@ const state = reactive({
     projectGroupModalVisible: false,
     favoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.PROJECT_GROUP,
-        id: storeState.groupId,
+        id: state.currentProjectGroupId,
     })),
     projectGroupMemberManagementModalVisible: false,
     projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
+});
+
+const modalState = reactive({
+    projectGroupFormVisible: false,
+    projectGroupDeleteCheckModalVisible: false,
+    projectFormModalVisible: false,
+    actionTargetItem: undefined,
+    projectGroupUpdateMode: false,
 });
 
 const {
@@ -100,7 +110,8 @@ const onProjectGroupNavClick = async (item: Breadcrumb) => {
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
-    projectPageStore.openProjectGroupFormModal(storeState.selectedItem, true);
+    modalState.projectGroupUpdateMode = true;
+    modalState.projectGroupFormVisible = true;
 };
 const handleClickProjectGroupDeleteButton = () => {
     projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
@@ -123,7 +134,8 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
         projectPageStore.openProjectFormModal(storeState.selectedItem);
     } else if (item.name === 'projectGroup') {
-        projectPageStore.openProjectGroupFormModal(storeState.selectedItem);
+        modalState.projectGroupUpdateMode = false;
+        modalState.projectGroupFormVisible = true;
     }
 };
 
@@ -145,12 +157,9 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
 
 <template>
     <div class="page-wrapper">
-        <p-heading :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECTS')"
-                   use-total-count
-                   :total-count="storeState.projectCount || 0"
-        >
+        <p-heading :title="state.currentProjectGroupId ? storeState.projectGroups[state.currentProjectGroupId].name : $t('PROJECT.LANDING.ALL_PROJECTS')">
             <template #title-right-extra>
-                <div v-if="storeState.groupId"
+                <div v-if="state.currentProjectGroupId"
                      class="title-right-button-wrapper"
                 >
                     <template v-if="projectPageState.isWorkspaceOwner">
@@ -169,7 +178,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                     </template>
                 </div>
                 <div class="top-button-box">
-                    <p-button v-if="storeState.groupId"
+                    <p-button v-if="state.currentProjectGroupId"
                               style-type="tertiary"
                               icon-left="ic_member"
                               class="mr-4"
@@ -200,23 +209,23 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             </template>
         </p-heading>
         <project-main />
-        <!--        <project-main-card-list-->
-        <!--            class="card-container"-->
-        <!--            :parent-groups="storeState.parentGroups"-->
-        <!--        />-->
 
-        <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
+        <project-main-project-group-form-modal v-if="modalState.projectGroupFormVisible"
+                                               :visible.sync="modalState.projectGroupFormVisible"
+                                               :project-group-id="state.currentProjectGroupId"
+                                               :update-mode="modalState.projectGroupUpdateMode"
+        />
         <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
         <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
                                                :visible.sync="state.projectGroupModalVisible"
                                                :is-project="false"
-                                               :target-id="storeState.groupId"
+                                               :target-id="state.currentProjectGroupId"
                                                @confirm="handleConfirmProjectGroupMoveModal"
         />
         <project-group-member-management-modal
             v-if="state.projectGroupMemberManagementModalVisible"
             :visible.sync="state.projectGroupMemberManagementModalVisible"
-            :project-group-id="storeState.groupId"
+            :project-group-id="state.currentProjectGroupId"
         />
     </div>
 </template>
