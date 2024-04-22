@@ -36,10 +36,11 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const router = useRouter();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    existingMetricNameList: computed<string[]>(() => metricExplorerPageState.metricList
+    existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
         .filter((d) => d.name !== metricExplorerPageState.metric?.name)
         .map((metric) => metric.name)),
 });
