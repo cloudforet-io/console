@@ -11,8 +11,6 @@ const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPa
 const ProjectDetailTabPage = () => import('@/services/project/pages/ProjectDetailTabPage.vue');
 
 const ProjectDashboardPage = () => import('@/services/project/pages/ProjectDashboardPage.vue');
-
-const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
@@ -58,17 +56,10 @@ export default {
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     props: true,
                     component: ProjectDetailTabPage,
                     children: [
-                        {
-                            path: 'summary',
-                            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-                            meta: { lsbVisible: true },
-                            props: true,
-                            component: ProjectSummaryPage,
-                        },
                         {
                             path: 'member',
                             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,

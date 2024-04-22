@@ -47,7 +47,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* PROJECT */
-    if (to.name === PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME) {
+    if (to.name === PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME) {
         const projectId = to?.params?.id;
         if (!projectId) return undefined;
         return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };

@@ -97,11 +97,6 @@ const state = reactive({
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => [
         {
-            name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-            label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
-            keepAlive: true,
-        },
-        {
             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
         },
@@ -118,7 +113,7 @@ const singleItemTabState = reactive({
             label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
         },
     ]),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+    activeTab: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
 });
 
 const onChangeTab = (activeTab) => {
@@ -138,7 +133,7 @@ watch(() => projectDetailPageState.projectId, async (projectId) => {
 
 watch(() => route.name, () => {
     const exactRoute = route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
-    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+    singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME;
 }, { immediate: true });
 
 watch([
@@ -194,7 +189,7 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .project-detail-tab-page {
     height: 100%;
-    margin-top: -0.25rem;
+    margin-top: 1.5rem;
 }
 .page-inner {
     height: 100%;
