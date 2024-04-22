@@ -65,8 +65,8 @@ const drawChart = () => {
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = 'month';
-    xAxis.get('dateFormats').month = 'YYYY-MM';
-    xAxis.get('periodChangeDateFormats').month = 'YYYY-MM';
+    xAxis.get('dateFormats').month = 'yyyy-MM';
+    xAxis.get('periodChangeDateFormats').month = 'yyyy-MM';
 
     // hide zoom button
     chart.zoomOutButton.set('forceHidden', true);
@@ -86,7 +86,7 @@ const drawChart = () => {
 
     // set data processor on series
     series.data.processor = chartHelper.createDataProcessor({
-        dateFormat: 'YYYY-MM',
+        dateFormat: 'yyyy-MM',
         dateFields: [DATE_FIELD_NAME],
     });
 
