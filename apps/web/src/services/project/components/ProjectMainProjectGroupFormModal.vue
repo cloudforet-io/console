@@ -15,23 +15,32 @@ import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-gro
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+interface Props {
+    visible: boolean;
+    projectGroupId?: string;
+    updateMode: boolean;
+}
 
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+}>();
 
-const projectPageStore = useProjectPageStore();
-const projectPageGetters = projectPageStore.getters;
-const projectPageState = projectPageStore.state;
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    projectGroups: computed(() => allReferenceStore.getters.projectGroup),
+});
+
 const state = reactive({
-    proxyVisible: computed({
-        get() { return projectPageState.projectGroupFormVisible; },
-        set(val) { projectPageStore.setProjectGroupFormVisible(val); },
-    }),
-    currentGroupId: computed(() => projectPageGetters.actionTargetNodeData?.id),
+    proxyVisible: useProxyValue('visible', props, emit),
     projectGroupNames: [] as string[],
     loading: false,
 });
@@ -58,25 +67,24 @@ const getProjectGroupNames = async () => {
     const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
         query: projectGroupNameApiQuery.data,
     });
-    const names = res.results?.map((d) => d.name) ?? [];
-    if (projectPageState.projectGroupFormUpdateMode) {
-        state.projectGroupNames = names.filter((name) => name !== projectPageGetters.groupName);
+    if (props.updateMode) {
+        state.projectGroupNames = (res.results || []).filter((projectGroup) => projectGroup.project_group_id !== props.projectGroupId).map((item) => item.name);
     } else {
-        state.projectGroupNames = names;
+        state.projectGroupNames = (res.results || []).map((item) => item.name);
     }
 };
 
 const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
-        await projectPageStore.createProjectGroup(params);
+        await SpaceConnector.clientV2.identity.projectGroup.create<ProjectGroupCreateParameters, ProjectGroupModel>(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
     }
 };
-const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
+const updateProjectGroup = async (params: ProjectGroupUpdateParameters) => {
     try {
-        await projectPageStore.updateProjectGroup(params);
+        await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters, ProjectGroupModel>(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -93,16 +101,16 @@ const confirm = async () => {
         name: projectGroupName.value,
     };
 
-    if (!projectPageState.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
-    else await updateProjectGroup(params);
+    if (!props.updateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
+    else await updateProjectGroup({ ...params, project_group_id: props.projectGroupId as string });
 
     state.loading = false;
-    projectPageStore.setProjectGroupFormVisible(false);
+    state.proxyVisible = false;
 };
 
-watch(() => state.currentGroupId, async (after) => {
-    if (after && projectPageState.projectGroupFormUpdateMode) {
-        setForm('projectGroupName', projectPageGetters.groupName);
+watch(() => props.projectGroupId, async (after) => {
+    if (after && props.updateMode) {
+        setForm('projectGroupName', storeState.projectGroups[after].name);
     } else {
         initForm();
     }
@@ -116,7 +124,7 @@ watch(() => state.currentGroupId, async (after) => {
 </script>
 
 <template>
-    <p-button-modal :header-title="projectPageState.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+    <p-button-modal :header-title="props.updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
                     centered
                     size="sm"
                     fade
