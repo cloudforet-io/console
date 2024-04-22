@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Vue, {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -9,15 +9,6 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
-import type { AppModel } from '@/schema/identity/app/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -26,9 +17,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-import type { RoleInfo } from '@/store/modules/user/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
@@ -41,29 +30,37 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { useAppPageStore } from '@/services/iam/store/app-page-store';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+
+interface Props {
+    accessUserMenu: boolean;
+    accessAppMenu: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    accessUserMenu: false,
+    accessAppMenu: false,
+});
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const userPageStore = useUserPageStore();
 const appPageStore = useAppPageStore();
 const appContextStore = useAppContextStore();
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageGetters = workspaceHomePageStore.getters;
 
 const router = useRouter();
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspace: computed<WorkspaceModel|undefined>(() => userWorkspaceGetters.currentWorkspace),
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
+    workspaceUserTotalCount: computed<number|undefined>(() => workspaceHomePageGetters.workspaceUserTotalCount),
+    appsTotalCount: computed<number|undefined>(() => workspaceHomePageGetters.appsTotalCount),
 });
 const state = reactive({
-    pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
-    isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-    accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
-    accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
     selectedWorkspace: computed<WorkspaceModel>(() => storeState.workspaceList.find((workspace) => workspace.workspace_id === storeState.currentWorkspace?.workspace_id) || {} as WorkspaceModel),
-    workspaceUserTotalCount: undefined as number|undefined,
-    appsTotalCount: undefined as number|undefined,
 });
 
 const handleActionButton = (type: string) => {
@@ -118,40 +115,6 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
         });
     }
 };
-
-const listQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchWorkspaceUserList = async () => {
-    try {
-        const { total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-            workspace_id: state.selectedWorkspace.workspace_id,
-            query: listQueryHelper.data,
-        });
-        state.workspaceUserTotalCount = total_count || undefined;
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    }
-};
-const fetchAppList = async () => {
-    try {
-        const { total_count } = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>({
-            workspace_id: state.selectedWorkspace.workspace_id,
-            query: listQueryHelper.data,
-        });
-        state.appsTotalCount = total_count || undefined;
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
-    }
-};
-
-watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
-    if (!workspace_id) return;
-    if (state.accessUserMenu) {
-        await fetchWorkspaceUserList();
-    }
-    if (state.accessAppMenu) {
-        await fetchAppList();
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -189,14 +152,14 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
             </template>
             <template #extra>
                 <div class="extra-wrapper">
-                    <p-button v-if="state.accessUserMenu"
+                    <p-button v-if="props.accessUserMenu"
                               style-type="tertiary"
                               icon-left="ic_service_user"
                               @click="handleActionButton('invite')"
                     >
                         {{ $t('HOME.INFO_INVITE_USER') }}
                     </p-button>
-                    <p-button v-if="state.accessAppMenu"
+                    <p-button v-if="props.accessAppMenu"
                               style-type="tertiary"
                               icon-left="ic_service_app"
                               @click="handleActionButton('create')"
@@ -210,7 +173,7 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
               class="desc"
         >{{ state.selectedWorkspace.tags?.description }}</span>
         <div class="info-cnt-wrapper">
-            <div v-if="state.accessUserMenu"
+            <div v-if="props.accessUserMenu"
                  class="info-cnt"
             >
                 <p-i name="ic_service_user"
@@ -219,17 +182,17 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
                      color="inherit"
                 />
                 <p-text-button @click="handleActionButton('user')">
-                    {{ state.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
+                    {{ storeState.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
                 </p-text-button>
             </div>
-            <p-i v-if="state.accessAppMenu && state.accessUserMenu"
+            <p-i v-if="props.accessAppMenu && props.accessUserMenu"
                  name="ic_dot"
                  width="0.125rem"
                  height="0.125rem"
                  :color="gray[500]"
                  class="dot"
             />
-            <div v-if="state.accessAppMenu"
+            <div v-if="props.accessAppMenu"
                  class="info-cnt"
             >
                 <p-i name="ic_service_app"
@@ -238,7 +201,7 @@ watch(() => state.selectedWorkspace.workspace_id, async (workspace_id) => {
                      color="inherit"
                 />
                 <p-text-button @click="handleActionButton('app')">
-                    {{ state.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
+                    {{ storeState.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
                 </p-text-button>
             </div>
         </div>
