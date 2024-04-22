@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, nextTick, onMounted, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -10,8 +10,6 @@ import {
 import { isEmpty } from 'lodash';
 
 
-import type { MetricModel } from '@/schema/inventory/metric/model';
-import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -19,6 +17,8 @@ import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
+import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
+import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -33,7 +33,6 @@ import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 interface NamespaceSubItemType {
@@ -45,13 +44,12 @@ interface NamespaceSubItemType {
 const route = useRoute();
 const router = useRouter();
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
-    loading: computed(() => metricExplorerPageStore.state.namespaceListLoading || metricExplorerPageStore.state.metricListLoading),
-    currentMetric: computed<MetricModel|undefined>(() => (state.isDetailPage ? metricExplorerPageStore.state.metric : undefined)),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
@@ -61,11 +59,12 @@ const storeState = reactive({
         });
         return res;
     }),
+
 });
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME),
+    isDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME && route.params.id),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -95,7 +94,7 @@ const state = reactive({
 const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
-    namespaces: computed<NamespaceModel[]>(() => metricExplorerPageStore.state.namespaces),
+    namespaces: computed<NamespaceReferenceItem[]>(() => Object.values(storeState.namespaces)),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
         if (!keyword) return namespaceState.namespaces;
@@ -120,7 +119,9 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
-    metrics: computed<MetricModel[]>(() => metricExplorerPageStore.state.metricList),
+    // metrics: computed<MetricModel[]>(() => metricExplorerPageStore.state.metricList),
+    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.id] : undefined)),
+    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
     metricsFilteredByInput: computed(() => {
         const keyword = metricState.inputValue.toLowerCase();
         if (!keyword) return metricState.metrics;
@@ -129,21 +130,21 @@ const metricState = reactive({
     metricItems: computed<LSBItem[]>(() => metricState.metricsFilteredByInput.map((metric) => ({
         type: MENU_ITEM_TYPE.ITEM,
         label: metric.name,
-        id: metric.metric_id,
-        icon: metric.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
+        id: metric.key,
+        icon: metric.data.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
         to: getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { id: metric.metric_id },
+            params: { id: metric.key },
         }),
     }))),
     addCustomMetricModalVisible: false,
 });
 
 /* Helper */
-const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const commonNamespaces = namespaces.filter((namespace) => namespace.category === 'COMMON').map((namespace) => ({
+const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+    const commonNamespaces = namespaces.filter((namespace) => namespace.data.category === 'COMMON').map((namespace) => ({
         label: namespace.name,
-        name: namespace.namespace_id,
+        name: namespace.key,
     }));
     if (commonNamespaces.length === 0) return [];
     return [{
@@ -152,14 +153,14 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[
         subItems: commonNamespaces,
     }];
 };
-const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.category === 'ASSET').forEach((namespace) => {
+    namespaces.filter((namespace) => namespace.data.category === 'ASSET').forEach((namespace) => {
         const providerData = storeState.providers[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
                 label: namespace.name,
-                name: namespace.namespace_id,
+                name: namespace.key,
                 provider: namespace.provider,
             });
         } else {
@@ -169,7 +170,7 @@ const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceModel[]
                 icon: providerData.icon,
                 subItems: [{
                     label: namespace.name,
-                    name: namespace.namespace_id,
+                    name: namespace.key,
                     provider: namespace.provider,
                 }],
             };
@@ -204,10 +205,6 @@ const handleSearchMetric = (keyword: string) => {
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
     namespaceState.selectedNamespace = namespace;
-    metricExplorerPageStore.$patch((_store) => {
-        const selectedNamespace = namespaceState.namespaces.find((item) => item.namespace_id === namespace.name);
-        if (selectedNamespace) _store.state.selectedNamespace = selectedNamespace;
-    });
 };
 const handleClickBackToNamespace = () => {
     namespaceState.selectedNamespace = undefined;
@@ -219,13 +216,6 @@ const handleClickBackToHome = () => {
     router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
 };
 
-watch(() => namespaceState.selectedNamespace, (selectedNamespace) => {
-    if (selectedNamespace) {
-        nextTick(() => {
-            metricExplorerPageStore.loadMetrics(selectedNamespace?.name);
-        });
-    }
-});
 
 watch(() => route.params, (params) => {
     if (!params.id) {
@@ -234,12 +224,10 @@ watch(() => route.params, (params) => {
 });
 
 onMounted(async () => {
-    await metricExplorerPageStore.loadNamespaces();
-    if (state.isDetailPage) await metricExplorerPageStore.loadMetric(route.params.id);
-    if (storeState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+    if (metricState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
-            label: namespaceState.namespaces.find((item) => item.namespace_id === storeState.currentMetric?.namespace_id).name,
-            name: storeState.currentMetric.namespace_id,
+            label: namespaceState.namespaces.find((item) => item.key === metricState.currentMetric?.data.namespace_id).name,
+            name: metricState.currentMetric.data.namespace_id,
         };
     }
 });
@@ -273,7 +261,7 @@ onMounted(async () => {
             </span>
         </template>
         <template #slot-namespace>
-            <p-data-loader :loading="storeState.loading"
+            <p-data-loader :loading="false"
                            :loader-backdrop-opacity="0.5"
                            :loader-backdrop-color="gray[100]"
                            class="namespace-data-loader"
@@ -346,7 +334,7 @@ onMounted(async () => {
             </p-data-loader>
         </template>
         <template #slot-metric>
-            <p-data-loader :loading="storeState.loading"
+            <p-data-loader :loading="false"
                            :loader-backdrop-opacity="0.5"
                            :loader-backdrop-color="gray[100]"
                            class="metric-data-loader"

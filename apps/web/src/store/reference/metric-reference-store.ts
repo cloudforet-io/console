@@ -19,8 +19,8 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type MetricItem = Required<Pick<ReferenceItem<Partial<MetricModel>>, 'key'|'label'|'name'|'data'>>;
-export type MetricReferenceMap = ReferenceMap<MetricItem>;
+export type MetricReferenceItem = Required<Pick<ReferenceItem<Partial<MetricModel>>, 'key'|'label'|'name'|'data'>>;
+export type MetricReferenceMap = ReferenceMap<MetricReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
@@ -57,7 +57,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
         try {
             const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
                 query: {
-                    only: ['metric_id', 'name', 'namespace_id'],
+                    only: ['metric_id', 'name', 'namespace_id', 'is_managed'],
                 },
             }, { timeout: 3000 });
 
@@ -68,6 +68,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                     name: metricInfo.name,
                     data: {
                         namespace_id: metricInfo.namespace_id,
+                        is_managed: metricInfo.is_managed,
                     },
                 };
             });
@@ -87,6 +88,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                 name: metricInfo.name,
                 data: {
                     namespace_id: metricInfo.namespace_id,
+                    is_managed: metricInfo.is_managed,
                 },
             },
         };
