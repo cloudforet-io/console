@@ -88,9 +88,7 @@ const state = reactive({
             type: MENU_ITEM_TYPE.ITEM,
             label: 'All Projects',
             icon: 'ic_dots-4-square',
-            to: getProperRouteLocation({
-                name: PROJECT_ROUTE._NAME,
-            }),
+            to: getProperRouteLocation({ name: PROJECT_ROUTE._NAME }),
             hideFavorite: true,
         },
         {
@@ -114,34 +112,26 @@ const state = reactive({
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
             id: 'project-member',
-            to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-            },
+            to: { name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME },
             hideFavorite: true,
         },
         {
             type: MENU_ITEM_TYPE.SLOT,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
             id: 'project-alert',
-            to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-            },
+            to: { name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME },
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
             id: 'project-notification',
-            to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-            },
+            to: { name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME },
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
             id: 'project-tag',
-            to: {
-                name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-            },
+            to: { name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME },
         },
     ]),
     menuSet: computed<LSBMenu[]>(() => {
