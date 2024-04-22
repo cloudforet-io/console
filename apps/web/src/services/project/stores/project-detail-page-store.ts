@@ -24,7 +24,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     const state = reactive({
         loading: false,
         projectId: undefined as string | undefined,
-        currentProject: null as ProjectModel | null,
+        currentProject: undefined as ProjectModel | undefined,
         alertCounts: [] as AlertCount[],
     });
     const getters = reactive({
@@ -35,7 +35,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     const setProjectId = (projectId?: string) => {
         state.projectId = projectId;
     };
-    const setProject = (project: ProjectModel|null) => {
+    const setProject = (project: ProjectModel|undefined) => {
         state.currentProject = project;
     };
 
@@ -49,7 +49,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
                 project_id: _projectId,
             });
         } catch (e) {
-            state.currentProject = null;
+            state.currentProject = undefined;
             ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
         } finally {
             state.loading = false;
@@ -68,7 +68,7 @@ export const useProjectDetailPageStore = defineStore('page-project-detail', () =
     };
     const reset = () => {
         state.projectId = '';
-        state.currentProject = null;
+        state.currentProject = undefined;
         state.alertCounts = [];
     };
 
