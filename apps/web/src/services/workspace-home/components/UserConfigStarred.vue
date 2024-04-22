@@ -22,12 +22,12 @@ import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/works
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
-const workspaceHomePageGetters = workspaceHomePageStore.getters;
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const router = useRouter();
 
 const storeState = reactive({
-    favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageGetters.favoriteMenuList),
+    favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageState.favoriteMenuList),
 
 });
 const state = reactive({
