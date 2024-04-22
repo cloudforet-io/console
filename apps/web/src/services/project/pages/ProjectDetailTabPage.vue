@@ -189,7 +189,7 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 .project-detail-tab-page {
     height: 100%;
-    margin-top: -0.25rem;
+    margin-top: 1.5rem;
 }
 .page-inner {
     height: 100%;
