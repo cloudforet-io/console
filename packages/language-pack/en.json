@@ -1758,8 +1758,8 @@
 		}
 	},
 	"HOME": {
+		"ACTIVATION_REQUIRED": "Activation Required",
 		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
-		"ACTIVATION_REQUIRED_TITLE": "Activation Required",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
 		"ALT_S_ADD_LINK": "Link successfully Added ",
 		"ASSET_SUMMARY_CREATED": "Created",

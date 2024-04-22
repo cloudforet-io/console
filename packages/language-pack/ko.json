@@ -1758,8 +1758,8 @@
 		}
 	},
 	"HOME": {
+		"ACTIVATION_REQUIRED": "",
 		"ACTIVATION_REQUIRED_DESC": "",
-		"ACTIVATION_REQUIRED_TITLE": "",
 		"ALT_E_DUPLICATED_NAME": "이름이 중복되었습니다. ",
 		"ALT_S_ADD_LINK": "",
 		"ASSET_SUMMARY_CREATED": "생성일",
