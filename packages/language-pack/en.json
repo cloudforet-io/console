@@ -1796,7 +1796,10 @@
 		"INFO_CREATE_APP": "Create App",
 		"INFO_INVITE_USER": "Invite User",
 		"INFO_USERS": "users",
-		"TOGGLE_MORE": "show more"
+		"TOGGLE_MORE": "show more",
+		"WELCOME_BUTTON": "Explore Now",
+		"WELCOME_DESC": "Start to manage your multi cloud resources and costs.",
+		"WELCOME_TITLE": "Welcome, {name}"
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",

@@ -1796,7 +1796,10 @@
 		"INFO_CREATE_APP": "앱 생성",
 		"INFO_INVITE_USER": "",
 		"INFO_USERS": "사용자",
-		"TOGGLE_MORE": "더보기"
+		"TOGGLE_MORE": "더보기",
+		"WELCOME_BUTTON": "",
+		"WELCOME_DESC": "",
+		"WELCOME_TITLE": ""
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "중복된 ‘key:value’ 입니다.",
