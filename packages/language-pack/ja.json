@@ -2751,6 +2751,7 @@
 			"NAME": "名前",
 			"NAME_DUPLICATED": "重複した名前です。",
 			"NAME_REQUIRED": "名前を入力してください",
+			"NO_DATA": "",
 			"NO_ITEMS": "アイテムがありません",
 			"NO_LEGENDS": "",
 			"OPERATOR": "",

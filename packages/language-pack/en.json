@@ -2751,6 +2751,7 @@
 			"NAME": "Name",
 			"NAME_DUPLICATED": "Name is duplicated.",
 			"NAME_REQUIRED": "Please enter name.",
+			"NO_DATA": "No Data",
 			"NO_ITEMS": "No Items",
 			"NO_LEGENDS": "There are no legends for this chart type",
 			"OPERATOR": "Operator",

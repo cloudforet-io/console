@@ -64,7 +64,7 @@ const state = reactive({
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
+const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
     try {
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
@@ -85,7 +85,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
                 },
                 sort: [{ key: '_total_count', desc: true }],
                 field_group: ['date'],
-                ...analyzeApiQueryHelper.data,
+                ...(setPage ? analyzeApiQueryHelper.data : { filter: analyzeApiQueryHelper.apiQuery.filter }),
             },
         });
         if (status === 'succeed') return response;
@@ -112,8 +112,10 @@ const handleUpdateThisPage = async () => {
 };
 const handleExport = async () => {
     try {
+        const { results } = await analyzeMetricData(false);
+        const refinedData = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
         await downloadExcel({
-            data: state.items,
+            data: refinedData,
             fields: state.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.metricExplorer,
         });
