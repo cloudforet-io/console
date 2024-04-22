@@ -9,17 +9,14 @@ import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -32,19 +29,20 @@ import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-e
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const { getProperRouteLocation } = useProperRouteLocation();
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageGetters = workspaceHomePageStore.getters;
+
 
 const storeState = reactive({
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
+    costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageGetters.costReportConfig),
 });
 const state = reactive({
     loading: false,
     currentDate: undefined as Dayjs | undefined,
-    costReportConfig: null as CostReportConfigModel|null|undefined,
-    currency: computed<Currency|undefined>(() => state.costReportConfig?.currency),
+    currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency),
     recentReportMonth: undefined as string|undefined,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
@@ -56,19 +54,6 @@ const state = reactive({
     }),
 });
 
-const fetchApiHelper = new ApiQueryHelper().setSort('created_at', true);
-const fetchCostReportConfig = async () => {
-    if (state.costReportConfig !== null) return;
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.costReportConfig.list<CostReportConfigListParameters, ListResponse<CostReportConfigModel>>({
-            query: fetchApiHelper.data,
-        });
-        state.costReportConfig = results?.[0];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.costReportConfig = undefined;
-    }
-};
 const analyzeCostReportData = async (isChart?: boolean) => {
     state.loading = true;
     try {
@@ -102,7 +87,7 @@ const analyzeCostReportData = async (isChart?: boolean) => {
             }],
         };
         const res = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
-            cost_report_config_id: state.costReportConfig?.cost_report_config_id,
+            cost_report_config_id: storeState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: isChart ? { ...defaultQuery, ...chartQuery } : { ...defaultQuery, ...reportQuery },
         });
@@ -141,19 +126,14 @@ const fetchRecentReportData = async (costReportConfigId?: string) => {
     }
 };
 
-watch(() => state.costReportConfig, async () => {
-    await fetchRecentReportData(state.costReportConfig?.cost_report_config_id);
+watch(() => storeState.costReportConfig, async () => {
+    await fetchRecentReportData(storeState.costReportConfig?.cost_report_config_id);
     await analyzeCostReportData();
     await analyzeCostReportData(true);
-});
+}, { immediate: true });
 watch(() => state.recentReportMonth, async (after) => {
     if (!after) return;
     state.currentDate = dayjs.utc(after);
-}, { immediate: true });
-
-watch(() => storeState.currentWorkspaceId, async () => {
-    if (!storeState.currentWorkspaceId) return;
-    await fetchCostReportConfig();
 }, { immediate: true });
 </script>
 

@@ -124,10 +124,11 @@ const handleGoBackButton = () => {
         </div>
         <div class="toolbox-wrapper">
             <p-button icon-left="ic_plus"
+                      class="add-link-button"
                       :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
                       @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
             >
-                {{ $t('HOME.BOOKMARK_ADD_LINK') }}
+                <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
             </p-button>
             <p-icon-button v-if="!storeState.isFullMode"
                            name="ic_chevron-down"
@@ -150,7 +151,6 @@ const handleGoBackButton = () => {
 <style scoped lang="postcss">
 .bookmark-header {
     @apply flex items-center;
-    padding-bottom: 1rem;
     gap: 0.5rem;
     .bookmark-folders-wrapper {
         @apply flex items-center;
@@ -183,6 +183,9 @@ const handleGoBackButton = () => {
         @apply flex;
         margin-left: auto;
         gap: 0.5rem;
+        .add-link-button {
+            @apply text-label-md;
+        }
     }
 
     /* custom design-system component - p-field-title */

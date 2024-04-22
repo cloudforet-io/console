@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive, watch } from 'vue';
-
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import { computed, reactive } from 'vue';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import BookmarkDeleteModal from '@/services/workspace-home/components/BookmarkDeleteModal.vue';
@@ -14,15 +12,12 @@ import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspa
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const bookmarkStore = useBookmarkStore();
 const bookmarkGetters = bookmarkStore.getters;
 
 const { height } = useWindowSize();
 
 const storeState = reactive({
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkFolderList),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     isFullMode: computed<boolean>(() => bookmarkGetters.isFullMode),
@@ -35,12 +30,6 @@ const state = reactive({
     }))),
     contentHeight: computed<number|undefined>(() => height.value - 392),
 });
-
-watch(() => storeState.currentWorkspaceId, async () => {
-    if (!storeState.currentWorkspaceId) return;
-    await bookmarkStore.fetchBookmarkFolderList();
-    await bookmarkStore.fetchBookmarkList();
-}, { immediate: true });
 </script>
 
 <template>

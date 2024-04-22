@@ -7,41 +7,27 @@ import {
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
-import type { UserConfigModel } from '@/schema/config/user-config/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
-
-
-const userWorkspaceStore = useUserWorkspaceStore();
-const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
-
-const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageGetters = workspaceHomePageStore.getters;
 
 const storeState = reactive({
-    userId: computed<string>(() => store.state.user.userId),
-    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
+    favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageGetters.favoriteMenuList),
+
 });
 const state = reactive({
     pageStart: 1,
-    favoriteMenuList: [] as FavoriteItem[],
-    slicedFavoriteMenuList: computed<FavoriteItem[]>(() => state.favoriteMenuList.slice((state.pageStart - 1) * 10, state.pageStart * 10)),
+    slicedFavoriteMenuList: computed<FavoriteItem[]>(() => storeState.favoriteMenuList.slice((state.pageStart - 1) * 10, state.pageStart * 10)),
 });
 const dropdownState = reactive({
     dropdownMenuList: computed<SelectDropdownMenuItem[]>(() => {
@@ -83,37 +69,9 @@ const dropdownState = reactive({
     selectedItem: 'All',
 });
 
-const fetchFavoriteList = async (selectedItem?: string) => {
-    favoriteListApiQuery.setFilters([
-        { k: 'user_id', v: storeState.userId, o: '=' },
-        { k: 'data.workspaceId', v: storeState.currentWorkspaceId || '', o: '=' },
-        { k: 'data.itemType', v: FAVORITE_TYPE.WORKSPACE, o: '!=' },
-    ]);
-    if (selectedItem === 'All' || !selectedItem) {
-        favoriteListApiQuery.addFilter({ k: 'name', v: 'console:favorite:', o: '' });
-    } else {
-        favoriteListApiQuery.addFilter({ k: 'name', v: `console:favorite:${selectedItem}`, o: '' });
-    }
-    try {
-        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
-            query: favoriteListApiQuery.data,
-        });
-        const _recentList = (results ?? []).map((i) => i.data as FavoriteItem);
-        state.favoriteMenuList = _recentList.filter((i) => !i?.isDeleted);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.favoriteMenuList = [];
-    }
-};
-
 watch(() => dropdownState.selectedItem, async (selectedItem) => {
-    if (!storeState.currentWorkspaceId) return;
-    await fetchFavoriteList(selectedItem);
-}, { immediate: true });
-watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
-    if (!currentWorkspaceId) return;
-    await fetchFavoriteList();
-}, { immediate: true });
+    await workspaceHomePageStore.fetchFavoriteList(selectedItem);
+});
 </script>
 
 <template>
@@ -134,7 +92,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                     :selected.sync="dropdownState.selectedItem"
                     menu-position="right"
                 />
-                <p-pagination :total-count="state.favoriteMenuList.length"
+                <p-pagination :total-count="storeState.favoriteMenuList.length"
                               :page-size="10"
                               @change="state.pageStart = $event"
                 />
@@ -144,7 +102,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             <user-configs-item v-for="(item) in state.slicedFavoriteMenuList"
                                :key="item.itemId"
                                :item="item"
-                               @click-favorite="fetchFavoriteList"
+                               @click-favorite="workspaceHomePageStore.fetchFavoriteList()"
             />
         </div>
     </div>

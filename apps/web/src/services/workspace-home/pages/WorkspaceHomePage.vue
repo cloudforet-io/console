@@ -1,20 +1,53 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+import type { RoleInfo } from '@/store/modules/user/type';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import Bookmark from '@/services/workspace-home/components/Bookmark.vue';
 import Summaries from '@/services/workspace-home/components/Summaries.vue';
 import UserConfigs from '@/services/workspace-home/components/UserConfigs.vue';
 import WorkspaceInfo from '@/services/workspace-home/components/WorkspaceInfo.vue';
+import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const bookmarkStore = useBookmarkStore();
 
 const storeState = reactive({
+    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
+const state = reactive({
+    pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
+    isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
+    accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
+});
+
+watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
+    if (!currentWorkspaceId) return;
+    await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
+    await workspaceHomePageStore.fetchFavoriteList();
+    await workspaceHomePageStore.fetchCostReportConfig();
+    await bookmarkStore.fetchBookmarkFolderList();
+    await bookmarkStore.fetchBookmarkList();
+    if (state.accessUserMenu) {
+        await workspaceHomePageStore.fetchWorkspaceUserList();
+    }
+    if (state.accessAppMenu) {
+        await workspaceHomePageStore.fetchAppList();
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -22,7 +55,9 @@ const storeState = reactive({
                          class="workspace-home-page"
     >
         <div class="page-contents">
-            <workspace-info />
+            <workspace-info :access-user-menu="state.accessAppMenu"
+                            :access-app-menu="state.accessAppMenu"
+            />
             <bookmark />
             <user-configs class="section" />
             <summaries class="section" />
