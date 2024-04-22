@@ -122,7 +122,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 />
             </div>
             <template #no-data>
-                {{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}
+                <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}</span>
             </template>
         </p-data-loader>
         <p-text-button v-if="!state.disableLegendToggle"
@@ -176,6 +176,13 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 }
             }
         }
+    }
+}
+
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .no-data-wrapper {
+        max-height: 22.25rem;
     }
 }
 </style>

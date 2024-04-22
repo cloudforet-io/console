@@ -5,12 +5,10 @@ import {
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
-    PSkeleton,
+    PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-
-import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -50,6 +48,15 @@ const drawChart = () => {
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
 
+    // set date format for daily chart
+    if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
+        xAxis.setAll({
+            dateFormats: {
+                day: 'd',
+            },
+        });
+    }
+
     // hide zoom button
     chart.zoomOutButton.set('forceHidden', true);
 
@@ -77,8 +84,7 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        const _tooltipValueFormatter = (value?: number): string => numberFormatter(value, { minimumFractionDigits: 2 }) ?? '';
-        chartHelper.setXYSharedTooltipText(chart, tooltip, _tooltipValueFormatter);
+        chartHelper.setXYSharedTooltipText(chart, tooltip);
         series.set('tooltip', tooltip);
 
         // set data on series
@@ -101,15 +107,23 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
         <p-skeleton v-if="props.loading"
                     height="100%"
         />
-        <div v-else
+        <div v-else-if="props.chartData.length"
              ref="chartContext"
              class="chart"
         />
+        <p-empty v-else
+                 class="empty-wrapper"
+        >
+            <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
+        </p-empty>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .chart {
+    height: 100%;
+}
+.empty-wrapper {
     height: 100%;
 }
 </style>
