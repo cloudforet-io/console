@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PButtonModal, PHeading, PIconButton, PI,
+    PBadge, PButtonModal, PPaneLayout, PIconButton, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import { find, isEmpty } from 'lodash';
@@ -33,6 +33,8 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import { useRecentStore } from '@/common/modules/navigations/stores/recent-store';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
+
+import { peacock } from '@/styles/colors';
 
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
@@ -136,7 +138,7 @@ const projectDeleteFormConfirm = async () => {
             itemId: projectDetailPageState.projectId as string,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
-        router.go(-1);
+        router.push({ name: PROJECT_ROUTE._NAME });
         const isFavoriteItem = favoriteGetters.projectItems.find((item) => item.itemId === projectDetailPageState.projectId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
@@ -194,30 +196,36 @@ onUnmounted(() => {
 <template>
     <div class="project-detail-page">
         <div class="top-wrapper">
-            <p-heading :title="state.item?.name"
-                       show-back-button
-                       @click-back-button="$router.go(-1)"
-            >
-                <template #title-right-extra>
+            <p-pane-layout>
+                <div class="header-container">
+                    <div class="title-wrapper">
+                        <p-i name="ic_document-filled"
+                             :color="peacock[600]"
+                             width="1.25rem"
+                             height="1.25rem"
+                        />{{ state.item?.name }}
+                    </div>
                     <div class="button-wrapper">
                         <template v-if="projectPageState.isWorkspaceOwner">
                             <p-icon-button name="ic_settings"
                                            class="edit-btn"
-                                           size="md"
+                                           size="sm"
                                            @click="projectPageStore.openProjectFormModal()"
                             />
                             <p-icon-button name="ic_move"
+                                           size="sm"
                                            style-type="transparent"
                                            @click="handleOpenProjectGroupMoveModal"
                             />
                             <p-icon-button name="ic_delete"
                                            class="delete-btn"
-                                           size="md"
+                                           size="sm"
                                            @click="openProjectDeleteForm"
                             />
                         </template>
                         <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
-                                 style-type="gray200"
+                                 class="ml-4 flex-shrink-0"
+                                 style-type="gray100"
                                  badge-type="subtle"
                         >
                             <div class="badge-content-wrapper">
@@ -226,15 +234,14 @@ onUnmounted(() => {
                                      height="0.75rem"
                                      color="inherit"
                                 />
-                                <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
+                                <span class="truncate">{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
                             </div>
                         </p-badge>
                     </div>
-                </template>
-            </p-heading>
+                </div>
+            </p-pane-layout>
             <keep-alive><router-view /></keep-alive>
         </div>
-
         <p-button-modal :header-title="formState.headerTitle"
                         :centered="true"
                         size="sm"
@@ -275,14 +282,21 @@ onUnmounted(() => {
     margin-top: -0.25rem;
 }
 .top-wrapper {
-    @apply mb-8 flex flex-wrap items-center;
-    .button-wrapper {
-        @apply inline-flex items-center;
-        .badge-content-wrapper {
-            @apply text-gray-900;
-            display: flex;
-            align-content: center;
-            gap: 0.25rem;
+    .header-container {
+        @apply flex gap-4 items-center;
+        padding: 0.75rem 1rem;
+        .title-wrapper {
+            @apply text-label-lg font-bold text-peacock-800 truncate;
+        }
+
+        .button-wrapper {
+            @apply inline-flex items-center;
+            .badge-content-wrapper {
+                @apply text-gray-700;
+                display: flex;
+                align-content: center;
+                gap: 0.25rem;
+            }
         }
     }
 }
