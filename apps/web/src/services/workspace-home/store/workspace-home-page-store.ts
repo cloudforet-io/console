@@ -10,6 +10,7 @@ import type { UserConfigListParameters } from '@/schema/config/user-config/api-v
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigListParameters } from '@/schema/cost-analysis/cost-report-config/api-verbs/list';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
@@ -35,6 +36,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         workspaceUserTotalCount: undefined as number|undefined,
         appsTotalCount: undefined as number|undefined,
         costReportConfig: null as CostReportConfigModel|null|undefined,
+        dataSource: [] as CostDataSourceModel[],
     });
 
     const _getters = reactive({
@@ -48,6 +50,7 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         workspaceUserTotalCount: computed<number|undefined>(() => state.workspaceUserTotalCount),
         appsTotalCount: computed<number|undefined>(() => state.appsTotalCount),
         costReportConfig: computed<CostReportConfigModel|null|undefined>(() => state.costReportConfig),
+        dataSource: computed<CostDataSourceModel[]>(() => state.dataSource),
     });
 
     const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
@@ -132,6 +135,14 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 ErrorHandler.handleError(e);
                 state.costReportConfig = undefined;
             }
+        },
+        fetchDataSource: async () => {
+            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
+                query: {
+                    sort: [{ key: 'workspace_id', desc: false }],
+                },
+            });
+            state.dataSource = response?.results || [];
         },
     };
 

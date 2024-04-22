@@ -11,16 +11,26 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import AssetSummaryDailyUpdateItem from '@/services/workspace-home/components/AssetSummaryDailyUpdateItem.vue';
 import AssetSummaryItem from '@/services/workspace-home/components/AssetSummaryItem.vue';
-import { WORKSPACE_HOME_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-import type { CloudServiceData, ProviderResourceDataItem, ProviderReferenceDataMap } from '@/services/workspace-home/types/workspace-home-type';
+import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
+import { SUMMARY_DATA_TYPE, WORKSPACE_HOME_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import type {
+    CloudServiceData,
+    ProviderResourceDataItem,
+    ProviderReferenceDataMap,
+    EmptyData,
+} from '@/services/workspace-home/types/workspace-home-type';
 
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
@@ -34,9 +44,13 @@ const apiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
     providerMap: computed<ProviderReferenceDataMap>(() => allReferenceGetters.provider),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
 });
 const state = reactive({
+    isNoCollectors: computed(() => !Object.keys(storeState.collectors).length),
+    isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
     providers: [] as ProviderResourceDataItem[],
     dailyUpdatesList: [] as CloudServiceData[],
     pageStart: {
@@ -47,6 +61,25 @@ const state = reactive({
         provider: computed<number>(() => Math.ceil(state.providers.length / 3) - 1),
         dailyUpdate: computed<number>(() => Math.ceil(state.dailyUpdatesList.length / 4) - 1),
     },
+    emptyData: computed<EmptyData>(() => {
+        let result = {} as EmptyData;
+        if (state.isNoServiceAccounts) {
+            result = {
+                to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                title: i18n.t('HOME.NO_ACCOUNT') as string,
+                desc: i18n.t('HOME.NO_ACCOUNT_DESC') as string,
+                buttonText: i18n.t('HOME.NO_ACCOUNT_ADD_NEW') as string,
+            };
+        } else {
+            result = {
+                to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
+                title: i18n.t('HOME.NO_COLLECTOR') as string,
+                buttonText: i18n.t('HOME.NO_COLLECTOR_DESC') as string,
+                desc: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW') as string,
+            };
+        }
+        return result;
+    }),
 });
 
 const handleClickArrowButton = (type: string, direction: string) => {
@@ -121,6 +154,7 @@ const fetchCloudServiceResources = async () => {
         state.providers = Object.keys(storeState.providerMap).map((key) => storeState.providerMap[key]);
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.providers = [];
     }
 };
 
@@ -137,94 +171,101 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                        size="lg"
                        class="main-title"
         />
-        <div class="content-wrapper">
-            <div class="row-items-wrapper">
-                <div ref="providerEl"
-                     class="row-items-container"
-                >
-                    <asset-summary-item v-for="(item, idx) in state.providers"
-                                        :key="`asset-summary-item-${idx}`"
-                                        :item="item"
-                    />
-                </div>
-                <div class="arrow-button-wrapper">
-                    <p-icon-button v-if="state.pageStart.provider !== 0"
-                                   class="arrow-button left"
-                                   name="ic_chevron-left"
-                                   color="inherit transparent"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleClickArrowButton('provider', 'left')"
-                    />
-                    <p-icon-button v-if="state.pageStart.provider !== Number(state.pageMax.provider)"
-                                   class="arrow-button right"
-                                   name="ic_chevron-right"
-                                   color="inherit transparent"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleClickArrowButton('provider', 'right')"
-                    />
-                </div>
-            </div>
-            <div class="daily-update-wrapper">
-                <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
-                               class="daily-update-title"
-                >
-                    <template #right>
-                        <span class="desc">{{ $t('HOME.ASSET_SUMMARY_DAILY_UPDATE_DESC') }}</span>
-                    </template>
-                </p-field-title>
-                <div v-if="state.dailyUpdatesList.length > 0"
-                     class="row-items-wrapper"
-                >
-                    <div ref="dailyUpdateEl"
+        <div v-if="!state.isNoCollectors && !state.isNoServiceAccounts">
+            <div class="content-wrapper">
+                <div class="row-items-wrapper">
+                    <div ref="providerEl"
                          class="row-items-container"
                     >
-                        <asset-summary-daily-update-item v-for="(item, idx) in state.dailyUpdatesList"
-                                                         :key="`asset-summary-daily-update-item-${idx}`"
-                                                         :item="item"
+                        <asset-summary-item v-for="(item, idx) in state.providers"
+                                            :key="`asset-summary-item-${idx}`"
+                                            :item="item"
                         />
                     </div>
                     <div class="arrow-button-wrapper">
-                        <p-icon-button v-if="state.pageStart.dailyUpdate !== 0"
+                        <p-icon-button v-if="state.pageStart.provider !== 0"
                                        class="arrow-button left"
                                        name="ic_chevron-left"
                                        color="inherit transparent"
                                        width="1.5rem"
                                        height="1.5rem"
-                                       @click="handleClickArrowButton('dailyUpdate', 'left')"
+                                       @click="handleClickArrowButton('provider', 'left')"
                         />
-                        <p-icon-button v-if="state.pageStart.dailyUpdate !== Number(state.pageMax.dailyUpdate)"
+                        <p-icon-button v-if="state.pageStart.provider !== Number(state.pageMax.provider)"
                                        class="arrow-button right"
                                        name="ic_chevron-right"
                                        color="inherit transparent"
                                        width="1.5rem"
                                        height="1.5rem"
-                                       @click="handleClickArrowButton('dailyUpdate', 'right')"
+                                       @click="handleClickArrowButton('provider', 'right')"
                         />
                     </div>
                 </div>
-                <p-empty v-else
-                         show-image
-                         image-size="sm"
-                         :title="$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
-                         class="empty"
-                >
-                    <template #image>
-                        <img alt="empty-image"
-                             src="@/assets/images/illust_circle_boy.svg"
+                <div class="daily-update-wrapper">
+                    <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
+                                   class="daily-update-title"
+                    >
+                        <template #right>
+                            <span class="desc">{{ $t('HOME.ASSET_SUMMARY_DAILY_UPDATE_DESC') }}</span>
+                        </template>
+                    </p-field-title>
+                    <div v-if="state.dailyUpdatesList.length > 0"
+                         class="row-items-wrapper"
+                    >
+                        <div ref="dailyUpdateEl"
+                             class="row-items-container"
                         >
-                    </template>
-                </p-empty>
+                            <asset-summary-daily-update-item v-for="(item, idx) in state.dailyUpdatesList"
+                                                             :key="`asset-summary-daily-update-item-${idx}`"
+                                                             :item="item"
+                            />
+                        </div>
+                        <div class="arrow-button-wrapper">
+                            <p-icon-button v-if="state.pageStart.dailyUpdate !== 0"
+                                           class="arrow-button left"
+                                           name="ic_chevron-left"
+                                           color="inherit transparent"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           @click="handleClickArrowButton('dailyUpdate', 'left')"
+                            />
+                            <p-icon-button v-if="state.pageStart.dailyUpdate !== Number(state.pageMax.dailyUpdate)"
+                                           class="arrow-button right"
+                                           name="ic_chevron-right"
+                                           color="inherit transparent"
+                                           width="1.5rem"
+                                           height="1.5rem"
+                                           @click="handleClickArrowButton('dailyUpdate', 'right')"
+                            />
+                        </div>
+                    </div>
+                    <p-empty v-else
+                             show-image
+                             image-size="sm"
+                             :title="$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
+                             class="empty"
+                    >
+                        <template #image>
+                            <img alt="empty-image"
+                                 src="@/assets/images/illust_circle_boy.svg"
+                            >
+                        </template>
+                    </p-empty>
+                </div>
             </div>
+            <p-divider class="divider" />
+            <p-link highlight
+                    action-icon="internal-link"
+                    class="link"
+            >
+                <span>{{ $t('HOME.ASSET_SUMMARY_SHOW_MORE_DAILY_UPDATE') }}</span>
+            </p-link>
         </div>
-        <p-divider class="divider" />
-        <p-link highlight
-                action-icon="internal-link"
-                class="link"
-        >
-            <span>{{ $t('HOME.ASSET_SUMMARY_SHOW_MORE_DAILY_UPDATE') }}</span>
-        </p-link>
+        <empty-summary-data v-else
+                            :image-url="require('/images/home/img_workspace-home_asset-summary_empty-state-background-min.png')"
+                            :empty-data="state.emptyData"
+                            :type="SUMMARY_DATA_TYPE.ASSET"
+        />
     </div>
 </template>
 

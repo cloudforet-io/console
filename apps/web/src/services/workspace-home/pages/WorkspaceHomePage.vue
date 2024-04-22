@@ -39,6 +39,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
     await workspaceHomePageStore.fetchFavoriteList();
     await workspaceHomePageStore.fetchCostReportConfig();
+    await workspaceHomePageStore.fetchDataSource();
     await bookmarkStore.fetchBookmarkFolderList();
     await bookmarkStore.fetchBookmarkList();
     if (state.accessUserMenu) {

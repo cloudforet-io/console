@@ -12,10 +12,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostReportConfigModel } from '@/schema/cost-analysis/cost-report-config/model';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -29,7 +32,10 @@ import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-e
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
 import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
+import EmptySummaryData from '@/services/workspace-home/components/EmptySummaryData.vue';
+import { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import type { EmptyData } from '@/services/workspace-home/types/workspace-home-type';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const workspaceHomePageStore = useWorkspaceHomePageStore();
@@ -38,6 +44,8 @@ const workspaceHomePageGetters = workspaceHomePageStore.getters;
 
 const storeState = reactive({
     costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageGetters.costReportConfig),
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageGetters.recentList),
+    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageGetters.dataSource),
 });
 const state = reactive({
     loading: false,
@@ -51,6 +59,25 @@ const state = reactive({
         const start = dayjs.utc(state.recentReportMonth).subtract(5, 'month').format('YYYY-MM');
         const end = state.recentReportMonth;
         return { start, end };
+    }),
+    emptyData: computed<EmptyData>(() => {
+        let result = {} as EmptyData;
+        if (storeState.dataSource.length === 0) {
+            result = {
+                to: { name: COST_EXPLORER_ROUTE.LANDING._NAME },
+                title: i18n.t('HOME.ACTIVATION_REQUIRED') as string,
+                buttonText: i18n.t('HOME.ACTIVATION_REQUIRED_DESC') as string,
+                desc: i18n.t('HOME.LEARN_MORE') as string,
+            };
+        } else {
+            result = {
+                to: { name: COST_EXPLORER_ROUTE.COST_REPORT._NAME },
+                title: i18n.t('HOME.NO_COST_DATA') as string,
+                desc: i18n.t('HOME.NO_COST_DATA_DESC') as string,
+                buttonText: i18n.t('HOME.COST_SUMMARY_GO_TO_REPORT') as string,
+            };
+        }
+        return result;
     }),
 });
 
@@ -143,30 +170,37 @@ watch(() => state.recentReportMonth, async (after) => {
                        size="lg"
                        class="main-title"
         />
-        <div class="content-wrapper">
-            <div class="price-wrapper">
-                <div>
-                    <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.recentReportMonth }) }}</p>
-                    <p class="price">
-                        <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
-                        <span>{{ currencyMoneyFormatter(state.totalAmount, { currency: state.currency, style: 'decimal' }) }}</span>
-                    </p>
+        <div v-if="state.data?.results.length > 0">
+            <div class="content-wrapper">
+                <div class="price-wrapper">
+                    <div>
+                        <p>{{ $t('HOME.COST_SUMMARY_RECENT', { date: state.recentReportMonth }) }}</p>
+                        <p class="price">
+                            <span class="unit">{{ CURRENCY_SYMBOL?.[state.currency] }}</span>
+                            <span>{{ currencyMoneyFormatter(state.totalAmount, { currency: state.currency, style: 'decimal' }) }}</span>
+                        </p>
+                    </div>
                 </div>
+                <cost-summary-chart :period="state.period"
+                                    :loading="state.loading"
+                                    :currency="state.currency"
+                                    :data="state.chartData"
+                />
             </div>
-            <cost-summary-chart :period="state.period"
-                                :loading="state.loading"
-                                :currency="state.currency"
-                                :data="state.chartData"
-            />
+            <p-divider class="divider" />
+            <p-link highlight
+                    :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
+                    action-icon="internal-link"
+                    class="link"
+            >
+                {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
+            </p-link>
         </div>
-        <p-divider class="divider" />
-        <p-link highlight
-                :to="getProperRouteLocation({ name: COST_EXPLORER_ROUTE.COST_REPORT._NAME })"
-                action-icon="internal-link"
-                class="link"
-        >
-            {{ $t('HOME.COST_SUMMARY_GO_TO_REPORT') }}
-        </p-link>
+        <empty-summary-data v-else
+                            :image-url="require('/images/home/img_workspace-home_cost-summary_empty-state-background-min.png')"
+                            :empty-data="state.emptyData"
+                            :type="SUMMARY_DATA_TYPE.COST"
+        />
     </div>
 </template>
 
@@ -198,6 +232,24 @@ watch(() => state.recentReportMonth, async (after) => {
         @apply flex items-center justify-center text-label-md;
         padding-top: 0.625rem;
         padding-bottom: 0.75rem;
+    }
+    .no-recent {
+        @apply flex flex-col justify-center items-center;
+        height: calc(100% - 1.375rem);
+        background-repeat: no-repeat;
+        background-position: left;
+        gap: 0.75rem;
+        .icon-wrapper {
+            @apply flex justify-center items-center bg-peacock-100 rounded-full;
+            width: 2.75rem;
+            height: 2.75rem;
+        }
+        .title {
+            @apply text-label-xl text-peacock-800 font-medium;
+        }
+        .desc {
+            @apply text-gray-700;
+        }
     }
 }
 </style>
