@@ -71,7 +71,7 @@ export interface WidgetExpose<Data = any> {
 
 export interface Legend {
     name: string;
-    label?: TranslateResult;
+    label?: TranslateResult|string;
     color?: string;
     disabled?: boolean; // this is used only in widget data table
 }

@@ -28,9 +28,10 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostReportDataAnalyzeResult } from '@/services/cost-explorer/types/cost-report-data-type';
+import CostSummaryChart from '@/services/workspace-home/components/CostSummaryChart.vue';
 
 const { getProperRouteLocation } = useProperRouteLocation();
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -40,12 +41,19 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
 });
 const state = reactive({
+    loading: false,
     currentDate: undefined as Dayjs | undefined,
     costReportConfig: null as CostReportConfigModel|null|undefined,
     currency: computed<Currency|undefined>(() => state.costReportConfig?.currency),
     recentReportMonth: undefined as string|undefined,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
+    chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
+    period: computed(() => {
+        const start = dayjs.utc(state.recentReportMonth).subtract(5, 'month').format('YYYY-MM');
+        const end = state.recentReportMonth;
+        return { start, end };
+    }),
 });
 
 const fetchApiHelper = new ApiQueryHelper().setSort('created_at', true);
@@ -61,34 +69,57 @@ const fetchCostReportConfig = async () => {
         state.costReportConfig = undefined;
     }
 };
-const analyzeCostReportData = async () => {
+const analyzeCostReportData = async (isChart?: boolean) => {
+    state.loading = true;
     try {
         const _period = {
-            start: state.currentDate?.format('YYYY-MM'),
-            end: state.currentDate?.format('YYYY-MM'),
+            start: isChart ? state.period.start : state.currentDate?.format('YYYY-MM'),
+            end: isChart ? state.period.end : state.currentDate?.format('YYYY-MM'),
         };
-        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        const defaultQuery = {
+            start: _period.start,
+            end: _period.end,
+            fields: {
+                value_sum: {
+                    key: `cost.${state.currency}`,
+                    operator: 'sum',
+                },
+            },
+        };
+        const reportQuery = {
+            group_by: [GROUP_BY.PROVIDER],
+            sort: [{
+                key: 'value_sum',
+                desc: true,
+            }],
+        };
+        const chartQuery = {
+            granularity: GRANULARITY.MONTHLY,
+            field_group: ['date'],
+            sort: [{
+                key: '_total_value_sum',
+                desc: true,
+            }],
+        };
+        const res = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
             cost_report_config_id: state.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
-            query: {
-                group_by: [GROUP_BY.PROVIDER],
-                start: _period.start,
-                end: _period.end,
-                fields: {
-                    value_sum: {
-                        key: `cost.${state.currency}`,
-                        operator: 'sum',
-                    },
-                },
-                sort: [{
-                    key: 'value_sum',
-                    desc: true,
-                }],
-            },
+            query: isChart ? { ...defaultQuery, ...chartQuery } : { ...defaultQuery, ...reportQuery },
         });
+        if (!isChart) {
+            state.data = res;
+        } else {
+            state.chartData = res;
+        }
     } catch (e) {
-        state.data = {};
+        if (!isChart) {
+            state.data = {};
+        } else {
+            state.chartData = {};
+        }
         ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 const fetchRecentReportData = async (costReportConfigId?: string) => {
@@ -113,6 +144,7 @@ const fetchRecentReportData = async (costReportConfigId?: string) => {
 watch(() => state.costReportConfig, async () => {
     await fetchRecentReportData(state.costReportConfig?.cost_report_config_id);
     await analyzeCostReportData();
+    await analyzeCostReportData(true);
 });
 watch(() => state.recentReportMonth, async (after) => {
     if (!after) return;
@@ -141,7 +173,11 @@ watch(() => storeState.currentWorkspaceId, async () => {
                     </p>
                 </div>
             </div>
-            <div class="chart-wrapper" />
+            <cost-summary-chart :period="state.period"
+                                :loading="state.loading"
+                                :currency="state.currency"
+                                :data="state.chartData"
+            />
         </div>
         <p-divider class="divider" />
         <p-link highlight
@@ -173,10 +209,6 @@ watch(() => storeState.currentWorkspaceId, async () => {
                     @apply text-display-sm text-gray-600;
                 }
             }
-        }
-        .chart-wrapper {
-            @apply bg-gray-100;
-            height: 16.75rem;
         }
     }
     .divider {
