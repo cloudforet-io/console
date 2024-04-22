@@ -74,8 +74,8 @@ const state = reactive({
             result = {
                 to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
                 title: i18n.t('HOME.NO_COLLECTOR'),
-                buttonText: i18n.t('HOME.NO_COLLECTOR_DESC'),
-                desc: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW'),
+                desc: i18n.t('HOME.NO_COLLECTOR_DESC'),
+                buttonText: i18n.t('HOME.NO_COLLECTOR_CREATE_NEW'),
             };
         }
         return result;
