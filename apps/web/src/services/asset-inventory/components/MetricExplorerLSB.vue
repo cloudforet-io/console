@@ -119,7 +119,6 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
-    // metrics: computed<MetricModel[]>(() => metricExplorerPageStore.state.metricList),
     currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.id] : undefined)),
     metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
     metricsFilteredByInput: computed(() => {

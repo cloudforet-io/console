@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 
 import {
@@ -36,9 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void}>();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const storeState = reactive({
-    metricNameList: computed(() => metricExplorerPageState.metricList.map((metric) => metric.name)),
+    metricNameList: computed(() => metricExplorerPageGetters.metrics.map((metric) => metric.name)),
 });
 
 const state = reactive({

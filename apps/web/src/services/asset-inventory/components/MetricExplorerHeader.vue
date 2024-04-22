@@ -77,7 +77,7 @@ const deleteMetric = async () => {
             metric_id: metricExplorerPageState.metric.metric_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
-        const otherMetricId = metricExplorerPageState.metricList[0]?.metric_id;
+        const otherMetricId = metricExplorerPageGetters.metrics[0]?.metric_id;
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,

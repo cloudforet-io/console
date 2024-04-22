@@ -6,14 +6,13 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
-import type { MetricListParameters } from '@/schema/inventory/metric/api-verbs/list';
 import type { MetricModel } from '@/schema/inventory/metric/model';
-import type { NamespaceGetParameters } from '@/schema/inventory/namespace/api-verbs/get';
 import type { NamespaceModel } from '@/schema/inventory/namespace/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getRefinedMetricDataAnalyzeQueryGroupBy } from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
@@ -26,18 +25,16 @@ import type {
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
     const appContextStore = useAppContextStore();
+    const allReferenceStore = useAllReferenceStore();
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     });
     const state = reactive({
-        namespaceListLoading: false,
-        metricListLoading: false,
         metricLoading: false,
         refreshMetricData: false,
         metricId: undefined as string|undefined,
         metric: undefined as MetricModel|undefined,
-        namespaces: [] as NamespaceModel[],
-        metricList: [] as MetricModel[],
         selectedNamespace: undefined as NamespaceModel|undefined,
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
@@ -50,6 +47,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedOperator: OPERATOR.SUM as Operator,
     });
     const getters = reactive({
+        metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === state.selectedNamespace?.name)),
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
             if (!state.metric?.label_keys?.length) return [];
             const staticFields: StaticGroupBy[] = ['project_id'];
@@ -124,40 +122,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.enabledFiltersProperties = undefined;
         state.metricId = undefined;
         state.metric = undefined;
-        state.metricList = [];
-        state.namespaces = [];
         state.selectedOperator = OPERATOR.SUM;
-    };
-    const loadNamespaces = async () => {
-        state.namespaceListLoading = true;
-        const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.namespace.list);
-        try {
-            const { response, status } = await fetcher<NamespaceGetParameters, ListResponse<NamespaceModel>>({});
-            if (status === 'succeed') {
-                state.namespaces = response.results || [];
-                state.namespaceListLoading = false;
-            }
-        } catch (e) {
-            console.error(e);
-            state.namespaces = [];
-            state.namespaceListLoading = false;
-        }
-    };
-    const loadMetrics = async (namespaceId: string) => {
-        if (!namespaceId) return;
-        state.metricList = [];
-        state.metricListLoading = true;
-        try {
-            const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
-                namespace_id: namespaceId,
-            });
-            state.metricList = response.results ?? [];
-        } catch (e) {
-            state.metricList = [];
-            console.error(e);
-        } finally {
-            state.metricListLoading = false;
-        }
     };
     const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
     const loadMetric = async (metricId?: string) => {
@@ -180,8 +145,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
 
     const actions = {
         reset,
-        loadNamespaces,
-        loadMetrics,
         loadMetric,
     };
     const mutations = {
