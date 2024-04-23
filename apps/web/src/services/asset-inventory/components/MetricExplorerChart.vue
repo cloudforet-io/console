@@ -69,7 +69,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
         const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy)] : [];
         const { status, response } = await fetcher({
-            metric_id: metricExplorerPageState.metricId as string,
+            metric_id: metricExplorerPageGetters.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
@@ -128,7 +128,7 @@ const handleAllSeries = (type: string) => {
 };
 
 watch([
-    () => metricExplorerPageState.metricId,
+    () => metricExplorerPageGetters.metricId,
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,
