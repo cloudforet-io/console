@@ -112,13 +112,13 @@ watch(() => props.id, (projectId) => {
                       @change="handleChangeTab"
         >
             <template #alert>
-                <project-alert :project-id="id" />
+                <project-alert :id="id" />
             </template>
             <template #webhook>
-                <project-webhook :project-id="id" />
+                <project-webhook :id="id" />
             </template>
             <template #settings>
-                <project-settings :project-id="id" />
+                <project-settings :id="id" />
             </template>
         </p-button-tab>
     </div>

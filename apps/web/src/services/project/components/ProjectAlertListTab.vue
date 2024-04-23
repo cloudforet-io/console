@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    onActivated, reactive,
-} from 'vue';
+import { reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { queryStringToString } from '@/lib/router-query-string';
@@ -90,12 +88,12 @@ const onChangeList = () => {
     projectDetailPageStore.getAlertCounts();
 };
 
-onActivated(() => {
+(() => {
     state.alertState = getInitialAlertState();
     state.urgency = getInitialUrgency();
     state.assigned = getInitialAssigned();
     queryTagsHelper.setURLQueryStringFilters(route.query.filters);
-});
+})();
 </script>
 
 <template>

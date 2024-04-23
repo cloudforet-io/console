@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-    computed, onActivated, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
@@ -152,14 +150,14 @@ const state = reactive({
     fields: computed(() => {
         const fields = [
             { name: 'alert_number', label: 'No' },
-            { name: 'title', label: 'Title', width: '437px' },
+            { name: 'title', label: 'Title', width: '320px' },
             { name: 'state', label: 'State' },
             { name: 'urgency', label: 'Urgency' },
-            { name: 'assignee', label: 'Assigned to' },
-            { name: 'project_id', label: 'Project', sortable: false },
-            { name: 'triggered_by', label: 'Triggered by' },
-            { name: 'duration', label: 'Duration', sortable: false },
+            { name: 'resource', label: 'Resource' },
             { name: 'created_at', label: 'Created' },
+            { name: 'duration', label: 'Duration', sortable: false },
+            { name: 'assignee', label: 'Assigned to' },
+            { name: 'triggered_by', label: 'Triggered by' },
         ];
 
         if (state.totalCount === 0) { fields[1].width = 'auto'; }
@@ -301,13 +299,7 @@ const initPage = () => {
     })();
 };
 
-onActivated(() => {
-    initPage();
-});
-
-if (!props.keepAlive) {
-    initPage();
-}
+initPage();
 </script>
 
 <template>
