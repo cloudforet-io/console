@@ -2,21 +2,31 @@
 import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
+import { screens } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import BookmarkDeleteModal from '@/services/workspace-home/components/BookmarkDeleteModal.vue';
 import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
 import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
-import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import {
+    BOOKMARK_MODAL_TYPE,
+    MAX_BOARD_SETS,
+    MAX_BOARD_SETS_TABLET,
+} from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+
+
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 const bookmarkGetters = bookmarkStore.getters;
 
-const { height } = useWindowSize();
+const { height, width } = useWindowSize();
 
 const storeState = reactive({
     bookmarkFolderList: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
@@ -25,10 +35,21 @@ const storeState = reactive({
     modalType: computed<BookmarkModalType|undefined>(() => bookmarkState.modal.type),
 });
 const state = reactive({
-    boardSets: computed<BookmarkBoardSet[]>(() => storeState.bookmarkList.map((d) => ({
-        ...d,
-        rounded: true,
-    }))),
+    isTabletSize: computed<boolean>(() => width.value < screens.tablet.max),
+    maxBoardSets: computed<number>(() => (state.isTabletSize ? MAX_BOARD_SETS_TABLET : MAX_BOARD_SETS)),
+    boardSets: computed<BookmarkBoardSet[]>(() => {
+        let _bookmarkList: BookmarkBoardSet[] = [];
+        if (storeState.isFullMode) return storeState.bookmarkList;
+        _bookmarkList = storeState.bookmarkList.slice(0, state.maxBoardSets);
+        if (_bookmarkList.length === state.maxBoardSets) {
+            _bookmarkList.push({
+                name: i18n.t('HOME.TOGGLE_MORE') as string,
+                icon: 'ic_ellipsis-horizontal',
+                isShowMore: true,
+            });
+        }
+        return _bookmarkList;
+    }),
     contentHeight: computed<number|undefined>(() => height.value - 392),
 });
 </script>
@@ -44,8 +65,9 @@ const state = reactive({
                             :bookmark-list="storeState.bookmarkList"
                             :height="state.contentHeight"
         />
-        <bookmark-board v-else-if="storeState.bookmarkList.length > 0"
+        <bookmark-board v-else-if="state.boardSets.length > 0"
                         :board-sets="state.boardSets"
+                        :is-max-board-sets="state.boardSets.length === state.maxBoardSets + 1"
                         class="bookmark-board-wrapper"
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
@@ -53,7 +75,6 @@ const state = reactive({
         />
         <bookmark-link-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.LINK"
                                   :bookmark-folder-list="storeState.bookmarkFolderList"
-                                  :bookmark-list="storeState.bookmarkList"
         />
         <bookmark-delete-modal
             v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK"
@@ -74,6 +95,10 @@ const state = reactive({
     }
     .bookmark-board-wrapper {
         @apply grid-cols-7;
+
+        @screen tablet {
+            @apply grid-cols-4;
+        }
     }
 }
 </style>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core/index';
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI,
+    PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI, screens,
 } from '@spaceone/design-system';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -20,10 +21,15 @@ const props = withDefaults(defineProps<Props>(), {
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
+const { width } = useWindowSize();
+
 const storeState = reactive({
     filterByFolder: computed<string|undefined>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+});
+const state = reactive({
+    isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
 });
 
 const handleClickFullModeButton = () => {
@@ -45,7 +51,9 @@ const handleGoBackButton = () => {
 </script>
 
 <template>
-    <div class="bookmark-header">
+    <div class="bookmark-header"
+         :class="{'full-mode': storeState.isFullMode}"
+    >
         <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARK_TITLE')"
                        size="lg"
         >
@@ -104,40 +112,44 @@ const handleGoBackButton = () => {
                     <span>{{ item.name }}</span>
                 </p-button>
             </div>
-            <p-divider vertical
+            <p-divider v-if="!storeState.isFileFullMode && !state.isMobileSize"
+                       vertical
                        class="divider"
             />
-            <p-icon-button v-if="props.bookmarkFolderList.length > 0"
-                           name="ic_plus"
-                           style-type="tertiary"
-                           shape="square"
-                           size="sm"
-                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
-            />
-            <p-text-button v-else
-                           icon-left="ic_plus"
-                           class="create-folder-button"
-                           @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
-            >
-                {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
-            </p-text-button>
+            <div v-if="!storeState.isFileFullMode && !state.isMobileSize">
+                <p-icon-button v-if="props.bookmarkFolderList.length > 0"
+                               name="ic_plus"
+                               style-type="tertiary"
+                               shape="square"
+                               size="sm"
+                               @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                />
+                <p-text-button v-else
+                               icon-left="ic_plus"
+                               class="create-folder-button"
+                               @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.FOLDER)"
+                >
+                    {{ $t('HOME.BOOKMARK_CREATE_FOLDER') }}
+                </p-text-button>
+            </div>
         </div>
         <div class="toolbox-wrapper">
-            <p-button icon-left="ic_plus"
+            <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
+                      icon-left="ic_plus"
                       class="add-link-button"
-                      :style-type="!storeState.isFullMode ? 'tertiary' : 'substitutive'"
+                      :style-type="storeState.isFullMode ? 'substitutive' : 'tertiary'"
                       @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
             >
                 <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
             </p-button>
-            <p-icon-button v-if="!storeState.isFullMode"
+            <p-icon-button v-if="!state.isMobileSize && !storeState.isFullMode"
                            name="ic_chevron-down"
                            shape="square"
                            size="md"
                            :activated="false"
                            @click="handleClickFullModeButton"
             />
-            <p-icon-button v-else
+            <p-icon-button v-else-if="storeState.isFullMode"
                            name="ic_close"
                            shape="square"
                            size="md"
@@ -154,8 +166,7 @@ const handleGoBackButton = () => {
     gap: 0.5rem;
     .bookmark-folders-wrapper {
         @apply flex items-center;
-        margin-left: 0.25rem;
-        gap: 0.75rem;
+        gap: 0.625rem;
         flex: 1;
         .bookmark-folders {
             @apply flex;
@@ -201,6 +212,12 @@ const handleGoBackButton = () => {
             .title-right-wrapper {
                 @apply flex text-gray-900;
             }
+        }
+    }
+
+    @screen mobile {
+        &:not(.full-mode) {
+            @apply flex-col items-start;
         }
     }
 }

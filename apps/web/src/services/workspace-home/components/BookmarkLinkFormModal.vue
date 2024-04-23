@@ -17,12 +17,10 @@ import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store
 import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    bookmarkList?: BookmarkItem[],
     bookmarkFolderList?: BookmarkItem[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    bookmarkList: undefined,
     bookmarkFolderList: undefined,
 });
 

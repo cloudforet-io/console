@@ -71,5 +71,11 @@ const state = reactive({
     .bookmark-board-wrapper {
         @apply grid-cols-4;
     }
+
+    @screen tablet {
+        .bookmark-board-wrapper {
+            @apply grid-cols-1;
+        }
+    }
 }
 </style>
