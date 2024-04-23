@@ -20,8 +20,8 @@ import type { ProjectReferenceMap } from '@/store/reference/project-reference-st
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import ProjectGroupMemberManagementModal from '@/services/project/components/ProjectGroupMemberManagementModal.vue';
 import ProjectMain from '@/services/project/components/ProjectMain.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
@@ -31,10 +31,9 @@ import { useProjectPageStore } from '@/services/project/stores/project-page-stor
 
 
 const gnbStore = useGnbStore();
-const gnbGetters = gnbStore.getters;
+// const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
-const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
 
 const menuRef = ref<any|null>(null);
@@ -43,26 +42,21 @@ const route = useRoute();
 
 const storeState = reactive({
     userId: computed(() => store.state.user.userId),
-    groupName: computed(() => projectPageGetters.groupName),
-    selectedItem: computed(() => projectPageState.selectedItem),
-    selectedNodeData: computed(() => projectPageGetters.selectedNodeData),
-    parentGroups: computed(() => projectPageGetters.parentGroups),
-    projectCount: computed(() => projectPageState.projectCount),
+    groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId].name),
+    // parentGroups: computed(() => projectPageGetters.parentGroups),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    projectGroupFormVisible: computed(() => projectPageState.projectGroupFormVisible),
-    projectGroupDeleteCheckModalVisible: computed(() => projectPageState.projectGroupDeleteCheckModalVisible),
 });
 
 const state = reactive({
     currentProjectGroupId: computed(() => route.params.projectGroupId),
-    projectGroupNavigation: computed(() => {
-        const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
-        if (storeState.selectedNodeData && storeState.groupName) {
-            result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
-        }
-        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
-    }),
+    // projectGroupNavigation: computed(() => {
+    //     const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
+    //     if (storeState.selectedNodeData && storeState.groupName) {
+    //         result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
+    //     }
+    //     return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
+    // }),
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'project',
@@ -79,14 +73,13 @@ const state = reactive({
         id: state.currentProjectGroupId,
     })),
     projectGroupMemberManagementModalVisible: false,
-    projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[storeState.groupId]?.data.users?.length),
+    projectGroupMemberCount: computed<number|undefined>(() => storeState.projectGroups?.[state.currentProjectGroupIds]?.data.users?.length),
 });
 
 const modalState = reactive({
     projectGroupFormVisible: false,
     projectGroupDeleteCheckModalVisible: false,
     projectFormModalVisible: false,
-    actionTargetItem: undefined,
     projectGroupUpdateMode: false,
 });
 
@@ -104,9 +97,9 @@ const {
 onClickOutside(menuRef, hideContextMenu);
 
 /* Navigation */
-const onProjectGroupNavClick = async (item: Breadcrumb) => {
-    if (item.data) await projectPageStore.selectNode(item.data.id);
-};
+// const onProjectGroupNavClick = async (item: Breadcrumb) => {
+//     if (item.data) await projectPageStore.selectNode(item.data.id);
+// };
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
@@ -114,13 +107,10 @@ const handleClickProjectGroupEditButton = () => {
     modalState.projectGroupFormVisible = true;
 };
 const handleClickProjectGroupDeleteButton = () => {
-    projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
+    modalState.projectGroupDeleteCheckModalVisible = true;
 };
 const handleOpenProjectGroupMoveModal = () => {
     state.projectGroupModalVisible = true;
-};
-const handleConfirmProjectGroupMoveModal = () => {
-    projectPageStore.refreshProjectTreeKey();
 };
 
 /* Handling Forms */
@@ -132,24 +122,19 @@ const handleClickCreateButton = () => {
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageStore.openProjectFormModal(storeState.selectedItem);
+        modalState.projectFormModalVisible = true;
     } else if (item.name === 'projectGroup') {
         modalState.projectGroupUpdateMode = false;
         modalState.projectGroupFormVisible = true;
     }
 };
 
-// watch(() => route.params, async (after, before) => {
-//     if (after?.projectGroupId !== before?.projectGroupId) {
-//         await projectPageStore.selectNode(after.projectGroupId);
-//     }
+// watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+//     gnbStore.setBreadcrumbs(projectGroupNavigation);
 // });
-watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-    gnbStore.setBreadcrumbs(projectGroupNavigation);
-});
-watch(() => gnbGetters.selectedItem, (selectedItem) => {
-    onProjectGroupNavClick(selectedItem);
-});
+// watch(() => gnbGetters.selectedItem, (selectedItem) => {
+//     onProjectGroupNavClick(selectedItem);
+// });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
@@ -215,17 +200,22 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                                                :project-group-id="state.currentProjectGroupId"
                                                :update-mode="modalState.projectGroupUpdateMode"
         />
-        <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
+        <project-main-project-group-delete-check-modal v-if="modalState.projectGroupDeleteCheckModalVisible"
+                                                       :visible.sync="modalState.projectGroupDeleteCheckModalVisible"
+                                                       :project-group-id="state.currentProjectGroupId"
+        />
         <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
                                                :visible.sync="state.projectGroupModalVisible"
                                                :is-project="false"
                                                :target-id="state.currentProjectGroupId"
-                                               @confirm="handleConfirmProjectGroupMoveModal"
         />
-        <project-group-member-management-modal
-            v-if="state.projectGroupMemberManagementModalVisible"
-            :visible.sync="state.projectGroupMemberManagementModalVisible"
-            :project-group-id="state.currentProjectGroupId"
+        <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
+                                               :visible.sync="state.projectGroupMemberManagementModalVisible"
+                                               :project-group-id="state.currentProjectGroupId"
+        />
+        <project-form-modal v-if="modalState.projectFormModalVisible"
+                            :visible.sync="modalState.projectFormModalVisible"
+                            :project-group-id="state.currentProjectGroupId"
         />
     </div>
 </template>
