@@ -89,6 +89,26 @@ const getDuplicatedMetricName = (name: string): string => {
 };
 
 /* Api */
+const duplicateMetric = async () => {
+    if (!metricExplorerPageState.metric) return;
+    try {
+        const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
+            name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
+            namespace_id: metricExplorerPageState.metric.namespace_id || '',
+            unit: metricExplorerPageState.metric.unit,
+            metric_type: metricExplorerPageState.metric.metric_type,
+            resource_type: 'inventory.CloudService',
+            query_options: metricExplorerPageState.metric.query_options,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: { id: duplicatedMetric.metric_id },
+        }));
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
+    }
+};
 const deleteCustomMetric = async () => {
     if (!metricExplorerPageState.metric) return;
     try {
@@ -131,34 +151,17 @@ const updateMetricExample = async () => {
 
 /* Event */
 const handleDuplicate = async () => {
-    if (!metricExplorerPageState.metric) return;
-    try {
-        const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
-            name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
-            namespace_id: metricExplorerPageState.metric.namespace_id || '',
-            unit: metricExplorerPageState.metric.unit,
-            metric_type: metricExplorerPageState.metric.metric_type,
-            resource_type: 'inventory.CloudService',
-            query_options: metricExplorerPageState.metric.query_options,
-        });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
-        await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { id: duplicatedMetric.metric_id },
-        }));
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
-    }
-};
-const handleClickMoreMenuButton = () => {
-    if (visibleContextMenu.value) hideContextMenu();
-    else showContextMenu();
-};
-const handleClickEditName = () => {
-    openNameFormModal(NAME_FORM_MODAL_TYPE.EDIT_NAME);
+    await duplicateMetric();
 };
 const handleSaveMetricExample = async () => {
     await updateMetricExample();
+};
+const handleDeleteCustomMetric = async () => {
+    await deleteCustomMetric();
+    state.metricDeleteModalVisible = false;
+};
+const handleClickEditName = () => {
+    openNameFormModal(NAME_FORM_MODAL_TYPE.EDIT_NAME);
 };
 const handleSelectSaveAsExample = () => {
     openNameFormModal(NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE);
@@ -166,9 +169,9 @@ const handleSelectSaveAsExample = () => {
 const handleClickDeleteMetric = () => {
     state.metricDeleteModalVisible = true;
 };
-const handleDeleteCustomMetric = async () => {
-    await deleteCustomMetric();
-    state.metricDeleteModalVisible = false;
+const handleClickMoreMenuButton = () => {
+    if (visibleContextMenu.value) hideContextMenu();
+    else showContextMenu();
 };
 </script>
 
