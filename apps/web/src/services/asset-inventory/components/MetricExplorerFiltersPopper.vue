@@ -72,12 +72,6 @@ const initSelectedFilters = () => {
     const _selectedItemsMap = {};
     Object.keys(_filters ?? {}).forEach((groupBy) => {
         _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d })) ?? [];
-        if (metricExplorerPageState.enabledFiltersProperties?.indexOf(groupBy) === -1) {
-            metricExplorerPageStore.setEnabledFiltersProperties([
-                ...(metricExplorerPageState.enabledFiltersProperties ?? []),
-                groupBy,
-            ]);
-        }
     });
     state.selectedItemsMap = _selectedItemsMap;
 };

@@ -102,7 +102,7 @@ const handleConfirm = async () => {
             metric_type: METRIC_TYPE.GAUGE,
             resource_type: 'inventory.CloudService',
             query_options: jsonParsedQuery,
-            namespace_id: metricExplorerPageStore.state.selectedNamespace?.namespace_id || '',
+            namespace_id: metricExplorerPageGetters.namespaceId || '',
         };
         await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>(createParameters);
         initForm();
