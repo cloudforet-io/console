@@ -16,9 +16,14 @@ import UserConfigStarred from '@/services/workspace-home/components/UserConfigSt
     gap: 1rem;
     .box-wrapper {
         @apply border border-gray-200 text-label-md;
+        min-height: 15.875rem;
         height: 15.875rem;
         border-radius: 0.375rem;
         flex: 1;
+    }
+
+    @screen mobile {
+        @apply flex-col;
     }
 }
 </style>
