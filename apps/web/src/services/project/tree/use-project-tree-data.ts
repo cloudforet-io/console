@@ -8,10 +8,11 @@ import type { Location } from 'vue-router';
 import { get } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectGroupReferenceMap, ProjectGroupReferenceItem } from '@/store/reference/project-group-reference-store';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
 import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 interface UseProjectTreeDataReturnType {
@@ -30,6 +31,9 @@ interface ProjectDataType {
 
 export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
     const allReferenceStore = useAllReferenceStore();
+    const projectTreeStore = useProjectTreeStore();
+    const projectTreeState = projectTreeStore.state;
+
     const storeState = reactive({
         projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
         project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -48,7 +52,6 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
             parentGroupId: value.data.parentGroupInfo?.id,
         }))),
         treeData: [] as TreeNode[],
-        treeDisplayMap: {} as TreeDisplayMap,
         selectedTreeNodeId: '',
     });
     const fetchProjectGroupList = (parentGroupId?: string): ProjectDataType[] => state.projectGroupData.filter((projectGroup) => projectGroup.parentGroupId === parentGroupId);
@@ -84,7 +87,6 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
     };
 
     const findSelectedNode = async (itemId: string, itemType: ProjectDataType['type']) => {
-        state.treeDisplayMap = {};
         const openPaths = await getParentItem(itemId, itemType);
         openPaths.map(async (path) => {
             if (path === itemId) return;
@@ -120,8 +122,8 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         },
     });
     const setOpenStateById = async (nodeId: string) => {
-        state.treeDisplayMap = {
-            ...state.treeDisplayMap,
+        projectTreeState.treeDisplayMap = {
+            ...projectTreeState.treeDisplayMap,
             [nodeId]: {
                 isOpen: true,
             },
@@ -164,49 +166,9 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         await findSelectedNode(id, itemType);
     });
 
-    /* For Name-Changed ProjectGroup or Project */
-    watch(
-        [() => storeState.project, () => storeState.projectGroup],
-        ([, newProjectGroups], [, oldProjectGroups]) => {
-            // Check Changed Project
-            // Object.entries(newProjects).forEach(([id, newProject]) => {
-            //     if (oldProjects[id] && newProject.name !== oldProjects[id].name) {
-            //         updateTreeNode(id, newProject);
-            //     }
-            // });
-
-            // Check Changed Project Group
-            Object.entries(newProjectGroups).forEach(([id, newGroup]) => {
-                if (oldProjectGroups[id] && newGroup.name !== oldProjectGroups[id].name) {
-                    updateTreeNode(id, newGroup);
-                }
-            });
-        },
-        { deep: true },
-    );
-
-    const updateTreeNode = (id: string, newData: ProjectGroupReferenceItem|ProjectReferenceItem) => {
-        const node = findNodeById(state.treeData, id);
-        if (node) {
-            node.data.name = newData.name;
-        }
-    };
-
-    const findNodeById = (nodes: TreeNode[], nodeId: string): TreeNode|undefined => nodes.reduce((acc: TreeNode|undefined, node: TreeNode) => {
-        if (acc) return acc;
-        if (node.id === nodeId) {
-            return node;
-        }
-        if (node.children) {
-            return findNodeById(node.children, nodeId);
-        }
-        return undefined;
-    }, undefined);
-
-
     return {
         treeData: toRef(state, 'treeData'),
-        treeDisplayMap: toRef(state, 'treeDisplayMap'),
+        treeDisplayMap: toRef(projectTreeState, 'treeDisplayMap'),
         fetchData,
         setSelectedNodeId,
     };
