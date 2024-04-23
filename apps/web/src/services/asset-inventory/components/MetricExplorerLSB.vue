@@ -64,7 +64,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME && route.params.id),
+    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.id),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -223,7 +223,8 @@ watch(() => route.params, (params) => {
 });
 
 onMounted(async () => {
-    if (metricState.currentMetric && !namespaceState.selectedNamespace && state.isDetailPage) {
+    await allReferenceStore.load('metric');
+    if (!isEmpty(metricState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
             label: namespaceState.namespaces.find((item) => item.key === metricState.currentMetric?.data.namespace_id).name,
             name: metricState.currentMetric.data.namespace_id,
