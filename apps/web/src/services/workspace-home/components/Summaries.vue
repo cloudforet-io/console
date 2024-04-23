@@ -22,5 +22,13 @@ import CostSummary from '@/services/workspace-home/components/CostSummary.vue';
         border-radius: 0.375rem;
         flex: 1;
     }
+
+    @screen laptop {
+        @apply flex-col;
+        .box-wrapper {
+            @apply w-full;
+            max-width: initial;
+        }
+    }
 }
 </style>
