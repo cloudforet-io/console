@@ -52,6 +52,9 @@ const {
         if (duplicatedName) {
             return i18n.t('HOME.ALT_E_DUPLICATED_NAME');
         }
+        if (value.length > 16) {
+            return i18n.t('HOME.ALT_E_MAX_LENGTH_INVALID', { max: 16 });
+        }
         return '';
     },
 });

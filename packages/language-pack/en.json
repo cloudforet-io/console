@@ -1761,6 +1761,7 @@
 		"ACTIVATION_REQUIRED": "Activation Required",
 		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
+		"ALT_E_MAX_LENGTH_INVALID": "{max} characters in max",
 		"ALT_S_ADD_LINK": "Link successfully Added ",
 		"ASSET_SUMMARY_CREATED": "Created",
 		"ASSET_SUMMARY_DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
