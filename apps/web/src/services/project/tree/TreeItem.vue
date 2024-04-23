@@ -1,18 +1,20 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, useSlots, watch,
+    computed, onMounted, reactive, useSlots, watch,
 } from 'vue';
 import type { SetupContext } from 'vue/types/v3-setup-context';
 
 import { PI, PSpinner } from '@spaceone/design-system';
 
-import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import type { TreeNode } from '@/services/project/tree/type';
 
 interface Props {
     node: TreeNode;
     selectedId?: string;
-    initialTreeDisplayMap?: TreeDisplayMap;
+    isOpen?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -21,45 +23,48 @@ const isExpandable = (_slots: SetupContext['slots']) => _slots['child-content'] 
 
 const emit = defineEmits<{(e: 'click-toggle', node: TreeNode): Promise<void>|void;
     (e: 'click-item', node: TreeNode): void;
+    (e: 'update:is-open', value: boolean): void;
 }>();
 
 const state = reactive({
-    isCollapsed: true,
-    toggleIcon: computed(() => (state.isCollapsed ? 'ic_caret-right' : 'ic_caret-down-filled-alt')),
+    toggleIcon: computed(() => (state.proxyIsOpen ? 'ic_caret-down-filled-alt' : 'ic_caret-right')),
     fetchLoading: false,
     isSelected: computed(() => props.selectedId === props.node.id),
+    proxyIsOpen: useProxyValue('isOpen', props, emit),
 });
 
 const openToggle = () => {
-    state.isCollapsed = false;
+    state.proxyIsOpen = true;
 };
 const closeToggle = () => {
-    state.isCollapsed = true;
+    state.proxyIsOpen = false;
 };
 
 const handleClickToggle = async () => {
-    if (state.isCollapsed) {
-        openToggle();
-    } else {
+    if (state.proxyIsOpen) {
         closeToggle();
+    } else {
+        openToggle();
     }
 };
 
 const handleClickItem = () => {
-    emit('click-item', state.node);
+    emit('click-item', props.node);
 };
 
-watch(() => props.initialTreeDisplayMap, (treeOpenStateMap) => {
-    if (treeOpenStateMap && treeOpenStateMap[props.node.id]) {
+
+watch(() => state.proxyIsOpen, async (isOpen) => {
+    if (!props.node.id) return;
+    if (isOpen) {
+        await emit('click-toggle', props.node);
+    } else state.proxyIsOpen = false;
+}, { immediate: true });
+
+onMounted(() => {
+    if (state.proxyIsOpen) {
         openToggle();
     }
 });
-
-watch(() => state.isCollapsed, async (collapsed) => {
-    if (!collapsed) {
-        await emit('click-toggle', state.node);
-    }
-}, { immediate: true });
 
 </script>
 
@@ -91,7 +96,7 @@ watch(() => state.isCollapsed, async (collapsed) => {
                 />
             </div>
         </component>
-        <div v-if="slots && !state.isCollapsed"
+        <div v-if="slots && state.proxyIsOpen"
              class="child-group"
         >
             <slot name="child-content" />
