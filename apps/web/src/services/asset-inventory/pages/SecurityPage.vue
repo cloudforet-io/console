@@ -56,7 +56,7 @@ const state = reactive({
                 };
             }
             result = {
-                to: undefined,
+                to: {},
                 buttonText: undefined,
                 desc: i18n.t('COMMON.ERROR.NO_RESOURCE_TITLE'),
             };
@@ -104,7 +104,7 @@ onUnmounted(() => {
         <p-empty
             show-image
             image-size="md"
-            :show-button="state.emptyData.to"
+            :show-button="!!state.emptyData.to?.name"
             class="no-data"
         >
             <template #image>
@@ -125,7 +125,7 @@ onUnmounted(() => {
                               icon-left="ic_plus_bold"
                               class="mx-auto text-center"
                     >
-                        {{ state.emptyData.buttonText }}
+                        {{ state.emptyData?.buttonText }}
                     </p-button>
                 </router-link>
             </template>
