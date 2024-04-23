@@ -2,7 +2,6 @@
 import { computed, reactive, watch } from 'vue';
 
 import { PButtonModal, PRadio, PRadioGroup } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -20,7 +19,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
@@ -39,8 +37,6 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
-const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
 const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -97,8 +93,6 @@ const changeProjectGroup = async () => {
         }
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
         state.proxyVisible = false;
-        projectPageStore.setIsInitiated(false);
-        if (projectPageState.rootNode) projectPageStore.setRootNode(cloneDeep(projectPageState.rootNode));
         emit('confirm');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
