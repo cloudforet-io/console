@@ -28,6 +28,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
 }>();
 
 const router = useRouter();
@@ -46,6 +47,7 @@ const deleteProjectGroup = async () => {
             project_group_id: props.projectGroupId,
         });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
+        emit('confirm');
         const isFavoriteItem = favoriteGetters.projectGroupItems.find((item) => item.itemId === props.projectGroupId);
         if (isFavoriteItem) {
             await favoriteStore.deleteFavorite({
