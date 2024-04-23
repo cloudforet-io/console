@@ -119,15 +119,14 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
 
 <template>
     <div class="workspace-info">
-        <p-heading :title="state.selectedWorkspace.name"
-                   class="heading-wrapper"
-        >
-            <template #title-left-extra>
+        <p-heading class="heading">
+            <div class="heading-title">
                 <workspace-logo-icon :text="state.selectedWorkspace.name"
                                      :theme="state.selectedWorkspace.tags?.theme"
                                      size="sm"
                 />
-            </template>
+                <span>{{ state.selectedWorkspace.name }}</span>
+            </div>
             <template #title-right-extra>
                 <span class="title-right-button-wrapper">
                     <favorite-button :item-id="state.selectedWorkspace.workspace_id"
@@ -214,8 +213,12 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
     padding-top: 1.25rem;
     padding-bottom: 3rem;
     gap: 0.25rem;
-    .heading-wrapper {
+    .heading {
         margin: 0;
+        .heading-title {
+            @apply flex items-center;
+            gap: 0.5rem;
+        }
         .title-right-button-wrapper {
             @apply flex items-center;
             .favorite-button {
@@ -237,6 +240,22 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
         .info-cnt {
             @apply flex items-center text-label-md;
             gap: 0.125rem;
+        }
+    }
+
+    @screen mobile {
+        .heading {
+            .extra-wrapper {
+                @apply hidden;
+            }
+        }
+
+        /* custom design-system component - p-heading */
+        :deep(.p-heading) {
+            .heading-wrapper {
+                @apply flex-col items-start;
+                gap: 0.25rem;
+            }
         }
     }
 }
