@@ -7,28 +7,25 @@ import {
 } from 'vue';
 
 import {
-    PButton, PPopover, PBadge, PIconButton, PDivider,
+    PButton, PPopover, PBadge, PIconButton,
 } from '@spaceone/design-system';
 
 import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
 import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
 import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
 import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
-import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
     filtersPopoverVisible: false,
-    queryFormModalVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: 0,
 });
@@ -39,9 +36,6 @@ const handleClickFilter = () => {
 };
 const handleClickRefresh = () => {
     metricExplorerPageStore.setRefreshMetricData(true);
-};
-const handleOpenQueryFormModal = () => {
-    state.queryFormModalVisible = true;
 };
 </script>
 
@@ -82,15 +76,6 @@ const handleOpenQueryFormModal = () => {
                         />
                     </template>
                 </p-popover>
-                <p-divider class="menu-divider"
-                           vertical
-                />
-                <p-button style-type="secondary"
-                          icon-left="ic_editor-code"
-                          @click="handleOpenQueryFormModal"
-                >
-                    {{ metricExplorerPageGetters.isManagedMetric ? $t('INVENTORY.METRIC_EXPLORER.VIEW_QUERY') : $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') }}
-                </p-button>
             </div>
             <div class="right-part">
                 <p-icon-button name="ic_renew"
@@ -101,9 +86,6 @@ const handleOpenQueryFormModal = () => {
                 />
             </div>
         </div>
-        <metric-explorer-query-form-modal :visible.sync="state.queryFormModalVisible"
-                                          :mode="metricExplorerPageGetters.isManagedMetric ? 'VIEW' : 'UPDATE'"
-        />
     </div>
 </template>
 
@@ -117,10 +99,6 @@ const handleOpenQueryFormModal = () => {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            .menu-divider {
-                height: 1.5rem;
-                margin: 0 0.5rem;
-            }
         }
         .right-part {
             display: flex;

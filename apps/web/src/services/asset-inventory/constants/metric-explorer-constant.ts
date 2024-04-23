@@ -64,3 +64,11 @@ export const CHART_TYPE = {
     TREEMAP: 'TREEMAP',
     DONUT: 'DONUT',
 } as const;
+
+export const NAME_FORM_MODAL_TYPE = {
+    // metric
+    ADD_EXAMPLE: 'ADD_EXAMPLE',
+    EDIT_NAME: 'EDIT_NAME',
+    // example
+    SAVE_AS_EXAMPLE: 'SAVE_AS_EXAMPLE',
+} as const;

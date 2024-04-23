@@ -1,4 +1,5 @@
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { defineStore } from 'pinia';
 
@@ -23,6 +24,7 @@ import type {
 
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
+    const route = useRoute();
     const appContextStore = useAppContextStore();
     const allReferenceStore = useAllReferenceStore();
     const _state = reactive({
@@ -43,6 +45,8 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedOperator: OPERATOR.SUM as Operator,
     });
     const getters = reactive({
+        metricId: computed<string|undefined>(() => route.params.id),
+        metricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
