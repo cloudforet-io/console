@@ -158,7 +158,8 @@ export default defineComponent<Props>({
             ) return;
 
             // sibling means other cards on the same depth
-            const siblings = (e?.target as HTMLDivElement)?.parentElement?.children as HTMLCollectionOf<HTMLDivElement>;
+            const siblings = (e?.target as HTMLDivElement)?.parentElement?.children as HTMLDivElement[]|undefined;
+            if (!siblings) return;
             const lastIndex = siblings.length - 1;
 
             let nextTarget = 0;
@@ -212,6 +213,9 @@ export default defineComponent<Props>({
     &.disabled {
         @apply border-gray-200 text-gray-400;
         cursor: not-allowed;
+        .contents {
+            opacity: 20%;
+        }
     }
     .marker {
         @apply absolute;
