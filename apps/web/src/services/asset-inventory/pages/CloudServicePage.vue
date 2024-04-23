@@ -121,21 +121,21 @@ const state = reactive({
         if (!Object.keys(storeState.serviceAccounts).length) {
             result = {
                 to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                buttonText: i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT') as string,
-                desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE') as string,
+                buttonText: i18n.t('INVENTORY.ADD_SERVICE_ACCOUNT'),
+                desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE'),
             };
         } else {
             if (!Object.keys(storeState.collectors).length) {
                 result = {
                     to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME },
-                    buttonText: i18n.t('INVENTORY.CREATE_COLLECTOR') as string,
-                    desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE') as string,
+                    buttonText: i18n.t('INVENTORY.CREATE_COLLECTOR'),
+                    desc: i18n.t('INVENTORY.EMPTY_CLOUD_SERVICE_RESOURCE'),
                 };
             }
             result = {
                 to: undefined,
                 buttonText: undefined,
-                desc: i18n.t('COMMON.ERROR.NO_RESOURCE_TITLE') as string,
+                desc: i18n.t('COMMON.ERROR.NO_RESOURCE_TITLE'),
             };
         }
         return result;
