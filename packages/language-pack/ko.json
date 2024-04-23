@@ -3552,7 +3552,19 @@
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "알림 정책 설정",
 				"STEP": "단계",
 				"TIME": "번",
-				"UPDATE": "수정"
+				"UPDATE": "수정",
+				"WEB_HOOK": {
+					"SUCCEED_MODAL": {
+						"COPY_WEBHOOK_URL": "",
+						"DESC": "",
+						"GUIDE": "",
+						"NAME": "",
+						"STATE": "",
+						"TITLE": "",
+						"VERSION": "",
+						"WEBHOOK_URL": ""
+					}
+				}
 			},
 			"ALT_E_ACTIVATE_ALERT": "얼럿 활성화 실패",
 			"ALT_E_ADD_MEMBER": "멤버 추가 실패",

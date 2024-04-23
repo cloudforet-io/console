@@ -3552,7 +3552,19 @@
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "通知ポリシー設定",
 				"STEP": "ステップ",
 				"TIME": "回",
-				"UPDATE": "編集"
+				"UPDATE": "編集",
+				"WEB_HOOK": {
+					"SUCCEED_MODAL": {
+						"COPY_WEBHOOK_URL": "",
+						"DESC": "",
+						"GUIDE": "",
+						"NAME": "",
+						"STATE": "",
+						"TITLE": "",
+						"VERSION": "",
+						"WEBHOOK_URL": ""
+					}
+				}
 			},
 			"ALT_E_ACTIVATE_ALERT": "アラート有効化に失敗",
 			"ALT_E_ADD_MEMBER": "メンバー追加に失敗",

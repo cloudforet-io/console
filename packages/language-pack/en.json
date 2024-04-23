@@ -3552,7 +3552,19 @@
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "Set Notification Policy",
 				"STEP": "STEP",
 				"TIME": "time | times",
-				"UPDATE": "Update"
+				"UPDATE": "Update",
+				"WEB_HOOK": {
+					"SUCCEED_MODAL": {
+						"COPY_WEBHOOK_URL": "Copy the Webhook URL",
+						"DESC": "Now, Copy the Webhook URL and follow {guide}",
+						"GUIDE": "the Guide",
+						"NAME": "Name",
+						"STATE": "State",
+						"TITLE": "Webhook Successfully Created!",
+						"VERSION": "Version",
+						"WEBHOOK_URL": "Webhook URL"
+					}
+				}
 			},
 			"ALT_E_ACTIVATE_ALERT": "Failed to Activate Alert",
 			"ALT_E_ADD_MEMBER": "Failed to Add Member",
