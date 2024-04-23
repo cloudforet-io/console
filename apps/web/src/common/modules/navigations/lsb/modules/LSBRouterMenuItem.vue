@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core';
+import type { Ref } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
@@ -34,10 +35,10 @@ const itemEl = ref<HTMLElement | null>(null);
 const textEL = ref<HTMLElement | null>(null);
 
 const state = reactive({
-    itemWidth: computed(() => useElementSize(itemEl.value).width),
-    textWidth: computed(() => useElementSize(textEL.value).width),
+    itemWidth: computed<Ref<number>>(() => useElementSize(itemEl.value).width),
+    textWidth: computed<Ref<number>>(() => useElementSize(textEL.value).width),
     hoveredItem: '' as MenuId | string,
-    isEllipsis: computed(() => state.hoveredItem === props.item.id && (state.itemWidth.value - 20 === state.textWidth.value)),
+    isEllipsis: computed<boolean>(() => state.hoveredItem === props.item.id && (state.itemWidth.value - 20 === state.textWidth.value)),
 });
 
 const getIsHovered = (itemId?: MenuId | string) => state.hoveredItem && state.hoveredItem === itemId;
