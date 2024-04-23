@@ -135,6 +135,12 @@ const handleRefreshTree = () => {
     projectTreeStore.refreshProjectTree();
 };
 
+// watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+//     gnbStore.setBreadcrumbs(projectGroupNavigation);
+// });
+// watch(() => gnbGetters.selectedItem, (selectedItem) => {
+//     onProjectGroupNavClick(selectedItem);
+// });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
