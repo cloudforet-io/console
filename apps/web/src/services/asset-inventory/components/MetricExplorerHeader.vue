@@ -5,13 +5,15 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    useContextMenuController, PHeading, PIconButton, PButton, PContextMenu,
+    useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
+import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
@@ -21,8 +23,10 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import MetricExplorerEditNameModal from '@/services/asset-inventory/components/MetricExplorerEditNameModal.vue';
-import MetricExplorerSaveAsModal from '@/services/asset-inventory/components/MetricExplorerSaveAsModal.vue';
+import { gray } from '@/styles/colors';
+
+import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
+import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
@@ -37,9 +41,9 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
-    metricSaveAsModalVisible: false,
-    metricEditNameModalVisible: false,
+    metricNameFormModalVisible: false,
     metricDeleteModalVisible: false,
+    selectedNameFormModalType: undefined as string|undefined,
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -54,6 +58,8 @@ const state = reactive({
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
     }),
+    existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
+        .map((metric) => metric.name)),
 });
 
 const {
@@ -69,15 +75,28 @@ const {
 });
 onClickOutside(rightPartRef, hideContextMenu);
 
+/* Util */
+const openNameFormModal = (modalType: string) => {
+    state.selectedNameFormModalType = modalType;
+    state.metricNameFormModalVisible = true;
+};
+const getDuplicatedMetricName = (name: string): string => {
+    const _name = `${name} Copy`;
+    if (state.existingMetricNameList.includes(_name)) {
+        return getDuplicatedMetricName(_name);
+    }
+    return _name;
+};
+
 /* Api */
-const deleteMetric = async () => {
+const deleteCustomMetric = async () => {
     if (!metricExplorerPageState.metric) return;
     try {
         await SpaceConnector.clientV2.inventory.metric.delete({
             metric_id: metricExplorerPageState.metric.metric_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
-        const otherMetricId = metricExplorerPageGetters.metrics[0]?.metric_id;
+        const otherMetricId = metricExplorerPageGetters.metrics[0]?.key;
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
@@ -92,72 +111,124 @@ const deleteMetric = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
     }
 };
-
-/* Event */
-const handleSaveQuerySet = async () => {
-    if (!metricExplorerPageState.metric) return;
+const updateMetricExample = async () => {
     try {
-        await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: metricExplorerPageState.metric.metric_id,
-            query_options: {
-                ...metricExplorerPageState.metric.query_options, // TODO: Implement query options
+        await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
+            example_id: metricExplorerPageGetters.metricExampleId,
+            options: {
+                granularity: metricExplorerPageState.granularity,
+                period: metricExplorerPageState.period,
+                relative_period: metricExplorerPageState.relativePeriod,
+                group_by: metricExplorerPageState.selectedGroupByList,
+                filters: metricExplorerPageState.filters,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_SAVE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_SAVE_AS_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_EXAMPLE'));
+    }
+};
+
+/* Event */
+const handleDuplicate = async () => {
+    if (!metricExplorerPageState.metric) return;
+    try {
+        const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
+            name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
+            namespace_id: metricExplorerPageState.metric.namespace_id || '',
+            unit: metricExplorerPageState.metric.unit,
+            metric_type: metricExplorerPageState.metric.metric_type,
+            resource_type: 'inventory.CloudService',
+            query_options: metricExplorerPageState.metric.query_options,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: { id: duplicatedMetric.metric_id },
+        }));
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
     }
 };
 const handleClickMoreMenuButton = () => {
     if (visibleContextMenu.value) hideContextMenu();
     else showContextMenu();
 };
-const handleClickSaveAsButton = () => {
-    state.metricSaveAsModalVisible = true;
+const handleClickEditName = () => {
+    openNameFormModal(NAME_FORM_MODAL_TYPE.EDIT_NAME);
 };
-const handleClickEditMetricName = () => {
-    state.metricEditNameModalVisible = true;
+const handleSaveMetricExample = async () => {
+    await updateMetricExample();
+};
+const handleSelectSaveAsExample = () => {
+    openNameFormModal(NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE);
 };
 const handleClickDeleteMetric = () => {
     state.metricDeleteModalVisible = true;
 };
-const handleDeleteMetric = async () => {
-    await deleteMetric();
+const handleDeleteCustomMetric = async () => {
+    await deleteCustomMetric();
     state.metricDeleteModalVisible = false;
 };
 </script>
 
 <template>
     <p-heading :title="state.pageTitle">
+        <template v-if="metricExplorerPageGetters.isManagedMetric"
+                  #title-left-extra
+        >
+            <p-i name="ic_main-filled"
+                 width="1rem"
+                 height="1rem"
+                 :color="gray[500]"
+            />
+        </template>
         <template #title-right-extra>
             <div v-if="!metricExplorerPageGetters.isManagedMetric"
                  class="title-right-extra icon-wrapper"
             >
                 <p-icon-button name="ic_edit-text"
                                size="md"
-                               @click.stop="handleClickEditMetricName"
+                               @click.stop="handleClickEditName"
                 />
                 <p-icon-button name="ic_delete"
                                size="md"
+                               style-type="negative-transparent"
                                @click.stop="handleClickDeleteMetric"
                 />
             </div>
-            <metric-explorer-edit-name-modal :visible.sync="state.metricEditNameModalVisible" />
-            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC')"
+            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC')"
                           :visible.sync="state.metricDeleteModalVisible"
                           :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
-                          @confirm="handleDeleteMetric"
+                          @confirm="handleDeleteCustomMetric"
             />
         </template>
         <template #extra>
             <div ref="rightPartRef"
                  class="right-part"
             >
-                <template v-if="!metricExplorerPageGetters.isManagedMetric">
+                <!-- metric case -->
+                <template v-if="!metricExplorerPageGetters.metricExampleId">
+                    <p-button class="mr-2"
+                              style-type="tertiary"
+                              icon-left="ic_duplicate"
+                              @click="handleDuplicate"
+                    >
+                        {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
+                    </p-button>
+                    <p-button style-type="tertiary"
+                              icon-left="ic_plus_bold"
+                              @click="handleSaveMetricExample"
+                    >
+                        {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
+                    </p-button>
+                </template>
+                <!-- example case -->
+                <template v-else>
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
-                              @click="handleSaveQuerySet"
+                              @click="handleSaveMetricExample"
                     >
                         {{ $t('INVENTORY.METRIC_EXPLORER.SAVE') }}
                     </p-button>
@@ -174,19 +245,13 @@ const handleDeleteMetric = async () => {
                                     ref="contextMenuRef"
                                     :menu="state.saveDropdownMenuItems"
                                     :style="contextMenuStyle"
-                                    @select="handleClickSaveAsButton"
+                                    @select="handleSelectSaveAsExample"
                     />
                 </template>
-                <template v-else>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_disk-edit-filled"
-                              @click="handleClickSaveAsButton"
-                    >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.SAVE_AS') }}
-                    </p-button>
-                </template>
             </div>
-            <metric-explorer-save-as-modal :visible.sync="state.metricSaveAsModalVisible" />
+            <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
+                                             :type="state.selectedNameFormModalType"
+            />
         </template>
     </p-heading>
 </template>
