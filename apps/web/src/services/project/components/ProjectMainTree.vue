@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -31,20 +31,20 @@ const state = reactive({
     selectedTreeId: undefined as string|undefined,
 });
 
-watch(route, () => {
+onMounted(() => {
     const selectedTreeId = (route.params.projectGroupId || route.params.id) as string|undefined;
     if (selectedTreeId) {
         state.selectedTreeId = selectedTreeId as string;
         setSelectedNodeId(selectedTreeId);
     }
-}, { immediate: true });
+});
 
 </script>
 
 <template>
     <div class="project-main-tree">
         <tree-view :tree-data="state.projectTreeData"
-                   :initial-tree-display-map="treeDisplayMap"
+                   :tree-display-map.sync="treeDisplayMap"
                    :selected-id="state.selectedTreeId"
                    @click-toggle="fetchData"
         >
