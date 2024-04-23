@@ -75,7 +75,7 @@ const handleClickItem = () => {
             params: {
                 provider: itemInfo[0],
                 group: itemInfo[1],
-                name: itemInfo[2],
+                name: props.item.label as string,
             },
         }).catch(() => {});
         return;
@@ -98,7 +98,7 @@ const handleClickItem = () => {
             params: {
                 provider: itemInfo[0],
                 group: itemInfo[1],
-                name: itemInfo[2],
+                name: props.item.label as string,
             },
         }).catch(() => {});
         return;
