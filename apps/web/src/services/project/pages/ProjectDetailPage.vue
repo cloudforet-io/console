@@ -240,7 +240,7 @@ onUnmounted(() => {
                     </div>
                 </div>
             </p-pane-layout>
-            <keep-alive><router-view /></keep-alive>
+            <router-view />
         </div>
         <p-button-modal :header-title="formState.headerTitle"
                         :centered="true"
