@@ -16,3 +16,6 @@ export const SUMMARY_DATA_TYPE = {
     ASSET: 'Asset',
     COST: 'cost',
 } as const;
+
+export const MAX_BOARD_SETS = 13;
+export const MAX_BOARD_SETS_TABLET = 7;

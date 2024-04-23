@@ -16,7 +16,9 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { blue, gray } from '@/styles/colors';
 
-import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import {
+    BOOKMARK_MODAL_TYPE,
+} from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkBoardSet, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -24,12 +26,14 @@ interface Props {
     boardSets: BookmarkBoardSet[];
     isFullMode?: boolean;
     isFolderBoard?: boolean;
+    isMaxBoardSets?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     boardSets: () => ([]),
     isFullMode: false,
     isFolderBoard: false,
+    isMaxBoardSets: false,
 });
 
 const bookmarkStore = useBookmarkStore();
@@ -37,18 +41,6 @@ const bookmarkStore = useBookmarkStore();
 const boardItemEl = ref<HTMLElement | null>(null);
 
 const state = reactive({
-    boardSets: computed<BookmarkBoardSet[]>(() => {
-        const result: BookmarkBoardSet[] = props.boardSets;
-        if (!props.isFullMode && result.length === 13) {
-            result.push({
-                name: i18n.t('HOME.TOGGLE_MORE') as string,
-                icon: 'ic_ellipsis-horizontal',
-                isShowMore: true,
-                rounded: true,
-            });
-        }
-        return result;
-    }),
     menuItems: computed<MenuItem[]>(() => {
         const defaultSets: MenuItem[] = [
             {
@@ -136,11 +128,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <p-board :board-sets="state.boardSets"
+    <p-board :board-sets="props.boardSets"
              selectable
              :style-type="BOARD_STYLE_TYPE.cards"
              class="bookmark-board"
-             :class="{'full-mode': props.isFullMode, 'folder': props.isFolderBoard}"
+             :class="{'full-mode': props.isFullMode, 'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
              @item-click="handleClickItem"
     >
         <template #item-content="{board}">
@@ -169,8 +161,6 @@ onBeforeUnmount(() => {
                     <p-lazy-img
                         v-if="board.imgIcon"
                         :src="assetUrlConverter(board.imgIcon)"
-                        width="1.5rem"
-                        height="1.5rem"
                         error-icon="ic_globe-filled"
                         :error-icon-color="gray[500]"
                         class="icon"
@@ -220,6 +210,79 @@ onBeforeUnmount(() => {
     @apply grid gap-2 text-label-md;
     padding-top: 1rem;
 
+    /* custom design-system component - p-board-item */
+    :deep(.p-board-item) {
+        @apply relative border-gray-150;
+        min-height: 3.5rem;
+        padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+        border-radius: 0.75rem;
+        box-shadow: none;
+
+        &:hover {
+            @apply bg-white border border-blue-500;
+            box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
+        }
+
+        .content {
+            width: 100%;
+        }
+
+        .board-item {
+            @apply flex items-center;
+            gap: 0.5rem;
+
+            .image-wrapper {
+                @apply flex items-center justify-center;
+                width: 2.5rem;
+                height: 2.5rem;
+                border-radius: 0.75rem;
+
+                .icon, img {
+                    width: 1.5rem !important;
+                    height: 1.5rem !important;
+                }
+
+                .show-more {
+                    @apply flex items-center justify-center bg-gray-100 rounded-xl;
+                    width: 2.5rem;
+                    height: 2.5rem;
+                }
+            }
+
+            .text-wrapper {
+                max-width: calc(100% - 3rem);
+
+                .bookmark-label {
+                    @apply truncate;
+                }
+
+                .bookmark-link {
+                    @apply text-label-sm text-gray-500 truncate;
+                }
+            }
+        }
+
+        .toolsets-wrapper {
+            @apply absolute hidden bg-blue-300 rounded-full;
+            top: 0.75rem;
+            right: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+
+            /* custom design-system component - p-icon-button */
+            :deep(.p-icon-button) {
+                @apply relative;
+            }
+
+            .toolsets-context-menu {
+                @apply absolute;
+                right: 0;
+                min-width: 7.25rem;
+                z-index: 10;
+            }
+        }
+    }
+
     &.full-mode {
         /* custom design-system component - p-board-item */
         :deep(.p-board-item) {
@@ -251,63 +314,46 @@ onBeforeUnmount(() => {
         }
     }
 
-    /* custom design-system component - p-board-item */
-    :deep(.p-board-item) {
-        @apply relative border-gray-150;
-        min-height: 3.5rem;
-        max-height: 3.5rem;
-        padding: 0.5rem 0.75rem 0.5rem 0.5rem;
-        border-radius: 0.75rem;
-        box-shadow: none;
-        &:hover {
-            @apply bg-white border border-blue-500;
-            box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
-        }
-        .content {
-            width: 100%;
-        }
+    @screen laptop {
+        &:not(.full-mode) {
+            &.is-max-board-sets {
+                /* custom design-system component - p-board-item */
+                :deep(.p-board-item) {
+                    &:last-child {
+                        .board-item {
+                            height: 1.25rem;
 
-        .board-item {
-            @apply flex items-center;
-            gap: 0.5rem;
-            .image-wrapper {
-                @apply flex items-center justify-center;
-                width: 2.5rem;
-                height: 2.5rem;
-                border-radius: 0.75rem;
-                .show-more {
-                    @apply flex items-center justify-center bg-gray-100 rounded-xl;
-                    width: 2.5rem;
-                    height: 2.5rem;
+                            .bookmark-label {
+                                @apply hidden;
+                            }
+                        }
+                    }
                 }
             }
-            .text-wrapper {
-                max-width: calc(100% - 3rem);
-                .bookmark-label {
-                    @apply truncate;
-                }
-                .bookmark-link {
-                    @apply text-label-sm text-gray-500 truncate;
-                }
-            }
-        }
 
-        .toolsets-wrapper {
-            @apply absolute hidden bg-blue-300 rounded-full;
-            top: 0.75rem;
-            right: 0.5rem;
-            width: 2rem;
-            height: 2rem;
+            /* custom design-system component - p-board-item */
+            :deep(.p-board-item) {
+                min-height: 3.625rem;
+                padding: 0.5rem;
 
-            /* custom design-system component - p-icon-button */
-            :deep(.p-icon-button) {
-                @apply relative;
-            }
-            .toolsets-context-menu {
-                @apply absolute;
-                right: 0;
-                min-width: 7.25rem;
-                z-index: 10;
+                .board-item {
+                    @apply flex-col;
+                    gap: 0.375rem;
+
+                    .image-wrapper {
+                        width: 1.25rem;
+                        height: 1.25rem;
+
+                        .icon, img {
+                            width: 1.25rem !important;
+                            height: 1.25rem !important;
+                        }
+
+                        .show-more {
+                            @apply bg-transparent;
+                        }
+                    }
+                }
             }
         }
     }

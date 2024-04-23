@@ -53,7 +53,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } else {
                 filteredList = state.bookmarkData.filter((i) => !i.folder);
             }
-            return state.isFullMode ? filteredList : filteredList.slice(0, 13);
+            return filteredList;
         }),
     });
 
