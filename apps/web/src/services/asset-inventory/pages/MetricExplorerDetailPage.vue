@@ -7,6 +7,9 @@ import {
     PDivider,
 } from '@spaceone/design-system';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
@@ -29,33 +32,36 @@ const props = withDefaults(defineProps<Props>(), {
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
 
+const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
+const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
+const storeState = reactive({
+    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
+});
 const state = reactive({
-    breadCrumbs: computed(() => [
-        ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
-        {
-            name: (`[${metricExplorerPageStore.state.selectedNamespace?.name}] ${metricExplorerPageStore.state.metric?.name}`) ?? props.id,
-            path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-        },
-    ]),
+    breadCrumbs: computed(() => {
+        const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
+        return [
+            ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
+            {
+                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? props.id,
+                path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            },
+        ];
+    }),
 });
 
 watch(() => props.id, async (metricId) => {
     if (metricId) {
-        metricExplorerPageStore.setMetricId(metricId);
-        await metricExplorerPageStore.loadMetric();
-    } else {
-        metricExplorerPageStore.setMetricId();
+        await metricExplorerPageStore.loadMetric(metricId);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
-watch(() => metricExplorerPageStore.state.namespaces, async (namespaces) => {
-    const metric = metricExplorerPageStore.state.metric;
-    const namespace = namespaces.find((d) => d.namespace_id === metric?.namespace_id);
-    if (namespace) metricExplorerPageStore.setSelectedNamespace(namespace);
-    gnbStore.setBreadcrumbs(state.breadCrumbs);
+watch(() => metricExplorerPageState.metric, async (metric) => {
+    if (metric) gnbStore.setBreadcrumbs(state.breadCrumbs);
 });
 </script>
 
