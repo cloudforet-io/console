@@ -29,6 +29,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         if (isPublicDashboard) return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
         return undefined;
     }
+
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
         const provider = to?.params?.provider;
@@ -36,6 +37,15 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         const name = to?.params?.name;
         if (!provider || !group || !name) return undefined;
         return { itemType: RECENT_TYPE.CLOUD_SERVICE_TYPE, workspaceId, itemId: `${provider}.${group}.${name}` };
+    }
+
+    /* SECURITY */
+    if (to.name === ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME) {
+        const provider = to?.params?.provider;
+        const group = to?.params?.group;
+        const name = to?.params?.name;
+        if (!provider || !group || !name) return undefined;
+        return { itemType: RECENT_TYPE.SECURITY, workspaceId, itemId: `${provider}.${group}.${name}` };
     }
 
     /* PROJECT GROUP */
@@ -71,7 +81,6 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* MENU */
-
     const menu = to.meta?.menuId && MENU_INFO_MAP[to.meta?.menuId as MenuId];
     if (menu) {
         return { itemType: RECENT_TYPE.SERVICE, workspaceId, itemId: to.meta?.menuId as MenuId };
