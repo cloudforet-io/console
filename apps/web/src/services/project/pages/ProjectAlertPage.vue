@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onActivated, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -19,7 +19,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import ProjectAlert from '@/services/project/components/ProjectAlertListTab.vue';
+import ProjectSettings from '@/services/project/components/ProjectAlertSettingsTab.vue';
+import ProjectWebhook from '@/services/project/components/ProjectWebhookTab.vue';
 
 
 interface Props {
@@ -35,11 +37,11 @@ const state = reactive({
 });
 const tabState = reactive({
     tabs: computed<TabItem[]>(() => ([
-        { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_ALERT') },
-        { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_WEBHOOK') },
-        { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_SETTINGS') },
+        { name: 'alert', label: i18n.t('PROJECT.DETAIL.SUBTAB_ALERT') },
+        { name: 'webhook', label: i18n.t('PROJECT.DETAIL.SUBTAB_WEBHOOK') },
+        { name: 'settings', label: i18n.t('PROJECT.DETAIL.SUBTAB_SETTINGS') },
     ])),
-    activeTab: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+    activeTab: 'alert',
 });
 
 /* api */
@@ -74,19 +76,18 @@ const handleActivateAlert = async () => {
 
 /* event */
 const handleChangeTab = async (activeTab: string) => {
-    if (activeTab === route.name) return;
-    await router.replace({ name: activeTab }).catch(() => {});
+    if (activeTab === route.query?.tab) return;
+    await router.replace({
+        query: { tab: activeTab },
+    }).catch(() => {});
 };
 
 /* init */
-onActivated(() => {
-    if (route.name !== tabState.activeTab) {
-        tabState.activeTab = route.name || PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME;
-    }
-});
-
 watch(() => props.id, (projectId) => {
     if (projectId) getProjectAlertConfig();
+    if (route.query?.tab !== tabState.activeTab) {
+        tabState.activeTab = route.query?.tab as string || 'alert';
+    }
 }, { immediate: true });
 </script>
 
@@ -110,7 +111,15 @@ watch(() => props.id, (projectId) => {
                       :active-tab.sync="tabState.activeTab"
                       @change="handleChangeTab"
         >
-            <keep-alive><router-view /></keep-alive>
+            <template #alert>
+                <project-alert :project-id="id" />
+            </template>
+            <template #webhook>
+                <project-webhook :project-id="id" />
+            </template>
+            <template #settings>
+                <project-settings :project-id="id" />
+            </template>
         </p-button-tab>
     </div>
 </template>

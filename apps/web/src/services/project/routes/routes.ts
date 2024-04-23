@@ -17,11 +17,6 @@ const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectN
 const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
 const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
-
-const ProjectAlertListPage = () => import('@/services/project/pages/ProjectAlertListPage.vue');
-const ProjectWebhookPage = () => import('@/services/project/pages/ProjectWebhookPage.vue');
-const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectAlertSettingsPage.vue');
-
 export default {
     path: 'project',
     meta: {
@@ -70,32 +65,9 @@ export default {
                         {
                             path: 'alert',
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-                            redirect: 'alert/alert',
+                            meta: { lsbVisible: true },
                             props: true,
                             component: ProjectAlertPage,
-                            children: [
-                                {
-                                    path: 'alert',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
-                                    meta: { lsbVisible: true },
-                                    props: true,
-                                    component: ProjectAlertListPage,
-                                },
-                                {
-                                    path: 'webhook',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
-                                    meta: { lsbVisible: true },
-                                    props: true,
-                                    component: ProjectWebhookPage,
-                                },
-                                {
-                                    path: 'settings',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME,
-                                    meta: { lsbVisible: true },
-                                    props: true,
-                                    component: ProjectAlertSettingsPage,
-                                },
-                            ],
                         },
                         {
                             path: 'notification',
@@ -113,7 +85,7 @@ export default {
                         },
                         {
                             path: '*',
-                            redirect: 'summary',
+                            redirect: 'member',
                         },
                     ],
                 },
