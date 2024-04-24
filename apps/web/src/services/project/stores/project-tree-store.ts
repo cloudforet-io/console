@@ -17,6 +17,9 @@ export const useProjectTreeStore = defineStore('project-tree', () => {
             await nextTick();
             state.treeDisplayMap = copiedMap;
         },
+        disposeProjectTree() {
+            state.treeDisplayMap = {};
+        },
     };
 
     return {
