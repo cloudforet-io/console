@@ -136,7 +136,7 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
         const curWidth = useElementSize(cur)?.width.value ?? 0;
         return curWidth + 4;
     });
-    state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length);
+    state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
 });
 </script>
 
@@ -156,14 +156,16 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
                                size="sm"
                                @click="handleGoBackButton"
                 />
-                <div class="folder-icon-wrapper">
+                <div v-if="!state.isMobileSize"
+                     class="folder-icon-wrapper"
+                >
                     <p-i name="ic_folder-filled"
                          width="0.875rem"
                          height="0.875rem"
                     />
                 </div>
             </template>
-            <template v-if="storeState.isFileFullMode"
+            <template v-if="storeState.isFileFullMode && !state.isMobileSize"
                       #right
             >
                 <div class="title-right-wrapper">
@@ -238,7 +240,7 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
                 />
             </div>
         </div>
-        <div v-if="!storeState.isFileFullMode && !state.isMobileSize"
+        <div v-if="!storeState.isFullMode && !state.isMobileSize"
              class="file-extra-wrapper"
         >
             <p-divider vertical
@@ -360,6 +362,15 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
     }
 
     @screen mobile {
+        &.full-mode {
+            /* custom design-system component - p-field-title */
+            :deep(.p-field-title) {
+                max-width: calc(100% - 9.375rem);
+                .title {
+                    @apply truncate;
+                }
+            }
+        }
         &:not(.full-mode) {
             @apply flex-col items-start;
         }
