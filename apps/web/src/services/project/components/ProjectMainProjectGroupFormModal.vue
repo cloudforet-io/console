@@ -31,6 +31,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -104,6 +105,7 @@ const confirm = async () => {
     if (!props.updateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
     else await updateProjectGroup({ ...params, project_group_id: props.projectGroupId as string });
 
+    emit('confirm');
     state.loading = false;
     state.proxyVisible = false;
 };

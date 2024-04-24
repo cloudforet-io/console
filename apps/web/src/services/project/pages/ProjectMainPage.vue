@@ -28,11 +28,13 @@ import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/componen
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
 
 
 const gnbStore = useGnbStore();
 // const gnbGetters = gnbStore.getters;
 const allReferenceStore = useAllReferenceStore();
+const projectTreeStore = useProjectTreeStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 
@@ -129,6 +131,10 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     }
 };
 
+const handleRefreshTree = () => {
+    projectTreeStore.refreshProjectTree();
+};
+
 // watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
 //     gnbStore.setBreadcrumbs(projectGroupNavigation);
 // });
@@ -199,15 +205,18 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
                                                :visible.sync="modalState.projectGroupFormVisible"
                                                :project-group-id="state.currentProjectGroupId"
                                                :update-mode="modalState.projectGroupUpdateMode"
+                                               @confirm="handleRefreshTree"
         />
         <project-main-project-group-delete-check-modal v-if="modalState.projectGroupDeleteCheckModalVisible"
                                                        :visible.sync="modalState.projectGroupDeleteCheckModalVisible"
                                                        :project-group-id="state.currentProjectGroupId"
+                                                       @confirm="handleRefreshTree"
         />
         <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
                                                :visible.sync="state.projectGroupModalVisible"
                                                :is-project="false"
                                                :target-id="state.currentProjectGroupId"
+                                               @confirm="handleRefreshTree"
         />
         <project-group-member-management-modal v-if="state.projectGroupMemberManagementModalVisible"
                                                :visible.sync="state.projectGroupMemberManagementModalVisible"
@@ -216,6 +225,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
         <project-form-modal v-if="modalState.projectFormModalVisible"
                             :visible.sync="modalState.projectFormModalVisible"
                             :project-group-id="state.currentProjectGroupId"
+                            @confirm="handleRefreshTree"
         />
     </div>
 </template>
