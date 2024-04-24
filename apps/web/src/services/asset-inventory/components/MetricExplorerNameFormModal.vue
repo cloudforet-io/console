@@ -78,6 +78,7 @@ const {
 
 /* Api */
 const createMetricExample = async () => {
+    // TODO: check working
     try {
         const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
             metric_id: metricExplorerPageState.metric?.metric_id || '',
@@ -94,8 +95,8 @@ const createMetricExample = async () => {
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
-                id: metricExample.metric_id,
-                exampleId: metricExample.example_id,
+                metricId: metricExample.metric_id,
+                metricExampleId: metricExample.example_id,
             },
         }));
     } catch (e) {

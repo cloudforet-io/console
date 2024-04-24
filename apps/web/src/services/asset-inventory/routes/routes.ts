@@ -216,9 +216,16 @@ const assetInventoryRoute: RouteConfig = {
                     component: MetricExplorerMainPage as any,
                 },
                 {
-                    path: ':id',
+                    path: ':metricId',
                     name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                    meta: { label: ({ params }) => params.id, lsbVisible: true },
+                    meta: { label: ({ params }) => params.metricId, lsbVisible: true },
+                    props: true,
+                    component: MetricExplorerDetailPage as any,
+                },
+                {
+                    path: ':metricId/:metricExampleId',
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                    meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
                     props: true,
                     component: MetricExplorerDetailPage as any,
                 },

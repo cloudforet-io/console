@@ -64,7 +64,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.id),
+    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.metricId),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -119,7 +119,7 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
-    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.id] : undefined)),
+    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
     metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
     metricsFilteredByInput: computed(() => {
         const keyword = metricState.inputValue.toLowerCase();
@@ -133,7 +133,7 @@ const metricState = reactive({
         icon: metric.data.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
         to: getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { id: metric.key },
+            params: { metricId: metric.key },
         }),
     }))),
     addCustomMetricModalVisible: false,
@@ -217,7 +217,7 @@ const handleClickBackToHome = () => {
 
 
 watch(() => route.params, (params) => {
-    if (!params.id) {
+    if (!params.metricId) {
         namespaceState.selectedNamespace = undefined;
     }
 });

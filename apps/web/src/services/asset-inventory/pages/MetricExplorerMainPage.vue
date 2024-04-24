@@ -73,7 +73,7 @@ const handleRouteToMetricDetail = (metricId: string) => {
     router.push({
         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
         params: {
-            id: metricId,
+            metricId,
         },
     });
 };
