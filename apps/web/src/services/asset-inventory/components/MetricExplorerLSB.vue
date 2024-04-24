@@ -64,7 +64,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.id),
+    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.metricId),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -133,7 +133,7 @@ const metricState = reactive({
         icon: metric.data.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
         to: getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { id: metric.key },
+            params: { metricId: metric.key },
         }),
     }))),
     addCustomMetricModalVisible: false,

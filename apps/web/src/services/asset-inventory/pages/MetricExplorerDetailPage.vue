@@ -23,10 +23,10 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 
 
 interface Props {
-    id: string;
+    metricId: string;
 }
 const props = withDefaults(defineProps<Props>(), {
-    id: '',
+    metricId: '',
 });
 
 const gnbStore = useGnbStore();
@@ -46,14 +46,14 @@ const state = reactive({
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? props.id,
+                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? props.metricId,
                 path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
 });
 
-watch(() => props.id, async (metricId) => {
+watch(() => props.metricId, async (metricId) => {
     if (metricId) {
         await metricExplorerPageStore.loadMetric(metricId);
     }

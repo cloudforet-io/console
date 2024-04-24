@@ -45,7 +45,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedOperator: OPERATOR.SUM as Operator,
     });
     const getters = reactive({
-        metricId: computed<string|undefined>(() => route.params.id),
+        metricId: computed<string|undefined>(() => route.params.metricId),
         metricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),

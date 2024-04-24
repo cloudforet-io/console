@@ -71,9 +71,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     if (to.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) {
-        const metricExplorerId = to?.params?.id;
-        if (!metricExplorerId) return undefined;
-        return { itemType: RECENT_TYPE.METRIC_EXPLORER, workspaceId, itemId: metricExplorerId };
+        const metricId = to?.params?.metricId;
+        if (!metricId) return undefined;
+        return { itemType: RECENT_TYPE.METRIC_EXPLORER, workspaceId, itemId: metricId };
     }
 
     /* MENU */

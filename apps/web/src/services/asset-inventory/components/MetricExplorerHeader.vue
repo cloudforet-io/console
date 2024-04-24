@@ -103,7 +103,7 @@ const duplicateMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { id: duplicatedMetric.metric_id },
+            params: { metricId: duplicatedMetric.metric_id },
         }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
@@ -120,7 +120,7 @@ const deleteCustomMetric = async () => {
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
                 name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                params: { id: otherMetricId },
+                params: { metricId: otherMetricId },
             }));
         } else {
             await router.replace(getProperRouteLocation({
