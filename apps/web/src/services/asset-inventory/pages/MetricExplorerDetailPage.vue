@@ -22,13 +22,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
-interface Props {
-    metricId: string;
-}
-const props = withDefaults(defineProps<Props>(), {
-    metricId: '',
-});
-
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
 
@@ -46,23 +39,20 @@ const state = reactive({
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? props.metricId,
+                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? metricExplorerPageGetters.metricId,
                 path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
 });
 
-watch(() => props.metricId, async (metricId) => {
+
+watch(() => metricExplorerPageGetters.metricId, async (metricId) => {
     if (metricId) {
         await metricExplorerPageStore.loadMetric(metricId);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
-
-watch(() => metricExplorerPageState.metric, async (metric) => {
-    if (metric) gnbStore.setBreadcrumbs(state.breadCrumbs);
-});
 </script>
 
 <template>
