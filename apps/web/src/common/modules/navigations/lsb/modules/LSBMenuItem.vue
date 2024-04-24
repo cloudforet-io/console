@@ -76,7 +76,11 @@ const handleSelect = (id: string, selected: string) => {
                                     :is-admin-mode="state.isAdminMode"
                                     :idx="idx"
                                     :current-path="currentPath"
-            />
+            >
+                <template #after-text>
+                    <slot :name="`after-text-${item.id}`" />
+                </template>
+            </l-s-b-router-menu-item>
         </div>
     </div>
 </template>

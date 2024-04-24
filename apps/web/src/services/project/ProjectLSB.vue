@@ -6,7 +6,9 @@ import { useRoute } from 'vue-router/composables';
 import {
     PTextInput, PTextHighlighting, PEmpty, PBadge,
 } from '@spaceone/design-system';
+import { find } from 'lodash';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -24,12 +26,15 @@ import { gray, indigo, peacock } from '@/styles/colors';
 
 import ProjectMainTree from '@/services/project/components/ProjectMainTree.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 const route = useRoute();
 const allReferenceStore = useAllReferenceStore();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
+const projectDetailPageStore = useProjectDetailPageStore();
+const projectDetailPageState = projectDetailPageStore.state;
 
 const storeState = reactive({
     projectItems: computed<ProjectReferenceItem[]>(() => Object.values(allReferenceStore.getters.project)),
@@ -100,7 +105,7 @@ const state = reactive({
             id: 'project',
         },
     ]),
-    defaultMenuSet: computed(() => [
+    projectDetailMenuSet: computed(() => [
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
             label: i18n.t('PROJECT.DETAIL.DASHBOARD.DASHBOARD'),
@@ -112,26 +117,26 @@ const state = reactive({
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_PROJECT_MEMBER'),
             id: 'project-member',
-            to: { name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME },
+            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME }),
             hideFavorite: true,
         },
         {
-            type: MENU_ITEM_TYPE.SLOT,
+            type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
             id: 'project-alert',
-            to: { name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME },
+            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME }),
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
             id: 'project-notification',
-            to: { name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME },
+            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME }),
         },
         {
             type: MENU_ITEM_TYPE.ITEM,
             label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
             id: 'project-tag',
-            to: { name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME },
+            to: getProperRouteLocation({ name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME }),
         },
     ]),
     menuSet: computed<LSBMenu[]>(() => {
@@ -148,7 +153,7 @@ const state = reactive({
             ...state.projectLandingMenuSet,
         ] : [
             ...baseMenuSet,
-            ...state.defaultMenuSet,
+            ...state.projectDetailMenuSet,
         ]);
     }),
     projectFilteredByKeyword: computed<LSBItem[]>(() => storeState.projectItems.filter((project) => project.name.includes(state.projectKeyword))
@@ -163,6 +168,9 @@ const state = reactive({
             }),
             favoriteOptions: { type: FAVORITE_TYPE.PROJECT, id: project.key },
         }))),
+    alertCounts: computed(() => ({
+        TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
+    })),
 });
 </script>
 
@@ -198,19 +206,13 @@ const state = reactive({
             </template>
             <project-main-tree v-else />
         </template>
-        <template #slot-project-alert="menu">
-            <l-s-b-router-menu-item :item="menu"
-                                    :idx="menu?.id"
+        <template #after-text-project-alert>
+            <p-badge style-type="primary3"
+                     badge-type="subtle"
+                     class="ml-1"
             >
-                <template #after-text>
-                    <p-badge style-type="primary3"
-                             badge-type="subtle"
-                             class="ml-1"
-                    >
-                        7
-                    </p-badge>
-                </template>
-            </l-s-b-router-menu-item>
+                {{ state.alertCounts.TRIGGERED }}
+            </p-badge>
         </template>
     </l-s-b>
 </template>
