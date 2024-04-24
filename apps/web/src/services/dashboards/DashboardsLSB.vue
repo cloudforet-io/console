@@ -179,10 +179,9 @@ const filterMenuItems = (menuItems: LSBMenu[] = []): LSBMenu[] => {
     const result = [] as LSBMenu[];
     menuItems.forEach((d) => {
         if (Array.isArray(d)) {
-            const filtered = d.filter((menu) => !(menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
-            const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
-            if (hasProject) result.push(filtered);
-        } else if (!(d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) {
+            const hasProject = d.filter((f) => f.type === 'item').length > 0;
+            if (hasProject) result.push(d);
+        } else {
             result.push(d);
         }
     });

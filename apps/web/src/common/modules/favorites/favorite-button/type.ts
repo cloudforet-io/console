@@ -1,5 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { MenuId } from '@/lib/menu/config';
+
 export const FAVORITE_TYPE = {
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
@@ -15,7 +17,7 @@ export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
 export interface FavoriteOptions {
     type: FavoriteType;
-    id?: string;
+    id?: MenuId | string;
 }
 
 export interface FavoriteConfig {

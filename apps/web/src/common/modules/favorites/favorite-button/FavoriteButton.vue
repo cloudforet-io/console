@@ -149,7 +149,7 @@ const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     &:not(.read-only) {
         cursor: pointer;
         &:hover {
-            transform: scale(1.5);
+            transform: scale(1.1);
             &:not(.active) {
                 @apply text-gray-300;
             }
