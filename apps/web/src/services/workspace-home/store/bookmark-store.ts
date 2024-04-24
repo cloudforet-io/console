@@ -1,4 +1,5 @@
 import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { defineStore } from 'pinia';
 
@@ -27,7 +28,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const state = reactive({
         bookmarkFolderData: [] as BookmarkItem[],
         bookmarkData: [] as BookmarkItem[],
-        filterByFolder: undefined as string|undefined,
+        filterByFolder: undefined as string|undefined|TranslateResult,
         selectedBookmark: undefined as BookmarkItem|undefined,
         isFullMode: false,
         isFileFullMode: false,
@@ -92,7 +93,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const actions = {
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('updated_at', true)
+                .setSort('created_at', false)
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
@@ -100,9 +101,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     { k: 'data.link', v: null, o: '=' },
                 ]);
             try {
-                if (!state.isFullMode) {
-                    bookmarkListApiQuery.setPageLimit(10);
-                }
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
@@ -117,7 +115,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         fetchBookmarkList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('updated_at', true)
+                .setSort('created_at', true)
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
@@ -190,7 +188,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await Promise.all(foldersLinkItems.map(async (item) => {
                     await actions.updateBookmarkLink({
                         id: item.id || '',
-                        name: item.name || '',
+                        name: item.name as string || '',
                         link: item.link || '',
                         folder: item.folder,
                     });
