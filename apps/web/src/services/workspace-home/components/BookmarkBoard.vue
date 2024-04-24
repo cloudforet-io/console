@@ -2,6 +2,7 @@
 import {
     computed, onBeforeUnmount, onMounted, reactive, ref,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBoard, PLazyImg, PI, PIconButton, PContextMenu, PEmpty,
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
+const bookmarkState = bookmarkStore.state;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
@@ -46,6 +48,8 @@ const boardItemEl = ref<HTMLElement | null>(null);
 
 const storeState = reactive({
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+    bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
+    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -136,7 +140,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="bookmark-board"
-         :class="{[props.isFullMode ? 'full-board' : 'collapsed-board']: true, 'no-data': storeState.recentList.length === 0}"
+         :class="{[props.isFullMode ? 'full-board' : 'collapsed-board']: true, 'no-data': storeState.recentList.length === 0 || storeState.bookmarkFolderData.length === 0}"
     >
         <p-board v-if="props.boardSets.length > 0"
                  :board-sets="props.boardSets"
@@ -214,7 +218,7 @@ onBeforeUnmount(() => {
                 </div>
             </template>
         </p-board>
-        <p-empty v-else-if="storeState.recentList.length > 0"
+        <p-empty v-else-if="storeState.recentList.length > 0 && storeState.filterByFolder"
                  class="empty"
         >
             {{ $t('HOME.EMPTY_LINK') }}
