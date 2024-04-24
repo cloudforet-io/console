@@ -1790,6 +1790,7 @@
 		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
 		"COST_SUMMARY_TITLE": "Cost Summary",
 		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
+		"EMPTY_LINK": "No Link",
 		"FORM_DESELECT": "Deselect",
 		"FORM_FOLDER": "Folder",
 		"FORM_NAME": "Name",
