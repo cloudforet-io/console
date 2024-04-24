@@ -24,6 +24,10 @@ const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
 });
 
+const MORE_BUTTON_DEFAULT_WIDTH = 124;
+const FOLDER_DEFAULT_GAP = 4;
+const EXTRA_DEFAULT_WIDTH = 150; // title + gap + divider + create folder button
+
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
@@ -47,7 +51,7 @@ const storeState = reactive({
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
-    folderListMaxWidth: computed<number>(() => containerWidth.value - 150 - toolboxWidth.value),
+    folderListMaxWidth: computed<number>(() => containerWidth.value - toolboxWidth.value - EXTRA_DEFAULT_WIDTH),
 
     refinedFolderList: [] as BookmarkItem[],
     refinedFolderListWidth: 0,
@@ -117,7 +121,7 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
 
 watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.bookmarkFolderList], ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
     if (!folderItemsValue) return;
-    const folderListWidthWithoutMoreButton = folderListMaxWidth - 124;
+    const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
     folderItemsValue.forEach((el) => {
@@ -134,7 +138,7 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
     _refinedFolderList.pop();
     state.refinedFolderListWidth = sumBy(_refinedFolderList, (cur) => {
         const curWidth = useElementSize(cur)?.width.value ?? 0;
-        return curWidth + 4;
+        return curWidth + FOLDER_DEFAULT_GAP;
     });
     state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
 });
