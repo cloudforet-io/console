@@ -43,6 +43,7 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     metricNameFormModalVisible: false,
     metricDeleteModalVisible: false,
+    loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
@@ -91,6 +92,7 @@ const getDuplicatedMetricName = (name: string): string => {
 /* Api */
 const duplicateMetric = async () => {
     if (!metricExplorerPageState.metric) return;
+    state.loadingDuplicate = true;
     try {
         const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
             name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
@@ -107,6 +109,8 @@ const duplicateMetric = async () => {
         }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
+    } finally {
+        state.loadingDuplicate = false;
     }
 };
 const deleteCustomMetric = async () => {
@@ -166,6 +170,9 @@ const handleClickEditName = () => {
 const handleSelectSaveAsExample = () => {
     openNameFormModal(NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE);
 };
+const handleOpenAddExampleModal = () => {
+    openNameFormModal(NAME_FORM_MODAL_TYPE.ADD_EXAMPLE);
+};
 const handleClickDeleteMetric = () => {
     state.metricDeleteModalVisible = true;
 };
@@ -215,13 +222,14 @@ const handleClickMoreMenuButton = () => {
                     <p-button class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"
+                              :loading="state.loadingDuplicate"
                               @click="handleDuplicate"
                     >
                         {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
                     </p-button>
                     <p-button style-type="tertiary"
                               icon-left="ic_plus_bold"
-                              @click="handleSaveMetricExample"
+                              @click="handleOpenAddExampleModal"
                     >
                         {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
                     </p-button>
