@@ -135,7 +135,9 @@ watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.b
             _refinedFolderList.push(el);
         }
     });
-    _refinedFolderList.pop();
+    if (moreState.isShowMoreButton) {
+        _refinedFolderList.pop();
+    }
     state.refinedFolderListWidth = sumBy(_refinedFolderList, (cur) => {
         const curWidth = useElementSize(cur)?.width.value ?? 0;
         return curWidth + FOLDER_DEFAULT_GAP;
