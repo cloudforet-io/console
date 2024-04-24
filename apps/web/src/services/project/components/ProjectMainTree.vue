@@ -1,17 +1,22 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { PI } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import TreeView from '@/services/project/tree/TreeView.vue';
 import type { TreeNode } from '@/services/project/tree/type';
 import { useProjectTreeData } from '@/services/project/tree/use-project-tree-data';
@@ -19,16 +24,34 @@ import { useProjectTreeData } from '@/services/project/tree/use-project-tree-dat
 const {
     treeData,
     treeDisplayMap,
+    parentGroupitems,
     fetchData,
     setSelectedNodeId,
 } = useProjectTreeData();
 
 const route = useRoute();
-
+const gnbStore = useGnbStore();
 
 const state = reactive({
     projectTreeData: computed<TreeNode[]>(() => treeData.value),
     selectedTreeId: undefined as string|undefined,
+    projectGroupNavigation: computed<Breadcrumb[]>(() => {
+        const allPaths = parentGroupitems.value.map((item) => ({
+            name: item.name,
+            to: {
+                name: PROJECT_ROUTE._NAME,
+                params: {
+                    projectGroupId: item.id,
+                },
+            },
+        }));
+
+        return [{ name: i18n.t('MENU.PROJECT') as string, data: null }, ...allPaths];
+    }),
+});
+
+watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
+    gnbStore.setBreadcrumbs(projectGroupNavigation);
 });
 
 onMounted(() => {
