@@ -222,6 +222,13 @@ const assetInventoryRoute: RouteConfig = {
                     props: true,
                     component: MetricExplorerDetailPage as any,
                 },
+                {
+                    path: ':metricId/:metricExampleId',
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                    meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                    props: true,
+                    component: MetricExplorerDetailPage as any,
+                },
             ],
         },
     ],
