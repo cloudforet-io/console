@@ -45,20 +45,12 @@ const route = useRoute();
 const storeState = reactive({
     userId: computed(() => store.state.user.userId),
     groupName: computed(() => storeState.projectGroups[state.currentProjectGroupId].name),
-    // parentGroups: computed(() => projectPageGetters.parentGroups),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
 });
 
 const state = reactive({
     currentProjectGroupId: computed(() => route.params.projectGroupId),
-    // projectGroupNavigation: computed(() => {
-    //     const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
-    //     if (storeState.selectedNodeData && storeState.groupName) {
-    //         result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
-    //     }
-    //     return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
-    // }),
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'project',
@@ -98,11 +90,6 @@ const {
 });
 onClickOutside(menuRef, hideContextMenu);
 
-/* Navigation */
-// const onProjectGroupNavClick = async (item: Breadcrumb) => {
-//     if (item.data) await projectPageStore.selectNode(item.data.id);
-// };
-
 /* Event */
 const handleClickProjectGroupEditButton = () => {
     modalState.projectGroupUpdateMode = true;
@@ -135,12 +122,6 @@ const handleRefreshTree = () => {
     projectTreeStore.refreshProjectTree();
 };
 
-// watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-//     gnbStore.setBreadcrumbs(projectGroupNavigation);
-// });
-// watch(() => gnbGetters.selectedItem, (selectedItem) => {
-//     onProjectGroupNavClick(selectedItem);
-// });
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
