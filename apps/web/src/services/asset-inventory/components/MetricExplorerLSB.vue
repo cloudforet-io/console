@@ -119,7 +119,7 @@ const namespaceState = reactive({
 
 const metricState = reactive({
     inputValue: '',
-    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.id] : undefined)),
+    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
     metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
     metricsFilteredByInput: computed(() => {
         const keyword = metricState.inputValue.toLowerCase();
@@ -217,7 +217,7 @@ const handleClickBackToHome = () => {
 
 
 watch(() => route.params, (params) => {
-    if (!params.id) {
+    if (!params.metricId) {
         namespaceState.selectedNamespace = undefined;
     }
 });
