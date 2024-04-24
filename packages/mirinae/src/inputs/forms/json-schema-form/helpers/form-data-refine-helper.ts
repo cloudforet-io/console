@@ -34,6 +34,7 @@ export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
         }
     }
     if (typeof val === 'string') return val?.trim() || undefined;
+    if (typeof val === 'boolean') return val;
     return undefined;
 };
 
