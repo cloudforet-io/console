@@ -5,7 +5,9 @@ import {
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PSelectButton } from '@spaceone/design-system';
+import {
+    PSelectButton, PTextEditor,
+} from '@spaceone/design-system';
 import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -37,19 +39,21 @@ import type {
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const QUERY_OPTIONS_TYPE = 'query_options';
+const SELECT_BUTTON_ITEMS = [
+    { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
+    { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
+    { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
+    { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
+    { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
+];
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
-    chartTypeItems: computed(() => [
-        { chartType: CHART_TYPE.LINE, icon: 'ic_chart-line' },
-        { chartType: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
-        { chartType: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
-        { chartType: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
-    ]),
-    selectedChartType: CHART_TYPE.LINE as ChartType,
+    selectedChartType: CHART_TYPE.LINE as ChartType|string,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
@@ -112,9 +116,11 @@ const setChartData = debounce(async () => {
 }, 300);
 
 /* Event */
-const handleSelectChartType = (chartType: ChartType) => {
-    setChartData();
-    state.selectedChartType = chartType;
+const handleSelectButton = (selected: ChartType|string) => {
+    if (selected !== QUERY_OPTIONS_TYPE) {
+        setChartData();
+    }
+    state.selectedChartType = selected;
 };
 const handleToggleSeries = (index: number) => {
     toggleSeries(state.chart as XYChart, index);
@@ -147,59 +153,69 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
 
 <template>
     <div class="metric-explorer-chart">
-        <div class="left-part">
-            <div class="chart-type-button-wrapper">
-                <span class="period-text">
-                    {{ state.periodText }}
-                </span>
-                <p-select-button v-for="item in state.chartTypeItems"
-                                 :key="`chart-select-button-${item.chartType}`"
+        <div class="top-part">
+            <div class="period-text">
+                <span v-if="state.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
+            </div>
+            <div class="select-button-wrapper">
+                <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
+                                 :key="`chart-select-button-${item.name}`"
                                  :selected="state.selectedChartType"
-                                 :value="item.chartType"
+                                 :value="item.name"
                                  :icon-name="item.icon"
                                  layout="icon-only"
                                  style-type="gray"
                                  size="sm"
-                                 @change="handleSelectChartType"
-                />
-            </div>
-            <div class="chart-wrapper">
-                <metric-explorer-line-chart
-                    v-if="state.selectedChartType === CHART_TYPE.LINE"
-                    :loading="state.loading"
-                    :chart.sync="state.chart"
-                    :chart-data="state.chartData"
-                    :legends="state.legends"
-                />
-                <metric-explorer-donut-chart
-                    v-else-if="state.selectedChartType === CHART_TYPE.DONUT"
-                    :loading="state.loading"
-                    :chart.sync="state.chart"
-                    :chart-data="state.chartData"
-                    :legends="state.legends"
-                />
-                <metric-explorer-tree-map-chart
-                    v-else-if="state.selectedChartType === CHART_TYPE.TREEMAP"
-                    :loading="state.loading"
-                    :chart-data="state.chartData"
-                    :legends="state.legends"
-                />
-                <metric-explorer-horizontal-column-chart
-                    v-else-if="state.selectedChartType === CHART_TYPE.COLUMN"
-                    :loading="state.loading"
-                    :chart.sync="state.chart"
-                    :chart-data="state.chartData"
+                                 @change="handleSelectButton"
                 />
             </div>
         </div>
-        <div class="right-part">
-            <metric-explorer-chart-legends :legends.sync="state.legends"
-                                           :loading="state.loading"
-                                           :more="state.data?.more"
-                                           :chart-type="state.selectedChartType"
-                                           @toggle-series="handleToggleSeries"
-                                           @show-all-series="handleAllSeries('show')"
-                                           @hide-all-series="handleAllSeries('hide')"
+        <div class="bottom-part">
+            <template v-if="state.selectedChartType !== QUERY_OPTIONS_TYPE">
+                <div class="left-part">
+                    <metric-explorer-line-chart
+                        v-if="state.selectedChartType === CHART_TYPE.LINE"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                    />
+                    <metric-explorer-donut-chart
+                        v-else-if="state.selectedChartType === CHART_TYPE.DONUT"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                    />
+                    <metric-explorer-tree-map-chart
+                        v-else-if="state.selectedChartType === CHART_TYPE.TREEMAP"
+                        :loading="state.loading"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                    />
+                    <metric-explorer-horizontal-column-chart
+                        v-else-if="state.selectedChartType === CHART_TYPE.COLUMN"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                    />
+                </div>
+                <div class="right-part">
+                    <metric-explorer-chart-legends :legends.sync="state.legends"
+                                                   :loading="state.loading"
+                                                   :more="state.data?.more"
+                                                   :chart-type="state.selectedChartType"
+                                                   @toggle-series="handleToggleSeries"
+                                                   @show-all-series="handleAllSeries('show')"
+                                                   @hide-all-series="handleAllSeries('hide')"
+                    />
+                </div>
+            </template>
+            <p-text-editor
+                v-if="state.selectedChartType === QUERY_OPTIONS_TYPE"
+                :code="metricExplorerPageState.metric?.query_options"
+                read-only
+                class="query-options-editor"
             />
         </div>
     </div>
@@ -207,32 +223,48 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
 
 <style lang="postcss" scoped>
 .metric-explorer-chart {
-    @apply grid grid-cols-12 border border-gray-200 rounded-md;
-    grid-gap: 1rem;
-    height: 29.5rem;
+    @apply border border-gray-200 rounded-md;
     padding: 1rem;
     margin-bottom: 1rem;
-    .left-part {
-        @apply col-span-9;
-        .chart-type-button-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.375rem;
-            align-items: center;
-        }
+    .top-part {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.75rem;
         .period-text {
-            @apply text-label-md text-gray-500;
+            @apply text-label-md text-gray-600;
             font-weight: 400;
             padding-right: 0.125rem;
         }
-        .chart-wrapper {
-            height: 25rem;
-            padding-top: 0.5rem;
-            padding-bottom: 1rem;
+        .select-button-wrapper {
+            display: flex;
+            gap: 0.375rem;
         }
     }
-    .right-part {
-        @apply col-span-3;
+    .bottom-part {
+        @apply grid grid-cols-12;
+        grid-gap: 1rem;
+        .left-part {
+            @apply col-span-9;
+            height: 25rem;
+            .chart-wrapper {
+                padding-top: 0.5rem;
+                padding-bottom: 1rem;
+            }
+        }
+        .right-part {
+            @apply col-span-3;
+        }
+        .query-options-editor {
+            @apply col-span-12;
+        }
+
+        /* custom design-system component - p-text-editor */
+        :deep(.p-text-editor) {
+            .CodeMirror {
+                height: 25rem;
+            }
+        }
     }
 }
 </style>

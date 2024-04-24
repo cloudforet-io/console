@@ -7,6 +7,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 
@@ -35,6 +38,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricLoading: false,
         refreshMetricData: false,
         metric: undefined as MetricModel|undefined,
+        metricExamples: [] as MetricExampleModel[],
         // query section
         granularity: GRANULARITY.DAILY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
@@ -49,6 +53,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
+        metricExample: computed<MetricExampleModel|undefined>(() => state.metricExamples.find((d) => d.example_id === getters.metricExampleId)),
         groupByItems: computed<Array<{name: string, label: string}>>(() => {
             if (!state.metric?.label_keys?.length) return [];
             const staticFields: StaticGroupBy[] = ['project_id'];
@@ -131,10 +136,22 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             console.error(e);
         }
     };
+    const loadMetricExamples = async (metricId: string) => {
+        try {
+            const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
+                metric_id: metricId,
+            });
+            state.metricExamples = res.results || [];
+        } catch (e) {
+            state.metricExamples = [];
+            console.error(e);
+        }
+    };
 
     const actions = {
         reset,
         loadMetric,
+        loadMetricExamples,
     };
     const mutations = {
         setGranularity,

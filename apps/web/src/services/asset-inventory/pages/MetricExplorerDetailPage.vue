@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PDivider,
@@ -24,6 +25,7 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 
 const gnbStore = useGnbStore();
 const { breadcrumbs } = useBreadcrumbs();
+const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -36,10 +38,12 @@ const storeState = reactive({
 const state = reactive({
     breadCrumbs: computed(() => {
         const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
+        const _targetMetric = metricExplorerPageState.metric;
+        const _targetMetricExample = metricExplorerPageGetters.metricExample;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: (`[${targetNamespace?.name}] ${metricExplorerPageState.metric?.name}`) ?? metricExplorerPageGetters.metricId,
+                name: `[${targetNamespace?.name}] ${_targetMetricExample?.name ?? _targetMetric?.name}`,
                 path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
@@ -47,10 +51,12 @@ const state = reactive({
 });
 
 
-watch(() => metricExplorerPageGetters.metricId, async (metricId) => {
-    if (metricId) {
-        await metricExplorerPageStore.loadMetric(metricId);
-    }
+watch(() => route.params, async (params) => {
+    if (!params.metricId) return;
+    await Promise.allSettled([
+        metricExplorerPageStore.loadMetric(params.metricId),
+        metricExplorerPageStore.loadMetricExamples(params.metricId),
+    ]);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 </script>
