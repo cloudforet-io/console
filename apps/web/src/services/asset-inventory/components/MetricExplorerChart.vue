@@ -40,19 +40,19 @@ import type {
 
 
 const QUERY_OPTIONS_TYPE = 'query_options';
+const SELECT_BUTTON_ITEMS = [
+    { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
+    { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
+    { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
+    { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
+    { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
+];
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
-    selectButtonItems: computed(() => [
-        { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
-        { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
-        { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
-        { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
-        { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
-    ]),
     selectedChartType: CHART_TYPE.LINE as ChartType|string,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
@@ -158,7 +158,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 <span v-if="state.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
             </div>
             <div class="select-button-wrapper">
-                <p-select-button v-for="item in state.selectButtonItems"
+                <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
                                  :key="`chart-select-button-${item.name}`"
                                  :selected="state.selectedChartType"
                                  :value="item.name"

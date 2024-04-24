@@ -20,12 +20,11 @@ import type { ChartType, Legend } from '@/services/asset-inventory/types/metric-
 interface Props {
     loading: boolean;
     legends: Legend[];
-    chartType?: ChartType;
+    chartType: ChartType;
     more?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
-    chartType: undefined,
     more: false,
 });
 const emit = defineEmits<{(e: 'toggle-series', index: number): void;
