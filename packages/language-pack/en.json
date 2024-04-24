@@ -230,7 +230,7 @@
 					"TAG_ADD": "Add tags",
 					"TAG_DESC_1": "Click a button to add tags.",
 					"TAG_DESC_2": "Click a button below to add tags.",
-					"TAG_LABEL": "Tags"
+					"TAG_LABEL": "Tag"
 				},
 				"CANCEL": "Cancel",
 				"CHECK_MODAL": {
@@ -643,7 +643,7 @@
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"START_DATE": "Start Date",
-				"TAGS": "Tags",
+				"TAGS": "Tag",
 				"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
@@ -948,7 +948,7 @@
 			"DEFAULT": "Default",
 			"RECOMMEND_SORT": "Recommendation",
 			"SEARCH_ATTRIBUTE_COL": "Search attribute columns",
-			"SEARCH_TAG": "Search Tags",
+			"SEARCH_TAG": "Search Tag",
 			"SELECT_TAG": "Select tags",
 			"SORT_BY": "Sort by",
 			"TAG": "(Tag)",
@@ -1240,10 +1240,10 @@
 		"STARRED_NO_DATA": "No starred items",
 		"TAGS": {
 			"ADD": "Add",
-			"ADD_TAG": "Add Tags",
+			"ADD_TAG": "Add Tag",
 			"ADD_TAG_DESC": "Add associated tags.",
-			"ALT_E_UPDATE": "Failed to Update Tags",
-			"ALT_S_UPDATE": "Tags successfully updated ",
+			"ALT_E_UPDATE": "Failed to Update Tag",
+			"ALT_S_UPDATE": "Tag successfully updated ",
 			"CANCEL": "Cancel",
 			"CLICK_TO_ADD_TAG": "Click a button to add tags.",
 			"EDIT": "Edit",
@@ -1251,7 +1251,7 @@
 			"KEY_VALUE_DESC": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 			"NO_TAGS": "No associated tags found.",
 			"SAVE": "Save",
-			"TITLE": "Tags",
+			"TITLE": "Tag",
 			"VALUE": "Value"
 		},
 		"TREE_MODAL": {
@@ -1836,7 +1836,7 @@
 				"COL_NAME": "Name",
 				"COL_ROLE_ID": "Role ID",
 				"COL_STATE": "State",
-				"COL_TAG": "Tags",
+				"COL_TAG": "Tag",
 				"COL_WORKSPACE_ROLE": "Workspace Owner Role",
 				"CREATE_TITLE": "Create App",
 				"DELETE_DESC": "You cannot undo this action.",
@@ -2029,7 +2029,7 @@
 		"USER": {
 			"ADD": "Add",
 			"FORM": {
-				"ADD_TAG": "Add Tags",
+				"ADD_TAG": "Add Tag",
 				"ADD_WORKSPACE": "New users will have access to",
 				"ADMIN_ROLE_HELP_TEXT": "New users will have comprehensive access to the entire domain, including admin mode and all workspaces with a role",
 				"ALT_E_INVALID_FULL_NAME": "Keep typing a full email.",
@@ -2061,7 +2061,7 @@
 				"ROLE_TITLE": "Invite with a role:",
 				"SELECT_ROLE": "Select a Role",
 				"SELECT_WORKSPACE": "Select one workspace or more",
-				"TAGS": "Tags",
+				"TAGS": "Tag",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "Already being used.",
@@ -2134,7 +2134,7 @@
 				"ROLE_TYPE": "Role Type",
 				"STATE": "State",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAG": "Tags",
+				"TAG": "Tag",
 				"TIMEZONE": "Time Zone",
 				"TODAY": "Today",
 				"USER_ID": "ID",
@@ -2275,10 +2275,10 @@
 				"SERVICE_ACCOUNT": "Service Account",
 				"TAB_INPUT": "Input Form",
 				"TAB_JSON": "Json Code",
-				"TAG_ADD": "Add Tags",
+				"TAG_ADD": "Add Tag",
 				"TAG_DESC_1": "Set {name}'s tag.",
 				"TAG_DESC_2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
-				"TAG_LABEL": "Tags",
+				"TAG_LABEL": "Tag",
 				"TITLE": "Create {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
@@ -2595,9 +2595,9 @@
 				"CHANGE_PROJECT": "Change Project",
 				"COLLECT_DATA": "Collect Data",
 				"CONSOLE": "Connect to Console",
-				"CUSTOM_TAGS": "Custom Tags",
+				"CUSTOM_TAGS": "Custom Tag",
 				"DELETE": "Delete",
-				"EDIT_CUSTOM_TAGS": "Edit Custom Tags",
+				"EDIT_CUSTOM_TAGS": "Edit Custom Tag",
 				"NO_SELECTED": "Select a cloud service for more details.",
 				"PROVIDER": "Provider",
 				"TAB_DATA": "Data ",
@@ -2696,7 +2696,7 @@
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",
 				"NAME": "Name",
-				"NO_TAG": "No Tags",
+				"NO_TAG": "No Tag",
 				"PAGE_NOTIFICATION": "This collector's settings can only be in admin mode",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
@@ -3340,7 +3340,7 @@
 		"CREATED_AT": "First Collected",
 		"DELETED_AT": "Deleted",
 		"FIELD_DESC": {
-			"TAGS": "(Tags)"
+			"TAGS": "(Tag)"
 		},
 		"HARDWARE": "Hardware",
 		"HYPER_THREADING": "Hyper-threading",
@@ -3368,7 +3368,7 @@
 		"SERVER_TYPE": "Server Type",
 		"SERVICE_ACCOUNT": "Service Accounts",
 		"SERVICE_ACCOUNT_TYPE": "Account Type",
-		"TAGS": "Tags",
+		"TAGS": "Tag",
 		"UPDATED_AT": "Updated",
 		"WORKSPACE": "Workspaces"
 	},
@@ -3390,7 +3390,7 @@
 					"PREV": "Prev",
 					"STEP": "Step {step}"
 				},
-				"TAB_ADD_TAG": "Add Tags",
+				"TAB_ADD_TAG": "Add Tag",
 				"TAB_SET_COLLECTOR": "Type Base Information",
 				"TITLE": "Create Collector"
 			},
