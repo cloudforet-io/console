@@ -58,17 +58,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     });
 
     const mutations = {
-        resetState: () => {
-            state.filterByFolder = undefined;
-            state.selectedBookmark = undefined;
-            state.isFullMode = false;
-            state.isFileFullMode = false;
-            state.modal = {
-                isNew: undefined,
-                isEdit: undefined,
-                type: undefined,
-            };
-        },
         setModalType: (type?: BookmarkModalType, isEditModal?: boolean, isNewFormModal?: boolean) => {
             state.modal.type = type;
             state.modal.isEdit = isEditModal;
@@ -101,6 +90,17 @@ export const useBookmarkStore = defineStore('bookmark', () => {
 
 
     const actions = {
+        resetState: () => {
+            state.filterByFolder = undefined;
+            state.selectedBookmark = undefined;
+            state.isFullMode = false;
+            state.isFileFullMode = false;
+            state.modal = {
+                isNew: undefined,
+                isEdit: undefined,
+                type: undefined,
+            };
+        },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('updated_at', true)
