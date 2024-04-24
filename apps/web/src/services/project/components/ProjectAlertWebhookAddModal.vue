@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectCard,
+    PButtonModal, PFieldGroup, PTextInput, PSelectCard, PIconModal, PDefinitionTable, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -12,11 +12,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';
 import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
-import { i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { PluginReferenceMap } from '@/store/reference/plugin-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -42,14 +46,19 @@ const props = withDefaults(defineProps<Props>(), {
     projectId: '',
 });
 const emit = defineEmits<{(e: 'confirm'): void}>();
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+});
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
     webhookName: '',
     nameInvalidText: computed(() => {
-        if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
-        if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
+        if (state.webhookName?.length === 0) return _i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
+        if (state.webhookName?.length > 40) return _i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
         return undefined;
     }),
     isNameValid: computed(() => !state.nameInvalidText),
@@ -60,6 +69,19 @@ const state = reactive({
         return true;
     }),
     showValidation: false,
+    // for succeed mode
+    succeedWebhook: {} as WebhookModel,
+    isSucceedMode: false,
+    fields: computed(() => [
+        { name: 'name', label: _i18n.t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.NAME') },
+        { name: 'state', label: _i18n.t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.STATE') },
+        { name: 'version', label: _i18n.t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.VERSION') },
+    ]),
+    data: computed(() => ({
+        name: state.succeedWebhook.name,
+        state: state.succeedWebhook.state,
+        version: state.succeedWebhook.plugin_info?.version,
+    })),
 });
 
 /* api */
@@ -83,10 +105,15 @@ const getListWebhookType = async () => {
         state.webhookTypeList = [];
     }
 };
+
+const convertSucceedMode = () => {
+    state.isSucceedMode = true;
+};
+
 const createWebhook = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.monitoring.webhook.create<WebhookCreateParameters>({
+        const webhook = await SpaceConnector.clientV2.monitoring.webhook.create<WebhookCreateParameters>({
             name: state.webhookName,
             plugin_info: {
                 plugin_id: state.selectedWebhookType?.plugin_id,
@@ -94,12 +121,13 @@ const createWebhook = async () => {
             },
             project_id: props.projectId,
         });
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
+        state.succeedWebhook = webhook;
+        convertSucceedMode();
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
+        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
     } finally {
         state.loading = false;
-        state.proxyVisible = false;
     }
 };
 
@@ -118,65 +146,123 @@ const onClickConfirm = async () => {
     emit('confirm');
 };
 
+const handleCloseSucceedModal = () => {
+    state.isSucceedMode = false;
+    state.proxyVisible = false;
+};
+
+const handleCopyWebhookUrl = () => {
+    navigator.clipboard.writeText(state.succeedWebhook.webhook_url);
+};
+
 /* init */
 const initInputModel = () => {
     state.webhookName = '';
     state.selectedWebhookType = {} as WebhookType;
     state.showValidation = false;
+    state.succeedWebhook = {} as WebhookModel;
+    state.isSucceedMode = false;
 };
 
-watch(() => props.visible, () => {
-    initInputModel();
+watch(() => props.visible, (visible) => {
+    if (visible) initInputModel();
     getListWebhookType();
 }, { immediate: true });
 </script>
 
 <template>
-    <p-button-modal
-        class="project-alert-webhook-add-modal"
-        size="md"
-        :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
-        :visible.sync="state.proxyVisible"
-        :disabled="state.showValidation && (!state.isNameValid || !state.isSelectedWebhookType)"
-        :loading="state.loading"
-        @confirm="onClickConfirm"
-    >
-        <template #body>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_NAME')"
-                required
-                :invalid="state.showValidation && !state.isNameValid"
-                :invalid-text="state.nameInvalidText"
-            >
-                <p-text-input
-                    v-model="state.webhookName"
+    <div>
+        <p-button-modal
+            v-show="!state.isSucceedMode"
+            class="project-alert-webhook-add-modal"
+            size="md"
+            :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
+            :visible.sync="state.proxyVisible"
+            :disabled="state.showValidation && (!state.isNameValid || !state.isSelectedWebhookType)"
+            :loading="state.loading"
+            @confirm="onClickConfirm"
+        >
+            <template #body>
+                <p-field-group
+                    :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_NAME')"
+                    required
                     :invalid="state.showValidation && !state.isNameValid"
-                    :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
-                    :disabled="state.loading"
-                    @update:value.once="onFirstInputName"
-                />
-            </p-field-group>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_TYPE')"
-                required
-            >
-                <div class="select-card-wrapper">
-                    <p-select-card
-                        v-for="(item, index) in state.webhookTypeList"
-                        :key="index"
-                        v-model="state.selectedWebhookType"
-                        :tab-index="index"
-                        :image-url="item.tags.icon"
-                        icon="ic_webhook"
-                        :value="item"
-                        :label="item.name"
+                    :invalid-text="state.nameInvalidText"
+                >
+                    <p-text-input
+                        v-model="state.webhookName"
+                        :invalid="state.showValidation && !state.isNameValid"
+                        :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
                         :disabled="state.loading"
-                        :invalid="state.showValidation"
+                        @update:value.once="onFirstInputName"
                     />
+                </p-field-group>
+                <p-field-group
+                    :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_TYPE')"
+                    required
+                >
+                    <div class="select-card-wrapper">
+                        <p-select-card
+                            v-for="(item, index) in state.webhookTypeList"
+                            :key="index"
+                            v-model="state.selectedWebhookType"
+                            :tab-index="index"
+                            :image-url="item.tags.icon"
+                            icon="ic_webhook"
+                            :value="item"
+                            :label="item.name"
+                            :disabled="state.loading"
+                            :invalid="state.showValidation"
+                        />
+                    </div>
+                </p-field-group>
+            </template>
+        </p-button-modal>
+        <p-icon-modal size="md"
+                      :visible="state.isSucceedMode"
+                      :header-title="$t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.TITLE')"
+                      :image-url="storeState.plugins[state.succeedWebhook.plugin_info?.plugin_id]?.icon"
+                      button-style-type="primary"
+                      :button-text="$t('APP.MAIN.CLOSE')"
+                      @update:visible="handleCloseSucceedModal"
+        >
+            <template #header-desc>
+                <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">
+                    <template #guide>
+                        <strong>{{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.GUIDE') }}</strong>
+                    </template>
+                </i18n>
+            </template>
+            <template #body>
+                <div>
+                    <div class="table">
+                        <p-definition-table :fields="state.fields"
+                                            :data="state.data"
+                                            :skeleton-rows="3"
+                                            style-type="white"
+                        />
+                    </div>
+                    <div class="webhook-url">
+                        <div class="left">
+                            <p class="title">
+                                {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.WEBHOOK_URL') }}
+                            </p>
+                            <p class="url">
+                                {{ state.succeedWebhook.webhook_url }}
+                            </p>
+                        </div>
+                        <p-button icon-left="ic_copy"
+                                  style-type="secondary"
+                                  class="button"
+                                  @click="handleCopyWebhookUrl"
+                        >
+                            {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.COPY_WEBHOOK_URL') }}
+                        </p-button>
+                    </div>
                 </div>
-            </p-field-group>
-        </template>
-    </p-button-modal>
+            </template>
+        </p-icon-modal>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -194,6 +280,35 @@ watch(() => props.visible, () => {
     /* custom design-system component - p-select-card */
     :deep(.p-select-card) {
         height: 9.0625rem;
+    }
+}
+
+.table {
+    :deep(.p-definition-table) {
+        @apply border border-gray-200 rounded-lg;
+        overflow: hidden;
+        min-height: unset;
+        tr:last-child {
+            border-bottom-width: 0;
+        }
+    }
+}
+
+.webhook-url {
+    @apply border border-gray-200 rounded-lg bg-violet-100 flex justify-between gap-2 text-gray-900 text-label-md;
+    text-align: left;
+    padding: 1rem 1rem 1.25rem 1rem;
+    .left {
+        flex-grow: 0;
+        .title {
+            @apply font-bold mb-2;
+        }
+        .url {
+            line-break: anywhere;
+        }
+    }
+    .button {
+        flex-shrink: 0;
     }
 }
 
