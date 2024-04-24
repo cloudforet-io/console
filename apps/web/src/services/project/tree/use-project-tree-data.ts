@@ -15,9 +15,15 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectTreeStore } from '@/services/project/stores/project-tree-store';
 import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
+interface ParentGroupItem {
+    name: string;
+    id: string;
+}
+
 interface UseProjectTreeDataReturnType {
     treeData: Ref<TreeNode[]>;
     treeDisplayMap: Ref<TreeDisplayMap>;
+    parentGroupitems: Ref<ParentGroupItem[]>;
     fetchData: (item: TreeNode) => void;
     setSelectedNodeId: (id: string) => void;
 }
@@ -53,6 +59,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
         }))),
         treeData: [] as TreeNode[],
         selectedTreeNodeId: '',
+        parentGroupitems: [] as ParentGroupItem[],
     });
     const fetchProjectGroupList = (parentGroupId?: string): ProjectDataType[] => state.projectGroupData.filter((projectGroup) => projectGroup.parentGroupId === parentGroupId);
     const fetchProjectList = (parentGroupId?: string): ProjectDataType[] => state.projectData.filter((project) => project.parentGroupId === parentGroupId);
@@ -92,6 +99,12 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
             if (path === itemId) return;
             await setOpenStateById(path);
         });
+
+        // Set parent group paths, when selecting current group item. For breadcrumbs
+        state.parentGroupitems = openPaths.map((id) => ({
+            name: storeState.projectGroup[id].name,
+            id,
+        }));
     };
 
     const setSelectedNodeId = (id: string) => {
@@ -169,6 +182,7 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
     return {
         treeData: toRef(state, 'treeData'),
         treeDisplayMap: toRef(projectTreeState, 'treeDisplayMap'),
+        parentGroupitems: toRef(state, 'parentGroupitems'),
         fetchData,
         setSelectedNodeId,
     };
