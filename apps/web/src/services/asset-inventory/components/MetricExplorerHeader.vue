@@ -180,6 +180,9 @@ const handleClickMoreMenuButton = () => {
     if (visibleContextMenu.value) hideContextMenu();
     else showContextMenu();
 };
+const handleOpenEditQuery = () => {
+    // TODO: open query editor
+};
 </script>
 
 <template>
@@ -219,6 +222,14 @@ const handleClickMoreMenuButton = () => {
             >
                 <!-- metric case -->
                 <template v-if="!metricExplorerPageGetters.metricExampleId">
+                    <p-button v-if="!metricExplorerPageGetters.isManagedMetric"
+                              class="mr-2"
+                              style-type="substitutive"
+                              icon-left="ic_editor-code"
+                              @click="handleOpenEditQuery"
+                    >
+                        {{ $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') }}
+                    </p-button>
                     <p-button class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"
