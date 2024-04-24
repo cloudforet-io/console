@@ -10,6 +10,7 @@ import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { i18n } from '@/translations';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -20,6 +21,7 @@ import {
     BOOKMARK_MODAL_TYPE,
 } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 import type { BookmarkBoardSet, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
@@ -37,9 +39,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const bookmarkStore = useBookmarkStore();
+const workspaceHomePageStore = useWorkspaceHomePageStore();
+const workspaceHomePageState = workspaceHomePageStore.state;
 
 const boardItemEl = ref<HTMLElement | null>(null);
 
+const storeState = reactive({
+    recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+});
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const defaultSets: MenuItem[] = [
@@ -129,7 +136,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="bookmark-board"
-         :class="{[props.isFullMode ? 'full-board' : 'collapsed-board']: true}"
+         :class="{[props.isFullMode ? 'full-board' : 'collapsed-board']: true, 'no-data': storeState.recentList.length === 0}"
     >
         <p-board v-if="props.boardSets.length > 0"
                  :board-sets="props.boardSets"
@@ -207,7 +214,7 @@ onBeforeUnmount(() => {
                 </div>
             </template>
         </p-board>
-        <p-empty v-else
+        <p-empty v-else-if="storeState.recentList.length > 0"
                  class="empty"
         >
             {{ $t('HOME.EMPTY_LINK') }}
@@ -218,6 +225,9 @@ onBeforeUnmount(() => {
 <style scoped lang="postcss">
 .bookmark-board {
     padding-top: 1rem;
+    &.no-data {
+        padding-top: 0;
+    }
     &.collapsed-board {
         .bookmark-board-wrapper {
             @apply grid-cols-7;
