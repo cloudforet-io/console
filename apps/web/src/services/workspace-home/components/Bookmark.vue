@@ -65,10 +65,9 @@ const state = reactive({
                             :bookmark-list="storeState.bookmarkList"
                             :height="state.contentHeight"
         />
-        <bookmark-board v-else-if="state.boardSets.length > 0"
+        <bookmark-board v-else
                         :board-sets="state.boardSets"
                         :is-max-board-sets="state.boardSets.length === state.maxBoardSets + 1"
-                        class="bookmark-board-wrapper"
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
@@ -92,13 +91,6 @@ const state = reactive({
         @apply relative bg-white;
         min-height: 22.5rem;
         padding-bottom: 2.5rem;
-    }
-    .bookmark-board-wrapper {
-        @apply grid-cols-7;
-
-        @screen tablet {
-            @apply grid-cols-4;
-        }
     }
 }
 </style>

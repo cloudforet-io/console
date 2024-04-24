@@ -51,11 +51,9 @@ const state = reactive({
                         :board-sets="state.folderBoardSets"
                         is-folder-board
                         is-full-mode
-                        class="bookmark-board-wrapper"
         />
         <bookmark-board :board-sets="state.boardSets"
                         is-full-mode
-                        class="bookmark-board-wrapper"
         />
     </div>
 </template>
@@ -68,14 +66,5 @@ const state = reactive({
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     gap: 1.25rem;
-    .bookmark-board-wrapper {
-        @apply grid-cols-4;
-    }
-
-    @screen tablet {
-        .bookmark-board-wrapper {
-            @apply grid-cols-1;
-        }
-    }
 }
 </style>
