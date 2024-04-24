@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectCard, PIconModal, PDefinitionTable, PButton,
+    PButtonModal, PFieldGroup, PTextInput, PSelectCard, PIconModal, PDefinitionTable, PButton, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -17,6 +17,7 @@ import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryModel } from '@/schema/repository/repository/model';
+import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -50,6 +51,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    language: computed(() => store.state.user.language),
 });
 
 const state = reactive({
@@ -82,6 +84,10 @@ const state = reactive({
         state: state.succeedWebhook.state,
         version: state.succeedWebhook.plugin_info?.version,
     })),
+    guideDocsLink: computed(() => {
+        const language = storeState.language === 'ko' ? 'ko/' : '';
+        return `https://cloudforet.io/${language}docs/guides/plugins/alert-manager-webhook/`;
+    }),
 });
 
 /* api */
@@ -229,7 +235,13 @@ watch(() => props.visible, (visible) => {
             <template #header-desc>
                 <i18n path="PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.DESC">
                     <template #guide>
-                        <strong>{{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.GUIDE') }}</strong>
+                        <p-link new-tab
+                                highlight
+                                action-icon="external-link"
+                                :href="state.guideDocsLink"
+                        >
+                            {{ $t('PROJECT.DETAIL.ALERT.WEB_HOOK.SUCCEED_MODAL.GUIDE') }}
+                        </p-link>
                     </template>
                 </i18n>
             </template>
@@ -239,8 +251,15 @@ watch(() => props.visible, (visible) => {
                         <p-definition-table :fields="state.fields"
                                             :data="state.data"
                                             :skeleton-rows="3"
+                                            disable-copy
                                             style-type="white"
-                        />
+                        >
+                            <template #data-state="{ value }">
+                                <div>
+                                    <div :class="(value==='ENABLED')?'enable': 'disabled'" /><span>{{ value==='ENABLED'? 'Enabled' : 'Disabled' }}</span>
+                                </div>
+                            </template>
+                        </p-definition-table>
                     </div>
                     <div class="webhook-url">
                         <div class="left">
@@ -291,6 +310,13 @@ watch(() => props.visible, (visible) => {
         tr:last-child {
             border-bottom-width: 0;
         }
+    }
+
+    .enable {
+        @apply inline-block w-2 h-2 rounded-full bg-green-600 mr-1;
+    }
+    .disabled {
+        @apply inline-block w-2 h-2 rounded-full bg-gray-400 mr-1;
     }
 }
 
