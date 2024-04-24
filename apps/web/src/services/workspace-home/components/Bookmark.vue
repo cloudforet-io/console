@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import {
+    computed, onUnmounted, reactive,
+} from 'vue';
 
 import { screens } from '@spaceone/design-system';
 
@@ -19,8 +21,6 @@ import {
 } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
-
-
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -52,6 +52,10 @@ const state = reactive({
     }),
     contentHeight: computed<number|undefined>(() => height.value - 392),
 });
+
+onUnmounted(() => {
+    bookmarkStore.resetState();
+});
 </script>
 
 <template>
@@ -65,10 +69,9 @@ const state = reactive({
                             :bookmark-list="storeState.bookmarkList"
                             :height="state.contentHeight"
         />
-        <bookmark-board v-else-if="state.boardSets.length > 0"
+        <bookmark-board v-else
                         :board-sets="state.boardSets"
                         :is-max-board-sets="state.boardSets.length === state.maxBoardSets + 1"
-                        class="bookmark-board-wrapper"
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
@@ -92,13 +95,6 @@ const state = reactive({
         @apply relative bg-white;
         min-height: 22.5rem;
         padding-bottom: 2.5rem;
-    }
-    .bookmark-board-wrapper {
-        @apply grid-cols-7;
-
-        @screen tablet {
-            @apply grid-cols-4;
-        }
     }
 }
 </style>
