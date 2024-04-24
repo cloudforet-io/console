@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, reactive, ref, watch,
+    computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -125,6 +125,10 @@ const handleRefreshTree = () => {
 watch(() => state.favoriteOptions, (favoriteOptions) => {
     gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
+
+onUnmounted(() => {
+    projectTreeStore.disposeProjectTree();
+});
 </script>
 
 <template>
