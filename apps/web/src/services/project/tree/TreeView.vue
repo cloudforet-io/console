@@ -9,20 +9,32 @@ export default defineComponent({
 <script setup lang="ts">
 /* eslint-disable import/first */
 // eslint-disable-next-line import/no-duplicates
+import { reactive } from 'vue';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import type { TreeNode, TreeDisplayMap } from '@/services/project/tree/type';
 
 import TreeItem from './TreeItem.vue';
 
 interface Props {
     treeData: TreeNode[];
-    initialTreeDisplayMap?: TreeDisplayMap;
+    treeDisplayMap?: TreeDisplayMap;
     selectedId?: string;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    treeDisplayMap: () => ({}),
+    selectedId: undefined,
+});
 const emit = defineEmits<{(event: 'click-toggle', node: TreeNode): Promise<void>|void;
     (e: 'click-item', node: TreeNode): void;
+    (e: 'update:tree-display-map', value: TreeDisplayMap): void;
 }>();
+
+const state = reactive({
+    proxyTreeDisplayMap: useProxyValue('treeDisplayMap', props, emit),
+});
 
 const handleClickToggle = async (item: TreeNode) => {
     await emit('click-toggle', item);
@@ -30,6 +42,17 @@ const handleClickToggle = async (item: TreeNode) => {
 const handleClickItem = (item: TreeNode) => {
     emit('click-item', item);
 };
+
+const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
+    if (!id) return;
+    state.proxyTreeDisplayMap = {
+        ...state.proxyTreeDisplayMap,
+        [id]: {
+            isOpen,
+        },
+    };
+};
+
 </script>
 <template>
     <div class="tree-view">
@@ -37,9 +60,10 @@ const handleClickItem = (item: TreeNode) => {
                    :key="item.id"
                    :node="item"
                    :selected-id="selectedId"
-                   :initial-tree-display-map="initialTreeDisplayMap"
-                   @click-toggle="handleClickToggle(item)"
-                   @click-item="handleClickItem(item)"
+                   :is-open="state.proxyTreeDisplayMap[item.id]?.isOpen"
+                   @click-toggle="handleClickToggle"
+                   @click-item="handleClickItem"
+                   @update:is-open="handleUpdateTreeDisplayMap(item.id, $event)"
         >
             <template #content="{ node }">
                 <slot name="content"
@@ -50,7 +74,7 @@ const handleClickItem = (item: TreeNode) => {
                       #child-content
             >
                 <tree-view :tree-data="item.children"
-                           :initial-tree-display-map="initialTreeDisplayMap"
+                           :tree-display-map.sync="state.proxyTreeDisplayMap"
                            :selected-id="selectedId"
                            @click-toggle="handleClickToggle"
                            @click-item="handleClickItem"
