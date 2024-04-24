@@ -16,6 +16,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -189,6 +190,9 @@ const handleSelectDataSource = (selected: string) => {
                             <span class="selected-item-postfix">
                                 ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
                             </span>
+                            <beta-mark v-if="item.label === 'Kubernetes'"
+                                       class="beta"
+                            />
                         </div>
                     </template>
                 </p-select-dropdown>
@@ -201,6 +205,9 @@ const handleSelectDataSource = (selected: string) => {
 .sidebar-menu {
     .selected-item-postfix {
         @apply text-gray-500;
+    }
+    .beta {
+        margin-left: 0.125rem;
     }
 }
 

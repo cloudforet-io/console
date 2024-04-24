@@ -930,10 +930,12 @@
 			"DETAILS_BY_PROJECT": "Details by Project",
 			"DETAILS_BY_PROVIDER": "Details by Provider",
 			"DETAILS_BY_SERVICE_ACCOUNT": "Details by Service Account",
+			"FROM": "From",
 			"INDEX": "Index",
-			"ISSUE_DATE": "Issure Date",
+			"ISSUE_DATE": "Issue Date",
 			"REPORT_NUMBER": "Report Number",
 			"SUBTOTAL": "Subtotal",
+			"TO": "To",
 			"TOTAL": "Total",
 			"TOTAL_AMOUNT_BY_PROVIDER": "Total amount by provider"
 		},
