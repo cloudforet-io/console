@@ -45,7 +45,12 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
 
-    const mutations = {
+    const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
+    const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
+    const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);
+    const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
+
+    const actions = {
         init: () => {
             state.recentList = [];
             state.favoriteMenuList = [];
@@ -54,14 +59,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
             state.costReportConfig = null;
             state.dataSource = [];
         },
-    };
-
-    const recentListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-    const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
-    const costReportConfigApiHelper = new ApiQueryHelper().setSort('created_at', true);
-    const listCountQueryHelper = new ApiQueryHelper().setCountOnly();
-
-    const actions = {
         fetchRecentList: async (currentWorkspaceId: string) => {
             recentListApiQuery.setFilters([
                 { k: 'user_id', v: _getters.userId, o: '=' },
@@ -157,7 +154,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
 
     return {
         state,
-        ...mutations,
         ...actions,
     };
 });
