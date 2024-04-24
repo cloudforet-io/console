@@ -92,6 +92,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
 
     const actions = {
         resetState: () => {
+            state.bookmarkFolderData = [];
             state.filterByFolder = undefined;
             state.selectedBookmark = undefined;
             state.isFullMode = false;

@@ -3,8 +3,6 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
-
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -33,7 +31,6 @@ const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
-    initLoading: computed<boolean>(() => workspaceHomePageState.initLoading),
 });
 const state = reactive({
     loading: false,
@@ -46,33 +43,30 @@ const state = reactive({
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.init();
     if (!currentWorkspaceId) return;
-    if (!storeState.initLoading) {
-        state.loading = true;
-    }
+
+    state.loading = true;
     try {
         // base API
         await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
-        // workspace info
-        if (state.accessUserMenu) {
-            await workspaceHomePageStore.fetchWorkspaceUserList();
-        }
-        if (state.accessAppMenu) {
-            await workspaceHomePageStore.fetchAppList();
-        }
-        // configs
-        await workspaceHomePageStore.fetchFavoriteList();
-        // summaries
-        await workspaceHomePageStore.fetchCostReportConfig();
-        await workspaceHomePageStore.fetchDataSource();
-
-        if (storeState.initLoading) {
-            // bookmark
-            await bookmarkStore.fetchBookmarkFolderList();
-            await bookmarkStore.fetchBookmarkList();
-        }
     } finally {
         state.loading = false;
     }
+
+    // workspace info
+    if (state.accessUserMenu) {
+        await workspaceHomePageStore.fetchWorkspaceUserList();
+    }
+    if (state.accessAppMenu) {
+        await workspaceHomePageStore.fetchAppList();
+    }
+    // bookmark
+    await bookmarkStore.fetchBookmarkFolderList();
+    await bookmarkStore.fetchBookmarkList();
+    // configs
+    await workspaceHomePageStore.fetchFavoriteList();
+    // summaries
+    await workspaceHomePageStore.fetchCostReportConfig();
+    await workspaceHomePageStore.fetchDataSource();
 }, { immediate: true });
 </script>
 
@@ -80,21 +74,17 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     <general-page-layout :key="storeState.currentWorkspaceId"
                          class="workspace-home-page"
     >
-        <p-data-loader :loading="state.loading"
-                       :data="true"
-        >
-            <div class="page-contents">
-                <workspace-info :access-user-menu="state.accessAppMenu"
-                                :access-app-menu="state.accessAppMenu"
-                />
-                <welcome v-if="!storeState.initLoading && storeState.recentList.length === 0" />
-                <bookmark />
-                <user-configs v-if="storeState.recentList.length !== 0"
-                              class="section"
-                />
-                <summaries class="section" />
-            </div>
-        </p-data-loader>
+        <div class="page-contents">
+            <workspace-info :access-user-menu="state.accessAppMenu"
+                            :access-app-menu="state.accessAppMenu"
+            />
+            <welcome v-if="!state.loading && storeState.recentList.length === 0" />
+            <bookmark />
+            <user-configs v-if="storeState.recentList.length !== 0"
+                          class="section"
+            />
+            <summaries class="section" />
+        </div>
     </general-page-layout>
 </template>
 

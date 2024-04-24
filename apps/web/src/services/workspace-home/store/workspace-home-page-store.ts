@@ -31,7 +31,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
     const state = reactive({
-        initLoading: false,
         recentList: [] as UserConfigModel[],
         favoriteMenuList: [] as FavoriteItem[],
         workspaceUserTotalCount: undefined as number|undefined,
@@ -70,7 +69,6 @@ export const useWorkspaceHomePageStore = defineStore('page-workspace-home', () =
                 { k: 'data.id', v: 'home-dashboard', o: '!=' },
             ]);
 
-            state.initLoading = true;
             try {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: recentListApiQuery.data,
