@@ -10,8 +10,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectModel } from '@/schema/identity/project/model';
 import type { EventRuleChangeOrderParameters } from '@/schema/monitoring/event-rule/api-verbs/change-order';
 import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
 import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
@@ -26,7 +24,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
 import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
@@ -70,16 +67,6 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 };
 
 /* api */
-const getProject = async () => {
-    try {
-        state.project = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-            project_id: props.projectId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.project = {};
-    }
-};
 const listEventRule = async () => {
     try {
         state.loading = true;
@@ -171,15 +158,12 @@ const handleClickFormCancel = () => {
 };
 
 (async () => {
-    await Promise.all([
-        getProject(),
-        listEventRule(),
-    ]);
+    await listEventRule();
 })();
 </script>
 
 <template>
-    <general-page-layout>
+    <div class="project-alert-event-rule-page">
         <p-heading show-back-button
                    class="page-title"
                    @click-back-button="$router.go(-1)"
@@ -298,99 +282,101 @@ const handleClickFormCancel = () => {
                       :contents="$t('PROJECT.EVENT_RULE.DELETE_MODAL_DESC')"
                       @confirm="eventRuleDeleteConfirm"
         />
-    </general-page-layout>
+    </div>
 </template>
 
 <style lang="postcss" scoped>
-.page-title {
-    .info-message {
-        font-weight: normal;
-        margin-left: 1rem;
-    }
-}
-.no-data-wrapper {
-    @apply border border-gray-200 rounded-md;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    padding: 3rem;
-    .title {
-        @apply text-gray-800;
-        font-size: 1.125rem;
-        line-height: 1.55;
-        margin-bottom: 1rem;
-    }
-    .help-text {
-        @apply text-gray-500;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        white-space: pre-line;
-        margin-bottom: 1.5rem;
-    }
-}
-.card-list-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-.add-event-rule-button {
-    width: 100%;
-    margin-top: 1rem;
-}
-
-/* custom design-system component - p-card */
-:deep(.p-card) {
-    margin-bottom: 1rem;
-
-    header {
-        display: flex;
-        justify-content: space-between;
-        font-size: 1rem;
-        font-weight: normal;
-
-        .left-part {
-            display: flex;
-            align-items: center;
-            .order-text {
-                @apply text-blue-900;
-                font-size: 1rem;
-                padding-right: 0.5rem;
-            }
-            .arrow-button {
-                @apply cursor-pointer text-gray-800;
-                &.disabled {
-                    @apply pointer-events-none cursor-not-allowed text-gray-200;
-                }
-                &:hover {
-                    @apply text-secondary;
-                }
-            }
+.project-alert-event-rule-page {
+    .page-title {
+        .info-message {
+            font-weight: normal;
+            margin-left: 1rem;
         }
-        .right-part {
-            display: flex;
-            align-items: center;
+    }
+    .no-data-wrapper {
+        @apply border border-gray-200 rounded-md;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        padding: 3rem;
+        .title {
+            @apply text-gray-800;
+            font-size: 1.125rem;
+            line-height: 1.55;
+            margin-bottom: 1rem;
+        }
+        .help-text {
+            @apply text-gray-500;
             font-size: 0.875rem;
-            .text-button {
-                @apply text-gray-800;
-                cursor: pointer;
-                margin: 0 0.75rem;
-                &:hover {
-                    &.delete {
-                        @apply text-alert underline;
+            line-height: 1.5;
+            white-space: pre-line;
+            margin-bottom: 1.5rem;
+        }
+    }
+    .card-list-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    .add-event-rule-button {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    /* custom design-system component - p-card */
+    :deep(.p-card) {
+        margin-bottom: 1rem;
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            font-weight: normal;
+
+            .left-part {
+                display: flex;
+                align-items: center;
+                .order-text {
+                    @apply text-blue-900;
+                    font-size: 1rem;
+                    padding-right: 0.5rem;
+                }
+                .arrow-button {
+                    @apply cursor-pointer text-gray-800;
+                    &.disabled {
+                        @apply pointer-events-none cursor-not-allowed text-gray-200;
                     }
-                    &.edit {
-                        @apply text-secondary underline;
+                    &:hover {
+                        @apply text-secondary;
                     }
                 }
-                &.disabled {
-                    @apply text-gray-300;
-                    pointer-events: none;
+            }
+            .right-part {
+                display: flex;
+                align-items: center;
+                font-size: 0.875rem;
+                .text-button {
+                    @apply text-gray-800;
+                    cursor: pointer;
+                    margin: 0 0.75rem;
+                    &:hover {
+                        &.delete {
+                            @apply text-alert underline;
+                        }
+                        &.edit {
+                            @apply text-secondary underline;
+                        }
+                    }
+                    &.disabled {
+                        @apply text-gray-300;
+                        pointer-events: none;
+                    }
                 }
             }
         }
-    }
 
-    .body {
-        padding: 1.5rem 1rem;
+        .body {
+            padding: 1.5rem 1rem;
+        }
     }
 }
 

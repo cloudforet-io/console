@@ -103,6 +103,13 @@ const state = reactive({
         type: FAVORITE_TYPE.PROJECT,
         id: projectDetailPageState.projectId,
     })),
+    isHeaderVisible: computed<boolean>(() => {
+        const excludeRoutes = [
+            PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
+            PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+        ];
+        return route.name ? !excludeRoutes.includes(route.name) : true;
+    }),
 });
 
 // Member modal
@@ -195,7 +202,9 @@ onUnmounted(() => {
 
 <template>
     <div class="project-detail-page">
-        <div class="top-wrapper">
+        <div v-if="state.isHeaderVisible"
+             class="top-wrapper"
+        >
             <p-pane-layout>
                 <div class="header-container">
                     <div class="title-wrapper">
@@ -240,8 +249,8 @@ onUnmounted(() => {
                     </div>
                 </div>
             </p-pane-layout>
-            <router-view />
         </div>
+        <router-view />
         <p-button-modal :header-title="formState.headerTitle"
                         :centered="true"
                         size="sm"
