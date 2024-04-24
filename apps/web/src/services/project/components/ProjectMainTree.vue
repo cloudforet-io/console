@@ -16,10 +16,10 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { indigo, peacock } from '@/styles/colors';
 
+import { useProjectTreeData } from '@/services/project/composables/use-project-tree-data';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import TreeView from '@/services/project/tree/TreeView.vue';
 import type { TreeNode } from '@/services/project/tree/type';
-import { useProjectTreeData } from '@/services/project/tree/use-project-tree-data';
 
 const {
     treeData,
