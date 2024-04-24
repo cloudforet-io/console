@@ -35,7 +35,7 @@ interface Getters {
     currentProviderData: ComputedRef<ProviderItem>|undefined;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     trustedAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
-    trustingSecretSchema: ComputedRef<Partial<SchemaModel>|undefined>;
+    trustingSecretSchemaList: ComputedRef<Partial<SchemaModel>|undefined>;
     secretSchema: ComputedRef<Partial<SchemaModel>|undefined>;
     isSupportTrustedAccount: ComputedRef<boolean>;
     isCachedProviderSchema: ComputedRef<boolean>;
@@ -65,7 +65,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),
         trustedAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT')),
-        trustingSecretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTING_SECRET')),
+        trustingSecretSchemaList: computed(() => getters.currentProviderSchemaList.filter((schema) => schema.schema_type === 'TRUSTING_SECRET')),
         secretSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SECRET')),
         isSupportTrustedAccount: computed(() => {
             const currentProviderData:ProviderModel = getters.currentProviderData?.data;
@@ -129,12 +129,12 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         setGeneralAccountDetailSchema: async () => {
             const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, false);
+            state.generalAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: false });
         },
         setTrustedAccountDetailSchema: async () => {
-            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT');
+            const accountSchema = getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'TRUSTED_ACCOUNT');
             const fields:DynamicField[] = getAccountFields(accountSchema);
-            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, true);
+            state.trustedAccountDetailSchema = getDefaultDetailSchema(fields, { isTrustedAccount: true, isAdminMode: _isAdminMode.value });
         },
     };
 

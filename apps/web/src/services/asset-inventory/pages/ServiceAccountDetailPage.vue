@@ -29,6 +29,7 @@ import ServiceAccountAttachedGeneralAccounts
 import ServiceAccountAutoSync from '@/services/asset-inventory/components/ServiceAccountAutoSync.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
+import ServiceAccountCluster from '@/services/asset-inventory/components/ServiceAccountCluster.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
@@ -60,11 +61,10 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    item: computed(() => serviceAccountPageStore.state.serviceAccountItem),
+    item: computed(() => serviceAccountPageStore.state.originServiceAccountItem),
     serviceAccountType: computed(() => serviceAccountPageStore.state.serviceAccountType),
     isTrustedAccount: computed(() => state.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
-    attachedTrustedAccountId: computed(() => state.item?.trusted_account_id),
     providerId: computed(() => state.item?.provider),
     provider: computed(() => {
         if (!state.loading) {
@@ -74,6 +74,7 @@ const state = reactive({
     }),
     providerKey: computed(() => state.provider?.key),
     providerIcon: computed(() => state.provider?.icon),
+    isKubernetesAgentMode: computed(() => state.providerKey === 'kubernetes'),
     consoleLink: computed(() => {
         try {
             if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
@@ -83,10 +84,10 @@ const state = reactive({
         }
         return '';
     }),
-    projectId: computed(() => state.item.project_info?.project_id),
     deleteModalVisible: false,
     editModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
+    isEditable: computed(() => !state.isManagedTrustedAccount || storeState.isAdminMode),
 });
 
 /* Api */
@@ -104,12 +105,12 @@ const getAccount = async (serviceAccountId: string) => {
             });
         }
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = item;
+            _state.state.originServiceAccountItem = item;
         });
     } catch (e) {
         ErrorHandler.handleError(e);
         serviceAccountPageStore.$patch((_state) => {
-            _state.state.serviceAccountItem = {};
+            _state.state.originServiceAccountItem = {};
         });
     } finally {
         state.loading = false;
@@ -129,7 +130,7 @@ const handleRefresh = () => {
 };
 const handleClickBackbutton = () => {
     router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: state.providerKey },
     }));
 };
 watch(() => state.providerId, async (provider) => {
@@ -137,8 +138,8 @@ watch(() => state.providerId, async (provider) => {
     await serviceAccountSchemaStore.setProviderSchema(provider ?? '');
 });
 /* Watcher */
-watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serviceAccountId, updateVisible]) => {
-    if (serviceAccountId && !updateVisible) {
+watch(() => props.serviceAccountId, async (serviceAccountId) => {
+    if (serviceAccountId) {
         const serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
         serviceAccountPageStore.$patch((_state) => {
             _state.state.serviceAccountType = serviceAccountType;
@@ -162,7 +163,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                             error-icon="ic_cloud-filled"
                 />
             </template>
-            <template v-if="!state.isManagedTrustedAccount || storeState.isAdminMode"
+            <template v-if="state.isEditable"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
@@ -176,7 +177,7 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                     />
                 </div>
             </template>
-            <template v-if="!state.isManagedTrustedAccount"
+            <template v-if="state.isEditable && state.consoleLink"
                       #extra
             >
                 <p-button style-type="tertiary"
@@ -191,29 +192,26 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             </template>
         </p-heading>
         <div class="content-wrapper">
-            <service-account-base-information :provider="state.providerKey"
-                                              :service-account-loading="state.loading"
+            <service-account-base-information :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
-                                              :service-account-type="state.serviceAccountType"
-                                              :service-account-data="state.item"
-                                              :editable="!state.isManagedTrustedAccount"
+                                              :editable="state.isEditable"
                                               @refresh="handleRefresh"
             />
             <service-account-attached-general-accounts v-if="state.isTrustedAccount && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
-            <service-account-credentials :provider="state.providerKey"
+            <service-account-cluster v-if="state.isKubernetesAgentMode"
+                                     :service-account-id="props.serviceAccountId"
+            />
+            <service-account-credentials v-else
                                          :service-account-loading="state.loading"
                                          :service-account-id="props.serviceAccountId"
-                                         :service-account-type="state.serviceAccountType"
-                                         :service-account-data="state.item"
-                                         :project-id="state.projectId"
-                                         :attached-trusted-account-id="state.attachedTrustedAccountId"
-                                         :editable="!state.isManagedTrustedAccount"
+                                         :editable="state.isEditable"
                                          @refresh="handleRefresh"
             />
-            <service-account-auto-sync v-if="state.isTrustedAccount"
+            <service-account-auto-sync v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
+                                       :editable="state.isEditable"
                                        @refresh="handleRefresh"
             />
         </div>
@@ -221,8 +219,10 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
                                       :service-account-type="state.serviceAccountType"
                                       :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
+                                      :is-agent-mode="state.isKubernetesAgentMode"
         />
         <service-account-edit-modal v-if="state.item?.name"
+                                    :key="state.item?.name"
                                     :visible.sync="state.editModalVisible"
                                     :is-trusted-account="state.isTrustedAccount"
                                     :service-account="state.item"
@@ -262,6 +262,9 @@ watch([() => props.serviceAccountId, () => state.editModalVisible], async ([serv
             @apply col-span-12;
         }
         .service-account-base-information {
+            @apply col-span-12;
+        }
+        .service-account-connect-cluster {
             @apply col-span-12;
         }
         .service-account-credentials {

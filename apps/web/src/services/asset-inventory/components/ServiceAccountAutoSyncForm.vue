@@ -24,17 +24,12 @@ const serviceAccountPageStore = useServiceAccountPageStore();
 const serviceAccountPageFormState = serviceAccountPageStore.formState;
 const appContextStore = useAppContextStore();
 
-const props = defineProps<{
-    mode: 'CREATE' | 'UPDATE';
-}>();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isDomainScope: computed(() => serviceAccountPageStore.state.serviceAccountItem.resource_group === 'DOMAIN'),
     timezone: computed<string>(() => store.state.user.timezone),
     scheduleHelpText: computed(() => i18n.t('INVENTORY.SERVICE_ACCOUNT.CREATE.TIMEZONE', { timezone: state.timezone })),
     isAutoSyncEnabled: computed(() => serviceAccountPageFormState.isAutoSyncEnabled),
-    domainName: computed(() => store.state.domain.name),
     timezoneAppliedHours: computed<number[]>(() => {
         if (state.timezone === 'UTC') return serviceAccountPageFormState.scheduleHours;
         return serviceAccountPageStore.formState.scheduleHours.map((utcHour) => dayjs.utc()
@@ -46,9 +41,7 @@ const state = reactive({
     isAdditionalOptionsValid: false,
     isAllValid: computed(() => {
         if (!state.isAutoSyncEnabled) return true;
-        if (!state.isAdminMode) return state.isScheduleHoursValid;
-        if (state.isDomainScope) return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
-        return state.isScheduleHoursValid;
+        return state.isScheduleHoursValid && (serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema ? state.isAdditionalOptionsValid : true);
     }),
 });
 
@@ -107,28 +100,30 @@ watch(() => state.isAllValid, (isAllValid) => {
                              show-state-text
                              position="left"
                              @change-toggle="handleChangeToggle"
-            /><p>{{ `Automatically synchronize ${serviceAccountPageStore.getters.selectedProviderItem.label} sub-accounts with ${state.domainName}.` }}</p>
+            /><p>
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.MAIN_DESCRIPTION', {
+                    provider: serviceAccountPageStore.getters.selectedProviderItem.label,
+                }) }}
+            </p>
         </div>
         <div v-if="state.isAutoSyncEnabled">
-            <div v-if="state.isAdminMode && (props.mode === 'CREATE' ? true : state.isDomainScope)">
-                <service-account-auto-sync-mapping-method />
-                <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
-                    <p-field-title label="Additional Options"
-                                   size="lg"
-                                   class="mb-2"
+            <service-account-auto-sync-mapping-method mode="UPDATE" />
+            <div v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema">
+                <p-field-title label="Additional Options"
+                               size="lg"
+                               class="mb-2"
+                />
+                <p-pane-layout class="p-4 mb-8">
+                    <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                        class="p-json-schema-form"
+                                        :form-data.sync="state.additionalOptions"
+                                        :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
+                                        :language="$store.state.user.language"
+                                        @validate="handleAdditionalOptionsValidate"
                     />
-                    <p-pane-layout class="p-4 mb-8">
-                        <p-json-schema-form v-if="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                            class="p-json-schema-form"
-                                            :form-data.sync="state.additionalOptions"
-                                            :schema="serviceAccountPageStore.getters.autoSyncAdditionalOptionsSchema"
-                                            :language="$store.state.user.language"
-                                            @validate="handleAdditionalOptionsValidate"
-                        />
-                    </p-pane-layout>
-                </div>
+                </p-pane-layout>
             </div>
-            <p-field-title label="Hourly Sync Schedule"
+            <p-field-title :label="$t('IDENTITY.SERVICE_ACCOUNT.AUTO_SYNC.HOURLY_SYNC_SCHEDULE')"
                            size="lg"
                            class="mb-1"
             />
