@@ -215,6 +215,7 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
     .workspace_title {
         @apply flex flex-col;
         gap: 0.25rem;
+        flex: 1;
         .heading {
             margin: 0;
             .heading-title {
