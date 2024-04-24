@@ -1,5 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
@@ -33,12 +34,13 @@ export type SummaryDataType = typeof SUMMARY_DATA_TYPE[keyof typeof SUMMARY_DATA
 // bookmark
 export interface BookmarkItem {
     id?: string;
-    name?: string;
+    name?: string | TranslateResult;
     folder?: string;
     icon?: string;
     imgIcon?: string;
     link?: string;
     isShowMore?: boolean;
+    workspaceId?: string;
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
 export type BookmarkBoardSet = BookmarkItem & BoardSet;
@@ -54,4 +56,7 @@ export interface EmptyData {
     title: string | TranslateResult;
     buttonText?: string | TranslateResult;
     desc: string | TranslateResult;
+}
+export interface MoreMenuItem extends MenuItem {
+    workspaceId?: string;
 }

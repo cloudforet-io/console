@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import { useElementBounding, useElementSize } from '@vueuse/core';
 import { useWindowSize } from '@vueuse/core/index';
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PDivider, PFieldTitle, PIconButton, PTextButton, PI, screens,
+    PButton, PDivider, PFieldTitle, PI, PIconButton, PTextButton, screens, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { sumBy } from 'lodash';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],
@@ -18,18 +24,61 @@ const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
 });
 
+const MORE_BUTTON_DEFAULT_WIDTH = 124;
+const FOLDER_DEFAULT_GAP = 4;
+const EXTRA_DEFAULT_WIDTH = 150; // title + gap + divider + create folder button
+
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
 const { width } = useWindowSize();
 
+const componentRef = ref<HTMLElement|null>(null);
+const toolboxRef = ref<HTMLElement|null>(null);
+const folderItemsRef = ref<HTMLElement[]|null>(null);
+
+const moreButtonRef = ref<HTMLElement | null>(null);
+const moreContextMenuRef = ref<any|null>(null);
+
+const { width: containerWidth } = useElementSize(componentRef);
+const { width: toolboxWidth } = useElementSize(toolboxRef);
+const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
+
 const storeState = reactive({
-    filterByFolder: computed<string|undefined>(() => bookmarkState.filterByFolder),
+    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
+    folderListMaxWidth: computed<number>(() => containerWidth.value - toolboxWidth.value - EXTRA_DEFAULT_WIDTH),
+
+    refinedFolderList: [] as BookmarkItem[],
+    refinedFolderListWidth: 0,
+});
+const moreState = reactive({
+    isShowMoreButton: false,
+    menuItems: computed<MoreMenuItem[]>(() => state.refinedFolderList.map((i) => ({
+        ...i,
+        name: i.id,
+        label: i.name,
+        type: CONTEXT_MENU_TYPE.item,
+    }))),
+    selectedItems: [] as MoreMenuItem[],
+});
+
+const {
+    visibleMenu: visibleContextMenu,
+    contextMenuStyle,
+    showContextMenu,
+    hideContextMenu,
+} = useContextMenuController({
+    useFixedStyle: true,
+    targetRef: moreButtonRef,
+    contextMenuRef: moreContextMenuRef,
+    selected: moreState.selectedItems,
+    menu: moreState.menuItems,
+    position: 'right',
 });
 
 const handleClickFullModeButton = () => {
@@ -48,10 +97,56 @@ const handleClickFolder = (item: BookmarkItem) => {
 const handleGoBackButton = () => {
     bookmarkStore.setFileFullMode(false);
 };
+
+const handleClickAddMore = () => {
+    if (visibleContextMenu.value) {
+        hideContextMenu();
+    } else {
+        showContextMenu();
+    }
+};
+const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
+    if (moreState.selectedItems[0]?.name === item?.name) {
+        moreState.selectedItems = [];
+    } else {
+        moreState.selectedItems = [item];
+    }
+    handleClickFolder({
+        id: item.name,
+        name: item.label,
+        workspaceId: item.workspaceId,
+    });
+    hideContextMenu();
+};
+
+watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.bookmarkFolderList], ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+    if (!folderItemsValue) return;
+    const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
+    const _refinedFolderList: HTMLElement[] = [];
+    let widthBaseline = 0;
+    folderItemsValue.forEach((el) => {
+        if (widthBaseline < folderListWidthWithoutMoreButton) {
+            const _width = widthBaseline + useElementSize(el).width.value;
+            if (_width > folderListWidthWithoutMoreButton) {
+                moreState.isShowMoreButton = true;
+                return;
+            }
+            widthBaseline += useElementSize(el).width.value;
+            _refinedFolderList.push(el);
+        }
+    });
+    _refinedFolderList.pop();
+    state.refinedFolderListWidth = sumBy(_refinedFolderList, (cur) => {
+        const curWidth = useElementSize(cur)?.width.value ?? 0;
+        return curWidth + FOLDER_DEFAULT_GAP;
+    });
+    state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
+});
 </script>
 
 <template>
-    <div class="bookmark-header"
+    <div ref="componentRef"
+         class="bookmark-header"
          :class="{'full-mode': storeState.isFullMode}"
     >
         <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARK_TITLE')"
@@ -65,14 +160,16 @@ const handleGoBackButton = () => {
                                size="sm"
                                @click="handleGoBackButton"
                 />
-                <div class="folder-icon-wrapper">
+                <div v-if="!state.isMobileSize"
+                     class="folder-icon-wrapper"
+                >
                     <p-i name="ic_folder-filled"
                          width="0.875rem"
                          height="0.875rem"
                     />
                 </div>
             </template>
-            <template v-if="storeState.isFileFullMode"
+            <template v-if="storeState.isFileFullMode && !state.isMobileSize"
                       #right
             >
                 <div class="title-right-wrapper">
@@ -89,20 +186,23 @@ const handleGoBackButton = () => {
         </p-field-title>
         <div v-if="!storeState.isFullMode"
              class="bookmark-folders-wrapper"
+             :style="{ maxWidth: `${state.folderListMaxWidth}px`}"
         >
-            <div class="bookmark-folders">
+            <div class="bookmark-folders"
+                 :style="{ maxWidth: `${state.refinedFolderListWidth}px`}"
+            >
                 <p-button v-for="(item, idx) in props.bookmarkFolderList"
+                          ref="folderItemsRef"
                           :key="idx"
                           style-type="tertiary"
                           class="folders-button"
                           :class="{'active': storeState.filterByFolder === item.name}"
                           @click="handleClickFolder(item)"
                 >
-                    <p-icon-button v-if="storeState.filterByFolder === item.name"
-                                   name="ic_close"
-                                   style-type="transparent"
-                                   size="sm"
-                                   @click.stop="handleClickActionButton(BOOKMARK_MODAL_TYPE.DELETE_FOLDER)"
+                    <p-i v-if="storeState.filterByFolder === item.name"
+                         name="ic_close"
+                         width="0.875rem"
+                         height="0.875rem"
                     />
                     <p-i v-else
                          name="ic_folder"
@@ -112,11 +212,45 @@ const handleGoBackButton = () => {
                     <span>{{ item.name }}</span>
                 </p-button>
             </div>
-            <p-divider v-if="!storeState.isFileFullMode && !state.isMobileSize"
-                       vertical
+            <div v-if="moreState.isShowMoreButton"
+                 class="show-more-wrapper"
+            >
+                <p-button ref="moreButtonRef"
+                          style-type="tertiary"
+                          class="show-more-button"
+                          :class="{'active': visibleContextMenu || moreState.selectedItems.length > 0}"
+                          @click="handleClickAddMore"
+                >
+                    <p-i v-if="visibleContextMenu"
+                         name="ic_close"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                    <p-i v-else
+                         name="ic_ellipsis-horizontal"
+                         width="0.875rem"
+                         height="0.875rem"
+                    />
+                    <span>{{ $t('HOME.BOOKMARK_MORE') }}</span>
+                </p-button>
+                <p-context-menu v-if="visibleContextMenu"
+                                ref="moreContextMenuRef"
+                                :menu="moreState.menuItems"
+                                :selected="moreState.selectedItems"
+                                :style="{ ...contextMenuStyle, 'top': `${moreButtonTop + moreButtonHeight}px`} "
+                                show-select-marker
+                                class="more-context-menu"
+                                @select="handleSelectAddMoreMenuItem"
+                />
+            </div>
+        </div>
+        <div v-if="!storeState.isFullMode && !state.isMobileSize"
+             class="file-extra-wrapper"
+        >
+            <p-divider vertical
                        class="divider"
             />
-            <div v-if="!storeState.isFileFullMode && !state.isMobileSize">
+            <div>
                 <p-icon-button v-if="props.bookmarkFolderList.length > 0"
                                name="ic_plus"
                                style-type="tertiary"
@@ -133,7 +267,9 @@ const handleGoBackButton = () => {
                 </p-text-button>
             </div>
         </div>
-        <div class="toolbox-wrapper">
+        <div ref="toolboxRef"
+             class="toolbox-wrapper"
+        >
             <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
                       icon-left="ic_plus"
                       class="add-link-button"
@@ -165,24 +301,38 @@ const handleGoBackButton = () => {
     @apply flex items-center;
     gap: 0.5rem;
     .bookmark-folders-wrapper {
-        @apply flex items-center;
-        gap: 0.625rem;
-        flex: 1;
+        @apply flex items-center overflow-hidden;
         .bookmark-folders {
-            @apply flex;
+            @apply flex overflow-hidden;
             gap: 0.25rem;
-            .folders-button {
-                @apply flex items-center font-normal text-label-md bg-gray-150;
-                min-width: initial;
-                height: 1.625rem;
-                padding: 0.25rem 0.625rem;
-                border: none;
-                gap: 0.25rem;
-                &.active {
-                    @apply bg-blue-300;
+        }
+        .folders-button, .show-more-button {
+            @apply flex items-center font-normal text-label-md bg-gray-150;
+            min-width: initial;
+            height: 1.625rem;
+            padding: 0.25rem 0.625rem;
+            border: none;
+            gap: 0.25rem;
+            &.active {
+                @apply bg-blue-300;
+                &:hover {
+                    @apply bg-blue-200;
                 }
             }
+            &:hover {
+                @apply bg-gray-200;
+            }
         }
+        .show-more-wrapper {
+            .more-context-menu {
+                z-index: 10;
+            }
+        }
+    }
+    .file-extra-wrapper {
+        @apply flex;
+        margin-left: 0.125rem;
+        gap: 0.625rem;
         .divider {
             height: 1.25rem;
         }
@@ -216,6 +366,15 @@ const handleGoBackButton = () => {
     }
 
     @screen mobile {
+        &.full-mode {
+            /* custom design-system component - p-field-title */
+            :deep(.p-field-title) {
+                max-width: calc(100% - 9.375rem);
+                .title {
+                    @apply truncate;
+                }
+            }
+        }
         &:not(.full-mode) {
             @apply flex-col items-start;
         }
