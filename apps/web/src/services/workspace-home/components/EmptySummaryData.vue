@@ -55,6 +55,7 @@ const router = useRouter();
     background-position: left;
     gap: 0.75rem;
     &.cost {
+        background-position: left 1rem center;
         .icon-wrapper {
             @apply bg-green-100;
         }

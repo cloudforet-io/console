@@ -187,7 +187,7 @@ watch(() => props.visible, (visible) => {
             </p-field-group>
         </template>
         <template #confirm-button>
-            <span>{{ $t('IAM.WORKSPACES.CREATE') }}</span>
+            <span v-if="props.createType === 'CREATE'">{{ $t('IAM.WORKSPACES.CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

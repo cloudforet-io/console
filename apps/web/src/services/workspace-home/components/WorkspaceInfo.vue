@@ -119,135 +119,138 @@ const routerToWorkspaceUser = (isOpenModal: boolean) => {
 
 <template>
     <div class="workspace-info">
-        <p-heading class="heading">
-            <div class="heading-title">
-                <workspace-logo-icon :text="state.selectedWorkspace.name"
-                                     :theme="state.selectedWorkspace.tags?.theme"
-                                     size="sm"
-                />
-                <span>{{ state.selectedWorkspace.name }}</span>
-            </div>
-            <template #title-right-extra>
-                <span class="title-right-button-wrapper">
-                    <favorite-button :item-id="state.selectedWorkspace.workspace_id"
-                                     :favorite-type="FAVORITE_TYPE.WORKSPACE"
-                                     class="favorite-button"
-                                     scale="0.8"
+        <div class="workspace_title">
+            <p-heading class="heading">
+                <div class="heading-title">
+                    <workspace-logo-icon :text="state.selectedWorkspace.name"
+                                         :theme="state.selectedWorkspace.tags?.theme"
+                                         size="sm"
                     />
-                    <p-icon-button v-if="storeState.isDomainAdmin"
-                                   name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   @click="handleActionButton('edit')"
-                    />
-                    <p-icon-button v-if="storeState.isDomainAdmin"
-                                   name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
-                                   class="delete-button"
-                                   @click="handleActionButton('delete')"
-                    />
-                </span>
-            </template>
-            <template #extra>
-                <div class="extra-wrapper">
-                    <p-button v-if="props.accessUserMenu"
-                              style-type="tertiary"
-                              icon-left="ic_service_user"
-                              @click="handleActionButton('invite')"
-                    >
-                        {{ $t('HOME.INFO_INVITE_USER') }}
-                    </p-button>
-                    <p-button v-if="props.accessAppMenu"
-                              style-type="tertiary"
-                              icon-left="ic_service_app"
-                              @click="handleActionButton('create')"
-                    >
-                        {{ $t('HOME.INFO_CREATE_APP') }}
-                    </p-button>
+                    <span>{{ state.selectedWorkspace.name }}</span>
                 </div>
-            </template>
-        </p-heading>
-        <span v-if="state.selectedWorkspace.tags?.description"
-              class="desc"
-        >{{ state.selectedWorkspace.tags?.description }}</span>
-        <div class="info-cnt-wrapper">
-            <div v-if="props.accessUserMenu"
-                 class="info-cnt"
-            >
-                <p-i name="ic_service_user"
-                     width="0.875rem"
-                     height="0.875rem"
-                     color="inherit"
+                <template #title-right-extra>
+                    <span class="title-right-button-wrapper">
+                        <favorite-button :item-id="state.selectedWorkspace.workspace_id"
+                                         :favorite-type="FAVORITE_TYPE.WORKSPACE"
+                                         class="favorite-button"
+                                         scale="0.8"
+                        />
+                        <p-icon-button v-if="storeState.isDomainAdmin"
+                                       name="ic_edit-text"
+                                       width="1.5rem"
+                                       height="1.5rem"
+                                       @click="handleActionButton('edit')"
+                        />
+                        <p-icon-button v-if="storeState.isDomainAdmin"
+                                       name="ic_delete"
+                                       width="1.5rem"
+                                       height="1.5rem"
+                                       class="delete-button"
+                                       @click="handleActionButton('delete')"
+                        />
+                    </span>
+                </template>
+            </p-heading>
+            <span v-if="state.selectedWorkspace.tags?.description"
+                  class="desc"
+            >{{ state.selectedWorkspace.tags?.description }}</span>
+            <div class="info-cnt-wrapper">
+                <div v-if="props.accessUserMenu"
+                     class="info-cnt"
+                >
+                    <p-i name="ic_service_user"
+                         width="0.875rem"
+                         height="0.875rem"
+                         color="inherit"
+                    />
+                    <p-text-button @click="handleActionButton('user')">
+                        {{ storeState.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
+                    </p-text-button>
+                </div>
+                <p-i v-if="props.accessAppMenu && props.accessUserMenu"
+                     name="ic_dot"
+                     width="0.125rem"
+                     height="0.125rem"
+                     :color="gray[500]"
+                     class="dot"
                 />
-                <p-text-button @click="handleActionButton('user')">
-                    {{ storeState.workspaceUserTotalCount || 0 }} {{ $t('HOME.INFO_USERS') }}
-                </p-text-button>
+                <div v-if="props.accessAppMenu"
+                     class="info-cnt"
+                >
+                    <p-i name="ic_service_app"
+                         width="0.875rem"
+                         height="0.875rem"
+                         color="inherit"
+                    />
+                    <p-text-button @click="handleActionButton('app')">
+                        {{ storeState.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
+                    </p-text-button>
+                </div>
             </div>
-            <p-i v-if="props.accessAppMenu && props.accessUserMenu"
-                 name="ic_dot"
-                 width="0.125rem"
-                 height="0.125rem"
-                 :color="gray[500]"
-                 class="dot"
-            />
-            <div v-if="props.accessAppMenu"
-                 class="info-cnt"
+        </div>
+        <div class="extra-wrapper">
+            <p-button v-if="props.accessUserMenu"
+                      style-type="tertiary"
+                      icon-left="ic_service_user"
+                      @click="handleActionButton('invite')"
             >
-                <p-i name="ic_service_app"
-                     width="0.875rem"
-                     height="0.875rem"
-                     color="inherit"
-                />
-                <p-text-button @click="handleActionButton('app')">
-                    {{ storeState.appsTotalCount || 0 }} {{ $t('HOME.INFO_APPS') }}
-                </p-text-button>
-            </div>
+                {{ $t('HOME.INFO_INVITE_USER') }}
+            </p-button>
+            <p-button v-if="props.accessAppMenu"
+                      style-type="tertiary"
+                      icon-left="ic_service_app"
+                      @click="handleActionButton('create')"
+            >
+                {{ $t('HOME.INFO_CREATE_APP') }}
+            </p-button>
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .workspace-info {
-    @apply flex flex-col;
+    @apply flex;
     padding-top: 1.25rem;
     padding-bottom: 3rem;
-    gap: 0.25rem;
-    .heading {
-        margin: 0;
-        .heading-title {
-            @apply flex items-center;
-            gap: 0.5rem;
-        }
-        .title-right-button-wrapper {
-            @apply flex items-center;
-            .favorite-button {
-                margin-right: 0.5rem;
+    .workspace_title {
+        @apply flex flex-col;
+        gap: 0.25rem;
+        flex: 1;
+        .heading {
+            margin: 0;
+            .heading-title {
+                @apply flex items-center;
+                gap: 0.5rem;
+            }
+            .title-right-button-wrapper {
+                @apply flex items-center;
+                .favorite-button {
+                    margin-right: 0.5rem;
+                }
             }
         }
-        .extra-wrapper {
-            @apply flex;
-            gap: 0.5rem;
+        .desc {
+            @apply text-paragraph-md text-gray-600;
         }
-    }
-    .desc {
-        @apply text-paragraph-md text-gray-600;
-    }
-    .info-cnt-wrapper {
-        @apply flex items-center;
-        margin-top: 0.5rem;
-        gap: 0.5rem;
-        .info-cnt {
-            @apply flex items-center text-label-md;
-            gap: 0.125rem;
+        .info-cnt-wrapper {
+            @apply flex items-center;
+            margin-top: 0.5rem;
+            gap: 0.5rem;
+            .info-cnt {
+                @apply flex items-center text-label-md;
+                gap: 0.125rem;
+            }
         }
     }
 
+    .extra-wrapper {
+        @apply flex;
+        gap: 0.5rem;
+    }
+
     @screen mobile {
-        .heading {
-            .extra-wrapper {
-                @apply hidden;
-            }
+        .extra-wrapper {
+            @apply hidden;
         }
 
         /* custom design-system component - p-heading */
