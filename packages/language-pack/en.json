@@ -1816,8 +1816,8 @@
 		"NO_STARRED_DESC1": "Add frequently visited pages to here.",
 		"NO_STARRED_DESC2": "Explore one of these commonly visited services.",
 		"TOGGLE_MORE": "show more",
-		"WELCOME_BUTTON": "Explore Now",
-		"WELCOME_DESC": "Start to manage your multi cloud resources and costs.",
+		"WELCOME_BUTTON": "Get Started",
+		"WELCOME_DESC": "Connect your relevant cloud accounts to this workspace and start optimizing resource management and cost savings today.",
 		"WELCOME_TITLE": "Welcome, {name}"
 	},
 	"IAM": {
