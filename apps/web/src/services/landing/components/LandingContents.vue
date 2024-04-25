@@ -135,11 +135,11 @@ onUnmounted(() => {
                 <landing-empty-contents :is-domain-admin="storeState.isDomainAdmin" />
             </template>
         </p-data-loader>
-        <div class="banner-wrapper">
-            <p-divider v-if="storeState.isDomainAdmin" />
-            <div v-if="storeState.isDomainAdmin"
-                 class="banner"
-            >
+        <div v-if="storeState.isDomainAdmin && storeState.workspaceList.length > 0"
+             class="banner-wrapper"
+        >
+            <p-divider />
+            <div class="banner">
                 <img alt="empty-cloud-service-img"
                      src="@/assets/images/landing/img_landing_create_workspace.png"
                      class="create-workspace-img"

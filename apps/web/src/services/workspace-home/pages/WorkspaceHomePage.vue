@@ -4,11 +4,14 @@ import {
 } from 'vue';
 
 import type { UserConfigModel } from '@/schema/config/user-config/model';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { RoleInfo } from '@/store/modules/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -26,11 +29,15 @@ const userWorkspaceGetters = userWorkspaceStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 const bookmarkStore = useBookmarkStore();
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
+    dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
+    collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
 });
 const state = reactive({
     loading: false,
@@ -38,6 +45,7 @@ const state = reactive({
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
     accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
+    isNoCollectors: computed(() => !Object.keys(storeState.collectors).length),
 });
 
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
@@ -48,6 +56,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     try {
         // base API
         await workspaceHomePageStore.fetchRecentList(currentWorkspaceId);
+        await workspaceHomePageStore.fetchDataSource();
     } finally {
         state.loading = false;
     }
@@ -66,7 +75,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     await workspaceHomePageStore.fetchFavoriteList();
     // summaries
     await workspaceHomePageStore.fetchCostReportConfig();
-    await workspaceHomePageStore.fetchDataSource();
 }, { immediate: true });
 </script>
 
@@ -78,7 +86,11 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
             <workspace-info :access-user-menu="state.accessAppMenu"
                             :access-app-menu="state.accessAppMenu"
             />
-            <welcome v-if="!state.loading && storeState.recentList.length === 0" />
+            <welcome
+                v-if="!state.loading && (storeState.recentList.length === 0
+                    || state.isNoCollectors
+                    || storeState.dataSource.length === 0)"
+            />
             <bookmark />
             <user-configs v-if="storeState.recentList.length !== 0"
                           class="section"

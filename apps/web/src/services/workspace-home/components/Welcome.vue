@@ -18,7 +18,11 @@ const handleClickButton = () => {
 
 <template>
     <div class="welcome">
-        <span class="title">{{ $t('HOME.WELCOME_TITLE', { name: storeState.userName }) }}</span>
+        <span class="title">
+            {{ $t('HOME.WELCOME_TITLE') }}
+            <span v-if="storeState.userName">, {{ storeState.userName }}</span>
+            😊
+        </span>
         <span class="desc">{{ $t('HOME.WELCOME_DESC') }}</span>
         <p-button icon-left="ic_rocket-filled"
                   class="explore-button"
