@@ -89,9 +89,11 @@ const handleConfirm = async () => {
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
         if (storeState.isFullMode && state.selectedFolder?.id) {
-            await bookmarkStore.setFileFullMode(true, state.selectedFolder);
-        } else if (!state.selectedFolder?.id) {
-            await bookmarkStore.setFullMode(true);
+            if (state.selectedFolder?.id) {
+                await bookmarkStore.setFileFullMode(true, state.selectedFolder);
+            } else {
+                await bookmarkStore.setFullMode(true);
+            }
         }
         await bookmarkStore.setSelectedBookmark(state.selectedFolder);
         await handleClose();
