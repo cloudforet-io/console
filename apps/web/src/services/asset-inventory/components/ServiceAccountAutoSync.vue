@@ -78,6 +78,7 @@ const handleClickSaveButton = async () => {
                 skip_project_group: serviceAccountPageFormState.skipProjectGroup,
                 single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
             },
+            plugin_options: serviceAccountPageFormState.additionalOptions,
         });
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.UPDATE_SUCCESS'), '');
     } catch (e) {
