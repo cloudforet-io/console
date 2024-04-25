@@ -2,7 +2,7 @@
 import { useElementBounding, useElementSize } from '@vueuse/core';
 import { useWindowSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, nextTick, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const MORE_BUTTON_DEFAULT_WIDTH = 124;
 const FOLDER_DEFAULT_GAP = 4;
-const EXTRA_DEFAULT_WIDTH = 150; // title + gap + divider + create folder button
+const EXTRA_DEFAULT_WIDTH = 151; // title + gap + divider + create folder button
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -119,12 +119,13 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
     hideContextMenu();
 };
 
-watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.bookmarkFolderList], ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+watch([() => folderItemsRef, () => state.folderListMaxWidth, () => props.bookmarkFolderList, () => storeState.isFullMode], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+    await nextTick();
     if (!folderItemsValue) return;
     const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
-    folderItemsValue.forEach((el) => {
+    folderItemsValue.value?.forEach((el) => {
         if (widthBaseline < folderListWidthWithoutMoreButton) {
             const _width = widthBaseline + useElementSize(el).width.value;
             if (_width > folderListWidthWithoutMoreButton) {
