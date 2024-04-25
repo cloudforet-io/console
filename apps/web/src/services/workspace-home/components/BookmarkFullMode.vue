@@ -51,9 +51,11 @@ const state = reactive({
                         :board-sets="state.folderBoardSets"
                         is-folder-board
                         is-full-mode
+                        class="board"
         />
         <bookmark-board :board-sets="state.boardSets"
                         is-full-mode
+                        class="board"
         />
     </div>
 </template>
@@ -66,5 +68,11 @@ const state = reactive({
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     gap: 1.25rem;
+
+    .board {
+        + .board {
+            padding-top: 0;
+        }
+    }
 }
 </style>

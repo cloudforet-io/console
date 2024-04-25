@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
+const bookmarkGetters = bookmarkStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
@@ -49,6 +50,7 @@ const boardItemEl = ref<HTMLElement | null>(null);
 const storeState = reactive({
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
+    bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
 });
 const state = reactive({
@@ -140,7 +142,11 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="bookmark-board"
-         :class="{[props.isFullMode ? 'full-board' : 'collapsed-board']: true, 'no-data': storeState.recentList.length === 0 || storeState.bookmarkFolderData.length === 0}"
+         :class="{
+             [props.isFullMode ? 'full-board' : 'collapsed-board']: true,
+             'no-data': storeState.recentList.length === 0
+                 || (storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0)
+         }"
     >
         <p-board v-if="props.boardSets.length > 0"
                  :board-sets="props.boardSets"
@@ -280,7 +286,7 @@ onBeforeUnmount(() => {
                     height: 2.5rem;
                     border-radius: 0.75rem;
 
-                    .icon, img {
+                    .icon, img, svg {
                         width: 1.5rem !important;
                         height: 1.5rem !important;
                     }
