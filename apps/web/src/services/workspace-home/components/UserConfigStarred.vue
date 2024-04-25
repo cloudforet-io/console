@@ -90,7 +90,9 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
             <p-field-title :label="$t('HOME.CONFIG_STARRED_TITLE')"
                            size="lg"
             />
-            <div class="filters-wrapper">
+            <div v-if="storeState.favoriteMenuList.length > 0"
+                 class="filters-wrapper"
+            >
                 <p-select-dropdown
                     class="sort-key-select-dropdown"
                     :menu="dropdownState.dropdownMenuList"

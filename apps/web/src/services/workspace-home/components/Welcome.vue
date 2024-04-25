@@ -12,7 +12,7 @@ const storeState = reactive({
 });
 
 const handleClickButton = () => {
-    window.open('https://cloudforet.io/docs/setup_operation/quick_install/', '_blank');
+    window.open('https://cloudforet.io/{language_code}/docs/guides/getting-started/', '_blank');
 };
 </script>
 
