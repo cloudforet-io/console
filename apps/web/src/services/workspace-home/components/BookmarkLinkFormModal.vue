@@ -35,6 +35,10 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    isDisabled: computed(() => {
+        const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
+        return !urlPattern.test(link.value) || !name.value;
+    }),
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
 });
@@ -99,7 +103,7 @@ const handleConfirm = async () => {
 watch(() => storeState.modal.type, (type) => {
     if (type !== BOOKMARK_MODAL_TYPE.LINK) return;
     if (storeState.modal.isEdit) {
-        setForm('name', storeState.selectedBookmark?.name || '');
+        setForm('name', storeState.selectedBookmark?.name as string || '');
         setForm('link', storeState.selectedBookmark?.link || '');
         state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
         return;
@@ -117,7 +121,7 @@ watch(() => storeState.modal.type, (type) => {
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.LINK"
-                    :disabled="name === ''"
+                    :disabled="state.isDisabled"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
