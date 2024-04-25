@@ -22,6 +22,7 @@ interface Props {
     treeData: TreeNode[];
     treeDisplayMap?: TreeDisplayMap;
     selectedId?: string;
+    useDefaultIndent?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -62,6 +63,7 @@ const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
                      :node="item"
                      :selected-id="selectedId"
                      :is-open="state.proxyTreeDisplayMap[item.id]?.isOpen"
+                     :use-default-indent="useDefaultIndent"
                      @click-toggle="handleClickToggle"
                      @click-item="handleClickItem"
                      @update:is-open="handleUpdateTreeDisplayMap(item.id, $event)"
@@ -77,6 +79,7 @@ const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
                 <p-tree-view :tree-data="item.children"
                              :tree-display-map.sync="state.proxyTreeDisplayMap"
                              :selected-id="selectedId"
+                             :use-default-indent="useDefaultIndent"
                              @click-toggle="handleClickToggle"
                              @click-item="handleClickItem"
                 >

@@ -136,6 +136,7 @@ const createAccount = async (): Promise<string|undefined> => {
                     skip_project_group: serviceAccountPageFormState.skipProjectGroup,
                     single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
                 },
+                plugin_options: serviceAccountPageFormState.additionalOptions,
             });
         } else {
             res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({

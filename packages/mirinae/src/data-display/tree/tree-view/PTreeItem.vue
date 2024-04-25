@@ -16,6 +16,7 @@ interface Props {
     node: TreeNode;
     selectedId?: string;
     isOpen?: boolean;
+    useDefaultIndent?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -78,20 +79,20 @@ onMounted(() => {
                    :style="{ 'padding-left': `${0.125 + (props.node.depth || 0) * 1}rem`}"
                    @click.native="handleClickItem"
         >
-            <div v-if="isExpandable(slots)"
+            <div v-if="isExpandable(slots) || props.useDefaultIndent"
                  class="toggle-icon"
             >
                 <p-spinner v-if="props.node.loading"
                            size="sm"
                 />
-                <p-i v-else
+                <p-i v-else-if="isExpandable(slots)"
                      :name="state.toggleIcon"
                      width="1rem"
                      height="1rem"
                      @click.prevent="handleClickToggle"
                 />
             </div>
-            <div :class="{'content-text': true, 'expandable': isExpandable(slots)}">
+            <div :class="{'content-text': true, 'expandable': isExpandable(slots) || useDefaultIndent}">
                 <slot name="content"
                       v-bind="{ node: props.node }"
                 />
@@ -116,6 +117,10 @@ onMounted(() => {
 
         &:hover {
             @apply bg-blue-100 cursor-pointer;
+        }
+
+        .toggle-icon {
+            min-width: 1rem;
         }
 
         &.selected {
