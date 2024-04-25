@@ -930,10 +930,12 @@
 			"DETAILS_BY_PROJECT": "프로젝트별 상세 보기 ",
 			"DETAILS_BY_PROVIDER": "프로바이더별 상세 보기 ",
 			"DETAILS_BY_SERVICE_ACCOUNT": "서비스 어카운트별 상세 보기",
+			"FROM": "발신자",
 			"INDEX": "인덱스",
 			"ISSUE_DATE": "발행일자 ",
 			"REPORT_NUMBER": "리포트 번호",
 			"SUBTOTAL": "소계 ",
+			"TO": "발신자",
 			"TOTAL": "총합계 ",
 			"TOTAL_AMOUNT_BY_PROVIDER": "프로바이더별 총합계 "
 		},

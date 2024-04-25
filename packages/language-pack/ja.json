@@ -930,10 +930,12 @@
 			"DETAILS_BY_PROJECT": "プロジェクト別詳細",
 			"DETAILS_BY_PROVIDER": "プロバイダ別詳細",
 			"DETAILS_BY_SERVICE_ACCOUNT": "サービスアカウント別詳細",
+			"FROM": "発信者",
 			"INDEX": "Index",
 			"ISSUE_DATE": "発行日",
 			"REPORT_NUMBER": "レポート番号",
 			"SUBTOTAL": "小計",
+			"TO": "受信者",
 			"TOTAL": "トータルコスト",
 			"TOTAL_AMOUNT_BY_PROVIDER": "プロバイダ別の合計金額"
 		},

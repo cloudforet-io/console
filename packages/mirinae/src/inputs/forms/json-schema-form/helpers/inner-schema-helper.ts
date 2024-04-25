@@ -47,6 +47,7 @@ export const getComponentNameBySchemaProperty = (schemaProperty: JsonSchema): Co
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     if (isStrictArraySelectMode(schemaProperty)) return 'PFilterableDropdown';
+    if (schemaProperty.type === 'boolean') return 'PToggleButton';
     return 'PTextInput';
 };
 
