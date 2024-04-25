@@ -24,6 +24,8 @@ import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/refe
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -415,22 +417,31 @@ onMounted(async () => {
                                  use-default-indent
                     >
                         <template #content="{ node }">
-                            <div class="metric-item">
-                                <p-i v-if="node.data.type === 'metric'"
-                                     :name="node.data.is_managed ? 'ic_main-filled': 'ic_sub'"
-                                     width="0.875rem"
-                                     height="0.875rem"
-                                     :color="gray[500]"
+                            <div class="tree-menu-item-content">
+                                <div class="tree-item">
+                                    <p-i v-if="node.data.type === 'metric'"
+                                         class="tree-item-icon"
+                                         :name="node.data.is_managed ? 'ic_main-filled': 'ic_sub'"
+                                         width="0.875rem"
+                                         height="0.875rem"
+                                         :color="gray[500]"
+                                    />
+                                    <p-i v-else
+                                         class="tree-item-icon"
+                                         name="ic_example-filled"
+                                         width="0.875rem"
+                                         height="0.875rem"
+                                         :color="gray[700]"
+                                    />
+                                    <span class="tree-item-name">
+                                        {{ node.data.name }}
+                                    </span>
+                                </div>
+                                <favorite-button :item-id="node.id"
+                                                 :favorite-type="node.data.type === 'metric' ? FAVORITE_TYPE.METRIC : FAVORITE_TYPE.METRIC_EXAMPLE"
+                                                 scale="0.8"
+                                                 class="favorite-button"
                                 />
-                                <p-i v-else
-                                     name="ic_example-filled"
-                                     width="0.875rem"
-                                     height="0.875rem"
-                                     :color="gray[700]"
-                                />
-                                <span class="metric-name">
-                                    {{ node.data.name }}
-                                </span>
                             </div>
                         </template>
                     </p-tree-view>
@@ -493,13 +504,37 @@ onMounted(async () => {
                 margin-bottom: 0.25rem;
             }
 
-            .metric-item {
-                @apply flex items-center;
+            .tree-menu-item-content {
+                @apply flex items-center justify-between w-full;
                 height: 2rem;
+                .tree-item {
+                    @apply flex items-center w-full;
+                    gap: 0.125rem;
 
-                .metric-name {
-                    @apply text-label-md text-gray-900;
-                    margin-left: 0.125rem;
+                    .tree-item-icon {
+                        min-width: 0.875rem;
+                    }
+                    .tree-item-name {
+                        @apply text-label-md text-gray-900;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                }
+                .favorite-button {
+                    display: none;
+                    min-width: 1.5rem;
+                    height: 1rem;
+                    padding-left: 0.5rem;
+                }
+
+                &:hover {
+                    .tree-item {
+                        width: calc(100% - 1.5rem);
+                    }
+                    .favorite-button {
+                        display: block;
+                    }
                 }
             }
 
