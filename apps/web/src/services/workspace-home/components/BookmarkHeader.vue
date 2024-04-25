@@ -12,6 +12,8 @@ import {
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { sumBy } from 'lodash';
 
+import { store } from '@/store';
+
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -45,6 +47,7 @@ const { width: toolboxWidth } = useElementSize(toolboxRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
+    language: computed<string>(() => store.state.user.language),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
@@ -87,7 +90,10 @@ const handleClickFullModeButton = () => {
 const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
     bookmarkStore.setModalType(type, isEdit, isNew);
 };
-const handleClickFolder = (item: BookmarkItem) => {
+const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
+    if (!isClickedMore) {
+        moreState.selectedItems = [];
+    }
     if (storeState.filterByFolder === item.name) {
         bookmarkStore.setSelectedBookmark(undefined);
         return;
@@ -115,11 +121,17 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
         id: item.name,
         name: item.label,
         workspaceId: item.workspaceId,
-    });
+    }, true);
     hideContextMenu();
 };
 
-watch([() => folderItemsRef, () => state.folderListMaxWidth, () => props.bookmarkFolderList, () => storeState.isFullMode], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+watch([
+    () => folderItemsRef,
+    () => state.folderListMaxWidth,
+    () => props.bookmarkFolderList,
+    () => storeState.isFullMode,
+    () => storeState.language,
+], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
     await nextTick();
     if (!folderItemsValue) return;
     const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
