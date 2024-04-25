@@ -5,8 +5,9 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton, PEmpty,
+    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PTreeView,
 } from '@spaceone/design-system';
+import type { TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
 import { isEmpty } from 'lodash';
 
 
@@ -26,13 +27,14 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
-import type { LSBMenu, LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
+import type { LSBMenu, LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 interface NamespaceSubItemType {
@@ -45,6 +47,7 @@ const route = useRoute();
 const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
+const metricExplorerPageStore = useMetricExplorerPageStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const storeState = reactive({
@@ -64,7 +67,7 @@ const storeState = reactive({
 
 const state = reactive({
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) && !!route.params.metricId),
+    isDetailPage: computed(() => !!route.params.metricId),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -118,6 +121,11 @@ const namespaceState = reactive({
 });
 
 const metricState = reactive({
+    selectedId: computed<string|undefined>(() => {
+        if (!state.isDetailPage) return undefined;
+        if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
+        return route.params.metricExampleId;
+    }),
     inputValue: '',
     currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
     metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
@@ -126,16 +134,46 @@ const metricState = reactive({
         if (!keyword) return metricState.metrics;
         return metricState.metrics.filter((metric) => metric.name.toLowerCase().includes(keyword));
     }),
-    metricItems: computed<LSBItem[]>(() => metricState.metricsFilteredByInput.map((metric) => ({
-        type: MENU_ITEM_TYPE.ITEM,
-        label: metric.name,
-        id: metric.key,
-        icon: metric.data.is_managed ? { name: 'ic_main-filled', color: gray[500] } : undefined,
-        to: getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { metricId: metric.key },
-        }),
-    }))),
+    metricItems: computed<TreeNode[]>(() => metricState.metricsFilteredByInput.map((metric) => {
+        const metricTreeNode = {
+            id: metric.key,
+            depth: 0,
+            data: {
+                ...metric,
+                type: 'metric',
+                is_managed: metric.data.is_managed,
+                to: {
+                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                    params: {
+                        metricId: metric.key,
+                    },
+                },
+            },
+        };
+        const examples = metricState.metricExamples.filter((example) => example.metric_id === metric.key);
+        if (examples.length) {
+            return {
+                ...metricTreeNode,
+                children: examples.map((example) => ({
+                    id: example.example_id,
+                    depth: 1,
+                    data: {
+                        ...example,
+                        type: 'example',
+                        to: {
+                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                            params: {
+                                metricId: metric.key,
+                                metricExampleId: example.example_id,
+                            },
+                        },
+                    },
+                })),
+            };
+        }
+        return metricTreeNode;
+    })),
+    metricExamples: computed(() => metricExplorerPageStore.state.metricExamples),
     addCustomMetricModalVisible: false,
 });
 
@@ -224,6 +262,7 @@ watch(() => route.params, (params) => {
 
 onMounted(async () => {
     await allReferenceStore.load('metric');
+    await metricExplorerPageStore.loadMetricExamples();
     if (!isEmpty(metricState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
             label: namespaceState.namespaces.find((item) => item.key === metricState.currentMetric?.data.namespace_id).name,
@@ -371,19 +410,30 @@ onMounted(async () => {
                               :value="metricState.inputValue"
                               @update:value="handleSearchMetric"
                     />
-                    <l-s-b-router-menu-item v-for="(item, idx) in metricState.metricItems"
-                                            :key="idx"
-                                            :item="item"
-                                            :idx="idx"
-                                            :current-path="state.currentPath"
+                    <p-tree-view :tree-data="metricState.metricItems"
+                                 :selected-id="metricState.selectedId"
+                                 use-default-indent
                     >
-                        <template #text>
-                            <p-text-highlighting class="text"
-                                                 :term="metricState.inputValue"
-                                                 :text="item?.label || ''"
-                            />
+                        <template #content="{ node }">
+                            <div class="metric-item">
+                                <p-i v-if="node.data.type === 'metric'"
+                                     :name="node.data.is_managed ? 'ic_main-filled': 'ic_sub'"
+                                     width="0.875rem"
+                                     height="0.875rem"
+                                     :color="gray[500]"
+                                />
+                                <p-i v-else
+                                     name="ic_example-filled"
+                                     width="0.875rem"
+                                     height="0.875rem"
+                                     :color="gray[700]"
+                                />
+                                <span class="metric-name">
+                                    {{ node.data.name }}
+                                </span>
+                            </div>
                         </template>
-                    </l-s-b-router-menu-item>
+                    </p-tree-view>
                     <p-empty v-if="metricState.inputValue && !metricState.metricItems.length"
                              class="keyword-search-empty"
                     >
@@ -441,6 +491,16 @@ onMounted(async () => {
 
             .metric-search {
                 margin-bottom: 0.25rem;
+            }
+
+            .metric-item {
+                @apply flex items-center;
+                height: 2rem;
+
+                .metric-name {
+                    @apply text-label-md text-gray-900;
+                    margin-left: 0.125rem;
+                }
             }
 
             .metric-title-item {
