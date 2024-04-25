@@ -337,7 +337,6 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Event Handlers */
         // form input case
         const handleUpdateFormValue = (property: InnerJsonSchema, propertyIdx: number, val?: any) => {
-            console.log('handleUpdateFormValue', property, propertyIdx, val);
             if (state.unmounting) return;
 
             const { propertyName, componentName } = property;
