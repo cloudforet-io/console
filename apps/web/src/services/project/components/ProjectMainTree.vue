@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTreeView } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -18,7 +18,6 @@ import { indigo, peacock } from '@/styles/colors';
 
 import { useProjectTreeData } from '@/services/project/composables/use-project-tree-data';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import TreeView from '@/services/project/tree/TreeView.vue';
 import type { TreeNode } from '@/services/project/tree/type';
 
 const {
@@ -66,10 +65,10 @@ onMounted(() => {
 
 <template>
     <div class="project-main-tree">
-        <tree-view :tree-data="state.projectTreeData"
-                   :tree-display-map.sync="treeDisplayMap"
-                   :selected-id="state.selectedTreeId"
-                   @click-toggle="fetchData"
+        <p-tree-view :tree-data="state.projectTreeData"
+                     :tree-display-map.sync="treeDisplayMap"
+                     :selected-id="state.selectedTreeId"
+                     @click-toggle="fetchData"
         >
             <template #content="{ node }">
                 <div class="project-menu-item-content">
@@ -89,7 +88,7 @@ onMounted(() => {
                     />
                 </div>
             </template>
-        </tree-view>
+        </p-tree-view>
     </div>
 </template>
 
