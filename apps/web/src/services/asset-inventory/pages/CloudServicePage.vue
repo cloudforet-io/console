@@ -239,7 +239,8 @@ onUnmounted(() => {
                                @refresh="handleRefresh"
         />
 
-        <p-data-loader class="flex-grow"
+        <p-data-loader v-if="Object.keys(storeState.serviceAccounts).length && Object.keys(storeState.collectors).length"
+                       class="flex-grow"
                        :data="state.items"
                        :loading="state.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -250,38 +251,37 @@ onUnmounted(() => {
                                          :item="item"
                 />
             </div>
-            <template #no-data>
-                <p-empty
-                    show-image
-                    image-size="md"
-                    :show-button="!!state.emptyData.to?.name"
-                >
-                    <template #image>
-                        <img v-if="state.isNoServiceAccounts"
-                             alt="empty-cloud-service-img"
-                             src="@/assets/images/illust_satellite.svg"
-                        >
-                        <img v-else
-                             alt="empty-cloud-service-img"
-                             src="@/assets/images/illust_microscope.svg"
-                        >
-                    </template>
-                    <template #button>
-                        <router-link
-                            :to="state.emptyData.to"
-                        >
-                            <p-button style-type="substitutive"
-                                      icon-left="ic_plus_bold"
-                                      class="mx-auto text-center"
-                            >
-                                {{ state.emptyData?.buttonText }}
-                            </p-button>
-                        </router-link>
-                    </template>
-                    {{ state.emptyData.desc }}
-                </p-empty>
-            </template>
         </p-data-loader>
+        <p-empty
+            v-else
+            show-image
+            image-size="md"
+            :show-button="!!state.emptyData.to?.name"
+        >
+            <template #image>
+                <img v-if="state.isNoServiceAccounts"
+                     alt="empty-cloud-service-img"
+                     src="@/assets/images/illust_satellite.svg"
+                >
+                <img v-else
+                     alt="empty-cloud-service-img"
+                     src="@/assets/images/illust_microscope.svg"
+                >
+            </template>
+            <template #button>
+                <router-link
+                    :to="state.emptyData.to"
+                >
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus_bold"
+                              class="mx-auto text-center"
+                    >
+                        {{ state.emptyData?.buttonText }}
+                    </p-button>
+                </router-link>
+            </template>
+            {{ state.emptyData.desc }}
+        </p-empty>
     </div>
 </template>
 
