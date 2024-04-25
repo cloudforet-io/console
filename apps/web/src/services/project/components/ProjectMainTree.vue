@@ -82,7 +82,7 @@ onMounted(() => {
                         <span class="text">{{ node.data.name }}</span>
                     </div>
                     <favorite-button :item-id="node.id"
-                                     :favorite-type="Array.isArray(node.children) ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECTs"
+                                     :favorite-type="Array.isArray(node.children) ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECT"
                                      scale="0.8"
                                      class="favorite-button"
                     />
