@@ -92,7 +92,7 @@ onMounted(() => {
                      @click.prevent="handleClickToggle"
                 />
             </div>
-            <div :class="{'content-text': true, 'expandable': isExpandable(slots)}">
+            <div :class="{'content-text': true, 'expandable': isExpandable(slots) || useDefaultIndent}">
                 <slot name="content"
                       v-bind="{ node: props.node }"
                 />
