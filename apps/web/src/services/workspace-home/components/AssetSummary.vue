@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
@@ -32,13 +33,26 @@ import type {
     EmptyData,
 } from '@/services/workspace-home/types/workspace-home-type';
 
+const PROVIDER_DEFAULT_WIDTH = 184 + 8;
+const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
+const DEFAULT_PADDING = 24;
+
+const ARROW_BUTTON_TYPE = {
+    PROVIDER: 'provider',
+    DAILY_UPDATES: 'dailyUpdate',
+} as const;
+type ArrowButtonType = typeof ARROW_BUTTON_TYPE[keyof typeof ARROW_BUTTON_TYPE];
+
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 
+const rowItemsWrapperRef = ref<null | HTMLElement>(null);
 const providerEl = ref<null | HTMLElement>(null);
 const dailyUpdateEl = ref<null | HTMLElement>(null);
+
+const { width: rowItemsWrapperWidth } = useElementSize(rowItemsWrapperRef);
 
 const apiQueryHelper = new ApiQueryHelper();
 
@@ -49,18 +63,19 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
 });
 const state = reactive({
-    isNoCollectors: computed(() => !Object.keys(storeState.collectors).length),
-    isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
+    isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
+    isNoServiceAccounts: computed<boolean>(() => !Object.keys(storeState.serviceAccounts).length),
     providers: [] as ProviderResourceDataItem[],
     dailyUpdatesList: [] as CloudServiceData[],
     pageStart: {
         provider: 0,
         dailyUpdate: 0,
     },
-    pageMax: {
-        provider: computed<number>(() => Math.ceil(state.providers.length / 3) - 1),
-        dailyUpdate: computed<number>(() => Math.ceil(state.dailyUpdatesList.length / 4) - 1),
-    },
+    pageMax: computed(() => {
+        const providerCount: number = state.providers.length / Math.floor(rowItemsWrapperWidth.value / (PROVIDER_DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
+        const dailyUpdateCount: number = state.dailyUpdatesList.length / Math.floor(rowItemsWrapperWidth.value / (DAILY_UPDATE__DEFAULT_WIDTH + DEFAULT_PADDING) - 1);
+        return { provider: providerCount, dailyUpdate: dailyUpdateCount };
+    }),
     emptyData: computed<EmptyData>(() => {
         let result = {} as EmptyData;
         if (state.isNoServiceAccounts) {
@@ -82,15 +97,20 @@ const state = reactive({
     }),
 });
 
-const handleClickArrowButton = (type: string, direction: string) => {
-    const element = type === 'provider' ? providerEl.value : dailyUpdateEl.value;
-    if (!element) return;
+const handleClickArrowButton = (type: ArrowButtonType, increment: number) => {
+    const element = type === ARROW_BUTTON_TYPE.PROVIDER ? {
+        el: providerEl.value,
+        defaultWidth: PROVIDER_DEFAULT_WIDTH,
+    } : {
+        el: dailyUpdateEl.value,
+        defaultWidth: DAILY_UPDATE__DEFAULT_WIDTH,
+    };
+    if (!element.el) return;
 
-    const increment = direction === 'right' ? 1 : -1;
     state.pageStart[type] += increment;
 
-    const marginLeft = state.pageStart[type] * 576;
-    element.style.marginLeft = direction === 'right' ? `-${marginLeft}px` : `${marginLeft}px`;
+    const marginLeft = increment * state.pageStart[type] * element.defaultWidth;
+    element.el.style.marginLeft = increment === 1 ? `-${marginLeft}px` : `${marginLeft}px`;
 };
 const getApiParameter = (type) => {
     apiQueryHelper.setSort('count', true);
@@ -173,7 +193,9 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
         />
         <div v-if="!state.isNoCollectors && !state.isNoServiceAccounts">
             <div class="content-wrapper">
-                <div class="row-items-wrapper">
+                <div ref="rowItemsWrapperRef"
+                     class="row-items-wrapper"
+                >
                     <div ref="providerEl"
                          class="row-items-container"
                     >
@@ -189,7 +211,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                        color="inherit transparent"
                                        width="1.5rem"
                                        height="1.5rem"
-                                       @click="handleClickArrowButton('provider', 'left')"
+                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, -1)"
                         />
                         <p-icon-button v-if="state.pageStart.provider !== Number(state.pageMax.provider)"
                                        class="arrow-button right"
@@ -197,7 +219,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                        color="inherit transparent"
                                        width="1.5rem"
                                        height="1.5rem"
-                                       @click="handleClickArrowButton('provider', 'right')"
+                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, 1)"
                         />
                     </div>
                 </div>
@@ -210,6 +232,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                         </template>
                     </p-field-title>
                     <div v-if="state.dailyUpdatesList.length > 0"
+                         ref="rowItemsWrapperRef"
                          class="row-items-wrapper"
                     >
                         <div ref="dailyUpdateEl"
@@ -227,7 +250,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                            color="inherit transparent"
                                            width="1.5rem"
                                            height="1.5rem"
-                                           @click="handleClickArrowButton('dailyUpdate', 'left')"
+                                           @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, -1)"
                             />
                             <p-icon-button v-if="state.pageStart.dailyUpdate !== Number(state.pageMax.dailyUpdate)"
                                            class="arrow-button right"
@@ -235,7 +258,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                            color="inherit transparent"
                                            width="1.5rem"
                                            height="1.5rem"
-                                           @click="handleClickArrowButton('dailyUpdate', 'right')"
+                                           @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, 1)"
                             />
                         </div>
                     </div>
