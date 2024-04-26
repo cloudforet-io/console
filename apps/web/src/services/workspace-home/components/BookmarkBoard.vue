@@ -144,8 +144,7 @@ onBeforeUnmount(() => {
     <div class="bookmark-board"
          :class="{
              [props.isFullMode ? 'full-board' : 'collapsed-board']: true,
-             'no-data': storeState.recentList.length === 0
-                 || (storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0)
+             'no-data': storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0
          }"
     >
         <p-board v-if="props.boardSets.length > 0"

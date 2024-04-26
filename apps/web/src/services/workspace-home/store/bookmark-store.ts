@@ -21,11 +21,22 @@ import getRandomId from '@/lib/random-id-generator';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { fetchFavicon } from '@/services/workspace-home/composables/use-bookmark';
+import { DEFAULT_BOOKMARK } from '@/services/workspace-home/constants/workspace-home-constant';
 import type { BookmarkItem, BookmarkModalType, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
+
+    const _getters = reactive({
+        userId: computed<string>(() => store.state.user.userId),
+        currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
+    });
+
+    const DefaultBookmarkData = DEFAULT_BOOKMARK.map((i) => ({
+        ...i,
+        workspaceId: _getters.currentWorkspaceId,
+    }));
 
     const state = reactive({
         bookmarkFolderData: [] as BookmarkItem[],
@@ -41,10 +52,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         } as BookmarkModalStateType,
     });
 
-    const _getters = reactive({
-        userId: computed<string>(() => store.state.user.userId),
-        currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
-    });
     const getters = reactive({
         bookmarkList: computed<BookmarkItem[]>(() => {
             let filteredList: BookmarkItem[] = [];
@@ -56,6 +63,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } else {
                 filteredList = state.bookmarkData.filter((i) => !i.folder);
             }
+            filteredList.unshift(...DefaultBookmarkData);
             return filteredList;
         }),
     });
@@ -167,7 +175,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkFolderList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
@@ -185,7 +192,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
@@ -210,7 +216,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkFolderList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
@@ -230,7 +235,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
@@ -246,7 +250,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkFolderList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
@@ -258,7 +261,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.bookmarkData = [];
                 throw e;
             }
         },
