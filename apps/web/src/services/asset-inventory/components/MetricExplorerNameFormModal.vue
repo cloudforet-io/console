@@ -78,7 +78,6 @@ const {
 
 /* Api */
 const createMetricExample = async () => {
-    // TODO: check working
     try {
         const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
             metric_id: metricExplorerPageState.metric?.metric_id || '',
@@ -91,7 +90,7 @@ const createMetricExample = async () => {
                 filters: metricExplorerPageState.filters,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_SAVE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
@@ -100,7 +99,7 @@ const createMetricExample = async () => {
             },
         }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_SAVE_AS_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
     }
 };
 const updateMetricName = async () => {
