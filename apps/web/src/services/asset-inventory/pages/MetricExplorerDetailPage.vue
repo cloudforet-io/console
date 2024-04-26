@@ -44,7 +44,7 @@ const state = reactive({
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
                 name: `[${targetNamespace?.name}] ${_targetMetricExample?.name ?? _targetMetric?.name}`,
-                path: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                path: _targetMetricExample ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
