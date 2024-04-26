@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
                  selectable
                  :style-type="BOARD_STYLE_TYPE.cards"
                  class="bookmark-board-wrapper"
-                 :class="{'full-mode': props.isFullMode, 'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
+                 :class="{'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
                  @item-click="handleClickItem"
         >
             <template #item-content="{board}">
@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
                              name="ic_plus"
                              width="1.25rem"
                              height="1.25rem"
-                             :color="blue[800]"
+                             :color="gray[800]"
                         />
                         <p-i v-else
                              name="ic_folder"
@@ -205,7 +205,7 @@ onBeforeUnmount(() => {
                             {{ board.link }}
                         </p>
                     </div>
-                    <div v-if="(props.isFolderBoard && !board.icon) || !props.isFolderBoard"
+                    <div v-if="!board.icon"
                          class="toolsets-wrapper"
                     >
                         <p-icon-button name="ic_ellipsis-horizontal"
@@ -234,27 +234,7 @@ onBeforeUnmount(() => {
 <style scoped lang="postcss">
 .bookmark-board {
     padding-top: 1rem;
-    &.no-data {
-        padding-top: 0;
-    }
-    &.collapsed-board {
-        .bookmark-board-wrapper {
-            @apply grid-cols-7;
 
-            @screen tablet {
-                @apply grid-cols-4;
-            }
-        }
-    }
-    &.full-board {
-        .bookmark-board-wrapper {
-            @apply grid-cols-4;
-
-            @screen tablet {
-                @apply grid-cols-1;
-            }
-        }
-    }
     .bookmark-board-wrapper {
         @apply grid gap-2 text-label-md;
 
@@ -269,6 +249,12 @@ onBeforeUnmount(() => {
             &:hover {
                 @apply bg-white border border-blue-500;
                 box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
+                .board-item .text-wrapper {
+                    max-width: calc(100% - 4.5rem);
+                }
+                .toolsets-wrapper {
+                    @apply block;
+                }
             }
 
             .content {
@@ -281,13 +267,13 @@ onBeforeUnmount(() => {
 
                 .image-wrapper {
                     @apply flex items-center justify-center;
-                    width: 2.5rem;
-                    height: 2.5rem;
-                    border-radius: 0.75rem;
+                    width: 2rem;
+                    height: 2rem;
+                    border-radius: 0.375rem;
 
                     .icon, img, svg {
-                        width: 1.5rem !important;
-                        height: 1.5rem !important;
+                        width: 1.25rem !important;
+                        height: 1.25rem !important;
                     }
 
                     .show-more {
@@ -330,8 +316,84 @@ onBeforeUnmount(() => {
                 }
             }
         }
+    }
 
-        &.full-mode {
+    &.collapsed-board {
+        .bookmark-board-wrapper {
+            @apply grid-cols-7;
+            .toolsets-wrapper {
+                @apply bg-white;
+            }
+        }
+
+        @screen tablet {
+            .bookmark-board-wrapper {
+                @apply grid-cols-4;
+            }
+        }
+
+        @screen laptop {
+            .bookmark-board-wrapper {
+                /* custom design-system component - p-board-item */
+                :deep(.p-board-item) {
+                    &:last-child {
+                        .board-item {
+                            height: 1.25rem;
+
+                            .bookmark-label {
+                                @apply hidden;
+                            }
+                        }
+                    }
+                    &:hover {
+                        .toolsets-wrapper {
+                            @apply hidden;
+                        }
+                    }
+                    .toolsets-wrapper {
+                        @apply hidden;
+                    }
+                    .board-item .text-wrapper {
+                        max-width: calc(100% - 3rem);
+                    }
+                }
+            }
+
+            /* custom design-system component - p-board-item */
+            :deep(.p-board-item) {
+                min-height: 3.625rem;
+                padding: 0.5rem;
+
+                .board-item {
+                    @apply flex-col;
+                    gap: 0.375rem;
+
+                    .image-wrapper {
+                        width: 1.25rem;
+                        height: 1.25rem;
+
+                        .icon, img {
+                            width: 1.25rem !important;
+                            height: 1.25rem !important;
+                        }
+
+                        .show-more {
+                            @apply bg-transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.full-board {
+        .bookmark-board-wrapper {
+            @apply grid-cols-4;
+
+            @screen tablet {
+                @apply grid-cols-1;
+            }
+
             /* custom design-system component - p-board-item */
             :deep(.p-board-item) {
                 @apply border-gray-200;
@@ -339,11 +401,11 @@ onBeforeUnmount(() => {
 
                 &:hover {
                     @apply border-blue-500;
-                    .toolsets-wrapper {
-                        @apply block;
-                    }
-                    .board-item .text-wrapper {
-                        max-width: calc(100% - 5rem);
+                }
+
+                &:first-child {
+                    .image-wrapper {
+                        @apply bg-gray-100;
                     }
                 }
             }
@@ -359,56 +421,25 @@ onBeforeUnmount(() => {
                 .image-wrapper {
                     @apply bg-blue-200;
                 }
-            }
-        }
-
-        @screen laptop {
-            &:not(.full-mode) {
-                &.is-max-board-sets {
-                    /* custom design-system component - p-board-item */
-                    :deep(.p-board-item) {
-                        &:last-child {
-                            .board-item {
-                                height: 1.25rem;
-
-                                .bookmark-label {
-                                    @apply hidden;
-                                }
-                            }
-                        }
-                    }
-                }
 
                 /* custom design-system component - p-board-item */
                 :deep(.p-board-item) {
-                    min-height: 3.625rem;
-                    padding: 0.5rem;
-
-                    .board-item {
-                        @apply flex-col;
-                        gap: 0.375rem;
-
+                    &:first-child {
                         .image-wrapper {
-                            width: 1.25rem;
-                            height: 1.25rem;
-
-                            .icon, img {
-                                width: 1.25rem !important;
-                                height: 1.25rem !important;
-                            }
-
-                            .show-more {
-                                @apply bg-transparent;
-                            }
+                            @apply bg-white;
                         }
                     }
                 }
             }
         }
     }
-    .empty {
-        padding-top: 1.125rem;
-        padding-bottom: 1.125rem;
+
+    &.no-data {
+        padding-top: 0;
+        .empty {
+            padding-top: 1.125rem;
+            padding-bottom: 1.125rem;
+        }
     }
 }
 </style>
