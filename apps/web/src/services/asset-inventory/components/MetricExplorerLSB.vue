@@ -509,7 +509,7 @@ onMounted(async () => {
                 height: 2rem;
                 .tree-item {
                     @apply flex items-center w-full;
-                    gap: 0.125rem;
+                    gap: 0.25rem;
 
                     .tree-item-icon {
                         min-width: 0.875rem;
