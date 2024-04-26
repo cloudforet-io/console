@@ -2740,13 +2740,15 @@
 			"COMMON": "Common",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "Add Custom Metric with Query",
+				"ALT_E_CREATE_METRIC": "Failed to create custom metric",
+				"ALT_E_UPDATE_METRIC": "Failed to update custom metric",
+				"ALT_S_CREATE_METRIC": "Custom metric successfully created",
+				"ALT_S_UPDATE_METRIC": "Custom metric successfully updated",
 				"DUPLICATED": "Metric name is duplicated.",
 				"NAME": "Name",
 				"REQUIRED_FIELD": "Required field",
-				"SUCCESSFULLY_ADDED": "Custom metric Successfully created",
 				"UNIT": "Unit",
-				"UPDATE_TITLE": "Edit Query",
-				"VIEW_TITLE": "View Query"
+				"UPDATE_TITLE": "Edit Custom Metric with Query"
 			},
 			"DAILY": "Daily",
 			"DELETE_CUSTOM_METRIC": "Delete Custom Metric",

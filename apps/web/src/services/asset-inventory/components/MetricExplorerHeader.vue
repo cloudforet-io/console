@@ -26,6 +26,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
+import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -42,6 +43,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     metricNameFormModalVisible: false,
+    metricQueryFormModalVisible: false,
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
@@ -55,6 +57,9 @@ const state = reactive({
     ])),
     pageTitle: computed<string|TranslateResult>(() => {
         if (metricExplorerPageState.metric) {
+            if (metricExplorerPageGetters.metricExample) {
+                return metricExplorerPageGetters.metricExample.name;
+            }
             return metricExplorerPageState.metric.name;
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
@@ -181,7 +186,7 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    // TODO: open query editor
+    state.metricQueryFormModalVisible = true;
 };
 </script>
 
@@ -273,6 +278,9 @@ const handleOpenEditQuery = () => {
             </div>
             <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
                                              :type="state.selectedNameFormModalType"
+            />
+            <metric-explorer-query-form-modal :visible.sync="state.metricQueryFormModalVisible"
+                                              mode="UPDATE"
             />
         </template>
     </p-heading>
