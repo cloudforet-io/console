@@ -11,9 +11,11 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
 import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
+import type { MetricDeleteParameters } from '@/schema/inventory/metric/api-verbs/delete';
 import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
@@ -63,6 +65,12 @@ const state = reactive({
             return metricExplorerPageState.metric.name;
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
+    }),
+    deleteModalTitle: computed(() => {
+        if (metricExplorerPageGetters.metricExampleId) {
+            return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC_EXAMPLE');
+        }
+        return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
     }),
     existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
         .map((metric) => metric.name)),
@@ -121,7 +129,7 @@ const duplicateMetric = async () => {
 const deleteCustomMetric = async () => {
     if (!metricExplorerPageState.metric) return;
     try {
-        await SpaceConnector.clientV2.inventory.metric.delete({
+        await SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>({
             metric_id: metricExplorerPageState.metric.metric_id,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
@@ -138,6 +146,20 @@ const deleteCustomMetric = async () => {
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
+    }
+};
+const deleteMetricExample = async () => {
+    try {
+        await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
+            example_id: metricExplorerPageGetters.metricExampleId,
+        });
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: { metricId: metricExplorerPageGetters.metricId },
+        }));
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
     }
 };
 const updateMetricExample = async () => {
@@ -165,8 +187,12 @@ const handleDuplicate = async () => {
 const handleSaveMetricExample = async () => {
     await updateMetricExample();
 };
-const handleDeleteCustomMetric = async () => {
-    await deleteCustomMetric();
+const handleDeleteMetric = async () => {
+    if (metricExplorerPageGetters.metricExampleId) {
+        await deleteMetricExample();
+    } else {
+        await deleteCustomMetric();
+    }
     state.metricDeleteModalVisible = false;
 };
 const handleClickEditName = () => {
@@ -215,10 +241,10 @@ const handleOpenEditQuery = () => {
                                @click.stop="handleClickDeleteMetric"
                 />
             </div>
-            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC')"
+            <delete-modal :header-title="state.deleteModalTitle"
                           :visible.sync="state.metricDeleteModalVisible"
                           :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
-                          @confirm="handleDeleteCustomMetric"
+                          @confirm="handleDeleteMetric"
             />
         </template>
         <template #extra>
