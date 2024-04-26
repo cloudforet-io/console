@@ -48,11 +48,13 @@ const router = useRouter();
 
 <style scoped>
 .empty-summary-data {
-    @apply flex flex-col justify-center items-center;
+    @apply flex flex-col justify-center items-center text-center;
     min-height: 25.25rem;
     height: calc(100% - 1.375rem);
     background-repeat: no-repeat;
     background-position: left;
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
     gap: 0.75rem;
     &.cost {
         background-position: left 1rem center;

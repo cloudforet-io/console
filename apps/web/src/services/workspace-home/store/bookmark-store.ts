@@ -16,6 +16,8 @@ import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import getRandomId from '@/lib/random-id-generator';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { fetchFavicon } from '@/services/workspace-home/composables/use-bookmark';
@@ -172,7 +174,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         createBookmarkLink: async ({ name, link, folder }: { name: string, link: string, folder?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
-                    name: `console:bookmark:${folder}:${name}`,
+                    name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,

@@ -2,7 +2,7 @@
 import { useElementBounding, useElementSize } from '@vueuse/core';
 import { useWindowSize } from '@vueuse/core/index';
 import {
-    computed, reactive, ref, watch,
+    computed, nextTick, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -11,6 +11,8 @@ import {
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { sumBy } from 'lodash';
+
+import { store } from '@/store';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
@@ -26,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const MORE_BUTTON_DEFAULT_WIDTH = 124;
 const FOLDER_DEFAULT_GAP = 4;
-const EXTRA_DEFAULT_WIDTH = 150; // title + gap + divider + create folder button
+const EXTRA_DEFAULT_WIDTH = 151; // title + gap + divider + create folder button
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -45,6 +47,7 @@ const { width: toolboxWidth } = useElementSize(toolboxRef);
 const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
+    language: computed<string>(() => store.state.user.language),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
@@ -87,7 +90,10 @@ const handleClickFullModeButton = () => {
 const handleClickActionButton = (type: BookmarkModalType, isEdit?: boolean, isNew?: boolean) => {
     bookmarkStore.setModalType(type, isEdit, isNew);
 };
-const handleClickFolder = (item: BookmarkItem) => {
+const handleClickFolder = (item: BookmarkItem, isClickedMore?: boolean) => {
+    if (!isClickedMore) {
+        moreState.selectedItems = [];
+    }
     if (storeState.filterByFolder === item.name) {
         bookmarkStore.setSelectedBookmark(undefined);
         return;
@@ -115,16 +121,23 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
         id: item.name,
         name: item.label,
         workspaceId: item.workspaceId,
-    });
+    }, true);
     hideContextMenu();
 };
 
-watch([() => folderItemsRef.value, () => state.folderListMaxWidth, () => props.bookmarkFolderList], ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+watch([
+    () => folderItemsRef,
+    () => state.folderListMaxWidth,
+    () => props.bookmarkFolderList,
+    () => storeState.isFullMode,
+    () => storeState.language,
+], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+    await nextTick();
     if (!folderItemsValue) return;
     const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
-    folderItemsValue.forEach((el) => {
+    folderItemsValue.value?.forEach((el) => {
         if (widthBaseline < folderListWidthWithoutMoreButton) {
             const _width = widthBaseline + useElementSize(el).width.value;
             if (_width > folderListWidthWithoutMoreButton) {
