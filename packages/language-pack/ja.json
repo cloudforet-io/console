@@ -2740,13 +2740,15 @@
 			"COMMON": "",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "",
+				"ALT_E_CREATE_METRIC": "",
+				"ALT_E_UPDATE_METRIC": "",
+				"ALT_S_CREATE_METRIC": "",
+				"ALT_S_UPDATE_METRIC": "",
 				"DUPLICATED": "",
 				"NAME": "名前",
 				"REQUIRED_FIELD": "必須入力項目です。",
-				"SUCCESSFULLY_ADDED": "",
 				"UNIT": "",
-				"UPDATE_TITLE": "",
-				"VIEW_TITLE": ""
+				"UPDATE_TITLE": ""
 			},
 			"DAILY": "日別データ",
 			"DELETE_CUSTOM_METRIC": "",
