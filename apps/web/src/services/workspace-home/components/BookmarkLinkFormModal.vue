@@ -54,6 +54,20 @@ const {
     link: '',
 }, {});
 
+const generateNewFolderName = (existingFolders) => {
+    const folderNumbers = existingFolders
+        .filter((n) => n.name.startsWith(i18n.t('HOME.FORM_NEW_FOLDER')))
+        .map((n) => parseInt(n.name.replace(i18n.t('HOME.FORM_NEW_FOLDER'), '')) || 0)
+        .sort((a, b) => a.name - b.name);
+
+    for (let i = 1; i <= folderNumbers.length; i++) {
+        if (!folderNumbers.includes(i)) {
+            return `${i18n.t('HOME.FORM_NEW_FOLDER')}${i}`;
+        }
+    }
+
+    return `${i18n.t('HOME.FORM_NEW_FOLDER')}${folderNumbers.length + 1}`;
+};
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
     state.selectedFolderIdx = undefined;
@@ -64,7 +78,8 @@ const handleDeselectButton = () => {
 };
 const handleClickNewFolderButton = async () => {
     try {
-        await bookmarkStore.createBookmarkFolder(i18n.t('HOME.FORM_NEW_FOLDER') as string);
+        const newFolder = generateNewFolderName(props.bookmarkFolderList);
+        await bookmarkStore.createBookmarkFolder(newFolder);
         state.selectedFolderIdx = 0;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
