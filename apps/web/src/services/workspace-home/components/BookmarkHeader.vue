@@ -53,6 +53,7 @@ const storeState = reactive({
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
+    isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     folderListMaxWidth: computed<number>(() => containerWidth.value - toolboxWidth.value - EXTRA_DEFAULT_WIDTH),
 
@@ -293,13 +294,13 @@ watch([
             >
                 <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
             </p-button>
-            <p-icon-button v-if="!state.isMobileSize && !storeState.isFullMode"
-                           name="ic_chevron-down"
-                           shape="square"
-                           size="md"
-                           :activated="false"
-                           @click="handleClickFullModeButton"
-            />
+            <p-button v-if="!state.isMobileSize && !storeState.isFullMode"
+                      class="add-link-button"
+                      style-type="tertiary"
+                      @click="handleClickFullModeButton"
+            >
+                <span>{{ $t('HOME.BOOKMARK_VIEW_ALL') }}</span>
+            </p-button>
             <p-icon-button v-else-if="storeState.isFullMode"
                            name="ic_close"
                            shape="square"
