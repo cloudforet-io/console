@@ -5,27 +5,19 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PTreeView,
+    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty,
 } from '@spaceone/design-system';
-import type { TreeNode, TreeDisplayMap } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
 import { isEmpty } from 'lodash';
 
 
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type {
-    CloudServiceTypeItem,
-    CloudServiceTypeReferenceMap,
-} from '@/store/reference/cloud-service-type-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
@@ -34,7 +26,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray, yellow } from '@/styles/colors';
 
-import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
+import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -50,18 +42,10 @@ const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
-    cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
-    cloudServiceTypeToItemMap: computed(() => {
-        const res: Record<string, CloudServiceTypeItem> = {};
-        Object.entries(storeState.cloudServiceTypes).forEach(([, item]) => {
-            res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
-        });
-        return res;
-    }),
-
 });
 
 const state = reactive({
+    loading: false,
     currentPath: computed(() => route.fullPath),
     isDetailPage: computed(() => !!route.params.metricId),
     menuSet: computed(() => {
@@ -114,73 +98,9 @@ const namespaceState = reactive({
         ];
     }),
     selectedNamespace: undefined as NamespaceSubItemType | undefined,
+    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
 });
 
-const metricState = reactive({
-    selectedId: computed<string|undefined>(() => {
-        if (!state.isDetailPage) return undefined;
-        if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
-        return route.params.metricExampleId;
-    }),
-    inputValue: '',
-    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
-    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
-    metricItems: computed<TreeNode[]>(() => metricState.metrics.map((metric) => {
-        const metricTreeNode = {
-            id: metric.key,
-            depth: 0,
-            data: {
-                ...metric,
-                type: 'metric',
-                is_managed: metric.data.is_managed,
-                to: {
-                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                    params: {
-                        metricId: metric.key,
-                    },
-                },
-            },
-        };
-        const examples = metricState.metricExamples.filter((example) => example.metric_id === metric.key);
-        if (examples.length) {
-            return {
-                ...metricTreeNode,
-                children: examples.map((example) => ({
-                    id: example.example_id,
-                    depth: 1,
-                    data: {
-                        ...example,
-                        type: 'example',
-                        to: {
-                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
-                            params: {
-                                metricId: metric.key,
-                                metricExampleId: example.example_id,
-                            },
-                        },
-                    },
-                })),
-            };
-        }
-        return metricTreeNode;
-    })),
-    metricItemsFilterByInput: computed(() => {
-        const keyword = metricState.inputValue.toLowerCase();
-        return metricState.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
-    }),
-    metricExamples: computed(() => metricExplorerPageStore.state.metricExamples),
-    addCustomMetricModalVisible: false,
-    metricTreeDisplayMap: computed<TreeDisplayMap|undefined>(() => {
-        if (!metricState.inputValue) return undefined;
-        const displayMap: TreeDisplayMap = {};
-        metricState.metricItems.forEach((metric) => {
-            displayMap[metric.id] = {
-                isOpen: true,
-            };
-        });
-        return displayMap;
-    }),
-});
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
@@ -220,17 +140,6 @@ const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferen
     });
     return Object.values(namespaceMap);
 };
-const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined => {
-    const provider = namespace.provider;
-    const formattedCloudServiceName = namespace.label.replace('/', ':');
-
-    if (provider) {
-        const key = `${provider}:${formattedCloudServiceName}`;
-        const icon = storeState.cloudServiceTypeToItemMap[key]?.icon;
-        if (icon) return assetUrlConverter(icon);
-    }
-    return undefined;
-};
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
     if (!namespaceState.selectedNamespace) return false;
     return namespaceState.selectedNamespace.name === namespace.name
@@ -242,17 +151,8 @@ const handleSearchNamespace = (keyword: string) => {
     if (keyword) namespaceState.collapsed = false; else namespaceState.collapsed = true;
     namespaceState.inputValue = keyword;
 };
-const handleSearchMetricAndExample = (keyword: string) => {
-    metricState.inputValue = keyword;
-};
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
     namespaceState.selectedNamespace = namespace;
-};
-const handleClickBackToNamespace = () => {
-    namespaceState.selectedNamespace = undefined;
-};
-const handleOpenAddCustomMetricModal = () => {
-    metricState.addCustomMetricModalVisible = true;
 };
 const handleClickBackToHome = () => {
     router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
@@ -266,14 +166,16 @@ watch(() => route.params, (params) => {
 });
 
 onMounted(async () => {
+    state.loading = true;
     await allReferenceStore.load('metric');
     await metricExplorerPageStore.loadMetricExamples();
-    if (!isEmpty(metricState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
+    if (!isEmpty(namespaceState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
-            label: namespaceState.namespaces.find((item) => item.key === metricState.currentMetric?.data.namespace_id).name,
-            name: metricState.currentMetric.data.namespace_id,
+            label: namespaceState.namespaces.find((item) => item.key === namespaceState.currentMetric?.data.namespace_id).name,
+            name: namespaceState.currentMetric.data.namespace_id,
         };
     }
+    state.loading = false;
 });
 
 </script>
@@ -305,7 +207,7 @@ onMounted(async () => {
             </span>
         </template>
         <template #slot-namespace>
-            <p-data-loader :loading="false"
+            <p-data-loader :loading="state.loading"
                            :loader-backdrop-opacity="0.5"
                            :loader-backdrop-color="gray[100]"
                            class="namespace-data-loader"
@@ -378,91 +280,10 @@ onMounted(async () => {
             </p-data-loader>
         </template>
         <template #slot-metric>
-            <p-data-loader :loading="false"
-                           :loader-backdrop-opacity="0.5"
-                           :loader-backdrop-color="gray[100]"
-                           class="metric-data-loader"
-            >
-                <div class="metric-wrapper">
-                    <div class="metric-title-item">
-                        <div class="title-wrapper">
-                            <p-icon-button class="back-button"
-                                           name="ic_arrow-left"
-                                           size="sm"
-                                           @click="handleClickBackToNamespace"
-                            />
-                            <p-lazy-img class="namespace-image"
-                                        :src="getNamespaceImageUrl(namespaceState.selectedNamespace)"
-                                        width="1.25rem"
-                                        height="1.25rem"
-                            />
-                            <p-tooltip class="title"
-                                       :contents="namespaceState.selectedNamespace?.label || ''"
-                            >
-                                <span>{{ namespaceState.selectedNamespace?.label.split('/')[0] }}</span>
-                                <span class="divider">/</span>
-                                <span class="type">{{ namespaceState.selectedNamespace?.label.split('/')[1] }}</span>
-                            </p-tooltip>
-                        </div>
-                        <p-icon-button style-type="tertiary"
-                                       name="ic_plus"
-                                       shape="square"
-                                       size="sm"
-                                       @click="handleOpenAddCustomMetricModal"
-                        />
-                    </div>
-                    <p-search class="metric-search"
-                              :value="metricState.inputValue"
-                              @update:value="handleSearchMetricAndExample"
-                    />
-                    <p-tree-view :tree-data="metricState.metricItemsFilterByInput"
-                                 :selected-id="metricState.selectedId"
-                                 :tree-display-map="metricState.metricTreeDisplayMap"
-                                 use-default-indent
-                    >
-                        <template #content="{ node }">
-                            <div class="tree-menu-item-content">
-                                <div class="tree-item">
-                                    <p-i v-if="node.data.type === 'metric'"
-                                         class="tree-item-icon"
-                                         :name="node.data.is_managed ? 'ic_main-filled': 'ic_sub'"
-                                         width="0.875rem"
-                                         height="0.875rem"
-                                         :color="gray[500]"
-                                    />
-                                    <p-i v-else
-                                         class="tree-item-icon"
-                                         name="ic_example-filled"
-                                         width="0.875rem"
-                                         height="0.875rem"
-                                         :color="gray[700]"
-                                    />
-                                    <p-text-highlighting class="tree-item-name"
-                                                         :term="metricState.inputValue"
-                                                         :text="node.data.name"
-                                    />
-                                </div>
-                                <favorite-button :item-id="node.id"
-                                                 :favorite-type="node.data.type === 'metric' ? FAVORITE_TYPE.METRIC : FAVORITE_TYPE.METRIC_EXAMPLE"
-                                                 scale="0.8"
-                                                 class="favorite-button"
-                                />
-                            </div>
-                        </template>
-                    </p-tree-view>
-                    <p-empty v-if="metricState.inputValue && !metricState.metricItemsFilterByInput.length"
-                             class="keyword-search-empty"
-                    >
-                        <span>
-                            {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
-                        </span>
-                    </p-empty>
-                </div>
-            </p-data-loader>
+            <metric-explorer-l-s-b-metric :selected-namespace.sync="namespaceState.selectedNamespace"
+                                          :is-detail-page="state.isDetailPage"
+            />
         </template>
-        <metric-explorer-query-form-modal :visible.sync="metricState.addCustomMetricModalVisible"
-                                          mode="CREATE"
-        />
     </l-s-b>
 </template>
 
@@ -494,78 +315,6 @@ onMounted(async () => {
                     .text {
                         @apply text-label-md overflow-hidden whitespace-no-wrap;
                         text-overflow: ellipsis;
-                    }
-                }
-            }
-        }
-    }
-    .metric-data-loader {
-        min-height: 15rem;
-
-        .metric-wrapper {
-            @apply flex flex-col;
-
-            .metric-search {
-                margin-bottom: 0.25rem;
-            }
-
-            .tree-menu-item-content {
-                @apply flex items-center justify-between w-full;
-                height: 2rem;
-                .tree-item {
-                    @apply flex items-center w-full;
-                    gap: 0.25rem;
-
-                    .tree-item-icon {
-                        min-width: 0.875rem;
-                    }
-                    .tree-item-name {
-                        @apply text-label-md text-gray-900;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-                }
-                .favorite-button {
-                    display: none;
-                    min-width: 1.5rem;
-                    height: 1rem;
-                    padding-left: 0.5rem;
-                }
-
-                &:hover {
-                    .tree-item {
-                        width: calc(100% - 1.5rem);
-                    }
-                    .favorite-button {
-                        display: block;
-                    }
-                }
-            }
-
-            .metric-title-item {
-                @apply flex items-center justify-between w-full;
-                margin-bottom: 0.5rem;
-
-                .title-wrapper {
-                    @apply inline-flex items-center gap-1 truncate;
-                    width: calc(100% - 2rem);
-
-                    .namespace-image {
-                        min-width: 1.25rem;
-                    }
-
-                    .title {
-                        @apply text-label-md truncate;
-
-                        .divider {
-                            @apply text-gray-500;
-                            margin: 0 0.125rem;
-                        }
-
-                        .type {
-                            @apply font-bold;
-                        }
                     }
                 }
             }
