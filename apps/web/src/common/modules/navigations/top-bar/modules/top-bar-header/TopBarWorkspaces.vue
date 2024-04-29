@@ -134,6 +134,10 @@ const handleClickAllWorkspaceButton = () => {
         name: LANDING_ROUTE._NAME,
     });
 };
+const checkFavoriteItem = (id: string) => {
+    const item = storeState.favoriteItems.find((i) => i.name === id);
+    return !!item;
+};
 
 watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
     if (!selectedWorkspace) return;
@@ -214,7 +218,9 @@ onMounted(() => {
                 </p-tooltip>
             </template>
             <template #menu-item--format="{item}">
-                <div class="menu-item-wrapper">
+                <div class="menu-item-wrapper"
+                     :class="{ 'is-starred': checkFavoriteItem(item.name)}"
+                >
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="item?.tags?.theme"
@@ -349,7 +355,16 @@ onMounted(() => {
         .menu-item-wrapper {
             @apply flex justify-between;
             max-width: 18rem;
-
+            &.is-starred {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
+            &:hover {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
             .label {
                 @apply flex items-center gap-2;
             }
@@ -360,10 +375,8 @@ onMounted(() => {
         }
 
         .workspace-toolbox-wrapper {
-            @apply absolute flex flex-col bg-white;
+            @apply flex flex-col bg-white;
             padding: 0.25rem 1rem 0.5rem;
-            bottom: 0;
-            left: 0;
             width: 100%;
             gap: 0.625rem;
             .workspace-toolbox {
@@ -388,8 +401,7 @@ onMounted(() => {
             .menu-container {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
-                padding-bottom: 2.75rem;
-                max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
+                max-height: calc(100vh - $top-bar-height - 7.1rem) !important;
             }
             .p-context-menu-item {
                 .favorite-button {
@@ -417,7 +429,7 @@ onMounted(() => {
             /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
                 .menu-container {
-                    padding-bottom: 8.35rem;
+                    max-height: calc(100vh - $top-bar-height - 12.85rem) !important;
                 }
             }
         }
