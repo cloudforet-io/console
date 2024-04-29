@@ -171,8 +171,12 @@ export const useProjectTreeData = (): UseProjectTreeDataReturnType => {
     onMounted(async () => {
         await allReferenceStore.load('project_group');
         await allReferenceStore.load('project');
-        init();
     });
+
+    // Whenever loading, creating or changing Proejct/ProjectGroup, update initial treeData
+    watch([() => storeState.projectGroup, () => storeState.project], () => {
+        init();
+    }, { immediate: true });
 
     watch([() => state.selectedTreeNodeId, () => state.treeData], async ([id]) => {
         const itemType = id.startsWith('pg-') ? 'PROJECT_GROUP' : 'PROJECT';
