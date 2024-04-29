@@ -19,6 +19,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -27,7 +28,7 @@ import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData,
+    convertMenuConfigToReferenceData, convertMetricConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
@@ -79,6 +80,7 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
@@ -115,6 +117,13 @@ const state = reactive({
                 name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: FAVORITE_TYPE.CLOUD_SERVICE,
             });
             results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
+        }
+        if (state.favoriteMetricItems.length) {
+            if (results.length !== 0) results.push({ type: 'divider' });
+            results.push({
+                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_METRIC_EXPLORER'), type: 'header', itemType: FAVORITE_TYPE.METRIC,
+            });
+            results.push(...state.favoriteMetricItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteSecurityItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
@@ -195,6 +204,16 @@ const state = reactive({
             favoriteGetters.cloudServiceItems ?? [],
             storeState.cloudServiceTypes,
         ) : [];
+    }),
+    favoriteMetricItems: computed<FavoriteItem[]>(() => {
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, store.getters['user/pageAccessPermissionList']);
+        if (!isUserAccessible) return [];
+        const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
+        // const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
+        return [
+            ...favoriteMetricItems,
+            // ...favoriteMetricExampleItems,
+        ];
     }),
     favoriteProjects: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
