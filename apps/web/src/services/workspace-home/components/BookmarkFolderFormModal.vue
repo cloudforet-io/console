@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
@@ -25,14 +26,14 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
-    filterByFolder: computed<string|undefined>(() => bookmarkState.filterByFolder),
+    filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
 });
 const state = reactive({
     loading: false,
-    bookmark: computed<string|undefined>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
+    bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
 });
 
 const {
@@ -60,7 +61,7 @@ const {
 });
 
 const handleClose = () => {
-    bookmarkStore.setModalType(undefined);
+    bookmarkStore.setModalType(undefined, false, false);
     initForm();
 };
 const handleConfirm = async () => {
@@ -88,7 +89,7 @@ const handleConfirm = async () => {
 
 watch(() => storeState.modal.isEdit, (isEditModal) => {
     if (isEditModal) {
-        setForm('name', state.bookmark || '');
+        setForm('name', state.bookmark as string || '');
     }
 }, { immediate: true });
 </script>

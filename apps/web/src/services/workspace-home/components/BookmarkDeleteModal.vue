@@ -86,7 +86,7 @@ const handleConfirm = async () => {
     }
 };
 const handleClose = () => {
-    bookmarkStore.setModalType(undefined);
+    bookmarkStore.setModalType(undefined, false, false);
 };
 </script>
 

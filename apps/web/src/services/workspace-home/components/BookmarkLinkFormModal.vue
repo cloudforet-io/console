@@ -35,10 +35,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    isDisabled: computed(() => {
-        const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
-        return !urlPattern.test(link.value) || !name.value;
-    }),
     selectedFolderIdx: undefined as number|undefined,
     selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
 });
@@ -49,11 +45,31 @@ const {
     },
     setForm,
     initForm,
+    invalidState,
+    invalidTexts,
+    isAllValid,
 } = useFormValidator({
     name: '',
     link: '',
-}, {});
+}, {
+    name: (value: string) => {
+        if (value.length < 2) return i18n.t('HOME.ALT_E_VALIDATION_NAME');
+        return true;
+    },
+    link: (value: string) => {
+        if (!isValidUrl(value)) return i18n.t('HOME.ALT_E_INVALID_LINK');
+        return true;
+    },
+});
 
+const isValidUrl = (url: string) => {
+    try {
+        new URL(url);
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
 const generateNewFolderName = (existingFolders) => {
     const folderNumbers = existingFolders
         .filter((n) => n.name.startsWith(i18n.t('HOME.FORM_NEW_FOLDER')))
@@ -138,7 +154,7 @@ watch(() => storeState.modal.type, (type) => {
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.LINK"
-                    :disabled="state.isDisabled"
+                    :disabled="!isAllValid"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -148,9 +164,12 @@ watch(() => storeState.modal.type, (type) => {
             <div class="form-contents">
                 <p-field-group label="URL"
                                class="input-form"
+                               :invalid="invalidState.link"
+                               :invalid-text="invalidTexts.link"
                                required
                 >
                     <p-text-input :value="link"
+                                  :invalid="invalidState.link"
                                   class="text-input"
                                   block
                                   @update:value="setForm('link', $event)"
@@ -158,9 +177,12 @@ watch(() => storeState.modal.type, (type) => {
                 </p-field-group>
                 <p-field-group :label="$t('HOME.FORM_NAME')"
                                class="input-form"
+                               :invalid="invalidState.name"
+                               :invalid-text="invalidTexts.name"
                                required
                 >
                     <p-text-input :value="name"
+                                  :invalid="invalidState.name"
                                   class="text-input"
                                   block
                                   @update:value="setForm('name', $event)"
