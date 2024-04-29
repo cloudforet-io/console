@@ -6,7 +6,7 @@ import Vue, {
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDataLoader, PDivider, PButton, screens,
+    PButton, PDataLoader, PDivider, screens,
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
@@ -58,9 +58,17 @@ const storeState = reactive({
     }))),
 });
 const state = reactive({
+    searchText: '',
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
+    searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText !== ''
+        ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText))
+        : storeState.workspaceList)),
+    refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
 });
 
+const handleSearch = (value: string) => {
+    state.searchText = value;
+};
 const handleClickButton = () => {
     appContextStore.enterAdminMode();
     window.open(router.resolve({
@@ -120,12 +128,12 @@ onUnmounted(() => {
                        :data="storeState.workspaceList"
         >
             <div class="contents-wrapper">
-                <landing-search :workspace-list="storeState.workspaceList" />
+                <landing-search @search="handleSearch" />
                 <landing-recent-visits v-if="storeState.recentWorkspace.length > 0"
                                        :workspace-list="storeState.workspaceList"
                                        :recent-visits="storeState.recentWorkspace"
                 />
-                <landing-all-workspaces :workspace-list="storeState.workspaceList"
+                <landing-all-workspaces :workspace-list="state.refinedWorkspaceList"
                                         :favorite-list="storeState.favoriteList"
                                         :is-domain-admin="storeState.isDomainAdmin"
                                         @create="handleClickButton"
