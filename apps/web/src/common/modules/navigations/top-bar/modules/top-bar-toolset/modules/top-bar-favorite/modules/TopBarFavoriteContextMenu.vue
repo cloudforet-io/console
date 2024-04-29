@@ -292,6 +292,13 @@ const handleSelect = (item: FavoriteMenuItem) => {
                 name: itemInfo[2],
             },
         }).catch(() => {});
+    } else if (item.itemType === FAVORITE_TYPE.METRIC) {
+        router.push({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: {
+                metricId: item.name || '',
+            },
+        }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
