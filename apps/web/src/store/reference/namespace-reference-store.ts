@@ -57,7 +57,7 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
         try {
             const response = await SpaceConnector.clientV2.inventory.namespace.list<NamespaceListParameters, ListResponse<NamespaceModel>>({
                 query: {
-                    only: ['namespace_id', 'name', 'provider', 'category'],
+                    only: ['namespace_id', 'name', 'provider', 'category', 'icon'],
                 },
             }, { timeout: 3000 });
 
@@ -69,6 +69,7 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
                     provider: namespaceInfo.provider,
                     data: {
                         category: namespaceInfo.category,
+                        icon: namespaceInfo.icon,
                     },
                 };
             });
@@ -89,6 +90,7 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
                 provider: namespaceInfo.provider,
                 data: {
                     category: namespaceInfo.category,
+                    icon: namespaceInfo.icon,
                 },
             },
         };
