@@ -64,7 +64,7 @@ const state = reactive({
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
+const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
     try {
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
@@ -89,16 +89,17 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
             },
         });
         if (status === 'succeed') return response;
-        return { more: false, results: [] };
+        return undefined;
     } catch (e) {
         return { more: false, results: [] };
     }
 };
 const setDataTableData = async () => {
     state.loading = true;
-    const { results, more } = await analyzeMetricData();
-    state.items = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
-    state.more = more ?? false;
+    const res = await analyzeMetricData();
+    if (!res) return;
+    state.items = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+    state.more = res.more;
     state.loading = false;
 };
 
@@ -112,8 +113,9 @@ const handleUpdateThisPage = async () => {
 };
 const handleExport = async () => {
     try {
-        const { results } = await analyzeMetricData(false);
-        const refinedData = getRefinedMetricExplorerTableData(results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+        const res = await analyzeMetricData(false);
+        if (!res) return;
+        const refinedData = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,

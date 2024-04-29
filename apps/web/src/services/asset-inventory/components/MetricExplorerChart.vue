@@ -68,7 +68,7 @@ const state = reactive({
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
-const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>> => {
+const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
         const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy)] : [];
@@ -91,7 +91,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
             },
         });
         if (status === 'succeed') return response;
-        return { more: false, results: [] };
+        return undefined;
     } catch (e) {
         return { more: false, results: [] };
     }
@@ -100,6 +100,7 @@ const setChartData = debounce(async () => {
     state.loading = true;
 
     const rawData = await analyzeMetricData();
+    if (!rawData) return;
     state.data = rawData;
 
     const _granularity = metricExplorerPageState.granularity;
