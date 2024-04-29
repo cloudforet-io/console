@@ -102,7 +102,7 @@ const confirm = async () => {
         name: projectGroupName.value,
     };
 
-    if (!props.updateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
+    if (!props.updateMode) await createProjectGroup({ ...params, parent_group_id: props.projectGroupId } as ProjectGroupCreateParameters);
     else await updateProjectGroup({ ...params, project_group_id: props.projectGroupId as string });
 
     emit('confirm');
