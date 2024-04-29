@@ -20,21 +20,19 @@ import { indigo, peacock } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 interface Props {
     item?: ReferenceData;
-    isHiddenFavoriteButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
-    isHiddenFavoriteButton: false,
 });
 
-const router = useRouter();
+const workspaceHomePageStore = useWorkspaceHomePageStore();
 
-const emit = defineEmits<{(e: 'click-favorite'): void;
-}>();
+const router = useRouter();
 
 const state = reactive({
     iconColor: computed<string|undefined>(() => {
@@ -48,6 +46,9 @@ const state = reactive({
     }),
 });
 
+const handleClickFavorite = () => {
+    workspaceHomePageStore.fetchFavoriteList();
+};
 const handleClickItem = () => {
     if (!props.item) return;
     const itemName = props.item.name as string;
@@ -152,12 +153,11 @@ const handleClickItem = () => {
             />
         </span>
         <favorite-button
-            v-if="!props.isHiddenFavoriteButton"
             :item-id="props.item?.itemId"
             :favorite-type="props.item?.itemType"
             scale="0.8"
             class="favorite-button"
-            @click-favorite="emit('click-favorite')"
+            @click-favorite="handleClickFavorite"
         />
     </div>
 </template>

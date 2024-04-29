@@ -26,7 +26,6 @@ const props = withDefaults(defineProps<Props>(), {
     bookmarkFolderList: undefined,
 });
 
-const MORE_BUTTON_DEFAULT_WIDTH = 124;
 const FOLDER_DEFAULT_GAP = 4;
 const EXTRA_DEFAULT_WIDTH = 151; // title + gap + divider + create folder button
 
@@ -44,7 +43,7 @@ const moreContextMenuRef = ref<any|null>(null);
 
 const { width: containerWidth } = useElementSize(componentRef);
 const { width: toolboxWidth } = useElementSize(toolboxRef);
-const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
+const { top: moreButtonTop, height: moreButtonHeight, width: moreButtonWidth } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
@@ -136,7 +135,7 @@ watch([
 ], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
     await nextTick();
     if (!folderItemsValue) return;
-    const folderListWidthWithoutMoreButton = folderListMaxWidth - MORE_BUTTON_DEFAULT_WIDTH;
+    const folderListWidthWithoutMoreButton = folderListMaxWidth - moreButtonWidth.value;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
     folderItemsValue.value?.forEach((el) => {

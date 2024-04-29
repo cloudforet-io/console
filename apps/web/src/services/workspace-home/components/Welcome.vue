@@ -44,7 +44,7 @@ const handleClickButton = () => {
     background-size: cover;
     background-image: url("@/assets/images/img_blurred-background.png");
     .title {
-        @apply text-display-lg text-violet-700;
+        @apply text-display-md text-violet-700;
     }
     .desc {
         @apply text-paragraph-lg text-gray-600 text-center;

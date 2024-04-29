@@ -145,7 +145,7 @@ const handleClose = () => {
 <style scoped lang="postcss">
 .bookmark-delete-modal {
     .content {
-        @apply overflow-y-scroll;
+        @apply overflow-y-auto;
         max-height: 16rem;
         .content-wrapper {
             @apply flex items-center bg-gray-100 border border-gray-200 rounded-xl;

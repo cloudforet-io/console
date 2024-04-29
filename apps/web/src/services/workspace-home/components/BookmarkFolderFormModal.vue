@@ -125,8 +125,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
             </div>
         </template>
         <template #confirm-button>
-            <span v-if="storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_EDIT') }}</span>
-            <span v-else>{{ $t('HOME.BOOKMARK_CREATE') }}</span>
+            <span v-if="!storeState.modal.isEdit">{{ $t('HOME.BOOKMARK_CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

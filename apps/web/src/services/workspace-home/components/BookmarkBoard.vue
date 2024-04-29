@@ -65,7 +65,7 @@ const state = reactive({
             {
                 icon: 'ic_delete',
                 name: 'delete',
-                label: i18n.t('HOME.BOOKMARK_REMOVE'),
+                label: i18n.t('HOME.BOOKMARK_DELETE'),
             },
         ];
         if (props.isFolderBoard) {
@@ -231,7 +231,8 @@ onBeforeUnmount(() => {
                     >
                         <p-icon-button name="ic_ellipsis-horizontal"
                                        size="md"
-                                       :color="props.isFullMode ? blue[600] : gray[600]"
+                                       style-type="transparent"
+                                       :color="gray[600]"
                                        @click.stop="handleClickDropdownButton(board)"
                         />
                         <p-context-menu v-if="state.menuVisible"
@@ -263,7 +264,8 @@ onBeforeUnmount(() => {
         :deep(.p-board-item) {
             @apply relative border-none;
             padding: 0;
-            min-height: initial;
+            min-height: 3.5rem;
+            max-height: 3.5rem;
             box-shadow: none;
             border-radius: 0.75rem;
 
@@ -325,8 +327,8 @@ onBeforeUnmount(() => {
             }
 
             .toolsets-wrapper {
-                @apply absolute hidden bg-blue-300 rounded-full;
-                top: 1rem;
+                @apply absolute hidden rounded-full;
+                top: 0.75rem;
                 right: 0.5rem;
                 width: 2rem;
                 height: 2rem;
@@ -349,9 +351,6 @@ onBeforeUnmount(() => {
     &.collapsed-board {
         .bookmark-board-wrapper {
             @apply grid-cols-7;
-            .toolsets-wrapper {
-                @apply bg-white;
-            }
         }
 
         @screen tablet {
@@ -366,7 +365,8 @@ onBeforeUnmount(() => {
                 :deep(.p-board-item) {
                     &:last-child {
                         .board-item {
-                            height: 1.25rem;
+                            @apply items-center justify-center;
+                            padding-top: 0.875rem;
 
                             .bookmark-label {
                                 @apply hidden;
@@ -382,15 +382,13 @@ onBeforeUnmount(() => {
                         @apply hidden;
                     }
                     .board-item .text-wrapper {
-                        max-width: calc(100% - 3rem);
+                        max-width: calc(100% - 1.5rem);
                     }
                 }
             }
 
             /* custom design-system component - p-board-item */
             :deep(.p-board-item) {
-                min-height: 3.625rem;
-
                 .board-item {
                     @apply flex-col;
                     padding: 0.5rem;

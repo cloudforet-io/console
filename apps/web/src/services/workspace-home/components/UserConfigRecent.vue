@@ -97,7 +97,6 @@ const convertRecentToReferenceData = (recentConfig: ConfigData): ReferenceData =
             <user-configs-item v-for="(item, idx) in state.recentList"
                                :key="`recent-list-${idx}`"
                                :item="item"
-                               is-hidden-favorite-button
             />
         </div>
     </div>

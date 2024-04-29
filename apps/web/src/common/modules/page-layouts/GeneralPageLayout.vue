@@ -1,9 +1,19 @@
 <script lang="ts" setup>
 import FNB from '@/common/modules/navigations/FNB.vue';
+
+interface Props {
+    isCentered?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isCentered: false,
+});
 </script>
 
 <template>
-    <div class="general-page-layout">
+    <div class="general-page-layout"
+         :class="{ 'is-centered': props.isCentered }"
+    >
         <portal-target name="page-top-notification" />
         <div class="header">
             <slot name="handbook" />
@@ -37,8 +47,6 @@ import FNB from '@/common/modules/navigations/FNB.vue';
         width: 100%;
         flex-grow: 1;
         padding: 0 1.5rem 2rem 1.5rem;
-        margin-right: auto;
-        margin-left: auto;
         max-width: 1920px;
 
         &.without-breadcrumbs {
@@ -47,6 +55,13 @@ import FNB from '@/common/modules/navigations/FNB.vue';
     }
     .fnb {
         width: 100%;
+    }
+
+    &.is-centered {
+        .page-contents {
+            margin-right: auto;
+            margin-left: auto;
+        }
     }
 }
 </style>
