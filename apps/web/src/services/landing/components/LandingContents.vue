@@ -74,7 +74,7 @@ const handleClickButton = () => {
     window.open(router.resolve({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
-            hasNoWorkpspace: 'true',
+            hasNoWorkspace: 'true',
         },
     }).href, '_blank');
     Vue.notify({

@@ -86,7 +86,7 @@ const handleClickButton = (hasNoWorkspace?: string) => {
     router.push({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
-            hasNoWorkpspace: hasNoWorkspace,
+            hasNoWorkspace,
         },
     });
     Vue.notify({

@@ -110,7 +110,7 @@ const { callApiWithGrantGuard } = useGrantScopeGuard(['DOMAIN'], () => refreshWo
 callApiWithGrantGuard();
 
 onMounted(() => {
-    if (route.query.hasNoWorkpspace === 'true') {
+    if (route.query.hasNoWorkspace === 'true') {
         handleCreateWorkspace();
     }
 });
