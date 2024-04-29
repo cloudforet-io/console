@@ -23,6 +23,7 @@ import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helper
 import type {
     Granularity, Operator, Period, RelativePeriod,
     StaticGroupBy,
+    QueryFormMode,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -47,6 +48,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
+        // query form sidebar
+        metricQueryFormMode: 'CREATE' as QueryFormMode,
+        showMetricQueryFormSidebar: false,
     });
     const getters = reactive({
         metricId: computed<string|undefined>(() => route.params.metricId),
@@ -106,6 +110,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setRefreshMetricData = (refreshMetricData: boolean) => {
         state.refreshMetricData = refreshMetricData;
     };
+    const setShowMetricQueryFormSidebar = (showMetricQueryFormSidebar: boolean) => {
+        state.showMetricQueryFormSidebar = showMetricQueryFormSidebar;
+    };
 
     /* Actions */
     const reset = () => {
@@ -147,11 +154,16 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             console.error(e);
         }
     };
+    const openMetricQueryFormSidebar = (mode: QueryFormMode) => {
+        state.metricQueryFormMode = mode;
+        state.showMetricQueryFormSidebar = true;
+    };
 
     const actions = {
         reset,
         loadMetric,
         loadMetricExamples,
+        openMetricQueryFormSidebar,
     };
     const mutations = {
         setGranularity,
@@ -162,6 +174,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setFilters,
         setSelectedOperator,
         setRefreshMetricData,
+        setShowMetricQueryFormSidebar,
     };
 
     return {
