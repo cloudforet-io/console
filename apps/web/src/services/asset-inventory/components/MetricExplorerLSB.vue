@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PI, PLazyImg, PSearch, PIconButton, PTooltip, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PTreeView,
 } from '@spaceone/design-system';
-import type { TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
+import type { TreeNode, TreeDisplayMap } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
 import { isEmpty } from 'lodash';
 
 
@@ -37,13 +37,7 @@ import { gray, yellow } from '@/styles/colors';
 import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-
-
-interface NamespaceSubItemType {
-    label: string;
-    name: string;
-    provider?: string;
-}
+import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
 
 const route = useRoute();
 const router = useRouter();
@@ -131,12 +125,7 @@ const metricState = reactive({
     inputValue: '',
     currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
     metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === namespaceState.selectedNamespace?.name)),
-    metricsFilteredByInput: computed(() => {
-        const keyword = metricState.inputValue.toLowerCase();
-        if (!keyword) return metricState.metrics;
-        return metricState.metrics.filter((metric) => metric.name.toLowerCase().includes(keyword));
-    }),
-    metricItems: computed<TreeNode[]>(() => metricState.metricsFilteredByInput.map((metric) => {
+    metricItems: computed<TreeNode[]>(() => metricState.metrics.map((metric) => {
         const metricTreeNode = {
             id: metric.key,
             depth: 0,
@@ -175,8 +164,22 @@ const metricState = reactive({
         }
         return metricTreeNode;
     })),
+    metricItemsFilterByInput: computed(() => {
+        const keyword = metricState.inputValue.toLowerCase();
+        return metricState.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
+    }),
     metricExamples: computed(() => metricExplorerPageStore.state.metricExamples),
     addCustomMetricModalVisible: false,
+    metricTreeDisplayMap: computed<TreeDisplayMap|undefined>(() => {
+        if (!metricState.inputValue) return undefined;
+        const displayMap: TreeDisplayMap = {};
+        metricState.metricItems.forEach((metric) => {
+            displayMap[metric.id] = {
+                isOpen: true,
+            };
+        });
+        return displayMap;
+    }),
 });
 
 /* Helper */
@@ -239,7 +242,7 @@ const handleSearchNamespace = (keyword: string) => {
     if (keyword) namespaceState.collapsed = false; else namespaceState.collapsed = true;
     namespaceState.inputValue = keyword;
 };
-const handleSearchMetric = (keyword: string) => {
+const handleSearchMetricAndExample = (keyword: string) => {
     metricState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
@@ -410,10 +413,11 @@ onMounted(async () => {
                     </div>
                     <p-search class="metric-search"
                               :value="metricState.inputValue"
-                              @update:value="handleSearchMetric"
+                              @update:value="handleSearchMetricAndExample"
                     />
-                    <p-tree-view :tree-data="metricState.metricItems"
+                    <p-tree-view :tree-data="metricState.metricItemsFilterByInput"
                                  :selected-id="metricState.selectedId"
+                                 :tree-display-map="metricState.metricTreeDisplayMap"
                                  use-default-indent
                     >
                         <template #content="{ node }">
@@ -433,9 +437,10 @@ onMounted(async () => {
                                          height="0.875rem"
                                          :color="gray[700]"
                                     />
-                                    <span class="tree-item-name">
-                                        {{ node.data.name }}
-                                    </span>
+                                    <p-text-highlighting class="tree-item-name"
+                                                         :term="metricState.inputValue"
+                                                         :text="node.data.name"
+                                    />
                                 </div>
                                 <favorite-button :item-id="node.id"
                                                  :favorite-type="node.data.type === 'metric' ? FAVORITE_TYPE.METRIC : FAVORITE_TYPE.METRIC_EXAMPLE"
@@ -445,7 +450,7 @@ onMounted(async () => {
                             </div>
                         </template>
                     </p-tree-view>
-                    <p-empty v-if="metricState.inputValue && !metricState.metricItems.length"
+                    <p-empty v-if="metricState.inputValue && !metricState.metricItemsFilterByInput.length"
                              class="keyword-search-empty"
                     >
                         <span>

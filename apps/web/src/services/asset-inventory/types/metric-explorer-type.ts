@@ -64,3 +64,9 @@ export interface RealtimeChartData {
     background_color?: string;
     font_color?: string;
 }
+
+export interface NamespaceSubItemType {
+    label: string;
+    name: string;
+    provider?: string;
+}
