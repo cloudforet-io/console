@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PBoard, PLazyImg, PI, PIconButton, PContextMenu, PEmpty,
+    PBoard, PLazyImg, PI, PIconButton, PContextMenu, PEmpty, PCheckbox,
 } from '@spaceone/design-system';
 import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
@@ -175,18 +175,11 @@ onBeforeUnmount(() => {
                      class="board-item"
                      :class="{'selected': checkSelectedId(board.id)}"
                 >
-                    <span v-if="props.isFullMode && !board.icon"
-                          class="checkbox-wrapper"
-                          @click.stop.prevent="handleClickCheckBox(board)"
-                    >
-                        <input type="checkbox">
-                        <p-i width="1.25rem"
-                             height="1.25rem"
-                             class="check-icon"
-                             :color="checkSelectedId(board.id) ? undefined : 'inherit transparent'"
-                             :name="!checkSelectedId(board.id) ? 'ic_checkbox' : 'ic_checkbox-selected'"
-                        />
-                    </span>
+                    <p-checkbox v-if="props.isFullMode && !board.icon"
+                                :value="true"
+                                :selected="checkSelectedId(board.id)"
+                                @change="handleClickCheckBox(board)"
+                    />
                     <div v-if="props.isFolderBoard"
                          class="image-wrapper"
                     >
@@ -298,19 +291,6 @@ onBeforeUnmount(() => {
 
                 &:hover {
                     @apply bg-white border border-blue-500;
-                }
-
-                .checkbox-wrapper {
-                    input {
-                        position: absolute;
-                        opacity: 0;
-                        cursor: pointer;
-                        height: 0;
-                        width: 0;
-                    }
-                    .check-icon {
-                        @apply text-gray-400 cursor-pointer;
-                    }
                 }
 
                 .image-wrapper {
