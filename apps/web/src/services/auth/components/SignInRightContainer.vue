@@ -2,26 +2,9 @@
     <div class="sign-in-right-container">
         <div class="form-wrapper">
             <div class="headline-wrapper">
-                <div class="block mobile:hidden">
-                    <p class="title">
-                        {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
-                    </p>
-                    <p class="subtitle">
-                        {{ $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
-                    </p>
-                </div>
-
-                <div class="hidden mobile:flex">
-                    <img v-if="symbolImage"
-                         class="logo-character"
-                         :src="symbolImage"
-                    >
-                    <img v-else
-                         class="logo-character"
-                         src="@/assets/images/brand/brand_logo.png"
-                    >
-                </div>
-
+                <p class="title">
+                    {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
+                </p>
                 <div v-if="showErrorMessage"
                      class="error-msg-box"
                 >
@@ -86,7 +69,6 @@ export default {
 
 <style lang="postcss" scoped>
 .sign-in-right-container {
-    @apply bg-white;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -94,15 +76,13 @@ export default {
     padding: 2.5rem;
 
     .form-wrapper {
+        @apply border border-gray-200 rounded-lg;
         position: relative;
-        width: 100%;
-        margin: auto 2.5rem;
         align-self: center;
-
-        @screen xs {
-            width: 25rem;
-            margin: auto;
-        }
+        background-color: white;
+        width: 28.5rem;
+        margin: auto;
+        padding: 2rem;
 
         .headline-wrapper {
             @apply relative;
@@ -115,12 +95,8 @@ export default {
                 margin-right: auto;
             }
             .title {
-                @apply text-display-lg text-primary1;
-            }
-            .subtitle {
-                @apply text-paragraph-md text-gray-400;
-                padding-bottom: 2.375rem;
-                margin-top: 0.5rem;
+                @apply text-display-md text-gray-900 font-bold;
+                margin-bottom: 1.5rem;
             }
             .error-msg-box {
                 @apply absolute bg-red-100 text-red-500 rounded;
@@ -145,29 +121,15 @@ export default {
                 }
             }
         }
-        .sign-in-button-wrapper {
-            @apply text-blue-700;
-            display: block;
-            font-size: 0.875rem;
-            line-height: 1.4;
-            cursor: pointer;
-            margin-top: 5.375rem;
+    }
 
-            @screen mobile {
-                text-align: center;
-            }
+    @screen mobile {
+        padding: 2rem 1.5rem;
 
-            &:hover {
-                text-decoration: underline;
-            }
-
-            .admin-icon {
-                @apply rounded-2xl;
-                margin-right: 0.5rem;
-            }
-            .user-icon {
-                margin-right: 0.5rem;
-            }
+        .form-wrapper {
+            width: 100%;
+            margin-top: 5.75rem;
+            padding: 2rem 1rem;
         }
     }
 }
