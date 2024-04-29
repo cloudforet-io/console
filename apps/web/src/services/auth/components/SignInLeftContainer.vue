@@ -61,7 +61,6 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .sign-in-left-container {
-    @apply bg-primary4;
     display: none;
     flex-direction: column;
     justify-content: space-between;
