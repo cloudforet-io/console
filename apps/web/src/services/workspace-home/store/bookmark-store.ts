@@ -43,6 +43,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         bookmarkData: [] as BookmarkItem[],
         filterByFolder: undefined as string|undefined|TranslateResult,
         selectedBookmark: undefined as BookmarkItem|undefined,
+        selectedBookmarks: [] as BookmarkItem[],
         isFullMode: false,
         isFileFullMode: false,
         modal: {
@@ -97,6 +98,12 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
             state.selectedBookmark = bookmark;
         },
+        setSelectedBookmarks: (items: BookmarkItem[]) => {
+            state.selectedBookmarks = items;
+        },
+        deleteSelectedId: (idx: number) => {
+            state.selectedBookmarks.splice(idx, 1);
+        },
     };
 
 
@@ -112,6 +119,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 isEdit: undefined,
                 type: undefined,
             };
+            state.selectedBookmarks = [];
         },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()

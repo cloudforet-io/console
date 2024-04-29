@@ -1786,6 +1786,7 @@
 		"BOOKMARK_EDIT_LINK": "Edit Link",
 		"BOOKMARK_MORE": "More",
 		"BOOKMARK_REMOVE": "Remove",
+		"BOOKMARK_SELECTED": "{count} selected",
 		"BOOKMARK_TITLE": "Added Link",
 		"BOOKMARK_VIEW_ALL": "View All",
 		"CONFIG_RECENT_TITLE": "Most recent",

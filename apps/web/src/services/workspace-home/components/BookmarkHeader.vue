@@ -51,6 +51,7 @@ const storeState = reactive({
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+    selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
     isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
@@ -158,6 +159,9 @@ watch([
     });
     state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
 });
+watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
+    bookmarkStore.setSelectedBookmarks([]);
+});
 </script>
 
 <template>
@@ -165,6 +169,23 @@ watch([
          class="bookmark-header"
          :class="{'full-mode': storeState.isFullMode}"
     >
+        <div v-if="storeState.isFullMode && storeState.selectedBookmarks.length > 0"
+             class="selected-ids-wrapper"
+        >
+            <div class="selected-ids">
+                <p-icon-button name="ic_close"
+                               size="sm"
+                               color="inherit"
+                               @click="bookmarkStore.setSelectedBookmarks([])"
+                />
+                <span>{{ $t('HOME.BOOKMARK_SELECTED', {count: storeState.selectedBookmarks.length}) }}</span>
+                <p-icon-button name="ic_delete"
+                               size="sm"
+                               color="inherit"
+                               @click="bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.MULTI_DELETE);"
+                />
+            </div>
+        </div>
         <p-field-title :label="storeState.isFileFullMode ? storeState.filterByFolder : $t('HOME.BOOKMARK_TITLE')"
                        size="lg"
         >
@@ -316,6 +337,20 @@ watch([
 .bookmark-header {
     @apply flex items-center;
     gap: 0.5rem;
+    .selected-ids-wrapper {
+        @apply absolute flex items-center justify-center;
+        top: 0.75rem;
+        left: 50%;
+        .selected-ids {
+            @apply flex items-center bg-gray-100 text-label-md border border-gray-200;
+            height: 2.5rem;
+            padding: 0.5rem;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+            border-radius: 2rem;
+            z-index: 10;
+            gap: 0.25rem;
+        }
+    }
     .bookmark-folders-wrapper {
         @apply flex items-center overflow-hidden;
         .bookmark-folders {

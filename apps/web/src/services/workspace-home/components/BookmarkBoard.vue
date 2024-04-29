@@ -52,6 +52,7 @@ const storeState = reactive({
     bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
+    selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -122,6 +123,21 @@ const handleClickItem = (item) => {
         window.open(item.link, '_blank');
     }
 };
+const handleClickCheckBox = (item: BookmarkItem) => {
+    const idx = storeState.selectedBookmarks.findIndex((i) => item.name === i.name);
+    if (idx === -1) {
+        bookmarkStore.setSelectedBookmarks([
+            ...storeState.selectedBookmarks,
+            item,
+        ]);
+        return;
+    }
+    bookmarkStore.deleteSelectedId(idx);
+};
+const checkSelectedId = (id: string) => {
+    const idx = storeState.selectedBookmarks.findIndex((i) => id === i.name);
+    return idx !== -1;
+};
 
 const handleClickOutside = (event) => {
     if (!props.isFullMode) return;
@@ -158,7 +174,20 @@ onBeforeUnmount(() => {
             <template #item-content="{board}">
                 <div ref="boardItemEl"
                      class="board-item"
+                     :class="{'selected': checkSelectedId(board.id)}"
                 >
+                    <span v-if="props.isFullMode && !board.icon"
+                          class="checkbox-wrapper"
+                          @click.stop.prevent="handleClickCheckBox(board)"
+                    >
+                        <input type="checkbox">
+                        <p-i width="1.25rem"
+                             height="1.25rem"
+                             class="check-icon"
+                             :color="checkSelectedId(board.id) ? undefined : 'inherit transparent'"
+                             :name="!checkSelectedId(board.id) ? 'ic_checkbox' : 'ic_checkbox-selected'"
+                        />
+                    </span>
                     <div v-if="props.isFolderBoard"
                          class="image-wrapper"
                     >
@@ -210,7 +239,7 @@ onBeforeUnmount(() => {
                     >
                         <p-icon-button name="ic_ellipsis-horizontal"
                                        size="md"
-                                       :color="blue[600]"
+                                       :color="props.isFullMode ? blue[600] : gray[600]"
                                        @click.stop="handleClickDropdownButton(board)"
                         />
                         <p-context-menu v-if="state.menuVisible"
@@ -240,14 +269,14 @@ onBeforeUnmount(() => {
 
         /* custom design-system component - p-board-item */
         :deep(.p-board-item) {
-            @apply relative border-gray-150;
-            min-height: 3.5rem;
-            padding: 0.5rem 0.75rem 0.5rem 0.5rem;
-            border-radius: 0.75rem;
+            @apply relative border-none;
+            padding: 0;
+            min-height: initial;
             box-shadow: none;
+            border-radius: 0.75rem;
 
             &:hover {
-                @apply bg-white border border-blue-500;
+                @apply bg-white;
                 box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
                 .board-item .text-wrapper {
                     max-width: calc(100% - 4.5rem);
@@ -262,8 +291,28 @@ onBeforeUnmount(() => {
             }
 
             .board-item {
-                @apply flex items-center;
+                @apply flex items-center border border-gray-150 box-border;
+                min-height: 3.5rem;
+                padding: 0.5rem 0.75rem 0.5rem 0.5rem;
                 gap: 0.5rem;
+                border-radius: 0.75rem;
+
+                &:hover {
+                    @apply bg-white border border-blue-500;
+                }
+
+                .checkbox-wrapper {
+                    input {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                        height: 0;
+                        width: 0;
+                    }
+                    .check-icon {
+                        @apply text-gray-400 cursor-pointer;
+                    }
+                }
 
                 .image-wrapper {
                     @apply flex items-center justify-center;
@@ -298,7 +347,7 @@ onBeforeUnmount(() => {
 
             .toolsets-wrapper {
                 @apply absolute hidden bg-blue-300 rounded-full;
-                top: 0.75rem;
+                top: 1rem;
                 right: 0.5rem;
                 width: 2rem;
                 height: 2rem;
@@ -362,10 +411,10 @@ onBeforeUnmount(() => {
             /* custom design-system component - p-board-item */
             :deep(.p-board-item) {
                 min-height: 3.625rem;
-                padding: 0.5rem;
 
                 .board-item {
                     @apply flex-col;
+                    padding: 0.5rem;
                     gap: 0.375rem;
 
                     .image-wrapper {
@@ -397,10 +446,21 @@ onBeforeUnmount(() => {
             /* custom design-system component - p-board-item */
             :deep(.p-board-item) {
                 @apply border-gray-200;
-                padding: 0.5rem;
+                .board-item {
+                    padding: 0.5rem;
+                    &.selected {
+                        @apply bg-blue-100;
+                    }
+                }
+                .board-item .text-wrapper {
+                    max-width: calc(100% - 4.75rem);
+                }
 
                 &:hover {
                     @apply border-blue-500;
+                    .board-item .text-wrapper {
+                        max-width: calc(100% - 6.5rem);
+                    }
                 }
 
                 &:first-child {
