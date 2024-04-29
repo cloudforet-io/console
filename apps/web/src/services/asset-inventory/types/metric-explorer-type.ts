@@ -8,6 +8,7 @@ import type {
 } from '@/services/asset-inventory/constants/metric-explorer-constant';
 
 
+/* Options */
 export interface Period {
     start?: string;
     end?: string;
@@ -25,12 +26,7 @@ export type StaticGroupBy = typeof STATIC_GROUP_BY[keyof typeof STATIC_GROUP_BY]
 
 export type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 
-export interface MetricNamespace {
-    provider: string;
-    cloud_service_group: string;
-    cloud_service_type: string;
-}
-
+/* Display */
 export type MetricPeriodMenu = typeof METRIC_PERIOD_MENU[keyof typeof METRIC_PERIOD_MENU];
 
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
@@ -42,6 +38,9 @@ export interface Legend {
     disabled?: boolean;
 }
 
+export type QueryFormMode = 'CREATE' | 'UPDATE';
+
+/* Data */
 export type MetricDataAnalyzeResult = {
     [groupBy: string]: string | any;
     count?: Array<{ date: string; value: number; }>;
