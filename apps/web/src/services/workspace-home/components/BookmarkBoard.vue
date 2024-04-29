@@ -140,7 +140,6 @@ const checkSelectedId = (id: string) => {
 };
 
 const handleClickOutside = (event) => {
-    if (!props.isFullMode) return;
     if (!event.relatedTarget) {
         state.menuVisible = false;
     }

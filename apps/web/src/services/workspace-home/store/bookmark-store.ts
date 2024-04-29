@@ -186,7 +186,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 throw e;
             }
         },
-        createBookmarkLink: async ({ name, link, folder }: { name: string, link: string, folder?: string}) => {
+        createBookmarkLink: async ({ name, link, folder }: { name?: string|TranslateResult, link?: string, folder?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
@@ -229,7 +229,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
         },
         updateBookmarkLink: async ({
             id, name, link, folder,
-        }: { id: string, name: string, link: string, folder?: string}) => {
+        }: { id: string, name?: string|TranslateResult, link?: string, folder?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
                     name: id,
