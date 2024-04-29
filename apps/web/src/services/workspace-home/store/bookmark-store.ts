@@ -63,8 +63,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 });
             } else {
                 filteredList = state.bookmarkData.filter((i) => !i.folder);
+                filteredList.unshift(...DefaultBookmarkData);
             }
-            filteredList.unshift(...DefaultBookmarkData);
             return filteredList;
         }),
     });

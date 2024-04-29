@@ -124,7 +124,7 @@ const handleClickItem = (item) => {
     }
 };
 const handleClickCheckBox = (item: BookmarkItem) => {
-    const idx = storeState.selectedBookmarks.findIndex((i) => item.name === i.name);
+    const idx = storeState.selectedBookmarks.findIndex((i) => item.id === i.id);
     if (idx === -1) {
         bookmarkStore.setSelectedBookmarks([
             ...storeState.selectedBookmarks,
@@ -135,7 +135,7 @@ const handleClickCheckBox = (item: BookmarkItem) => {
     bookmarkStore.deleteSelectedId(idx);
 };
 const checkSelectedId = (id: string) => {
-    const idx = storeState.selectedBookmarks.findIndex((i) => id === i.name);
+    const idx = storeState.selectedBookmarks.findIndex((i) => id === i.id);
     return idx !== -1;
 };
 
@@ -496,10 +496,10 @@ onBeforeUnmount(() => {
 
     &.no-data {
         padding-top: 0;
-        .empty {
-            padding-top: 1.125rem;
-            padding-bottom: 1.125rem;
-        }
+    }
+
+    .empty {
+        padding-bottom: 1.125rem;
     }
 }
 </style>

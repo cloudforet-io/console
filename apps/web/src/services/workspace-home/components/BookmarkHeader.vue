@@ -341,6 +341,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         @apply absolute flex items-center justify-center;
         top: 0.75rem;
         left: 50%;
+        transform: translate(-50%);
         .selected-ids {
             @apply flex items-center bg-gray-100 text-label-md border border-gray-200;
             height: 2.5rem;

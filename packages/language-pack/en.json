@@ -1781,6 +1781,7 @@
 		"BOOKMARK_DELETE": "Delete",
 		"BOOKMARK_DELETE_FOLDER_TITLE": "Delete Folder",
 		"BOOKMARK_DELETE_LINK_TITLE": "Delete Link",
+		"BOOKMARK_DELETE_MULTI_ITEMS": "Delete Selected Items",
 		"BOOKMARK_EDIT": "Edit",
 		"BOOKMARK_EDIT_FOLDER": "Edit Folder",
 		"BOOKMARK_EDIT_LINK": "Edit Link",

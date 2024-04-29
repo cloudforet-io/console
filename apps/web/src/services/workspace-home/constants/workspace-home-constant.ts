@@ -4,6 +4,7 @@ import getRandomId from '@/lib/random-id-generator';
 export const BOOKMARK_MODAL_TYPE = {
     FOLDER: 'folder',
     LINK: 'link',
+    MULTI_DELETE: 'multiDelete',
     DELETE_FOLDER: 'deleteFolder',
     DELETE_LINK: 'deleteLink',
 } as const;
