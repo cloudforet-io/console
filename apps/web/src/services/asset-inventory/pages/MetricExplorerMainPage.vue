@@ -227,9 +227,15 @@ const fetchRecentList = async () => {
                 grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
                 grid-template-rows: auto;
 
+                /* custom design-system component - p-card */
+                :deep(.p-card) {
+                    .body {
+                        height: 100%;
+                    }
+                }
+
                 .recent-card {
                     min-width: 11.25rem;
-                    height: 100%;
                     padding: 0.25rem 0.125rem;
                     cursor: pointer;
 
