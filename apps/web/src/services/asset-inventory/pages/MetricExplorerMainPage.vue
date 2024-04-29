@@ -18,16 +18,17 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-
+import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
-
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
@@ -163,6 +164,7 @@ const fetchRecentList = async () => {
                         </p-card>
                     </div>
                 </div>
+                <metric-explorer-query-form-sidebar v-show="metricExplorerPageState.showMetricQueryFormSidebar" />
             </div>
         </p-pane-layout>
     </div>

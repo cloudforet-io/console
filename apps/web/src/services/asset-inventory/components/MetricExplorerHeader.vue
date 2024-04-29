@@ -28,7 +28,7 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { gray } from '@/styles/colors';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
-import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
+import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -212,7 +212,7 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    state.metricQueryFormModalVisible = true;
+    metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
 };
 </script>
 
@@ -305,9 +305,7 @@ const handleOpenEditQuery = () => {
             <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
                                              :type="state.selectedNameFormModalType"
             />
-            <metric-explorer-query-form-modal :visible.sync="state.metricQueryFormModalVisible"
-                                              mode="UPDATE"
-            />
+            <metric-explorer-query-form-sidebar v-show="metricExplorerPageState.showMetricQueryFormSidebar" />
         </template>
     </p-heading>
 </template>

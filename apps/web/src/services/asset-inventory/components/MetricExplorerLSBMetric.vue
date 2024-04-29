@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, onMounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -21,14 +20,11 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-
-
-
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
-import MetricExplorerQueryFormModal from '@/services/asset-inventory/components/MetricExplorerQueryFormModal.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
+
 
 interface Props {
     selectedNamespace?: NamespaceSubItemType;
@@ -108,7 +104,6 @@ const state = reactive({
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
     metricExamples: computed(() => metricExplorerPageStore.state.metricExamples),
-    addCustomMetricModalVisible: false,
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -140,7 +135,7 @@ const handleClickBackToNamespace = () => {
     state.proxySelectedNamespace = undefined;
 };
 const handleOpenAddCustomMetricModal = () => {
-    state.addCustomMetricModalVisible = true;
+    metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
 };
 const handleSearchMetricAndExample = (keyword: string) => {
     state.inputValue = keyword;
@@ -217,9 +212,6 @@ onMounted(() => {
                 </span>
             </p-empty>
         </div>
-        <metric-explorer-query-form-modal :visible.sync="state.addCustomMetricModalVisible"
-                                          mode="CREATE"
-        />
     </p-data-loader>
 </template>
 
