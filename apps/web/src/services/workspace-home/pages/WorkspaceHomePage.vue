@@ -81,6 +81,7 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
 <template>
     <general-page-layout :key="storeState.currentWorkspaceId"
                          class="workspace-home-page"
+                         is-centered
     >
         <div class="page-contents">
             <workspace-info :access-user-menu="state.accessAppMenu"
@@ -114,4 +115,5 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
         }
     }
 }
+
 </style>

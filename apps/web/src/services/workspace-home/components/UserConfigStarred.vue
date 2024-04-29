@@ -111,7 +111,6 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
             <user-configs-item v-for="(item) in state.slicedFavoriteMenuList"
                                :key="item.itemId"
                                :item="item"
-                               @click-favorite="workspaceHomePageStore.fetchFavoriteList()"
             />
         </div>
         <div v-else
