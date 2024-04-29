@@ -10,4 +10,5 @@ export interface NamespaceModel {
     tags: Tags;
     domain_id: string;
     created_at: string;
+    icon: string;
 }

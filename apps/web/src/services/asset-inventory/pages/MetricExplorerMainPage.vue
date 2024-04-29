@@ -62,7 +62,7 @@ const state = reactive({
         const namespace = storeState.namespace[metric?.data?.namespace_id ?? ''];
         return ({
             id: recent.data.id,
-            icon: '',
+            icon: namespace?.data?.icon,
             label: namespace?.label ?? '',
             metricName: metric?.label ?? '',
         });
