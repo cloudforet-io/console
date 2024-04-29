@@ -52,6 +52,7 @@ const storeState = reactive({
     bookmarkFolderData: computed<BookmarkItem[]>(() => bookmarkState.bookmarkFolderData),
     bookmarkList: computed<BookmarkItem[]>(() => bookmarkGetters.bookmarkList),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
+    selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
@@ -122,6 +123,21 @@ const handleClickItem = (item) => {
         window.open(item.link, '_blank');
     }
 };
+const handleClickCheckBox = (item: BookmarkItem) => {
+    const idx = storeState.selectedBookmarks.findIndex((i) => item.id === i.id);
+    if (idx === -1) {
+        bookmarkStore.setSelectedBookmarks([
+            ...storeState.selectedBookmarks,
+            item,
+        ]);
+        return;
+    }
+    bookmarkStore.deleteSelectedId(idx);
+};
+const checkSelectedId = (id: string) => {
+    const idx = storeState.selectedBookmarks.findIndex((i) => id === i.id);
+    return idx !== -1;
+};
 
 const handleClickOutside = (event) => {
     if (!props.isFullMode) return;
@@ -144,8 +160,7 @@ onBeforeUnmount(() => {
     <div class="bookmark-board"
          :class="{
              [props.isFullMode ? 'full-board' : 'collapsed-board']: true,
-             'no-data': storeState.recentList.length === 0
-                 || (storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0)
+             'no-data': storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0
          }"
     >
         <p-board v-if="props.boardSets.length > 0"
@@ -153,13 +168,26 @@ onBeforeUnmount(() => {
                  selectable
                  :style-type="BOARD_STYLE_TYPE.cards"
                  class="bookmark-board-wrapper"
-                 :class="{'full-mode': props.isFullMode, 'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
+                 :class="{'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
                  @item-click="handleClickItem"
         >
             <template #item-content="{board}">
                 <div ref="boardItemEl"
                      class="board-item"
+                     :class="{'selected': checkSelectedId(board.id)}"
                 >
+                    <span v-if="props.isFullMode && !board.icon"
+                          class="checkbox-wrapper"
+                          @click.stop.prevent="handleClickCheckBox(board)"
+                    >
+                        <input type="checkbox">
+                        <p-i width="1.25rem"
+                             height="1.25rem"
+                             class="check-icon"
+                             :color="checkSelectedId(board.id) ? undefined : 'inherit transparent'"
+                             :name="!checkSelectedId(board.id) ? 'ic_checkbox' : 'ic_checkbox-selected'"
+                        />
+                    </span>
                     <div v-if="props.isFolderBoard"
                          class="image-wrapper"
                     >
@@ -167,7 +195,7 @@ onBeforeUnmount(() => {
                              name="ic_plus"
                              width="1.25rem"
                              height="1.25rem"
-                             :color="blue[800]"
+                             :color="gray[800]"
                         />
                         <p-i v-else
                              name="ic_folder"
@@ -206,12 +234,12 @@ onBeforeUnmount(() => {
                             {{ board.link }}
                         </p>
                     </div>
-                    <div v-if="(props.isFolderBoard && !board.icon) || !props.isFolderBoard"
+                    <div v-if="!board.icon"
                          class="toolsets-wrapper"
                     >
                         <p-icon-button name="ic_ellipsis-horizontal"
                                        size="md"
-                                       :color="blue[600]"
+                                       :color="props.isFullMode ? blue[600] : gray[600]"
                                        @click.stop="handleClickDropdownButton(board)"
                         />
                         <p-context-menu v-if="state.menuVisible"
@@ -235,41 +263,27 @@ onBeforeUnmount(() => {
 <style scoped lang="postcss">
 .bookmark-board {
     padding-top: 1rem;
-    &.no-data {
-        padding-top: 0;
-    }
-    &.collapsed-board {
-        .bookmark-board-wrapper {
-            @apply grid-cols-7;
 
-            @screen tablet {
-                @apply grid-cols-4;
-            }
-        }
-    }
-    &.full-board {
-        .bookmark-board-wrapper {
-            @apply grid-cols-4;
-
-            @screen tablet {
-                @apply grid-cols-1;
-            }
-        }
-    }
     .bookmark-board-wrapper {
         @apply grid gap-2 text-label-md;
 
         /* custom design-system component - p-board-item */
         :deep(.p-board-item) {
-            @apply relative border-gray-150;
-            min-height: 3.5rem;
-            padding: 0.5rem 0.75rem 0.5rem 0.5rem;
-            border-radius: 0.75rem;
+            @apply relative border-none;
+            padding: 0;
+            min-height: initial;
             box-shadow: none;
+            border-radius: 0.75rem;
 
             &:hover {
-                @apply bg-white border border-blue-500;
+                @apply bg-white;
                 box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
+                .board-item .text-wrapper {
+                    max-width: calc(100% - 4.5rem);
+                }
+                .toolsets-wrapper {
+                    @apply block;
+                }
             }
 
             .content {
@@ -277,18 +291,38 @@ onBeforeUnmount(() => {
             }
 
             .board-item {
-                @apply flex items-center;
+                @apply flex items-center border border-gray-150 box-border;
+                min-height: 3.5rem;
+                padding: 0.5rem 0.75rem 0.5rem 0.5rem;
                 gap: 0.5rem;
+                border-radius: 0.75rem;
+
+                &:hover {
+                    @apply bg-white border border-blue-500;
+                }
+
+                .checkbox-wrapper {
+                    input {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                        height: 0;
+                        width: 0;
+                    }
+                    .check-icon {
+                        @apply text-gray-400 cursor-pointer;
+                    }
+                }
 
                 .image-wrapper {
                     @apply flex items-center justify-center;
-                    width: 2.5rem;
-                    height: 2.5rem;
-                    border-radius: 0.75rem;
+                    width: 2rem;
+                    height: 2rem;
+                    border-radius: 0.375rem;
 
                     .icon, img, svg {
-                        width: 1.5rem !important;
-                        height: 1.5rem !important;
+                        width: 1.25rem !important;
+                        height: 1.25rem !important;
                     }
 
                     .show-more {
@@ -313,7 +347,7 @@ onBeforeUnmount(() => {
 
             .toolsets-wrapper {
                 @apply absolute hidden bg-blue-300 rounded-full;
-                top: 0.75rem;
+                top: 1rem;
                 right: 0.5rem;
                 width: 2rem;
                 height: 2rem;
@@ -331,20 +365,107 @@ onBeforeUnmount(() => {
                 }
             }
         }
+    }
 
-        &.full-mode {
+    &.collapsed-board {
+        .bookmark-board-wrapper {
+            @apply grid-cols-7;
+            .toolsets-wrapper {
+                @apply bg-white;
+            }
+        }
+
+        @screen tablet {
+            .bookmark-board-wrapper {
+                @apply grid-cols-4;
+            }
+        }
+
+        @screen laptop {
+            .bookmark-board-wrapper {
+                /* custom design-system component - p-board-item */
+                :deep(.p-board-item) {
+                    &:last-child {
+                        .board-item {
+                            height: 1.25rem;
+
+                            .bookmark-label {
+                                @apply hidden;
+                            }
+                        }
+                    }
+                    &:hover {
+                        .toolsets-wrapper {
+                            @apply hidden;
+                        }
+                    }
+                    .toolsets-wrapper {
+                        @apply hidden;
+                    }
+                    .board-item .text-wrapper {
+                        max-width: calc(100% - 3rem);
+                    }
+                }
+            }
+
+            /* custom design-system component - p-board-item */
+            :deep(.p-board-item) {
+                min-height: 3.625rem;
+
+                .board-item {
+                    @apply flex-col;
+                    padding: 0.5rem;
+                    gap: 0.375rem;
+
+                    .image-wrapper {
+                        width: 1.25rem;
+                        height: 1.25rem;
+
+                        .icon, img {
+                            width: 1.25rem !important;
+                            height: 1.25rem !important;
+                        }
+
+                        .show-more {
+                            @apply bg-transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.full-board {
+        .bookmark-board-wrapper {
+            @apply grid-cols-4;
+
+            @screen tablet {
+                @apply grid-cols-1;
+            }
+
             /* custom design-system component - p-board-item */
             :deep(.p-board-item) {
                 @apply border-gray-200;
-                padding: 0.5rem;
+                .board-item {
+                    padding: 0.5rem;
+                    &.selected {
+                        @apply bg-blue-100;
+                    }
+                }
+                .board-item .text-wrapper {
+                    max-width: calc(100% - 4.75rem);
+                }
 
                 &:hover {
                     @apply border-blue-500;
-                    .toolsets-wrapper {
-                        @apply block;
-                    }
                     .board-item .text-wrapper {
-                        max-width: calc(100% - 5rem);
+                        max-width: calc(100% - 6.5rem);
+                    }
+                }
+
+                &:first-child {
+                    .image-wrapper {
+                        @apply bg-gray-100;
                     }
                 }
             }
@@ -360,55 +481,24 @@ onBeforeUnmount(() => {
                 .image-wrapper {
                     @apply bg-blue-200;
                 }
-            }
-        }
-
-        @screen laptop {
-            &:not(.full-mode) {
-                &.is-max-board-sets {
-                    /* custom design-system component - p-board-item */
-                    :deep(.p-board-item) {
-                        &:last-child {
-                            .board-item {
-                                height: 1.25rem;
-
-                                .bookmark-label {
-                                    @apply hidden;
-                                }
-                            }
-                        }
-                    }
-                }
 
                 /* custom design-system component - p-board-item */
                 :deep(.p-board-item) {
-                    min-height: 3.625rem;
-                    padding: 0.5rem;
-
-                    .board-item {
-                        @apply flex-col;
-                        gap: 0.375rem;
-
+                    &:first-child {
                         .image-wrapper {
-                            width: 1.25rem;
-                            height: 1.25rem;
-
-                            .icon, img {
-                                width: 1.25rem !important;
-                                height: 1.25rem !important;
-                            }
-
-                            .show-more {
-                                @apply bg-transparent;
-                            }
+                            @apply bg-white;
                         }
                     }
                 }
             }
         }
     }
+
+    &.no-data {
+        padding-top: 0;
+    }
+
     .empty {
-        padding-top: 1.125rem;
         padding-bottom: 1.125rem;
     }
 }

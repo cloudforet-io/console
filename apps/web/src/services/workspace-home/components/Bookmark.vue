@@ -80,7 +80,9 @@ onUnmounted(() => {
                                   :bookmark-folder-list="storeState.bookmarkFolderList"
         />
         <bookmark-delete-modal
-            v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK"
+            v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_FOLDER
+                || storeState.modalType === BOOKMARK_MODAL_TYPE.DELETE_LINK
+                || storeState.modalType === BOOKMARK_MODAL_TYPE.MULTI_DELETE"
         />
     </div>
 </template>
