@@ -69,6 +69,7 @@ export const NAME_FORM_MODAL_TYPE = {
     // metric
     ADD_EXAMPLE: 'ADD_EXAMPLE',
     EDIT_NAME: 'EDIT_NAME',
+    SAVE_AS_CUSTOM_METRIC: 'SAVE_AS_METRIC',
     // example
     SAVE_AS_EXAMPLE: 'SAVE_AS_EXAMPLE',
 } as const;
