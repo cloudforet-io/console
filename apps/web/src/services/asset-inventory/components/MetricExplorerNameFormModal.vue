@@ -37,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     type: NAME_FORM_MODAL_TYPE.EDIT_NAME,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
+    (e: 'confirm', name?: string): void;
 }>();
 
 const router = useRouter();
@@ -46,9 +47,16 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
-        .filter((d) => d.name !== metricExplorerPageState.metric?.name)
-        .map((metric) => metric.name)),
+    existingNameList: computed<string[]>(() => {
+        if (metricExplorerPageGetters.metricExampleId) {
+            return metricExplorerPageState.metricExamples
+                .filter((d) => d.example_id !== metricExplorerPageGetters.metricExampleId)
+                .map((d) => d.name);
+        }
+        return metricExplorerPageGetters.metrics
+            .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
+            .map((metric) => metric.name);
+    }),
     headerTitle: computed(() => {
         if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_METRIC_EXAMPLE');
@@ -56,6 +64,7 @@ const state = reactive({
             if (metricExplorerPageGetters.metricExampleId) return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_METRIC_EXAMPLE_NAME');
             return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_CUSTOM_METRIC_NAME');
         }
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_NEW_CUSTOM_METRIC');
         return '';
     }),
 });
@@ -71,7 +80,7 @@ const {
 }, {
     name(value) {
         if (!value) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_REQUIRED');
-        if (state.existingMetricNameList.find((d) => d === value)) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_DUPLICATED');
+        if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_DUPLICATED');
         return true;
     },
 });
@@ -121,6 +130,8 @@ const handleFormConfirm = async () => {
         await createMetricExample();
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         await updateMetricName();
+    } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
+        emit('confirm', name.value);
     }
     state.proxyVisible = false;
 };
@@ -129,7 +140,7 @@ const handleFormConfirm = async () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible && props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         if (metricExplorerPageGetters.metricExampleId) {
-            // TODO: setForm('name', metricExplorerPageState.metricExample?.name);
+            setForm('name', metricExplorerPageGetters.metricExample?.name);
         } else {
             setForm('name', metricExplorerPageState.metric?.name);
         }
