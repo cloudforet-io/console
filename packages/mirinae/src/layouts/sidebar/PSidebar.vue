@@ -152,7 +152,7 @@ export default defineComponent({
             height: 100%;
             width: 100%;
         }
-        .title {
+        > .title {
             width: calc(100% - 2rem);
             min-height: 1.575rem;
             font-size: 1.125rem;
@@ -202,9 +202,11 @@ export default defineComponent({
         $sidebar-sm: 20%;
         $sidebar-md: 25%;
         $sidebar-lg: 30%;
+        $sidebar-xl: 70%;
         $sidebar-fixed-sm: 16.25rem;
         $sidebar-fixed-md: 20rem;
         $sidebar-fixed-lg: 25rem;
+        $sidebar-fixed-xl: 35rem;
 
         @define-mixin sidebar-size $sidebar-size, $sidebar-fixed-size {
             width: $sidebar-size;
@@ -235,6 +237,9 @@ export default defineComponent({
             &.lg {
                 @mixin sidebar-size $sidebar-lg, $sidebar-fixed-lg;
             }
+            &.xl {
+                @mixin sidebar-size $sidebar-xl, $sidebar-fixed-xl;
+            }
         }
 
         @define-mixin sidebar-animation $sidebar-size, $sidebar-fixed-size {
@@ -254,6 +259,9 @@ export default defineComponent({
             }
             &.lg {
                 @mixin sidebar-animation $sidebar-lg, $sidebar-fixed-lg;
+            }
+            &.xl {
+                @mixin sidebar-animation $sidebar-xl, $sidebar-fixed-xl;
             }
         }
     }
