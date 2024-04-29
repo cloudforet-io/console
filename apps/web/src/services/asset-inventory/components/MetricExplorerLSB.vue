@@ -18,10 +18,13 @@ import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/refe
 
 
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
+import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
-import type { LSBMenu, LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
+import type { LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
 import { gray, yellow } from '@/styles/colors';
@@ -37,11 +40,17 @@ const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const { getProperRouteLocation } = useProperRouteLocation();
+const favoriteStore = useFavoriteStore();
+const favoriteGetters = favoriteStore.getters;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
+    favoriteItems: computed(() => [
+        ...favoriteGetters.metricItems,
+        // ...favoriteGetters.metricExampleItems,
+    ]),
 });
 
 const state = reactive({
@@ -62,7 +71,32 @@ const state = reactive({
         if (!namespaceState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
-    starredMenuSet: computed<LSBMenu[]>(() => []),
+    starredMenuSet: computed<LSBItem[]>(() => {
+        const metricMenuList: LSBItem[] = Object.values(storeState.metrics).map((metric) => ({
+            type: 'item',
+            id: metric.key,
+            label: metric.name,
+            icon: {
+                name: metric.key.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
+                color: gray[500],
+            },
+            to: getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                params: {
+                    metricId: metric.key,
+                },
+            }),
+            favoriteOptions: {
+                type: FAVORITE_TYPE.METRIC,
+                id: metric.key,
+            },
+        }));
+
+        return [
+            ...metricMenuList,
+            // ...metricExampleList,
+        ].filter((menu) => menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]);
+    }),
     namespaceMenu: computed(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('COMMON.NAMESPACE'),
@@ -72,6 +106,13 @@ const state = reactive({
         type: MENU_ITEM_TYPE.SLOT,
         id: 'metric',
     })),
+    favoriteItemMap: computed(() => {
+        const result: Record<string, FavoriteConfig> = {};
+        storeState.favoriteItems?.forEach((d) => {
+            result[d.itemId] = d;
+        });
+        return result;
+    }),
 });
 
 const namespaceState = reactive({
