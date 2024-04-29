@@ -1,28 +1,14 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import FNB from '@/common/modules/navigations/FNB.vue';
-import TopBarProfile
-    from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
 import LandingContents from '@/services/landing/components/LandingContents.vue';
-
-const state = reactive({
-    openedProfileMenu: false,
-});
-
-const handleOpenedMenu = (visible: boolean) => {
-    state.openedProfileMenu = visible;
-};
+import LandingHeader from '@/services/landing/components/LandingHeader.vue';
 </script>
 
 <template>
     <div class="workspace-lading-page">
-        <top-bar-profile :visible="state.openedProfileMenu"
-                         class="profile"
-                         @update:visible="handleOpenedMenu"
-        />
+        <landing-header />
         <div class="scroll-contents">
             <console-logo class="logo"
                           :position-fixed="false"
@@ -37,11 +23,6 @@ const handleOpenedMenu = (visible: boolean) => {
 <style scoped lang="postcss">
 .workspace-lading-page {
     @apply relative flex flex-col w-full h-full;
-    .profile {
-        @apply absolute;
-        top: 0.652rem;
-        right: 1.5rem;
-    }
     .scroll-contents {
         @apply flex flex-col items-center overflow-y-auto;
         padding-right: 1.5rem;
