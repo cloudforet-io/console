@@ -366,7 +366,6 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
             }
         }
         .empty {
-            @apply border border-gray-150 rounded-md;
             width: calc(100% - 3rem);
             height: 10rem;
             margin-left: 1.5rem;

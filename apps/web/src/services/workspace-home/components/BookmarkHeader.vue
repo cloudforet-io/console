@@ -43,7 +43,7 @@ const moreContextMenuRef = ref<any|null>(null);
 
 const { width: containerWidth } = useElementSize(componentRef);
 const { width: toolboxWidth } = useElementSize(toolboxRef);
-const { top: moreButtonTop, height: moreButtonHeight, width: moreButtonWidth } = useElementBounding(moreButtonRef);
+const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
@@ -127,15 +127,16 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
 };
 
 watch([
+    () => storeState.language,
     () => folderItemsRef,
     () => state.folderListMaxWidth,
     () => props.bookmarkFolderList,
     () => storeState.isFullMode,
-    () => storeState.language,
-], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+], async ([language, folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+    state.refinedFolderListWidth = folderListMaxWidth;
     await nextTick();
-    if (!folderItemsValue) return;
-    const folderListWidthWithoutMoreButton = folderListMaxWidth - moreButtonWidth.value;
+    const moreButtonWidth = language === 'ja' ? 108 : 74;
+    const folderListWidthWithoutMoreButton = folderListMaxWidth - moreButtonWidth;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
     folderItemsValue.value?.forEach((el) => {
@@ -157,7 +158,7 @@ watch([
         return curWidth + FOLDER_DEFAULT_GAP;
     });
     state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
-});
+}, { immediate: true });
 watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
     bookmarkStore.setSelectedBookmarks([]);
 });
@@ -308,15 +309,17 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         >
             <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
                       icon-left="ic_plus"
+                      size="sm"
                       class="add-link-button"
                       :style-type="storeState.isFullMode ? 'substitutive' : 'tertiary'"
                       @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
             >
                 <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
             </p-button>
-            <p-button v-if="!state.isMobileSize && !storeState.isFullMode"
+            <p-button v-if="!storeState.isFullMode"
                       class="add-link-button"
                       style-type="tertiary"
+                      size="sm"
                       @click="handleClickFullModeButton"
             >
                 <span>{{ $t('HOME.BOOKMARK_VIEW_ALL') }}</span>
@@ -341,6 +344,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         top: 0.75rem;
         left: 50%;
         transform: translate(-50%);
+        padding-bottom: 1rem;
         .selected-ids {
             @apply flex items-center bg-gray-100 text-label-md border border-gray-200;
             height: 2.5rem;
@@ -363,6 +367,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             height: 1.625rem;
             padding: 0.25rem 0.625rem;
             border: none;
+            font-family: Noto Sans, Roboto, sans-serif;
             gap: 0.25rem;
             &.active {
                 @apply bg-blue-300;
@@ -392,12 +397,9 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         }
     }
     .toolbox-wrapper {
-        @apply flex;
+        @apply flex items-center;
         margin-left: auto;
         gap: 0.5rem;
-        .add-link-button {
-            @apply text-label-md;
-        }
     }
 
     /* custom design-system component - p-field-title */
@@ -427,7 +429,12 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             }
         }
         &:not(.full-mode) {
-            @apply flex-col items-start;
+            @apply relative flex-col items-start;
+            .toolbox-wrapper {
+                @apply absolute;
+                top: 0.25rem;
+                right: 0;
+            }
         }
     }
 }
