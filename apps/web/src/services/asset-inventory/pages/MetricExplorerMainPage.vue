@@ -65,7 +65,7 @@ const state = reactive({
             id: recent.data.id,
             icon: namespace?.data?.icon,
             label: namespace?.label ?? '',
-            metricName: metric?.label ?? '',
+            metricName: metric?.label ?? undefined,
         });
     })),
 });
@@ -155,9 +155,11 @@ const fetchRecentList = async () => {
                                     />
                                 </span>
                                 <div class="recent-desc">
-                                    <p>{{ recent.label }}</p>
+                                    <p class="label-text">
+                                        {{ recent.label }}
+                                    </p>
                                     <p class="metric-name">
-                                        {{ recent.metricName }}
+                                        {{ recent?.metricName ?? recent.id }}
                                     </p>
                                 </div>
                             </div>
@@ -226,7 +228,7 @@ const fetchRecentList = async () => {
 
             .recent-card-wrapper {
                 @apply grid gap-2;
-                grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
                 grid-template-rows: auto;
 
                 /* custom design-system component - p-card */
@@ -237,15 +239,20 @@ const fetchRecentList = async () => {
                 }
 
                 .recent-card {
-                    min-width: 11.25rem;
+                    min-width: 16rem;
                     padding: 0.25rem 0.125rem;
                     cursor: pointer;
+                    word-break: break-all;
 
                     .card-contents {
                         @apply flex gap-2;
 
                         .recent-desc {
                             display: inline-block;
+
+                            .label-text {
+                                @apply text-label-md text-gray-800;
+                            }
 
                             .metric-name {
                                 @apply text-label-lg font-bold;
