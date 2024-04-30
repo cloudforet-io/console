@@ -42,12 +42,12 @@ const state = reactive({
 /* Util */
 const getMenuHandler = (groupBy: string): AutocompleteHandler => {
     try {
-        const variableModels = new VariableModel(({
+        const variableModels = new VariableModel({
             type: 'RESOURCE_VALUE',
             resource_type: 'inventory.MetricData',
             reference_key: getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
             name: groupBy,
-        }));
+        });
         const handler = getVariableModelMenuHandler(variableModels);
 
         return async (...args) => {
