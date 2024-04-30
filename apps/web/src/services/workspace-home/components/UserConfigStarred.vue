@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
-    PFieldTitle, PSelectDropdown, PI, PPagination, PTextButton,
+    PFieldTitle, PSelectDropdown, PI, PPagination, PLink,
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -14,17 +13,14 @@ import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/sto
 import type { FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
+import { STARRED_SERVICE_ITEMS } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
 
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-
-const router = useRouter();
 
 const storeState = reactive({
     favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageState.favoriteMenuList),
@@ -116,32 +112,33 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
         <div v-else
              class="empty"
         >
-            <span class="title">{{ $t('HOME.NO_STARRED') }}</span>
+            <span class="title">{{ $t('HOME.NO_STARRED_TITLE') }}</span>
             <div class="desc-wrapper">
                 <p>{{ $t('HOME.NO_STARRED_DESC1') }}</p>
-                <p>{{ $t('HOME.NO_STARRED_DESC2') }}</p>
+                <div class="route-buttons">
+                    <p-link v-for="(item, idx) in STARRED_SERVICE_ITEMS"
+                            :key="`starred-service-item-${idx}`"
+                            class="starred-service-item"
+                            :to="item.to"
+                            :icon-left="item.icon"
+                    >
+                        {{ item.label }}
+                    </p-link>
+                </div>
             </div>
-            <div class="route-buttons">
-                <p-text-button style-type="highlight"
-                               @click="router.push({ name: DASHBOARDS_ROUTE._NAME })"
-                >
-                    <span>{{ $t('MENU.DASHBOARDS') }}</span>
-                </p-text-button>
-                <span>/</span>
-                <p-text-button style-type="highlight"
-                               @click="router.push({ name: PROJECT_ROUTE._NAME })"
-                >
-                    <span>{{ $t('MENU.PROJECT') }}</span>
-                </p-text-button>
-                <!-- TODO: add Metric Explorer after merged -->
-            </div>
+            <img alt="star-menu-image"
+                 class="star-menu-image"
+                 src="/images/home/img_how-to-star-menu.png"
+                 srcset="/images/home/img_how-to-star-menu@2x.png 2x,
+                        /images/home/img_how-to-star-menu@3x.png 3x"
+            >
         </div>
     </div>
 </template>
 
 <style scoped lang="postcss">
 .user-config-starred {
-    @apply flex flex-col;
+    @apply flex flex-col overflow-y-hidden;
     .header-wrapper {
         @apply flex items-center;
         padding: 1rem;
@@ -166,17 +163,38 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
     }
     .empty {
         @apply flex flex-col items-center justify-center;
+        padding-right: 1rem;
+        padding-left: 1rem;
         gap: 0.75rem;
         flex: 1;
         .title {
-            @apply text-label-xl text-gray-800;
+            @apply text-label-xl text-gray-800 text-center;
         }
         .desc-wrapper {
             @apply flex flex-col items-center text-paragraph-md text-gray-700;
-        }
-        .route-buttons {
-            @apply flex;
             gap: 0.5rem;
+            padding-bottom: 0.25rem;
+            .route-buttons {
+                @apply flex;
+                gap: 0.375rem;
+                .starred-service-item {
+                    @apply flex bg-gray-150 text-gray-900;
+                    padding: 0.5rem 0.625rem;
+                    border-radius: 0.25rem;
+                }
+            }
+        }
+    }
+
+    @screen laptop {
+        .desc-wrapper {
+            .starred-service-item {
+                &:nth-child(3), &:nth-child(4) {
+                    width: 0;
+                    height: 0;
+                    opacity: 0;
+                }
+            }
         }
     }
 }
