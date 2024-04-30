@@ -119,11 +119,11 @@ const handleClickBoardItem = (item: WorkspaceBoardSet) => {
                 gap: 0.25rem;
                 .role-type-icon {
                     @apply rounded-full;
-                    width: 1.5rem;
-                    height: 1.5rem;
+                    width: 1rem;
+                    height: 1rem;
                 }
                 .role-type {
-                    @apply text-gray-700 truncate;
+                    @apply text-label-sm text-gray-700 truncate;
                     width: 100%;
                 }
             }
