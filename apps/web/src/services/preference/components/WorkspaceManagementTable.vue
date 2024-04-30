@@ -1,6 +1,6 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PSelectDropdown, PStatus, PToolboxTable, PLink,
@@ -49,30 +49,41 @@ const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
+const route = useRoute();
+
 const workspaceListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
     .setSort('name', true);
 let workspaceListApiQuery = workspaceListApiQueryHelper.data;
+
 const queryTagsHelper = useQueryTags({ keyItemSets: WORKSPACE_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagsHelper;
+if (route.query.selectedWorkspaceId) {
+    queryTagsHelper.setFilters([
+        {
+            k: 'workspace_id',
+            v: route.query.selectedWorkspaceId,
+            o: '=',
+        },
+    ]);
+}
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
-
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
         type: 'item',
         name: 'enable',
         label: i18n.t('IAM.WORKSPACES.ENABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'ENABLED'),
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'ENABLED'),
     },
     {
         type: 'item',
         name: 'disable',
         label: i18n.t('IAM.WORKSPACES.DISABLE'),
-        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'DISABLED'),
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0]?.state === 'DISABLED'),
     },
     {
         type: 'divider',
@@ -140,8 +151,6 @@ const getUserRouteLocationByWorkspaceName = (item: WorkspaceTableModel) => ({
         workspaceId: item?.workspace_id,
     },
 });
-
-
 </script>
 
 <template>

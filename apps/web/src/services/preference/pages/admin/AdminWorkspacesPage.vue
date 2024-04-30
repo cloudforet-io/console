@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Vue, { onMounted, onUnmounted, reactive } from 'vue';
+import Vue, {
+    onMounted, onUnmounted, reactive,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
@@ -42,6 +44,11 @@ const workspaceListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
 const refreshWorkspaceList = async (isInit?: boolean) => {
+    if (isInit && route.query.selectedWorkspaceId) {
+        workspacePageStore.$patch((_state) => {
+            _state.searchFilters = [{ k: 'workspace_id', v: route.query.selectedWorkspaceId, o: '=' }];
+        });
+    }
     workspacePageStore.$patch({ loading: true });
     workspaceListApiQueryHelper
         .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
@@ -49,9 +56,10 @@ const refreshWorkspaceList = async (isInit?: boolean) => {
     try {
         await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
         if (isInit) {
-            const idx = workspacePageState.workspaces.findIndex((workspace) => workspace.workspace_id === route.query.selectedWorkspaceId);
-            workspacePageStore.$patch({ selectedIndices: [idx] });
-            handleSelectAction(route.query.modalType as string);
+            await workspacePageStore.$patch({ selectedIndices: [0] });
+            if (route.query.modalType) {
+                handleSelectAction(route.query.modalType as string);
+            }
         }
     } finally {
         workspacePageStore.$patch({ loading: false });

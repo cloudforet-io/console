@@ -61,6 +61,7 @@ const storeState = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
 const state = reactive({
@@ -72,7 +73,7 @@ const state = reactive({
 
 const selectWorkspace = (name: string): void => {
     const workspaceId = name;
-    if (!workspaceId || workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+    if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
     const reversedMatched = clone(router.currentRoute.matched).reverse();
@@ -82,11 +83,13 @@ const selectWorkspace = (name: string): void => {
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
 };
 const handleClickButton = (hasNoWorkspace?: string) => {
+    const selectedWorkspaceId = !hasNoWorkspace && storeState.selectedWorkspace?.workspace_id || '';
     appContextStore.enterAdminMode();
     router.push({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace,
+            selectedWorkspaceId: !hasNoWorkspace ? selectedWorkspaceId : undefined,
         },
     });
     Vue.notify({
