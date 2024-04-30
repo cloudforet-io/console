@@ -153,6 +153,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
             <p-sidebar :visible="true"
                        style-type="primary"
                        size="xl"
+                       backdrop
                        @close="handleCloseSidebar"
             >
                 <main class="main">
@@ -233,10 +234,13 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
 
 <style scoped lang="postcss">
 .metric-explorer-query-form-sidebar {
-    position: absolute;
-    top: 0;
+    position: fixed;
+    top: calc($top-bar-height + $gnb-toolbox-height);
     right: 0;
-    z-index: 10;
+    z-index: 50;
+    .sidebar-title {
+        @apply text-label-xl;
+    }
     .sidebar-contents {
         position: relative;
         :deep(.p-text-input) {
@@ -255,13 +259,20 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
         }
     }
     .footer-wrapper {
+        @apply border-t border-gray-200;
         position: absolute;
-        bottom: calc($top-bar-height + $gnb-toolbox-height);
+        bottom: 0;
         display: flex;
         justify-content: flex-end;
         width: 100%;
         gap: 1rem;
         padding: 0.75rem 1rem;
+    }
+
+    @screen lg {
+        .footer-wrapper {
+            bottom: calc($top-bar-height + $gnb-toolbox-height);
+        }
     }
 }
 
@@ -272,10 +283,16 @@ $footer-height: 57px;
     .sidebar-wrapper {
         height: 100%;
         padding-top: 0;
-        padding-bottom: calc($top-bar-height + $gnb-toolbox-height + $footer-height);
+        padding-bottom: $footer-height;
         .inner {
             padding-top: 2rem;
             padding-bottom: 1rem;
+        }
+    }
+
+    @screen lg {
+        .sidebar-wrapper {
+            padding-bottom: calc($top-bar-height + $gnb-toolbox-height + $footer-height);
         }
     }
 }

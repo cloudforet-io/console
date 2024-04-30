@@ -75,12 +75,12 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
     try {
         let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
         if (!variableModels) {
-            variableModels = new VariableModel(({
+            variableModels = new VariableModel({
                 type: 'RESOURCE_VALUE',
                 resource_type: 'cost_analysis.Cost',
                 reference_key: groupBy,
                 name: groupBy,
-            }));
+            });
         }
         const handler = getVariableModelMenuHandler(variableModels, listQueryOptions);
 
