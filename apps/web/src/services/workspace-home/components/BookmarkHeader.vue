@@ -43,7 +43,7 @@ const moreContextMenuRef = ref<any|null>(null);
 
 const { width: containerWidth } = useElementSize(componentRef);
 const { width: toolboxWidth } = useElementSize(toolboxRef);
-const { top: moreButtonTop, height: moreButtonHeight, width: moreButtonWidth } = useElementBounding(moreButtonRef);
+const { top: moreButtonTop, height: moreButtonHeight } = useElementBounding(moreButtonRef);
 
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
@@ -127,15 +127,16 @@ const handleSelectAddMoreMenuItem = (item: MoreMenuItem) => {
 };
 
 watch([
+    () => storeState.language,
     () => folderItemsRef,
     () => state.folderListMaxWidth,
     () => props.bookmarkFolderList,
     () => storeState.isFullMode,
-    () => storeState.language,
-], async ([folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+], async ([language, folderItemsValue, folderListMaxWidth, bookmarkFolderList]) => {
+    state.refinedFolderListWidth = folderListMaxWidth;
     await nextTick();
-    if (!folderItemsValue) return;
-    const folderListWidthWithoutMoreButton = folderListMaxWidth - moreButtonWidth.value;
+    const moreButtonWidth = language === 'ja' ? 108 : 74;
+    const folderListWidthWithoutMoreButton = folderListMaxWidth - moreButtonWidth;
     const _refinedFolderList: HTMLElement[] = [];
     let widthBaseline = 0;
     folderItemsValue.value?.forEach((el) => {
@@ -157,7 +158,7 @@ watch([
         return curWidth + FOLDER_DEFAULT_GAP;
     });
     state.refinedFolderList = bookmarkFolderList?.slice(_refinedFolderList.length) || [];
-});
+}, { immediate: true });
 watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
     bookmarkStore.setSelectedBookmarks([]);
 });
@@ -363,6 +364,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             height: 1.625rem;
             padding: 0.25rem 0.625rem;
             border: none;
+            font-family: Noto Sans, Roboto, sans-serif;
             gap: 0.25rem;
             &.active {
                 @apply bg-blue-300;
