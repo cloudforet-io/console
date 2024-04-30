@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Vue, {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
@@ -57,22 +57,19 @@ const recentStore = useRecentStore();
 
 const router = useRouter();
 
+const selectDropdownRef = ref<PSelectDropdown|null>(null);
+
 const storeState = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
+    currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
-});
-const state = reactive({
-    workspaceMenuList: computed<MenuItem[]>(() => [
-        ...filterStarredItems(storeState.favoriteItems),
-        ...formatMenuItems(storeState.workspaceList),
-    ]),
 });
 
 const selectWorkspace = (name: string): void => {
     const workspaceId = name;
-    if (!workspaceId || workspaceId === userWorkspaceStore.getters.currentWorkspaceId) return;
+    if (!workspaceId || workspaceId === storeState.currentWorkspaceId) return;
 
     appContextStore.setGlobalGrantLoading(true);
     const reversedMatched = clone(router.currentRoute.matched).reverse();
@@ -82,11 +79,13 @@ const selectWorkspace = (name: string): void => {
     router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
 };
 const handleClickButton = (hasNoWorkspace?: string) => {
+    const selectedWorkspaceId = !hasNoWorkspace && storeState.selectedWorkspace?.workspace_id || '';
     appContextStore.enterAdminMode();
     router.push({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
-            hasNoWorkpspace: hasNoWorkspace,
+            hasNoWorkspace,
+            selectedWorkspaceId: !hasNoWorkspace ? selectedWorkspaceId : undefined,
         },
     });
     Vue.notify({
@@ -134,7 +133,21 @@ const handleClickAllWorkspaceButton = () => {
         name: LANDING_ROUTE._NAME,
     });
 };
+const checkFavoriteItem = (id: string) => {
+    const item = storeState.favoriteItems.find((i) => i.name === id);
+    return !!item;
+};
+const menuHandler = async () => ({
+    results: [
+        ...filterStarredItems(storeState.favoriteItems),
+        ...formatMenuItems(storeState.workspaceList),
+    ],
+});
 
+watch(() => storeState.favoriteItems, async () => {
+    if (!selectDropdownRef.value) return;
+    await selectDropdownRef.value?.reloadMenu();
+});
 watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
     if (!selectedWorkspace) return;
     recentStore.createRecent({
@@ -167,9 +180,10 @@ onMounted(() => {
             </span>
         </div>
         <p-select-dropdown v-if="!props.isAdminMode"
+                           ref="selectDropdownRef"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
-                           :menu="state.workspaceMenuList"
+                           :handler="menuHandler"
                            hide-header-without-items
                            :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
@@ -214,7 +228,9 @@ onMounted(() => {
                 </p-tooltip>
             </template>
             <template #menu-item--format="{item}">
-                <div class="menu-item-wrapper">
+                <div class="menu-item-wrapper"
+                     :class="{ 'is-starred': checkFavoriteItem(item.name)}"
+                >
                     <div class="label">
                         <workspace-logo-icon :text="item?.label || ''"
                                              :theme="item?.tags?.theme"
@@ -349,7 +365,16 @@ onMounted(() => {
         .menu-item-wrapper {
             @apply flex justify-between;
             max-width: 18rem;
-
+            &.is-starred {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
+            &:hover {
+                .label-text {
+                    max-width: 15rem;
+                }
+            }
             .label {
                 @apply flex items-center gap-2;
             }
@@ -360,10 +385,8 @@ onMounted(() => {
         }
 
         .workspace-toolbox-wrapper {
-            @apply absolute flex flex-col bg-white;
+            @apply flex flex-col bg-white;
             padding: 0.25rem 1rem 0.5rem;
-            bottom: 0;
-            left: 0;
             width: 100%;
             gap: 0.625rem;
             .workspace-toolbox {
@@ -388,8 +411,7 @@ onMounted(() => {
             .menu-container {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
-                padding-bottom: 2.75rem;
-                max-height: calc(100vh - $top-bar-height - 4.35rem) !important;
+                max-height: calc(100vh - $top-bar-height - 7.1rem) !important;
             }
             .p-context-menu-item {
                 .favorite-button {
@@ -417,7 +439,7 @@ onMounted(() => {
             /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
                 .menu-container {
-                    padding-bottom: 8.35rem;
+                    max-height: calc(100vh - $top-bar-height - 12.85rem) !important;
                 }
             }
         }
