@@ -2760,6 +2760,10 @@
 			"DELETE_CUSTOM_METRIC": "Delete Custom Metric",
 			"DELETE_METRIC_EXAMPLE": "Delete Metric Example",
 			"DELETE_MODAL_DESC": "Are you sure you want to delete metric?",
+			"DETAIL": {
+				"SAVE_DESC": "Saving will reset the data and unlink any associated examples.",
+				"SAVE_TITLE": "Are you sure you want to save changes?"
+			},
 			"DUPLICATE": "Duplicate",
 			"EDIT_CUSTOM_METRIC_NAME": "Edit Custom Metric Name",
 			"EDIT_METRIC_EXAMPLE_NAME": "Edit Metric Example Name",

@@ -16,6 +16,7 @@ import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
@@ -43,6 +44,7 @@ const state = reactive({
         return !!invalidState.name;
     }),
     saveAsModalVisible: false,
+    visibleSaveModal: false,
 });
 
 const {
@@ -133,6 +135,7 @@ const handleOpenCustomMetricNameFormModal = () => {
 };
 const handleSaveCustomMetric = async () => {
     await updateCustomMetric();
+    state.visibleSaveModal = false;
 };
 
 watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
@@ -216,7 +219,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                             </p-button>
                             <p-button style-type="primary"
                                       :disabled="state.disableConfirmButton"
-                                      @click="handleSaveCustomMetric"
+                                      @click="() => {state.visibleSaveModal = true}"
                             >
                                 {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.SAVE') }}
                             </p-button>
@@ -228,6 +231,13 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                                              :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
                                              @confirm="handleSaveAsCustomMetric"
             />
+            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_TITLE')"
+                          :visible.sync="state.visibleSaveModal"
+                          :disabled="state.loading"
+                          @confirm="handleSaveCustomMetric"
+            >
+                {{ $t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_DESC') }}
+            </delete-modal>
         </div>
     </transition>
 </template>
