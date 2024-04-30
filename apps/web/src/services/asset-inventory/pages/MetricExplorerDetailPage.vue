@@ -12,6 +12,8 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
+import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
+import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
@@ -48,6 +50,10 @@ const state = reactive({
             },
         ];
     }),
+    favoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.METRIC,
+        id: metricExplorerPageState.metric?.metric_id,
+    })),
 });
 
 
@@ -58,6 +64,10 @@ watch(() => route.params, async (params) => {
         metricExplorerPageStore.loadMetricExamples(params.metricId),
     ]);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
+}, { immediate: true });
+
+watch(() => state.favoriteOptions, (favoriteOptions) => {
+    gnbStore.setFavoriteItemId(favoriteOptions);
 }, { immediate: true });
 </script>
 
