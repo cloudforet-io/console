@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Vue, {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
@@ -57,18 +57,14 @@ const recentStore = useRecentStore();
 
 const router = useRouter();
 
+const selectDropdownRef = ref<PSelectDropdown|null>(null);
+
 const storeState = reactive({
     isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
-});
-const state = reactive({
-    workspaceMenuList: computed<MenuItem[]>(() => [
-        ...filterStarredItems(storeState.favoriteItems),
-        ...formatMenuItems(storeState.workspaceList),
-    ]),
 });
 
 const selectWorkspace = (name: string): void => {
@@ -141,7 +137,17 @@ const checkFavoriteItem = (id: string) => {
     const item = storeState.favoriteItems.find((i) => i.name === id);
     return !!item;
 };
+const menuHandler = async () => ({
+    results: [
+        ...filterStarredItems(storeState.favoriteItems),
+        ...formatMenuItems(storeState.workspaceList),
+    ],
+});
 
+watch(() => storeState.favoriteItems, async () => {
+    if (!selectDropdownRef.value) return;
+    await selectDropdownRef.value?.reloadMenu();
+});
 watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
     if (!selectedWorkspace) return;
     recentStore.createRecent({
@@ -174,9 +180,10 @@ onMounted(() => {
             </span>
         </div>
         <p-select-dropdown v-if="!props.isAdminMode"
+                           ref="selectDropdownRef"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
-                           :menu="state.workspaceMenuList"
+                           :handler="menuHandler"
                            hide-header-without-items
                            :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
