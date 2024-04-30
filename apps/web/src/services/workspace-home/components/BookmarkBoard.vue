@@ -361,18 +361,24 @@ onBeforeUnmount(() => {
 
         @screen laptop {
             .bookmark-board-wrapper {
-                /* custom design-system component - p-board-item */
-                :deep(.p-board-item) {
-                    &:last-child {
-                        .board-item {
-                            @apply items-center justify-center;
-                            padding-top: 0.875rem;
+                &.is-max-board-sets {
+                    /* custom design-system component - p-board-item */
+                    :deep(.p-board-item) {
+                        &:last-child {
+                            .board-item {
+                                @apply items-center justify-center;
+                                padding-top: 0.875rem;
 
-                            .bookmark-label {
-                                @apply hidden;
+                                .bookmark-label {
+                                    @apply hidden;
+                                }
                             }
                         }
                     }
+                }
+
+                /* custom design-system component - p-board-item */
+                :deep(.p-board-item) {
                     &:hover {
                         .toolsets-wrapper {
                             @apply hidden;
@@ -413,6 +419,7 @@ onBeforeUnmount(() => {
     }
 
     &.full-board {
+        padding-top: 0;
         .bookmark-board-wrapper {
             @apply grid-cols-4;
 

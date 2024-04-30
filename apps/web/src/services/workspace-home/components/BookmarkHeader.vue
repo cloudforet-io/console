@@ -309,15 +309,17 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         >
             <p-button v-if="!state.isMobileSize || (state.isMobileSize && storeState.isFullMode)"
                       icon-left="ic_plus"
+                      size="sm"
                       class="add-link-button"
                       :style-type="storeState.isFullMode ? 'substitutive' : 'tertiary'"
                       @click="handleClickActionButton(BOOKMARK_MODAL_TYPE.LINK, false, true)"
             >
                 <span>{{ $t('HOME.BOOKMARK_ADD_LINK') }}</span>
             </p-button>
-            <p-button v-if="!state.isMobileSize && !storeState.isFullMode"
+            <p-button v-if="!storeState.isFullMode"
                       class="add-link-button"
                       style-type="tertiary"
+                      size="sm"
                       @click="handleClickFullModeButton"
             >
                 <span>{{ $t('HOME.BOOKMARK_VIEW_ALL') }}</span>
@@ -342,6 +344,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         top: 0.75rem;
         left: 50%;
         transform: translate(-50%);
+        padding-bottom: 1rem;
         .selected-ids {
             @apply flex items-center bg-gray-100 text-label-md border border-gray-200;
             height: 2.5rem;
@@ -394,12 +397,9 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
         }
     }
     .toolbox-wrapper {
-        @apply flex;
+        @apply flex items-center;
         margin-left: auto;
         gap: 0.5rem;
-        .add-link-button {
-            @apply text-label-md;
-        }
     }
 
     /* custom design-system component - p-field-title */
@@ -429,7 +429,12 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             }
         }
         &:not(.full-mode) {
-            @apply flex-col items-start;
+            @apply relative flex-col items-start;
+            .toolbox-wrapper {
+                @apply absolute;
+                top: 0.25rem;
+                right: 0;
+            }
         }
     }
 }
