@@ -247,7 +247,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
     position: fixed;
     top: calc($top-bar-height + $gnb-toolbox-height);
     right: 0;
-    z-index: 50;
+    z-index: 100;
     .sidebar-title {
         @apply text-label-xl;
     }

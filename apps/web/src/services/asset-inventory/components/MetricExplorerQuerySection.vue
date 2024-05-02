@@ -3,6 +3,7 @@ import {
     useElementSize,
 } from '@vueuse/core';
 import {
+    computed,
     reactive, ref,
 } from 'vue';
 
@@ -27,7 +28,13 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const state = reactive({
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
-    selectedFiltersCount: 0,
+    selectedFiltersCount: computed(() => {
+        let count = 0;
+        Object.values(metricExplorerPageState.filters ?? {}).forEach((filterItems) => {
+            count += filterItems.length;
+        });
+        return count;
+    }),
 });
 
 /* event */

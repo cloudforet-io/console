@@ -6,16 +6,16 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
+
+import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { VariableModel } from '@/lib/variable-models';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    getRefinedMetricDataAnalyzeQueryGroupBy,
-} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
@@ -28,30 +28,46 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.groupByItems),
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+        name: d.key,
+        label: d.name,
+    }))),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
-        metricExplorerPageGetters.groupByItems.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name);
+        metricExplorerPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
+            handlerMaps[labelKey.key] = getMenuHandler(labelKey);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string): AutocompleteHandler => {
+const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
-        const variableModels = new VariableModel({
-            type: 'RESOURCE_VALUE',
-            resource_type: 'inventory.MetricData',
-            reference_key: getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
-            name: groupBy,
-        });
-        const handler = getVariableModelMenuHandler(variableModels);
+        let variableModel: VariableModel | undefined;
+        if (isEmpty(labelKey.reference)) {
+            variableModel = new VariableModel({
+                type: 'RESOURCE_VALUE',
+                resource_type: 'inventory.MetricData',
+                reference_key: labelKey.key,
+                name: labelKey.key,
+            });
+        } else {
+            const _resourceType = labelKey.reference?.resource_type;
+            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODEL_CONFIGS)
+                .find((d) => (d.resourceType === _resourceType));
+            if (targetModelConfig) {
+                variableModel = new VariableModel({
+                    type: 'MANAGED',
+                    key: targetModelConfig.key,
+                });
+            }
+        }
+        if (!variableModel) return async () => ({ results: [] });
 
+        const handler = getVariableModelMenuHandler(variableModel);
         return async (...args) => {
-            if (!groupBy) return { results: [] };
             try {
                 state.loading = true;
                 return await handler(...args);
