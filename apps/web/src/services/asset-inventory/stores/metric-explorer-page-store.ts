@@ -50,9 +50,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
-        // query form sidebar
+        // display
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
+        refreshMetricPeriodDropdown: false,
     });
     const getters = reactive({
         metricId: computed<string|undefined>(() => route.params.metricId),
@@ -131,10 +132,14 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setShowMetricQueryFormSidebar = (showMetricQueryFormSidebar: boolean) => {
         state.showMetricQueryFormSidebar = showMetricQueryFormSidebar;
     };
+    const setRefreshMetricPeriodDropdown = (refresh: boolean) => {
+        state.refreshMetricPeriodDropdown = refresh;
+    };
 
     /* Actions */
     const reset = () => {
         state.metric = undefined;
+        state.refreshMetricPeriodDropdown = false;
         //
         state.granularity = GRANULARITY.DAILY;
         state.period = getInitialPeriodByGranularity(GRANULARITY.DAILY)[0];
@@ -154,6 +159,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
         if (_options?.filters) state.filters = cloneDeep(getters.metricExample?.options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;
+        state.refreshMetricPeriodDropdown = true;
     };
     const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
     const loadMetric = async (metricId: string) => {
@@ -214,6 +220,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setSelectedOperator,
         setRefreshMetricData,
         setShowMetricQueryFormSidebar,
+        setRefreshMetricPeriodDropdown,
     };
 
     return {

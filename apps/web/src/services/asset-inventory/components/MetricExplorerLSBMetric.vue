@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -8,6 +8,7 @@ import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
 } from '@spaceone/design-system';
 import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
+import { isEmpty } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
@@ -153,6 +154,11 @@ onMounted(() => {
         };
     }
 });
+
+/* Watcher */
+watch(() => props.selectedNamespace, (selectedNamespace) => {
+    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+}, { immediate: true });
 </script>
 
 <template>
