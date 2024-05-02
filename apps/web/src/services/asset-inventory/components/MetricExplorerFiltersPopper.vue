@@ -11,6 +11,7 @@ import { cloneDeep, isEmpty } from 'lodash';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { VariableModel } from '@/lib/variable-models';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -43,16 +44,29 @@ const state = reactive({
 
 /* Util */
 const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
-    if (isEmpty(labelKey.reference)) return async () => ({ results: [] });
     try {
-        const variableModels = new VariableModel({
-            type: 'RESOURCE_VALUE',
-            resource_type: labelKey.reference?.resource_type || '',
-            reference_key: labelKey.reference?.reference_key || '', // getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
-            name: labelKey.key,
-        });
-        const handler = getVariableModelMenuHandler(variableModels);
+        let variableModel: VariableModel | undefined;
+        if (isEmpty(labelKey.reference)) {
+            variableModel = new VariableModel({
+                type: 'RESOURCE_VALUE',
+                resource_type: 'inventory.MetricData',
+                reference_key: labelKey.key,
+                name: labelKey.key,
+            });
+        } else {
+            const _resourceType = labelKey.reference?.resource_type;
+            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODEL_CONFIGS)
+                .find((d) => (d.resourceType === _resourceType));
+            if (targetModelConfig) {
+                variableModel = new VariableModel({
+                    type: 'MANAGED',
+                    key: targetModelConfig.key,
+                });
+            }
+        }
+        if (!variableModel) return async () => ({ results: [] });
 
+        const handler = getVariableModelMenuHandler(variableModel);
         return async (...args) => {
             try {
                 state.loading = true;
