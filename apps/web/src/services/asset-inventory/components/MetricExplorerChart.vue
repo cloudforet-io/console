@@ -104,9 +104,9 @@ const setChartData = debounce(async () => {
     const _period = metricExplorerPageState.period as Period;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
 
-    state.legends = getMetricChartLegends(state.selectedChartType, rawData, _groupBy);
+    state.legends = getMetricChartLegends(metricExplorerPageGetters.labelKeysReferenceMap, state.selectedChartType, rawData, _groupBy);
     if (state.isRealtimeChart) {
-        state.chartData = getRefinedMetricRealtimeChartData(rawData, _groupBy);
+        state.chartData = getRefinedMetricRealtimeChartData(metricExplorerPageGetters.labelKeysReferenceMap, rawData, _groupBy);
     } else {
         state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
     }
