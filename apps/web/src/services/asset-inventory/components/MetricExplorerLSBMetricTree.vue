@@ -4,9 +4,6 @@
 import { PTreeView, PI, PTextHighlighting } from '@spaceone/design-system';
 import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-
 import { gray } from '@/styles/colors';
 
 interface Props {
@@ -49,11 +46,6 @@ const props = defineProps<Props>();
                                          :text="node.data.name"
                     />
                 </div>
-                <favorite-button :item-id="node.id"
-                                 :favorite-type="node.data.type === 'metric' ? FAVORITE_TYPE.METRIC : FAVORITE_TYPE.METRIC_EXAMPLE"
-                                 scale="0.8"
-                                 class="favorite-button"
-                />
             </div>
         </template>
     </p-tree-view>
