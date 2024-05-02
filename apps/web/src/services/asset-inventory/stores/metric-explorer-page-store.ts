@@ -114,9 +114,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const reset = () => {
         state.metric = undefined;
         //
-        state.granularity = GRANULARITY.MONTHLY;
-        state.period = getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[0];
-        state.relativePeriod = getInitialPeriodByGranularity(GRANULARITY.MONTHLY)[1];
+        state.granularity = GRANULARITY.DAILY;
+        state.period = getInitialPeriodByGranularity(GRANULARITY.DAILY)[0];
+        state.relativePeriod = getInitialPeriodByGranularity(GRANULARITY.DAILY)[1];
         state.filters = {};
         state.selectedGroupByList = [];
         state.selectedChartGroupBy = undefined;
