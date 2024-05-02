@@ -10,6 +10,7 @@ import { cloneDeep, isEmpty } from 'lodash';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
+import getRandomId from '@/lib/random-id-generator';
 import { VariableModel } from '@/lib/variable-models';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
@@ -17,6 +18,7 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import type { MetricFilter } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 const props = defineProps<{
@@ -28,6 +30,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
+    randomId: getRandomId(),
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
         name: d.key,
         label: d.name,
@@ -83,11 +86,10 @@ const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
         return async () => ({ results: [] });
     }
 };
-const initSelectedFilters = () => {
-    const _filters = metricExplorerPageState.filters;
+const initSelectedFilters = (filters: MetricFilter) => {
     const _selectedItemsMap = {};
-    Object.keys(_filters ?? {}).forEach((groupBy) => {
-        _selectedItemsMap[groupBy] = _filters?.[groupBy].map((d) => ({ name: d })) ?? [];
+    Object.keys(filters ?? {}).forEach((groupBy) => {
+        _selectedItemsMap[groupBy] = filters?.[groupBy].map((d) => ({ name: d })) ?? [];
     });
     state.selectedItemsMap = _selectedItemsMap;
 };
@@ -104,14 +106,20 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
     });
 };
 const handleClickResetFilters = () => {
-    state.selectedItemsMap = {};
-    metricExplorerPageStore.setFilters({});
-    // TODO: get saved filters if exists
+    if (metricExplorerPageGetters.metricExampleId) {
+        const _originalFilters = cloneDeep(metricExplorerPageGetters.metricExample?.options?.filters);
+        initSelectedFilters(_originalFilters);
+        metricExplorerPageStore.setFilters(_originalFilters);
+    } else {
+        metricExplorerPageStore.setFilters({});
+        state.selectedItemsMap = {};
+    }
+    state.randomId = getRandomId();
 };
 
 watch(() => props.visible, (visible) => {
     if (!visible) return;
-    initSelectedFilters();
+    initSelectedFilters(metricExplorerPageState.filters);
 }, { immediate: true });
 
 </script>
@@ -120,7 +128,7 @@ watch(() => props.visible, (visible) => {
     <div class="metric-explorer-filters-popper">
         <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
-            :key="`filters-dropdown-${groupBy.name}`"
+            :key="`filters-dropdown-${groupBy.name}-${state.randomId}`"
             class="filters-popper-dropdown"
             is-filterable
             :handler="state.handlerMap[groupBy.name]"

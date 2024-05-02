@@ -3,8 +3,7 @@ import {
     useElementSize,
 } from '@vueuse/core';
 import {
-    computed,
-    reactive, ref,
+    computed, reactive, ref,
 } from 'vue';
 
 import {
