@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -144,6 +144,17 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedChartGroupBy = undefined;
         state.selectedOperator = OPERATOR.SUM;
     };
+    const initMetricExampleOptions = () => {
+        const _options = getters.metricExample?.options;
+        if (isEmpty(_options)) return;
+
+        if (_options?.granularity) state.granularity = _options?.granularity;
+        if (_options?.period) state.period = _options?.period;
+        if (_options?.relative_period) state.relativePeriod = _options?.relative_period;
+        if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
+        if (_options?.filters) state.filters = cloneDeep(getters.metricExample?.options?.filters);
+        if (_options?.operator) state.selectedOperator = _options?.operator;
+    };
     const loadMetricFetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.metric.get);
     const loadMetric = async (metricId: string) => {
         state.metricLoading = true;
@@ -161,10 +172,19 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             console.error(e);
         }
     };
-    const loadMetricExamples = async (metricId?: string) => {
+    const loadMetricExamples = async (namespaceId?: string) => {
+        if (!namespaceId) return;
         try {
             const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
-                metric_id: metricId,
+                query: {
+                    filter: [
+                        {
+                            k: 'namespace_id',
+                            v: namespaceId,
+                            o: 'eq',
+                        },
+                    ],
+                },
             });
             state.metricExamples = res.results || [];
         } catch (e) {
@@ -182,6 +202,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         loadMetric,
         loadMetricExamples,
         openMetricQueryFormSidebar,
+        initMetricExampleOptions,
     };
     const mutations = {
         setGranularity,
