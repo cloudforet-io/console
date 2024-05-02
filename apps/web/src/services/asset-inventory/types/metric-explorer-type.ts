@@ -23,6 +23,8 @@ export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 
 export type Operator = typeof OPERATOR[keyof typeof OPERATOR];
 
+export type MetricFilter = Record<string, string[]>;
+
 /* Display */
 export type MetricPeriodMenu = typeof METRIC_PERIOD_MENU[keyof typeof METRIC_PERIOD_MENU];
 

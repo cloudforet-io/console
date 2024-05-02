@@ -25,8 +25,7 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
-    Granularity, Operator, Period, RelativePeriod,
-    QueryFormMode,
+    Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -47,7 +46,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         granularity: GRANULARITY.DAILY as Granularity,
         period: getInitialPeriodByGranularity(GRANULARITY.DAILY)[0] as Period|undefined,
         relativePeriod: getInitialPeriodByGranularity(GRANULARITY.DAILY)[1] as RelativePeriod|undefined,
-        filters: {} as Record<string, string[]>,
+        filters: {} as MetricFilter,
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
@@ -120,7 +119,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     const setSelectedChartGroupBy = (groupBy: string|undefined) => {
         state.selectedChartGroupBy = groupBy;
     };
-    const setFilters = (filters: Record<string, string[]>) => {
+    const setFilters = (filters: MetricFilter) => {
         state.filters = filters;
     };
     const setSelectedOperator = (operator: Operator) => {
