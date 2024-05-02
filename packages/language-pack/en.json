@@ -2739,6 +2739,7 @@
 			"ALT_S_DUPLICATE_METRIC": "Successfully duplicated metric",
 			"ALT_S_SAVE_METRIC": "Successfully saved metric",
 			"ALT_S_UPDATE_METRIC_EXAMPLE": "Successfully updated metric example",
+			"ALT_S_UPDATE_METRIC_NAME": "Metric name successfully changed",
 			"COMMON": "Common",
 			"CUSTOM_METRIC": {
 				"ADD_TITLE": "Add Custom Metric with Query",
