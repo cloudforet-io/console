@@ -194,7 +194,6 @@ onMounted(() => {
                            is-filterable
                            hide-header-without-items
                            show-delete-all-button
-                           highlight-term
                            :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
