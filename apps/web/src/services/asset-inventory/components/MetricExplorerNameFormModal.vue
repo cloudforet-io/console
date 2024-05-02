@@ -114,9 +114,10 @@ const createMetricExample = async () => {
 const updateMetricName = async () => {
     try {
         await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: metricExplorerPageState.metric?.metric_id || '',
+            metric_id: metricExplorerPageGetters.metricId,
             name: name.value,
         });
+        await metricExplorerPageStore.loadMetric(metricExplorerPageGetters.metricId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
