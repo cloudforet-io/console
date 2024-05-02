@@ -60,3 +60,10 @@ export interface EmptyData {
 export interface MoreMenuItem extends MenuItem {
     workspaceId?: string;
 }
+
+// configs
+export type StarredServiceItem = {
+    icon: string;
+    label: TranslateResult;
+    to: string;
+};
