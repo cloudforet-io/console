@@ -2525,6 +2525,7 @@
 				"SET": "Set",
 				"SHOW_ALL": "Show all",
 				"SHOW_CHARTS": "Show Charts",
+				"SHOW_IN_METRIC_EXPLORER": "Show in Metric Explorer",
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "Cloud Service",
 				"USAGE_OVERVIEW": "Usage Overview",

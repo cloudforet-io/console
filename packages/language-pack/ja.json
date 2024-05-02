@@ -2525,6 +2525,7 @@
 				"SET": "設定",
 				"SHOW_ALL": "すべて表示",
 				"SHOW_CHARTS": "チャートの表示",
+				"SHOW_IN_METRIC_EXPLORER": "",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "クラウドサービス",
 				"USAGE_OVERVIEW": "利用概要",

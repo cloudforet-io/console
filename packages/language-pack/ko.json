@@ -2525,6 +2525,7 @@
 				"SET": "설정",
 				"SHOW_ALL": "모두 보기",
 				"SHOW_CHARTS": "차트 보기",
+				"SHOW_IN_METRIC_EXPLORER": "",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "클라우드 서비스 ",
 				"USAGE_OVERVIEW": "이용 현황",
