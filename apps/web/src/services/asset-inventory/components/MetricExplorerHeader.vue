@@ -58,6 +58,7 @@ const state = reactive({
         },
     ])),
     pageTitle: computed<string|TranslateResult>(() => {
+        if (metricExplorerPageState.metricLoading) return '';
         if (metricExplorerPageState.metric) {
             if (metricExplorerPageGetters.metricExample) {
                 return metricExplorerPageGetters.metricExample.name;
@@ -225,7 +226,9 @@ const handleOpenEditQuery = () => {
 
 <template>
     <p-heading :title="state.pageTitle">
-        <template #title-left-extra>
+        <template v-if="!metricExplorerPageState.metricLoading"
+                  #title-left-extra
+        >
             <p-i v-if="metricExplorerPageGetters.metricExampleId"
                  name="ic_example-filled"
                  width="1.5rem"
@@ -239,7 +242,9 @@ const handleOpenEditQuery = () => {
                  :color="gray[500]"
             />
         </template>
-        <template #title-right-extra>
+        <template v-if="!metricExplorerPageState.metricLoading"
+                  #title-right-extra
+        >
             <div v-if="!metricExplorerPageGetters.isManagedMetric"
                  class="title-right-extra icon-wrapper"
             >
@@ -259,12 +264,14 @@ const handleOpenEditQuery = () => {
                           @confirm="handleDeleteMetric"
             />
         </template>
-        <template #extra>
+        <template v-if="!metricExplorerPageState.metricLoading"
+                  #extra
+        >
             <div ref="rightPartRef"
                  class="right-part"
             >
                 <!-- metric case -->
-                <template v-if="!metricExplorerPageState.metricLoading && !metricExplorerPageGetters.metricExampleId">
+                <template v-if="!metricExplorerPageGetters.metricExampleId">
                     <p-button v-if="!metricExplorerPageGetters.isManagedMetric"
                               class="mr-2"
                               style-type="substitutive"
@@ -289,7 +296,7 @@ const handleOpenEditQuery = () => {
                     </p-button>
                 </template>
                 <!-- example case -->
-                <template v-else-if="!metricExplorerPageState.metricLoading">
+                <template v-else>
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
