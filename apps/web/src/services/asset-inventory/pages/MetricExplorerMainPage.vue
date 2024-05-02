@@ -9,6 +9,7 @@ import {
 import MetricImgAlert from '@/assets/images/metric/img_alert.png';
 import MetricImgHowToUse from '@/assets/images/metric/img_how-to-use.png';
 import MetricImgVisualization from '@/assets/images/metric/img_visualization.png';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -31,6 +32,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
+    language: computed(() => store.state.user.language),
     currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
     namespace: computed(() => allReferenceStore.getters.namespace),
     metric: computed(() => allReferenceStore.getters.metric),
@@ -77,6 +79,10 @@ const handleRouteToMetricDetail = (metricId: string) => {
             metricId,
         },
     });
+};
+const handleClickLearnMore = () => {
+    const language = storeState.language === 'ko' ? 'ko/' : '';
+    window.open(`https://cloudforet.io/${language}/docs/guides/asset-inventory/metric-explorer`, '_blank');
 };
 
 const fetchRecentList = async () => {
@@ -126,6 +132,7 @@ const fetchRecentList = async () => {
                 <p-button style-type="secondary"
                           icon-right="ic_external-link"
                           style="margin-top: 0.5rem; margin-bottom: 3rem;"
+                          @click="handleClickLearnMore"
                 >
                     {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.LEARN_MORE') }}
                 </p-button>
