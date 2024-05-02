@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -36,6 +37,11 @@ const state = reactive({
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
     metricExplorerPageStore.setGranularity(granularity);
+    // set period
+    const [_period, _relativePeriod] = getInitialPeriodByGranularity(granularity);
+    metricExplorerPageStore.setPeriod(_period);
+    metricExplorerPageStore.setRelativePeriod(_relativePeriod);
+    metricExplorerPageStore.setRefreshMetricPeriodDropdown(true);
 };
 </script>
 

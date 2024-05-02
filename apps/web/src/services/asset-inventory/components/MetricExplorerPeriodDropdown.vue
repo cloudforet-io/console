@@ -19,12 +19,12 @@ import {
     METRIC_PERIOD_MENU_ITEM_MAP,
 } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getInitialPeriodByGranularity,
     convertRelativePeriodToPeriod, getRefinedDailyPeriod,
 } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
-    Granularity, MetricPeriodMenu,
+    MetricPeriodMenu,
+    RelativePeriod,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -98,11 +98,17 @@ const state = reactive({
 });
 
 /* Util */
-const setSelectedPeriodItemByGranularity = (granularity: Granularity) => {
-    const [_period, _relativePeriod] = getInitialPeriodByGranularity(granularity);
-    metricExplorerPageStore.setPeriod(_period);
-    metricExplorerPageStore.setRelativePeriod(_relativePeriod);
-    state.selectedPeriod = Object.values(METRIC_PERIOD_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, _relativePeriod))?.name;
+const getPeriodItemNameByRelativePeriod = (relativePeriod: RelativePeriod) => Object.values(METRIC_PERIOD_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
+const initSelectedPeriod = () => {
+    if (metricExplorerPageState.relativePeriod) {
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(metricExplorerPageState.relativePeriod);
+    } else if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
+        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, metricExplorerPageState.period));
+        state.selectedPeriod = selectedPeriodItem?.name;
+    } else {
+        state.selectedPeriod = 'custom';
+    }
+    metricExplorerPageStore.setRefreshMetricPeriodDropdown(false);
 };
 
 /* Event */
@@ -133,10 +139,8 @@ const handleCustomRangeModalConfirm = (start: string, end: string) => {
 };
 
 /* Watcher */
-watch(() => metricExplorerPageState.granularity, (granularity) => {
-    if (granularity) {
-        setSelectedPeriodItemByGranularity(granularity);
-    }
+watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
+    if (refresh) initSelectedPeriod();
 }, { immediate: false });
 </script>
 
