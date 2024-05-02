@@ -224,10 +224,15 @@ const handleOpenEditQuery = () => {
 
 <template>
     <p-heading :title="state.pageTitle">
-        <template v-if="metricExplorerPageGetters.isManagedMetric"
-                  #title-left-extra
-        >
-            <p-i name="ic_main-filled"
+        <template #title-left-extra>
+            <p-i v-if="metricExplorerPageGetters.metricExampleId"
+                 name="ic_example-filled"
+                 width="1.5rem"
+                 height="1.5rem"
+                 :color="gray[700]"
+            />
+            <p-i v-else
+                 :name="metricExplorerPageGetters.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
                  width="1rem"
                  height="1rem"
                  :color="gray[500]"
