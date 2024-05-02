@@ -59,6 +59,7 @@ const state = reactive({
 
 watch(() => route.params, async (params) => {
     if (!params.metricId) return;
+    metricExplorerPageStore.reset();
     await Promise.allSettled([
         metricExplorerPageStore.loadMetric(params.metricId),
         metricExplorerPageStore.loadMetricExamples(params.metricId),
