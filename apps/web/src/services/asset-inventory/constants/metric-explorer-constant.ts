@@ -3,11 +3,6 @@ export const GRANULARITY = {
     MONTHLY: 'MONTHLY',
 } as const;
 
-export const STATIC_GROUP_BY = {
-    PROJECT_ID: 'project_id',
-    WORKSPACE_ID: 'workspace_id',
-} as const;
-
 export const OPERATOR = {
     SUM: 'sum',
     AVG: 'avg',
