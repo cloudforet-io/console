@@ -5,7 +5,7 @@ import { i18n } from '@/translations';
 
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkBoardSet } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList: BookmarkItem[];
@@ -26,21 +26,13 @@ const storeState = reactive({
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
-    folderBoardSets: computed<BookmarkBoardSet[]>(() => {
-        const createFolderItem: BookmarkBoardSet = {
+    folderBoardSets: computed<BookmarkItem[]>(() => {
+        const createFolderItem: BookmarkItem = {
             name: i18n.t('HOME.BOOKMARK_CREATE_FOLDER'),
             icon: 'ic_plus',
-            rounded: true,
         };
-        return [createFolderItem, ...props.bookmarkFolderList.map((folder) => ({
-            ...folder,
-            rounded: true,
-        }))];
+        return [createFolderItem, ...props.bookmarkFolderList];
     }),
-    boardSets: computed<BookmarkBoardSet[]>(() => props.bookmarkList.map((d) => ({
-        ...d,
-        rounded: true,
-    }))),
     isFullMode: false,
 });
 </script>
@@ -50,12 +42,12 @@ const state = reactive({
          :style="{ maxHeight: `${props.height}px` }"
     >
         <bookmark-board v-if="!storeState.isFileFullMode"
-                        :board-sets="state.folderBoardSets"
+                        :board-list="state.folderBoardSets"
                         is-folder-board
                         is-full-mode
                         class="board"
         />
-        <bookmark-board :board-sets="state.boardSets"
+        <bookmark-board :board-list="props.bookmarkList"
                         is-full-mode
                         class="board"
         />

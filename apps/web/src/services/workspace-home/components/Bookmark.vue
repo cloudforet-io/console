@@ -20,7 +20,7 @@ import {
     MAX_BOARD_SETS_TABLET,
 } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkBoardSet, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
@@ -37,8 +37,8 @@ const storeState = reactive({
 const state = reactive({
     isTabletSize: computed<boolean>(() => width.value < screens.tablet.max),
     maxBoardSets: computed<number>(() => (state.isTabletSize ? MAX_BOARD_SETS_TABLET : MAX_BOARD_SETS)),
-    boardSets: computed<BookmarkBoardSet[]>(() => {
-        let _bookmarkList: BookmarkBoardSet[] = [];
+    boardList: computed<BookmarkItem[]>(() => {
+        let _bookmarkList: BookmarkItem[] = [];
         if (storeState.isFullMode) return storeState.bookmarkList;
         _bookmarkList = storeState.bookmarkList.slice(0, state.maxBoardSets);
         if (_bookmarkList.length === state.maxBoardSets) {
@@ -70,8 +70,8 @@ onUnmounted(() => {
                             :height="state.contentHeight"
         />
         <bookmark-board v-else
-                        :board-sets="state.boardSets"
-                        :is-max-board-sets="state.boardSets.length === state.maxBoardSets + 1"
+                        :board-list="state.boardList"
+                        :is-max-board-list="state.boardList.length === state.maxBoardSets + 1"
         />
         <bookmark-folder-form-modal v-if="storeState.modalType === BOOKMARK_MODAL_TYPE.FOLDER"
                                     :bookmark-folder-list="storeState.bookmarkFolderList"
