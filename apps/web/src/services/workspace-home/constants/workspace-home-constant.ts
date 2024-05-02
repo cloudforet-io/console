@@ -6,6 +6,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { StarredServiceItem } from '@/services/workspace-home/types/workspace-home-type';
 
 // Bookmark
 export const BOOKMARK_MODAL_TYPE = {
@@ -39,26 +40,26 @@ export const DEFAULT_BOOKMARK = [
 ];
 
 // Configs
-export const STARRED_SERVICE_ITEMS = [
+export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
     {
         icon: 'ic_service_dashboard',
         label: i18n.t('MENU.DASHBOARDS'),
-        to: { name: DASHBOARDS_ROUTE._NAME },
+        to: DASHBOARDS_ROUTE._NAME,
     },
     {
         icon: 'ic_service_project',
         label: i18n.t('MENU.PROJECT'),
-        to: { name: PROJECT_ROUTE._NAME },
+        to: PROJECT_ROUTE._NAME,
     },
     {
         icon: 'ic_service_cloud-service',
         label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'),
-        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+        to: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
     },
     {
         icon: 'ic_service_cost-anlaysis',
         label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
-        to: { name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME },
+        to: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
     },
 ];
 

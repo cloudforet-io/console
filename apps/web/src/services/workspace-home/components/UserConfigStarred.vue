@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldTitle, PSelectDropdown, PI, PPagination, PLink,
+    PFieldTitle, PSelectDropdown, PI, PPagination, PLink, screens,
 } from '@spaceone/design-system';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -16,18 +17,22 @@ import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import UserConfigsItem from '@/services/workspace-home/components/UserConfigsItem.vue';
 import { STARRED_SERVICE_ITEMS } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
+import type { StarredServiceItem } from '@/services/workspace-home/types/workspace-home-type';
 
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
 
+const { width } = useWindowSize();
+
 const storeState = reactive({
     favoriteMenuList: computed<FavoriteItem[]>(() => workspaceHomePageState.favoriteMenuList),
-
 });
 const state = reactive({
     pageStart: 1,
+    isLaptopSize: computed<boolean>(() => width.value < screens.laptop.max),
+    starredServiceItem: computed<StarredServiceItem[]>(() => (state.isLaptopSize ? STARRED_SERVICE_ITEMS.slice(0, 2) : STARRED_SERVICE_ITEMS)),
     slicedFavoriteMenuList: computed<FavoriteItem[]>(() => storeState.favoriteMenuList.slice((state.pageStart - 1) * 10, state.pageStart * 10)),
 });
 const dropdownState = reactive({
@@ -116,10 +121,10 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
             <div class="desc-wrapper">
                 <p>{{ $t('HOME.NO_STARRED_DESC1') }}</p>
                 <div class="route-buttons">
-                    <p-link v-for="(item, idx) in STARRED_SERVICE_ITEMS"
+                    <p-link v-for="(item, idx) in state.starredServiceItem"
                             :key="`starred-service-item-${idx}`"
                             class="starred-service-item"
-                            :to="item.to"
+                            :to="{ name: item.to }"
                             :icon-left="item.icon"
                     >
                         {{ item.label }}
@@ -179,20 +184,8 @@ watch(() => dropdownState.selectedItem, async (selectedItem) => {
                 gap: 0.375rem;
                 .starred-service-item {
                     @apply flex bg-gray-150 text-gray-900;
-                    padding: 0.5rem 0.625rem;
+                    padding: 0.25rem 0.625rem;
                     border-radius: 0.25rem;
-                }
-            }
-        }
-    }
-
-    @screen laptop {
-        .desc-wrapper {
-            .starred-service-item {
-                &:nth-child(3), &:nth-child(4) {
-                    width: 0;
-                    height: 0;
-                    opacity: 0;
                 }
             }
         }
