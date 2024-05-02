@@ -1,6 +1,12 @@
 <template>
     <button class="p-select-button"
-            :class="{selected: isSelected, [styleType]: disabled ? false : true, [state.size]: true, disabled}"
+            :class="{
+                selected: isSelected,
+                [styleType]: disabled ? false : true,
+                [state.size]: true,
+                disabled,
+                ['icon-layout']: layout === SELECT_BUTTON_LAYOUT_TYPE.ICON_ONLY,
+            }"
             @click="onClick"
             v-on="$listeners"
     >
@@ -169,6 +175,10 @@ export default defineComponent<Props>({
     border-width: 1px;
     border-style: solid;
     padding: 0.25rem;
+
+    &.icon-layout {
+        line-height: 0;
+    }
 
     &.disabled {
         @apply border border-solid border-gray-300;
