@@ -3,8 +3,9 @@ import {
     useElementSize,
 } from '@vueuse/core';
 import {
-    computed, reactive, ref,
+    computed, reactive, ref, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButton, PPopover, PBadge, PIconButton,
@@ -18,6 +19,7 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
@@ -43,6 +45,11 @@ const handleClickFilter = () => {
 const handleClickRefresh = () => {
     metricExplorerPageStore.setRefreshMetricData(true);
 };
+
+/* watch */
+watch(() => route.params, async () => {
+    state.filtersPopoverVisible = false;
+});
 </script>
 
 <template>
