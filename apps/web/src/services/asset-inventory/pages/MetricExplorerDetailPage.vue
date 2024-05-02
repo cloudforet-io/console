@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     PDivider,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
@@ -64,6 +65,7 @@ watch(() => route.params, async (params) => {
         metricExplorerPageStore.loadMetric(params.metricId),
         metricExplorerPageStore.loadMetricExamples(params.metricId),
     ]);
+    metricExplorerPageStore.setFilters(cloneDeep(metricExplorerPageGetters.metricExample?.options?.filters));
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
