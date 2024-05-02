@@ -166,7 +166,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
            :top-title="state.topTitle"
            class="cloud-service-l-s-b"
     >
-        <template #collapsible-contents>
+        <template #collapsible-contents-provider>
             <p-radio-group direction="vertical"
                            class="provider-radio-group"
             >

@@ -7,7 +7,7 @@ import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, sum } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -34,11 +34,6 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
-    filtersLength: computed<number>(() => {
-        const selectedValues = Object.values(costAnalysisPageState.filters);
-        return sum(selectedValues.map((v) => v?.length || 0));
-    }),
-    //
     proxyLegends: useProxyValue('legends', props, emit),
     groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];

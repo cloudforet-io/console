@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { cloneDeep, sortBy, sum } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cost-report-data/api-verbs/analyze';
@@ -17,7 +18,6 @@ import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
-
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -176,7 +176,8 @@ const drawChart = () => {
         templateField: 'pieSettings',
     });
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(series, tooltip, state.baseInfo?.currency);
+    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+    chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(cloneDeep(state.chartData));
 };

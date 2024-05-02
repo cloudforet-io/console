@@ -14,6 +14,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -21,7 +22,7 @@ import type { ConfigData } from '@/lib/helper/config-data-helper';
 import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
-    convertDashboardConfigToReferenceData, convertMenuConfigToReferenceData,
+    convertDashboardConfigToReferenceData, convertMenuConfigToReferenceData, convertMetricConfigToReferenceData,
     convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 
@@ -62,6 +63,7 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
 });
 const state = reactive({
@@ -104,6 +106,9 @@ const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     }
     if (itemType === FAVORITE_TYPE.CLOUD_SERVICE || itemType === FAVORITE_TYPE.SECURITY) {
         return convertCloudServiceConfigToReferenceData([favoriteConfig], storeState.cloudServiceTypes)[0];
+    }
+    if (itemType === FAVORITE_TYPE.METRIC) {
+        return convertMetricConfigToReferenceData([favoriteConfig], storeState.metrics)[0];
     }
     if (itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([favoriteConfig], storeState.costQuerySets, storeState.costDataSource)[0];

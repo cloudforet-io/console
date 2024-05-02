@@ -59,7 +59,7 @@ onUnmounted(() => {
                 <router-view />
             </template>
         </vertical-page-layout>
-        <centered-page-layout v-if="route.meta.centeredLayout"
+        <centered-page-layout v-else-if="route.meta.centeredLayout"
                               has-nav-bar
         >
             <router-view />
