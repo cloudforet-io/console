@@ -216,7 +216,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
-                {{ metricExplorerPageGetters.labelKeysReferenceMap[field.name]?.[value]?.label || value }}
+                {{ metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value }}
             </span>
         </template>
     </p-toolbox-table>
