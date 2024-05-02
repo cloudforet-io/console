@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
 import {
     PSelectButton,
 } from '@spaceone/design-system';
@@ -15,6 +17,12 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 
+const state = reactive({
+    groupByItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+        name: d.key,
+        label: d.name,
+    }))),
+});
 /* Event */
 const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: boolean) => {
     if (isSelected && metricExplorerPageState.selectedGroupByList.length >= 3) {
@@ -41,7 +49,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
                 >{{ metricExplorerPageState.selectedGroupByList.length }}</span>
                 <span>/3</span>
             </p>
-            <p-select-button v-for="item in metricExplorerPageGetters.groupByItems"
+            <p-select-button v-for="item in state.groupByItems"
                              :key="item.name"
                              :value="item.name"
                              :selected="metricExplorerPageState.selectedGroupByList"

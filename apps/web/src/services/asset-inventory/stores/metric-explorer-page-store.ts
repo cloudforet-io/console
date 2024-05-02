@@ -12,17 +12,16 @@ import type { MetricExampleListParameters } from '@/schema/inventory/metric-exam
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricGetParameters } from '@/schema/inventory/metric/api-verbs/get';
 import type { MetricModel } from '@/schema/inventory/metric/model';
+import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { getRefinedMetricDataAnalyzeQueryGroupBy } from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod,
-    StaticGroupBy,
     QueryFormMode,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -58,23 +57,20 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
         metricExample: computed<MetricExampleModel|undefined>(() => state.metricExamples.find((d) => d.example_id === getters.metricExampleId)),
-        groupByItems: computed<Array<{name: string, label: string}>>(() => {
+        refinedMetricLabelKeys: computed<MetricLabelKey[]>(() => {
             if (!state.metric?.label_keys?.length) return [];
-            const staticFields: StaticGroupBy[] = ['project_id'];
-            if (_state.isAdminMode) staticFields.push('workspace_id');
-
-            const labelFields: string[] = state.metric?.label_keys || [];
-            return [...staticFields, ...labelFields].map((d) => ({
-                name: d, label: d,
-            }));
+            if (_state.isAdminMode) {
+                return state.metric.label_keys;
+            }
+            return state.metric.label_keys.filter((d) => d.key !== 'workspace_id');
         }),
-        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => getters.groupByItems.filter((d) => state.selectedGroupByList.includes(d.name))),
+        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => getters.refinedMetricLabelKeys.filter((d) => state.selectedGroupByList.includes(d.key))),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
                 if (filterItems.length) {
                     results.push({
-                        k: getRefinedMetricDataAnalyzeQueryGroupBy(category),
+                        k: category,
                         v: filterItems,
                         o: '=',
                     });

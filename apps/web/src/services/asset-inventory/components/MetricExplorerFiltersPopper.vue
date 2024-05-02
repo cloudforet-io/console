@@ -6,16 +6,15 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
+
+import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    getRefinedMetricDataAnalyzeQueryGroupBy,
-} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
@@ -28,30 +27,33 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.groupByItems),
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+        name: d.key,
+        label: d.name,
+    }))),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
-        metricExplorerPageGetters.groupByItems.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name);
+        metricExplorerPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
+            handlerMaps[labelKey.key] = getMenuHandler(labelKey);
         });
         return handlerMaps;
     }),
 });
 
 /* Util */
-const getMenuHandler = (groupBy: string): AutocompleteHandler => {
+const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
+    if (isEmpty(labelKey.reference)) return async () => ({ results: [] });
     try {
         const variableModels = new VariableModel({
             type: 'RESOURCE_VALUE',
-            resource_type: 'inventory.MetricData',
-            reference_key: getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
-            name: groupBy,
+            resource_type: labelKey.reference?.resource_type || '',
+            reference_key: labelKey.reference?.reference_key || '', // getRefinedMetricDataAnalyzeQueryGroupBy(groupBy),
+            name: labelKey.key,
         });
         const handler = getVariableModelMenuHandler(variableModels);
 
         return async (...args) => {
-            if (!groupBy) return { results: [] };
             try {
                 state.loading = true;
                 return await handler(...args);
