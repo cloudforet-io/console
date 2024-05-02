@@ -101,6 +101,7 @@ const createMetricExample = async () => {
                 relative_period: metricExplorerPageState.relativePeriod,
                 group_by: metricExplorerPageState.selectedGroupByList,
                 filters: metricExplorerPageState.filters,
+                operator: metricExplorerPageState.selectedOperator,
             },
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
