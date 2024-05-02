@@ -95,9 +95,15 @@ const openNameFormModal = (modalType: string) => {
     state.metricNameFormModalVisible = true;
 };
 const getDuplicatedMetricName = (name: string): string => {
-    const _name = `${name} Copy`;
-    if (state.existingMetricNameList.includes(_name)) {
-        return getDuplicatedMetricName(_name);
+    let _count = 2;
+    let _name = name;
+    while (state.existingMetricNameList.includes(_name)) {
+        if (_name.endsWith(' copy')) {
+            _name = `${name} copy ${_count}`;
+            _count += 1;
+        } else {
+            _name = `${name} copy`;
+        }
     }
     return _name;
 };
@@ -218,10 +224,15 @@ const handleOpenEditQuery = () => {
 
 <template>
     <p-heading :title="state.pageTitle">
-        <template v-if="metricExplorerPageGetters.isManagedMetric"
-                  #title-left-extra
-        >
-            <p-i name="ic_main-filled"
+        <template #title-left-extra>
+            <p-i v-if="metricExplorerPageGetters.metricExampleId"
+                 name="ic_example-filled"
+                 width="1.5rem"
+                 height="1.5rem"
+                 :color="gray[700]"
+            />
+            <p-i v-else
+                 :name="metricExplorerPageGetters.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
                  width="1rem"
                  height="1rem"
                  :color="gray[500]"
