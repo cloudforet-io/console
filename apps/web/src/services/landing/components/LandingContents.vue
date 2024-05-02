@@ -129,7 +129,7 @@ onUnmounted(() => {
         >
             <div class="contents-wrapper">
                 <landing-search @search="handleSearch" />
-                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0"
+                <landing-recent-visits v-if="storeState.recentWorkspace.length > 0 && state.searchText === ''"
                                        :workspace-list="storeState.workspaceList"
                                        :recent-visits="storeState.recentWorkspace"
                 />
