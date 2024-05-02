@@ -69,7 +69,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             return state.metric.label_keys.filter((d) => d.key !== 'workspace_id');
         }),
         // below is the map of reference store for each reference label key
-        referenceStoreMap: computed<Record<string, ReferenceMap>>(() => {
+        labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
             const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
             state.metric?.label_keys.filter((d) => !isEmpty(d.reference)).forEach((d) => {
                 const _fieldName = d.key.replace('labels.', '');
