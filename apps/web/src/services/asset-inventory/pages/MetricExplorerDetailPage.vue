@@ -63,7 +63,6 @@ watch(() => route.params, async (params) => {
     metricExplorerPageStore.reset();
     await Promise.allSettled([
         metricExplorerPageStore.loadMetric(params.metricId),
-        metricExplorerPageStore.loadMetricExamples(params.metricId),
     ]);
     metricExplorerPageStore.setFilters(cloneDeep(metricExplorerPageGetters.metricExample?.options?.filters));
     gnbStore.setBreadcrumbs(state.breadCrumbs);

@@ -161,10 +161,19 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             console.error(e);
         }
     };
-    const loadMetricExamples = async (metricId?: string) => {
+    const loadMetricExamples = async (namespaceId?: string) => {
+        if (!namespaceId) return;
         try {
             const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
-                metric_id: metricId,
+                query: {
+                    filter: [
+                        {
+                            k: 'namespace_id',
+                            v: namespaceId,
+                            o: 'eq',
+                        },
+                    ],
+                },
             });
             state.metricExamples = res.results || [];
         } catch (e) {

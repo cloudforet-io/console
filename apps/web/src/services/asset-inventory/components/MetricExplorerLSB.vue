@@ -16,7 +16,6 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceItem, NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
-
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/type';
@@ -31,14 +30,12 @@ import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
 
 const route = useRoute();
 const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
-const metricExplorerPageStore = useMetricExplorerPageStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
@@ -209,10 +206,9 @@ watch(() => route.params, (params) => {
 onMounted(async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
-    await metricExplorerPageStore.loadMetricExamples();
     if (!isEmpty(namespaceState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
         namespaceState.selectedNamespace = {
-            label: namespaceState.namespaces.find((item) => item.key === namespaceState.currentMetric?.data.namespace_id).name,
+            label: namespaceState.namespaces.find((item) => item.key === namespaceState.currentMetric?.data.namespace_id)?.name,
             name: namespaceState.currentMetric.data.namespace_id,
         };
     }

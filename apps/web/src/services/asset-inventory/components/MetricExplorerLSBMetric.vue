@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
     PDataLoader, PIconButton, PLazyImg, PSearch, PEmpty, PTooltip,
 } from '@spaceone/design-system';
 import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
+import { isEmpty } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
@@ -36,6 +39,7 @@ const emit = defineEmits<{(e: 'update:selected-namespace', value: NamespaceSubIt
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 const route = useRoute();
 
 
@@ -103,7 +107,7 @@ const state = reactive({
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
-    metricExamples: computed(() => metricExplorerPageStore.state.metricExamples),
+    metricExamples: computed(() => metricExplorerPageState.metricExamples),
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -151,6 +155,10 @@ onMounted(() => {
     }
 });
 
+/* Watcher */
+watch(() => props.selectedNamespace, (selectedNamespace) => {
+    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+}, { immediate: true });
 </script>
 
 <template>
