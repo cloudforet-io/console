@@ -2,6 +2,8 @@ import dayjs from 'dayjs';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 
+import type { ReferenceMap } from '@/store/reference/type';
+
 import {
     gray, transparent, violet, white,
 } from '@/styles/colors';
@@ -46,7 +48,7 @@ const getTreemapChartColor = (idx: number) => {
     return [backgroundColor, fontColor];
 };
 
-export const getMetricChartLegends = (chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
+export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>, chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
@@ -56,7 +58,7 @@ export const getMetricChartLegends = (chartType: ChartType, rawData: AnalyzeResp
         rawData.results?.forEach((d, idx) => {
             if (d.count) {
                 let _name = d[_groupBy];
-                let _label = d[_groupBy];
+                let _label = referenceMap[_groupBy]?.[_name]?.label || d[_groupBy];
                 if (!_name) {
                     _name = `no_${_groupBy}`;
                     _label = 'Unknown';
@@ -112,7 +114,7 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
     return chartData;
 };
 
-export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): RealtimeChartData[] => {
+export const getRefinedMetricRealtimeChartData = (referenceMap: Record<string, ReferenceMap>, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): RealtimeChartData[] => {
     if (!rawData.results?.length) return [];
     const chartData: RealtimeChartData[] = [];
 
@@ -124,8 +126,9 @@ export const getRefinedMetricRealtimeChartData = (rawData: AnalyzeResponse<Metri
     rawData.results.forEach((d, idx) => {
         const [backgroundColor, fontColor] = getTreemapChartColor(idx);
         if (_groupBy) {
+            const _name = d[_groupBy];
             chartData.push({
-                category: d[_groupBy] || 'Unknown',
+                category: referenceMap[_groupBy]?.[_name]?.label || d[_groupBy] || 'Unknown',
                 value: d._total_count || 0,
                 background_color: backgroundColor,
                 font_color: fontColor,
