@@ -1,6 +1,7 @@
 import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -17,6 +18,9 @@ import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
+import type { ReferenceMap } from '@/store/reference/type';
+
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
@@ -65,6 +69,25 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             return state.metric.label_keys.filter((d) => d.key !== 'workspace_id');
         }),
         // below is the map of reference store for each reference label key
+        referenceStoreMap: computed<Record<string, ReferenceMap>>(() => {
+            const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
+            state.metric?.label_keys.filter((d) => !isEmpty(d.reference)).forEach((d) => {
+                const _fieldName = d.key.replace('labels.', '');
+                _labelKeysMap[_fieldName] = d;
+            });
+
+            const _storeMap: Record<string, ReferenceMap> = {};
+            Object.values(_labelKeysMap).forEach((labelKey) => {
+                const _resourceType = labelKey.reference?.resource_type;
+                const targetModelConfig = Object.values(MANAGED_VARIABLE_MODEL_CONFIGS)
+                    .find((d) => (d.resourceType === _resourceType));
+                if (targetModelConfig) {
+                    const _refinedKey = labelKey.key.replace('labels.', '');
+                    _storeMap[_refinedKey] = allReferenceStore.getters[targetModelConfig.key];
+                }
+            });
+            return _storeMap; // e.g. { 'Region': {...}, 'project_id': {...} }
+        }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
