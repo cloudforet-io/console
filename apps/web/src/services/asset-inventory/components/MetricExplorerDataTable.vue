@@ -22,9 +22,6 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    getRefinedMetricDataAnalyzeQueryGroupBy,
-} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
-import {
     getMetricExplorerDataTableDateFields, getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -36,7 +33,12 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
-    groupByFields: computed<DataTableFieldType[]>(() => metricExplorerPageGetters.groupByItems.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.name))),
+    groupByFields: computed<DataTableFieldType[]>(() => {
+        const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
+        return filteredLabelKeys.map((d) => ({
+            name: d.key, label: d.name,
+        }));
+    }),
     dateFields: computed<DataTableFieldType[]>(() => getMetricExplorerDataTableDateFields(
         metricExplorerPageState.granularity,
         metricExplorerPageState.period ?? {},
@@ -69,12 +71,11 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
             .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const _groupBy = metricExplorerPageState.selectedGroupByList.map((groupBy) => getRefinedMetricDataAnalyzeQueryGroupBy(groupBy));
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
-                group_by: _groupBy,
+                group_by: metricExplorerPageState.selectedGroupByList,
                 start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {

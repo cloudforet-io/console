@@ -29,9 +29,6 @@ import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer
 import {
     getMetricChartLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
-import {
-    getRefinedMetricDataAnalyzeQueryGroupBy,
-} from '@/services/asset-inventory/helpers/metric-explorer-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
     ChartType, Legend, MetricDataAnalyzeResult, Period,
@@ -71,7 +68,7 @@ const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeRespon
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
-        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [getRefinedMetricDataAnalyzeQueryGroupBy(metricExplorerPageState.selectedChartGroupBy)] : [];
+        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [metricExplorerPageState.selectedChartGroupBy] : [];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
