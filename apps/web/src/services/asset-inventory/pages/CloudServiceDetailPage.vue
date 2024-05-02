@@ -213,6 +213,15 @@ const getTableSchema = async (): Promise<null|DynamicLayout> => {
         if (!appContextGetters.isAdminMode && workspaceIndex !== -1) {
             response.options.fields.splice(workspaceIndex, 1);
         }
+        const nameIndex = response.options.fields.findIndex((field) => field.name === 'Name');
+        if (props.isSecurityPage) {
+            response.options.fields[nameIndex] = {
+                ...response.options.fields[nameIndex],
+                options: {
+                    width: '28rem',
+                },
+            };
+        }
         return response;
     } catch (e) {
         ErrorHandler.handleError(e);
