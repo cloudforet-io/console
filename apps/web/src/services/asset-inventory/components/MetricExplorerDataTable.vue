@@ -1,32 +1,40 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
+import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import {
     getMetricExplorerDataTableDateFields,
     getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
@@ -60,6 +68,8 @@ const state = reactive({
     thisPage: 1,
     pageSize: 15,
     more: false,
+    metricResourceType: computed<string|undefined>(() => metricExplorerPageState.metric?.resource_type),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => metricExplorerPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
 });
 
 /* Api */
@@ -125,6 +135,36 @@ const handleExport = async () => {
         ErrorHandler.handleError(e);
     }
 };
+const queryHelper = new QueryHelper();
+const handleClickRow = (item) => {
+    if (!metricExplorerPageState.selectedGroupByList.length) return;
+    const _filters: ConsoleFilter[] = [];
+    metricExplorerPageState.selectedGroupByList.forEach((d) => {
+        const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === d);
+        if (_targetLabelKey) {
+            const _fieldName = _targetLabelKey.key.replace('labels.', '');
+            _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
+        }
+    });
+    if (state.metricResourceType === 'inventory.CloudService') {
+        router.push(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+            params: {},
+            query: {
+                filters: queryHelper.setFilters(_filters).rawQueryStrings,
+            },
+        }));
+    } if (state.metricResourceType.startsWith('inventory.CloudService:')) {
+        const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
+        router.push(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+            params: { provider, group, name },
+            query: {
+                filters: queryHelper.setFilters(_filters).rawQueryStrings,
+            },
+        }));
+    }
+};
 
 watch(
     [
@@ -156,10 +196,12 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                      :searchable="false"
                      :page-size.sync="state.pageSize"
                      row-height-fixed
+                     :row-cursor-pointer="!!metricExplorerPageState.selectedGroupByList.length"
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
                      @export="handleExport"
+                     @rowLeftClick="handleClickRow"
     >
         <template #pagination-area>
             <p-text-pagination :this-page.sync="state.thisPage"
@@ -174,7 +216,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
-                {{ metricExplorerPageGetters.referenceStoreMap[field.name]?.[value]?.label || value }}
+                {{ metricExplorerPageGetters.labelKeysReferenceMap[field.name]?.[value]?.label || value }}
             </span>
         </template>
     </p-toolbox-table>
@@ -184,6 +226,13 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
 .cell-text {
     &.raised {
         @apply text-alert;
+    }
+}
+
+.no-link {
+    /* custom design-system component - p-link */
+    :deep(.p-link) {
+        @apply cursor-auto;
     }
 }
 </style>
