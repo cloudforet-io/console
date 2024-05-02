@@ -2761,6 +2761,10 @@
 			"DELETE_CUSTOM_METRIC": "",
 			"DELETE_METRIC_EXAMPLE": "",
 			"DELETE_MODAL_DESC": "",
+			"DETAIL": {
+				"SAVE_DESC": "",
+				"SAVE_TITLE": ""
+			},
 			"DUPLICATE": "복제",
 			"EDIT_CUSTOM_METRIC_NAME": "",
 			"EDIT_METRIC_EXAMPLE_NAME": "",
