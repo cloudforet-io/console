@@ -64,7 +64,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             }
             return state.metric.label_keys.filter((d) => d.key !== 'workspace_id');
         }),
-        selectedGroupByItems: computed<Array<{name: string, label: string}>>(() => getters.refinedMetricLabelKeys.filter((d) => state.selectedGroupByList.includes(d.key))),
+        // below is the map of reference store for each reference label key
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
             Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
