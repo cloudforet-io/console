@@ -11,6 +11,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { MetricExampleCreateParameters } from '@/schema/inventory/metric-example/api-verbs/create';
+import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
 import type { MetricModel } from '@/schema/inventory/metric/model';
@@ -127,6 +128,18 @@ const updateMetricName = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
     }
 };
+const updateMetricExampleName = async () => {
+    try {
+        await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
+            example_id: metricExplorerPageGetters.metricExampleId,
+            name: name.value,
+        });
+        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    }
+};
 
 /* Event */
 const handleFormConfirm = async () => {
@@ -134,7 +147,11 @@ const handleFormConfirm = async () => {
     if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
         await createMetricExample();
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-        await updateMetricName();
+        if (metricExplorerPageGetters.metricExampleId) {
+            await updateMetricExampleName();
+        } else {
+            await updateMetricName();
+        }
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
         emit('save-as', name.value);
     }
