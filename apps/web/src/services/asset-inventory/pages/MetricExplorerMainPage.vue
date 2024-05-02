@@ -183,6 +183,7 @@ const fetchRecentList = async () => {
 
         .title {
             @apply text-display-sm font-medium;
+            margin-bottom: 0.75rem;
         }
 
         .desc-wrapper {
