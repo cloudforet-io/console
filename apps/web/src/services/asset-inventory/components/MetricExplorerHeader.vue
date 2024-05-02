@@ -263,7 +263,7 @@ const handleOpenEditQuery = () => {
                  class="right-part"
             >
                 <!-- metric case -->
-                <template v-if="!metricExplorerPageGetters.metricExampleId">
+                <template v-if="!metricExplorerPageState.metricLoading && !metricExplorerPageGetters.metricExampleId">
                     <p-button v-if="!metricExplorerPageGetters.isManagedMetric"
                               class="mr-2"
                               style-type="substitutive"
@@ -288,7 +288,7 @@ const handleOpenEditQuery = () => {
                     </p-button>
                 </template>
                 <!-- example case -->
-                <template v-else>
+                <template v-else-if="!metricExplorerPageState.metricLoading">
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
