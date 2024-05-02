@@ -55,7 +55,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
         </div>
         <div class="right-part">
             <strong>{{ $t('INVENTORY.METRIC_EXPLORER.UNIT') }}:</strong>
-            <span class="ml-1">{{ metricExplorerPageState.metric?.unit }}</span>
+            <span class="ml-1">{{ metricExplorerPageState.metric?.unit || '--' }}</span>
         </div>
     </div>
 </template>
