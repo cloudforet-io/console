@@ -37,14 +37,14 @@ const props = withDefaults(defineProps<Props>(), {
     type: NAME_FORM_MODAL_TYPE.EDIT_NAME,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
-    (e: 'confirm', name?: string): void;
+    (e: 'save-as', name?: string): void;
 }>();
 
 const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
-const { getProperRouteLocation } = useProperRouteLocation();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     existingNameList: computed<string[]>(() => {
@@ -52,6 +52,9 @@ const state = reactive({
             return metricExplorerPageState.metricExamples
                 .filter((d) => d.example_id !== metricExplorerPageGetters.metricExampleId)
                 .map((d) => d.name);
+        }
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
+            return metricExplorerPageGetters.metrics.map((d) => d.name);
         }
         return metricExplorerPageGetters.metrics
             .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
@@ -106,7 +109,7 @@ const createMetricExample = async () => {
                 metricId: metricExample.metric_id,
                 metricExampleId: metricExample.example_id,
             },
-        }));
+        })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
     }
@@ -132,7 +135,7 @@ const handleFormConfirm = async () => {
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
         await updateMetricName();
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
-        emit('confirm', name.value);
+        emit('save-as', name.value);
     }
     state.proxyVisible = false;
 };

@@ -40,6 +40,9 @@ const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
     disableLegendToggle: computed<boolean>(() => props.chartType === CHART_TYPE.TREEMAP || props.chartType === CHART_TYPE.COLUMN),
+    chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
+        .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
+        .map((d) => ({ name: d.key, label: d.name }))),
 });
 
 /* Util */
@@ -94,7 +97,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
 
 <template>
     <div class="metric-explorer-chart-legends">
-        <p-select-dropdown :menu="metricExplorerPageGetters.selectedGroupByItems"
+        <p-select-dropdown :menu="state.chartGroupByMenuItems"
                            :selected="metricExplorerPageState.selectedChartGroupBy"
                            :disabled="!metricExplorerPageState.selectedGroupByList.length"
                            class="group-by-select-dropdown"

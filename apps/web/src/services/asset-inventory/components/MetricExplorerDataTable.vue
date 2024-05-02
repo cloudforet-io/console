@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PToolboxTable, PTextPagination,
-} from '@spaceone/design-system';
+import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -22,7 +20,8 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    getMetricExplorerDataTableDateFields, getRefinedMetricExplorerTableData,
+    getMetricExplorerDataTableDateFields,
+    getRefinedMetricExplorerTableData,
 } from '@/services/asset-inventory/helpers/metric-explorer-data-table-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -36,7 +35,7 @@ const state = reactive({
     groupByFields: computed<DataTableFieldType[]>(() => {
         const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
-            name: d.key, label: d.name,
+            name: d.key.replace('labels.', ''), label: d.name,
         }));
     }),
     dateFields: computed<DataTableFieldType[]>(() => getMetricExplorerDataTableDateFields(
@@ -50,7 +49,7 @@ const state = reactive({
     ]),
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
-        if (metricExplorerPageGetters.selectedGroupByItems.length) fields.push(...state.groupByFields);
+        if (metricExplorerPageState.selectedGroupByList.length) fields.push(...state.groupByFields);
         fields.push(...state.dateFields);
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
@@ -175,7 +174,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
-                {{ value }}
+                {{ metricExplorerPageGetters.referenceStoreMap[field.name]?.[value]?.label || value }}
             </span>
         </template>
     </p-toolbox-table>
