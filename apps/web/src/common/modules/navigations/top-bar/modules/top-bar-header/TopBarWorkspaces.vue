@@ -6,7 +6,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PTooltip, PI, PButton, PDivider,
+    PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
@@ -66,6 +66,9 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
 });
+const state = reactive({
+    searchText: '',
+});
 
 const selectWorkspace = (name: string): void => {
     const workspaceId = name;
@@ -97,9 +100,9 @@ const handleClickButton = (hasNoWorkspace?: string) => {
     });
 };
 const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
-    const result = [
+    const result = menuItems.length > 0 ? [
         { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${storeState.workspaceList.length})` },
-    ] as MenuItem[];
+    ] : [] as MenuItem[];
     menuItems.forEach((d) => {
         result.push({
             ...d,
@@ -137,12 +140,15 @@ const checkFavoriteItem = (id: string) => {
     const item = storeState.favoriteItems.find((i) => i.name === id);
     return !!item;
 };
-const menuHandler = async () => ({
-    results: [
-        ...filterStarredItems(storeState.favoriteItems),
-        ...formatMenuItems(storeState.workspaceList),
-    ],
-});
+const menuHandler = async (inputText: string) => {
+    const _workspaceList = storeState.workspaceList.filter((w) => w.name.includes(inputText));
+    return {
+        results: inputText ? formatMenuItems(_workspaceList) : [
+            ...filterStarredItems(storeState.favoriteItems),
+            ...formatMenuItems(_workspaceList),
+        ],
+    };
+};
 
 watch(() => storeState.favoriteItems, async () => {
     if (!selectDropdownRef.value) return;
@@ -184,7 +190,11 @@ onMounted(() => {
                            :class="{'workspace-dropdown': true, 'is-domain-admin': storeState.isDomainAdmin}"
                            style-type="transparent"
                            :handler="menuHandler"
+                           :search-text.sync="state.searchText"
+                           is-filterable
                            hide-header-without-items
+                           show-delete-all-button
+                           highlight-term
                            :selected="storeState.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
@@ -236,7 +246,10 @@ onMounted(() => {
                                              :theme="item?.tags?.theme"
                                              size="xs"
                         />
-                        <span class="label-text">{{ item.label }}</span>
+                        <p-text-highlighting class="label-text"
+                                             :text="item.label"
+                                             :term="state.searchText"
+                        />
                     </div>
                     <favorite-button :item-id="item.name"
                                      :favorite-type="FAVORITE_TYPE.WORKSPACE"
@@ -277,6 +290,17 @@ onMounted(() => {
                             {{ $t("COMMON.GNB.WORKSPACE.MANAGE_WORKSPACE") }}
                         </p-button>
                     </div>
+                </div>
+            </template>
+            <template #no-data-area>
+                <div class="no-data-wrapper">
+                    <p class="title-wrapper">
+                        <span class="title">{{ $t('COMMON.GNB.WORKSPACE.WORKSPACES') }} </span>
+                        <span>({{ storeState.workspaceList.length }})</span>
+                    </p>
+                    <p-empty class="empty">
+                        {{ $t('COMMON.GNB.WORKSPACE.NO_RESULTS_FOUND') }}
+                    </p-empty>
                 </div>
             </template>
         </p-select-dropdown>
@@ -400,6 +424,19 @@ onMounted(() => {
                     height: 0.125rem;
                     margin-left: -1rem;
                 }
+            }
+        }
+
+        .no-data-wrapper {
+            .title-wrapper {
+                @apply text-paragraph-sm text-gray-500;
+                .title {
+                    @apply font-bold;
+                }
+            }
+            .empty {
+                padding-top: 0.75rem;
+                padding-bottom: 1.5rem;
             }
         }
 
