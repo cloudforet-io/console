@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PFieldGroup, PTextInput, PTextEditor, PButton, PSidebar,
@@ -18,12 +19,16 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
+const router = useRouter();
+const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
@@ -83,7 +88,7 @@ const createCustomMetric = async () => {
     try {
         state.loading = true;
         const jsonParsedQuery = JSON.parse(code.value.trim());
-        await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
+        const createdMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
             name: name.value,
             unit: unit.value,
             metric_type: METRIC_TYPE.GAUGE,
@@ -94,6 +99,12 @@ const createCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
         await metricExplorerPageStore.loadMetric(metricExplorerPageGetters.metricId);
+        await router.replace(getProperRouteLocation({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            params: {
+                metricId: createdMetric.metric_id,
+            },
+        })).catch(() => {});
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
     } finally {
@@ -229,7 +240,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
             </p-sidebar>
             <metric-explorer-name-form-modal :visible.sync="state.saveAsModalVisible"
                                              :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
-                                             @confirm="handleSaveAsCustomMetric"
+                                             @save-as="handleSaveAsCustomMetric"
             />
             <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_TITLE')"
                           :visible.sync="state.visibleSaveModal"
