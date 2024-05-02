@@ -1,5 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type { MetricType } from '@/schema/inventory/metric/type';
+import type { MetricType, MetricLabelKey } from '@/schema/inventory/metric/type';
 
 
 export interface MetricModel {
@@ -11,7 +11,7 @@ export interface MetricModel {
     date_field: string;
     unit: string;
     tags: Tags;
-    label_keys: string[];
+    label_keys: MetricLabelKey[];
     is_managed: boolean;
     namespace_id: string;
     domain_id: string;
