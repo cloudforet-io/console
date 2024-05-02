@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider, PTextButton, PI,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -50,9 +50,8 @@ import ExcelExportOptionModal
     from '@/services/asset-inventory/components/CloudServiceDetailExcelExportOptionModal.vue';
 import CloudServiceDetailTabs
     from '@/services/asset-inventory/components/CloudServiceDetailTabs.vue';
+import CloudServiceMetricButton from '@/services/asset-inventory/components/CloudServiceMetricButton.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
-import CloudServiceUsageOverview
-    from '@/services/asset-inventory/components/CloudServiceUsageOverview.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
@@ -60,6 +59,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
 
 interface Props {
     provider?: string;
@@ -80,7 +80,6 @@ const props = withDefaults(defineProps<Props>(), {
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -437,7 +436,11 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                    :total-count="typeOptionState.totalCount"
                    :selected-count="tableState.selectedItems.length"
                    @click-back-button="$router.go(-1)"
-        />
+        >
+            <template #extra>
+                <cloud-service-metric-button go-to-metric-server-page />
+            </template>
+        </p-heading>
         <p-heading v-else-if="props.isSecurityPage"
                    :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                    use-total-count
@@ -454,7 +457,14 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                    :total-count="typeOptionState.totalCount"
                    :selected-count="tableState.selectedItems.length"
                    @click-back-button="$router.go(-1)"
-        />
+        >
+            <template #extra>
+                <cloud-service-metric-button :provider="props.provider"
+                                             :group="props.group"
+                                             :name="props.name"
+                />
+            </template>
+        </p-heading>
         <div v-if="!checkIsEmpty(overviewState.period)"
              class="filter-wrapper"
         >
@@ -530,19 +540,19 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
                             </p-button>
                         </template>
-                        <template v-if="!props.isServerPage &&!props.isSecurityPage"
-                                  #toolbox-bottom
-                        >
-                            <div class="mb-3">
-                                <p-divider />
-                            </div>
-                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
-                                                          :filters="searchFilters"
-                                                          :hidden-filters="hiddenFilters"
-                                                          :period="overviewState.period"
-                                                          :key-item-sets="keyItemSets"
-                            />
-                        </template>
+                        <!--                        <template v-if="!props.isServerPage &&!props.isSecurityPage"-->
+                        <!--                                  #toolbox-bottom-->
+                        <!--                        >-->
+                        <!--                            <div class="mb-3">-->
+                        <!--                                <p-divider />-->
+                        <!--                            </div>-->
+                        <!--                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"-->
+                        <!--                                                          :filters="searchFilters"-->
+                        <!--                                                          :hidden-filters="hiddenFilters"-->
+                        <!--                                                          :period="overviewState.period"-->
+                        <!--                                                          :key-item-sets="keyItemSets"-->
+                        <!--                            />-->
+                        <!--                        </template>-->
                     </p-dynamic-layout>
                 </template>
             </template>

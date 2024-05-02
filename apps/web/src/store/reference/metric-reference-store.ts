@@ -57,7 +57,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
         try {
             const response = await SpaceConnector.clientV2.inventory.metric.list<MetricListParameters, ListResponse<MetricModel>>({
                 query: {
-                    only: ['metric_id', 'name', 'namespace_id', 'is_managed'],
+                    only: ['metric_id', 'name', 'namespace_id', 'is_managed', 'resource_type'],
                 },
             }, { timeout: 3000 });
 
@@ -69,6 +69,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                     data: {
                         namespace_id: metricInfo.namespace_id,
                         is_managed: metricInfo.is_managed,
+                        resource_type: metricInfo.resource_type,
                     },
                 };
             });
@@ -89,6 +90,7 @@ export const useMetricReferenceStore = defineStore('reference-metric', () => {
                 data: {
                     namespace_id: metricInfo.namespace_id,
                     is_managed: metricInfo.is_managed,
+                    resource_type: metricInfo.resource_type,
                 },
             },
         };
