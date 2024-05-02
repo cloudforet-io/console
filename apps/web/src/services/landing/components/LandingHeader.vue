@@ -40,8 +40,6 @@ const handleOpenedMenu = (visible: boolean) => {
     @apply absolute flex;
     top: 0.652rem;
     right: 1.5rem;
-    .toggle-button {
-        margin-right: -0.5rem;
-    }
+    gap: 0.5rem;
 }
 </style>

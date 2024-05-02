@@ -57,23 +57,25 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
 
 <template>
     <div class="top-bar-toolset">
-        <top-bar-integration v-if="!state.isAdminMode && !state.isGrantLoading && state.integrationMenu"
-                             :menu="state.integrationMenu"
-                             :visible="props.openedMenu === 'integration'"
-                             @update:visible="updateOpenedMenu('integration', $event)"
-        />
-        <top-bar-favorite v-if="!state.isAdminMode && !state.isGrantLoading"
-                          :visible="props.openedMenu === 'favorite'"
-                          @update:visible="updateOpenedMenu('favorite', $event)"
-        />
-        <top-bar-notifications v-if="!state.isAdminMode && !state.isGrantLoading"
-                               :visible="props.openedMenu === 'notifications'"
-                               @update:visible="updateOpenedMenu('notifications', $event)"
-        />
-        <top-bar-notice v-if="!state.isAdminMode && !state.isGrantLoading"
-                        :visible="props.openedMenu === 'notice'"
-                        @update:visible="updateOpenedMenu('notice', $event)"
-        />
+        <div class="top-bar-icons-wrapper">
+            <top-bar-integration v-if="!state.isAdminMode && !state.isGrantLoading && state.integrationMenu"
+                                 :menu="state.integrationMenu"
+                                 :visible="props.openedMenu === 'integration'"
+                                 @update:visible="updateOpenedMenu('integration', $event)"
+            />
+            <top-bar-favorite v-if="!state.isAdminMode && !state.isGrantLoading"
+                              :visible="props.openedMenu === 'favorite'"
+                              @update:visible="updateOpenedMenu('favorite', $event)"
+            />
+            <top-bar-notifications v-if="!state.isAdminMode && !state.isGrantLoading"
+                                   :visible="props.openedMenu === 'notifications'"
+                                   @update:visible="updateOpenedMenu('notifications', $event)"
+            />
+            <top-bar-notice v-if="!state.isAdminMode && !state.isGrantLoading"
+                            :visible="props.openedMenu === 'notice'"
+                            @update:visible="updateOpenedMenu('notice', $event)"
+            />
+        </div>
         <p-tooltip :contents="state.tooltipTexts.adminToggle"
                    position="bottom"
         >
@@ -88,5 +90,9 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
 <style lang="postcss" scoped>
 .top-bar-toolset {
     @apply flex items-center;
+    gap: 0.5rem;
+    .top-bar-icons-wrapper {
+        @apply flex items-center;
+    }
 }
 </style>
