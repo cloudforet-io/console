@@ -10,14 +10,15 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 
 import { i18n } from '@/translations';
 
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
-interface Props {
-    selectedItem?: DataSourceItem;
-}
 
-const props = withDefaults(defineProps<Props>(), {
-    selectedItem: undefined,
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageGetters = dataSourcesPageStore.getters;
+
+const storeState = reactive({
+    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
 });
 
 const tableState = reactive({
@@ -31,13 +32,13 @@ const tableState = reactive({
 </script>
 
 <template>
-    <div class="data-source-management-tab-detail">
+    <div class="data-source-management-tab-detail-base-information">
         <p-heading heading-type="sub"
                    :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
                    class="title"
         />
         <p-definition-table :fields="tableState.fields"
-                            :data="props.selectedItem"
+                            :data="storeState.selectedItem"
                             :skeleton-rows="4"
                             style-type="white"
                             class="data-source-definition-table"
@@ -46,11 +47,11 @@ const tableState = reactive({
             <template #data-name>
                 <div class="col-name">
                     <p-lazy-img class="left-icon"
-                                :src="props.selectedItem.icon"
+                                :src="storeState.selectedItem?.icon"
                                 width="1.5rem"
                                 height="1.5rem"
                     />
-                    <span>{{ props.selectedItem.name }}</span>
+                    <span>{{ storeState.selectedItem?.name }}</span>
                 </div>
             </template>
         </p-definition-table>
@@ -58,7 +59,7 @@ const tableState = reactive({
 </template>
 
 <style lang="postcss" scoped>
-.data-source-management-tab-detail {
+.data-source-management-tab-detail-base-information {
     .title {
         margin-top: 2.25rem;
     }
