@@ -12,6 +12,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -71,6 +72,14 @@ const state = reactive({
     metricResourceType: computed<string|undefined>(() => metricExplorerPageState.metric?.resource_type),
     hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => metricExplorerPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
 });
+
+/* Util */
+const getRefinedColumnValue = (field, value) => {
+    if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
+        return numberFormatter(value, { notation: 'compact' }) || '--';
+    }
+    return metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+};
 
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
@@ -167,6 +176,7 @@ watch(
         () => metricExplorerPageGetters.metricId,
         () => metricExplorerPageState.period,
         () => metricExplorerPageState.selectedOperator,
+        () => metricExplorerPageState.selectedGroupByList,
         () => metricExplorerPageGetters.consoleFilters,
     ],
     async ([metricId]) => {
@@ -211,7 +221,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
-                {{ metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value }}
+                {{ getRefinedColumnValue(field, value) }}
             </span>
         </template>
     </p-toolbox-table>
