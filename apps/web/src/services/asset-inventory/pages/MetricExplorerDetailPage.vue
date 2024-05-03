@@ -64,8 +64,8 @@ watch(() => route.params, async (params) => {
     if (params.metricExampleId) {
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         metricExplorerPageStore.initMetricExampleOptions();
-    } else if (metricExplorerPageGetters.defaultMetricGroupBy) {
-        metricExplorerPageStore.setSelectedGroupByList([metricExplorerPageGetters.defaultMetricGroupBy]);
+    } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
+        metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
