@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -35,14 +35,15 @@ const tableState = reactive({
     ]),
 });
 
-onMounted(() => {
+watch(() => storeState.selectedItem, (selectedItem) => {
+    if (!selectedItem) return;
     state.loading = true;
     try {
-        dataSourcesPageStore.fetchJobList(storeState.selectedItem?.data_source_id);
+        dataSourcesPageStore.fetchJobList(selectedItem?.data_source_id || '');
     } finally {
         state.loading = false;
     }
-});
+}, { immediate: true });
 </script>
 
 <template>

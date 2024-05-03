@@ -38,7 +38,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const getters = reactive({
         dataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => {
-            const icon = _getters.provider[i.provider].icon;
+            const icon = _getters.provider[i.provider]?.icon;
             return {
                 ...i,
                 icon: assetUrlConverter(icon),
