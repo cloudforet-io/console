@@ -851,8 +851,10 @@
 			},
 			"DATA_SOURCES": {
 				"COL_BILLING_ACCOUNT": "Billing Account",
+				"COL_DATASOURCE": "Data Source",
+				"COL_DESCRIPTION": "Description",
 				"COL_LINKED_ACCOUNT": "Linked Account",
-				"COL_NAME": "Data Source",
+				"COL_NAME": "Name",
 				"COL_TIME": "Registered Time",
 				"COL_WORKSPACE": "Workspace",
 				"GUIDE": "How to register data sources",
