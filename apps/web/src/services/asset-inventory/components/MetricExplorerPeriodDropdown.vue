@@ -149,7 +149,7 @@ const handleCustomRangeModalConfirm = (start: string, end: string) => {
 /* Watcher */
 watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
     if (refresh) initSelectedPeriod();
-}, { immediate: false });
+}, { immediate: true });
 </script>
 
 <template>
