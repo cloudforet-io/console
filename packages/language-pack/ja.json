@@ -1822,7 +1822,7 @@
 		"TOGGLE_MORE": "もっと見る",
 		"WELCOME_BUTTON": "始める",
 		"WELCOME_DESC": "このワークスペースに関連するクラウドアカウントを接続して、今日からリソース管理とコスト削減の最適化を開始してください。",
-		"WELCOME_TITLE": "ようこそ!"
+		"WELCOME_TITLE": "ようこそ{user_name}"
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "重複した「キー：値」です。",

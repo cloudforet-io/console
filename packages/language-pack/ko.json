@@ -1822,7 +1822,7 @@
 		"TOGGLE_MORE": "더보기",
 		"WELCOME_BUTTON": "시작하기",
 		"WELCOME_DESC": "워크스페이스에 관련된 클라우드 계정을 연결하고, 효율적인 리소스 관리 및 비용 최적화를 시작하세요.",
-		"WELCOME_TITLE": "환영합니\u001f다"
+		"WELCOME_TITLE": "{user_name} 환영합니다."
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "중복된 ‘key:value’ 입니다.",
