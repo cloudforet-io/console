@@ -12,6 +12,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
@@ -19,6 +20,7 @@ const storeState = reactive({
 const state = reactive({
     dataSourceList: [] as DataSourceModel[],
     totalCount: 0,
+    selectedIndices: [] as number[],
 });
 
 const fetchDataSourceList = async () => {
@@ -44,7 +46,7 @@ onMounted(() => {
                    use-total-count
                    use-selected-count
                    :total-count="state.totalCount"
-                   :selected-count="1"
+                   :selected-count="state.selectedIndices.length"
         >
             <template #extra>
                 <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
@@ -57,6 +59,9 @@ onMounted(() => {
                 />
             </template>
         </p-heading>
+        <data-source-management-table :data-source-list="state.dataSourceList"
+                                      :selected-indices.sync="state.selectedIndices"
+        />
     </div>
 </template>
 
