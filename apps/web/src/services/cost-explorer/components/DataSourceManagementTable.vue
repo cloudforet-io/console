@@ -2,25 +2,19 @@
 import { computed, reactive } from 'vue';
 
 import { PToolboxTable, PHorizontalLayout, PLazyImg } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 interface Props {
-    dataSourceList?: DataSourceModel[];
+    dataSourceList?: DataSourceItem[];
     selectedIndices?: number[];
 }
 
@@ -29,15 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
     selectedIndices: undefined,
 });
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
-
 const emit = defineEmits<{(e: 'update:selected-indices'): void}>();
 
-const storeState = reactive({
-    timezone: computed(() => store.state.user.timezone),
-    provider: computed(() => allReferenceGetters.provider),
-});
 const state = reactive({
     loading: false,
     selectedIndices: useProxyValue('selectedIndices', props, emit),
@@ -47,18 +34,13 @@ const tableState = reactive({
     pageLimit: 15,
     searchFilters: [] as ConsoleFilter[],
     fields: computed(() => [
-        { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_NAME'), type: 'item' },
+        { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_DATASOURCE'), type: 'item' },
         { name: 'data_source_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING_ACCOUNT'), type: 'item' },
         { name: 'data_source_account_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINKED_ACCOUNT'), type: 'item' },
         { name: 'connected_workspace_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'), type: 'item' },
         { name: 'created_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME'), type: 'item' },
     ]),
 });
-
-const getDataSourceIcon = (provider: string) => {
-    const icon = storeState.provider[provider].icon;
-    return assetUrlConverter(icon);
-};
 
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
@@ -94,7 +76,7 @@ const handleChange = (options: any = {}) => {
                 <template #col-name-format="{value, item}">
                     <div class="col-name">
                         <p-lazy-img class="left-icon"
-                                    :src="getDataSourceIcon(item.provider)"
+                                    :src="item.icon"
                                     width="1.5rem"
                                     height="1.5rem"
                         />
@@ -106,9 +88,6 @@ const handleChange = (options: any = {}) => {
                 </template>
                 <template #col-connected_workspace_count-format="{value}">
                     <span>{{ value || 0 }}</span>
-                </template>
-                <template #col-created_at-format="{value}">
-                    <span>{{ dayjs(value).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}</span>
                 </template>
             </p-toolbox-table>
         </template>

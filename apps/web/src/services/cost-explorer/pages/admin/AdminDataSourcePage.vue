@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive } from 'vue';
 
 import { PHeading, PLink } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -10,21 +11,40 @@ import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-s
 import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
 import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
+import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
+    timezone: computed(() => store.state.user.timezone),
+    provider: computed(() => allReferenceGetters.provider),
 });
 const state = reactive({
     dataSourceList: [] as DataSourceModel[],
+    refinedDataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => ({
+        ...i,
+        icon: getDataSourceIcon(i.provider),
+        created_at: dayjs(i.created_at).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss'),
+    }))),
     totalCount: 0,
     selectedIndices: [] as number[],
-    selectedItem: computed(() => state.dataSourceList[state.selectedIndices[0]]),
+    selectedItem: computed<DataSourceItem>(() => state.refinedDataSourceList[state.selectedIndices[0]]),
 });
 
+const getDataSourceIcon = (provider: string) => {
+    const icon = storeState.provider[provider].icon;
+    return assetUrlConverter(icon);
+};
 const fetchDataSourceList = async () => {
     try {
         const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>();
@@ -62,10 +82,12 @@ onMounted(() => {
             </template>
         </p-heading>
         <div class="contents">
-            <data-source-management-table :data-source-list="state.dataSourceList"
+            <data-source-management-table :data-source-list="state.refinedDataSourceList"
                                           :selected-indices.sync="state.selectedIndices"
             />
-            <data-source-management-tabs v-if="state.selectedIndices.length > 0" />
+            <data-source-management-tabs v-if="state.selectedIndices.length > 0"
+                                         :selected-item="state.selectedItem"
+            />
             <span v-else
                   class="no-data"
             >
