@@ -148,6 +148,8 @@ const queryHelper = new QueryHelper();
 const handleClickRow = (item) => {
     if (!metricExplorerPageState.selectedGroupByList.length) return;
     const _filters: ConsoleFilter[] = [];
+
+    // set filters from groupBy
     metricExplorerPageState.selectedGroupByList.forEach((d) => {
         const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === d);
         if (_targetLabelKey) {
@@ -155,6 +157,17 @@ const handleClickRow = (item) => {
             _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
         }
     });
+
+    // set filters from popper
+    Object.entries(metricExplorerPageState.filters)
+        .filter(([key]) => !metricExplorerPageState.selectedGroupByList.includes(key))
+        .forEach(([key, value]) => {
+            const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === key);
+            if (_targetLabelKey) {
+                _filters.push({ k: _targetLabelKey.search_key, v: value, o: '=' });
+            }
+        });
+
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
     if (state.metricResourceType.startsWith('inventory.CloudService:')) {

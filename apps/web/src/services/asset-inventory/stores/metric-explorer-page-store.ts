@@ -90,10 +90,10 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
-            Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
+            Object.entries(state.filters ?? {}).forEach(([groupBy, filterItems]) => {
                 if (filterItems.length) {
                     results.push({
-                        k: category,
+                        k: groupBy,
                         v: filterItems,
                         o: '=',
                     });
