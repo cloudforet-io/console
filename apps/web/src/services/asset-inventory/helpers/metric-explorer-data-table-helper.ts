@@ -54,7 +54,7 @@ export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResu
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
             if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
-                target?.push({ date: now.format(dateFormat), value: 0 });
+                target?.push({ date: now.format(dateFormat), value: undefined });
             }
             now = now.add(1, timeUnit);
         }

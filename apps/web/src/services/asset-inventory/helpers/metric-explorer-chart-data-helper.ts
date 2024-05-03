@@ -103,9 +103,9 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || undefined;
             } else {
-                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || undefined;
             }
         });
         chartData.push(chartDataByDate);
@@ -129,14 +129,14 @@ export const getRefinedMetricRealtimeChartData = (referenceMap: Record<string, R
             const _name = d[_groupBy];
             chartData.push({
                 category: referenceMap[_groupBy]?.[_name]?.label || d[_groupBy] || 'Unknown',
-                value: d._total_count || 0,
+                value: d._total_count || undefined,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });
         } else {
             chartData.push({
                 category: 'Total Count',
-                value: d._total_count || 0,
+                value: d._total_count || undefined,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });
