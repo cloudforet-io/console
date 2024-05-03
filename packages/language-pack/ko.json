@@ -3017,6 +3017,7 @@
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
+		"COST_EXPLORER_DATA_SOURCES": "",
 		"COST_EXPLORER_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",
 		"COST_EXPLORER_REPORT": "비용 리포트",
 		"COST_EXPLORER_TITLE": "기능 활성화 필요",
