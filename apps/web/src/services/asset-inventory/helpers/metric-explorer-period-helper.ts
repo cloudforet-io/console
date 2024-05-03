@@ -29,10 +29,12 @@ export const convertRelativePeriodToPeriod = (granularity: Granularity, relative
         };
     }
     if (includeToday) {
-        return {
-            start: today.subtract(relativePeriod.value, 'month').startOf('month').format(dateFormat),
-            end: today.format(dateFormat),
-        };
+        if (relativePeriod.unit === 'day') {
+            return {
+                start: today.subtract(relativePeriod.value, 'day').format(dateFormat),
+                end: today.format(dateFormat),
+            };
+        }
     }
     return {
         start: today.subtract(relativePeriod.value, relativePeriod.unit).startOf('month').format(dateFormat),
@@ -48,7 +50,7 @@ export const getRefinedDailyPeriod = (yearMonth: string): Period => ({
 export const getInitialPeriodByGranularity = (granularity: Granularity): [Period, RelativePeriod|undefined] => {
     let periodMenu: MetricPeriodMenu = METRIC_PERIOD_MENU.LAST_6_MONTHS;
     if (granularity === GRANULARITY.DAILY) {
-        periodMenu = METRIC_PERIOD_MENU.CURRENT_MONTH;
+        periodMenu = METRIC_PERIOD_MENU.LAST_14_DAYS;
     }
     const relativePeriod: RelativePeriod = METRIC_PERIOD_MENU_ITEM_MAP[periodMenu].relativePeriod;
     return [convertRelativePeriodToPeriod(granularity, relativePeriod), relativePeriod];
