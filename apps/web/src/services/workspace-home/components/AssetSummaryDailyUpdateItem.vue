@@ -101,8 +101,7 @@ const state = reactive({
                      class="warning-icon"
                 />
                 <router-link :to="state.dailyUpdateItem.createdHref">
-                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED') }}</span>
-                    <span>{{ state.dailyUpdateItem.createdCount }}</span>
+                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_CREATED', { count: state.dailyUpdateItem.createdCount }) }}</span>
                 </router-link>
             </span>
         </div>
@@ -117,8 +116,7 @@ const state = reactive({
                      class="warning-icon"
                 />
                 <router-link :to="state.dailyUpdateItem.deletedHref">
-                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED') }}</span>
-                    <span>{{ state.dailyUpdateItem.deletedCount }}</span>
+                    <span class="label">{{ $t('HOME.ASSET_SUMMARY_DELETED', { count: state.dailyUpdateItem.deletedCount }) }}</span>
                 </router-link>
             </span>
         </div>
@@ -153,9 +151,6 @@ const state = reactive({
             border-radius: 0.25rem;
             .warning-icon {
                 margin-top: -0.125rem;
-                margin-right: 0.25rem;
-            }
-            .label {
                 margin-right: 0.25rem;
             }
         }
