@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, onBeforeUnmount, onMounted, reactive, ref,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PBoard, PLazyImg, PI, PIconButton, PContextMenu, PEmpty, PCheckbox,
+    PLazyImg, PI, PEmpty, PCheckbox, PBoardItem, PSelectDropdown,
 } from '@spaceone/design-system';
-import { BOARD_STYLE_TYPE } from '@spaceone/design-system/src/data-display/board/type';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 
@@ -23,20 +22,20 @@ import {
 } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import { useWorkspaceHomePageStore } from '@/services/workspace-home/store/workspace-home-page-store';
-import type { BookmarkBoardSet, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
+import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
-    boardSets: BookmarkBoardSet[];
+    boardList: BookmarkItem[];
     isFullMode?: boolean;
     isFolderBoard?: boolean;
-    isMaxBoardSets?: boolean;
+    isMaxBoardList?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    boardSets: () => ([]),
+    boardList: () => ([]),
     isFullMode: false,
     isFolderBoard: false,
-    isMaxBoardSets: false,
+    isMaxBoardList: false,
 });
 
 const bookmarkStore = useBookmarkStore();
@@ -44,8 +43,6 @@ const bookmarkState = bookmarkStore.state;
 const bookmarkGetters = bookmarkStore.getters;
 const workspaceHomePageStore = useWorkspaceHomePageStore();
 const workspaceHomePageState = workspaceHomePageStore.state;
-
-const boardItemEl = ref<HTMLElement | null>(null);
 
 const storeState = reactive({
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
@@ -81,15 +78,15 @@ const state = reactive({
         }
         return defaultSets;
     }),
-    menuVisible: false,
 });
 
-const handleClickDropdownButton = (item: BookmarkItem) => {
-    state.menuVisible = !state.menuVisible;
-    bookmarkStore.setSelectedBookmark(item, true);
+const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
+    if (visibleMenu) {
+        bookmarkStore.setSelectedBookmark(item, true);
+    }
 };
-const handleSelectDropdownMenu = (item: MenuItem) => {
-    if (item.name === 'edit') {
+const handleSelectDropdownMenu = (item: string) => {
+    if (item === 'edit') {
         if (props.isFolderBoard) {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.FOLDER, true);
         } else {
@@ -97,7 +94,7 @@ const handleSelectDropdownMenu = (item: MenuItem) => {
         }
         return;
     }
-    if (item.name === 'delete') {
+    if (item === 'delete') {
         if (props.isFolderBoard) {
             bookmarkStore.setModalType(BOOKMARK_MODAL_TYPE.DELETE_FOLDER);
         } else {
@@ -134,25 +131,10 @@ const handleClickCheckBox = (item: BookmarkItem) => {
     }
     bookmarkStore.deleteSelectedId(idx);
 };
-const checkSelectedId = (id: string) => {
+const checkSelectedId = (id?: string) => {
     const idx = storeState.selectedBookmarks.findIndex((i) => id === i.id);
     return idx !== -1;
 };
-
-const handleClickOutside = (event) => {
-    if (!event.relatedTarget) {
-        state.menuVisible = false;
-    }
-};
-
-
-onMounted(() => {
-    document.addEventListener('focusout', handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('focusout', handleClickOutside);
-});
 </script>
 
 <template>
@@ -162,28 +144,26 @@ onBeforeUnmount(() => {
              'no-data': storeState.bookmarkFolderData.length === 0 && storeState.bookmarkList.length === 0
          }"
     >
-        <p-board v-if="props.boardSets.length > 0"
-                 :board-sets="props.boardSets"
-                 selectable
-                 :style-type="BOARD_STYLE_TYPE.cards"
-                 class="bookmark-board-wrapper"
-                 :class="{'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardSets}"
-                 @item-click="handleClickItem"
+        <div v-if="props.boardList.length > 0"
+             class="bookmark-board-wrapper"
+             :class="{'folder': props.isFolderBoard, 'is-max-board-sets': props.isMaxBoardList}"
         >
-            <template #item-content="{board}">
-                <div ref="boardItemEl"
-                     class="board-item"
-                     :class="{'selected': checkSelectedId(board.id)}"
-                >
-                    <p-checkbox v-if="props.isFullMode && !board.icon"
+            <p-board-item v-for="(item, idx) in props.boardList"
+                          :key="idx"
+                          class="board-item"
+                          :class="{'selected': checkSelectedId(item.id)}"
+                          @click="handleClickItem(item)"
+            >
+                <template #content>
+                    <p-checkbox v-if="props.isFullMode && !item.icon"
                                 :value="true"
-                                :selected="checkSelectedId(board.id)"
-                                @change="handleClickCheckBox(board)"
+                                :selected="checkSelectedId(item.id)"
+                                @change="handleClickCheckBox(item)"
                     />
                     <div v-if="props.isFolderBoard"
                          class="image-wrapper"
                     >
-                        <p-i v-if="board.icon"
+                        <p-i v-if="item.icon"
                              name="ic_plus"
                              width="1.25rem"
                              height="1.25rem"
@@ -200,16 +180,16 @@ onBeforeUnmount(() => {
                          class="image-wrapper"
                     >
                         <p-lazy-img
-                            v-if="board.imgIcon"
-                            :src="assetUrlConverter(board.imgIcon)"
+                            v-if="item.imgIcon"
+                            :src="assetUrlConverter(item.imgIcon)"
                             error-icon="ic_globe-filled"
                             :error-icon-color="gray[500]"
                             class="icon"
                         />
-                        <div v-else-if="board.icon"
+                        <div v-else-if="item.icon"
                              class="show-more"
                         >
-                            <p-i :name="board.icon"
+                            <p-i :name="item.icon"
                                  width="1.25rem"
                                  height="1.25rem"
                                  :color="gray[700]"
@@ -218,33 +198,29 @@ onBeforeUnmount(() => {
                     </div>
                     <div class="text-wrapper">
                         <p class="bookmark-label">
-                            {{ board.name }}
+                            {{ item.name }}
                         </p>
                         <p v-if="props.isFullMode"
                            class="bookmark-link"
                         >
-                            {{ board.link }}
+                            {{ item.link }}
                         </p>
                     </div>
-                    <div v-if="!board.icon"
-                         class="toolsets-wrapper"
-                    >
-                        <p-icon-button name="ic_ellipsis-horizontal"
-                                       size="md"
-                                       style-type="transparent"
-                                       :color="gray[600]"
-                                       @click.stop="handleClickDropdownButton(board)"
-                        />
-                        <p-context-menu v-if="state.menuVisible"
-                                        :menu="state.menuItems"
-                                        class="toolsets-context-menu"
-                                        no-select-indication
-                                        @select="handleSelectDropdownMenu"
-                        />
-                    </div>
-                </div>
-            </template>
-        </p-board>
+                </template>
+                <template #overlay-content>
+                    <p-select-dropdown v-if="!item.icon"
+                                       :menu="state.menuItems"
+                                       style-type="icon-button"
+                                       button-icon="ic_ellipsis-horizontal"
+                                       use-fixed-menu-style
+                                       class="overlay"
+                                       menu-position="right"
+                                       @select="handleSelectDropdownMenu"
+                                       @update:visible-menu="handleUpdateVisibleMenu(item, $event)"
+                    />
+                </template>
+            </p-board-item>
+        </div>
         <p-empty v-else-if="storeState.recentList.length > 0 && storeState.filterByFolder"
                  class="empty"
         >
@@ -262,88 +238,85 @@ onBeforeUnmount(() => {
 
         /* custom design-system component - p-board-item */
         :deep(.p-board-item) {
-            @apply relative border-none;
-            padding: 0;
-            min-height: 3.5rem;
-            max-height: 3.5rem;
+            .content {
+                @apply flex items-center;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .right-overlay-wrapper {
+                top: 0.75rem;
+                right: 0.5rem;
+                .overlay-contents {
+                    @apply bg-white;
+
+                    .p-select-dropdown .dropdown-context-menu {
+                        min-width: 7.25rem !important;
+                        margin-top: 0;
+                        margin-left: -5.25rem;
+                    }
+                }
+            }
+        }
+
+        .board-item {
+            @apply relative bg-white border border-gray-150 box-border cursor-pointer;
+            min-height: 3.625rem;
+            max-height: 3.625rem;
             box-shadow: none;
+            padding: 0.5rem 0.75rem 0.5rem 0.5rem;
             border-radius: 0.75rem;
 
             &:hover {
-                @apply bg-white;
+                @apply border border-blue-500;
                 box-shadow: 0 0 4px 0 rgba(0, 178, 255, 0.4);
-                .board-item .text-wrapper {
+
+                .text-wrapper {
                     max-width: calc(100% - 4.5rem);
                 }
-                .toolsets-wrapper {
-                    @apply block;
-                }
             }
 
-            .content {
-                width: 100%;
-            }
+            .image-wrapper {
+                @apply flex items-center justify-center;
+                width: 2rem;
+                height: 2rem;
+                border-radius: 0.375rem;
 
-            .board-item {
-                @apply flex items-center border border-gray-150 box-border;
-                min-height: 3.5rem;
-                padding: 0.5rem 0.75rem 0.5rem 0.5rem;
-                gap: 0.5rem;
-                border-radius: 0.75rem;
-
-                &:hover {
-                    @apply bg-white border border-blue-500;
-                }
-
-                .image-wrapper {
-                    @apply flex items-center justify-center;
-                    width: 2rem;
-                    height: 2rem;
-                    border-radius: 0.375rem;
-
-                    .icon, img, svg {
+                /* custom design-system component - p-lazy-img */
+                :deep(.p-lazy-img) {
+                    img {
                         width: 1.25rem !important;
                         height: 1.25rem !important;
                     }
-
-                    .show-more {
-                        @apply flex items-center justify-center bg-gray-100 rounded-xl;
-                        width: 2.5rem;
-                        height: 2.5rem;
-                    }
                 }
 
-                .text-wrapper {
-                    max-width: calc(100% - 3rem);
+                .icon, svg {
+                    width: 1.25rem !important;
+                    height: 1.25rem !important;
+                }
 
-                    .bookmark-label {
-                        @apply truncate;
-                    }
-
-                    .bookmark-link {
-                        @apply text-label-sm text-gray-500 truncate;
-                    }
+                .show-more {
+                    @apply flex items-center justify-center bg-gray-100 rounded-xl;
+                    width: 2.5rem;
+                    height: 2.5rem;
                 }
             }
 
-            .toolsets-wrapper {
-                @apply absolute hidden rounded-full;
-                top: 0.75rem;
-                right: 0.5rem;
+            .text-wrapper {
+                max-width: calc(100% - 2.5rem);
+
+                .bookmark-label {
+                    @apply truncate;
+                }
+
+                .bookmark-link {
+                    @apply text-label-sm text-gray-500 truncate;
+                }
+            }
+
+            .overlay {
+                @apply rounded-full;
                 width: 2rem;
                 height: 2rem;
-
-                /* custom design-system component - p-icon-button */
-                :deep(.p-icon-button) {
-                    @apply relative;
-                }
-
-                .toolsets-context-menu {
-                    @apply absolute;
-                    right: 0;
-                    min-width: 7.25rem;
-                    z-index: 10;
-                }
             }
         }
     }
@@ -365,9 +338,8 @@ onBeforeUnmount(() => {
                     /* custom design-system component - p-board-item */
                     :deep(.p-board-item) {
                         &:last-child {
-                            .board-item {
+                            .content {
                                 @apply items-center justify-center;
-                                padding-top: 0.875rem;
 
                                 .bookmark-label {
                                     @apply hidden;
@@ -379,27 +351,14 @@ onBeforeUnmount(() => {
 
                 /* custom design-system component - p-board-item */
                 :deep(.p-board-item) {
-                    &:hover {
-                        .toolsets-wrapper {
-                            @apply hidden;
-                        }
-                    }
-                    .toolsets-wrapper {
-                        @apply hidden;
-                    }
-                    .board-item .text-wrapper {
-                        max-width: calc(100% - 1.5rem);
+                    padding: 0.5rem;
+                    .content {
+                        @apply flex-col;
+                        gap: 0.125rem;
                     }
                 }
-            }
 
-            /* custom design-system component - p-board-item */
-            :deep(.p-board-item) {
                 .board-item {
-                    @apply flex-col;
-                    padding: 0.5rem;
-                    gap: 0.375rem;
-
                     .image-wrapper {
                         width: 1.25rem;
                         height: 1.25rem;
@@ -411,6 +370,14 @@ onBeforeUnmount(() => {
 
                         .show-more {
                             @apply bg-transparent;
+                        }
+                    }
+                    &:hover {
+                        .text-wrapper {
+                            max-width: calc(100% - 2.5rem);
+                        }
+                        .overlay {
+                            @apply hidden;
                         }
                     }
                 }
@@ -425,28 +392,38 @@ onBeforeUnmount(() => {
 
             @screen tablet {
                 @apply grid-cols-1;
-            }
 
-            /* custom design-system component - p-board-item */
-            :deep(.p-board-item) {
-                @apply border-gray-200;
-                .board-item {
-                    padding: 0.5rem;
-                    &.selected {
-                        @apply bg-blue-100;
+                /* custom design-system component - p-board-item */
+                :deep(.p-board-item) {
+                    .content-area .desktop {
+                        @apply block;
                     }
                 }
-                .board-item .text-wrapper {
-                    max-width: calc(100% - 4.75rem);
-                }
+            }
 
-                &:hover {
-                    @apply border-blue-500;
-                    .board-item .text-wrapper {
+            .board-item {
+                @apply border-gray-200;
+                padding: 0.5rem;
+
+                &.selected {
+                    @apply bg-blue-100;
+                }
+                .text-wrapper {
+                    max-width: calc(100% - 4.25rem);
+
+                    @screen tablet {
                         max-width: calc(100% - 6.5rem);
                     }
                 }
-
+                &:hover {
+                    @apply border-blue-500;
+                    .text-wrapper {
+                        max-width: calc(100% - 6.5rem);
+                    }
+                    .overlay {
+                        @apply block;
+                    }
+                }
                 &:first-child {
                     .image-wrapper {
                         @apply bg-gray-100;
@@ -466,8 +443,7 @@ onBeforeUnmount(() => {
                     @apply bg-blue-200;
                 }
 
-                /* custom design-system component - p-board-item */
-                :deep(.p-board-item) {
+                .board-item {
                     &:first-child {
                         .image-wrapper {
                             @apply bg-white;
