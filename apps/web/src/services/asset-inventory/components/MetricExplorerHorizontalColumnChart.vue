@@ -4,9 +4,6 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PSkeleton,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
@@ -88,10 +85,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else
+        <div v-show="!props.loading"
              ref="chartContext"
              class="chart"
         />

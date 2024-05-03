@@ -4,9 +4,6 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PSkeleton, PEmpty,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
@@ -104,26 +101,15 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else-if="props.chartData.length"
+        <div v-show="props.chartData.length"
              ref="chartContext"
              class="chart"
         />
-        <p-empty v-else
-                 class="empty-wrapper"
-        >
-            <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
-        </p-empty>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .chart {
-    height: 100%;
-}
-.empty-wrapper {
     height: 100%;
 }
 </style>

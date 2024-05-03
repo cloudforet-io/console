@@ -48,7 +48,7 @@ const getTreemapChartColor = (idx: number) => {
     return [backgroundColor, fontColor];
 };
 
-export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>, chartType: ChartType, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
+export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>, chartType: ChartType|string, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         if (groupBy.includes('.')) {
