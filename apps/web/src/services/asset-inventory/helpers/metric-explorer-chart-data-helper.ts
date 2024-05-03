@@ -114,6 +114,15 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
     return chartData;
 };
 
+export const getFilteredRealtimeData = (rawData: AnalyzeResponse<MetricDataAnalyzeResult>): AnalyzeResponse<MetricDataAnalyzeResult> => {
+    if (!rawData.results?.length) return rawData;
+
+    const _latestData = rawData.results[0];
+    return {
+        more: rawData.more,
+        results: rawData.results.filter((d) => d.date === _latestData.date),
+    };
+};
 export const getRefinedMetricRealtimeChartData = (referenceMap: Record<string, ReferenceMap>, rawData: AnalyzeResponse<MetricDataAnalyzeResult>, groupBy?: string): RealtimeChartData[] => {
     if (!rawData.results?.length) return [];
     const chartData: RealtimeChartData[] = [];
@@ -129,14 +138,14 @@ export const getRefinedMetricRealtimeChartData = (referenceMap: Record<string, R
             const _name = d[_groupBy];
             chartData.push({
                 category: referenceMap[_groupBy]?.[_name]?.label || d[_groupBy] || 'Unknown',
-                value: d._total_count || undefined,
+                value: d.count || undefined,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });
         } else {
             chartData.push({
                 category: 'Total Count',
-                value: d._total_count || undefined,
+                value: d.count || undefined,
                 background_color: backgroundColor,
                 font_color: fontColor,
             });

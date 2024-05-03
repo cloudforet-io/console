@@ -27,6 +27,7 @@ import MetricExplorerLineChart from '@/services/asset-inventory/components/Metri
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
+    getFilteredRealtimeData,
     getMetricChartLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -57,7 +58,9 @@ const state = reactive({
     isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
     periodText: computed<string>(() => {
         if (isEmpty(metricExplorerPageState.period)) return '';
-        if (state.isRealtimeChart) return metricExplorerPageState.period.end || '';
+        if (state.isRealtimeChart) {
+            return state.data?.results[0]?.date || '';
+        }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
     }),
 });
@@ -69,12 +72,14 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
         const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [metricExplorerPageState.selectedChartGroupBy] : [];
+        const _sort = state.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = state.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
-                start: state.isRealtimeChart ? metricExplorerPageState.period?.end : metricExplorerPageState.period?.start,
+                start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
                     count: {
@@ -82,12 +87,12 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: '_total_count', desc: true }],
-                field_group: ['date'],
+                sort: _sort,
+                field_group: _fieldGroup,
                 ...analyzeApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') return getFilteredRealtimeData(response);
         return undefined;
     } catch (e) {
         return { more: false, results: [] };
