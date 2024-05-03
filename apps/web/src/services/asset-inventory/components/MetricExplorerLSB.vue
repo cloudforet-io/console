@@ -333,7 +333,8 @@ onMounted(async () => {
             height: 1.6875rem;
         }
         .namespace-wrapper {
-            @apply flex flex-col gap-1;
+            @apply flex flex-col;
+            gap: 0.5rem;
 
             .category-menu-item {
                 padding: 0 0.25rem;
