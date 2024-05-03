@@ -849,6 +849,14 @@
 				"TOTAL_COST": "トータルコスト",
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
+			"DATA_SOURCES": {
+				"COL_BILLING": "",
+				"COL_LINK": "",
+				"COL_NAME": "",
+				"COL_TIME": "",
+				"COL_WORKSPACE": "",
+				"GUIDE": ""
+			},
 			"HOME": {
 				"CONTACT_BUTTON": "お問い合わ",
 				"COST_ANALYSIS_DESC": "様々なグループ分けオプション、フィルター、粒度設定を使用して、使用状況とコストを探索し、分析を行います。",

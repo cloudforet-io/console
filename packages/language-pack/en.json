@@ -849,6 +849,14 @@
 				"TOTAL_COST": "Total Cost",
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
+			"DATA_SOURCES": {
+				"COL_BILLING": "Billing Account",
+				"COL_LINK": "Linked Account",
+				"COL_NAME": "Data Source",
+				"COL_TIME": "Registered Time",
+				"COL_WORKSPACE": "Workspace",
+				"GUIDE": "How to register data sources"
+			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",
 				"COST_ANALYSIS_DESC": "Explore your usage and costs while conducting analysis using various group-by options, filters, and granularity settings.",
