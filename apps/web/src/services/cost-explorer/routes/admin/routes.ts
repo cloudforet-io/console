@@ -21,6 +21,7 @@ const AdminBudgetDetailPage = () => import('@/services/cost-explorer/pages/admin
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
+const DataSourcesPage = () => import('@/services/cost-explorer/pages/admin/AdminDataSourcePage.vue');
 
 const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -157,6 +158,35 @@ const adminCostExplorerRoutes: RouteConfig = {
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_REPORT._NAME),
                     meta: { menuId: MENU_ID.COST_REPORT },
                     component: CostReportPage as any,
+                },
+            ],
+        },
+        {
+            path: 'data-sources',
+            meta: {
+                menuId: MENU_ID.DATA_SOURCES,
+                translationId: MENU_INFO_MAP[MENU_ID.DATA_SOURCES].translationId,
+            },
+            component: { template: '<router-view />' },
+            beforeEnter: async (to, from, next) => {
+                try {
+                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                    const results = response?.results || [];
+                    if (results.length === 0) { // none-data-source case
+                        next({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME) });
+                    } else {
+                        next();
+                    }
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            },
+            children: [
+                {
+                    path: '/',
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.DATA_SOURCES._NAME),
+                    meta: { menuId: MENU_ID.DATA_SOURCES },
+                    component: DataSourcesPage as any,
                 },
             ],
         },
