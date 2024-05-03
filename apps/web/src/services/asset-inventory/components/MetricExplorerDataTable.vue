@@ -146,24 +146,20 @@ const handleClickRow = (item) => {
             _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
         }
     });
-    if (state.metricResourceType === 'inventory.CloudService') {
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-            params: {},
-            query: {
-                filters: queryHelper.setFilters(_filters).rawQueryStrings,
-            },
-        }));
-    } if (state.metricResourceType.startsWith('inventory.CloudService:')) {
+    let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
+    let _params = {};
+    if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: { provider, group, name },
-            query: {
-                filters: queryHelper.setFilters(_filters).rawQueryStrings,
-            },
-        }));
+        _params = { provider, group, name };
+        _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
     }
+    window.open(router.resolve(getProperRouteLocation({
+        name: _routeName,
+        params: _params,
+        query: {
+            filters: queryHelper.setFilters(_filters).rawQueryStrings,
+        },
+    })).href, '_blank');
 };
 
 watch(
