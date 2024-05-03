@@ -3017,6 +3017,7 @@
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
+		"COST_EXPLORER_DATA_SOURCES": "",
 		"COST_EXPLORER_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",
 		"COST_EXPLORER_REPORT": "コストレポート",
 		"COST_EXPLORER_TITLE": "アクティベーションが必要です。",
