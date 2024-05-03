@@ -78,7 +78,6 @@ const state = reactive({
         }
         return defaultSets;
     }),
-    visibleMenu: false,
 });
 
 const handleUpdateVisibleMenu = (item: BookmarkItem, visibleMenu: boolean) => {
