@@ -22,10 +22,10 @@ import type { ReferenceMap } from '@/store/reference/type';
 
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-import { GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
-    Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter,
+    Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -38,6 +38,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     });
     const state = reactive({
+        // data
         metricLoading: false,
         refreshMetricData: false,
         metric: undefined as MetricModel|undefined,
@@ -50,6 +51,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
+        selectedChartType: CHART_TYPE.LINE as ChartType|string,
         // display
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
@@ -102,9 +104,13 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             return results;
         }),
         isManagedMetric: computed<boolean>(() => (state.metric?.is_managed && !getters.metricExampleId) || false),
+        isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
     });
 
     /* Mutations */
+    const setSelectedChartType = (chartType: ChartType|string) => {
+        state.selectedChartType = chartType;
+    };
     const setGranularity = (granularity: Granularity) => {
         state.granularity = granularity;
     };
@@ -148,6 +154,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedGroupByList = [];
         state.selectedChartGroupBy = undefined;
         state.selectedOperator = OPERATOR.SUM;
+        state.refreshMetricPeriodDropdown = true;
     };
     const initMetricExampleOptions = () => {
         const _options = getters.metricExample?.options;
@@ -221,6 +228,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         setRefreshMetricData,
         setShowMetricQueryFormSidebar,
         setRefreshMetricPeriodDropdown,
+        setSelectedChartType,
     };
 
     return {
