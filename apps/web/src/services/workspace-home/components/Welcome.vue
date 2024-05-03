@@ -5,23 +5,33 @@ import { PButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import type { RoleInfo } from '@/store/modules/user/type';
-
 const storeState = reactive({
-    userName: computed<RoleInfo>(() => store.state.user.name),
+    language: computed<string>(() => store.state.user.language),
+    userName: computed<string>(() => store.state.user.name),
+});
+
+const state = reactive({
+    userName: computed<string>(() => {
+        if (!storeState.userName) return '';
+        if (storeState.language === 'ko') {
+            return `${storeState.userName}님`;
+        }
+        if (storeState.language === 'ja') {
+            return `, ${storeState.userName}さん`;
+        }
+        return `, ${storeState.userName}`;
+    }),
 });
 
 const handleClickButton = () => {
-    window.open('https://cloudforet.io/{language_code}/docs/guides/getting-started/', '_blank');
+    window.open(`https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`, '_blank');
 };
 </script>
 
 <template>
     <div class="welcome">
         <span class="title">
-            {{ $t('HOME.WELCOME_TITLE') }}
-            <span v-if="storeState.userName">, {{ storeState.userName }}</span>
-            😊
+            {{ $t('HOME.WELCOME_TITLE', { 'user_name': state.userName}) }}😊
         </span>
         <span class="desc">{{ $t('HOME.WELCOME_DESC') }}</span>
         <p-button icon-left="ic_rocket-filled"
