@@ -167,7 +167,6 @@ watch(
         () => metricExplorerPageGetters.metricId,
         () => metricExplorerPageState.period,
         () => metricExplorerPageState.selectedOperator,
-        () => metricExplorerPageState.selectedChartGroupBy,
         () => metricExplorerPageGetters.consoleFilters,
     ],
     async ([metricId]) => {
