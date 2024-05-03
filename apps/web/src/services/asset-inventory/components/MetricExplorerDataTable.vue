@@ -41,6 +41,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
+    realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
         const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
@@ -51,6 +52,7 @@ const state = reactive({
         metricExplorerPageState.granularity,
         metricExplorerPageState.period ?? {},
         !!metricExplorerPageState.selectedGroupByList.length,
+        state.realtimeDate,
     )),
     fields: computed<DataTableFieldType[]>(() => [
         ...state.groupByFields,
@@ -89,6 +91,8 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
             .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
@@ -102,12 +106,19 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: '_total_count', desc: true }],
-                field_group: ['date'],
+                sort: _sort,
+                field_group: _fieldGroup,
                 ...(setPage ? analyzeApiQueryHelper.data : { filter: analyzeApiQueryHelper.apiQuery.filter }),
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            if (metricExplorerPageGetters.isRealtimeChart) {
+                state.realtimeDate = response.results?.[0]?.date;
+            } else {
+                state.realtimeDate = undefined;
+            }
+            return response;
+        }
         return undefined;
     } catch (e) {
         return { more: false, results: [] };
@@ -117,7 +128,7 @@ const setDataTableData = async () => {
     state.loading = true;
     const res = await analyzeMetricData();
     if (!res) return;
-    state.items = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+    state.items = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
     state.more = res.more;
     state.loading = false;
 };
@@ -134,7 +145,7 @@ const handleExport = async () => {
     try {
         const res = await analyzeMetricData(false);
         if (!res) return;
-        const refinedData = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+        const refinedData = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,
@@ -191,6 +202,7 @@ watch(
         () => metricExplorerPageState.selectedOperator,
         () => metricExplorerPageState.selectedGroupByList,
         () => metricExplorerPageGetters.consoleFilters,
+        () => metricExplorerPageState.selectedChartType,
     ],
     async ([metricId]) => {
         if (!metricId) return;
