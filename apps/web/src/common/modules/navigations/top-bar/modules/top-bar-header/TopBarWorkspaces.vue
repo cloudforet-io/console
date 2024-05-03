@@ -141,7 +141,7 @@ const checkFavoriteItem = (id: string) => {
     return !!item;
 };
 const menuHandler = async (inputText: string) => {
-    const _workspaceList = storeState.workspaceList.filter((w) => w.name.includes(inputText));
+    const _workspaceList = storeState.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText));
     return {
         results: inputText ? formatMenuItems(_workspaceList) : [
             ...filterStarredItems(storeState.favoriteItems),
