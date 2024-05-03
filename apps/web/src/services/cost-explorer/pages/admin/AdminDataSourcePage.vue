@@ -2,63 +2,24 @@
 import { computed, onMounted, reactive } from 'vue';
 
 import { PHeading, PLink } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
-import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
 import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 
-const allReferenceStore = useAllReferenceStore();
-const allReferenceGetters = allReferenceStore.getters;
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageState = dataSourcesPageStore.state;
 
 const storeState = reactive({
-    language: computed(() => store.state.user.language),
-    timezone: computed(() => store.state.user.timezone),
-    provider: computed(() => allReferenceGetters.provider),
+    language: computed<string>(() => store.state.user.language),
+    totalCount: computed<number>(() => dataSourcesPageState.totalCount),
+    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedIndices),
 });
-const state = reactive({
-    dataSourceList: [] as DataSourceModel[],
-    refinedDataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => ({
-        ...i,
-        icon: getDataSourceIcon(i.provider),
-        created_at: dayjs(i.created_at).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss'),
-    }))),
-    totalCount: 0,
-    selectedIndices: [] as number[],
-    selectedItem: computed<DataSourceItem>(() => state.refinedDataSourceList[state.selectedIndices[0]]),
-});
-
-const getDataSourceIcon = (provider: string) => {
-    const icon = storeState.provider[provider].icon;
-    return assetUrlConverter(icon);
-};
-const fetchDataSourceList = async () => {
-    try {
-        const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>();
-        state.dataSourceList = results || [];
-        state.totalCount = total_count || 0;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.dataSourceList = [];
-        state.totalCount = 0;
-    }
-};
 
 onMounted(() => {
-    fetchDataSourceList();
+    dataSourcesPageStore.fetchDataSourceList();
 });
 </script>
 
@@ -67,8 +28,8 @@ onMounted(() => {
         <p-heading :title="$t('MENU.COST_EXPLORER_DATA_SOURCES')"
                    use-total-count
                    use-selected-count
-                   :total-count="state.totalCount"
-                   :selected-count="state.selectedIndices.length"
+                   :total-count="storeState.totalCount"
+                   :selected-count="storeState.selectedIndices.length"
         >
             <template #extra>
                 <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
@@ -82,12 +43,8 @@ onMounted(() => {
             </template>
         </p-heading>
         <div class="contents">
-            <data-source-management-table :data-source-list="state.refinedDataSourceList"
-                                          :selected-indices.sync="state.selectedIndices"
-            />
-            <data-source-management-tabs v-if="state.selectedIndices.length > 0"
-                                         :selected-item="state.selectedItem"
-            />
+            <data-source-management-table :selected-indices="storeState.selectedIndices" />
+            <data-source-management-tabs v-if="storeState.selectedIndices.length > 0" />
             <span v-else
                   class="no-data"
             >

@@ -5,16 +5,8 @@ import { PTab } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import DataSourceManagementTabDetail from '@/services/cost-explorer/components/DataSourceManagementTabDetail.vue';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
-
-interface Props {
-    selectedItem?: DataSourceItem;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    selectedItem: undefined,
-});
+import DataSourceManagementTabDetailBaseInformation
+    from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
 
 const tabState = reactive({
     tabs: computed(() => [
@@ -29,9 +21,21 @@ const tabState = reactive({
     <p-tab :tabs="tabState.tabs"
            :active-tab.sync="tabState.activeTab"
            :class="tabState.activeTab"
+           class="data-source-management-tabs"
     >
         <template #detail>
-            <data-source-management-tab-detail :selected-item="props.selectedItem" />
+            <div class="data-source-management-tab-detail">
+                <data-source-management-tab-detail-base-information />
+            </div>
         </template>
     </p-tab>
 </template>
+
+<style lang="postcss" scoped>
+.data-source-management-tabs {
+    .data-source-management-tab-detail {
+        @apply flex flex-col;
+        gap: 0.25rem;
+    }
+}
+</style>

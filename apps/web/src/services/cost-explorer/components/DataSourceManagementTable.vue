@@ -9,25 +9,25 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 interface Props {
-    dataSourceList?: DataSourceItem[];
     selectedIndices?: number[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    dataSourceList: undefined,
     selectedIndices: undefined,
 });
 
-const emit = defineEmits<{(e: 'update:selected-indices'): void}>();
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
+const storeState = reactive({
+    dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
+});
 const state = reactive({
     loading: false,
-    selectedIndices: useProxyValue('selectedIndices', props, emit),
 });
 const tableState = reactive({
     pageStart: 0,
@@ -46,6 +46,10 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(tableState.pageStart).setPageLimit(tableState.pageLimit)
     .setSort('name', true);
 let userListApiQuery = userListApiQueryHelper.data;
+
+const handleUpdateSelectIndex = (indices: number[]) => {
+    dataSourcesPageStore.setSelectedIndices(indices);
+};
 const handleChange = (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
@@ -65,13 +69,14 @@ const handleChange = (options: any = {}) => {
                              selectable
                              sort-by="name"
                              :multi-select="false"
-                             :select-index.sync="state.selectedIndices"
+                             :select-index="props.selectedIndices"
                              :fields="tableState.fields"
-                             :items="props.dataSourceList"
+                             :items="storeState.dataSourceList"
                              :loading="state.loading"
                              :style="{height: `${height}px`}"
                              @change="handleChange"
                              @refresh="handleChange()"
+                             @update:select-index="handleUpdateSelectIndex"
             >
                 <template #col-name-format="{value, item}">
                     <div class="col-name">
