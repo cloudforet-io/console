@@ -183,7 +183,7 @@ const refinedMenuList = (list, value) => {
                         >
                             {{ item.label }}
                         </span>
-                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeNavRail"
+                        <p-button v-if="item.disabled && !state.isMenuDescription"
                                   icon-right="ic_arrow-right"
                                   style-type="tertiary"
                                   size="sm"
@@ -358,6 +358,9 @@ const refinedMenuList = (list, value) => {
         }
         .service-menu {
             width: 2.25rem;
+            .learn-more-button {
+                @apply hidden;
+            }
             &:hover:not(.is-only-label) {
                 @apply bg-violet-200;
             }
@@ -374,6 +377,9 @@ const refinedMenuList = (list, value) => {
             }
             .service-menu {
                 width: 100%;
+                .learn-more-button {
+                    @apply block;
+                }
                 &:hover:not(.is-only-label) {
                     @apply bg-violet-100;
                 }
@@ -381,6 +387,12 @@ const refinedMenuList = (list, value) => {
                     @apply bg-violet-100;
                 }
             }
+            .menu-description {
+                @apply flex;
+            }
+        }
+        .menu-description {
+            @apply hidden;
         }
     }
     .menu-description {

@@ -56,10 +56,6 @@ const {
         if (value.length < 2) return i18n.t('HOME.ALT_E_VALIDATION_NAME');
         return true;
     },
-    link: (value: string) => {
-        if (!isValidUrl(value)) return i18n.t('HOME.ALT_E_INVALID_LINK');
-        return true;
-    },
 });
 
 const isValidUrl = (url: string) => {
@@ -69,6 +65,15 @@ const isValidUrl = (url: string) => {
     } catch (error) {
         return false;
     }
+};
+const convertUrlProtocol = (url: string): string => {
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+        return `http://${trimmedUrl}`;
+    }
+
+    return trimmedUrl;
 };
 const generateNewFolderName = (existingFolders) => {
     const folderNumbers = existingFolders
@@ -103,18 +108,23 @@ const handleClickNewFolderButton = async () => {
 };
 const handleConfirm = async () => {
     state.loading = true;
+    let convertedLink = link.value;
+    if (!isValidUrl(link.value)) {
+        convertedLink = convertUrlProtocol(link.value);
+    }
+
     try {
         if (storeState.modal.isEdit) {
             await bookmarkStore.updateBookmarkLink({
                 id: storeState.selectedBookmark?.id || '',
                 name: name.value,
-                link: link.value,
+                link: convertedLink,
                 folder: state.selectedFolder?.id,
             });
         } else {
             await bookmarkStore.createBookmarkLink({
                 name: name.value,
-                link: link.value,
+                link: convertedLink,
                 folder: state.selectedFolder?.id,
             });
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');

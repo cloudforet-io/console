@@ -18,10 +18,13 @@ import type { CostReportDataAnalyzeParameters } from '@/schema/cost-analysis/cos
 import type { CostReportListParameters } from '@/schema/cost-analysis/cost-report/api-verbs/list';
 import type { CostReportModel } from '@/schema/cost-analysis/cost-report/model';
 import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
+import type { RoleInfo } from '@/store/modules/user/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -45,11 +48,13 @@ const storeState = reactive({
     costReportConfig: computed<CostReportConfigModel|null|undefined>(() => workspaceHomePageState.costReportConfig),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
+    getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
 });
 const state = reactive({
     loading: false,
     currentDate: undefined as Dayjs | undefined,
     currency: computed<Currency|undefined>(() => storeState.costReportConfig?.currency),
+    isWorkspaceMember: computed(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     recentReportMonth: undefined as string|undefined,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     chartData: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
@@ -153,6 +158,7 @@ const fetchRecentReportData = async (costReportConfigId?: string) => {
 };
 
 watch(() => storeState.costReportConfig, async () => {
+    if (state.isWorkspaceMember) return;
     await fetchRecentReportData(storeState.costReportConfig?.cost_report_config_id);
     await analyzeCostReportData();
     await analyzeCostReportData(true);

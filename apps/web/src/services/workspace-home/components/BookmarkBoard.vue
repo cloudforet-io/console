@@ -401,13 +401,20 @@ const checkSelectedId = (id?: string) => {
                 }
             }
 
+            /* custom design-system component - p-board-item */
+            :deep(.p-board-item) {
+                &.selected {
+                    @apply bg-blue-100;
+                    .overlay-contents {
+                        @apply bg-blue-100;
+                    }
+                }
+            }
+
             .board-item {
                 @apply border-gray-200;
                 padding: 0.5rem;
 
-                &.selected {
-                    @apply bg-blue-100;
-                }
                 .text-wrapper {
                     max-width: calc(100% - 4.25rem);
 
