@@ -12,6 +12,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { RoleInfo } from '@/store/modules/user/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CollectorReferenceMap } from '@/store/reference/collector-reference-store';
+import type { ServiceAccountReferenceMap } from '@/store/reference/service-account-reference-store';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -38,14 +39,17 @@ const storeState = reactive({
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
     dataSource: computed<CostDataSourceModel[]>(() => workspaceHomePageState.dataSource),
     collectors: computed<CollectorReferenceMap>(() => allReferenceGetters.collector),
+    serviceAccounts: computed<ServiceAccountReferenceMap>(() => allReferenceGetters.serviceAccount),
 });
 const state = reactive({
     loading: false,
     pageAccess: computed<string[]>(() => storeState.getCurrentRoleInfo.pageAccess),
     isWorkspaceOwner: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceMember: computed<boolean>(() => storeState.getCurrentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     accessUserMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.USER._NAME || access === '*') && state.isWorkspaceOwner),
     accessAppMenu: computed<boolean>(() => state.pageAccess.find((access) => access === IAM_ROUTE.APP._NAME || access === '*') && state.isWorkspaceOwner),
-    isNoCollectors: computed(() => !Object.keys(storeState.collectors).length),
+    isNoServiceAccounts: computed(() => !Object.keys(storeState.serviceAccounts).length),
+    isNoCollectors: computed<boolean>(() => !Object.keys(storeState.collectors).length),
 });
 
 watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
@@ -74,7 +78,9 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     // configs
     await workspaceHomePageStore.fetchFavoriteList();
     // summaries
-    await workspaceHomePageStore.fetchCostReportConfig();
+    if (!state.isWorkspaceMember) {
+        await workspaceHomePageStore.fetchCostReportConfig();
+    }
 }, { immediate: true });
 </script>
 
@@ -88,9 +94,8 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
                             :access-app-menu="state.accessAppMenu"
             />
             <welcome
-                v-if="!state.loading && (storeState.recentList.length === 0
-                    || state.isNoCollectors
-                    || storeState.dataSource.length === 0)"
+                v-if="!state.loading
+                    && ((state.isNoCollectors || state.isNoServiceAccounts) && storeState.dataSource.length === 0)"
             />
             <bookmark />
             <user-configs v-if="storeState.recentList.length !== 0"

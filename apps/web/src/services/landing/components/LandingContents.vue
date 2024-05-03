@@ -61,7 +61,7 @@ const state = reactive({
     searchText: '',
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     searchedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText !== ''
-        ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText))
+        ? storeState.workspaceList.filter((item) => item.name.toLowerCase()?.includes(state.searchText.toLowerCase()))
         : storeState.workspaceList)),
     refinedWorkspaceList: computed<WorkspaceModel[]>(() => (state.searchText ? state.searchedWorkspaceList : storeState.workspaceList)),
 });
