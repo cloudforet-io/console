@@ -851,8 +851,10 @@
 			},
 			"DATA_SOURCES": {
 				"COL_BILLING_ACCOUNT": "",
+				"COL_DATASOURCE": "",
+				"COL_DESCRIPTION": "説明",
 				"COL_LINKED_ACCOUNT": "",
-				"COL_NAME": "",
+				"COL_NAME": "名前",
 				"COL_TIME": "",
 				"COL_WORKSPACE": "",
 				"GUIDE": "",
