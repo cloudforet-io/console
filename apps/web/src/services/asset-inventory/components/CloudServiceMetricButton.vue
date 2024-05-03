@@ -47,21 +47,12 @@ const state = reactive({
 });
 
 const handleClickGoToMetric = () => {
-    if (props.goToMetricServerPage) {
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: {
-                metricId: METRIC_SERVER_ID,
-            },
-        }));
-        return;
-    }
-    router.push(getProperRouteLocation({
+    window.open(router.resolve(getProperRouteLocation({
         name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
         params: {
-            metricId: state.targetMetric.key,
+            metricId: props.goToMetricServerPage ? METRIC_SERVER_ID : state.targetMetric.key,
         },
-    }));
+    })).href, '_blank');
 };
 </script>
 

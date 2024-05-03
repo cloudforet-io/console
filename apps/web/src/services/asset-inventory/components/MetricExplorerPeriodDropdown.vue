@@ -35,6 +35,14 @@ const state = reactive({
         const locale = i18n.locale;
         return [
             {
+                name: METRIC_PERIOD_MENU.LAST_14_DAYS,
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_14_DAYS'),
+            },
+            {
+                name: METRIC_PERIOD_MENU.LAST_30_DAYS,
+                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_30_DAYS'),
+            },
+            {
                 name: METRIC_PERIOD_MENU.CURRENT_MONTH,
                 label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_MONTH'),
             },
@@ -93,7 +101,7 @@ const state = reactive({
             ...customItem,
         ];
     }),
-    selectedPeriod: METRIC_PERIOD_MENU.CURRENT_MONTH as MetricPeriodMenu,
+    selectedPeriod: METRIC_PERIOD_MENU.LAST_14_DAYS as MetricPeriodMenu,
     customDateModalVisible: false,
 });
 
@@ -141,7 +149,7 @@ const handleCustomRangeModalConfirm = (start: string, end: string) => {
 /* Watcher */
 watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
     if (refresh) initSelectedPeriod();
-}, { immediate: false });
+}, { immediate: true });
 </script>
 
 <template>

@@ -9,7 +9,7 @@ import type {
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
-export const getMetricExplorerDataTableDateFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
+export const getMetricExplorerDataTableDateFields = (granularity: Granularity, period: Period, hasGroupBy: boolean, realtimeDate?: string): DataTableFieldType[] => {
     const defaultFields: DataTableFieldType[] = [];
     const dateFields: DataTableFieldType[] = [];
     if (!hasGroupBy) {
@@ -22,6 +22,17 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     if (granularity === GRANULARITY.DAILY) {
         timeUnit = 'day';
         labelDateFormat = 'M/D';
+    }
+
+    if (realtimeDate) {
+        const targetDate = dayjs.utc(realtimeDate);
+        dateFields.push({
+            name: 'count.0.value',
+            label: targetDate.locale('en').format(labelDateFormat),
+            textAlign: 'right',
+            sortable: true,
+        });
+        return defaultFields.concat(dateFields);
     }
 
     const today = dayjs.utc();
@@ -41,20 +52,35 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     return defaultFields.concat(dateFields);
 };
 
-export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResult[] = [], granularity: Granularity, period: Period): MetricDataAnalyzeResult[] => {
+export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResult[] = [], granularity: Granularity, period: Period, realtimeDate?: string): MetricDataAnalyzeResult[] => {
     const timeUnit = granularity === GRANULARITY.MONTHLY ? 'month' : 'day';
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
 
     const _results = cloneDeep(results);
     const refinedTableData: MetricDataAnalyzeResult[] = [];
+
+    if (realtimeDate) {
+        _results.forEach((d) => {
+            refinedTableData.push({
+                ...d,
+                count: [
+                    {
+                        date: realtimeDate,
+                        value: d.count,
+                    },
+                ],
+            });
+        });
+        return refinedTableData;
+    }
     const today = dayjs.utc();
     _results.forEach((d) => {
         let target = cloneDeep(d.count);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
             if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
-                target?.push({ date: now.format(dateFormat), value: 0 });
+                target?.push({ date: now.format(dateFormat), value: undefined });
             }
             now = now.add(1, timeUnit);
         }

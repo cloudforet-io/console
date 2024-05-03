@@ -6,10 +6,6 @@ import {
 } from '@spaceone/design-system';
 import { xor } from 'lodash';
 
-import { i18n } from '@/translations';
-
-import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
-
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 
 
@@ -25,10 +21,6 @@ const state = reactive({
 });
 /* Event */
 const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: boolean) => {
-    if (isSelected && metricExplorerPageState.selectedGroupByList.length >= 3) {
-        showInfoMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_GROUP_BY'), i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_GROUP_BY_DESC'));
-        return;
-    }
     if (isSelected) {
         const addedGroupByName: string = xor(metricExplorerPageState.selectedGroupByList, selectedItems)[0];
         metricExplorerPageStore.setSelectedGroupByList([addedGroupByName, ...metricExplorerPageState.selectedGroupByList]);
