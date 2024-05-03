@@ -1095,6 +1095,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "Create New Workspace",
 				"MANAGE_WORKSPACE": "Manage Workspace",
+				"NO_RESULTS_FOUND": "No Results Found",
 				"VIEW_WORKSPACES": "View All Workspaces",
 				"WORKSPACES": "Workspaces"
 			}

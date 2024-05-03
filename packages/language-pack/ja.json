@@ -1095,6 +1095,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "ワークスペースの作成",
 				"MANAGE_WORKSPACE": "ワークスペースの管理",
+				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"VIEW_WORKSPACES": "",
 				"WORKSPACES": "ワークスペース"
 			}
