@@ -153,7 +153,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             padding: 0 0.5rem 0.5rem 0.5rem;
         }
         .legend {
-            height: 25px;
+            height: 1.5rem;
             display: flex;
             align-items: center;
             font-size: 0.875rem;
@@ -183,7 +183,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
 /* custom design-system component - p-data-loader */
 :deep(.p-data-loader) {
     .no-data-wrapper {
-        max-height: 22.25rem;
+        max-height: 19.25rem;
     }
 }
 </style>

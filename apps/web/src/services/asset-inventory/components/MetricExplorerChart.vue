@@ -3,7 +3,9 @@ import { computed, reactive, watch } from 'vue';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PSelectButton, PTextEditor } from '@spaceone/design-system';
+import {
+    PSelectButton, PSkeleton, PTextEditor, PEmpty,
+} from '@spaceone/design-system';
 import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -51,7 +53,7 @@ const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
-    loading: false,
+    loading: true,
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
@@ -104,6 +106,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     }
 };
 const setChartData = debounce(async () => {
+    console.log('setchartdata');
     state.loading = true;
 
     const rawData = await analyzeMetricData();
@@ -125,6 +128,7 @@ const setChartData = debounce(async () => {
 
 /* Event */
 const handleSelectButton = (selected: ChartType|string) => {
+    state.loading = true;
     if (selected !== QUERY_OPTIONS_TYPE) {
         setChartData();
     }
@@ -181,32 +185,42 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         <div class="bottom-part">
             <template v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
                 <div class="left-part">
-                    <metric-explorer-line-chart
-                        v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
+                    <p-skeleton v-if="state.loading"
+                                height="100%"
                     />
-                    <metric-explorer-donut-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                    />
-                    <metric-explorer-tree-map-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
-                        :loading="state.loading"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                    />
-                    <metric-explorer-horizontal-column-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                    />
+                    <template v-else-if="state.chartData.length">
+                        <metric-explorer-line-chart
+                            v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                        />
+                        <metric-explorer-donut-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                        />
+                        <metric-explorer-tree-map-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
+                            :loading="state.loading"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                        />
+                        <metric-explorer-horizontal-column-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                        />
+                    </template>
+                    <p-empty v-else
+                             class="empty-wrapper"
+                    >
+                        <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
+                    </p-empty>
                 </div>
                 <div class="right-part">
                     <metric-explorer-chart-legends :legends.sync="state.legends"
@@ -254,9 +268,8 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         .left-part {
             @apply col-span-9;
             height: 25rem;
-            .chart-wrapper {
-                padding-top: 0.5rem;
-                padding-bottom: 1rem;
+            .empty-wrapper {
+                height: 100%;
             }
         }
         .right-part {
