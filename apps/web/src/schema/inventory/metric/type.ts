@@ -7,6 +7,7 @@ export interface MetricLabelKey {
     key: string;
     name: string;
     search_key?: string;
+    default?: boolean;
     reference?: {
         resource_type: string;
         reference_key: string;
