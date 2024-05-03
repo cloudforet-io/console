@@ -106,7 +106,6 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     }
 };
 const setChartData = debounce(async () => {
-    console.log('setchartdata');
     state.loading = true;
 
     const rawData = await analyzeMetricData();
