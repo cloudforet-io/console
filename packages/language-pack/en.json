@@ -1764,7 +1764,7 @@
 		"ACTIVATION_REQUIRED": "Activation Required",
 		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
 		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
-		"ALT_E_INVALID_LINK": "Sorry could not save bookmark. Please check if the link is a valid url.",
+		"ALT_E_INVALID_LINK": "Sorry could not save bookmark. Please check if the link is a valid URL.",
 		"ALT_E_MAX_LENGTH_INVALID": "{max} characters in max",
 		"ALT_E_VALIDATION_NAME": "Must be longer than 2 characters",
 		"ALT_S_ADD_LINK": "Link successfully Added ",
@@ -3841,7 +3841,7 @@
 				"EDIT": "Edit"
 			},
 			"SEARCH": "Search ",
-			"SEARCH_EMPTY_TEXT": "No results found\nTry again with diffrent term",
+			"SEARCH_EMPTY_TEXT": "No results found.\nTry again with different term.",
 			"SEARCH_PROJECT_GROUP": "Project Group",
 			"SERVER": "Server",
 			"SERVICE_ACCOUNTS": "Service Accounts",
