@@ -42,8 +42,9 @@ export type QueryFormMode = 'CREATE' | 'UPDATE';
 /* Data */
 export type MetricDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    count?: Array<{ date: string; value: number; }>;
+    count?: number | Array<{ date: string; value: number; }>;
     _total_count?: number;
+    date?: string;
 };
 
 export interface XYChartData {

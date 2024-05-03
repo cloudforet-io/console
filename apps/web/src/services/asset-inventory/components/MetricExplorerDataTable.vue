@@ -12,6 +12,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -40,6 +41,7 @@ const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
+    realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
         const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
         return filteredLabelKeys.map((d) => ({
@@ -50,6 +52,7 @@ const state = reactive({
         metricExplorerPageState.granularity,
         metricExplorerPageState.period ?? {},
         !!metricExplorerPageState.selectedGroupByList.length,
+        state.realtimeDate,
     )),
     fields: computed<DataTableFieldType[]>(() => [
         ...state.groupByFields,
@@ -72,6 +75,14 @@ const state = reactive({
     hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => metricExplorerPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
 });
 
+/* Util */
+const getRefinedColumnValue = (field, value) => {
+    if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
+        return numberFormatter(value, { notation: 'compact' }) || '--';
+    }
+    return metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
+};
+
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
@@ -80,6 +91,8 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
         analyzeApiQueryHelper
             .setFilters(metricExplorerPageGetters.consoleFilters)
             .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
@@ -93,12 +106,19 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: '_total_count', desc: true }],
-                field_group: ['date'],
+                sort: _sort,
+                field_group: _fieldGroup,
                 ...(setPage ? analyzeApiQueryHelper.data : { filter: analyzeApiQueryHelper.apiQuery.filter }),
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            if (metricExplorerPageGetters.isRealtimeChart) {
+                state.realtimeDate = response.results?.[0]?.date;
+            } else {
+                state.realtimeDate = undefined;
+            }
+            return response;
+        }
         return undefined;
     } catch (e) {
         return { more: false, results: [] };
@@ -108,7 +128,7 @@ const setDataTableData = async () => {
     state.loading = true;
     const res = await analyzeMetricData();
     if (!res) return;
-    state.items = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+    state.items = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
     state.more = res.more;
     state.loading = false;
 };
@@ -125,7 +145,7 @@ const handleExport = async () => {
     try {
         const res = await analyzeMetricData(false);
         if (!res) return;
-        const refinedData = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {});
+        const refinedData = getRefinedMetricExplorerTableData(res.results, metricExplorerPageState.granularity, metricExplorerPageState.period ?? {}, state.realtimeDate);
         await downloadExcel({
             data: refinedData,
             fields: state.excelFields,
@@ -139,6 +159,8 @@ const queryHelper = new QueryHelper();
 const handleClickRow = (item) => {
     if (!metricExplorerPageState.selectedGroupByList.length) return;
     const _filters: ConsoleFilter[] = [];
+
+    // set filters from groupBy
     metricExplorerPageState.selectedGroupByList.forEach((d) => {
         const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === d);
         if (_targetLabelKey) {
@@ -146,24 +168,31 @@ const handleClickRow = (item) => {
             _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
         }
     });
-    if (state.metricResourceType === 'inventory.CloudService') {
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-            params: {},
-            query: {
-                filters: queryHelper.setFilters(_filters).rawQueryStrings,
-            },
-        }));
-    } if (state.metricResourceType.startsWith('inventory.CloudService:')) {
+
+    // set filters from popper
+    Object.entries(metricExplorerPageState.filters)
+        .filter(([key]) => !metricExplorerPageState.selectedGroupByList.includes(key))
+        .forEach(([key, value]) => {
+            const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === key);
+            if (_targetLabelKey) {
+                _filters.push({ k: _targetLabelKey.search_key, v: value, o: '=' });
+            }
+        });
+
+    let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
+    let _params = {};
+    if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-            params: { provider, group, name },
-            query: {
-                filters: queryHelper.setFilters(_filters).rawQueryStrings,
-            },
-        }));
+        _params = { provider, group, name };
+        _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
     }
+    window.open(router.resolve(getProperRouteLocation({
+        name: _routeName,
+        params: _params,
+        query: {
+            filters: queryHelper.setFilters(_filters).rawQueryStrings,
+        },
+    })).href, '_blank');
 };
 
 watch(
@@ -171,8 +200,9 @@ watch(
         () => metricExplorerPageGetters.metricId,
         () => metricExplorerPageState.period,
         () => metricExplorerPageState.selectedOperator,
-        () => metricExplorerPageState.selectedChartGroupBy,
+        () => metricExplorerPageState.selectedGroupByList,
         () => metricExplorerPageGetters.consoleFilters,
+        () => metricExplorerPageState.selectedChartType,
     ],
     async ([metricId]) => {
         if (!metricId) return;
@@ -216,7 +246,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 {{ $t('INVENTORY.METRIC_EXPLORER.TOTAL_COUNT') }}
             </span>
             <span v-else>
-                {{ metricExplorerPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value }}
+                {{ getRefinedColumnValue(field, value) }}
             </span>
         </template>
     </p-toolbox-table>

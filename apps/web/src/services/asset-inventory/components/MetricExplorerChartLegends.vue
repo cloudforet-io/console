@@ -14,13 +14,12 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { ChartType, Legend } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { Legend } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
 interface Props {
     loading: boolean;
     legends: Legend[];
-    chartType: ChartType;
     more?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -39,7 +38,7 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
-    disableLegendToggle: computed<boolean>(() => props.chartType === CHART_TYPE.TREEMAP || props.chartType === CHART_TYPE.COLUMN),
+    disableLegendToggle: computed<boolean>(() => [CHART_TYPE.TREEMAP, CHART_TYPE.COLUMN].includes(metricExplorerPageState.selectedChartType)),
     chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
         .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
         .map((d) => ({ name: d.key, label: d.name }))),

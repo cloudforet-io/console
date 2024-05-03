@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import {
-    PSelectButton, PTextEditor,
-} from '@spaceone/design-system';
+import { PSelectButton, PTextEditor } from '@spaceone/design-system';
 import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -27,12 +23,19 @@ import MetricExplorerLineChart from '@/services/asset-inventory/components/Metri
 import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import {
-    getMetricChartLegends, getRefinedMetricRealtimeChartData, getRefinedMetricXYChartData,
+    getFilteredRealtimeData,
+    getMetricChartLegends,
+    getRefinedMetricRealtimeChartData,
+    getRefinedMetricXYChartData,
 } from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type {
-    ChartType, Legend, MetricDataAnalyzeResult, Period,
-    XYChartData, RealtimeChartData,
+    ChartType,
+    Legend,
+    MetricDataAnalyzeResult,
+    Period,
+    RealtimeChartData,
+    XYChartData,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -50,14 +53,14 @@ const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
-    selectedChartType: CHART_TYPE.LINE as ChartType|string,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
-    isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
     periodText: computed<string>(() => {
         if (isEmpty(metricExplorerPageState.period)) return '';
-        if (state.isRealtimeChart) return metricExplorerPageState.period.end || '';
+        if (metricExplorerPageGetters.isRealtimeChart) {
+            return state.data?.results[0]?.date || '';
+        }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
     }),
 });
@@ -69,12 +72,14 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     try {
         analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
         const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [metricExplorerPageState.selectedChartGroupBy] : [];
+        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: metricExplorerPageGetters.metricId as string,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
-                start: state.isRealtimeChart ? metricExplorerPageState.period?.end : metricExplorerPageState.period?.start,
+                start: metricExplorerPageState.period?.start,
                 end: metricExplorerPageState.period?.end,
                 fields: {
                     count: {
@@ -82,12 +87,17 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
                         operator: metricExplorerPageState.selectedOperator,
                     },
                 },
-                sort: [{ key: '_total_count', desc: true }],
-                field_group: ['date'],
+                sort: _sort,
+                field_group: _fieldGroup,
                 ...analyzeApiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response;
+        if (status === 'succeed') {
+            if (metricExplorerPageGetters.isRealtimeChart) {
+                return getFilteredRealtimeData(response);
+            }
+            return response;
+        }
         return undefined;
     } catch (e) {
         return { more: false, results: [] };
@@ -104,8 +114,8 @@ const setChartData = debounce(async () => {
     const _period = metricExplorerPageState.period as Period;
     const _groupBy = metricExplorerPageState.selectedChartGroupBy;
 
-    state.legends = getMetricChartLegends(metricExplorerPageGetters.labelKeysReferenceMap, state.selectedChartType, rawData, _groupBy);
-    if (state.isRealtimeChart) {
+    state.legends = getMetricChartLegends(metricExplorerPageGetters.labelKeysReferenceMap, metricExplorerPageState.selectedChartType, rawData, _groupBy);
+    if (metricExplorerPageGetters.isRealtimeChart) {
         state.chartData = getRefinedMetricRealtimeChartData(metricExplorerPageGetters.labelKeysReferenceMap, rawData, _groupBy);
     } else {
         state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
@@ -118,7 +128,7 @@ const handleSelectButton = (selected: ChartType|string) => {
     if (selected !== QUERY_OPTIONS_TYPE) {
         setChartData();
     }
-    state.selectedChartType = selected;
+    metricExplorerPageStore.setSelectedChartType(selected);
 };
 const handleToggleSeries = (index: number) => {
     toggleSeries(state.chart as XYChart, index);
@@ -153,12 +163,12 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
     <div class="metric-explorer-chart">
         <div class="top-part">
             <div class="period-text">
-                <span v-if="state.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
+                <span v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
             </div>
             <div class="select-button-wrapper">
                 <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
                                  :key="`chart-select-button-${item.name}`"
-                                 :selected="state.selectedChartType"
+                                 :selected="metricExplorerPageState.selectedChartType"
                                  :value="item.name"
                                  :icon-name="item.icon"
                                  layout="icon-only"
@@ -169,30 +179,30 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
             </div>
         </div>
         <div class="bottom-part">
-            <template v-if="state.selectedChartType !== QUERY_OPTIONS_TYPE">
+            <template v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
                 <div class="left-part">
                     <metric-explorer-line-chart
-                        v-if="state.selectedChartType === CHART_TYPE.LINE"
+                        v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
                         :loading="state.loading"
                         :chart.sync="state.chart"
                         :chart-data="state.chartData"
                         :legends="state.legends"
                     />
                     <metric-explorer-donut-chart
-                        v-else-if="state.selectedChartType === CHART_TYPE.DONUT"
+                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
                         :loading="state.loading"
                         :chart.sync="state.chart"
                         :chart-data="state.chartData"
                         :legends="state.legends"
                     />
                     <metric-explorer-tree-map-chart
-                        v-else-if="state.selectedChartType === CHART_TYPE.TREEMAP"
+                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
                         :loading="state.loading"
                         :chart-data="state.chartData"
                         :legends="state.legends"
                     />
                     <metric-explorer-horizontal-column-chart
-                        v-else-if="state.selectedChartType === CHART_TYPE.COLUMN"
+                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
                         :loading="state.loading"
                         :chart.sync="state.chart"
                         :chart-data="state.chartData"
@@ -202,7 +212,6 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                     <metric-explorer-chart-legends :legends.sync="state.legends"
                                                    :loading="state.loading"
                                                    :more="state.data?.more"
-                                                   :chart-type="state.selectedChartType"
                                                    @toggle-series="handleToggleSeries"
                                                    @show-all-series="handleAllSeries('show')"
                                                    @hide-all-series="handleAllSeries('hide')"
@@ -210,7 +219,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                 </div>
             </template>
             <p-text-editor
-                v-if="state.selectedChartType === QUERY_OPTIONS_TYPE"
+                v-if="metricExplorerPageState.selectedChartType === QUERY_OPTIONS_TYPE"
                 :code="metricExplorerPageState.metric?.query_options"
                 read-only
                 class="query-options-editor"

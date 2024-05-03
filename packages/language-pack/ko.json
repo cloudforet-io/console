@@ -2788,7 +2788,7 @@
 				"TITLE": "리소스 분석 시작하기",
 				"UPCOMING": "지원 예정"
 			},
-			"METRIC_EXPLORER": "리소스 분\u001f석",
+			"METRIC_EXPLORER": "리소스 분석",
 			"METRIC_EXPLORER_HOME": "리소스 분석 홈",
 			"MONTHLY": "월별 데이터",
 			"NAME": "이름",
@@ -2802,6 +2802,7 @@
 				"CUSTOM": "커스텀",
 				"LAST_12_MONTHS": "지난 12개월",
 				"LAST_14_DAYS": "최근 2주일",
+				"LAST_30_DAYS": "최근 30일",
 				"LAST_3_MONTHS": "지난 3개월",
 				"LAST_6_MONTHS": "지난 6개월",
 				"LAST_7_DAYS": "최근 1주일",

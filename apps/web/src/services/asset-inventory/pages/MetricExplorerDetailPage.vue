@@ -64,6 +64,8 @@ watch(() => route.params, async (params) => {
     if (params.metricExampleId) {
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         metricExplorerPageStore.initMetricExampleOptions();
+    } else if (metricExplorerPageGetters.defaultMetricGroupBy) {
+        metricExplorerPageStore.setSelectedGroupByList([metricExplorerPageGetters.defaultMetricGroupBy]);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
