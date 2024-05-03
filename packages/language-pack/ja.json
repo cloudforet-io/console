@@ -850,12 +850,15 @@
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
 			"DATA_SOURCES": {
-				"COL_BILLING": "",
-				"COL_LINK": "",
+				"COL_BILLING_ACCOUNT": "",
+				"COL_LINKED_ACCOUNT": "",
 				"COL_NAME": "",
 				"COL_TIME": "",
 				"COL_WORKSPACE": "",
-				"GUIDE": ""
+				"GUIDE": "",
+				"TAB_DETAILS_TITLE": "詳細情報",
+				"TAB_LINKED_ACCOUNT_TITLE": "",
+				"TAB_NO_DATA": ""
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "お問い合わ",

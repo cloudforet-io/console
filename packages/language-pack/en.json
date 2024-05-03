@@ -850,12 +850,15 @@
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"DATA_SOURCES": {
-				"COL_BILLING": "Billing Account",
-				"COL_LINK": "Linked Account",
+				"COL_BILLING_ACCOUNT": "Billing Account",
+				"COL_LINKED_ACCOUNT": "Linked Account",
 				"COL_NAME": "Data Source",
 				"COL_TIME": "Registered Time",
 				"COL_WORKSPACE": "Workspace",
-				"GUIDE": "How to register data sources"
+				"GUIDE": "How to register data sources",
+				"TAB_DETAILS_TITLE": "Details",
+				"TAB_LINKED_ACCOUNT_TITLE": "Linked Account",
+				"TAB_NO_DATA": "Select an item for more details."
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",

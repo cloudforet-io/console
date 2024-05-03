@@ -48,8 +48,8 @@ const tableState = reactive({
     searchFilters: [] as ConsoleFilter[],
     fields: computed(() => [
         { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_NAME'), type: 'item' },
-        { name: 'data_source_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING'), type: 'item' },
-        { name: 'data_source_account_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINK'), type: 'item' },
+        { name: 'data_source_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING_ACCOUNT'), type: 'item' },
+        { name: 'data_source_account_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINKED_ACCOUNT'), type: 'item' },
         { name: 'connected_workspace_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'), type: 'item' },
         { name: 'created_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME'), type: 'item' },
     ]),
