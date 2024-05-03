@@ -13,6 +13,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
+import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
@@ -21,6 +22,7 @@ const state = reactive({
     dataSourceList: [] as DataSourceModel[],
     totalCount: 0,
     selectedIndices: [] as number[],
+    selectedItem: computed(() => state.dataSourceList[state.selectedIndices[0]]),
 });
 
 const fetchDataSourceList = async () => {
@@ -59,9 +61,17 @@ onMounted(() => {
                 />
             </template>
         </p-heading>
-        <data-source-management-table :data-source-list="state.dataSourceList"
-                                      :selected-indices.sync="state.selectedIndices"
-        />
+        <div class="contents">
+            <data-source-management-table :data-source-list="state.dataSourceList"
+                                          :selected-indices.sync="state.selectedIndices"
+            />
+            <data-source-management-tabs v-if="state.selectedIndices.length > 0" />
+            <span v-else
+                  class="no-data"
+            >
+                {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_NO_DATA') }}
+            </span>
+        </div>
     </div>
 </template>
 
@@ -71,6 +81,14 @@ onMounted(() => {
     :deep(.p-link) {
         @apply flex items-center;
         gap: 0.125rem;
+    }
+    .contents {
+        @apply flex flex-col;
+        gap: 0.75rem;
+        .no-data {
+            @apply text-paragraph-md text-gray-300 text-center;
+            padding-top: 3rem;
+        }
     }
 }
 </style>
