@@ -80,11 +80,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 state.totalCount = 0;
             }
         },
-        fetchJobList: async (dataSourceId: string) => {
+        fetchJobList: async (params: CostJobListParameters) => {
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>({
-                    data_source_id: dataSourceId,
-                });
+                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
                 state.jobList = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);

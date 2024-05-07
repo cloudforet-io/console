@@ -5,9 +5,12 @@ import {
 
 import {
     PButton, PButtonModal,
-    PDataTable, PHeading, PI, PTextEditor,
+    PDataTable, PHeading, PI, PTextEditor, PToolbox,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { CostJobStatus } from '@/schema/cost-analysis/job/type';
 import { i18n } from '@/translations';
@@ -80,14 +83,27 @@ const handleClickErrorDetail = (jobId: string) => {
     state.selectedJobId = jobId;
 };
 
-watch(() => storeState.selectedItem, (selectedItem) => {
-    if (!selectedItem) return;
+const jobListApiQueryHelper = new ApiQueryHelper();
+const handleChangeToolbox = (options: ToolboxOptions) => {
+    if (options.pageStart !== undefined) jobListApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) jobListApiQueryHelper.setPageLimit(options.pageLimit);
+    fetchJobList();
+};
+const fetchJobList = () => {
     state.loading = true;
     try {
-        dataSourcesPageStore.fetchJobList(selectedItem?.data_source_id || '');
+        dataSourcesPageStore.fetchJobList({
+            data_source_id: storeState.selectedItem?.data_source_id || '',
+            query: jobListApiQueryHelper.data,
+        });
     } finally {
         state.loading = false;
     }
+};
+
+watch(() => storeState.selectedItem, (selectedItem) => {
+    if (!selectedItem) return;
+    fetchJobList();
 }, { immediate: true });
 </script>
 
@@ -98,7 +114,14 @@ watch(() => storeState.selectedItem, (selectedItem) => {
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
                    :total-count="storeState.jobList.length"
                    class="title"
-        />
+        >
+            <template #extra>
+                <p-toolbox :searchable="false"
+                           @change="handleChangeToolbox"
+                           @refresh="fetchJobList"
+                />
+            </template>
+        </p-heading>
         <p-data-table :fields="tableState.fields"
                       :items="storeState.jobList"
                       style-type="white"
@@ -157,7 +180,18 @@ watch(() => storeState.selectedItem, (selectedItem) => {
 <style lang="postcss" scoped>
 .data-source-management-tab-detail-base-information {
     .title {
+        @apply items-center;
         margin-top: 2.25rem;
+
+        /* custom design-system component - p-toolbox */
+        :deep(.p-toolbox) {
+            .tools-wrapper {
+                margin-bottom: -0.325rem;
+            }
+            .tool {
+                margin-bottom: 0;
+            }
+        }
     }
     .data-source-definition-table {
         padding-top: 0.5rem;
