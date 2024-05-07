@@ -4,23 +4,24 @@ import {
 } from 'vue';
 
 import {
-    PDataTable, PHeading,
+    PButton,
+    PDataTable, PHeading, PI,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 
-import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
+import { green, red } from '@/styles/colors';
+
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import type { DataSourceItem, CostJobItem } from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
-const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
-    jobList: computed<JobModel[]>(() => dataSourcesPageState.jobList),
+    jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
 });
 const state = reactive({
     loading: false,
@@ -55,12 +56,30 @@ watch(() => storeState.selectedItem, (selectedItem) => {
                    class="title"
         />
         <p-data-table :fields="tableState.fields"
-                      :data="storeState.jobList"
+                      :items="storeState.jobList"
                       style-type="white"
                       :loading="state.loading"
                       class="data-source-definition-table"
                       v-on="$listeners"
-        />
+        >
+            <template #col-status-format="{value}">
+                <p-i :name="(value === 'SUCCESS') ? 'ic_check' : 'ic_error-filled'"
+                     :color="(value === 'SUCCESS') ? green[600] : red[400]"
+                     width="1rem"
+                     height="1rem"
+                     class="icon-info"
+                />
+                <span v-if="value === 'SUCCESS'">
+                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SUCCESS') }}
+                </span>
+                <p-button v-else
+                          size="sm"
+                          style-type="tertiary"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND') }}
+                </p-button>
+            </template>
+        </p-data-table>
     </div>
 </template>
 
@@ -71,9 +90,8 @@ watch(() => storeState.selectedItem, (selectedItem) => {
     }
     .data-source-definition-table {
         padding-top: 0.5rem;
-        .col-name {
-            @apply inline-flex items-center;
-            gap: 0.5rem;
+        .icon-info {
+            margin-right: 0.5rem;
         }
     }
 }
