@@ -1822,7 +1822,8 @@
 		"TOGGLE_MORE": "show more",
 		"WELCOME_BUTTON": "Get Started",
 		"WELCOME_DESC": "Connect your relevant cloud accounts to this workspace and start optimizing resource management and cost savings today.",
-		"WELCOME_TITLE": "Welcome"
+		"WELCOME_TITLE": "Welcome",
+		"WELCOME_TITLE_USER_NAME": "Welcome, {user_name} "
 	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",
