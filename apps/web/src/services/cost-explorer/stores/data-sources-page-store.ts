@@ -7,6 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
+import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
@@ -30,6 +32,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         totalCount: 0,
         selectedIndices: [] as number[],
         jobList: [] as CostJobModel[],
+        linkedAccounts: [] as CostDataSourceAccountModel[],
     });
 
     const _getters = reactive({
@@ -87,6 +90,15 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.jobList = [];
+            }
+        },
+        fetchLinkedAccount: async (params: CostJobListParameters) => {
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.DataSourceAccount.list<CostDataSourceAccountListParameters, ListResponse<CostDataSourceAccountModel>>(params);
+                state.linkedAccounts = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.linkedAccounts = [];
             }
         },
     };

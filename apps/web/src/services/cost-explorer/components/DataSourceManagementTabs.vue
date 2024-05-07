@@ -8,6 +8,8 @@ import { i18n } from '@/translations';
 import DataSourceManagementTabDetailBaseInformation
     from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
 import DataSourceManagementTabDetailJob from '@/services/cost-explorer/components/DataSourceManagementTabDetailJob.vue';
+import DataSourceManagementTabLinkedAccount
+    from '@/services/cost-explorer/components/DataSourceManagementTabLinkedAccount.vue';
 
 
 const tabState = reactive({
@@ -30,6 +32,9 @@ const tabState = reactive({
                 <data-source-management-tab-detail-base-information />
                 <data-source-management-tab-detail-job />
             </div>
+        </template>
+        <template #linked_account>
+            <data-source-management-tab-linked-account />
         </template>
     </p-tab>
 </template>
