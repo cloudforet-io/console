@@ -118,7 +118,7 @@ watch(() => storeState.selectedItem, (selectedItem) => {
             <template #extra>
                 <p-toolbox :searchable="false"
                            @change="handleChangeToolbox"
-                           @refresh="fetchJobList"
+                           @refresh="fetchJobList()"
                 />
             </template>
         </p-heading>
