@@ -8,6 +8,8 @@ import {
     PDivider,
 } from '@spaceone/design-system';
 
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
@@ -38,15 +40,16 @@ const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
 });
 const state = reactive({
+    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
         const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
         const _targetMetric = metricExplorerPageState.metric;
-        const _targetMetricExample = metricExplorerPageGetters.metricExample;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: `[${targetNamespace?.name}] ${_targetMetricExample?.name ?? _targetMetric?.name}`,
-                path: _targetMetricExample ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
+                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),

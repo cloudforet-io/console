@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
@@ -49,11 +50,14 @@ const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
 ];
+
+const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
+    currentMetricId: computed<string>(() => route.params.metricId),
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
@@ -77,7 +81,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
         const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
-            metric_id: metricExplorerPageGetters.metricId as string,
+            metric_id: state.currentMetricId,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
@@ -145,7 +149,7 @@ const handleAllSeries = (type: string) => {
 };
 
 watch([
-    () => metricExplorerPageGetters.metricId,
+    () => state.currentMetricId,
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,

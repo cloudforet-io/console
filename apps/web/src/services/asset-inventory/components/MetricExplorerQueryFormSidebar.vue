@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PFieldGroup, PTextInput, PTextEditor, PButton, PSidebar,
@@ -28,6 +28,7 @@ import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/me
 
 
 const router = useRouter();
+const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
@@ -39,6 +40,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
+    currentMetricId: computed<string>(() => route.params.metricId),
     sidebarTitle: computed<TranslateResult>(() => {
         if (metricExplorerPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
         return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
@@ -98,7 +100,7 @@ const createCustomMetric = async () => {
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(metricExplorerPageGetters.metricId);
+        await metricExplorerPageStore.loadMetric(state.currentMetricId);
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
@@ -116,13 +118,13 @@ const updateCustomMetric = async () => {
         state.loading = true;
         const jsonParsedQuery = JSON.parse(code.value.trim());
         await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: metricExplorerPageGetters.metricId,
+            metric_id: state.currentMetricId,
             unit: unit.value,
             query_options: jsonParsedQuery,
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(metricExplorerPageGetters.metricId);
+        await metricExplorerPageStore.loadMetric(state.currentMetricId);
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
