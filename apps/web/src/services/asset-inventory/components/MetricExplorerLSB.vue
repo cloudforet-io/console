@@ -22,6 +22,7 @@ import type { FavoriteConfig } from '@/common/modules/favorites/favorite-button/
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import LSBCollapsibleMenuItem from '@/common/modules/navigations/lsb/modules/LSBCollapsibleMenuItem.vue';
+import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vue';
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
@@ -94,12 +95,16 @@ const state = reactive({
             // ...metricExampleList,
         ].filter((menu) => menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]);
     }),
-    namespaceMenu: computed(() => ({
+    namespaceMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         label: i18n.t('COMMON.NAMESPACE'),
         id: 'namespace',
     })),
-    metricMenu: computed(() => ({
+    namespaceTopTitleMenu: computed<LSBItem>(() => ({
+        type: MENU_ITEM_TYPE.TOP_TITLE,
+        label: i18n.t('COMMON.NAMESPACE'),
+    })),
+    metricMenu: computed<LSBItem>(() => ({
         type: MENU_ITEM_TYPE.SLOT,
         id: 'metric',
     })),
@@ -257,63 +262,63 @@ onMounted(async () => {
                 >
                     {{ $t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER_HOME') }}
                 </p-text-button>
-                <l-s-b-collapsible-menu-item :item="state.namespaceMenu">
-                    <template #collapsible-contents>
-                        <div class="namespace-wrapper">
-                            <p-search class="namespace-search"
-                                      :value="namespaceState.inputValue"
-                                      @update:value="handleSearchNamespace"
-                            />
-                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                         v-show="!namespaceState.inputValue"
-                                                         :key="`namespace-${idx}`"
-                                                         class="category-menu-item"
-                                                         :item="item"
-                                                         is-sub-item
+                <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
+                                 :current-path="state.currentPath"
+                                 :depth="1"
+                />
+                <div class="namespace-wrapper">
+                    <p-search class="namespace-search"
+                              :value="namespaceState.inputValue"
+                              @update:value="handleSearchNamespace"
+                    />
+                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                 v-show="!namespaceState.inputValue"
+                                                 :key="`namespace-${idx}`"
+                                                 class="category-menu-item"
+                                                 :item="item"
+                                                 is-sub-item
+                    >
+                        <template #collapsible-contents="{ item: _item }">
+                            <div v-for="(_menu, _idx) in _item.subItems"
+                                 :key="`${_menu.label}-${_idx}`"
+                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                 @click="handleClickNamespace(_menu)"
                             >
-                                <template #collapsible-contents="{ item: _item }">
-                                    <div v-for="(_menu, _idx) in _item.subItems"
-                                         :key="`${_menu.label}-${_idx}`"
-                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                         @click="handleClickNamespace(_menu)"
-                                    >
-                                        <span class="text">
-                                            {{ _menu?.label || '' }}
-                                        </span>
-                                    </div>
-                                </template>
-                            </l-s-b-collapsible-menu-item>
-                            <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
-                                                         v-show="namespaceState.inputValue"
-                                                         :key="`namespace-search-${idx}`"
-                                                         class="category-menu-item category-menu-item-by-keyword"
-                                                         :item="item"
-                                                         is-sub-item
-                                                         :override-collapsed="namespaceState.collapsed"
-                            >
-                                <template #collapsible-contents="{ item: _item }">
-                                    <div v-for="(_menu, _idx) in _item.subItems"
-                                         :key="`${_menu.label}-${_idx}`"
-                                         :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                         @click="handleClickNamespace(_menu)"
-                                    >
-                                        <p-text-highlighting class="text"
-                                                             :term="namespaceState.inputValue"
-                                                             :text="_menu?.label || ''"
-                                        />
-                                    </div>
-                                </template>
-                            </l-s-b-collapsible-menu-item>
-                            <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
-                                     class="keyword-search-empty"
-                            >
-                                <span>
-                                    {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                                <span class="text">
+                                    {{ _menu?.label || '' }}
                                 </span>
-                            </p-empty>
-                        </div>
-                    </template>
-                </l-s-b-collapsible-menu-item>
+                            </div>
+                        </template>
+                    </l-s-b-collapsible-menu-item>
+                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
+                                                 v-show="namespaceState.inputValue"
+                                                 :key="`namespace-search-${idx}`"
+                                                 class="category-menu-item category-menu-item-by-keyword"
+                                                 :item="item"
+                                                 is-sub-item
+                                                 :override-collapsed="namespaceState.collapsed"
+                    >
+                        <template #collapsible-contents="{ item: _item }">
+                            <div v-for="(_menu, _idx) in _item.subItems"
+                                 :key="`${_menu.label}-${_idx}`"
+                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                 @click="handleClickNamespace(_menu)"
+                            >
+                                <p-text-highlighting class="text"
+                                                     :term="namespaceState.inputValue"
+                                                     :text="_menu?.label || ''"
+                                />
+                            </div>
+                        </template>
+                    </l-s-b-collapsible-menu-item>
+                    <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
+                             class="keyword-search-empty"
+                    >
+                        <span>
+                            {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                        </span>
+                    </p-empty>
+                </div>
             </p-data-loader>
         </template>
         <template #slot-metric>
