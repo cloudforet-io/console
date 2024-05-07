@@ -6,6 +6,7 @@ import { initServiceSettingsStore } from '@/store/util';
 interface AssetInventorySettingsStore {
     cloudServiceTableHeight: number;
     cloudServiceTablePageLimit: number;
+    notShowMetricSelectGuidePopover?: boolean;
 }
 
 export const DEFAULT_TABLE_PAGE_LIMIT = 15;
@@ -15,10 +16,12 @@ export const useAssetInventorySettingsStore = defineStore('asset-inventory-setti
     state: (): AssetInventorySettingsStore => ({
         cloudServiceTableHeight: TABLE_MIN_HEIGHT,
         cloudServiceTablePageLimit: DEFAULT_TABLE_PAGE_LIMIT,
+        notShowMetricSelectGuidePopover: false,
     }),
     getters: {
         getCloudServiceTableHeight: (state): number => state.cloudServiceTableHeight,
         getCloudServiceTablePageLimit: (state): number => state.cloudServiceTablePageLimit,
+        getNotShowMetricSelectGuidePopover: (state): boolean => !!state.notShowMetricSelectGuidePopover,
     },
     actions: {
         setCloudServiceTableHeight(height: number) {
@@ -27,10 +30,14 @@ export const useAssetInventorySettingsStore = defineStore('asset-inventory-setti
         setCloudServiceTablePageLimit(limit: number) {
             this.cloudServiceTablePageLimit = limit;
         },
+        setNotShowMetricSelectGuidePopover(noMore: boolean) {
+            this.notShowMetricSelectGuidePopover = noMore;
+        },
         initState() {
             const localStorageItem = initServiceSettingsStore<AssetInventorySettingsStore>('assetInventory');
             this.cloudServiceTableHeight = localStorageItem?.cloudServiceTableHeight ?? TABLE_MIN_HEIGHT;
             this.cloudServiceTablePageLimit = localStorageItem?.cloudServiceTablePageLimit ?? DEFAULT_TABLE_PAGE_LIMIT;
+            this.notShowMetricSelectGuidePopover = localStorageItem?.notShowMetricSelectGuidePopover ?? false;
         },
     },
 });
