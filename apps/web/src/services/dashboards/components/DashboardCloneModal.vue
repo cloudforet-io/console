@@ -73,7 +73,7 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     dashboardType: 'PRIVATE' as DashboardType,
-    isPrivate: true,
+    isPrivate: false,
     projectId: computed<string|undefined>(() => {
         if (props.dashboard?.project_id !== '*') return props.dashboard?.project_id;
         return undefined;
@@ -138,6 +138,7 @@ const handleConfirm = async () => {
 
 const init = () => {
     initForm('name', `Clone - ${props.dashboard?.name}`);
+    state.isPrivate = !!props.dashboard?.private_dashboard_id;
 };
 
 watch(() => props.visible, (visible) => {
