@@ -42,6 +42,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -69,7 +70,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!metricExplorerPageStore.state.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -143,7 +144,7 @@ const namespaceState = reactive({
             ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
-    selectedNamespace: computed(() => metricExplorerPageStore.state.selectedNamespace),
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
     currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
 });
 
