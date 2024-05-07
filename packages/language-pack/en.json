@@ -1609,6 +1609,7 @@
 			"DATE_HELP_TEXT_MONTHLY": "Up to last 12 months",
 			"DELETE_TITLE": "Are you sure you want to delete dashboard?",
 			"LABEL_DASHBOARD_NAME": "Dashboard Name",
+			"LABEL_MAKE_PRIVATE": "Make Private (Only you)",
 			"LABEL_PRIVATE": "Private (Only me)",
 			"LABEL_PUBLIC": "Public (Anyone who has 'View' access to this dashboard scope)",
 			"LABEL_VIEWERS": "Viewers",

@@ -1609,6 +1609,7 @@
 			"DATE_HELP_TEXT_MONTHLY": "最長12ヶ月(期間内)設定可能",
 			"DELETE_TITLE": "ダッシュボードを削除しますか？",
 			"LABEL_DASHBOARD_NAME": "ダッシュボード名",
+			"LABEL_MAKE_PRIVATE": "",
 			"LABEL_PRIVATE": "非公開",
 			"LABEL_PUBLIC": "公開（選択したダッシュボードの範囲に対して「View」アクセス権を持つすべてのユーザー）",
 			"LABEL_VIEWERS": "公開可否",
