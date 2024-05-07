@@ -33,6 +33,11 @@ export const getDefaultSchema = () => ({
             format: 'generate_id',
             markdown: '[How to generate ID?](https://www.google.com)',
         },
+        is_that_true: {
+            type: 'boolean',
+            title: 'Is that true?',
+            default: true,
+        },
         password: {
             title: 'Password',
             minLength: 8,
@@ -178,7 +183,7 @@ G6aFKaqQfOXKCyWoUiVknQJAXsssyFFci/2ueKlIE1QqIiLSZ8V8OlpFLRnb1pzI
         },
     },
     required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider', 'friends', 'pem_key'],
-    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food', 'pem_key'],
+    order: ['user_id', 'is_that_true', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food', 'pem_key'],
 });
 
 export const getDefaultFormData = () => ({

@@ -29,6 +29,7 @@
                     >
                         {{ proxySelected[0].label || proxySelected[0].name }}
                         <p-badge v-if="proxySelected.length > 1"
+                                 badge-type="subtle"
                                  :style-type="disabled ? 'gray200' : 'blue200'"
                         >
                             +{{ proxySelected.length - 1 }}
@@ -544,7 +545,7 @@ export default defineComponent<TextInputProps>({
         @apply w-full;
     }
     > .input-container {
-        @apply inline-flex border bg-white text-gray-900 rounded items-center;
+        @apply inline-flex border border-gray-300 bg-white text-gray-900 rounded items-center;
         width: inherit;
         min-height: 2rem;
         height: auto;

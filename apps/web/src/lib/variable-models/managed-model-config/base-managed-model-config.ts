@@ -13,6 +13,7 @@ import CloudServiceVariableModel from '@/lib/variable-models/managed-model/resou
 import CollectorVariableModel from '@/lib/variable-models/managed-model/resource-model/collector-variable-model';
 import CostDataSourceVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-data-source-variable-model';
 import CostVariableModel from '@/lib/variable-models/managed-model/resource-model/cost-variable-model';
+import MetricDataVariableModel from '@/lib/variable-models/managed-model/resource-model/metric-data-variable-model';
 import ProjectGroupVariableModel from '@/lib/variable-models/managed-model/resource-model/project-group-variable-model';
 import ProjectVariableModel from '@/lib/variable-models/managed-model/resource-model/project-variable-model';
 import ProviderVariableModel from '@/lib/variable-models/managed-model/resource-model/provider-variable-model';
@@ -46,6 +47,7 @@ const RESOURCE_VARIABLE_MODELS = {
     webhook: WebhookVariableModel,
     workspace: WorkspaceVariableModel,
     cost: CostVariableModel,
+    metric_data: MetricDataVariableModel,
 } as const;
 const CUSTOM_RESOURCE_VARIABLE_MODELS = {
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,

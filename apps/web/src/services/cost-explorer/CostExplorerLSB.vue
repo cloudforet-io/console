@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PLazyImg, PSelectDropdown,
+    PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -17,6 +17,7 @@ import type { PluginReferenceMap } from '@/store/reference/plugin-reference-stor
 
 import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useFavoriteStore } from '@/common/modules/favorites/favorite-button/store/favorite-store';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
@@ -26,13 +27,16 @@ import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRoute
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { gray } from '@/styles/colors';
+import {
+    yellow, gray,
+} from '@/styles/colors';
+
 
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
-const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
+const DATA_SOURCE_MENU_ID = 'data-source';
 const STARRED_MENU_ID = 'starred';
 
 const costQuerySetStore = useCostQuerySetStore();
@@ -174,25 +178,8 @@ const handleSelectDataSource = (selected: string) => {
 <template>
     <aside class="sidebar-menu">
         <l-s-b :menu-set="state.menuSet">
-            <template #collapsible-contents="{item: collapsible_item}">
-                <div v-if="collapsible_item?.id === STARRED_MENU_ID">
-                    <div v-if="state.starredMenuSet.length > 0">
-                        <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
-                                                :key="idx"
-                                                :item="menu"
-                                                :idx="idx"
-                                                :current-path="state.currentPath"
-                                                is-hide-favorite
-                        />
-                    </div>
-                    <span v-else
-                          class="no-data"
-                    >
-                        {{ $t('COMMON.STARRED_NO_DATA') }}
-                    </span>
-                </div>
-                <p-select-dropdown v-else
-                                   class="select-options-dropdown"
+            <template #collapsible-contents-data-source>
+                <p-select-dropdown class="select-options-dropdown"
                                    :menu="dataSourceState.items"
                                    :selected="dataSourceState.selected"
                                    use-fixed-menu-style
@@ -218,9 +205,34 @@ const handleSelectDataSource = (selected: string) => {
                             <span class="selected-item-postfix">
                                 ({{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}: {{ getCurrentCurrencySet(item.name) }})
                             </span>
+                            <beta-mark v-if="item.label === 'Kubernetes'"
+                                       class="beta"
+                            />
                         </div>
                     </template>
                 </p-select-dropdown>
+            </template>
+            <template #collapsible-contents-starred>
+                <div v-if="state.starredMenuSet.length > 0">
+                    <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
+                                            :key="idx"
+                                            :item="menu"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
+                    />
+                </div>
+                <span v-else
+                      class="no-data"
+                >
+                    <p-i class="menu-icon"
+                         name="ic_star-filled"
+                         height="1rem"
+                         width="1rem"
+                         :color="yellow[500]"
+                    />
+                    {{ $t('COMMON.STARRED_NO_DATA') }}
+                </span>
             </template>
         </l-s-b>
     </aside>
@@ -243,6 +255,9 @@ const handleSelectDataSource = (selected: string) => {
     }
     .selected-item-postfix {
         @apply text-gray-500;
+    }
+    .beta {
+        margin-left: 0.125rem;
     }
 }
 
