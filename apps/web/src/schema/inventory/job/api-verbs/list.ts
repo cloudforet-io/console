@@ -10,4 +10,5 @@ export interface JobListParameters {
     secret_id?: string;
     plugin_id?: string;
     workspace_id?: string;
+    data_source_id?: string;
 }

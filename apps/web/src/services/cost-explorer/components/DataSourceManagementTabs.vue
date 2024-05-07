@@ -7,6 +7,8 @@ import { i18n } from '@/translations';
 
 import DataSourceManagementTabDetailBaseInformation
     from '@/services/cost-explorer/components/DataSourceManagementTabDetailBaseInformation.vue';
+import DataSourceManagementTabDetailJob from '@/services/cost-explorer/components/DataSourceManagementTabDetailJob.vue';
+
 
 const tabState = reactive({
     tabs: computed(() => [
@@ -26,6 +28,7 @@ const tabState = reactive({
         <template #detail>
             <div class="data-source-management-tab-detail">
                 <data-source-management-tab-detail-base-information />
+                <data-source-management-tab-detail-job />
             </div>
         </template>
     </p-tab>

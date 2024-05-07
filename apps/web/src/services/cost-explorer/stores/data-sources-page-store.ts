@@ -7,6 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
+import type { JobModel } from '@/schema/inventory/job/model';
 import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
 
@@ -26,6 +28,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceList: [] as DataSourceModel[],
         totalCount: 0,
         selectedIndices: [] as number[],
+        jobList: [] as JobModel[],
     });
 
     const _getters = reactive({
@@ -35,7 +38,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const getters = reactive({
         dataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => {
-            const icon = _getters.provider[i.provider].icon;
+            const icon = _getters.provider[i.provider]?.icon;
             return {
                 ...i,
                 icon: assetUrlConverter(icon),
@@ -61,6 +64,17 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 ErrorHandler.handleError(e);
                 state.dataSourceList = [];
                 state.totalCount = 0;
+            }
+        },
+        fetchJobList: async (dataSourceId: string) => {
+            try {
+                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({
+                    data_source_id: dataSourceId,
+                });
+                state.jobList = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.jobList = [];
             }
         },
     };
