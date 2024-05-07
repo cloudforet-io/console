@@ -21,6 +21,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import { convertWorkspaceConfigToReferenceData } from '@/lib/helper/config-data-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -64,7 +65,13 @@ const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreGetters.currentWorkspace),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
-    favoriteItems: computed(() => sortBy(favoriteGetters.workspaceItems, 'label')),
+    favoriteItems: computed<FavoriteItem[]>(() => {
+        const sortedList = sortBy(favoriteGetters.workspaceItems, 'label');
+        return convertWorkspaceConfigToReferenceData(
+            sortedList ?? [],
+            storeState.workspaceList,
+        );
+    }),
 });
 const state = reactive({
     searchText: '',
@@ -156,7 +163,6 @@ watch(() => storeState.favoriteItems, async () => {
 });
 watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
     if (!selectedWorkspace) return;
-    userWorkspaceStore.load();
     recentStore.createRecent({
         type: RECENT_TYPE.WORKSPACE,
         workspaceId: selectedWorkspace?.workspace_id || '',
