@@ -109,6 +109,7 @@ const createMetricExample = async () => {
             },
         });
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
+        state.proxyVisible = false;
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
@@ -119,8 +120,6 @@ const createMetricExample = async () => {
         })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
-    } finally {
-        state.proxyVisible = false;
     }
 };
 const updateMetricName = async () => {
@@ -130,11 +129,10 @@ const updateMetricName = async () => {
             name: name.value,
         });
         await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        state.proxyVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    } finally {
-        state.proxyVisible = false;
     }
 };
 const updateMetricExampleName = async () => {
@@ -144,11 +142,10 @@ const updateMetricExampleName = async () => {
             name: name.value,
         });
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        state.proxyVisible = false;
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
-    } finally {
-        state.proxyVisible = false;
     }
 };
 

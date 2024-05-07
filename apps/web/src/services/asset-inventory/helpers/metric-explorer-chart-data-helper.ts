@@ -76,7 +76,11 @@ export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>
         return legends;
     }
     if (rawData.results?.length) {
-        return [{ name: 'totalCount', label: 'Total Count', disabled: false }];
+        const legend: Legend = { name: 'totalCount', label: 'Total Count', disabled: false };
+        if (chartType === CHART_TYPE.TREEMAP) {
+            legend.color = getTreemapChartColor(0)[0];
+        }
+        return [legend];
     }
     return [];
 };
