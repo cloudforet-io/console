@@ -8,7 +8,7 @@ export const BASIC_CHART_COLORS = [
     red[400], indigo[400],
 ];
 
-export const DEFAULT_CHART_COLORS = [
+export const MASSIVE_CHART_COLORS = [
     violet[400], violet[600], blue[400], blue[600], coral[400], coral[600],
     yellow[400], yellow[600], green[400], green[600], peacock[400], peacock[600],
     red[400], red[600], indigo[400], indigo[600], violet[500], violet[700],
