@@ -19,8 +19,6 @@ import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { gray } from '@/styles/colors';
 
 import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
@@ -30,12 +28,10 @@ import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metr
 
 
 interface Props {
-    selectedNamespace?: NamespaceSubItemType;
     isDetailPage?: boolean;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:selected-namespace', value: NamespaceSubItemType|undefined): void;}>();
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -53,17 +49,16 @@ const storeState = reactive({
         });
         return res;
     }),
-
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
 });
 const state = reactive({
-    proxySelectedNamespace: useProxyValue('selectedNamespace', props, emit),
     selectedId: computed<string|undefined>(() => {
         if (!props.isDetailPage) return undefined;
         if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
         return route.params.metricExampleId;
     }),
     inputValue: '',
-    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === state.proxySelectedNamespace?.name)),
+    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     metricItems: computed<TreeNode[]>(() => state.metrics.map((metric) => {
         const metricTreeNode = {
             id: metric.key,
@@ -136,7 +131,7 @@ const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    state.proxySelectedNamespace = undefined;
+    metricExplorerPageStore.setSelectedNamespace(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
     metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
@@ -156,7 +151,7 @@ onMounted(() => {
 });
 
 /* Watcher */
-watch(() => props.selectedNamespace, (selectedNamespace) => {
+watch(() => storeState.selectedNamespace, (selectedNamespace) => {
     if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
 }, { immediate: true });
 </script>
@@ -176,16 +171,16 @@ watch(() => props.selectedNamespace, (selectedNamespace) => {
                                    @click="handleClickBackToNamespace"
                     />
                     <p-lazy-img class="namespace-image"
-                                :src="getNamespaceImageUrl(state.proxySelectedNamespace)"
+                                :src="getNamespaceImageUrl(storeState.selectedNamespace)"
                                 width="1.25rem"
                                 height="1.25rem"
                     />
                     <p-tooltip class="title"
-                               :contents="state.proxySelectedNamespace?.label || ''"
+                               :contents="storeState.selectedNamespace?.label || ''"
                     >
-                        <span>{{ state.proxySelectedNamespace?.label.split('/')[0] }}</span>
+                        <span>{{ storeState.selectedNamespace?.label.split('/')[0] }}</span>
                         <span class="divider">/</span>
-                        <span class="type">{{ state.proxySelectedNamespace?.label.split('/')[1] }}</span>
+                        <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
                     </p-tooltip>
                 </div>
                 <p-icon-button style-type="tertiary"
