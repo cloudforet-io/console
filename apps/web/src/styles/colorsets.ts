@@ -1,16 +1,22 @@
 import {
-    palette,
+    blue, coral, gray, green, indigo, peacock, red, violet, yellow,
 } from '@/styles/colors';
 
-export const DEFAULT_CHART_COLORS = [
-    palette.violet[400], palette.violet[600], palette.blue[400], palette.blue[600], palette.coral[400], palette.coral[600],
-    palette.yellow[400], palette.yellow[600], palette.green[400], palette.green[600], palette.peacock[400], palette.peacock[600],
-    palette.red[400], palette.red[600], palette.indigo[400], palette.indigo[600], palette.violet[500], palette.violet[700],
-    palette.blue[500], palette.blue[700], palette.coral[500], palette.coral[700], palette.yellow[500], palette.yellow[700],
-    palette.green[500], palette.green[700], palette.peacock[500], palette.peacock[700], palette.red[500], palette.red[700],
-    palette.indigo[500], palette.indigo[700],
+
+export const BASIC_CHART_COLORS = [
+    violet[400], blue[400], coral[400], yellow[400], green[400], peacock[400],
+    red[400], indigo[400],
 ];
 
-export const DISABLED_LEGEND_COLOR = palette.gray[300];
+export const DEFAULT_CHART_COLORS = [
+    violet[400], violet[600], blue[400], blue[600], coral[400], coral[600],
+    yellow[400], yellow[600], green[400], green[600], peacock[400], peacock[600],
+    red[400], red[600], indigo[400], indigo[600], violet[500], violet[700],
+    blue[500], blue[700], coral[500], coral[700], yellow[500], yellow[700],
+    green[500], green[700], peacock[500], peacock[700], red[500], red[700],
+    indigo[500], indigo[700],
+];
 
-export const BACKGROUND_COLOR = palette.gray[100];
+export const DISABLED_LEGEND_COLOR = gray[300];
+
+export const BACKGROUND_COLOR = gray[100];
