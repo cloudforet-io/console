@@ -156,6 +156,7 @@ watch(() => storeState.favoriteItems, async () => {
 });
 watch(() => storeState.selectedWorkspace, (selectedWorkspace) => {
     if (!selectedWorkspace) return;
+    userWorkspaceStore.load();
     recentStore.createRecent({
         type: RECENT_TYPE.WORKSPACE,
         workspaceId: selectedWorkspace?.workspace_id || '',

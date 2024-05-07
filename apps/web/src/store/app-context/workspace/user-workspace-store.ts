@@ -9,13 +9,13 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 interface UserWorkspaceStoreState {
     items: WorkspaceModel[];
-    currentItem?: WorkspaceModel;
+    currentItem?: string;
 }
 
 export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
     const state = reactive<UserWorkspaceStoreState>({
         items: [],
-        currentItem: undefined,
+        currentItem: '',
     });
 
     const getters = reactive({
@@ -27,25 +27,29 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             });
             return map;
         }),
-        currentWorkspace: computed<WorkspaceModel|undefined>(() => state.currentItem),
-        currentWorkspaceId: computed<string|undefined>(() => state.currentItem?.workspace_id),
-    });
-
-    const actions = {
-        async load() {
-            const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
-            state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
-        },
-        setCurrentWorkspace(workspaceId?: string) {
-            const found = state.items.find((workspace) => workspace.workspace_id === workspaceId);
+        currentWorkspace: computed<WorkspaceModel|undefined>(() => {
+            const found = state.items.find((workspace) => workspace.workspace_id === state.currentItem);
             let currentItem: WorkspaceModel|undefined;
             if (found) {
                 currentItem = found;
             } else {
                 currentItem = undefined;
             }
+            return currentItem;
+        }),
+        currentWorkspaceId: computed<string|undefined>(() => state.currentItem),
+    });
 
-            state.currentItem = currentItem;
+    const mutations = {
+        setCurrentWorkspace(workspaceId?: string) {
+            state.currentItem = workspaceId;
+        },
+    };
+
+    const actions = {
+        async load() {
+            const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
+            state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
         },
         getIsAccessibleWorkspace(workspaceId: string) {
             if (!workspaceId) return false;
@@ -59,6 +63,7 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
 
     return {
         getters,
+        ...mutations,
         ...actions,
     };
 });
