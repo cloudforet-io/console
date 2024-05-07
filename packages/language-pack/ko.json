@@ -1609,6 +1609,7 @@
 			"DATE_HELP_TEXT_MONTHLY": "최대 12개월 기간내 설정 가능",
 			"DELETE_TITLE": "대시보드를 삭제하시겠습니까?",
 			"LABEL_DASHBOARD_NAME": "대시보드 이름",
+			"LABEL_MAKE_PRIVATE": "",
 			"LABEL_PRIVATE": "비공개 (나만보기)",
 			"LABEL_PUBLIC": "공개 (해당 대시보드 범위에 'View' 엑세스 권한을 갖는 모든 유저)",
 			"LABEL_VIEWERS": "공개 여부",
