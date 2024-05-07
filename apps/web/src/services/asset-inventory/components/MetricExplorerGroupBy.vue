@@ -47,7 +47,9 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
                 {{ item.label }}
             </p-select-button>
         </div>
-        <div class="right-part">
+        <div v-if="!metricExplorerPageState.metricLoading"
+             class="right-part"
+        >
             <strong>{{ $t('INVENTORY.METRIC_EXPLORER.UNIT') }}:</strong>
             <span class="ml-1">{{ metricExplorerPageState.metric?.unit || '--' }}</span>
         </div>
@@ -58,6 +60,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
 .metric-explorer-group-by {
     @apply flex flex-wrap justify-between;
     column-gap: 0.375rem;
+    min-height: 3.625rem;
     row-gap: 0.5rem;
     align-items: center;
     font-size: 0.875rem;
