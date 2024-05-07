@@ -11,7 +11,7 @@ import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { MASSIVE_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
@@ -50,7 +50,7 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    return DEFAULT_CHART_COLORS[index];
+    return MASSIVE_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];

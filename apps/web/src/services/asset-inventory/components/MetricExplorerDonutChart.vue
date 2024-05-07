@@ -5,9 +5,9 @@ import {
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 
-import { numberFormatter } from '@cloudforet/utils';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+
+import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 
 import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -58,14 +58,17 @@ const drawChart = () => {
         }
         return undefined;
     });
-
     chart.series.push(series);
 
+    // set color
+    if (props.legends.length <= BASIC_CHART_COLORS.length) {
+        chartHelper.setChartColors(chart, BASIC_CHART_COLORS);
+    }
 
+    // tooltip
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
         const tooltip = chartHelper.createTooltip();
-        const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
-        chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
+        chartHelper.setPieTooltipText(series, tooltip);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(props.chartData);
     }

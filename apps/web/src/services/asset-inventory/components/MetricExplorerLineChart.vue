@@ -9,6 +9,8 @@ import { cloneDeep } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
+import { BASIC_CHART_COLORS } from '@/styles/colorsets';
+
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Legend, XYChartData } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -41,6 +43,10 @@ const drawChart = () => {
         max: dayjs.utc(metricExplorerPageState.period?.end).add(1, 'day').valueOf(),
     } : {};
     const { chart, xAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
+
+    if (props.legends.length <= BASIC_CHART_COLORS.length) {
+        chartHelper.setChartColors(chart, BASIC_CHART_COLORS);
+    }
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';

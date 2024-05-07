@@ -10,7 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -49,7 +49,8 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    return DEFAULT_CHART_COLORS[index];
+    if (props.legends.length <= BASIC_CHART_COLORS.length) return BASIC_CHART_COLORS[index % BASIC_CHART_COLORS.length];
+    return MASSIVE_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];

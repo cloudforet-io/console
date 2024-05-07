@@ -96,14 +96,18 @@ const openNameFormModal = (modalType: string) => {
     state.metricNameFormModalVisible = true;
 };
 const getDuplicatedMetricName = (name: string): string => {
-    let _count = 2;
     let _name = name;
+    const _regex = /^(.*?)\s*copy(\s+(\d+))?$/i;
+
     while (state.existingMetricNameList.includes(_name)) {
-        if (_name.endsWith(' copy')) {
-            _name = `${name} copy ${_count}`;
-            _count += 1;
+        const match = _regex.exec(_name);
+        if (match) {
+            const baseName = match[1];
+            const numberStr = match[3];
+            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
+            _name = `${baseName} copy ${newNumber}`;
         } else {
-            _name = `${name} copy`;
+            _name = `${_name} copy`;
         }
     }
     return _name;
