@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"DATA_SOURCES": {
+				"CANCELED": "취소됨",
 				"COL_BILLING_ACCOUNT": "",
 				"COL_DATASOURCE": "",
 				"COL_DESCRIPTION": "설명",
@@ -863,13 +864,17 @@
 				"COL_TIME": "",
 				"COL_WORKSPACE": "",
 				"ERROR_FOUND": "오류 확인",
+				"ERROR_FOUND_CODE": "",
+				"ERROR_FOUND_OK": "확인",
+				"ERROR_FOUND_TITLE": "",
 				"GUIDE": "",
 				"SUCCESS": "성공",
 				"TAB_DETAILS_COLLECTION_JOB": "",
 				"TAB_DETAILS_TITLE": "상세 정보",
 				"TAB_DETAIL_BASE_INFORMATION": "기본 정보",
 				"TAB_LINKED_ACCOUNT_TITLE": "",
-				"TAB_NO_DATA": ""
+				"TAB_NO_DATA": "",
+				"TIMEOUT": ""
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "문의하기",

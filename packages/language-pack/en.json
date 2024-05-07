@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"DATA_SOURCES": {
+				"CANCELED": "Canceled",
 				"COL_BILLING_ACCOUNT": "Billing Account",
 				"COL_DATASOURCE": "Data Source",
 				"COL_DESCRIPTION": "Description",
@@ -863,13 +864,17 @@
 				"COL_TIME": "Registered Time",
 				"COL_WORKSPACE": "Workspace",
 				"ERROR_FOUND": "Error Found",
+				"ERROR_FOUND_CODE": "Error Code",
+				"ERROR_FOUND_OK": "OK",
+				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
 				"SUCCESS": "Success",
 				"TAB_DETAILS_COLLECTION_JOB": "Recent Data Collection Job",
 				"TAB_DETAILS_TITLE": "Details",
 				"TAB_DETAIL_BASE_INFORMATION": "Base Information",
 				"TAB_LINKED_ACCOUNT_TITLE": "Linked Account",
-				"TAB_NO_DATA": "Select an item for more details."
+				"TAB_NO_DATA": "Select an item for more details.",
+				"TIMEOUT": "Timeout"
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",
