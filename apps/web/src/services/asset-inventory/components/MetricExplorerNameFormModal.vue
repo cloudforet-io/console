@@ -115,6 +115,8 @@ const createMetricExample = async () => {
         })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 const updateMetricName = async () => {
@@ -127,6 +129,8 @@ const updateMetricName = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 const updateMetricExampleName = async () => {
@@ -139,6 +143,8 @@ const updateMetricExampleName = async () => {
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 
@@ -155,8 +161,8 @@ const handleFormConfirm = async () => {
         }
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
         emit('save-as', name.value);
+        state.proxyVisible = false;
     }
-    state.proxyVisible = false;
 };
 
 /* Watcher */

@@ -164,6 +164,7 @@ const deleteMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
             example_id: metricExplorerPageGetters.metricExampleId,
         });
+        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
