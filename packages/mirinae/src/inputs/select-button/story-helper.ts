@@ -1,6 +1,6 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
+import { SELECT_BUTTON_LAYOUT_TYPE, SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
 export const getSelectButtonArgTypes = (): ArgTypes => ({
     /* props */
@@ -36,6 +36,42 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'object',
+        },
+    },
+    iconName: {
+        name: 'iconName',
+        type: { name: 'string' },
+        description: 'You can use the icon name from the [Icons](https://storybook.developer.spaceone.dev/?path=/story/foundation-graphics-icons--all-icons).',
+        defaultValue: 'ic_chart-line',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'ic_chart-line',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
         },
     },
     selected: {
@@ -89,6 +125,25 @@ export const getSelectButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
+        },
+    },
+    layout: {
+        name: 'layout',
+        type: { name: 'string' },
+        description: `Layout of select button. ${Object.values(SELECT_BUTTON_LAYOUT_TYPE)} are available.`,
+        defaultValue: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SELECT_BUTTON_LAYOUT_TYPE.TEXT_ONLY,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SELECT_BUTTON_LAYOUT_TYPE),
         },
     },
     styleType: {

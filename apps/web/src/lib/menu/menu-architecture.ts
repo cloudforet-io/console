@@ -18,6 +18,7 @@ export const MENU_LIST: Menu[] = [
             { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
             { id: MENU_ID.SERVER, needPermissionByRole: true },
             { id: MENU_ID.SECURITY, needPermissionByRole: true },
+            { id: MENU_ID.METRIC_EXPLORER, needPermissionByRole: true },
             { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
             { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true },
         ],

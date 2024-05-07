@@ -5,7 +5,7 @@ import {
 import { range } from 'lodash'
 import { getSelectButtonArgTypes } from '@/inputs/select-button/story-helper';
 import PSelectButton from './PSelectButton.vue';
-import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
+import { SELECT_BUTTON_LAYOUT_TYPE, SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 import { useProxyValue } from '@/hooks';
 
 
@@ -26,7 +26,11 @@ export const Template = (args, { argTypes }) => ({
             v-model="proxySelected"
             :predicate="predicate"
             :multi-selectable="multiSelectable"
+            :icon-name="iconName"
             :style-type="styleType"
+            :size="size"
+            :disabled="disabled"
+            :layout="layout"
             @change="onChange"
         >
             <span v-if="defaultSlot" v-html="defaultSlot" />
@@ -159,6 +163,50 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+
+## Layout
+
+<Canvas>
+    <Story name="Layout">
+        {{
+            components: { PSelectButton },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-button v-for="item in items" :key="item.value"
+            :value="item.value"
+            :layout="SELECT_BUTTON_LAYOUT_TYPE.ICON_ONLY"
+            :icon-name="item.iconName"
+            :style-type="SELECT_BUTTON_STYLE_TYPE.gray"
+            :disabled="item.disabled"
+            v-model="selected"
+            class="mr-2"
+        >
+            {{item}}
+        </p-select-button>
+    </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    selected: 1,
+                    items: [
+                        { value: 0, iconName: 'ic_chart-line' },
+                        { value: 1, iconName: 'ic_chart-line' },
+                        { value: 2, iconName: 'ic_chart-line' },
+                        { value: 3, iconName: 'ic_chart-line', disabled: true },
+                    ],
+                })
+                return {
+                    ...toRefs(state),
+                    SELECT_BUTTON_LAYOUT_TYPE,
+                    SELECT_BUTTON_STYLE_TYPE,
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 
 ## Advanced

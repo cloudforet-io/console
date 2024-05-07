@@ -82,6 +82,7 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
     Object.defineProperty(MANAGED_VARIABLE_MODEL_CONFIGS, key, {
         configurable: false,
         writable: false,
+        enumerable: true,
         value: {
             key: model.key,
             name: model.name,
