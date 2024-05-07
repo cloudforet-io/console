@@ -156,6 +156,7 @@ watch(() => storeState.selectedItem, (selectedItem) => {
             backdrop
             hide-footer-close-button
             :visible.sync="state.modalVisible"
+            @confirm="state.modalVisible = false"
         >
             <template #body>
                 <div class="content">
