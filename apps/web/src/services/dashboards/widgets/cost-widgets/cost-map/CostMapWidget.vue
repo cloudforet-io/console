@@ -24,7 +24,6 @@ import type {
     WidgetExpose, WidgetProps, WidgetEmit,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
-
 import type {
     AnalyzeRawData, TreemapChartData,
 } from './costmap-chart-data-helper';
@@ -103,7 +102,7 @@ const drawChart = (chartData: TreemapChartData[]) => {
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency);
+    chartHelper.setTreemapTooltipText(series, tooltip);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });

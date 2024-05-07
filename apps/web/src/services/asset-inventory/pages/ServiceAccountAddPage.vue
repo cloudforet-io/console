@@ -136,6 +136,7 @@ const createAccount = async (): Promise<string|undefined> => {
                     skip_project_group: serviceAccountPageFormState.skipProjectGroup,
                     single_workspace_id: serviceAccountPageFormState.selectedSingleWorkspace ?? undefined,
                 },
+                plugin_options: serviceAccountPageFormState.additionalOptions,
             });
         } else {
             res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
@@ -187,7 +188,7 @@ const handleSave = async () => {
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
                 params: { serviceAccountId: accountId as string },
             }));
-        } else router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+        } else router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         if (accountId) await deleteServiceAccount(accountId);
@@ -283,7 +284,7 @@ const handleRouteToServiceAccountDetailPage = () => {
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
-                <service-account-credentials-form />
+                <service-account-credentials-form create-mode />
             </p-pane-layout>
             <p-pane-layout v-if="state.isTrustedAccount && serviceAccountPageStore.getters.isMainProvider"
                            class="form-wrapper"

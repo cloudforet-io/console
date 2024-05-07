@@ -10,6 +10,7 @@ import type {
     CostDataSourceItems,
 } from '@/store/reference/cost-data-source-reference-store';
 
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { DisplayDataType } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
@@ -53,6 +54,9 @@ const state = reactive({
 
 const handleUpdateSelected = (selected: DisplayDataType) => {
     costAnalysisPageStore.setDisplayDataType(selected);
+    if (selected === 'usage') {
+        costAnalysisPageStore.setGroupBy([GROUP_BY.USAGE_TYPE]);
+    }
 };
 </script>
 

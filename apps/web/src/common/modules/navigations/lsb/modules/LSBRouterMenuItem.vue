@@ -70,7 +70,9 @@ const getIconName = (icon: LSBIcon): string => {
                  height="1rem"
                  class="icon"
             />
-            <span class="text">{{ item.label }}</span>
+            <span class="text">
+                <slot name="text">{{ item.label }}</slot>
+            </span>
             <slot name="after-text"
                   v-bind="{...props, item, index: idx}"
             />

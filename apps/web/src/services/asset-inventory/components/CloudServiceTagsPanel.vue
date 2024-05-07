@@ -102,7 +102,7 @@ const getCloudServiceTags = async () => {
 
 const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[tagType];
 const getProviderBadgeOption = (provider) => ({
-    color: state.providers[provider]?.options.background_color,
+    color: state.providers[provider]?.options?.background_color,
     label: state.providers[provider]?.name,
 });
 

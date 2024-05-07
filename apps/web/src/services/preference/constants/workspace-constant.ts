@@ -6,7 +6,9 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 export const WORKSPACE_TABLE_FIELDS = [
     { name: 'name', label: 'Name' },
-    { name: 'tags.description', label: 'Description', sortable: false },
+    {
+        name: 'tags.description', label: 'Description', sortable: false, width: '28erm',
+    },
     { name: 'state', label: 'State', sortable: false },
     { name: 'users', label: 'Users', sortable: false },
     { name: 'created_at', label: 'Created', sortable: false },

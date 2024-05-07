@@ -13,6 +13,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
 
@@ -137,7 +138,8 @@ const drawChart = (chartData: MapChartData[]) => {
         });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, widgetState.currency);
+        const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+        chartHelper.setPieTooltipText(pieSeries, tooltip, valueFormatter);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         return chartHelper.createBullet({

@@ -21,6 +21,9 @@
                 <p class="provider-name">
                     {{ item.name }}
                 </p>
+                <beta-mark v-if="item.key === 'kubernetes'"
+                           class="beta"
+                />
             </p-button>
         </div>
     </div>
@@ -35,6 +38,7 @@ import { cloneDeep } from 'lodash';
 
 import type { ReferenceItem } from '@/store/reference/type';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 const PROVIDER_BUTTON_SIZE = 182;
@@ -106,6 +110,12 @@ const handleSelectProvider = (providerName) => {
                 word-wrap: break-word;
                 text-overflow: ellipsis;
                 overflow: hidden;
+            }
+
+            .beta {
+                @apply font-normal;
+                margin-left: 0;
+                margin-top: -0.375rem;
             }
         }
         .selected-button {
