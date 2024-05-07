@@ -18,6 +18,8 @@ import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 
+import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS } from '@/styles/colorsets';
+
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
 import MetricExplorerHorizontalColumnChart
@@ -68,6 +70,18 @@ const state = reactive({
             return state.data?.results[0]?.date || '';
         }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+    }),
+    chartColorSet: computed(() => {
+        const _isMassive = state.legends.length > BASIC_CHART_COLORS.length;
+        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === metricExplorerPageState.selectedChartType);
+        const _sliceIndex = _isMassive ? _index * 4 : _index * 2;
+        let _colorSet = MASSIVE_CHART_COLORS;
+        if (!_isMassive) {
+            _colorSet = BASIC_CHART_COLORS;
+        }
+        const firstPart = _colorSet.slice(_sliceIndex);
+        const secondPart = _colorSet.slice(0, _sliceIndex);
+        return firstPart.concat(secondPart).slice(0, state.legends.length);
     }),
 });
 
@@ -198,6 +212,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
+                            :color-set="state.chartColorSet"
                         />
                         <metric-explorer-donut-chart
                             v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
@@ -205,6 +220,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
+                            :color-set="state.chartColorSet"
                         />
                         <metric-explorer-tree-map-chart
                             v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
@@ -217,6 +233,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :loading="state.loading"
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
+                            :color-set="state.chartColorSet"
                         />
                     </template>
                     <p-empty v-else
@@ -229,6 +246,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                     <metric-explorer-chart-legends :legends.sync="state.legends"
                                                    :loading="state.loading"
                                                    :more="state.data?.more"
+                                                   :color-set="state.chartColorSet"
                                                    @toggle-series="handleToggleSeries"
                                                    @show-all-series="handleAllSeries('show')"
                                                    @hide-all-series="handleAllSeries('hide')"

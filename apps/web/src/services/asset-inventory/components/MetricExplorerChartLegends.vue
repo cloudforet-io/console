@@ -10,7 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -21,10 +21,12 @@ interface Props {
     loading: boolean;
     legends: Legend[];
     more?: boolean;
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
     more: false,
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'hide-all-series'): void;
@@ -49,8 +51,11 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    if (props.legends.length <= BASIC_CHART_COLORS.length) return BASIC_CHART_COLORS[index % BASIC_CHART_COLORS.length];
-    return MASSIVE_CHART_COLORS[index];
+    if (metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN) {
+        const _reveredColorSet = cloneDeep(props.colorSet).reverse();
+        return _reveredColorSet[index % props.colorSet.length];
+    }
+    return props.colorSet[index % props.colorSet.length];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];

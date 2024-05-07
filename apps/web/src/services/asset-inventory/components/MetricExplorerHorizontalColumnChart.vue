@@ -20,12 +20,14 @@ interface Props {
     loading: boolean;
     chart: null | am5xy.XYChart;
     chartData: RealtimeChartData[];
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -54,9 +56,10 @@ const drawChart = () => {
     // create series
     const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
 
-    // set series style
-    series.columns.template.setAll({
-        height: 16,
+    // set color
+    series.columns.template.adapters.add('fill', (fill, target) => {
+        const _index = series.columns.indexOf(target);
+        return props.colorSet[_index];
     });
 
     // set tooltip if showPassFindings is true

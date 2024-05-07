@@ -11,8 +11,6 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import { BASIC_CHART_COLORS } from '@/styles/colorsets';
-
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { Legend, XYChartData } from '@/services/asset-inventory/types/metric-explorer-type';
@@ -23,12 +21,14 @@ interface Props {
     chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -47,9 +47,8 @@ const drawChart = () => {
     } : {};
     const { chart, xAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
 
-    if (props.legends.length <= BASIC_CHART_COLORS.length) {
-        chartHelper.setChartColors(chart, BASIC_CHART_COLORS);
-    }
+    // set color set
+    chartHelper.setChartColors(chart, props.colorSet);
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
