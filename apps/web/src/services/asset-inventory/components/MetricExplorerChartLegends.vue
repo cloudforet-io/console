@@ -127,9 +127,8 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}</span>
             </template>
         </p-data-loader>
-        <p-text-button v-if="!state.disableLegendToggle"
-                       size="md"
-                       :disabled="!legends.length"
+        <p-text-button size="md"
+                       :disabled="!legends.length || state.disableLegendToggle"
                        @click="handleToggleAllLegends"
         >
             {{ state.showHideAll ? $t('INVENTORY.METRIC_EXPLORER.HIDE_ALL') : $t('INVENTORY.METRIC_EXPLORER.SHOW_ALL') }}
