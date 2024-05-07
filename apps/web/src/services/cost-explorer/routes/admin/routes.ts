@@ -189,7 +189,6 @@ const adminCostExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.DATA_SOURCES._NAME),
-                    meta: { menuId: MENU_ID.DATA_SOURCES },
                     component: DataSourcesPage as any,
                 },
             ],

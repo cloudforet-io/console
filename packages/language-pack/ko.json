@@ -849,6 +849,17 @@
 				"TOTAL_COST": "총 비용",
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
+			"DATA_SOURCES": {
+				"COL_BILLING_ACCOUNT": "",
+				"COL_LINKED_ACCOUNT": "",
+				"COL_NAME": "",
+				"COL_TIME": "",
+				"COL_WORKSPACE": "",
+				"GUIDE": "",
+				"TAB_DETAILS_TITLE": "상세 정보",
+				"TAB_LINKED_ACCOUNT_TITLE": "",
+				"TAB_NO_DATA": ""
+			},
 			"HOME": {
 				"CONTACT_BUTTON": "문의하기",
 				"COST_ANALYSIS_DESC": "비용 및 사용량을 탐색하고 다양한 Group-by 옵션, 필터 및 세분화 설정을 활용하여 분석할 수 있습니다.",

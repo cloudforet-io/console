@@ -11,4 +11,5 @@ export interface CostDataSourceListParameters {
     data_source_type?: CostDataSourceType;
     provider?: string;
     workspace_id?: string;
+    connected_workspace_id?: string;
 }
