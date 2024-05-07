@@ -112,13 +112,13 @@ const handleConfirm = async () => {
                     theme: state.selectedTheme ?? 'blue',
                 },
             });
-            await userWorkspaceStore.load();
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
             emit('confirm', {
                 id: response.workspace_id,
                 name: response.name,
             });
         }
+        await userWorkspaceStore.load();
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
