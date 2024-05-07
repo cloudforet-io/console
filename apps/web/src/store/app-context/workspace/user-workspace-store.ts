@@ -9,13 +9,13 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 interface UserWorkspaceStoreState {
     items: WorkspaceModel[];
-    currentItem?: string;
+    currentWorkspaceId?: string;
 }
 
 export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
     const state = reactive<UserWorkspaceStoreState>({
         items: [],
-        currentItem: '',
+        currentWorkspaceId: '',
     });
 
     const getters = reactive({
@@ -28,7 +28,7 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             return map;
         }),
         currentWorkspace: computed<WorkspaceModel|undefined>(() => {
-            const found = state.items.find((workspace) => workspace.workspace_id === state.currentItem);
+            const found = state.items.find((workspace) => workspace.workspace_id === state.currentWorkspaceId);
             let currentItem: WorkspaceModel|undefined;
             if (found) {
                 currentItem = found;
@@ -37,12 +37,12 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
             }
             return currentItem;
         }),
-        currentWorkspaceId: computed<string|undefined>(() => state.currentItem),
+        currentWorkspaceId: computed<string|undefined>(() => state.currentWorkspaceId),
     });
 
     const mutations = {
         setCurrentWorkspace(workspaceId?: string) {
-            state.currentItem = workspaceId;
+            state.currentWorkspaceId = workspaceId;
         },
     };
 
@@ -57,7 +57,7 @@ export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
         },
         reset() {
             state.items = [];
-            state.currentItem = undefined;
+            state.currentWorkspaceId = undefined;
         },
     };
 
