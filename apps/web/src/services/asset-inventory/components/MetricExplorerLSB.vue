@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core';
 import {
-    computed, reactive, watch,
+    computed, reactive, ref, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty,
+    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PPopover, PButton, PCheckbox,
 } from '@spaceone/design-system';
+import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import { isEmpty } from 'lodash';
 
 
@@ -31,12 +33,17 @@ import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
+
+const lsbRef = ref<HTMLElement|null>(null);
+const { width: lsbWidth } = useElementSize(lsbRef);
 
 const route = useRoute();
 const router = useRouter();
 
+const assetInventorySettinsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
@@ -52,6 +59,7 @@ const storeState = reactive({
         ...favoriteGetters.metricItems,
         // ...favoriteGetters.metricExampleItems,
     ]),
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
 });
 
 const state = reactive({
@@ -59,6 +67,7 @@ const state = reactive({
     currentPath: computed(() => route.fullPath),
     currentMetricIdByUrl: computed(() => route.params.metricId),
     isDetailPage: computed(() => !!state.currentMetricIdByUrl),
+    currentMetrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -124,6 +133,7 @@ const state = reactive({
 const namespaceState = reactive({
     inputValue: '',
     collapsed: true,
+    selectedMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
     namespaces: computed<NamespaceReferenceItem[]>(() => Object.values(storeState.namespaces)),
     namespacesFilteredByInput: computed(() => {
         const keyword = namespaceState.inputValue.toLowerCase();
@@ -144,8 +154,11 @@ const namespaceState = reactive({
             ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
-    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
-    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
+});
+
+const guidePopoverState = reactive({
+    metricGuideVisible: false,
+    noMore: false,
 });
 
 
@@ -188,9 +201,9 @@ const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferen
     return Object.values(namespaceMap);
 };
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
-    if (!namespaceState.selectedNamespace) return false;
-    return namespaceState.selectedNamespace.name === namespace.name
-        && namespaceState.selectedNamespace.provider === namespace.provider;
+    if (!storeState.selectedNamespace) return false;
+    return storeState.selectedNamespace.name === namespace.name
+        && storeState.selectedNamespace.provider === namespace.provider;
 };
 
 /* Event */
@@ -204,124 +217,176 @@ const handleClickNamespace = (namespace: NamespaceSubItemType) => {
 const handleClickBackToHome = () => {
     router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
 };
+const handleConfirmMetricGuide = () => {
+    if (guidePopoverState.noMore) {
+        assetInventorySettinsStore.setNotShowMetricSelectGuidePopover(true);
+    }
+    guidePopoverState.metricGuideVisible = false;
+    guidePopoverState.noMore = false;
+};
 
 watch(() => route.params, async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
         metricExplorerPageStore.setSelectedNamespace({
-            label: namespaceState.namespaces.find((item) => item.key === namespaceState.currentMetric?.data.namespace_id)?.name,
-            name: namespaceState.currentMetric.data.namespace_id,
+            label: namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id)?.name,
+            name: namespaceState.selectedMetric.data.namespace_id,
         });
     } else metricExplorerPageStore.setSelectedNamespace(undefined);
     state.loading = false;
 }, { immediate: true });
 
+// Whether to show metric-select-guide popover
+watch(() => storeState.selectedNamespace, (selectedNamespace) => {
+    if (selectedNamespace
+        && state.isDetailPage
+        && !state.currentMetrics.map((metric) => metric.key).includes(state.currentMetricIdByUrl)
+        && !assetInventorySettinsStore.getNotShowMetricSelectGuidePopover
+    ) {
+        guidePopoverState.metricGuideVisible = true;
+    } else guidePopoverState.metricGuideVisible = false;
+});
+
 </script>
 
 <template>
-    <l-s-b class="metric-explorer-l-s-b"
-           :menu-set="state.menuSet"
-    >
-        <template #collapsible-contents-starred>
-            <div v-if="state.starredMenuSet.length > 0">
-                <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
-                                        :key="idx"
-                                        :item="item"
-                                        :idx="idx"
-                                        :current-path="state.currentPath"
-                                        is-hide-favorite
-                />
-            </div>
-            <span v-else
-                  class="no-data"
-            >
-                <p-i class="menu-icon"
-                     name="ic_star-filled"
-                     height="1rem"
-                     width="1rem"
-                     :color="yellow[500]"
-                />
-                {{ $t('COMMON.STARRED_NO_DATA') }}
-            </span>
-        </template>
-        <template #slot-namespace>
-            <p-data-loader :loading="state.loading"
-                           :loader-backdrop-opacity="0.5"
-                           :loader-backdrop-color="gray[100]"
-                           class="namespace-data-loader"
-            >
-                <p-text-button v-if="state.isDetailPage"
-                               class="back-to-home-button"
-                               icon-left="ic_arrow-left"
-                               size="sm"
-                               @click="handleClickBackToHome"
-                >
-                    {{ $t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER_HOME') }}
-                </p-text-button>
-                <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
-                                 :current-path="state.currentPath"
-                                 :depth="1"
-                />
-                <div class="namespace-wrapper">
-                    <p-search class="namespace-search"
-                              :value="namespaceState.inputValue"
-                              @update:value="handleSearchNamespace"
+    <fragment>
+        <l-s-b ref="lsbRef"
+               class="metric-explorer-l-s-b"
+               :menu-set="state.menuSet"
+        >
+            <template #collapsible-contents-starred>
+                <div v-if="state.starredMenuSet.length > 0">
+                    <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
+                                            :key="idx"
+                                            :item="item"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
                     />
-                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
-                                                 v-show="!namespaceState.inputValue"
-                                                 :key="`namespace-${idx}`"
-                                                 class="category-menu-item"
-                                                 :item="item"
-                                                 is-sub-item
-                    >
-                        <template #collapsible-contents="{ item: _item }">
-                            <div v-for="(_menu, _idx) in _item.subItems"
-                                 :key="`${_menu.label}-${_idx}`"
-                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                 @click="handleClickNamespace(_menu)"
-                            >
-                                <span class="text">
-                                    {{ _menu?.label || '' }}
-                                </span>
-                            </div>
-                        </template>
-                    </l-s-b-collapsible-menu-item>
-                    <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
-                                                 v-show="namespaceState.inputValue"
-                                                 :key="`namespace-search-${idx}`"
-                                                 class="category-menu-item category-menu-item-by-keyword"
-                                                 :item="item"
-                                                 is-sub-item
-                                                 :override-collapsed="namespaceState.collapsed"
-                    >
-                        <template #collapsible-contents="{ item: _item }">
-                            <div v-for="(_menu, _idx) in _item.subItems"
-                                 :key="`${_menu.label}-${_idx}`"
-                                 :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
-                                 @click="handleClickNamespace(_menu)"
-                            >
-                                <p-text-highlighting class="text"
-                                                     :term="namespaceState.inputValue"
-                                                     :text="_menu?.label || ''"
-                                />
-                            </div>
-                        </template>
-                    </l-s-b-collapsible-menu-item>
-                    <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
-                             class="keyword-search-empty"
-                    >
-                        <span>
-                            {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
-                        </span>
-                    </p-empty>
                 </div>
-            </p-data-loader>
-        </template>
-        <template #slot-metric>
-            <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage" />
-        </template>
-    </l-s-b>
+                <span v-else
+                      class="no-data"
+                >
+                    <p-i class="menu-icon"
+                         name="ic_star-filled"
+                         height="1rem"
+                         width="1rem"
+                         :color="yellow[500]"
+                    />
+                    {{ $t('COMMON.STARRED_NO_DATA') }}
+                </span>
+            </template>
+            <template #slot-namespace>
+                <p-data-loader :loading="state.loading"
+                               :loader-backdrop-opacity="0.5"
+                               :loader-backdrop-color="gray[100]"
+                               class="namespace-data-loader"
+                >
+                    <p-text-button v-if="state.isDetailPage"
+                                   class="back-to-home-button"
+                                   icon-left="ic_arrow-left"
+                                   size="sm"
+                                   @click="handleClickBackToHome"
+                    >
+                        {{ $t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER_HOME') }}
+                    </p-text-button>
+                    <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
+                                     :current-path="state.currentPath"
+                                     :depth="1"
+                    />
+                    <div class="namespace-wrapper">
+                        <p-search class="namespace-search"
+                                  :value="namespaceState.inputValue"
+                                  @update:value="handleSearchNamespace"
+                        />
+                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItems"
+                                                     v-show="!namespaceState.inputValue"
+                                                     :key="`namespace-${idx}`"
+                                                     class="category-menu-item"
+                                                     :item="item"
+                                                     is-sub-item
+                        >
+                            <template #collapsible-contents="{ item: _item }">
+                                <div v-for="(_menu, _idx) in _item.subItems"
+                                     :key="`${_menu.label}-${_idx}`"
+                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                     @click="handleClickNamespace(_menu)"
+                                >
+                                    <span class="text">
+                                        {{ _menu?.label || '' }}
+                                    </span>
+                                </div>
+                            </template>
+                        </l-s-b-collapsible-menu-item>
+                        <l-s-b-collapsible-menu-item v-for="(item, idx) in namespaceState.namespaceItemsByKeyword"
+                                                     v-show="namespaceState.inputValue"
+                                                     :key="`namespace-search-${idx}`"
+                                                     class="category-menu-item category-menu-item-by-keyword"
+                                                     :item="item"
+                                                     is-sub-item
+                                                     :override-collapsed="namespaceState.collapsed"
+                        >
+                            <template #collapsible-contents="{ item: _item }">
+                                <div v-for="(_menu, _idx) in _item.subItems"
+                                     :key="`${_menu.label}-${_idx}`"
+                                     :class="{'namespace-menu-item': true, 'selected': isSelectedNamespace(_menu) }"
+                                     @click="handleClickNamespace(_menu)"
+                                >
+                                    <p-text-highlighting class="text"
+                                                         :term="namespaceState.inputValue"
+                                                         :text="_menu?.label || ''"
+                                    />
+                                </div>
+                            </template>
+                        </l-s-b-collapsible-menu-item>
+                        <p-empty v-if="namespaceState.inputValue && !namespaceState.namespaceItemsByKeyword.length"
+                                 class="keyword-search-empty"
+                        >
+                            <span>
+                                {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                            </span>
+                        </p-empty>
+                    </div>
+                </p-data-loader>
+            </template>
+            <template #slot-metric>
+                <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
+                                              :metrics="state.currentMetrics"
+                />
+            </template>
+        </l-s-b>
+        <p-popover class="metric-select-guide-popover"
+                   :is-visible="guidePopoverState.metricGuideVisible"
+                   position="right"
+                   ignore-outside-click
+                   ignore-target-click
+                   :trigger="POPOVER_TRIGGER.NONE"
+                   :style="{ left: `${lsbWidth}px`}"
+        >
+            <template #content>
+                <div class="metric-select-guide-content">
+                    <p class="title">
+                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.TITLE') }}
+                    </p>
+                    <span class="description">
+                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DESCRIPTION') }}
+                    </span>
+                    <div class="button-wrapper">
+                        <p-checkbox v-model="guidePopoverState.noMore">
+                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DONT_SHOW_ME_AGAIN') }}
+                        </p-checkbox>
+                        <p-button style-type="substitutive"
+                                  @click="handleConfirmMetricGuide"
+                        >
+                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.CONFIRM') }}
+                        </p-button>
+                    </div>
+                </div>
+            </template>
+        </p-popover>
+    </fragment>
 </template>
 
 <style scoped lang="postcss">
@@ -370,4 +435,29 @@ watch(() => route.params, async () => {
         white-space: pre;
     }
 }
+
+.metric-select-guide-popover {
+    @apply absolute;
+    top: 12rem;
+
+    .metric-select-guide-content {
+        padding: 0.75rem 0.5rem;
+        width: 21.5rem;
+        height: 9rem;
+
+        .title {
+            @apply text-label-md font-bold text-gray-900;
+            margin-bottom: 0.5rem;
+        }
+        .description {
+            @apply text-paragraph-md text-gray-900;
+            white-space: pre-line;
+        }
+        .button-wrapper {
+            @apply flex justify-between items-center;
+            padding-top: 1.25rem;
+        }
+    }
+}
+
 </style>

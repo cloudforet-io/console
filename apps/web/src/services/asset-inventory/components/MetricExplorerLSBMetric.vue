@@ -29,6 +29,7 @@ import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metr
 
 interface Props {
     isDetailPage?: boolean;
+    metrics: MetricReferenceItem[];
 }
 
 const props = defineProps<Props>();
@@ -58,8 +59,7 @@ const state = reactive({
         return route.params.metricExampleId;
     }),
     inputValue: '',
-    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === storeState.selectedNamespace?.name)),
-    metricItems: computed<TreeNode[]>(() => state.metrics.map((metric) => {
+    metricItems: computed<TreeNode[]>(() => props.metrics.map((metric) => {
         const metricTreeNode = {
             id: metric.key,
             depth: 0,
@@ -262,4 +262,5 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
         white-space: pre;
     }
 }
+
 </style>
