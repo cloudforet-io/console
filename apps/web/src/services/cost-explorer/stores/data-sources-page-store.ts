@@ -4,11 +4,12 @@ import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { durationFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
-import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
-import type { JobModel } from '@/schema/inventory/job/model';
+import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
+import type { CostJobModel } from '@/schema/cost-analysis/job/model';
 import type { DataSourceModel } from '@/schema/monitoring/data-source/model';
 import { store } from '@/store';
 
@@ -18,7 +19,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import type { DataSourceItem, CostJobItem } from '@/services/cost-explorer/types/data-sources-type';
 
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -28,7 +29,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         dataSourceList: [] as DataSourceModel[],
         totalCount: 0,
         selectedIndices: [] as number[],
-        jobList: [] as JobModel[],
+        jobList: [] as CostJobModel[],
     });
 
     const _getters = reactive({
@@ -45,6 +46,11 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 created_at: dayjs(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             };
         })),
+        jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
+            ...i,
+            created_at: dayjs(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
+            duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
+        })))),
         selectedItem: computed<DataSourceItem>(() => getters.dataSourceList[state.selectedIndices[0]]),
     });
 
@@ -68,7 +74,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         fetchJobList: async (dataSourceId: string) => {
             try {
-                const { results } = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({
+                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>({
                     data_source_id: dataSourceId,
                 });
                 state.jobList = results || [];
