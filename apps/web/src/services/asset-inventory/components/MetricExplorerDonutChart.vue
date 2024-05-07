@@ -5,9 +5,9 @@ import {
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { numberFormatter } from '@cloudforet/utils';
 
-import { BASIC_CHART_COLORS } from '@/styles/colorsets';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
 
@@ -17,6 +17,7 @@ interface Props {
     chart: null | am5percent.PieChart;
     chartData: RealtimeChartData[];
     legends: Legend[];
+    colorSet?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -31,6 +33,7 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     const chart = chartHelper.createDonutChart();
     const seriesSettings = {
@@ -61,14 +64,12 @@ const drawChart = () => {
     chart.series.push(series);
 
     // set color
-    if (props.legends.length <= BASIC_CHART_COLORS.length) {
-        chartHelper.setChartColors(chart, BASIC_CHART_COLORS);
-    }
+    chartHelper.setChartColors(chart, props.colorSet);
 
     // tooltip
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip);
+        chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(props.chartData);
     }

@@ -2,7 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
@@ -42,16 +42,20 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const router = useRouter();
+const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
+    currentMetricId: computed<string>(() => route.params.metricId),
+    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     proxyVisible: useProxyValue('visible', props, emit),
     existingNameList: computed<string[]>(() => {
-        if (metricExplorerPageGetters.metricExampleId) {
+        if (state.currentMetricExampleId) {
             return metricExplorerPageState.metricExamples
-                .filter((d) => d.example_id !== metricExplorerPageGetters.metricExampleId)
+                .filter((d) => d.example_id !== state.currentMetricExampleId)
                 .map((d) => d.name);
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
@@ -65,7 +69,7 @@ const state = reactive({
         if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_METRIC_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-            if (metricExplorerPageGetters.metricExampleId) return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_METRIC_EXAMPLE_NAME');
+            if (state.currentMetricExampleId) return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_METRIC_EXAMPLE_NAME');
             return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_CUSTOM_METRIC_NAME');
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_NEW_CUSTOM_METRIC');
@@ -115,30 +119,36 @@ const createMetricExample = async () => {
         })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 const updateMetricName = async () => {
     try {
         await SpaceConnector.clientV2.inventory.metric.update<MetricUpdateParameters, MetricModel>({
-            metric_id: metricExplorerPageGetters.metricId,
+            metric_id: state.currentMetricId,
             name: name.value,
         });
-        await metricExplorerPageStore.loadMetric(metricExplorerPageGetters.metricId);
+        await metricExplorerPageStore.loadMetric(state.currentMetricId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 const updateMetricExampleName = async () => {
     try {
         await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
-            example_id: metricExplorerPageGetters.metricExampleId,
+            example_id: state.currentMetricExampleId,
             name: name.value,
         });
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+    } finally {
+        state.proxyVisible = false;
     }
 };
 
@@ -148,22 +158,22 @@ const handleFormConfirm = async () => {
     if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE || props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) {
         await createMetricExample();
     } else if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-        if (metricExplorerPageGetters.metricExampleId) {
+        if (state.currentMetricExampleId) {
             await updateMetricExampleName();
         } else {
             await updateMetricName();
         }
     } else if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
         emit('save-as', name.value);
+        state.proxyVisible = false;
     }
-    state.proxyVisible = false;
 };
 
 /* Watcher */
 watch(() => state.proxyVisible, (visible) => {
     if (visible && props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-        if (metricExplorerPageGetters.metricExampleId) {
-            setForm('name', metricExplorerPageGetters.metricExample?.name);
+        if (state.currentMetricExampleId) {
+            setForm('name', state.currentMetricExample?.name);
         } else {
             setForm('name', metricExplorerPageState.metric?.name);
         }

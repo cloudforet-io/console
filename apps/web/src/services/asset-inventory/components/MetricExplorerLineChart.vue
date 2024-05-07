@@ -7,9 +7,9 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { numberFormatter } from '@cloudforet/utils';
 
-import { BASIC_CHART_COLORS } from '@/styles/colorsets';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -21,12 +21,14 @@ interface Props {
     chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -37,6 +39,7 @@ const chartHelper = useAmcharts5(chartContext);
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     const _dateAxisSettings = metricExplorerPageState.granularity === GRANULARITY.DAILY ? {
         min: dayjs.utc(metricExplorerPageState.period?.start).valueOf(),
@@ -44,9 +47,8 @@ const drawChart = () => {
     } : {};
     const { chart, xAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
 
-    if (props.legends.length <= BASIC_CHART_COLORS.length) {
-        chartHelper.setChartColors(chart, BASIC_CHART_COLORS);
-    }
+    // set color set
+    chartHelper.setChartColors(chart, props.colorSet);
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
@@ -87,7 +89,7 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip);
+        chartHelper.setXYSharedTooltipText(chart, tooltip, valueFormatter);
         series.set('tooltip', tooltip);
 
         // set data on series

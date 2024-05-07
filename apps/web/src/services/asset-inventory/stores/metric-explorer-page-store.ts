@@ -1,5 +1,4 @@
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { cloneDeep, isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
@@ -31,7 +30,6 @@ import type {
 
 
 export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
-    const route = useRoute();
     const appContextStore = useAppContextStore();
     const allReferenceStore = useAllReferenceStore();
     const _state = reactive({
@@ -60,11 +58,8 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         refreshMetricPeriodDropdown: false,
     });
     const getters = reactive({
-        metricId: computed<string|undefined>(() => route.params.metricId),
-        metricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
-        metricExample: computed<MetricExampleModel|undefined>(() => state.metricExamples.find((d) => d.example_id === getters.metricExampleId)),
         refinedMetricLabelKeys: computed<MetricLabelKey[]>(() => {
             if (!state.metric?.label_keys?.length) return [];
             if (_state.isAdminMode) {
@@ -109,7 +104,6 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
             });
             return results;
         }),
-        isManagedMetric: computed<boolean>(() => (state.metric?.is_managed && !getters.metricExampleId) || false),
         isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
     });
 
@@ -165,15 +159,15 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedOperator = OPERATOR.SUM;
         state.refreshMetricPeriodDropdown = true;
     };
-    const initMetricExampleOptions = () => {
-        const _options = getters.metricExample?.options;
+    const initMetricExampleOptions = (metricExample: MetricExampleModel) => {
+        const _options: any = metricExample?.options ?? {};
         if (isEmpty(_options)) return;
 
         if (_options?.granularity) state.granularity = _options?.granularity;
         if (_options?.period) state.period = _options?.period;
         if (_options?.relative_period) state.relativePeriod = _options?.relative_period;
         if (_options?.group_by) state.selectedGroupByList = _options?.group_by;
-        if (_options?.filters) state.filters = cloneDeep(getters.metricExample?.options?.filters);
+        if (_options?.filters) state.filters = cloneDeep(metricExample?.options?.filters);
         if (_options?.operator) state.selectedOperator = _options?.operator;
         state.refreshMetricPeriodDropdown = true;
     };

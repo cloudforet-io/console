@@ -5,7 +5,7 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ReferenceMap } from '@/store/reference/type';
 
 import {
-    gray, transparent, violet, white,
+    gray, indigo, transparent, white,
 } from '@/styles/colors';
 
 import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
@@ -21,27 +21,27 @@ const getTreemapChartColor = (idx: number) => {
 
     switch (true) {
     case [0].includes(idx):
-        backgroundColor = violet[700];
+        backgroundColor = indigo[700];
         fontColor = white;
         break;
     case [1].includes(idx):
-        backgroundColor = violet[500];
+        backgroundColor = indigo[500];
         fontColor = white;
         break;
     case [2].includes(idx):
-        backgroundColor = violet[400];
+        backgroundColor = indigo[400];
         fontColor = white;
         break;
     case [3].includes(idx):
-        backgroundColor = violet[300];
+        backgroundColor = indigo[300];
         fontColor = gray[900];
         break;
     case [4, 5, 6, 7].includes(idx):
-        backgroundColor = violet[300];
+        backgroundColor = indigo[300];
         fontColor = transparent;
         break;
     default:
-        backgroundColor = violet[200];
+        backgroundColor = indigo[200];
         fontColor = transparent;
         break;
     }
@@ -65,7 +65,6 @@ export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>
                 }
                 let _color;
                 if (chartType === CHART_TYPE.TREEMAP) _color = getTreemapChartColor(idx)[0];
-                else if (chartType === CHART_TYPE.COLUMN) _color = violet[400];
                 legends.push({
                     name: _name,
                     label: _label,

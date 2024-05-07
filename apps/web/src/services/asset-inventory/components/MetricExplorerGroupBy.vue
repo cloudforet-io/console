@@ -35,12 +35,6 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
     <div class="metric-explorer-group-by">
         <div class="left-part">
             <b class="label">{{ $t('INVENTORY.METRIC_EXPLORER.GROUP_BY') }}:</b>
-            <p class="count-text">
-                <span class="selected-group-by-items-count"
-                      :class="{ 'selected': metricExplorerPageState.selectedGroupByList.length > 0 }"
-                >{{ metricExplorerPageState.selectedGroupByList.length }}</span>
-                <span>/3</span>
-            </p>
             <p-select-button v-for="item in state.groupByItems"
                              :key="item.name"
                              :value="item.name"
@@ -73,15 +67,6 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    .count-text {
-        @apply text-label-lg text-gray-500;
-        .selected-group-by-items-count {
-            &.selected {
-                @apply text-gray-900;
-            }
-        }
     }
 }
 </style>

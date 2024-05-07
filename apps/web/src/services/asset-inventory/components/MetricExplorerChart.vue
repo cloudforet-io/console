@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
@@ -16,6 +17,8 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
+
+import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
@@ -49,11 +52,14 @@ const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
 ];
+
+const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: true,
+    currentMetricId: computed<string>(() => route.params.metricId),
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
@@ -64,6 +70,18 @@ const state = reactive({
             return state.data?.results[0]?.date || '';
         }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+    }),
+    chartColorSet: computed(() => {
+        const _isMassive = state.legends.length > BASIC_CHART_COLORS.length;
+        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === metricExplorerPageState.selectedChartType);
+        const _sliceIndex = _isMassive ? _index * 4 : _index * 2;
+        let _colorSet = MASSIVE_CHART_COLORS;
+        if (!_isMassive) {
+            _colorSet = BASIC_CHART_COLORS;
+        }
+        const firstPart = _colorSet.slice(_sliceIndex);
+        const secondPart = _colorSet.slice(0, _sliceIndex);
+        return firstPart.concat(secondPart).slice(0, state.legends.length);
     }),
 });
 
@@ -77,7 +95,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
         const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
-            metric_id: metricExplorerPageGetters.metricId as string,
+            metric_id: state.currentMetricId,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
@@ -145,7 +163,7 @@ const handleAllSeries = (type: string) => {
 };
 
 watch([
-    () => metricExplorerPageGetters.metricId,
+    () => state.currentMetricId,
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,
@@ -194,6 +212,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
+                            :color-set="state.chartColorSet"
                         />
                         <metric-explorer-donut-chart
                             v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
@@ -201,6 +220,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
+                            :color-set="state.chartColorSet"
                         />
                         <metric-explorer-tree-map-chart
                             v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
@@ -213,6 +233,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                             :loading="state.loading"
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
+                            :color-set="state.chartColorSet"
                         />
                     </template>
                     <p-empty v-else
@@ -225,6 +246,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                     <metric-explorer-chart-legends :legends.sync="state.legends"
                                                    :loading="state.loading"
                                                    :more="state.data?.more"
+                                                   :color-set="state.chartColorSet"
                                                    @toggle-series="handleToggleSeries"
                                                    @show-all-series="handleAllSeries('show')"
                                                    @hide-all-series="handleAllSeries('hide')"
