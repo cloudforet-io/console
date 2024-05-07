@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -31,6 +31,7 @@ import { gray, yellow } from '@/styles/colors';
 
 import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
 
 const route = useRoute();
@@ -40,6 +41,8 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const metricExplorerPageStore = useMetricExplorerPageStore();
+const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -54,7 +57,8 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     currentPath: computed(() => route.fullPath),
-    isDetailPage: computed(() => !!route.params.metricId),
+    currentMetricIdByUrl: computed(() => route.params.metricId),
+    isDetailPage: computed(() => !!state.currentMetricIdByUrl),
     menuSet: computed(() => {
         const baseMenuSet = [
             {
@@ -66,7 +70,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!namespaceState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -140,8 +144,8 @@ const namespaceState = reactive({
             ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
-    selectedNamespace: undefined as NamespaceSubItemType | undefined,
-    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[route.params.metricId] : undefined)),
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
+    currentMetric: computed<MetricReferenceItem|undefined>(() => (state.isDetailPage ? storeState.metrics[state.currentMetricIdByUrl] : undefined)),
 });
 
 
@@ -195,30 +199,23 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
-    namespaceState.selectedNamespace = namespace;
+    metricExplorerPageStore.setSelectedNamespace(namespace);
 };
 const handleClickBackToHome = () => {
     router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
 };
 
-
-watch(() => route.params, (params) => {
-    if (!params.metricId) {
-        namespaceState.selectedNamespace = undefined;
-    }
-});
-
-onMounted(async () => {
+watch(() => route.params, async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
-    if (!isEmpty(namespaceState.currentMetric) && !namespaceState.selectedNamespace && state.isDetailPage) {
-        namespaceState.selectedNamespace = {
+    if (state.currentMetricIdByUrl) {
+        metricExplorerPageStore.setSelectedNamespace({
             label: namespaceState.namespaces.find((item) => item.key === namespaceState.currentMetric?.data.namespace_id)?.name,
             name: namespaceState.currentMetric.data.namespace_id,
-        };
-    }
+        });
+    } else metricExplorerPageStore.setSelectedNamespace(undefined);
     state.loading = false;
-});
+}, { immediate: true });
 
 </script>
 
@@ -322,9 +319,7 @@ onMounted(async () => {
             </p-data-loader>
         </template>
         <template #slot-metric>
-            <metric-explorer-l-s-b-metric :selected-namespace.sync="namespaceState.selectedNamespace"
-                                          :is-detail-page="state.isDetailPage"
-            />
+            <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage" />
         </template>
     </l-s-b>
 </template>

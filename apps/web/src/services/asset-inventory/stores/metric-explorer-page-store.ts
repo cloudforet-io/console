@@ -26,6 +26,7 @@ import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/co
 import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
+    NamespaceSubItemType,
 } from '@/services/asset-inventory/types/metric-explorer-type';
 
 
@@ -38,6 +39,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     });
     const state = reactive({
+        selectedNamespace: undefined as NamespaceSubItemType|undefined,
         // data
         metricLoading: false,
         refreshMetricData: false,
@@ -112,6 +114,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
     });
 
     /* Mutations */
+    const setSelectedNamespace = (namespace?: NamespaceSubItemType) => {
+        state.selectedNamespace = namespace;
+    };
     const setSelectedChartType = (chartType: ChartType|string) => {
         state.selectedChartType = chartType;
     };
@@ -222,6 +227,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         initMetricExampleOptions,
     };
     const mutations = {
+        setSelectedNamespace,
         setGranularity,
         setPeriod,
         setRelativePeriod,
