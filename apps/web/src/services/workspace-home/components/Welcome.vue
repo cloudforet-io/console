@@ -10,19 +10,6 @@ const storeState = reactive({
     userName: computed<string>(() => store.state.user.name),
 });
 
-const state = reactive({
-    userName: computed<string>(() => {
-        if (!storeState.userName) return '';
-        if (storeState.language === 'ko') {
-            return `${storeState.userName}님`;
-        }
-        if (storeState.language === 'ja') {
-            return `, ${storeState.userName}さん`;
-        }
-        return `, ${storeState.userName}`;
-    }),
-});
-
 const handleClickButton = () => {
     window.open(`https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`, '_blank');
 };
@@ -31,7 +18,7 @@ const handleClickButton = () => {
 <template>
     <div class="welcome">
         <span class="title">
-            {{ $t('HOME.WELCOME_TITLE', { 'user_name': state.userName}) }}😊
+            {{ !storeState.userName ? $t('HOME.WELCOME_TITLE') : $t('HOME.WELCOME_TITLE_USER_NAME', { 'user_name': storeState.userName}) }}😊
         </span>
         <span class="desc">{{ $t('HOME.WELCOME_DESC') }}</span>
         <p-button icon-left="ic_rocket-filled"
