@@ -6,8 +6,6 @@ import {
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/utils';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import {
     setXYSharedTooltipText,
@@ -60,8 +58,7 @@ const drawChart = () => {
 
     // set tooltip if showPassFindings is true
     const tooltip = chartHelper.createTooltip();
-    const _tooltipValueFormatter = (value?: number): string => numberFormatter(value, { minimumFractionDigits: 2 }) ?? '';
-    setXYSharedTooltipText(chart, tooltip, _tooltipValueFormatter);
+    setXYSharedTooltipText(chart, tooltip);
     series.set('tooltip', tooltip);
 
     // add series to chart
