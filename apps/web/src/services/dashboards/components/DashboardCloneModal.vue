@@ -111,7 +111,7 @@ const createDashboard = async () => {
             state.dashboardType = DASHBOARD_TYPE.PUBLIC;
             params.resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (state.dashboardType !== 'PRIVATE') {
-            params.resource_group = props.dashboard?.resource_group; // workspace, project
+            params.resource_group = props.dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
             if (props.dashboard?.project_id && props.dashboard?.project_id !== '*') {
                 params.project_id = props.dashboard?.project_id;
             }
