@@ -287,6 +287,7 @@ watch([() => state.selectedProvider, () => state.grantLoading], async ([after], 
     if (after && after !== before) {
         await serviceAccountSchemaStore.setProviderSchema(after);
         await replaceUrlQuery('provider', after);
+        if (tableState.accountTypeList.length === 1) serviceAccountSchemaState.selectedAccountType = tableState.accountTypeList[0].name;
         await reloadTable();
     }
 }, { immediate: true });
