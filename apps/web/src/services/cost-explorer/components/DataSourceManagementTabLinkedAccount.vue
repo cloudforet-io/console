@@ -27,6 +27,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
     linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageState.linkedAccounts),
+    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
 });
 const state = reactive({
     loading: false,
@@ -75,8 +76,7 @@ const fetchLinkedAccountList = () => {
     }
 };
 
-watch(() => storeState.selectedItem, (selectedItem) => {
-    if (!selectedItem) return;
+watch(() => storeState.activeTab, () => {
     fetchLinkedAccountList();
 }, { immediate: true });
 </script>

@@ -28,6 +28,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceGetters = allReferenceStore.getters;
 
     const state = reactive({
+        activeTab: 'detail',
         dataSourceList: [] as DataSourceModel[],
         totalCount: 0,
         selectedIndices: [] as number[],
@@ -69,6 +70,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const mutation = {
         setSelectedIndices: (indices: number[]) => {
             state.selectedIndices = indices;
+        },
+        setActiveTab: (tab: string) => {
+            state.activeTab = tab;
         },
     };
 

@@ -10,22 +10,32 @@ import DataSourceManagementTabDetailBaseInformation
 import DataSourceManagementTabDetailJob from '@/services/cost-explorer/components/DataSourceManagementTabDetailJob.vue';
 import DataSourceManagementTabLinkedAccount
     from '@/services/cost-explorer/components/DataSourceManagementTabLinkedAccount.vue';
+import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 
+const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageState = dataSourcesPageStore.state;
 
+const storeState = reactive({
+    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
+});
 const tabState = reactive({
     tabs: computed(() => [
         { name: 'detail', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_TITLE') },
         { name: 'linked_account', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE') },
     ]),
-    activeTab: 'detail',
 });
+
+const handleChangeTab = (tab: string) => {
+    dataSourcesPageStore.setActiveTab(tab);
+};
 </script>
 
 <template>
     <p-tab :tabs="tabState.tabs"
-           :active-tab.sync="tabState.activeTab"
-           :class="tabState.activeTab"
+           :active-tab="storeState.activeTab"
+           :class="storeState.activeTab"
            class="data-source-management-tabs"
+           @change="handleChangeTab"
     >
         <template #detail>
             <div class="data-source-management-tab-detail">

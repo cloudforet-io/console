@@ -21,11 +21,13 @@ import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-so
 import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
+    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
 });
 const state = reactive({
     loading: false,
@@ -101,8 +103,7 @@ const fetchJobList = () => {
     }
 };
 
-watch(() => storeState.selectedItem, (selectedItem) => {
-    if (!selectedItem) return;
+watch(() => storeState.activeTab, () => {
     fetchJobList();
 }, { immediate: true });
 </script>
