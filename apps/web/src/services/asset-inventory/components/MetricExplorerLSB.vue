@@ -12,6 +12,7 @@ import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popove
 import { isEmpty } from 'lodash';
 
 
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -28,6 +29,7 @@ import LSBMenuItem from '@/common/modules/navigations/lsb/modules/LSBMenuItem.vu
 import LSBRouterMenuItem from '@/common/modules/navigations/lsb/modules/LSBRouterMenuItem.vue';
 import type { LSBCollapsibleItem, LSBItem } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, yellow } from '@/styles/colors';
 
@@ -48,16 +50,19 @@ const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
+const gnbStore = useGnbStore();
+const gnbGetters = gnbStore.getters;
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metricExamples: computed<MetricExampleModel[]>(() => gnbGetters.metricExamples),
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
     providers: computed(() => allReferenceStore.getters.provider),
     favoriteItems: computed(() => [
         ...favoriteGetters.metricItems,
-        // ...favoriteGetters.metricExampleItems,
+        ...favoriteGetters.metricExampleItems,
     ]),
     selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
 });
@@ -102,10 +107,27 @@ const state = reactive({
                 id: metric.key,
             },
         }));
+        const metricExampleList: LSBItem[] = storeState.metricExamples.map((example) => ({
+            type: 'item',
+            id: example.example_id,
+            label: example.name,
+            icon: 'ic_example-filled',
+            to: getProperRouteLocation({
+                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                params: {
+                    metricId: example.metric_id,
+                    metricExampleId: example.example_id,
+                },
+            }),
+            favoriteOptions: {
+                type: FAVORITE_TYPE.METRIC_EXAMPLE,
+                id: example.example_id,
+            },
+        }));
 
         return [
             ...metricMenuList,
-            // ...metricExampleList,
+            ...metricExampleList,
         ].filter((menu) => menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]);
     }),
     namespaceMenu: computed<LSBItem>(() => ({

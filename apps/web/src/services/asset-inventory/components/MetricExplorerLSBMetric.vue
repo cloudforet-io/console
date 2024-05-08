@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -15,7 +15,7 @@ import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
-import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
+import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -41,7 +41,6 @@ const route = useRoute();
 
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
         const res: Record<string, CloudServiceTypeItem> = {};
@@ -59,45 +58,51 @@ const state = reactive({
         return route.params.metricExampleId;
     }),
     inputValue: '',
-    metricItems: computed<TreeNode[]>(() => props.metrics.map((metric) => {
-        const metricTreeNode = {
-            id: metric.key,
-            depth: 0,
-            data: {
-                ...metric,
-                type: 'metric',
-                is_managed: metric.data.is_managed,
-                to: {
-                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                    params: {
-                        metricId: metric.key,
-                    },
-                },
-            },
-        };
-        const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
-        if (examples.length) {
-            return {
-                ...metricTreeNode,
-                children: examples.map((example) => ({
-                    id: example.example_id,
-                    depth: 1,
-                    data: {
-                        ...example,
-                        type: 'example',
-                        to: {
-                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
-                            params: {
-                                metricId: metric.key,
-                                metricExampleId: example.example_id,
-                            },
+    metricItems: computed<TreeNode[]>(() => {
+        const sortedMetrics = [
+            ...props.metrics.filter((metric) => metric.key.startsWith('metric-managed-')),
+            ...props.metrics.filter((metric) => !metric.key.startsWith('metric-managed-')),
+        ];
+        return sortedMetrics.map((metric) => {
+            const metricTreeNode = {
+                id: metric.key,
+                depth: 0,
+                data: {
+                    ...metric,
+                    type: 'metric',
+                    is_managed: metric.data.is_managed,
+                    to: {
+                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                        params: {
+                            metricId: metric.key,
                         },
                     },
-                })),
+                },
             };
-        }
-        return metricTreeNode;
-    })),
+            const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
+            if (examples.length) {
+                return {
+                    ...metricTreeNode,
+                    children: examples.map((example) => ({
+                        id: example.example_id,
+                        depth: 1,
+                        data: {
+                            ...example,
+                            type: 'example',
+                            to: {
+                                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                                params: {
+                                    metricId: metric.key,
+                                    metricExampleId: example.example_id,
+                                },
+                            },
+                        },
+                    })),
+                };
+            }
+            return metricTreeNode;
+        });
+    }),
     metricItemsFilterByInput: computed(() => {
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
@@ -140,7 +145,7 @@ const handleSearchMetricAndExample = (keyword: string) => {
     state.inputValue = keyword;
 };
 
-onMounted(() => {
+watch(() => route.params, () => {
     if (route.params.metricExampleId) {
         state.metricTreeDisplayMap = {
             [route.params.metricId]: {
@@ -148,7 +153,7 @@ onMounted(() => {
             },
         };
     }
-});
+}, { immediate: true });
 
 /* Watcher */
 watch(() => storeState.selectedNamespace, (selectedNamespace) => {
