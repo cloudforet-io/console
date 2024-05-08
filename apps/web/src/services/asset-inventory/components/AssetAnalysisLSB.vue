@@ -283,7 +283,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     <p-tooltip v-for="(item, idx) of state.starredMenuSet"
                                :key="`asset-analysis-starred-${idx}`"
                                position="bottom"
-                               :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : ''"
+                               :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : item.label"
                     >
                         <l-s-b-router-menu-item :item="item"
                                                 :idx="idx"
