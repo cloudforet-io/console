@@ -55,6 +55,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
         selectedItem: computed<DataSourceItem>(() => {
+            if (state.selectedIndices.length === 0) return {} as DataSourceItem;
             const item = getters.dataSourceList[state.selectedIndices[0]];
             if (!item) return {} as DataSourceItem;
             const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];

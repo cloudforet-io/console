@@ -43,7 +43,7 @@ const tableState = reactive({
     ]),
 });
 
-const getStatusInfo = (value: CostJobStatus) => {
+const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     let info = {} as CostJobStatusInfo;
     switch (value) {
     case 'SUCCESS':
