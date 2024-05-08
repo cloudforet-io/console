@@ -61,17 +61,19 @@ export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResu
     const refinedTableData: MetricDataAnalyzeResult[] = [];
 
     if (realtimeDate) {
-        _results.forEach((d) => {
-            refinedTableData.push({
-                ...d,
-                count: [
-                    {
-                        date: realtimeDate,
-                        value: d.count,
-                    },
-                ],
+        _results
+            .filter((d) => d.date === realtimeDate)
+            .forEach((d) => {
+                refinedTableData.push({
+                    ...d,
+                    count: [
+                        {
+                            date: realtimeDate,
+                            value: d.count,
+                        },
+                    ],
+                });
             });
-        });
         return refinedTableData;
     }
     const today = dayjs.utc();

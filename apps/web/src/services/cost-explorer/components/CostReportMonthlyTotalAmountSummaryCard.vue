@@ -36,7 +36,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { white } from '@/styles/colors';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
 import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -99,8 +99,8 @@ const state = reactive({
             ? storeState.workspaces[_category]?.label ?? d.workspace_id
             : storeState.providers[_category]?.name ?? d.provider;
         const _color = state.selectedTarget === GROUP_BY.WORKSPACE
-            ? DEFAULT_CHART_COLORS[idx]
-            : storeState.providers[_category]?.color ?? DEFAULT_CHART_COLORS[idx];
+            ? MASSIVE_CHART_COLORS[idx]
+            : storeState.providers[_category]?.color ?? MASSIVE_CHART_COLORS[idx];
         return {
             category: _categoryLabel,
             value: d.value_sum,
@@ -319,7 +319,7 @@ watch(() => state.currentDate, () => {
                         <template #col-format="{field, value, rowIndex}">
                             <span v-if="field.name === GROUP_BY.WORKSPACE">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': DEFAULT_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': MASSIVE_CHART_COLORS[rowIndex] }"
                                 />
                                 <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
                                            position="bottom"
@@ -329,7 +329,7 @@ watch(() => state.currentDate, () => {
                             </span>
                             <span v-else-if="field.name === GROUP_BY.PROVIDER">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': storeState.providers[value]?.color ?? DEFAULT_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex] }"
                                 />
                                 <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
                                            position="bottom"

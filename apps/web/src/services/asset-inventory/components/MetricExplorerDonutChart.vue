@@ -4,9 +4,6 @@ import {
 } from 'vue';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
-import {
-    PSkeleton,
-} from '@spaceone/design-system';
 
 import { numberFormatter } from '@cloudforet/utils';
 
@@ -20,6 +17,7 @@ interface Props {
     chart: null | am5percent.PieChart;
     chartData: RealtimeChartData[];
     legends: Legend[];
+    colorSet?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -34,6 +33,7 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     const chart = chartHelper.createDonutChart();
     const seriesSettings = {
@@ -61,13 +61,14 @@ const drawChart = () => {
         }
         return undefined;
     });
-
     chart.series.push(series);
 
+    // set color
+    chartHelper.setChartColors(chart, props.colorSet);
 
+    // tooltip
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
         const tooltip = chartHelper.createTooltip();
-        const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
         chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(props.chartData);
@@ -87,10 +88,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else
+        <div v-show="!props.loading"
              ref="chartContext"
              class="chart"
         />

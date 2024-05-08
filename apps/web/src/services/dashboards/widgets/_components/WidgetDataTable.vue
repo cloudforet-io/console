@@ -22,7 +22,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { gray } from '@/styles/colors';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { MASSIVE_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import type {
@@ -86,7 +86,7 @@ const getLegendIconColor = (index: number): string => {
     if (legend?.disabled || state.disabledLegends[index]) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
     if (props.colorSet) return props.colorSet[index];
-    return DEFAULT_CHART_COLORS[index];
+    return MASSIVE_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];

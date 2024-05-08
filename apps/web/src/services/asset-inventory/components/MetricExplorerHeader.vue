@@ -2,7 +2,7 @@
 import { onClickOutside } from '@vueuse/core/index';
 import { computed, reactive, ref } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     useContextMenuController, PHeading, PIconButton, PButton, PContextMenu, PI,
@@ -38,12 +38,17 @@ const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
 const router = useRouter();
+const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
+    currentMetricId: computed<string>(() => route.params.metricId),
+    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    isManagedMetric: computed<boolean>(() => (metricExplorerPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
     metricNameFormModalVisible: false,
     metricQueryFormModalVisible: false,
     metricDeleteModalVisible: false,
@@ -60,15 +65,12 @@ const state = reactive({
     pageTitle: computed<string|TranslateResult>(() => {
         if (metricExplorerPageState.metricLoading) return '';
         if (metricExplorerPageState.metric) {
-            if (metricExplorerPageGetters.metricExample) {
-                return metricExplorerPageGetters.metricExample.name;
-            }
-            return metricExplorerPageState.metric.name;
+            return state.currentMetricExample?.name || metricExplorerPageState.metric.name;
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
     }),
     deleteModalTitle: computed(() => {
-        if (metricExplorerPageGetters.metricExampleId) {
+        if (state.currentMetricExampleId) {
             return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC_EXAMPLE');
         }
         return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
@@ -96,14 +98,18 @@ const openNameFormModal = (modalType: string) => {
     state.metricNameFormModalVisible = true;
 };
 const getDuplicatedMetricName = (name: string): string => {
-    let _count = 2;
     let _name = name;
+    const _regex = /^(.*?)\s*copy(\s+(\d+))?$/i;
+
     while (state.existingMetricNameList.includes(_name)) {
-        if (_name.endsWith(' copy')) {
-            _name = `${name} copy ${_count}`;
-            _count += 1;
+        const match = _regex.exec(_name);
+        if (match) {
+            const baseName = match[1];
+            const numberStr = match[3];
+            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
+            _name = `${baseName} copy ${newNumber}`;
         } else {
-            _name = `${name} copy`;
+            _name = `${_name} copy`;
         }
     }
     return _name;
@@ -158,12 +164,13 @@ const deleteCustomMetric = async () => {
 const deleteMetricExample = async () => {
     try {
         await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
-            example_id: metricExplorerPageGetters.metricExampleId,
+            example_id: state.currentMetricExampleId as string,
         });
+        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: { metricId: metricExplorerPageGetters.metricId },
+            params: { metricId: state.currentMetricId },
         }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
@@ -172,7 +179,7 @@ const deleteMetricExample = async () => {
 const updateMetricExample = async () => {
     try {
         await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
-            example_id: metricExplorerPageGetters.metricExampleId,
+            example_id: state.currentMetricExampleId as string,
             options: {
                 granularity: metricExplorerPageState.granularity,
                 period: metricExplorerPageState.period,
@@ -196,7 +203,7 @@ const handleSaveMetricExample = async () => {
     await updateMetricExample();
 };
 const handleDeleteMetric = async () => {
-    if (metricExplorerPageGetters.metricExampleId) {
+    if (state.currentMetricExampleId) {
         await deleteMetricExample();
     } else {
         await deleteCustomMetric();
@@ -229,14 +236,14 @@ const handleOpenEditQuery = () => {
         <template v-if="!metricExplorerPageState.metricLoading"
                   #title-left-extra
         >
-            <p-i v-if="metricExplorerPageGetters.metricExampleId"
+            <p-i v-if="state.currentMetricExampleId"
                  name="ic_example-filled"
                  width="1.5rem"
                  height="1.5rem"
                  :color="gray[700]"
             />
             <p-i v-else
-                 :name="metricExplorerPageGetters.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
+                 :name="state.isManagedMetric ? 'ic_main-filled' : 'ic_sub'"
                  width="1rem"
                  height="1rem"
                  :color="gray[500]"
@@ -245,7 +252,7 @@ const handleOpenEditQuery = () => {
         <template v-if="!metricExplorerPageState.metricLoading"
                   #title-right-extra
         >
-            <div v-if="!metricExplorerPageGetters.isManagedMetric"
+            <div v-if="!state.isManagedMetric"
                  class="title-right-extra icon-wrapper"
             >
                 <p-icon-button name="ic_edit-text"
@@ -271,8 +278,8 @@ const handleOpenEditQuery = () => {
                  class="right-part"
             >
                 <!-- metric case -->
-                <template v-if="!metricExplorerPageGetters.metricExampleId">
-                    <p-button v-if="!metricExplorerPageGetters.isManagedMetric"
+                <template v-if="!state.currentMetricExampleId">
+                    <p-button v-if="!state.isManagedMetric"
                               class="mr-2"
                               style-type="substitutive"
                               icon-left="ic_editor-code"
