@@ -21,14 +21,15 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import type { UpdatableWidgetInfo } from '@/common/modules/widgets/_types/widget-type';
+
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface WidgetValidMap {

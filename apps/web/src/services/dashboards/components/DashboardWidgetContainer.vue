@@ -8,6 +8,10 @@ import { PDataLoader } from '@spaceone/design-system';
 import { debounce } from 'lodash';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import type {
+    UpdatableWidgetInfo,
+    WidgetExpose, WidgetProps,
+} from '@/common/modules/widgets/_types/widget-type';
 
 import DashboardWidgetEditModal from '@/services/dashboards/components/DashboardWidgetEditModal.vue';
 import WidgetFullModeModal from '@/services/dashboards/components/WidgetFullModeModal.vue';
@@ -21,10 +25,6 @@ import {
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type {
-    UpdatableWidgetInfo,
-    WidgetExpose, WidgetProps,
-} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;

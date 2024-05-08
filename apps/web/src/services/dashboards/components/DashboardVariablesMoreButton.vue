@@ -16,11 +16,11 @@ import type { DashboardVariableSchemaProperty, DashboardVariablesSchema } from '
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
 interface Props {

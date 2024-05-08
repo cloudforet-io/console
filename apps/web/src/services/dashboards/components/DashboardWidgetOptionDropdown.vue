@@ -31,14 +31,15 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
+import {
+    COST_VALUE_WIDGET_OPTION_CONFIGS,
+} from '@/common/modules/widgets/_constants/managed-widget-options-schema.js';
+import { setFilterAndGetWidgetFiltersMap } from '@/common/modules/widgets/_helpers/widget-options-filters-helper';
+import { getWidgetOptionKeyByVariableKey } from '@/common/modules/widgets/_helpers/widget-schema-helper';
+
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import {
-    COST_VALUE_WIDGET_OPTION_CONFIGS,
-} from '@/services/dashboards/widgets/_constants/managed-widget-options-schema.js';
-import { setFilterAndGetWidgetFiltersMap } from '@/services/dashboards/widgets/_helpers/widget-options-filters-helper';
-import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 

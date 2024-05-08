@@ -6,9 +6,9 @@ import type {
     InheritOptions, WidgetConfig, WidgetFiltersMap, WidgetOptions,
 } from '@/schema/dashboard/_types/widget-type';
 
-import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
-import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
+import { getInheritingOptionKeys } from '@/common/modules/widgets/_helpers/widget-inherit-options-helper';
+import { getWidgetOptionKeyByVariableKey } from '@/common/modules/widgets/_helpers/widget-schema-helper';
+import type { UpdatableWidgetInfo } from '@/common/modules/widgets/_types/widget-type';
 
 /**
  * @description get updated widget info. if the property is not changed, it will be declared as undefined.

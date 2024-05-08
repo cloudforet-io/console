@@ -5,11 +5,13 @@ import {
     PButtonModal,
 } from '@spaceone/design-system';
 
+import type { UpdatableWidgetInfo } from '@/common/modules/widgets/_types/widget-type';
+
 import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidgetForm.vue';
 import {
     useWidgetFormStore,
 } from '@/services/dashboards/stores/widget-form-store';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 interface Props {
     visible: boolean;
