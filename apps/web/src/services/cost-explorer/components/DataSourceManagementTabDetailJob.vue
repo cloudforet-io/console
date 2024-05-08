@@ -43,7 +43,7 @@ const tableState = reactive({
     ]),
 });
 
-const getStatusInfo = (value: CostJobStatus) => {
+const getStatusInfo = (value: CostJobStatus): CostJobStatusInfo => {
     let info = {} as CostJobStatusInfo;
     switch (value) {
     case 'SUCCESS':
@@ -118,7 +118,7 @@ watch(() => storeState.selectedItem, (selectedItem) => {
             <template #extra>
                 <p-toolbox :searchable="false"
                            @change="handleChangeToolbox"
-                           @refresh="fetchJobList"
+                           @refresh="fetchJobList()"
                 />
             </template>
         </p-heading>
