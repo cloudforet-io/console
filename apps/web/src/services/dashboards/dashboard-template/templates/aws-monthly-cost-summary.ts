@@ -58,6 +58,10 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
                 fixed: true,
                 use: true,
             },
+            project_group: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project_group,
+                use: true,
+            },
             project: {
                 ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
                 use: true,
@@ -79,7 +83,7 @@ export const awsMonthlyCostSummaryDashboard: DashboardTemplate = {
                 use: false,
             },
         },
-        order: ['cost_data_source', 'project', 'service_account', 'region', 'cost_product', 'provider'],
+        order: ['cost_data_source', 'project_group', 'project', 'service_account', 'region', 'cost_product', 'provider'],
         fixed_options: {
             provider: 'aws',
         },
