@@ -63,9 +63,9 @@ const tableState = reactive({
     }]),
     fields: computed<DefinitionField[]>(() => [
         { name: 'account_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_ACCOUNT_ID') },
-        { name: 'workspace_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE') },
-        { name: 'is_sync', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_AUTO_MAPPING') },
-        { name: 'updated_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_UPDATED_AT') },
+        { name: 'workspace_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'), sortable: false },
+        { name: 'is_sync', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_AUTO_MAPPING'), sortable: false },
+        { name: 'updated_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_UPDATED_AT'), sortable: false },
     ]),
     valueHandlerMap: {},
 });
@@ -168,6 +168,7 @@ watch(() => storeState.activeTab, () => {
                          class="linked-account-table"
                          searchable
                          selectable
+                         sortable
                          :placeholder="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SELECT')"
                          :loading="state.loading"
                          :items="storeState.linkedAccounts"

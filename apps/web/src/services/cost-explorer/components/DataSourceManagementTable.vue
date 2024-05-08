@@ -34,11 +34,35 @@ const tableState = reactive({
     pageLimit: 15,
     searchFilters: [] as ConsoleFilter[],
     fields: computed(() => [
-        { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_DATASOURCE'), type: 'item' },
-        { name: 'data_source_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING_ACCOUNT'), type: 'item' },
-        { name: 'data_source_account_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINKED_ACCOUNT'), type: 'item' },
-        { name: 'connected_workspace_count', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'), type: 'item' },
-        { name: 'created_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME'), type: 'item' },
+        {
+            name: 'name',
+            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_DATASOURCE'),
+            type: 'item',
+        },
+        {
+            name: 'data_source_id',
+            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING_ACCOUNT'),
+            type: 'item',
+            sortable: false,
+        },
+        {
+            name: 'data_source_account_count',
+            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINKED_ACCOUNT'),
+            type: 'item',
+            sortable: false,
+        },
+        {
+            name: 'connected_workspace_count',
+            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'),
+            type: 'item',
+            sortable: false,
+        },
+        {
+            name: 'created_at',
+            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME'),
+            type: 'item',
+            sortable: false,
+        },
     ]),
 });
 
@@ -67,6 +91,7 @@ const handleChange = (options: any = {}) => {
                              search-type="query"
                              searchable
                              selectable
+                             sortable
                              sort-by="name"
                              :multi-select="false"
                              :select-index="props.selectedIndices"
