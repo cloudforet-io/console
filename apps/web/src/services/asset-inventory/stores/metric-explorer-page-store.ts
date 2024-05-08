@@ -159,9 +159,9 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         state.selectedOperator = OPERATOR.SUM;
         state.refreshMetricPeriodDropdown = true;
     };
-    const initMetricExampleOptions = (metricExample: MetricExampleModel) => {
+    const initMetricExampleOptions = (metricExample?: MetricExampleModel) => {
         const _options: any = metricExample?.options ?? {};
-        if (isEmpty(_options)) return;
+        if (!metricExample || isEmpty(_options)) return;
 
         if (_options?.granularity) state.granularity = _options?.granularity;
         if (_options?.period) state.period = _options?.period;

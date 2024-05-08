@@ -66,7 +66,8 @@ watch(() => route.params, async (params) => {
     await metricExplorerPageStore.loadMetric(params.metricId);
     if (params.metricExampleId) {
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        metricExplorerPageStore.initMetricExampleOptions();
+        const targetMetricExample = metricExplorerPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
+        metricExplorerPageStore.initMetricExampleOptions(targetMetricExample);
     } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
         metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
     }
