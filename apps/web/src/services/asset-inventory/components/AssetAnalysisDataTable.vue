@@ -167,7 +167,9 @@ const handleClickRow = (item) => {
         const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === d);
         if (_targetLabelKey) {
             const _fieldName = _targetLabelKey.key.replace('labels.', '');
-            _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
+            if (item[_fieldName]) {
+                _filters.push({ k: _targetLabelKey.search_key, v: item[_fieldName], o: '=' });
+            }
         }
     });
 
@@ -176,7 +178,7 @@ const handleClickRow = (item) => {
         .filter(([key]) => !assetAnalysisPageState.selectedGroupByList.includes(key))
         .forEach(([key, value]) => {
             const _targetLabelKey = state.hasSearchKeyLabelKeys.find((k) => k.key === key);
-            if (_targetLabelKey) {
+            if (_targetLabelKey && value?.length) {
                 _filters.push({ k: _targetLabelKey.search_key, v: value, o: '=' });
             }
         });
