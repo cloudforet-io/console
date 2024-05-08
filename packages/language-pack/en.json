@@ -2875,6 +2875,7 @@
 				"DEACTIVATE": "Deactivate",
 				"DEACTIVATE_MODAL_TEXT": "Are you sure you want to deactivate your cluster?",
 				"DELETE": "Delete",
+				"DELETE_AGENT_SCRIPT_DESCRIPTION": "Make sure you delete SpaceONE agent from your system before deleting connected cluster.\nTo delete the agent, please run the following command:",
 				"DELETE_CLUSTER_MODAL_TEXT": "Delete Connected Cluster",
 				"DELETE_WARNING": "If you delete your account, you will lose all of your data.",
 				"DISCONNECTED_CLUSTER_TEXT": "A cluster has not been connected yet.",

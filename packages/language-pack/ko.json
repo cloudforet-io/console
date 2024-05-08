@@ -2875,6 +2875,7 @@
 				"DEACTIVATE": "비활성화",
 				"DEACTIVATE_MODAL_TEXT": "클러스터를 비활성화하겠습니까?",
 				"DELETE": "삭제",
+				"DELETE_AGENT_SCRIPT_DESCRIPTION": "연결된 클러스터를 삭제하기 전, 시스템에서 SpaceONE 에이전트를 삭제해야 합니다. \n에이전트를 삭제하려면 다음 명령어를 실행하세요.",
 				"DELETE_CLUSTER_MODAL_TEXT": "연결된 클러스터 삭제",
 				"DELETE_WARNING": "서비스 어카운트 삭제시, 수집된 모든 데이터가 삭제됩니다.",
 				"DISCONNECTED_CLUSTER_TEXT": "클러스터가 아직 연결되지 않았습니다.",
