@@ -9,12 +9,10 @@ import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashbo
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
-import { CONSOLE_WIDGET_CONFIGS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
-
 import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidgetForm.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
+import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 
 interface TemplateWidgetConfig extends WidgetConfig {
     template_widget_id?: string

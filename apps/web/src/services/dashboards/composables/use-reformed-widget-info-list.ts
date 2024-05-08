@@ -6,17 +6,15 @@ import { flattenDeep } from 'lodash';
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetConfig, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetTheme } from '@/common/modules/widgets/_types/widget-type';
-
 import {
     widgetThemeAssigner,
 } from '@/services/dashboards/helpers/widget-theme-helper';
 import {
     widgetWidthAssigner,
 } from '@/services/dashboards/helpers/widget-width-helper';
-
+import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface UseWidgetReformerOptions {
     dashboardWidgetInfoList: Ref<DashboardLayoutWidgetInfo[]>;
