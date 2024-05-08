@@ -11,6 +11,8 @@ import type { AgentModel } from '@/schema/identity/agent/model';
 import { i18n } from '@/translations';
 
 import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
+import ServiceAccountAddClusterScriptField
+    from '@/services/asset-inventory/components/ServiceAccountAddClusterScriptField.vue';
 import ServiceAccountClusterDetail
     from '@/services/asset-inventory/components/ServiceAccountClusterDetail.vue';
 import { useServiceAccountAgentStore } from '@/services/asset-inventory/stores/service-account-agent-store';
@@ -42,6 +44,7 @@ const modalState = reactive({
     addClusterModalVisible: false,
     connectionModalVisible: false,
     deleteClusterModalVislble: false,
+    deleteAgentScript: computed(() => 'helm uninstall spaceone-agent -n spaceone-agent helm repo remove spaceone-agent'),
 });
 
 const handleOpenAddClusterModal = () => {
@@ -157,12 +160,20 @@ onUnmounted(() => {
                         @confirm="handleConfirmClusterConnection"
         />
         <p-double-check-modal class="cluster-delete-modal"
-                              modal-size="sm"
+                              modal-size="md"
                               :visible.sync="modalState.deleteClusterModalVislble"
                               :header-title="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_CLUSTER_MODAL_TEXT')"
                               :verification-text="storeState.agentData?.options?.cluster_name"
                               @confirm="handleConfirmDeleteCluster"
-        />
+        >
+            <template #middle-contents>
+                <service-account-add-cluster-script-field class="delete-agent-script"
+                                                          :script="modalState.deleteAgentScript"
+                                                          :description="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_AGENT_SCRIPT_DESCRIPTION')"
+                                                          script-height="3.5rem"
+                />
+            </template>
+        </p-double-check-modal>
     </p-pane-layout>
 </template>
 
@@ -200,6 +211,10 @@ onUnmounted(() => {
                 }
             }
         }
+    }
+
+    .delete-agent-script {
+        margin-bottom: 1.5rem;
     }
 }
 </style>
