@@ -2875,6 +2875,7 @@
 				"DEACTIVATE": "無効化",
 				"DEACTIVATE_MODAL_TEXT": "クラスターを無効化しますか？",
 				"DELETE": "削除",
+				"DELETE_AGENT_SCRIPT_DESCRIPTION": "接続されたクラスターを削除する前に、システムからSpaceONEエージェントを削除してください。\nエージェントを削除するには、次のコマンドを実行してください。",
 				"DELETE_CLUSTER_MODAL_TEXT": "接続されたクラスターを削除",
 				"DELETE_WARNING": "サービスアカウントを削除すると、収集されたすべてのデータが削除されます.",
 				"DISCONNECTED_CLUSTER_TEXT": "クラスターはまだ接続されていません.",
