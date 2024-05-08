@@ -33,11 +33,11 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { gray, yellow } from '@/styles/colors';
 
-import MetricExplorerLSBMetric from '@/services/asset-inventory/components/MetricExplorerLSBMetric.vue';
+import AssetAnalysisLSBMetric from '@/services/asset-inventory/components/AssetAnalysisLSBMetric.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
@@ -52,8 +52,8 @@ const favoriteStore = useFavoriteStore();
 const favoriteGetters = favoriteStore.getters;
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
@@ -64,7 +64,7 @@ const storeState = reactive({
         ...favoriteGetters.metricItems,
         ...favoriteGetters.metricExampleItems,
     ]),
-    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
+    selectedNamespace: computed(() => assetAnalysisPageState.selectedNamespace),
 });
 
 const state = reactive({
@@ -84,7 +84,7 @@ const state = reactive({
                 type: MENU_ITEM_TYPE.DIVIDER,
             },
         ];
-        if (!metricExplorerPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
+        if (!assetAnalysisPageState.selectedNamespace) return [...baseMenuSet, state.namespaceMenu];
         return [...baseMenuSet, state.metricMenu];
     }),
     starredMenuSet: computed<LSBItem[]>(() => {
@@ -97,7 +97,7 @@ const state = reactive({
                 color: gray[500],
             },
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
                 params: {
                     metricId: metric.key,
                 },
@@ -113,7 +113,7 @@ const state = reactive({
             label: example.name,
             icon: 'ic_example-filled',
             to: getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
                 params: {
                     metricId: example.metric_id,
                     metricExampleId: example.example_id,
@@ -193,7 +193,7 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
     if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
-        label: i18n.t('INVENTORY.METRIC_EXPLORER.COMMON'),
+        label: i18n.t('INVENTORY.ASSET_ANALYSIS.COMMON'),
         subItems: commonNamespaces,
     }];
 };
@@ -234,10 +234,10 @@ const handleSearchNamespace = (keyword: string) => {
     namespaceState.inputValue = keyword;
 };
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
-    metricExplorerPageStore.setSelectedNamespace(namespace);
+    assetAnalysisPageStore.setSelectedNamespace(namespace);
 };
 const handleClickBackToHome = () => {
-    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME }));
+    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME }));
 };
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
@@ -251,11 +251,11 @@ watch(() => route.params, async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
-        metricExplorerPageStore.setSelectedNamespace({
+        assetAnalysisPageStore.setSelectedNamespace({
             label: namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id)?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
         });
-    } else metricExplorerPageStore.setSelectedNamespace(undefined);
+    } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
 }, { immediate: true });
 
@@ -275,7 +275,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 <template>
     <fragment>
         <l-s-b ref="lsbRef"
-               class="metric-explorer-l-s-b"
+               class="asset-analysis-l-s-b"
                :menu-set="state.menuSet"
         >
             <template #collapsible-contents-starred>
@@ -312,7 +312,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                    size="sm"
                                    @click="handleClickBackToHome"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER_HOME') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS_HOME') }}
                     </p-text-button>
                     <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
                                      :current-path="state.currentPath"
@@ -367,15 +367,15 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                  class="keyword-search-empty"
                         >
                             <span>
-                                {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                                {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
                             </span>
                         </p-empty>
                     </div>
                 </p-data-loader>
             </template>
             <template #slot-metric>
-                <metric-explorer-l-s-b-metric :is-detail-page="state.isDetailPage"
-                                              :metrics="state.currentMetrics"
+                <asset-analysis-l-s-b-metric :is-detail-page="state.isDetailPage"
+                                             :metrics="state.currentMetrics"
                 />
             </template>
         </l-s-b>
@@ -390,19 +390,19 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
             <template #content>
                 <div class="metric-select-guide-content">
                     <p class="title">
-                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.TITLE') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.TITLE') }}
                     </p>
                     <span class="description">
-                        {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DESCRIPTION') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.DESCRIPTION') }}
                     </span>
                     <div class="button-wrapper">
                         <p-checkbox v-model="guidePopoverState.noMore">
-                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.DONT_SHOW_ME_AGAIN') }}
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.DONT_SHOW_ME_AGAIN') }}
                         </p-checkbox>
                         <p-button style-type="substitutive"
                                   @click="handleConfirmMetricGuide"
                         >
-                            {{ $t('INVENTORY.METRIC_EXPLORER.SELECT_METRIC_GUIDE.CONFIRM') }}
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.SELECT_METRIC_GUIDE.CONFIRM') }}
                         </p-button>
                     </div>
                 </div>
@@ -412,7 +412,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </template>
 
 <style scoped lang="postcss">
-.metric-explorer-l-s-b {
+.asset-analysis-l-s-b {
     .namespace-data-loader {
         min-height: 15rem;
 

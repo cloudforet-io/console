@@ -19,8 +19,8 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { MetricFilter } from '@/services/asset-inventory/types/metric-explorer-type';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const props = defineProps<{
@@ -28,22 +28,22 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     loading: true,
     randomId: getRandomId(),
-    enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => assetAnalysisPageGetters.refinedMetricLabelKeys.map((d) => ({
         name: d.key,
         label: d.name,
     }))),
     selectedItemsMap: {} as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
         const handlerMaps = {};
-        metricExplorerPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
+        assetAnalysisPageGetters.refinedMetricLabelKeys.forEach((labelKey: MetricLabelKey) => {
             handlerMaps[labelKey.key] = getMenuHandler(labelKey);
         });
         return handlerMaps;
@@ -105,8 +105,8 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    metricExplorerPageStore.setFilters({
-        ...metricExplorerPageState.filters,
+    assetAnalysisPageStore.setFilters({
+        ...assetAnalysisPageState.filters,
         [groupBy]: selectedItems.map((d) => d.name as string),
     });
 };
@@ -114,9 +114,9 @@ const handleClickResetFilters = () => {
     if (state.currentMetricExampleId) {
         const _originalFilters = cloneDeep(state.currentMetricExample?.options?.filters);
         initSelectedFilters(_originalFilters);
-        metricExplorerPageStore.setFilters(_originalFilters);
+        assetAnalysisPageStore.setFilters(_originalFilters);
     } else {
-        metricExplorerPageStore.setFilters({});
+        assetAnalysisPageStore.setFilters({});
         state.selectedItemsMap = {};
     }
     state.randomId = getRandomId();
@@ -124,13 +124,13 @@ const handleClickResetFilters = () => {
 
 watch(() => props.visible, (visible) => {
     if (!visible) return;
-    initSelectedFilters(metricExplorerPageState.filters);
+    initSelectedFilters(assetAnalysisPageState.filters);
 }, { immediate: true });
 
 </script>
 
 <template>
-    <div class="metric-explorer-filters-popper">
+    <div class="asset-analysis-filters-popper">
         <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}-${state.randomId}`"
@@ -156,13 +156,13 @@ watch(() => props.visible, (visible) => {
                        class="reset-button"
                        @click="handleClickResetFilters"
         >
-            {{ $t('INVENTORY.METRIC_EXPLORER.RESET') }}
+            {{ $t('INVENTORY.ASSET_ANALYSIS.RESET') }}
         </p-text-button>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-filters-popper {
+.asset-analysis-filters-popper {
     @apply flex items-center flex-wrap;
     flex: 1;
     gap: 0.5rem;

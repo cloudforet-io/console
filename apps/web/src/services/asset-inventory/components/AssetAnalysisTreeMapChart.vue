@@ -11,7 +11,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import type {
     Legend, RealtimeChartData, TreemapChartData,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const COLOR_FIELD_NAME = 'background_color';

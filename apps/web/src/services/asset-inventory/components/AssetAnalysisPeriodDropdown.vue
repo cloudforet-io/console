@@ -17,38 +17,38 @@ import {
     GRANULARITY,
     METRIC_PERIOD_MENU,
     METRIC_PERIOD_MENU_ITEM_MAP,
-} from '@/services/asset-inventory/constants/metric-explorer-constant';
+} from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     convertRelativePeriodToPeriod, getRefinedDailyPeriod,
-} from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+} from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import type {
     MetricPeriodMenu,
     RelativePeriod,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 const state = reactive({
     dailyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const locale = i18n.locale;
         return [
             {
                 name: METRIC_PERIOD_MENU.LAST_14_DAYS,
-                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_14_DAYS'),
+                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_14_DAYS'),
             },
             {
                 name: METRIC_PERIOD_MENU.LAST_30_DAYS,
-                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_30_DAYS'),
+                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_30_DAYS'),
             },
             {
                 name: METRIC_PERIOD_MENU.CURRENT_MONTH,
-                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_MONTH'),
+                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.THIS_MONTH'),
             },
             {
                 name: METRIC_PERIOD_MENU.LAST_MONTH,
-                label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_MONTH'),
+                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_MONTH'),
             },
             ...(range(12).map((i) => {
                 const start = dayjs.utc().subtract(i, 'month').startOf('month');
@@ -62,23 +62,23 @@ const state = reactive({
     monthlyPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: METRIC_PERIOD_MENU.LAST_3_MONTHS,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_3_MONTHS'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_3_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_6_MONTHS,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_6_MONTHS'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_6_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_12_MONTHS,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_12_MONTHS'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_12_MONTHS'),
         },
         {
             name: METRIC_PERIOD_MENU.CURRENT_YEAR,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.THIS_YEAR'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.THIS_YEAR'),
         },
         {
             name: METRIC_PERIOD_MENU.LAST_YEAR,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.LAST_YEAR'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_YEAR'),
         }])),
     allPeriodMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         ...state.dailyPeriodMenuItems,
@@ -86,15 +86,15 @@ const state = reactive({
     ])),
     periodMenuItems: computed<MenuItem[]>(() => {
         const menuItems = [
-            ...((metricExplorerPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodMenuItems : []),
-            ...((metricExplorerPageState.granularity === GRANULARITY.MONTHLY) ? state.monthlyPeriodMenuItems : []),
+            ...((assetAnalysisPageState.granularity === GRANULARITY.DAILY) ? state.dailyPeriodMenuItems : []),
+            ...((assetAnalysisPageState.granularity === GRANULARITY.MONTHLY) ? state.monthlyPeriodMenuItems : []),
         ];
         const customItem = [{
             type: 'divider',
         }, {
             type: 'item',
             name: 'custom',
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.PERIOD.CUSTOM'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.CUSTOM'),
         }];
         return [
             ...menuItems,
@@ -108,15 +108,15 @@ const state = reactive({
 /* Util */
 const getPeriodItemNameByRelativePeriod = (relativePeriod: RelativePeriod) => Object.values(METRIC_PERIOD_MENU_ITEM_MAP).find((item) => isEqual(item.relativePeriod, relativePeriod))?.name;
 const initSelectedPeriod = () => {
-    if (metricExplorerPageState.relativePeriod) {
-        state.selectedPeriod = getPeriodItemNameByRelativePeriod(metricExplorerPageState.relativePeriod);
-    } else if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
-        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, metricExplorerPageState.period));
+    if (assetAnalysisPageState.relativePeriod) {
+        state.selectedPeriod = getPeriodItemNameByRelativePeriod(assetAnalysisPageState.relativePeriod);
+    } else if (assetAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        const selectedPeriodItem = state.dailyPeriodMenuItems.find((item) => isEqual(item.name, assetAnalysisPageState.period));
         state.selectedPeriod = selectedPeriodItem?.name;
     } else {
         state.selectedPeriod = 'custom';
     }
-    metricExplorerPageStore.setRefreshMetricPeriodDropdown(false);
+    assetAnalysisPageStore.setRefreshMetricPeriodDropdown(false);
 };
 
 /* Event */
@@ -130,24 +130,24 @@ const handleSelectPeriod = (periodMenuName: string) => {
     const _selectedPeriodItem = METRIC_PERIOD_MENU_ITEM_MAP[periodMenuName];
     if (_selectedPeriodItem) {
         const _relativePeriod = _selectedPeriodItem.relativePeriod;
-        const _period = convertRelativePeriodToPeriod(metricExplorerPageState.granularity, _relativePeriod);
-        metricExplorerPageStore.setPeriod(_period);
-        metricExplorerPageStore.setRelativePeriod(_relativePeriod);
+        const _period = convertRelativePeriodToPeriod(assetAnalysisPageState.granularity, _relativePeriod);
+        assetAnalysisPageStore.setPeriod(_period);
+        assetAnalysisPageStore.setRelativePeriod(_relativePeriod);
     } else {
         const _period = getRefinedDailyPeriod(periodMenuName);
-        metricExplorerPageStore.setPeriod(_period);
-        metricExplorerPageStore.setRelativePeriod(undefined);
+        assetAnalysisPageStore.setPeriod(_period);
+        assetAnalysisPageStore.setRelativePeriod(undefined);
     }
 };
 const handleCustomRangeModalConfirm = (start: string, end: string) => {
-    metricExplorerPageStore.setPeriod({ start, end });
-    metricExplorerPageStore.setRelativePeriod(undefined);
+    assetAnalysisPageStore.setPeriod({ start, end });
+    assetAnalysisPageStore.setRelativePeriod(undefined);
     state.selectedPeriod = 'custom';
     state.customDateModalVisible = false;
 };
 
 /* Watcher */
-watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
+watch(() => assetAnalysisPageState.refreshMetricPeriodDropdown, (refresh) => {
     if (refresh) initSelectedPeriod();
 }, { immediate: true });
 </script>
@@ -155,7 +155,7 @@ watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
 <template>
     <div>
         <p-select-dropdown :menu="state.periodMenuItems"
-                           :selection-label="$t('INVENTORY.METRIC_EXPLORER.PERIOD.PERIOD')"
+                           :selection-label="$t('INVENTORY.ASSET_ANALYSIS.PERIOD.PERIOD')"
                            disable-proxy
                            reset-selection-on-menu-close
                            style-type="rounded"
@@ -164,9 +164,9 @@ watch(() => metricExplorerPageState.refreshMetricPeriodDropdown, (refresh) => {
         />
         <custom-date-modal
             :visible.sync="state.customDateModalVisible"
-            :start="metricExplorerPageState.period?.start"
-            :end="metricExplorerPageState.period?.end"
-            :datetime-picker-data-type="metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'yearToDate' : 'yearToMonth'"
+            :start="assetAnalysisPageState.period?.start"
+            :end="assetAnalysisPageState.period?.end"
+            :datetime-picker-data-type="assetAnalysisPageState.granularity === GRANULARITY.DAILY ? 'yearToDate' : 'yearToMonth'"
             use-restricted-mode
             @confirm="handleCustomRangeModalConfirm"
         />

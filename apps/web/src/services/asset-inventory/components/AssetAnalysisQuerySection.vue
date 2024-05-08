@@ -11,17 +11,17 @@ import {
     PButton, PPopover, PBadge, PIconButton,
 } from '@spaceone/design-system';
 
-import MetricExplorerFiltersPopper from '@/services/asset-inventory/components/MetricExplorerFiltersPopper.vue';
-import MetricExplorerGranularityDropdown from '@/services/asset-inventory/components/MetricExplorerGranularityDropdown.vue';
-import MetricExplorerOperatorDropdown from '@/services/asset-inventory/components/MetricExplorerOperatorDropdown.vue';
-import MetricExplorerPeriodDropdown from '@/services/asset-inventory/components/MetricExplorerPeriodDropdown.vue';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
+import AssetAnalysisFiltersPopper from '@/services/asset-inventory/components/AssetAnalysisFiltersPopper.vue';
+import AssetAnalysisGranularityDropdown from '@/services/asset-inventory/components/AssetAnalysisGranularityDropdown.vue';
+import AssetAnalysisOperatorDropdown from '@/services/asset-inventory/components/AssetAnalysisOperatorDropdown.vue';
+import AssetAnalysisPeriodDropdown from '@/services/asset-inventory/components/AssetAnalysisPeriodDropdown.vue';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const route = useRoute();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 
 const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -31,7 +31,7 @@ const state = reactive({
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: computed(() => {
         let count = 0;
-        Object.values(metricExplorerPageState.filters ?? {}).forEach((filterItems) => {
+        Object.values(assetAnalysisPageState.filters ?? {}).forEach((filterItems) => {
             count += filterItems.length;
         });
         return count;
@@ -43,7 +43,7 @@ const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
 const handleClickRefresh = () => {
-    metricExplorerPageStore.setRefreshMetricData(true);
+    assetAnalysisPageStore.setRefreshMetricData(true);
 };
 
 /* watch */
@@ -53,14 +53,14 @@ watch(() => route.params, async () => {
 </script>
 
 <template>
-    <div class="metric-explorer-query-section">
+    <div class="asset-analysis-query-section">
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40 + 16: 16}px` }"
         >
             <div class="left-part">
-                <metric-explorer-operator-dropdown />
-                <metric-explorer-granularity-dropdown />
-                <metric-explorer-period-dropdown />
+                <asset-analysis-operator-dropdown />
+                <asset-analysis-granularity-dropdown />
+                <asset-analysis-period-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -74,7 +74,7 @@ watch(() => route.params, async () => {
                               icon-left="ic_filter"
                               @click="handleClickFilter"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.FILTERS') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.FILTERS') }}
                         <p-badge v-if="state.selectedFiltersCount"
                                  badge-type="subtle"
                                  :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
@@ -84,8 +84,8 @@ watch(() => route.params, async () => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <metric-explorer-filters-popper ref="filtersPopperRef"
-                                                        :visible="state.filtersPopoverVisible"
+                        <asset-analysis-filters-popper ref="filtersPopperRef"
+                                                       :visible="state.filtersPopoverVisible"
                         />
                     </template>
                 </p-popover>
@@ -94,7 +94,7 @@ watch(() => route.params, async () => {
                 <p-icon-button name="ic_renew"
                                style-type="tertiary"
                                shape="square"
-                               :disabled="metricExplorerPageState.refreshMetricData"
+                               :disabled="assetAnalysisPageState.refreshMetricData"
                                @click="handleClickRefresh"
                 />
             </div>
@@ -103,7 +103,7 @@ watch(() => route.params, async () => {
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-query-section {
+.asset-analysis-query-section {
     margin-top: 1.5rem;
     .filter-wrapper {
         @apply relative flex items-center justify-between;

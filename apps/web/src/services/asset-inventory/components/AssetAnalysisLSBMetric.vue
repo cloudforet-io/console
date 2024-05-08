@@ -21,10 +21,10 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { gray } from '@/styles/colors';
 
-import MetricExplorerLSBMetricTree from '@/services/asset-inventory/components/MetricExplorerLSBMetricTree.vue';
+import AssetAnalysisLSBMetricTree from '@/services/asset-inventory/components/AssetAnalysisLSBMetricTree.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metric-explorer-type';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 interface Props {
@@ -35,8 +35,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 const route = useRoute();
 
 
@@ -49,12 +49,12 @@ const storeState = reactive({
         });
         return res;
     }),
-    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
+    selectedNamespace: computed(() => assetAnalysisPageState.selectedNamespace),
 });
 const state = reactive({
     selectedId: computed<string|undefined>(() => {
         if (!props.isDetailPage) return undefined;
-        if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
+        if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) return route.params.metricId;
         return route.params.metricExampleId;
     }),
     inputValue: '',
@@ -72,7 +72,7 @@ const state = reactive({
                     type: 'metric',
                     is_managed: metric.data.is_managed,
                     to: {
-                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
                         params: {
                             metricId: metric.key,
                         },
@@ -90,7 +90,7 @@ const state = reactive({
                             ...example,
                             type: 'example',
                             to: {
-                                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
                                 params: {
                                     metricId: metric.key,
                                     metricExampleId: example.example_id,
@@ -107,7 +107,7 @@ const state = reactive({
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
     }),
-    metricExamples: computed(() => metricExplorerPageState.metricExamples),
+    metricExamples: computed(() => assetAnalysisPageState.metricExamples),
     metricTreeDisplayMap: undefined,
     metricTreeDisplayMapWithSearchKeyword: computed<TreeDisplayMap|undefined>(() => {
         if (!state.inputValue) return undefined;
@@ -136,10 +136,10 @@ const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    metricExplorerPageStore.setSelectedNamespace(undefined);
+    assetAnalysisPageStore.setSelectedNamespace(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
-    metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
+    assetAnalysisPageStore.openMetricQueryFormSidebar('CREATE');
 };
 const handleSearchMetricAndExample = (keyword: string) => {
     state.inputValue = keyword;
@@ -157,7 +157,7 @@ watch(() => route.params, () => {
 
 /* Watcher */
 watch(() => storeState.selectedNamespace, (selectedNamespace) => {
-    if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
+    if (!isEmpty(selectedNamespace)) assetAnalysisPageStore.loadMetricExamples(selectedNamespace?.name);
 }, { immediate: true });
 </script>
 
@@ -165,7 +165,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
     <p-data-loader :loading="false"
                    :loader-backdrop-opacity="0.5"
                    :loader-backdrop-color="gray[100]"
-                   class="metric-explorer-l-s-b-metric-menu"
+                   class="asset-analysis-l-s-b-metric-menu"
     >
         <div class="metric-wrapper">
             <div class="metric-title-item">
@@ -199,24 +199,24 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                       :value="state.inputValue"
                       @update:value="handleSearchMetricAndExample"
             />
-            <metric-explorer-l-s-b-metric-tree v-show="!state.inputValue"
-                                               class="base-metric-tree-menu"
-                                               :metric-items="state.metricItems"
-                                               :tree-display-map="state.metricTreeDisplayMap"
-                                               :selected-id="state.selectedId"
+            <asset-analysis-l-s-b-metric-tree v-show="!state.inputValue"
+                                              class="base-metric-tree-menu"
+                                              :metric-items="state.metricItems"
+                                              :tree-display-map="state.metricTreeDisplayMap"
+                                              :selected-id="state.selectedId"
             />
-            <metric-explorer-l-s-b-metric-tree v-if="state.inputValue"
-                                               class="search-metric-tree-menu"
-                                               :metric-items="state.metricItemsFilterByInput"
-                                               :tree-display-map="state.metricTreeDisplayMapWithSearchKeyword"
-                                               :selected-id="state.selectedId"
-                                               :keyword="state.inputValue"
+            <asset-analysis-l-s-b-metric-tree v-if="state.inputValue"
+                                              class="search-metric-tree-menu"
+                                              :metric-items="state.metricItemsFilterByInput"
+                                              :tree-display-map="state.metricTreeDisplayMapWithSearchKeyword"
+                                              :selected-id="state.selectedId"
+                                              :keyword="state.inputValue"
             />
             <p-empty v-if="state.inputValue && !state.metricItemsFilterByInput.length"
                      class="keyword-search-empty"
             >
                 <span>
-                    {{ $t('INVENTORY.METRIC_EXPLORER.EMPTY_TEXT') }}
+                    {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
                 </span>
             </p-empty>
         </div>
@@ -224,7 +224,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </template>
 
 <style scoped lang="postcss">
-.metric-explorer-l-s-b-metric-menu {
+.asset-analysis-l-s-b-metric-menu {
     min-height: 15rem;
 
     .metric-wrapper {

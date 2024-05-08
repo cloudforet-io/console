@@ -12,9 +12,9 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { Legend } from '@/services/asset-inventory/types/metric-explorer-type';
+import { CHART_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { Legend } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 interface Props {
@@ -33,16 +33,16 @@ const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'show-all-series'): void;
 }>();
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 
 const state = reactive({
     proxyLegends: useProxyValue('legends', props, emit),
     showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
-    disableLegendToggle: computed<boolean>(() => [CHART_TYPE.TREEMAP, CHART_TYPE.COLUMN].includes(metricExplorerPageState.selectedChartType)),
-    chartGroupByMenuItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys
-        .filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key))
+    disableLegendToggle: computed<boolean>(() => [CHART_TYPE.TREEMAP, CHART_TYPE.COLUMN].includes(assetAnalysisPageState.selectedChartType)),
+    chartGroupByMenuItems: computed(() => assetAnalysisPageGetters.refinedMetricLabelKeys
+        .filter((d) => assetAnalysisPageState.selectedGroupByList.includes(d.key))
         .map((d) => ({ name: d.key, label: d.name }))),
 });
 
@@ -51,7 +51,7 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    if (metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN) {
+    if (assetAnalysisPageState.selectedChartType === CHART_TYPE.COLUMN) {
         const _reveredColorSet = cloneDeep(props.colorSet).reverse();
         return _reveredColorSet[index % props.colorSet.length];
     }
@@ -87,24 +87,24 @@ const handleToggleAllLegends = () => {
     state.proxyLegends = _legends;
 };
 const handleChartGroupByItem = (groupBy?: string) => {
-    metricExplorerPageStore.setSelectedChartGroupBy(groupBy);
+    assetAnalysisPageStore.setSelectedChartGroupBy(groupBy);
 };
 
 /* Watcher */
-watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
+watch(() => assetAnalysisPageState.selectedGroupByList, (after) => {
     if (!after.length) {
-        metricExplorerPageStore.setSelectedChartGroupBy(undefined);
-    } else if (!after.filter((d) => d === metricExplorerPageState.selectedChartGroupBy).length) {
-        metricExplorerPageStore.setSelectedChartGroupBy(after[0]);
+        assetAnalysisPageStore.setSelectedChartGroupBy(undefined);
+    } else if (!after.filter((d) => d === assetAnalysisPageState.selectedChartGroupBy).length) {
+        assetAnalysisPageStore.setSelectedChartGroupBy(after[0]);
     }
 });
 </script>
 
 <template>
-    <div class="metric-explorer-chart-legends">
+    <div class="asset-analysis-chart-legends">
         <p-select-dropdown :menu="state.chartGroupByMenuItems"
-                           :selected="metricExplorerPageState.selectedChartGroupBy"
-                           :disabled="!metricExplorerPageState.selectedGroupByList.length"
+                           :selected="assetAnalysisPageState.selectedChartGroupBy"
+                           :disabled="!assetAnalysisPageState.selectedGroupByList.length"
                            class="group-by-select-dropdown"
                            @select="handleChartGroupByItem"
         />
@@ -115,7 +115,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             <p v-if="props.more"
                class="too-many-text"
             >
-                {{ $t('INVENTORY.METRIC_EXPLORER.SHOWING_TOP_15') }}
+                {{ $t('INVENTORY.ASSET_ANALYSIS.SHOWING_TOP_15') }}
             </p>
             <div v-for="(legend, idx) in legends"
                  :key="`legend-${legend.name}-${idx}`"
@@ -129,20 +129,20 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 />
             </div>
             <template #no-data>
-                <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}</span>
+                <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_ITEMS') }}</span>
             </template>
         </p-data-loader>
         <p-text-button size="md"
                        :disabled="!legends.length || state.disableLegendToggle"
                        @click="handleToggleAllLegends"
         >
-            {{ state.showHideAll ? $t('INVENTORY.METRIC_EXPLORER.HIDE_ALL') : $t('INVENTORY.METRIC_EXPLORER.SHOW_ALL') }}
+            {{ state.showHideAll ? $t('INVENTORY.ASSET_ANALYSIS.HIDE_ALL') : $t('INVENTORY.ASSET_ANALYSIS.SHOW_ALL') }}
         </p-text-button>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-chart-legends {
+.asset-analysis-chart-legends {
     .group-by-select-dropdown {
         width: 100%;
         margin-bottom: 0.5rem;

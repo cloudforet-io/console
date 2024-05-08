@@ -24,9 +24,9 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
 interface Props {
@@ -44,35 +44,35 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     proxyVisible: useProxyValue('visible', props, emit),
     existingNameList: computed<string[]>(() => {
         if (state.currentMetricExampleId) {
-            return metricExplorerPageState.metricExamples
+            return assetAnalysisPageState.metricExamples
                 .filter((d) => d.example_id !== state.currentMetricExampleId)
                 .map((d) => d.name);
         }
         if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) {
-            return metricExplorerPageGetters.metrics.map((d) => d.name);
+            return assetAnalysisPageGetters.metrics.map((d) => d.name);
         }
-        return metricExplorerPageGetters.metrics
-            .filter((d) => d.key !== metricExplorerPageState.metric?.metric_id)
+        return assetAnalysisPageGetters.metrics
+            .filter((d) => d.key !== assetAnalysisPageState.metric?.metric_id)
             .map((metric) => metric.name);
     }),
     headerTitle: computed(() => {
-        if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE');
-        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_METRIC_EXAMPLE');
+        if (props.type === NAME_FORM_MODAL_TYPE.ADD_EXAMPLE) return i18n.t('INVENTORY.ASSET_ANALYSIS.ADD_EXAMPLE');
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_EXAMPLE) return i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS_METRIC_EXAMPLE');
         if (props.type === NAME_FORM_MODAL_TYPE.EDIT_NAME) {
-            if (state.currentMetricExampleId) return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_METRIC_EXAMPLE_NAME');
-            return i18n.t('INVENTORY.METRIC_EXPLORER.EDIT_CUSTOM_METRIC_NAME');
+            if (state.currentMetricExampleId) return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_METRIC_EXAMPLE_NAME');
+            return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_CUSTOM_METRIC_NAME');
         }
-        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS_NEW_CUSTOM_METRIC');
+        if (props.type === NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC) return i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS_NEW_CUSTOM_METRIC');
         return '';
     }),
 });
@@ -87,8 +87,8 @@ const {
     name: undefined as string|undefined,
 }, {
     name(value) {
-        if (!value) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_REQUIRED');
-        if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.METRIC_EXPLORER.NAME_DUPLICATED');
+        if (!value) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_REQUIRED');
+        if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_DUPLICATED');
         return true;
     },
 });
@@ -97,29 +97,29 @@ const {
 const createMetricExample = async () => {
     try {
         const metricExample = await SpaceConnector.clientV2.inventory.metricExample.create<MetricExampleCreateParameters, MetricExampleModel>({
-            metric_id: metricExplorerPageState.metric?.metric_id || '',
+            metric_id: assetAnalysisPageState.metric?.metric_id || '',
             name: name.value,
             options: {
-                granularity: metricExplorerPageState.granularity,
-                period: metricExplorerPageState.period,
-                relative_period: metricExplorerPageState.relativePeriod,
-                group_by: metricExplorerPageState.selectedGroupByList,
-                filters: metricExplorerPageState.filters,
-                operator: metricExplorerPageState.selectedOperator,
+                granularity: assetAnalysisPageState.granularity,
+                period: assetAnalysisPageState.period,
+                relative_period: assetAnalysisPageState.relativePeriod,
+                group_by: assetAnalysisPageState.selectedGroupByList,
+                filters: assetAnalysisPageState.filters,
+                operator: assetAnalysisPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_ADD_METRIC_EXAMPLE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
             params: {
                 metricId: metricExample.metric_id,
                 metricExampleId: metricExample.example_id,
             },
         })).catch(() => {});
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_ADD_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_ADD_METRIC_EXAMPLE'));
     }
 };
 const updateMetricName = async () => {
@@ -128,11 +128,11 @@ const updateMetricName = async () => {
             metric_id: state.currentMetricId,
             name: name.value,
         });
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         state.proxyVisible = false;
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
     }
 };
 const updateMetricExampleName = async () => {
@@ -141,11 +141,11 @@ const updateMetricExampleName = async () => {
             example_id: state.currentMetricExampleId,
             name: name.value,
         });
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
+        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         state.proxyVisible = false;
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_NAME'), '');
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_NAME'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
     }
 };
 
@@ -172,7 +172,7 @@ watch(() => state.proxyVisible, (visible) => {
         if (state.currentMetricExampleId) {
             setForm('name', state.currentMetricExample?.name);
         } else {
-            setForm('name', metricExplorerPageState.metric?.name);
+            setForm('name', assetAnalysisPageState.metric?.name);
         }
     } else {
         initForm();
@@ -193,7 +193,7 @@ watch(() => state.proxyVisible, (visible) => {
     >
         <template #body>
             <p-field-group class="query-name-input-wrap"
-                           :label="$t('INVENTORY.METRIC_EXPLORER.NAME')"
+                           :label="$t('INVENTORY.ASSET_ANALYSIS.NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -201,7 +201,7 @@ watch(() => state.proxyVisible, (visible) => {
                 <template #default="{invalid}">
                     <p-text-input :value="name"
                                   class="block w-full"
-                                  :placeholder="$t('INVENTORY.METRIC_EXPLORER.NAME')"
+                                  :placeholder="$t('INVENTORY.ASSET_ANALYSIS.NAME')"
                                   :invalid="invalid"
                                   @update:value="setForm('name', $event)"
                     />

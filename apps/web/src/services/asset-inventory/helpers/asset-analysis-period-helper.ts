@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 
-import { GRANULARITY, METRIC_PERIOD_MENU, METRIC_PERIOD_MENU_ITEM_MAP } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { GRANULARITY, METRIC_PERIOD_MENU, METRIC_PERIOD_MENU_ITEM_MAP } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import type {
     Granularity, Period, RelativePeriod, MetricPeriodMenu,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 export const convertRelativePeriodToPeriod = (granularity: Granularity, relativePeriod: RelativePeriod): Period => {

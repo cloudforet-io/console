@@ -8,11 +8,11 @@ import {
     gray, indigo, transparent, white,
 } from '@/styles/colors';
 
-import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { CHART_TYPE, GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import type {
     Legend, MetricDataAnalyzeResult, Granularity, Period,
     XYChartData, RealtimeChartData, ChartType,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const getTreemapChartColor = (idx: number) => {
