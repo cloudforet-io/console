@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
 			"DATA_SOURCES": {
+				"CANCELED": "キャンセル",
 				"COL_BILLING_ACCOUNT": "",
 				"COL_DATASOURCE": "",
 				"COL_DESCRIPTION": "説明",
@@ -863,13 +864,17 @@
 				"COL_TIME": "",
 				"COL_WORKSPACE": "",
 				"ERROR_FOUND": "エラー",
+				"ERROR_FOUND_CODE": "",
+				"ERROR_FOUND_OK": "はい",
+				"ERROR_FOUND_TITLE": "",
 				"GUIDE": "",
 				"SUCCESS": "成功",
 				"TAB_DETAILS_COLLECTION_JOB": "",
 				"TAB_DETAILS_TITLE": "詳細情報",
 				"TAB_DETAIL_BASE_INFORMATION": "基本情報",
 				"TAB_LINKED_ACCOUNT_TITLE": "",
-				"TAB_NO_DATA": ""
+				"TAB_NO_DATA": "",
+				"TIMEOUT": ""
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "お問い合わ",

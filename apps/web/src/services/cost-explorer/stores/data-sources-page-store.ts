@@ -33,13 +33,13 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const _getters = reactive({
-        provider: computed(() => allReferenceGetters.provider),
+        plugin: computed(() => allReferenceGetters.plugin),
         timezone: computed(() => store.state.user.timezone),
     });
 
     const getters = reactive({
         dataSourceList: computed<DataSourceItem[]>(() => state.dataSourceList.map((i) => {
-            const icon = _getters.provider[i.provider]?.icon;
+            const icon = _getters.plugin[i.plugin_info?.plugin_id || '']?.icon;
             return {
                 ...i,
                 icon: assetUrlConverter(icon),
@@ -51,7 +51,15 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             created_at: dayjs(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
-        selectedItem: computed<DataSourceItem>(() => getters.dataSourceList[state.selectedIndices[0]]),
+        selectedItem: computed<DataSourceItem>(() => {
+            const item = getters.dataSourceList[state.selectedIndices[0]];
+            if (!item) return {} as DataSourceItem;
+            const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];
+            return {
+                ...item,
+                description: pluginItem.description,
+            };
+        }),
     });
 
     const mutation = {
@@ -72,11 +80,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 state.totalCount = 0;
             }
         },
-        fetchJobList: async (dataSourceId: string) => {
+        fetchJobList: async (params: CostJobListParameters) => {
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>({
-                    data_source_id: dataSourceId,
-                });
+                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
                 state.jobList = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
