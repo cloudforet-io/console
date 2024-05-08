@@ -17,11 +17,6 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
-import type {
-    UpdatableWidgetInfo, WidgetExpose, WidgetProps, WidgetTheme,
-} from '@/common/modules/widgets/_types/widget-type';
-
 import { gray } from '@/styles/colors';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
@@ -31,6 +26,10 @@ import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-r
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
+import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
+import type {
+    UpdatableWidgetInfo, WidgetExpose, WidgetProps, WidgetTheme,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface WidgetFullModeModalProps {
