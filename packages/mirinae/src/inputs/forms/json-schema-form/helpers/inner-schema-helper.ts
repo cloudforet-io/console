@@ -85,7 +85,7 @@ const getUseAutoComplete = (schemaProperty: JsonSchema): boolean => schemaProper
 const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceType|undefined => {
     if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
-        if (schemaProperty.type === 'array') return 'badge';
+        if (schemaProperty.type === 'array') return 'stack';
         return 'basic';
     }
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PFilterableDropdown') {
