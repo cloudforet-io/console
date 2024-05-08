@@ -192,15 +192,7 @@ export const useMetricExplorerPageStore = defineStore('page-metric-explorer', ()
         if (!namespaceId) return;
         try {
             const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>({
-                query: {
-                    filter: [
-                        {
-                            k: 'namespace_id',
-                            v: namespaceId,
-                            o: 'eq',
-                        },
-                    ],
-                },
+                namespace_id: namespaceId,
             });
             state.metricExamples = res.results || [];
         } catch (e) {
