@@ -6,7 +6,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PPopover, PButton, PCheckbox,
+    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PPopover, PButton, PCheckbox, PTooltip,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import { isEmpty } from 'lodash';
@@ -280,13 +280,17 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
         >
             <template #collapsible-contents-starred>
                 <div v-if="state.starredMenuSet.length > 0">
-                    <l-s-b-router-menu-item v-for="(item, idx) of state.starredMenuSet"
-                                            :key="idx"
-                                            :item="item"
-                                            :idx="idx"
-                                            :current-path="state.currentPath"
-                                            is-hide-favorite
-                    />
+                    <p-tooltip v-for="(item, idx) of state.starredMenuSet"
+                               :key="`asset-analysis-starred-${idx}`"
+                               position="bottom"
+                               :contents="item.favoriteOptions?.type === FAVORITE_TYPE.METRIC_EXAMPLE ? `${storeState.metrics[item.to?.params?.metricId || '']?.name} > ${item.label}` : ''"
+                    >
+                        <l-s-b-router-menu-item :item="item"
+                                                :idx="idx"
+                                                :current-path="state.currentPath"
+                                                is-hide-favorite
+                        />
+                    </p-tooltip>
                 </div>
                 <span v-else
                       class="no-data"
