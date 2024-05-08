@@ -16,13 +16,11 @@ import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashbo
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { store } from '@/store';
 
-import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-
 import { red } from '@/styles/colors';
 
 import DashboardWidgetAddModal from '@/services/dashboards/components/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 interface Props {
     loading?: boolean;
