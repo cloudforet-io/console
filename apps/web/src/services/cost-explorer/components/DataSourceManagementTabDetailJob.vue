@@ -95,6 +95,9 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
 const fetchJobList = () => {
     state.loading = true;
     try {
+        jobListApiQueryHelper.setFilters([
+            { k: 'status', v: 'IN_PROGRESS', o: '!=' },
+        ]);
         dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,

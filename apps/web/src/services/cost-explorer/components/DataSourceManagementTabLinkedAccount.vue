@@ -34,6 +34,8 @@ const state = reactive({
     loading: false,
 });
 const tableState = reactive({
+    pageStart: 0,
+    pageLimit: 15,
     selectedIndices: [] as number[],
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
@@ -61,13 +63,14 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    if (options.pageStart !== undefined) listApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) listApiQueryHelper.setPageLimit(options.pageLimit);
+    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
     fetchLinkedAccountList();
 };
 const fetchLinkedAccountList = () => {
     state.loading = true;
     try {
+        listApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit);
         dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: listApiQueryHelper.data,
@@ -107,14 +110,13 @@ watch(() => storeState.activeTab, () => {
                          class="linked-account-table"
                          searchable
                          selectable
-                         :loading="false"
-                         disabled
+                         :loading="state.loading"
                          :items="storeState.linkedAccounts"
                          :select-index="tableState.selectedIndices"
                          :fields="tableState.fields"
                          sort-by="name"
                          :sort-desc="true"
-                         :total-count="storeState.linkedAccounts.length"
+                         :total-count="storeState.totalCount"
                          :key-item-sets="tableState.keyItemSets"
                          :value-handler-map="tableState.valueHandlerMap"
                          :query-tags="queryTags"
