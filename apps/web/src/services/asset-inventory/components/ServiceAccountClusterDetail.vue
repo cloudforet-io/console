@@ -83,13 +83,13 @@ const connectedStatusFormatter = (value: string): StatusProps => ({
             <template v-if="state.data.last_accessed_at"
                       #data-last_accessed_at="item"
             >
-                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template #data-expired_at="item">
-                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template #data-created_at="item">
-                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ dayjs.utc(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
         </p-definition-table>
     </p-data-loader>
