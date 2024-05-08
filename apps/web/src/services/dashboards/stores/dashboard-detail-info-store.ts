@@ -48,16 +48,18 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
     },
 });
 
-const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    let projectPropertySchema = {
-        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema): DashboardVariablesSchema => {
+    const projectSchemaProperty: DashboardVariableSchemaProperty = {
+        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, use: true, readonly: true, fixed: true,
     };
-    if (labels?.includes('Asset')) {
-        projectPropertySchema = {
-            ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
-        };
-    }
-    const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
+    const projectGroupSchemaProperty: DashboardVariableSchemaProperty = {
+        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project_group, use: false, fixed: true,
+    };
+    const properties = {
+        ...variablesSchemaInfo.properties,
+        project: projectSchemaProperty,
+        project_group: projectGroupSchemaProperty,
+    };
 
     const order = [...variablesSchemaInfo.order];
     const projectIdx = variablesSchemaInfo.order.findIndex((property) => property === 'project');
@@ -126,6 +128,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                     };
                     if (typeof property.fixed === 'boolean') {
                         _refinedVariablesSchema.properties[propertyName].fixed = property.fixed;
+                    }
+                    if (typeof property.readonly === 'boolean') {
+                        _refinedVariablesSchema.properties[propertyName].readonly = property.readonly;
                     }
                 } else {
                     _refinedVariablesSchema.properties[propertyName] = property;
@@ -219,7 +224,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
         let _variables = _template.variables ?? {};
         if (state.projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _template.labels);
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
             _variables = refineProjectDashboardVariables(_variables, state.projectId);
         }
         setVariablesSchema(_variablesSchema);
@@ -275,7 +280,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         };
         let _variables = _dashboardInfo.variables ?? {};
         if (_projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
             _variables = refineProjectDashboardVariables(_variables, _projectId);
         }
         const _variablesInitMap = {};
