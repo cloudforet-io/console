@@ -7,8 +7,6 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/utils';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
@@ -39,7 +37,6 @@ const chartHelper = useAmcharts5(chartContext);
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
 const assetAnalysisPageState = assetAnalysisPageStore.state;
 
-const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     const _dateAxisSettings = assetAnalysisPageState.granularity === GRANULARITY.DAILY ? {
         min: dayjs.utc(assetAnalysisPageState.period?.start).valueOf(),
@@ -89,7 +86,7 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip, valueFormatter);
+        chartHelper.setXYSharedTooltipText(chart, tooltip);
         series.set('tooltip', tooltip);
 
         // set data on series

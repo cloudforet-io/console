@@ -5,8 +5,6 @@ import {
 
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/utils';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import type {
@@ -34,7 +32,6 @@ const chartHelper = useAmcharts5(chartContext);
 const getRefinedTreemapChartData = (data: RealtimeChartData[]): TreemapChartData[] => [{
     children: data,
 }];
-const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     if (!props.chartData?.length) return;
     const seriesSettings = {
@@ -48,7 +45,7 @@ const drawChart = () => {
     // tooltip
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, valueFormatter);
+    chartHelper.setTreemapTooltipText(series, tooltip);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
