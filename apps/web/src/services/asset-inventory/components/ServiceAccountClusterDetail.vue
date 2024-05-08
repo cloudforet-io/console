@@ -18,25 +18,43 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    fields: computed(() => [
-        {
-            label: 'Cluster Name',
-            name: 'cluster_name',
-        },
-        {
-            label: 'Status',
-            name: 'state',
-            disableCopy: true,
-        },
-        {
-            label: 'Created',
-            name: 'created_at',
-            disableCopy: true,
-        },
-    ]),
+    fields: computed(() => {
+        const basicFields = [
+            {
+                label: 'Cluster Name',
+                name: 'cluster_name',
+            },
+            {
+                label: 'Status',
+                name: 'state',
+                disableCopy: true,
+            },
+        ];
+        const basicDateFields = [
+            {
+                label: 'Expired at',
+                name: 'expired_at',
+            },
+            {
+                label: 'Created',
+                name: 'created_at',
+            },
+        ];
+        const optionalFields = state.data.last_accessed_at ? [{
+            label: 'Last Access at',
+            name: 'last_accessed_at',
+        }] : [];
+        return [
+            ...basicFields,
+            ...optionalFields,
+            ...basicDateFields,
+        ];
+    }),
     data: computed(() => ({
         cluster_name: storeState.agentInfo?.options?.cluster_name,
         state: storeState.agentInfo?.last_accessed_at ? storeState.agentInfo?.state : 'DISABLED',
+        last_accessed_at: storeState.agentInfo?.last_accessed_at,
+        expired_at: storeState.agentInfo?.expired_at,
         created_at: storeState.agentInfo?.created_at,
     })),
 });
@@ -61,6 +79,14 @@ const connectedStatusFormatter = (value: string): StatusProps => ({
                 <p-status v-bind="connectedStatusFormatter(value)"
                           class="capitalize"
                 />
+            </template>
+            <template v-if="state.data.last_accessed_at"
+                      #data-last_accessed_at="item"
+            >
+                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+            <template #data-expired_at="item">
+                {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template #data-created_at="item">
                 {{ dayjs(item.data).tz(storeState.timezone).format('YYYY-MM-DD HH:mm:ss') }}
