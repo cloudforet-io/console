@@ -192,6 +192,8 @@ watch(() => storeState.activeTab, () => {
                                    :search-text.sync="dropdownState.searchText"
                                    show-select-marker
                                    is-filterable
+                                   :selected="[{ name: value, label: getWorkspaceInfo(value)?.name}]"
+                                   show-select-header
                                    :handler="workspaceMenuHandler"
                                    class="col-workspace-select-dropdown"
                                    @select="handleSelectDropdownItem($event, rowIndex)"
