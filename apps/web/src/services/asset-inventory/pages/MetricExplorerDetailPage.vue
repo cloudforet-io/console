@@ -53,9 +53,13 @@ const state = reactive({
             },
         ];
     }),
-    favoriteOptions: computed<FavoriteOptions>(() => ({
+    metricFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC,
         id: metricExplorerPageState.metric?.metric_id,
+    })),
+    metricExampleFavoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.METRIC_EXAMPLE,
+        id: route.params.metricExampleId,
     })),
 });
 
@@ -74,8 +78,12 @@ watch(() => route.params, async (params) => {
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
+watch([
+    () => state.metricFavoriteOptions,
+    () => state.metricExampleFavoriteOptions,
+], ([metricFavoriteOptions, metricExampleFavoriteOptions]) => {
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
 </script>
 
