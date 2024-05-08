@@ -57,6 +57,10 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             created_at: dayjs(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
+        linkedAccounts: computed<CostDataSourceAccountModel[]>(() => (state.linkedAccounts.map((i) => ({
+            ...i,
+            updated_at: dayjs(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
+        })))),
         selectedItem: computed<DataSourceItem>(() => {
             if (state.selectedIndices.length === 0) return {} as DataSourceItem;
             const item = getters.dataSourceList[state.selectedIndices[0]];
@@ -106,6 +110,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.list<CostDataSourceAccountListParameters, ListResponse<CostDataSourceAccountModel>>(
                     params,
                 );
+                console.log({ results });
                 state.linkedAccounts = results || [];
                 state.linkedAccountsTotalCount = total_count || 0;
             } catch (e) {
