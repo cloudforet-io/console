@@ -2819,6 +2819,12 @@
 			"SAVE_AS_METRIC_EXAMPLE": "Save as Metric Example",
 			"SAVE_AS_NEW_CUSTOM_METRIC": "Save as New Custom Metric",
 			"SAVE_TO_CUSTOM_METRIC": "Save to Custom Metric",
+			"SELECT_METRIC_GUIDE": {
+				"CONFIRM": "Got it!",
+				"DESCRIPTION": "You've just selected another Namespace.\nNow select a Metric, then it will apply to the chart.",
+				"DONT_SHOW_ME_AGAIN": "Don't show me again",
+				"TITLE": "Metric has not been selected"
+			},
 			"SHOWING_TOP_15": "Showing Top 15",
 			"SHOW_ALL": "Show all",
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",

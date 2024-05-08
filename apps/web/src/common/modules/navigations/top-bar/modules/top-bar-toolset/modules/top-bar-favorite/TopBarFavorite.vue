@@ -26,6 +26,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
 
 const setVisible = (visible: boolean) => {
     if (visible) {
+        gnbStore.fetchMetricExample();
         gnbStore.fetchCostQuerySet();
     }
     emit('update:visible', visible);

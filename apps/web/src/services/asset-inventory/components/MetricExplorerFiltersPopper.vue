@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PSelectDropdown, PTextButton } from '@spaceone/design-system';
 import type {
@@ -8,6 +9,7 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, isEmpty } from 'lodash';
 
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -25,10 +27,13 @@ const props = defineProps<{
     visible: boolean;
 }>();
 
+const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
+    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     loading: true,
     randomId: getRandomId(),
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
@@ -106,8 +111,8 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
     });
 };
 const handleClickResetFilters = () => {
-    if (metricExplorerPageGetters.metricExampleId) {
-        const _originalFilters = cloneDeep(metricExplorerPageGetters.metricExample?.options?.filters);
+    if (state.currentMetricExampleId) {
+        const _originalFilters = cloneDeep(state.currentMetricExample?.options?.filters);
         initSelectedFilters(_originalFilters);
         metricExplorerPageStore.setFilters(_originalFilters);
     } else {

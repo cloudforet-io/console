@@ -37,13 +37,13 @@ const storeState = reactive({
 });
 const state = reactive({
     targetMetric: computed<MetricReferenceItem|undefined>(() => {
+        if (props.goToMetricServerPage) {
+            return Object.values(storeState.metrics).find((d) => d.key === METRIC_SERVER_ID);
+        }
         const _refinedResourceType = `inventory.CloudService:${props.provider}.${props.group}.${props.name}`;
         return Object.values(storeState.metrics).find((d) => d.data.resource_type === _refinedResourceType);
     }),
-    showMetricButton: computed<boolean>(() => {
-        if (props.goToMetricServerPage) return true;
-        return !!state.targetMetric;
-    }),
+    showMetricButton: computed<boolean>(() => !!state.targetMetric),
 });
 
 const handleClickGoToMetric = () => {

@@ -5,4 +5,5 @@ export interface MetricExampleListParameters {
     query?: Query;
     metric_id?: string;
     name?: string;
+    namespace_id?: string;
 }

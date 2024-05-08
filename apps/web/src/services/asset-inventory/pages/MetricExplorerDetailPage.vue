@@ -8,6 +8,8 @@ import {
     PDivider,
 } from '@spaceone/design-system';
 
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
@@ -38,21 +40,26 @@ const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
 });
 const state = reactive({
+    currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
         const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
         const _targetMetric = metricExplorerPageState.metric;
-        const _targetMetricExample = metricExplorerPageGetters.metricExample;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
-                name: `[${targetNamespace?.name}] ${_targetMetricExample?.name ?? _targetMetric?.name}`,
-                path: _targetMetricExample ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
+                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             },
         ];
     }),
-    favoriteOptions: computed<FavoriteOptions>(() => ({
+    metricFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC,
         id: metricExplorerPageState.metric?.metric_id,
+    })),
+    metricExampleFavoriteOptions: computed<FavoriteOptions>(() => ({
+        type: FAVORITE_TYPE.METRIC_EXAMPLE,
+        id: route.params.metricExampleId,
     })),
 });
 
@@ -63,15 +70,20 @@ watch(() => route.params, async (params) => {
     await metricExplorerPageStore.loadMetric(params.metricId);
     if (params.metricExampleId) {
         await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        metricExplorerPageStore.initMetricExampleOptions();
+        const targetMetricExample = metricExplorerPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
+        metricExplorerPageStore.initMetricExampleOptions(targetMetricExample);
     } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
         metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
-watch(() => state.favoriteOptions, (favoriteOptions) => {
-    gnbStore.setFavoriteItemId(favoriteOptions);
+watch([
+    () => state.metricFavoriteOptions,
+    () => state.metricExampleFavoriteOptions,
+], ([metricFavoriteOptions, metricExampleFavoriteOptions]) => {
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
 </script>
 

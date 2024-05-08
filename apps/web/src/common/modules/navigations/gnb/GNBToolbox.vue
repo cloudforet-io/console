@@ -107,8 +107,11 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
     if (state.selectedMenuId === MENU_ID.COST_ANALYSIS || state.selectedMenuId === MENU_ID.SECURITY) return;
-    await gnbStore.setFavoriteItemId(state.favoriteOptions);
-    await gnbStore.fetchCostQuerySet();
+    await Promise.all([
+        gnbStore.setFavoriteItemId(state.favoriteOptions),
+        gnbStore.fetchMetricExample(),
+        gnbStore.fetchCostQuerySet(),
+    ]);
 }, { immediate: true });
 </script>
 

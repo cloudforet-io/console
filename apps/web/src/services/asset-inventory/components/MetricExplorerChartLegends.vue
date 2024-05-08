@@ -10,7 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
 import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
@@ -21,10 +21,12 @@ interface Props {
     loading: boolean;
     legends: Legend[];
     more?: boolean;
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
     more: false,
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'toggle-series', index: number): void;
     (e: 'hide-all-series'): void;
@@ -49,7 +51,11 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    return DEFAULT_CHART_COLORS[index];
+    if (metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN) {
+        const _reveredColorSet = cloneDeep(props.colorSet).reverse();
+        return _reveredColorSet[index % props.colorSet.length];
+    }
+    return props.colorSet[index % props.colorSet.length];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];
@@ -126,9 +132,8 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
                 <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_ITEMS') }}</span>
             </template>
         </p-data-loader>
-        <p-text-button v-if="!state.disableLegendToggle"
-                       size="md"
-                       :disabled="!legends.length"
+        <p-text-button size="md"
+                       :disabled="!legends.length || state.disableLegendToggle"
                        @click="handleToggleAllLegends"
         >
             {{ state.showHideAll ? $t('INVENTORY.METRIC_EXPLORER.HIDE_ALL') : $t('INVENTORY.METRIC_EXPLORER.SHOW_ALL') }}
@@ -153,7 +158,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
             padding: 0 0.5rem 0.5rem 0.5rem;
         }
         .legend {
-            height: 25px;
+            height: 1.5rem;
             display: flex;
             align-items: center;
             font-size: 0.875rem;
@@ -183,7 +188,7 @@ watch(() => metricExplorerPageState.selectedGroupByList, (after) => {
 /* custom design-system component - p-data-loader */
 :deep(.p-data-loader) {
     .no-data-wrapper {
-        max-height: 22.25rem;
+        max-height: 19.25rem;
     }
 }
 </style>

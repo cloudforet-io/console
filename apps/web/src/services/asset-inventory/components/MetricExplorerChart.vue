@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PSelectButton, PTextEditor } from '@spaceone/design-system';
+import {
+    PSelectButton, PSkeleton, PTextEditor, PEmpty,
+} from '@spaceone/design-system';
 import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -14,6 +17,8 @@ import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
+
+import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
 import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
@@ -47,11 +52,14 @@ const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
     { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
 ];
+
+const route = useRoute();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
-    loading: false,
+    loading: true,
+    currentMetricId: computed<string>(() => route.params.metricId),
     data: undefined as undefined|AnalyzeResponse<MetricDataAnalyzeResult>,
     chartData: [] as Array<XYChartData|RealtimeChartData>,
     legends: [] as Legend[],
@@ -62,6 +70,18 @@ const state = reactive({
             return state.data?.results[0]?.date || '';
         }
         return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+    }),
+    chartColorSet: computed(() => {
+        const _isMassive = state.legends.length > BASIC_CHART_COLORS.length;
+        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === metricExplorerPageState.selectedChartType);
+        const _sliceIndex = _isMassive ? _index * 4 : _index * 2;
+        let _colorSet = MASSIVE_CHART_COLORS;
+        if (!_isMassive) {
+            _colorSet = BASIC_CHART_COLORS;
+        }
+        const firstPart = _colorSet.slice(_sliceIndex);
+        const secondPart = _colorSet.slice(0, _sliceIndex);
+        return firstPart.concat(secondPart).slice(0, state.legends.length);
     }),
 });
 
@@ -75,7 +95,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
         const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
-            metric_id: metricExplorerPageGetters.metricId as string,
+            metric_id: state.currentMetricId,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: _groupBy,
@@ -125,6 +145,7 @@ const setChartData = debounce(async () => {
 
 /* Event */
 const handleSelectButton = (selected: ChartType|string) => {
+    state.loading = true;
     if (selected !== QUERY_OPTIONS_TYPE) {
         setChartData();
     }
@@ -142,7 +163,7 @@ const handleAllSeries = (type: string) => {
 };
 
 watch([
-    () => metricExplorerPageGetters.metricId,
+    () => state.currentMetricId,
     () => metricExplorerPageState.period,
     () => metricExplorerPageState.selectedOperator,
     () => metricExplorerPageState.selectedChartGroupBy,
@@ -181,37 +202,51 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         <div class="bottom-part">
             <template v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
                 <div class="left-part">
-                    <metric-explorer-line-chart
-                        v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
+                    <p-skeleton v-if="state.loading"
+                                height="100%"
                     />
-                    <metric-explorer-donut-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                    />
-                    <metric-explorer-tree-map-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
-                        :loading="state.loading"
-                        :chart-data="state.chartData"
-                        :legends="state.legends"
-                    />
-                    <metric-explorer-horizontal-column-chart
-                        v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
-                        :loading="state.loading"
-                        :chart.sync="state.chart"
-                        :chart-data="state.chartData"
-                    />
+                    <template v-else-if="state.chartData.length">
+                        <metric-explorer-line-chart
+                            v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                            :color-set="state.chartColorSet"
+                        />
+                        <metric-explorer-donut-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                            :color-set="state.chartColorSet"
+                        />
+                        <metric-explorer-tree-map-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
+                            :loading="state.loading"
+                            :chart-data="state.chartData"
+                            :legends="state.legends"
+                        />
+                        <metric-explorer-horizontal-column-chart
+                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
+                            :loading="state.loading"
+                            :chart.sync="state.chart"
+                            :chart-data="state.chartData"
+                            :color-set="state.chartColorSet"
+                        />
+                    </template>
+                    <p-empty v-else
+                             class="empty-wrapper"
+                    >
+                        <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
+                    </p-empty>
                 </div>
                 <div class="right-part">
                     <metric-explorer-chart-legends :legends.sync="state.legends"
                                                    :loading="state.loading"
                                                    :more="state.data?.more"
+                                                   :color-set="state.chartColorSet"
                                                    @toggle-series="handleToggleSeries"
                                                    @show-all-series="handleAllSeries('show')"
                                                    @hide-all-series="handleAllSeries('hide')"
@@ -254,9 +289,8 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
         .left-part {
             @apply col-span-9;
             height: 25rem;
-            .chart-wrapper {
-                padding-top: 0.5rem;
-                padding-bottom: 1rem;
+            .empty-wrapper {
+                height: 100%;
             }
         }
         .right-part {

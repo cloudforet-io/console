@@ -4,11 +4,10 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PSkeleton, PEmpty,
-} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
+
+import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -22,12 +21,14 @@ interface Props {
     chart: null | am5xy.XYChart;
     chartData: XYChartData[];
     legends: Legend[];
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -38,12 +39,16 @@ const chartHelper = useAmcharts5(chartContext);
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     const _dateAxisSettings = metricExplorerPageState.granularity === GRANULARITY.DAILY ? {
         min: dayjs.utc(metricExplorerPageState.period?.start).valueOf(),
         max: dayjs.utc(metricExplorerPageState.period?.end).add(1, 'day').valueOf(),
     } : {};
     const { chart, xAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
+
+    // set color set
+    chartHelper.setChartColors(chart, props.colorSet);
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
@@ -84,7 +89,7 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip);
+        chartHelper.setXYSharedTooltipText(chart, tooltip, valueFormatter);
         series.set('tooltip', tooltip);
 
         // set data on series
@@ -104,26 +109,15 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else-if="props.chartData.length"
+        <div v-show="props.chartData.length"
              ref="chartContext"
              class="chart"
         />
-        <p-empty v-else
-                 class="empty-wrapper"
-        >
-            <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
-        </p-empty>
     </div>
 </template>
 
 <style lang="postcss" scoped>
 .chart {
-    height: 100%;
-}
-.empty-wrapper {
     height: 100%;
 }
 </style>

@@ -4,9 +4,6 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import {
-    PSkeleton,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/utils';
@@ -23,12 +20,14 @@ interface Props {
     loading: boolean;
     chart: null | am5xy.XYChart;
     chartData: RealtimeChartData[];
+    colorSet?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
     chart: null,
     chartData: () => ([]),
     legends: () => ([]),
+    colorSet: () => ([]),
 });
 const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
@@ -36,6 +35,7 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
@@ -56,15 +56,15 @@ const drawChart = () => {
     // create series
     const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
 
-    // set series style
-    series.columns.template.setAll({
-        height: 16,
+    // set color
+    series.columns.template.adapters.add('fill', (fill, target) => {
+        const _index = series.columns.indexOf(target);
+        return props.colorSet[_index];
     });
 
     // set tooltip if showPassFindings is true
     const tooltip = chartHelper.createTooltip();
-    const _tooltipValueFormatter = (value?: number): string => numberFormatter(value, { minimumFractionDigits: 2 }) ?? '';
-    setXYSharedTooltipText(chart, tooltip, _tooltipValueFormatter);
+    setXYSharedTooltipText(chart, tooltip, valueFormatter);
     series.set('tooltip', tooltip);
 
     // add series to chart
@@ -88,10 +88,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else
+        <div v-show="!props.loading"
              ref="chartContext"
              class="chart"
         />
