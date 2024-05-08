@@ -85,6 +85,19 @@ const state = reactive({
     }),
 });
 
+/* Util */
+const setPeriodText = () => {
+    let periodText = '';
+    if (isEmpty(assetAnalysisPageState.period)) {
+        periodText = '';
+    } else if (assetAnalysisPageGetters.isRealtimeChart) {
+        periodText = state.data?.results[0]?.date || '';
+    } else {
+        periodText = `${assetAnalysisPageState.period.start} ~ ${assetAnalysisPageState.period.end}`;
+    }
+    assetAnalysisPageStore.setPeriodText(periodText);
+};
+
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
@@ -129,6 +142,7 @@ const setChartData = debounce(async () => {
     const rawData = await analyzeMetricData();
     if (!rawData) return;
     state.data = rawData;
+    setPeriodText();
 
     const _granularity = assetAnalysisPageState.granularity;
     const _period = assetAnalysisPageState.period as Period;
@@ -183,9 +197,6 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
 <template>
     <div class="asset-analysis-chart">
         <div class="top-part">
-            <div class="period-text">
-                <span v-if="assetAnalysisPageState.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
-            </div>
             <div class="select-button-wrapper">
                 <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
                                  :key="`chart-select-button-${item.name}`"
@@ -270,14 +281,9 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
     margin-bottom: 1rem;
     .top-part {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         padding-bottom: 0.75rem;
-        .period-text {
-            @apply text-label-md text-gray-600;
-            font-weight: 400;
-            padding-right: 0.125rem;
-        }
         .select-button-wrapper {
             display: flex;
             gap: 0.375rem;

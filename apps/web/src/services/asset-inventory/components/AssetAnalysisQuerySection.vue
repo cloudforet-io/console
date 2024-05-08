@@ -91,6 +91,9 @@ watch(() => route.params, async () => {
                 </p-popover>
             </div>
             <div class="right-part">
+                <span class="period-text">
+                    {{ assetAnalysisPageState.periodText }}
+                </span>
                 <p-icon-button name="ic_renew"
                                style-type="tertiary"
                                shape="square"
@@ -117,8 +120,9 @@ watch(() => route.params, async () => {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            .period-label-text {
+            .period-text {
                 @apply text-label-md text-gray-700;
+                font-weight: 400;
             }
         }
         .filters-button {
