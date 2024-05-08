@@ -27,11 +27,11 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import { gray } from '@/styles/colors';
 
-import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
-import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
-import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import AssetAnalysisNameFormModal from '@/services/asset-inventory/components/AssetAnalysisNameFormModal.vue';
+import AssetAnalysisQueryFormSidebar from '@/services/asset-inventory/components/AssetAnalysisQueryFormSidebar.vue';
+import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
 const contextMenuRef = ref<any|null>(null);
@@ -41,14 +41,14 @@ const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
-    isManagedMetric: computed<boolean>(() => (metricExplorerPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    isManagedMetric: computed<boolean>(() => (assetAnalysisPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
     metricNameFormModalVisible: false,
     metricQueryFormModalVisible: false,
     metricDeleteModalVisible: false,
@@ -59,23 +59,23 @@ const state = reactive({
             type: 'item',
             name: 'saveAs',
             icon: 'ic_disk-edit-filled',
-            label: `${i18n.t('INVENTORY.METRIC_EXPLORER.SAVE_AS')}...`,
+            label: `${i18n.t('INVENTORY.ASSET_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
     pageTitle: computed<string|TranslateResult>(() => {
-        if (metricExplorerPageState.metricLoading) return '';
-        if (metricExplorerPageState.metric) {
-            return state.currentMetricExample?.name || metricExplorerPageState.metric.name;
+        if (assetAnalysisPageState.metricLoading) return '';
+        if (assetAnalysisPageState.metric) {
+            return state.currentMetricExample?.name || assetAnalysisPageState.metric.name;
         }
-        return i18n.t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER');
+        return i18n.t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS');
     }),
     deleteModalTitle: computed(() => {
         if (state.currentMetricExampleId) {
-            return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_METRIC_EXAMPLE');
+            return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_METRIC_EXAMPLE');
         }
-        return i18n.t('INVENTORY.METRIC_EXPLORER.DELETE_CUSTOM_METRIC');
+        return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_CUSTOM_METRIC');
     }),
-    existingMetricNameList: computed<string[]>(() => metricExplorerPageGetters.metrics
+    existingMetricNameList: computed<string[]>(() => assetAnalysisPageGetters.metrics
         .map((metric) => metric.name)),
 });
 
@@ -117,48 +117,48 @@ const getDuplicatedMetricName = (name: string): string => {
 
 /* Api */
 const duplicateMetric = async () => {
-    if (!metricExplorerPageState.metric) return;
+    if (!assetAnalysisPageState.metric) return;
     state.loadingDuplicate = true;
     try {
         const duplicatedMetric = await SpaceConnector.clientV2.inventory.metric.create<MetricCreateParameters, MetricModel>({
-            name: getDuplicatedMetricName(metricExplorerPageState.metric.name),
-            namespace_id: metricExplorerPageState.metric.namespace_id || '',
-            unit: metricExplorerPageState.metric.unit,
-            metric_type: metricExplorerPageState.metric.metric_type,
+            name: getDuplicatedMetricName(assetAnalysisPageState.metric.name),
+            namespace_id: assetAnalysisPageState.metric.namespace_id || '',
+            unit: assetAnalysisPageState.metric.unit,
+            metric_type: assetAnalysisPageState.metric.metric_type,
             resource_type: 'inventory.CloudService',
-            query_options: metricExplorerPageState.metric.query_options,
+            query_options: assetAnalysisPageState.metric.query_options,
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DUPLICATE_METRIC'), '');
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DUPLICATE_METRIC'), '');
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             params: { metricId: duplicatedMetric.metric_id },
         }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DUPLICATE_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DUPLICATE_METRIC'));
     } finally {
         state.loadingDuplicate = false;
     }
 };
 const deleteCustomMetric = async () => {
-    if (!metricExplorerPageState.metric) return;
+    if (!assetAnalysisPageState.metric) return;
     try {
         await SpaceConnector.clientV2.inventory.metric.delete<MetricDeleteParameters>({
-            metric_id: metricExplorerPageState.metric.metric_id,
+            metric_id: assetAnalysisPageState.metric.metric_id,
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC'), '');
-        const otherMetricId = metricExplorerPageGetters.metrics[0]?.key;
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DELETE_METRIC'), '');
+        const otherMetricId = assetAnalysisPageGetters.metrics[0]?.key;
         if (otherMetricId) {
             await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
                 params: { metricId: otherMetricId },
             }));
         } else {
             await router.replace(getProperRouteLocation({
-                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER._NAME,
+                name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME,
             }));
         }
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DELETE_METRIC'));
     }
 };
 const deleteMetricExample = async () => {
@@ -166,14 +166,14 @@ const deleteMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.delete<MetricExampleDeleteParameters>({
             example_id: state.currentMetricExampleId as string,
         });
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_DELETE_METRIC_EXAMPLE'), '');
+        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DELETE_METRIC_EXAMPLE'), '');
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             params: { metricId: state.currentMetricId },
         }));
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_DELETE_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_DELETE_METRIC_EXAMPLE'));
     }
 };
 const updateMetricExample = async () => {
@@ -181,17 +181,17 @@ const updateMetricExample = async () => {
         await SpaceConnector.clientV2.inventory.metricExample.update<MetricExampleUpdateParameters, MetricExampleModel>({
             example_id: state.currentMetricExampleId as string,
             options: {
-                granularity: metricExplorerPageState.granularity,
-                period: metricExplorerPageState.period,
-                relative_period: metricExplorerPageState.relativePeriod,
-                group_by: metricExplorerPageState.selectedGroupByList,
-                filters: metricExplorerPageState.filters,
-                operator: metricExplorerPageState.selectedOperator,
+                granularity: assetAnalysisPageState.granularity,
+                period: assetAnalysisPageState.period,
+                relative_period: assetAnalysisPageState.relativePeriod,
+                group_by: assetAnalysisPageState.selectedGroupByList,
+                filters: assetAnalysisPageState.filters,
+                operator: assetAnalysisPageState.selectedOperator,
             },
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_EXAMPLE'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.METRIC_EXPLORER.ALT_E_UPDATE_METRIC_EXAMPLE'));
+        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_EXAMPLE'));
     }
 };
 
@@ -227,13 +227,13 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    metricExplorerPageStore.openMetricQueryFormSidebar('UPDATE');
+    assetAnalysisPageStore.openMetricQueryFormSidebar('UPDATE');
 };
 </script>
 
 <template>
     <p-heading :title="state.pageTitle">
-        <template v-if="!metricExplorerPageState.metricLoading"
+        <template v-if="!assetAnalysisPageState.metricLoading"
                   #title-left-extra
         >
             <p-i v-if="state.currentMetricExampleId"
@@ -249,7 +249,7 @@ const handleOpenEditQuery = () => {
                  :color="gray[500]"
             />
         </template>
-        <template v-if="!metricExplorerPageState.metricLoading"
+        <template v-if="!assetAnalysisPageState.metricLoading"
                   #title-right-extra
         >
             <div v-if="!state.isManagedMetric"
@@ -267,11 +267,11 @@ const handleOpenEditQuery = () => {
             </div>
             <delete-modal :header-title="state.deleteModalTitle"
                           :visible.sync="state.metricDeleteModalVisible"
-                          :contents="$t('INVENTORY.METRIC_EXPLORER.DELETE_MODAL_DESC')"
+                          :contents="$t('INVENTORY.ASSET_ANALYSIS.DELETE_MODAL_DESC')"
                           @confirm="handleDeleteMetric"
             />
         </template>
-        <template v-if="!metricExplorerPageState.metricLoading"
+        <template v-if="!assetAnalysisPageState.metricLoading"
                   #extra
         >
             <div ref="rightPartRef"
@@ -285,7 +285,7 @@ const handleOpenEditQuery = () => {
                               icon-left="ic_editor-code"
                               @click="handleOpenEditQuery"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.EDIT_QUERY') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.EDIT_QUERY') }}
                     </p-button>
                     <p-button class="mr-2"
                               style-type="tertiary"
@@ -293,13 +293,13 @@ const handleOpenEditQuery = () => {
                               :loading="state.loadingDuplicate"
                               @click="handleDuplicate"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.DUPLICATE') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.DUPLICATE') }}
                     </p-button>
                     <p-button style-type="tertiary"
                               icon-left="ic_plus_bold"
                               @click="handleOpenAddExampleModal"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.ADD_EXAMPLE') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.ADD_EXAMPLE') }}
                     </p-button>
                 </template>
                 <!-- example case -->
@@ -309,7 +309,7 @@ const handleOpenEditQuery = () => {
                               icon-left="ic_disk-filled"
                               @click="handleSaveMetricExample"
                     >
-                        {{ $t('INVENTORY.METRIC_EXPLORER.SAVE') }}
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.SAVE') }}
                     </p-button>
                     <p-icon-button ref="targetRef"
                                    class="more-menu-button"
@@ -328,10 +328,10 @@ const handleOpenEditQuery = () => {
                     />
                 </template>
             </div>
-            <metric-explorer-name-form-modal :visible.sync="state.metricNameFormModalVisible"
-                                             :type="state.selectedNameFormModalType"
+            <asset-analysis-name-form-modal :visible.sync="state.metricNameFormModalVisible"
+                                            :type="state.selectedNameFormModalType"
             />
-            <metric-explorer-query-form-sidebar v-show="metricExplorerPageState.showMetricQueryFormSidebar" />
+            <asset-analysis-query-form-sidebar v-show="assetAnalysisPageState.showMetricQueryFormSidebar" />
         </template>
     </p-heading>
 </template>

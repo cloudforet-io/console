@@ -9,7 +9,7 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { Legend, RealtimeChartData } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 interface Props {

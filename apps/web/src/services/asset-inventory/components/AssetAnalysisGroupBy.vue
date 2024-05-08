@@ -6,15 +6,15 @@ import {
 } from '@spaceone/design-system';
 import { xor } from 'lodash';
 
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 
 const state = reactive({
-    groupByItems: computed(() => metricExplorerPageGetters.refinedMetricLabelKeys.map((d) => ({
+    groupByItems: computed(() => assetAnalysisPageGetters.refinedMetricLabelKeys.map((d) => ({
         name: d.key,
         label: d.name,
     }))),
@@ -22,23 +22,23 @@ const state = reactive({
 /* Event */
 const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: boolean) => {
     if (isSelected) {
-        const addedGroupByName: string = xor(metricExplorerPageState.selectedGroupByList, selectedItems)[0];
-        metricExplorerPageStore.setSelectedGroupByList([addedGroupByName, ...metricExplorerPageState.selectedGroupByList]);
-        metricExplorerPageStore.setSelectedChartGroupBy(addedGroupByName);
+        const addedGroupByName: string = xor(assetAnalysisPageState.selectedGroupByList, selectedItems)[0];
+        assetAnalysisPageStore.setSelectedGroupByList([addedGroupByName, ...assetAnalysisPageState.selectedGroupByList]);
+        assetAnalysisPageStore.setSelectedChartGroupBy(addedGroupByName);
     } else {
-        metricExplorerPageStore.setSelectedGroupByList(selectedItems);
+        assetAnalysisPageStore.setSelectedGroupByList(selectedItems);
     }
 };
 </script>
 
 <template>
-    <div class="metric-explorer-group-by">
+    <div class="asset-analysis-group-by">
         <div class="left-part">
-            <b class="label">{{ $t('INVENTORY.METRIC_EXPLORER.GROUP_BY') }}:</b>
+            <b class="label">{{ $t('INVENTORY.ASSET_ANALYSIS.GROUP_BY') }}:</b>
             <p-select-button v-for="item in state.groupByItems"
                              :key="item.name"
                              :value="item.name"
-                             :selected="metricExplorerPageState.selectedGroupByList"
+                             :selected="assetAnalysisPageState.selectedGroupByList"
                              use-fixed-menu-style
                              multi-selectable
                              size="sm"
@@ -47,17 +47,17 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
                 {{ item.label }}
             </p-select-button>
         </div>
-        <div v-if="!metricExplorerPageState.metricLoading"
+        <div v-if="!assetAnalysisPageState.metricLoading"
              class="right-part"
         >
-            <strong>{{ $t('INVENTORY.METRIC_EXPLORER.UNIT') }}:</strong>
-            <span class="ml-1">{{ metricExplorerPageState.metric?.unit || '--' }}</span>
+            <strong>{{ $t('INVENTORY.ASSET_ANALYSIS.UNIT') }}:</strong>
+            <span class="ml-1">{{ assetAnalysisPageState.metric?.unit || '--' }}</span>
         </div>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-group-by {
+.asset-analysis-group-by {
     @apply flex flex-wrap justify-between;
     column-gap: 0.375rem;
     min-height: 3.625rem;

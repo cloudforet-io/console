@@ -4,7 +4,7 @@ import type { ManipulateType } from 'dayjs';
 
 import type {
     GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,
-} from '@/services/asset-inventory/constants/metric-explorer-constant';
+} from '@/services/asset-inventory/constants/asset-analysis-constant';
 
 
 /* Options */

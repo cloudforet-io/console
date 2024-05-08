@@ -20,20 +20,20 @@ import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables
 
 import { BASIC_CHART_COLORS, MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
-import MetricExplorerChartLegends from '@/services/asset-inventory/components/MetricExplorerChartLegends.vue';
-import MetricExplorerDonutChart from '@/services/asset-inventory/components/MetricExplorerDonutChart.vue';
-import MetricExplorerHorizontalColumnChart
-    from '@/services/asset-inventory/components/MetricExplorerHorizontalColumnChart.vue';
-import MetricExplorerLineChart from '@/services/asset-inventory/components/MetricExplorerLineChart.vue';
-import MetricExplorerTreeMapChart from '@/services/asset-inventory/components/MetricExplorerTreeMapChart.vue';
-import { CHART_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import AssetAnalysisChartLegends from '@/services/asset-inventory/components/AssetAnalysisChartLegends.vue';
+import AssetAnalysisDonutChart from '@/services/asset-inventory/components/AssetAnalysisDonutChart.vue';
+import AssetAnalysisHorizontalColumnChart
+    from '@/services/asset-inventory/components/AssetAnalysisHorizontalColumnChart.vue';
+import AssetAnalysisLineChart from '@/services/asset-inventory/components/AssetAnalysisLineChart.vue';
+import AssetAnalysisTreeMapChart from '@/services/asset-inventory/components/AssetAnalysisTreeMapChart.vue';
+import { CHART_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getFilteredRealtimeData,
     getMetricChartLegends,
     getRefinedMetricRealtimeChartData,
     getRefinedMetricXYChartData,
-} from '@/services/asset-inventory/helpers/metric-explorer-chart-data-helper';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+} from '@/services/asset-inventory/helpers/asset-analysis-chart-data-helper';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import type {
     ChartType,
     Legend,
@@ -41,7 +41,7 @@ import type {
     Period,
     RealtimeChartData,
     XYChartData,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 const QUERY_OPTIONS_TYPE = 'query_options';
@@ -54,9 +54,9 @@ const SELECT_BUTTON_ITEMS = [
 ];
 
 const route = useRoute();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 const state = reactive({
     loading: true,
     currentMetricId: computed<string>(() => route.params.metricId),
@@ -65,15 +65,15 @@ const state = reactive({
     legends: [] as Legend[],
     chart: null as XYChart|am5percent.PieChart| null,
     periodText: computed<string>(() => {
-        if (isEmpty(metricExplorerPageState.period)) return '';
-        if (metricExplorerPageGetters.isRealtimeChart) {
+        if (isEmpty(assetAnalysisPageState.period)) return '';
+        if (assetAnalysisPageGetters.isRealtimeChart) {
             return state.data?.results[0]?.date || '';
         }
-        return `${metricExplorerPageState.period.start} ~ ${metricExplorerPageState.period.end}`;
+        return `${assetAnalysisPageState.period.start} ~ ${assetAnalysisPageState.period.end}`;
     }),
     chartColorSet: computed(() => {
         const _isMassive = state.legends.length > BASIC_CHART_COLORS.length;
-        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === metricExplorerPageState.selectedChartType);
+        const _index = SELECT_BUTTON_ITEMS.findIndex((item) => item.name === assetAnalysisPageState.selectedChartType);
         const _sliceIndex = _isMassive ? _index * 4 : _index * 2;
         let _colorSet = MASSIVE_CHART_COLORS;
         if (!_isMassive) {
@@ -90,21 +90,21 @@ const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const fetcher = getCancellableFetcher<MetricDataAnalyzeParameters, AnalyzeResponse<MetricDataAnalyzeResult>>(SpaceConnector.clientV2.inventory.metricData.analyze);
 const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeResult>|undefined> => {
     try {
-        analyzeApiQueryHelper.setFilters(metricExplorerPageGetters.consoleFilters);
-        const _groupBy = metricExplorerPageState.selectedChartGroupBy ? [metricExplorerPageState.selectedChartGroupBy] : [];
-        const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
-        const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
+        analyzeApiQueryHelper.setFilters(assetAnalysisPageGetters.consoleFilters);
+        const _groupBy = assetAnalysisPageState.selectedChartGroupBy ? [assetAnalysisPageState.selectedChartGroupBy] : [];
+        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _fieldGroup = assetAnalysisPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: state.currentMetricId,
             query: {
-                granularity: metricExplorerPageState.granularity,
+                granularity: assetAnalysisPageState.granularity,
                 group_by: _groupBy,
-                start: metricExplorerPageState.period?.start,
-                end: metricExplorerPageState.period?.end,
+                start: assetAnalysisPageState.period?.start,
+                end: assetAnalysisPageState.period?.end,
                 fields: {
                     count: {
                         key: 'value',
-                        operator: metricExplorerPageState.selectedOperator,
+                        operator: assetAnalysisPageState.selectedOperator,
                     },
                 },
                 sort: _sort,
@@ -113,7 +113,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
             },
         });
         if (status === 'succeed') {
-            if (metricExplorerPageGetters.isRealtimeChart) {
+            if (assetAnalysisPageGetters.isRealtimeChart) {
                 return getFilteredRealtimeData(response);
             }
             return response;
@@ -130,13 +130,13 @@ const setChartData = debounce(async () => {
     if (!rawData) return;
     state.data = rawData;
 
-    const _granularity = metricExplorerPageState.granularity;
-    const _period = metricExplorerPageState.period as Period;
-    const _groupBy = metricExplorerPageState.selectedChartGroupBy;
+    const _granularity = assetAnalysisPageState.granularity;
+    const _period = assetAnalysisPageState.period as Period;
+    const _groupBy = assetAnalysisPageState.selectedChartGroupBy;
 
-    state.legends = getMetricChartLegends(metricExplorerPageGetters.labelKeysReferenceMap, metricExplorerPageState.selectedChartType, rawData, _groupBy);
-    if (metricExplorerPageGetters.isRealtimeChart) {
-        state.chartData = getRefinedMetricRealtimeChartData(metricExplorerPageGetters.labelKeysReferenceMap, rawData, _groupBy);
+    state.legends = getMetricChartLegends(assetAnalysisPageGetters.labelKeysReferenceMap, assetAnalysisPageState.selectedChartType, rawData, _groupBy);
+    if (assetAnalysisPageGetters.isRealtimeChart) {
+        state.chartData = getRefinedMetricRealtimeChartData(assetAnalysisPageGetters.labelKeysReferenceMap, rawData, _groupBy);
     } else {
         state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
     }
@@ -149,7 +149,7 @@ const handleSelectButton = (selected: ChartType|string) => {
     if (selected !== QUERY_OPTIONS_TYPE) {
         setChartData();
     }
-    metricExplorerPageStore.setSelectedChartType(selected);
+    assetAnalysisPageStore.setSelectedChartType(selected);
 };
 const handleToggleSeries = (index: number) => {
     toggleSeries(state.chart as XYChart, index);
@@ -164,32 +164,32 @@ const handleAllSeries = (type: string) => {
 
 watch([
     () => state.currentMetricId,
-    () => metricExplorerPageState.period,
-    () => metricExplorerPageState.selectedOperator,
-    () => metricExplorerPageState.selectedChartGroupBy,
-    () => metricExplorerPageGetters.consoleFilters,
+    () => assetAnalysisPageState.period,
+    () => assetAnalysisPageState.selectedOperator,
+    () => assetAnalysisPageState.selectedChartGroupBy,
+    () => assetAnalysisPageGetters.consoleFilters,
 ], async ([metricId]) => {
     if (!metricId) return;
     await setChartData();
 }, { immediate: true });
-watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
+watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
         await setChartData();
-        metricExplorerPageStore.setRefreshMetricData(false);
+        assetAnalysisPageStore.setRefreshMetricData(false);
     }
 }, { immediate: false });
 </script>
 
 <template>
-    <div class="metric-explorer-chart">
+    <div class="asset-analysis-chart">
         <div class="top-part">
             <div class="period-text">
-                <span v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
+                <span v-if="assetAnalysisPageState.selectedChartType !== QUERY_OPTIONS_TYPE">{{ state.periodText }}</span>
             </div>
             <div class="select-button-wrapper">
                 <p-select-button v-for="item in SELECT_BUTTON_ITEMS"
                                  :key="`chart-select-button-${item.name}`"
-                                 :selected="metricExplorerPageState.selectedChartType"
+                                 :selected="assetAnalysisPageState.selectedChartType"
                                  :value="item.name"
                                  :icon-name="item.icon"
                                  layout="icon-only"
@@ -200,36 +200,36 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
             </div>
         </div>
         <div class="bottom-part">
-            <template v-if="metricExplorerPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
+            <template v-if="assetAnalysisPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
                 <div class="left-part">
                     <p-skeleton v-if="state.loading"
                                 height="100%"
                     />
                     <template v-else-if="state.chartData.length">
-                        <metric-explorer-line-chart
-                            v-if="metricExplorerPageState.selectedChartType === CHART_TYPE.LINE"
+                        <asset-analysis-line-chart
+                            v-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE"
                             :loading="state.loading"
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
                             :color-set="state.chartColorSet"
                         />
-                        <metric-explorer-donut-chart
-                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.DONUT"
+                        <asset-analysis-donut-chart
+                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT"
                             :loading="state.loading"
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
                             :legends="state.legends"
                             :color-set="state.chartColorSet"
                         />
-                        <metric-explorer-tree-map-chart
-                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.TREEMAP"
+                        <asset-analysis-tree-map-chart
+                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.TREEMAP"
                             :loading="state.loading"
                             :chart-data="state.chartData"
                             :legends="state.legends"
                         />
-                        <metric-explorer-horizontal-column-chart
-                            v-else-if="metricExplorerPageState.selectedChartType === CHART_TYPE.COLUMN"
+                        <asset-analysis-horizontal-column-chart
+                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.COLUMN"
                             :loading="state.loading"
                             :chart.sync="state.chart"
                             :chart-data="state.chartData"
@@ -239,23 +239,23 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
                     <p-empty v-else
                              class="empty-wrapper"
                     >
-                        <span class="text-paragraph-md">{{ $t('INVENTORY.METRIC_EXPLORER.NO_DATA') }}</span>
+                        <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_DATA') }}</span>
                     </p-empty>
                 </div>
                 <div class="right-part">
-                    <metric-explorer-chart-legends :legends.sync="state.legends"
-                                                   :loading="state.loading"
-                                                   :more="state.data?.more"
-                                                   :color-set="state.chartColorSet"
-                                                   @toggle-series="handleToggleSeries"
-                                                   @show-all-series="handleAllSeries('show')"
-                                                   @hide-all-series="handleAllSeries('hide')"
+                    <asset-analysis-chart-legends :legends.sync="state.legends"
+                                                  :loading="state.loading"
+                                                  :more="state.data?.more"
+                                                  :color-set="state.chartColorSet"
+                                                  @toggle-series="handleToggleSeries"
+                                                  @show-all-series="handleAllSeries('show')"
+                                                  @hide-all-series="handleAllSeries('hide')"
                     />
                 </div>
             </template>
             <p-text-editor
-                v-if="metricExplorerPageState.selectedChartType === QUERY_OPTIONS_TYPE"
-                :code="metricExplorerPageState.metric?.query_options"
+                v-if="assetAnalysisPageState.selectedChartType === QUERY_OPTIONS_TYPE"
+                :code="assetAnalysisPageState.metric?.query_options"
                 read-only
                 class="query-options-editor"
             />
@@ -264,7 +264,7 @@ watch(() => metricExplorerPageState.refreshMetricData, async (refresh) => {
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-chart {
+.asset-analysis-chart {
     @apply border border-gray-200 rounded-md;
     padding: 1rem;
     margin-bottom: 1rem;

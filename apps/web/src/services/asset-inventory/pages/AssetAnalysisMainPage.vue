@@ -19,17 +19,17 @@ import { useRecentStore } from '@/common/modules/navigations/stores/recent-store
 import type { RecentItem } from '@/common/modules/navigations/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import MetricExplorerQueryFormSidebar from '@/services/asset-inventory/components/MetricExplorerQueryFormSidebar.vue';
+import AssetAnalysisQueryFormSidebar from '@/services/asset-inventory/components/AssetAnalysisQueryFormSidebar.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
 const recentStore = useRecentStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const allReferenceStore = useAllReferenceStore();
 const router = useRouter();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
@@ -41,21 +41,21 @@ const storeState = reactive({
 const state = reactive({
     cardList: computed(() => [
         {
-            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS'),
+            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.LOCATE_METRICS'),
             alt: 'metric',
-            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.LOCATE_METRICS_DESC'),
+            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.LOCATE_METRICS_DESC'),
             img: MetricImgHowToUse,
         },
         {
-            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA'),
+            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.ANALYZE_DATA'),
             alt: 'analyze',
-            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.ANALYZE_DATA_DESC'),
+            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.ANALYZE_DATA_DESC'),
             img: MetricImgVisualization,
         },
         {
-            title: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS'),
+            title: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.CONFIGURE_ALERTS'),
             alt: 'alert',
-            desc: i18n.t('INVENTORY.METRIC_EXPLORER.MAIN.CONFIGURE_ALERTS_DESC'),
+            desc: i18n.t('INVENTORY.ASSET_ANALYSIS.MAIN.CONFIGURE_ALERTS_DESC'),
             img: MetricImgAlert,
         },
     ]),
@@ -74,7 +74,7 @@ const state = reactive({
 
 const handleRouteToMetricDetail = (metricId: string) => {
     router.push({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
         params: {
             metricId,
         },
@@ -82,12 +82,12 @@ const handleRouteToMetricDetail = (metricId: string) => {
 };
 const handleClickLearnMore = () => {
     const language = storeState.language === 'ko' ? 'ko/' : '';
-    window.open(`https://cloudforet.io/${language}/docs/guides/asset-inventory/metric-explorer`, '_blank');
+    window.open(`https://cloudforet.io/${language}/docs/guides/asset-inventory/asset-analysis`, '_blank');
 };
 
 const fetchRecentList = async () => {
     const recentList = await recentStore.fetchRecent({
-        type: RECENT_TYPE.METRIC_EXPLORER,
+        type: RECENT_TYPE.ASSET_ANALYSIS,
         workspaceIds: [storeState.currentWorkspaceId ?? ''],
         limit: 10,
     });
@@ -100,12 +100,12 @@ const fetchRecentList = async () => {
 </script>
 
 <template>
-    <div class="metric-explorer-content">
-        <p-heading :title="$t('INVENTORY.METRIC_EXPLORER.METRIC_EXPLORER')" />
+    <div class="asset-analysis-content">
+        <p-heading :title="$t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS')" />
         <p-pane-layout>
             <div class="contents">
                 <p class="title">
-                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.TITLE') }}
+                    {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.TITLE') }}
                 </p>
                 <div class="card-group">
                     <div v-for="(card, idx) in state.cardList"
@@ -121,7 +121,7 @@ const fetchRecentList = async () => {
                                                       badge-type="subtle"
                                                       style-type="indigo100"
                             >
-                                {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.UPCOMING') }}
+                                {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.UPCOMING') }}
                             </p-badge>
                         </p>
                         <p class="card-desc">
@@ -134,13 +134,13 @@ const fetchRecentList = async () => {
                           style="margin-top: 0.5rem; margin-bottom: 3rem;"
                           @click="handleClickLearnMore"
                 >
-                    {{ $t('INVENTORY.METRIC_EXPLORER.MAIN.LEARN_MORE') }}
+                    {{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.LEARN_MORE') }}
                 </p-button>
                 <p-divider v-if="state.recentMetricCardList.length" />
                 <div v-if="state.recentMetricCardList.length"
                      class="bottom-area"
                 >
-                    <header>{{ $t('INVENTORY.METRIC_EXPLORER.MAIN.RECENTLY_VISITED') }}</header>
+                    <header>{{ $t('INVENTORY.ASSET_ANALYSIS.MAIN.RECENTLY_VISITED') }}</header>
                     <div class="recent-card-wrapper">
                         <p-card v-for="recent in state.recentMetricCardList"
                                 :key="recent.id"
@@ -173,14 +173,14 @@ const fetchRecentList = async () => {
                         </p-card>
                     </div>
                 </div>
-                <metric-explorer-query-form-sidebar v-show="metricExplorerPageState.showMetricQueryFormSidebar" />
+                <asset-analysis-query-form-sidebar v-show="assetAnalysisPageState.showMetricQueryFormSidebar" />
             </div>
         </p-pane-layout>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-content {
+.asset-analysis-content {
     @apply text-gray-900;
     width: 100%;
 
@@ -275,7 +275,7 @@ const fetchRecentList = async () => {
 }
 
 @screen tablet {
-    .metric-explorer-content {
+    .asset-analysis-content {
         .contents {
             .card-group {
                 @apply flex gap-4 justify-center flex-wrap;
@@ -285,7 +285,7 @@ const fetchRecentList = async () => {
 }
 
 @screen mobile {
-    .metric-explorer-content {
+    .asset-analysis-content {
         .contents {
             .card-group {
                 @apply flex-col gap-4;

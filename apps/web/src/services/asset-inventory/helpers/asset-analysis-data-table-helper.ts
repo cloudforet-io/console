@@ -3,13 +3,13 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import type {
     Granularity, Period, MetricDataAnalyzeResult,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-export const getMetricExplorerDataTableDateFields = (granularity: Granularity, period: Period, hasGroupBy: boolean, realtimeDate?: string): DataTableFieldType[] => {
+export const getAssetAnalysisDataTableDateFields = (granularity: Granularity, period: Period, hasGroupBy: boolean, realtimeDate?: string): DataTableFieldType[] => {
     const defaultFields: DataTableFieldType[] = [];
     const dateFields: DataTableFieldType[] = [];
     if (!hasGroupBy) {
@@ -52,7 +52,7 @@ export const getMetricExplorerDataTableDateFields = (granularity: Granularity, p
     return defaultFields.concat(dateFields);
 };
 
-export const getRefinedMetricExplorerTableData = (results: MetricDataAnalyzeResult[] = [], granularity: Granularity, period: Period, realtimeDate?: string): MetricDataAnalyzeResult[] => {
+export const getRefinedAssetAnalysisTableData = (results: MetricDataAnalyzeResult[] = [], granularity: Granularity, period: Period, realtimeDate?: string): MetricDataAnalyzeResult[] => {
     const timeUnit = granularity === GRANULARITY.MONTHLY ? 'month' : 'day';
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';

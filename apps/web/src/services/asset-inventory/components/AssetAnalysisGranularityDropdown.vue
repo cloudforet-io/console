@@ -10,25 +10,25 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { i18n } from '@/translations';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { Granularity } from '@/services/asset-inventory/types/metric-explorer-type';
+import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { Granularity } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 const state = reactive({
     granularityItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
             name: GRANULARITY.DAILY,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.DAILY'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.DAILY'),
         },
         {
             type: 'item',
             name: GRANULARITY.MONTHLY,
-            label: i18n.t('INVENTORY.METRIC_EXPLORER.MONTHLY'),
+            label: i18n.t('INVENTORY.ASSET_ANALYSIS.MONTHLY'),
         },
     ])),
     granularity: GRANULARITY.MONTHLY as Granularity|undefined,
@@ -36,21 +36,21 @@ const state = reactive({
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    metricExplorerPageStore.setGranularity(granularity);
+    assetAnalysisPageStore.setGranularity(granularity);
     // set period
     const [_period, _relativePeriod] = getInitialPeriodByGranularity(granularity);
-    metricExplorerPageStore.setPeriod(_period);
-    metricExplorerPageStore.setRelativePeriod(_relativePeriod);
-    metricExplorerPageStore.setRefreshMetricPeriodDropdown(true);
+    assetAnalysisPageStore.setPeriod(_period);
+    assetAnalysisPageStore.setRelativePeriod(_relativePeriod);
+    assetAnalysisPageStore.setRefreshMetricPeriodDropdown(true);
 };
 </script>
 
 <template>
-    <div class="metric-explorer-granularity-dropdown">
+    <div class="asset-analysis-granularity-dropdown">
         <p-select-dropdown :menu="state.granularityItems"
-                           :selection-label="$t('INVENTORY.METRIC_EXPLORER.GRANULARITY')"
+                           :selection-label="$t('INVENTORY.ASSET_ANALYSIS.GRANULARITY')"
                            style-type="rounded"
-                           :selected="metricExplorerPageState.granularity"
+                           :selected="assetAnalysisPageState.granularity"
                            class="granularity-dropdown"
                            reset-selection-on-menu-close
                            @select="handleSelectGranularity"
@@ -59,7 +59,7 @@ const handleSelectGranularity = async (granularity: Granularity) => {
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-granularity-dropdown {
+.asset-analysis-granularity-dropdown {
     display: flex;
     align-items: center;
     gap: 0.5rem;

@@ -18,13 +18,13 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
-import MetricExplorerChart from '@/services/asset-inventory/components/MetricExplorerChart.vue';
-import MetricExplorerDataTable from '@/services/asset-inventory/components/MetricExplorerDataTable.vue';
-import MetricExplorerGroupBy from '@/services/asset-inventory/components/MetricExplorerGroupBy.vue';
-import MetricExplorerHeader from '@/services/asset-inventory/components/MetricExplorerHeader.vue';
-import MetricExplorerQuerySection from '@/services/asset-inventory/components/MetricExplorerQuerySection.vue';
+import AssetAnalysisChart from '@/services/asset-inventory/components/AssetAnalysisChart.vue';
+import AssetAnalysisDataTable from '@/services/asset-inventory/components/AssetAnalysisDataTable.vue';
+import AssetAnalysisGroupBy from '@/services/asset-inventory/components/AssetAnalysisGroupBy.vue';
+import AssetAnalysisHeader from '@/services/asset-inventory/components/AssetAnalysisHeader.vue';
+import AssetAnalysisQuerySection from '@/services/asset-inventory/components/AssetAnalysisQuerySection.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
 const gnbStore = useGnbStore();
@@ -32,30 +32,30 @@ const { breadcrumbs } = useBreadcrumbs();
 const route = useRoute();
 
 const allReferenceStore = useAllReferenceStore();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 
 const storeState = reactive({
     namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
 });
 const state = reactive({
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
-    currentMetricExample: computed<MetricExampleModel|undefined>(() => metricExplorerPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
+    currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     breadCrumbs: computed(() => {
-        const targetNamespace = storeState.namespaces[metricExplorerPageGetters.namespaceId];
-        const _targetMetric = metricExplorerPageState.metric;
+        const targetNamespace = storeState.namespaces[assetAnalysisPageGetters.namespaceId];
+        const _targetMetric = assetAnalysisPageState.metric;
         return [
             ...(breadcrumbs.value.slice(0, breadcrumbs.value.length - 1)),
             {
                 name: `[${targetNamespace?.name}] ${state.currentMetricExample?.name ?? _targetMetric?.name}`,
-                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                path: state.currentMetricExampleId ? ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME : ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             },
         ];
     }),
     metricFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC,
-        id: metricExplorerPageState.metric?.metric_id,
+        id: assetAnalysisPageState.metric?.metric_id,
     })),
     metricExampleFavoriteOptions: computed<FavoriteOptions>(() => ({
         type: FAVORITE_TYPE.METRIC_EXAMPLE,
@@ -66,14 +66,14 @@ const state = reactive({
 
 watch(() => route.params, async (params) => {
     if (!params.metricId) return;
-    metricExplorerPageStore.reset();
-    await metricExplorerPageStore.loadMetric(params.metricId);
+    assetAnalysisPageStore.reset();
+    await assetAnalysisPageStore.loadMetric(params.metricId);
     if (params.metricExampleId) {
-        await metricExplorerPageStore.loadMetricExamples(metricExplorerPageGetters.namespaceId);
-        const targetMetricExample = metricExplorerPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
-        metricExplorerPageStore.initMetricExampleOptions(targetMetricExample);
-    } else if (metricExplorerPageGetters.defaultMetricGroupByList) {
-        metricExplorerPageStore.setSelectedGroupByList(metricExplorerPageGetters.defaultMetricGroupByList);
+        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
+        const targetMetricExample = assetAnalysisPageState.metricExamples.find((d) => d.example_id === params.metricExampleId);
+        assetAnalysisPageStore.initMetricExampleOptions(targetMetricExample);
+    } else if (assetAnalysisPageGetters.defaultMetricGroupByList) {
+        assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
     }
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
@@ -82,22 +82,22 @@ watch([
     () => state.metricFavoriteOptions,
     () => state.metricExampleFavoriteOptions,
 ], ([metricFavoriteOptions, metricExampleFavoriteOptions]) => {
-    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
-    if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
+    if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
 </script>
 
 <template>
-    <div class="metric-explorer-content">
-        <metric-explorer-header />
+    <div class="asset-analysis-content">
+        <asset-analysis-header />
         <p-divider />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
-                <metric-explorer-query-section />
+                <asset-analysis-query-section />
                 <div class="contents-wrapper">
-                    <metric-explorer-group-by />
-                    <metric-explorer-chart />
-                    <metric-explorer-data-table />
+                    <asset-analysis-group-by />
+                    <asset-analysis-chart />
+                    <asset-analysis-data-table />
                 </div>
             </div>
         </div>
@@ -105,7 +105,7 @@ watch([
 </template>
 
 <style lang="postcss" scoped>
-.metric-explorer-content {
+.asset-analysis-content {
     .content-wrapper {
         overflow-x: auto;
         padding-bottom: 1.625rem;

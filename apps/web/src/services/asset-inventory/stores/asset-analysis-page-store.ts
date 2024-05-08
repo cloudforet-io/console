@@ -21,15 +21,15 @@ import type { ReferenceMap } from '@/store/reference/type';
 
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/metric-explorer-period-helper';
+import { CHART_TYPE, GRANULARITY, OPERATOR } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { getInitialPeriodByGranularity } from '@/services/asset-inventory/helpers/asset-analysis-period-helper';
 import type {
     Granularity, Operator, Period, RelativePeriod, QueryFormMode, MetricFilter, ChartType,
     NamespaceSubItemType,
-} from '@/services/asset-inventory/types/metric-explorer-type';
+} from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-export const useMetricExplorerPageStore = defineStore('page-metric-explorer', () => {
+export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () => {
     const appContextStore = useAppContextStore();
     const allReferenceStore = useAllReferenceStore();
     const _state = reactive({

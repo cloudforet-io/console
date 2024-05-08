@@ -13,7 +13,7 @@ import {
     setXYSharedTooltipText,
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
-import type { RealtimeChartData } from '@/services/asset-inventory/types/metric-explorer-type';
+import type { RealtimeChartData } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 interface Props {

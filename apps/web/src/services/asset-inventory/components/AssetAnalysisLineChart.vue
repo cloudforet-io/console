@@ -11,9 +11,9 @@ import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import { GRANULARITY } from '@/services/asset-inventory/constants/metric-explorer-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
-import type { Legend, XYChartData } from '@/services/asset-inventory/types/metric-explorer-type';
+import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
+import type { Legend, XYChartData } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
 interface Props {
@@ -36,14 +36,14 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
 
 const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
-    const _dateAxisSettings = metricExplorerPageState.granularity === GRANULARITY.DAILY ? {
-        min: dayjs.utc(metricExplorerPageState.period?.start).valueOf(),
-        max: dayjs.utc(metricExplorerPageState.period?.end).add(1, 'day').valueOf(),
+    const _dateAxisSettings = assetAnalysisPageState.granularity === GRANULARITY.DAILY ? {
+        min: dayjs.utc(assetAnalysisPageState.period?.start).valueOf(),
+        max: dayjs.utc(assetAnalysisPageState.period?.end).add(1, 'day').valueOf(),
     } : {};
     const { chart, xAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
 
@@ -51,10 +51,10 @@ const drawChart = () => {
     chartHelper.setChartColors(chart, props.colorSet);
 
     // set base interval of xAxis
-    xAxis.get('baseInterval').timeUnit = metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
+    xAxis.get('baseInterval').timeUnit = assetAnalysisPageState.granularity === GRANULARITY.DAILY ? 'day' : 'month';
 
     // set date format for daily chart
-    if (metricExplorerPageState.granularity === GRANULARITY.DAILY) {
+    if (assetAnalysisPageState.granularity === GRANULARITY.DAILY) {
         xAxis.setAll({
             dateFormats: {
                 day: 'd',
@@ -83,7 +83,7 @@ const drawChart = () => {
 
         // set data processor on series
         series.data.processor = chartHelper.createDataProcessor({
-            dateFormat: metricExplorerPageState.granularity === GRANULARITY.DAILY ? 'yyyy-MM-dd' : 'yyyy-MM',
+            dateFormat: assetAnalysisPageState.granularity === GRANULARITY.DAILY ? 'yyyy-MM-dd' : 'yyyy-MM',
             dateFields: [DATE_FIELD_NAME],
         });
 

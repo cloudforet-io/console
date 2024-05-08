@@ -21,33 +21,33 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import MetricExplorerNameFormModal from '@/services/asset-inventory/components/MetricExplorerNameFormModal.vue';
-import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/metric-explorer-constant';
+import AssetAnalysisNameFormModal from '@/services/asset-inventory/components/AssetAnalysisNameFormModal.vue';
+import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import { useMetricExplorerPageStore } from '@/services/asset-inventory/stores/metric-explorer-page-store';
+import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
 
 const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
-const metricExplorerPageStore = useMetricExplorerPageStore();
-const metricExplorerPageState = metricExplorerPageStore.state;
-const metricExplorerPageGetters = metricExplorerPageStore.getters;
+const assetAnalysisPageStore = useAssetAnalysisPageStore();
+const assetAnalysisPageState = assetAnalysisPageStore.state;
+const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
 
 const storeState = reactive({
-    metricNameList: computed(() => metricExplorerPageGetters.metrics.map((metric) => metric.name)),
+    metricNameList: computed(() => assetAnalysisPageGetters.metrics.map((metric) => metric.name)),
 });
 
 const state = reactive({
     loading: false,
     currentMetricId: computed<string>(() => route.params.metricId),
     sidebarTitle: computed<TranslateResult>(() => {
-        if (metricExplorerPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ADD_TITLE');
-        return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UPDATE_TITLE');
+        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ADD_TITLE');
+        return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UPDATE_TITLE');
     }),
     disableConfirmButton: computed<boolean>(() => {
         if (state.loading) return true;
-        if (metricExplorerPageState.metricQueryFormMode === 'CREATE') return !isAllValid;
+        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return !isAllValid;
         return !!invalidState.name;
     }),
     saveAsModalVisible: false,
@@ -71,8 +71,8 @@ const {
     code: '',
 }, {
     name: (value: string) => {
-        if (!value.length) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.REQUIRED_FIELD');
-        if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.DUPLICATED');
+        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+        if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.DUPLICATED');
         return true;
     },
     code: (value: string) => {
@@ -96,19 +96,19 @@ const createCustomMetric = async () => {
             metric_type: METRIC_TYPE.GAUGE,
             resource_type: 'inventory.CloudService',
             query_options: jsonParsedQuery,
-            namespace_id: metricExplorerPageGetters.namespaceId || '',
+            namespace_id: assetAnalysisPageGetters.namespaceId || '',
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
-        metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
+        assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
+        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         await router.replace(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
             params: {
                 metricId: createdMetric.metric_id,
             },
         })).catch(() => {});
     } catch (e) {
-        showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
+        showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_CREATE_METRIC'), e);
     } finally {
         state.loading = false;
     }
@@ -122,11 +122,11 @@ const updateCustomMetric = async () => {
             unit: unit.value,
             query_options: jsonParsedQuery,
         });
-        showSuccessMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
-        metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
-        await metricExplorerPageStore.loadMetric(state.currentMetricId);
+        showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
+        assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
+        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
     } catch (e) {
-        showErrorMessage(i18n.t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
+        showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
         state.loading = false;
     }
@@ -134,7 +134,7 @@ const updateCustomMetric = async () => {
 
 /* Event */
 const handleCloseSidebar = () => {
-    metricExplorerPageStore.setShowMetricQueryFormSidebar(false);
+    assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
 };
 const handleCreateCustomMetric = async () => {
     await createCustomMetric();
@@ -151,11 +151,11 @@ const handleSaveCustomMetric = async () => {
     state.visibleSaveModal = false;
 };
 
-watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
+watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (metricExplorerPageState.metricQueryFormMode === 'UPDATE') {
-            setForm('code', JSON.stringify(metricExplorerPageState.metric?.query_options));
-            setForm('unit', metricExplorerPageState.metric?.unit || '');
+        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') {
+            setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
+            setForm('unit', assetAnalysisPageState.metric?.unit || '');
         }
     } else {
         initForm();
@@ -165,7 +165,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
 
 <template>
     <transition name="slide-left">
-        <div class="metric-explorer-query-form-sidebar">
+        <div class="asset-analysis-query-form-sidebar">
             <p-sidebar :visible="true"
                        style-type="primary"
                        size="xl"
@@ -180,8 +180,8 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                 </template>
                 <template #sidebar>
                     <div class="sidebar-contents">
-                        <p-field-group v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'"
-                                       :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.NAME')"
+                        <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
+                                       :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.NAME')"
                                        required
                                        :invalid="invalidState.name"
                                        :invalid-text="invalidTexts.name"
@@ -192,7 +192,7 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                                           @update:value="setForm('name', $event)"
                             />
                         </p-field-group>
-                        <p-field-group :label="$t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.UNIT')"
+                        <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
                                        class="col-span-8"
                         >
                             <p-text-input :value="unit"
@@ -213,14 +213,14 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                         <p-button style-type="transparent"
                                   @click="handleCloseSidebar"
                         >
-                            {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.CANCEL') }}
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CANCEL') }}
                         </p-button>
-                        <template v-if="metricExplorerPageState.metricQueryFormMode === 'CREATE'">
+                        <template v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'">
                             <p-button style-type="primary"
                                       :disabled="state.disableConfirmButton"
                                       @click="handleCreateCustomMetric"
                             >
-                                {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.CONFIRM') }}
+                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CONFIRM') }}
                             </p-button>
                         </template>
                         <template v-else>
@@ -228,35 +228,35 @@ watch(() => metricExplorerPageState.showMetricQueryFormSidebar, (visible) => {
                                       :disabled="state.disableConfirmButton"
                                       @click="handleOpenCustomMetricNameFormModal"
                             >
-                                {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.SAVE_AS') }}
+                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE_AS') }}
                             </p-button>
                             <p-button style-type="primary"
                                       :disabled="state.disableConfirmButton"
                                       @click="() => {state.visibleSaveModal = true}"
                             >
-                                {{ $t('INVENTORY.METRIC_EXPLORER.CUSTOM_METRIC.SAVE') }}
+                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE') }}
                             </p-button>
                         </template>
                     </div>
                 </template>
             </p-sidebar>
-            <metric-explorer-name-form-modal :visible.sync="state.saveAsModalVisible"
-                                             :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
-                                             @save-as="handleSaveAsCustomMetric"
+            <asset-analysis-name-form-modal :visible.sync="state.saveAsModalVisible"
+                                            :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
+                                            @save-as="handleSaveAsCustomMetric"
             />
-            <delete-modal :header-title="$t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_TITLE')"
+            <delete-modal :header-title="$t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_TITLE')"
                           :visible.sync="state.visibleSaveModal"
                           :disabled="state.loading"
                           @confirm="handleSaveCustomMetric"
             >
-                {{ $t('INVENTORY.METRIC_EXPLORER.DETAIL.SAVE_DESC') }}
+                {{ $t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_DESC') }}
             </delete-modal>
         </div>
     </transition>
 </template>
 
 <style scoped lang="postcss">
-.metric-explorer-query-form-sidebar {
+.asset-analysis-query-form-sidebar {
     position: fixed;
     top: calc($top-bar-height + $gnb-toolbox-height);
     right: 0;
