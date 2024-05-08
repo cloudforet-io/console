@@ -2549,9 +2549,9 @@
 			"SAVE_AS_NEW_CUSTOM_METRIC": "새로운 사용자 정의 메트릭으로 저장",
 			"SAVE_TO_CUSTOM_METRIC": "사용자 정의 메트릭 저장",
 			"SELECT_METRIC_GUIDE": {
-				"CONFIRM": "",
+				"CONFIRM": "확인",
 				"DESCRIPTION": "새로운 네임스페이스 선택 시, \n메트릭 선택을 해야 우측 차트에 반영됩니다.",
-				"DONT_SHOW_ME_AGAIN": "",
+				"DONT_SHOW_ME_AGAIN": "다시 보지 않기",
 				"TITLE": "메트릭을 선택해주세요"
 			},
 			"SHOWING_TOP_15": "상위 15개 데이터",
