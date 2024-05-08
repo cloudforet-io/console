@@ -27,6 +27,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
+    totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
 });
 const state = reactive({
@@ -113,7 +114,7 @@ watch(() => storeState.activeTab, () => {
         <p-heading heading-type="sub"
                    use-total-count
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
-                   :total-count="storeState.jobList.length"
+                   :total-count="storeState.totalCount"
                    class="title"
         >
             <template #extra>

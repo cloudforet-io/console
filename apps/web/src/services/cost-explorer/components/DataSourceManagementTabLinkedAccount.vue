@@ -27,6 +27,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
     linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageState.linkedAccounts),
+    totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
 });
 const state = reactive({
@@ -88,7 +89,7 @@ watch(() => storeState.activeTab, () => {
                    use-selected-count
                    :selected-count="tableState.selectedIndices.length"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
-                   :total-count="storeState.linkedAccounts"
+                   :total-count="storeState.totalCount"
                    class="title"
         >
             <template #extra>

@@ -30,10 +30,12 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const state = reactive({
         activeTab: 'detail',
         dataSourceList: [] as DataSourceModel[],
-        totalCount: 0,
+        dataSourceListTotalCount: 0,
         selectedIndices: [] as number[],
         jobList: [] as CostJobModel[],
+        jobListTotalCount: 0,
         linkedAccounts: [] as CostDataSourceAccountModel[],
+        linkedAccountsTotalCount: 0,
     });
 
     const _getters = reactive({
@@ -81,29 +83,35 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>();
                 state.dataSourceList = results || [];
-                state.totalCount = total_count || 0;
+                state.dataSourceListTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.dataSourceList = [];
-                state.totalCount = 0;
+                state.dataSourceListTotalCount = 0;
             }
         },
         fetchJobList: async (params: CostJobListParameters) => {
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.job.list<CostJobListParameters, ListResponse<CostJobModel>>(params);
                 state.jobList = results || [];
+                state.jobListTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.jobList = [];
+                state.jobListTotalCount = 0;
             }
         },
         fetchLinkedAccount: async (params: CostJobListParameters) => {
             try {
-                const { results } = await SpaceConnector.clientV2.costAnalysis.DataSourceAccount.list<CostDataSourceAccountListParameters, ListResponse<CostDataSourceAccountModel>>(params);
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.list<CostDataSourceAccountListParameters, ListResponse<CostDataSourceAccountModel>>(
+                    params,
+                );
                 state.linkedAccounts = results || [];
+                state.linkedAccountsTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.linkedAccounts = [];
+                state.linkedAccountsTotalCount = 0;
             }
         },
     };
