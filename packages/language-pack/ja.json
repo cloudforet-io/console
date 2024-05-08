@@ -2549,9 +2549,9 @@
 			"SAVE_AS_NEW_CUSTOM_METRIC": "新しいカスタムメトリックとして保存",
 			"SAVE_TO_CUSTOM_METRIC": "カスタムメトリックを保存",
 			"SELECT_METRIC_GUIDE": {
-				"CONFIRM": "",
+				"CONFIRM": "わかりました",
 				"DESCRIPTION": "",
-				"DONT_SHOW_ME_AGAIN": "",
+				"DONT_SHOW_ME_AGAIN": "次から表示しない",
 				"TITLE": ""
 			},
 			"SHOWING_TOP_15": "上位15表示中",
