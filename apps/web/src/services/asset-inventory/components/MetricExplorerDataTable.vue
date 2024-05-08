@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
@@ -35,12 +35,14 @@ import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/m
 
 
 const router = useRouter();
+const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
 const metricExplorerPageStore = useMetricExplorerPageStore();
 const metricExplorerPageState = metricExplorerPageStore.state;
 const metricExplorerPageGetters = metricExplorerPageStore.getters;
 const state = reactive({
     loading: false,
+    currentMetricId: computed<string>(() => route.params.metricId),
     realtimeDate: undefined as string|undefined,
     groupByFields: computed<DataTableFieldType[]>(() => {
         const filteredLabelKeys = metricExplorerPageGetters.refinedMetricLabelKeys.filter((d) => metricExplorerPageState.selectedGroupByList.includes(d.key));
@@ -94,7 +96,7 @@ const analyzeMetricData = async (setPage = true): Promise<AnalyzeResponse<Metric
         const _sort = metricExplorerPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
         const _fieldGroup = metricExplorerPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
-            metric_id: metricExplorerPageGetters.metricId as string,
+            metric_id: state.currentMetricId,
             query: {
                 granularity: metricExplorerPageState.granularity,
                 group_by: metricExplorerPageState.selectedGroupByList,
@@ -197,7 +199,7 @@ const handleClickRow = (item) => {
 
 watch(
     [
-        () => metricExplorerPageGetters.metricId,
+        () => state.currentMetricId,
         () => metricExplorerPageState.period,
         () => metricExplorerPageState.selectedOperator,
         () => metricExplorerPageState.selectedGroupByList,

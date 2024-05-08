@@ -11,6 +11,7 @@ import {
 import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -28,7 +29,7 @@ import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData, convertMetricConfigToReferenceData,
+    convertMenuConfigToReferenceData, convertMetricConfigToReferenceData, convertMetricExampleConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
@@ -81,6 +82,7 @@ const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
@@ -209,10 +211,10 @@ const state = reactive({
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.METRIC_EXPLORER, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
         const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
-        // const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
+        const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
         return [
             ...favoriteMetricItems,
-            // ...favoriteMetricExampleItems,
+            ...favoriteMetricExampleItems,
         ];
     }),
     favoriteProjects: computed<FavoriteItem[]>(() => {
@@ -237,6 +239,7 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
     if (type === FAVORITE_TYPE.PROJECT) return state.favoriteProjects.length;
     if (type === FAVORITE_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
+    if (type === FAVORITE_TYPE.METRIC) return state.favoriteMetricItems.length;
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     if (type === FAVORITE_TYPE.SECURITY) return state.favoriteSecurityItems.length;
     return 0;
@@ -297,6 +300,16 @@ const handleSelect = (item: FavoriteMenuItem) => {
             name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
             params: {
                 metricId: item.name || '',
+            },
+        }).catch(() => {});
+    } else if (item.itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
+        const metricId = storeState.metricExamples.find((example) => example.example_id === item.name)?.metric_id;
+        if (!metricId) return;
+        router.push({
+            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+            params: {
+                metricId,
+                metricExampleId: item.name || '',
             },
         }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
