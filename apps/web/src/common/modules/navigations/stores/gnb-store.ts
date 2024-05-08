@@ -9,6 +9,8 @@ import type { UserConfigGetParameters } from '@/schema/config/user-config/api-ve
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { MetricExampleListParameters } from '@/schema/inventory/metric-example/api-verbs/list';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -26,6 +28,7 @@ interface GnbStoreState {
     favoriteItem?: FavoriteOptions;
     isHideNavRail?: boolean;
     isMinimizeNavRail?: boolean;
+    metricExamples: MetricExampleModel[];
     costQuerySets: CostQuerySetModel[];
 }
 
@@ -44,6 +47,7 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: {} as Breadcrumb,
         id: '',
         favoriteItem: {} as FavoriteOptions,
+        metricExamples: [] as MetricExampleModel[],
         costQuerySets: [] as CostQuerySetModel[],
         isHideNavRail: false,
         isMinimizeNavRail: false,
@@ -54,6 +58,7 @@ export const useGnbStore = defineStore('gnb', () => {
         selectedItem: computed<Breadcrumb>(() => state.selectedItem),
         id: computed<string|undefined>(() => state.id),
         favoriteItem: computed<FavoriteOptions|undefined>(() => state.favoriteItem),
+        metricExamples: computed<MetricExampleModel[]>(() => state.metricExamples),
         costQuerySets: computed<CostQuerySetModel[]>(() => state.costQuerySets),
         isHideNavRail: computed<boolean|undefined>(() => state.isHideNavRail),
         isMinimizeNavRail: computed<boolean|undefined>(() => state.isMinimizeNavRail),
@@ -105,6 +110,15 @@ export const useGnbStore = defineStore('gnb', () => {
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+            }
+        },
+        fetchMetricExample: async () => {
+            try {
+                const res = await SpaceConnector.clientV2.inventory.metricExample.list<MetricExampleListParameters, ListResponse<MetricExampleModel>>();
+                state.metricExamples = res.results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.metricExamples = [];
             }
         },
         fetchCostQuerySet: async () => {

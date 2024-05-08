@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -15,11 +15,9 @@ import type {
     CloudServiceTypeItem,
     CloudServiceTypeReferenceMap,
 } from '@/store/reference/cloud-service-type-reference-store';
-import type { MetricReferenceItem, MetricReferenceMap } from '@/store/reference/metric-reference-store';
+import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
@@ -30,12 +28,11 @@ import type { NamespaceSubItemType } from '@/services/asset-inventory/types/metr
 
 
 interface Props {
-    selectedNamespace?: NamespaceSubItemType;
     isDetailPage?: boolean;
+    metrics: MetricReferenceItem[];
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:selected-namespace', value: NamespaceSubItemType|undefined): void;}>();
 
 const allReferenceStore = useAllReferenceStore();
 const metricExplorerPageStore = useMetricExplorerPageStore();
@@ -44,7 +41,6 @@ const route = useRoute();
 
 
 const storeState = reactive({
-    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
     cloudServiceTypeToItemMap: computed(() => {
         const res: Record<string, CloudServiceTypeItem> = {};
@@ -53,56 +49,60 @@ const storeState = reactive({
         });
         return res;
     }),
-
+    selectedNamespace: computed(() => metricExplorerPageState.selectedNamespace),
 });
 const state = reactive({
-    proxySelectedNamespace: useProxyValue('selectedNamespace', props, emit),
     selectedId: computed<string|undefined>(() => {
         if (!props.isDetailPage) return undefined;
         if (route.name === ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME) return route.params.metricId;
         return route.params.metricExampleId;
     }),
     inputValue: '',
-    metrics: computed<MetricReferenceItem[]>(() => Object.values(storeState.metrics).filter((metric) => metric.data.namespace_id === state.proxySelectedNamespace?.name)),
-    metricItems: computed<TreeNode[]>(() => state.metrics.map((metric) => {
-        const metricTreeNode = {
-            id: metric.key,
-            depth: 0,
-            data: {
-                ...metric,
-                type: 'metric',
-                is_managed: metric.data.is_managed,
-                to: {
-                    name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-                    params: {
-                        metricId: metric.key,
-                    },
-                },
-            },
-        };
-        const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
-        if (examples.length) {
-            return {
-                ...metricTreeNode,
-                children: examples.map((example) => ({
-                    id: example.example_id,
-                    depth: 1,
-                    data: {
-                        ...example,
-                        type: 'example',
-                        to: {
-                            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
-                            params: {
-                                metricId: metric.key,
-                                metricExampleId: example.example_id,
-                            },
+    metricItems: computed<TreeNode[]>(() => {
+        const sortedMetrics = [
+            ...props.metrics.filter((metric) => metric.key.startsWith('metric-managed-')),
+            ...props.metrics.filter((metric) => !metric.key.startsWith('metric-managed-')),
+        ];
+        return sortedMetrics.map((metric) => {
+            const metricTreeNode = {
+                id: metric.key,
+                depth: 0,
+                data: {
+                    ...metric,
+                    type: 'metric',
+                    is_managed: metric.data.is_managed,
+                    to: {
+                        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+                        params: {
+                            metricId: metric.key,
                         },
                     },
-                })),
+                },
             };
-        }
-        return metricTreeNode;
-    })),
+            const examples = state.metricExamples.filter((example) => example.metric_id === metric.key);
+            if (examples.length) {
+                return {
+                    ...metricTreeNode,
+                    children: examples.map((example) => ({
+                        id: example.example_id,
+                        depth: 1,
+                        data: {
+                            ...example,
+                            type: 'example',
+                            to: {
+                                name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL.EXAMPLE._NAME,
+                                params: {
+                                    metricId: metric.key,
+                                    metricExampleId: example.example_id,
+                                },
+                            },
+                        },
+                    })),
+                };
+            }
+            return metricTreeNode;
+        });
+    }),
     metricItemsFilterByInput: computed(() => {
         const keyword = state.inputValue.toLowerCase();
         return state.metricItems.filter((metric) => metric.data.name.toLowerCase().includes(keyword) || metric.children?.some((example) => example.data.name.toLowerCase().includes(keyword)));
@@ -136,7 +136,7 @@ const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined
 
 /* Event */
 const handleClickBackToNamespace = () => {
-    state.proxySelectedNamespace = undefined;
+    metricExplorerPageStore.setSelectedNamespace(undefined);
 };
 const handleOpenAddCustomMetricModal = () => {
     metricExplorerPageStore.openMetricQueryFormSidebar('CREATE');
@@ -145,7 +145,7 @@ const handleSearchMetricAndExample = (keyword: string) => {
     state.inputValue = keyword;
 };
 
-onMounted(() => {
+watch(() => route.params, () => {
     if (route.params.metricExampleId) {
         state.metricTreeDisplayMap = {
             [route.params.metricId]: {
@@ -153,10 +153,10 @@ onMounted(() => {
             },
         };
     }
-});
+}, { immediate: true });
 
 /* Watcher */
-watch(() => props.selectedNamespace, (selectedNamespace) => {
+watch(() => storeState.selectedNamespace, (selectedNamespace) => {
     if (!isEmpty(selectedNamespace)) metricExplorerPageStore.loadMetricExamples(selectedNamespace?.name);
 }, { immediate: true });
 </script>
@@ -176,16 +176,16 @@ watch(() => props.selectedNamespace, (selectedNamespace) => {
                                    @click="handleClickBackToNamespace"
                     />
                     <p-lazy-img class="namespace-image"
-                                :src="getNamespaceImageUrl(state.proxySelectedNamespace)"
+                                :src="getNamespaceImageUrl(storeState.selectedNamespace)"
                                 width="1.25rem"
                                 height="1.25rem"
                     />
                     <p-tooltip class="title"
-                               :contents="state.proxySelectedNamespace?.label || ''"
+                               :contents="storeState.selectedNamespace?.label || ''"
                     >
-                        <span>{{ state.proxySelectedNamespace?.label.split('/')[0] }}</span>
+                        <span>{{ storeState.selectedNamespace?.label.split('/')[0] }}</span>
                         <span class="divider">/</span>
-                        <span class="type">{{ state.proxySelectedNamespace?.label.split('/')[1] }}</span>
+                        <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
                     </p-tooltip>
                 </div>
                 <p-icon-button style-type="tertiary"
@@ -267,4 +267,5 @@ watch(() => props.selectedNamespace, (selectedNamespace) => {
         white-space: pre;
     }
 }
+
 </style>

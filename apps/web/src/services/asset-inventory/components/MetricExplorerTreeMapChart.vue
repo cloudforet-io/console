@@ -3,10 +3,9 @@ import {
     nextTick, ref, watch,
 } from 'vue';
 
-import {
-    PSkeleton,
-} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -32,10 +31,10 @@ const props = withDefaults(defineProps<Props>(), {
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-
 const getRefinedTreemapChartData = (data: RealtimeChartData[]): TreemapChartData[] => [{
     children: data,
 }];
+const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     if (!props.chartData?.length) return;
     const seriesSettings = {
@@ -44,10 +43,12 @@ const drawChart = () => {
         nodePaddingInner: 4,
     };
     const series = chartHelper.createTreeMapSeries(seriesSettings);
+    series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
+
+    // tooltip
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
-    chartHelper.setTreemapTooltipText(series, tooltip);
+    chartHelper.setTreemapTooltipText(series, tooltip, valueFormatter);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
@@ -68,10 +69,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <div class="h-full">
-        <p-skeleton v-if="props.loading"
-                    height="100%"
-        />
-        <div v-else
+        <div v-show="!props.loading"
              ref="chartContext"
              class="chart"
         />
