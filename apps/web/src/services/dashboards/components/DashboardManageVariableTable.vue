@@ -143,7 +143,7 @@ watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
             </template>
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
-                                 :disabled="item.disabled || item.required"
+                                 :disabled="item.disabled || item.required || item.fixed || item.readonly"
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>

@@ -7,6 +7,7 @@ import {
 
 export const MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP = {
     // workspace: { key: 'workspace', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
+    project_group: { key: 'project_group', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
     project: { key: 'project', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
     provider: { key: 'provider', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
     service_account: { key: 'service_account', modelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
@@ -31,6 +32,17 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         //         key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.modelKey,
         //     }],
         // },
+        project_group: {
+            name: 'Project Group',
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'MULTI',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT_GROUP',
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project_group.modelKey,
+            }],
+        },
         project: {
             name: 'Project',
             variable_type: 'MANAGED',
@@ -133,6 +145,7 @@ export const MANAGED_DASHBOARD_VARIABLES_SCHEMA: DashboardVariablesSchema = {
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.cloud_service_query_set.key,
         // MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.workspace.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project.key,
+        MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.project_group.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.provider.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.service_account.key,
         MANAGED_DASHBOARD_VARIABLE_MODEL_INFO_MAP.region.key,

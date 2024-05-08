@@ -60,6 +60,10 @@ export const dCloComplianceOverviewDashboard: DashboardTemplate = {
                 use: true,
                 fixed: true,
             },
+            project_group: {
+                ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project_group,
+                use: true,
+            },
             project: {
                 ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project,
                 use: true,
@@ -77,13 +81,7 @@ export const dCloComplianceOverviewDashboard: DashboardTemplate = {
                 use: false,
             },
         },
-        order: [
-            'cloud_service_query_set',
-            'project',
-            'service_account',
-            'region',
-            'provider',
-        ],
+        order: ['cloud_service_query_set', 'project_group', 'project', 'service_account', 'region', 'provider'],
         fixed_options: {
             cloud_service_group: 'D-CLO',
         },
