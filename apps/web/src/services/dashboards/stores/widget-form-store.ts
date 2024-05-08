@@ -11,19 +11,20 @@ import type {
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import type { MergedBaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/merge-base-widget-state';
+import { mergeBaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/merge-base-widget-state';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { getInitialWidgetInheritOptions } from '@/common/modules/widgets/_helpers/widget-inherit-options-helper';
+import { getRefinedWidgetOptions } from '@/common/modules/widgets/_helpers/widget-options-helper';
+import { getWidgetOptionsSchema } from '@/common/modules/widgets/_helpers/widget-options-schema-generator';
+import { getInitialSchemaProperties, getRefinedSchemaProperties } from '@/common/modules/widgets/_helpers/widget-schema-helper';
+import type { UpdatableWidgetInfo } from '@/common/modules/widgets/_types/widget-type';
+
 import { useWidgetTitleInput } from '@/services/dashboards/composables/use-widget-title-input';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
-import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
-import { getRefinedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-options-helper';
-import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
-import { getInitialSchemaProperties, getRefinedSchemaProperties } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 /* Description

@@ -5,7 +5,7 @@ import type {
 
 import getRandomId from '@/lib/random-id-generator';
 
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
 
 
