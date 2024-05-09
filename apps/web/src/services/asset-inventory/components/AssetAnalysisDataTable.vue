@@ -206,7 +206,6 @@ watch(
         () => assetAnalysisPageState.selectedOperator,
         () => assetAnalysisPageState.selectedGroupByList,
         () => assetAnalysisPageGetters.consoleFilters,
-        () => assetAnalysisPageState.selectedChartType,
     ],
     async ([metricId]) => {
         if (!metricId) return;
@@ -215,6 +214,9 @@ watch(
     },
     { immediate: true, deep: true },
 );
+watch(() => assetAnalysisPageGetters.isRealtimeChart, async () => {
+    await setDataTableData();
+});
 watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
     if (refresh) {
         await setDataTableData();

@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
+import { isEmpty } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -48,9 +49,15 @@ const drawChart = () => {
         text: '{category}',
         fontSize: 12,
         fill: chartHelper.color(gray[700]),
-
     });
     chart.series.push(series);
+
+    if (!isEmpty(props.chartData?.[0]?.colorSettings)) {
+        series.slices.template.setAll({
+            strokeOpacity: 0,
+            templateField: 'colorSettings',
+        });
+    }
 
     // set color
     chartHelper.setChartColors(chart, props.colorSet);

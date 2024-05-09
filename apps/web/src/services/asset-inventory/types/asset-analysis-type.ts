@@ -60,6 +60,7 @@ export interface TreemapChartData {
 export interface RealtimeChartData {
     category?: string;
     value?: number;
+    colorSettings?: { fill?: string; }
     background_color?: string;
     font_color?: string;
 }

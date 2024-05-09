@@ -21,8 +21,6 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
-import AssetAnalysisNameFormModal from '@/services/asset-inventory/components/AssetAnalysisNameFormModal.vue';
-import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 
@@ -48,16 +46,18 @@ const state = reactive({
     }),
     disableConfirmButton: computed<boolean>(() => {
         if (state.loading) return true;
-        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return !isAllValid;
-        return !!invalidState.name;
+        if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') {
+            return !isAllValid.value;
+        }
+        return !!invalidState.name || !!invalidState.resourceType;
     }),
-    saveAsModalVisible: false,
     visibleSaveModal: false,
 });
 
 const {
     forms: {
         name,
+        resourceType,
         unit,
         code,
     },
@@ -68,6 +68,7 @@ const {
     initForm,
 } = useFormValidator({
     name: '',
+    resourceType: '',
     unit: '',
     code: '',
 }, {
@@ -76,7 +77,15 @@ const {
         if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.DUPLICATED');
         return true;
     },
+    resourceType: (value: string) => {
+        if (assetAnalysisPageState.metricQueryFormMode === 'VIEW') return true;
+        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+        const regex = /^.+?\..+?\..+?$/;
+        if (!regex.test(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
+        return true;
+    },
     code: (value: string) => {
+        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
         try {
             JSON.parse(value);
             return true;
@@ -95,7 +104,7 @@ const createCustomMetric = async () => {
             name: name.value,
             unit: unit.value,
             metric_type: METRIC_TYPE.GAUGE,
-            resource_type: 'inventory.CloudService',
+            resource_type: `inventory.CloudService:${resourceType.value}`,
             query_options: jsonParsedQuery,
             namespace_id: assetAnalysisPageGetters.namespaceId || '',
         });
@@ -126,6 +135,7 @@ const updateCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
         await assetAnalysisPageStore.loadMetric(state.currentMetricId);
+        assetAnalysisPageStore.setRefreshMetricData(true);
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
@@ -140,13 +150,6 @@ const handleClose = () => {
 const handleCreateCustomMetric = async () => {
     await createCustomMetric();
 };
-const handleSaveAsCustomMetric = async (_name: string) => {
-    setForm('name', _name);
-    await createCustomMetric();
-};
-const handleOpenCustomMetricNameFormModal = () => {
-    state.saveAsModalVisible = true;
-};
 const handleSaveCustomMetric = async () => {
     await updateCustomMetric();
     state.visibleSaveModal = false;
@@ -154,9 +157,9 @@ const handleSaveCustomMetric = async () => {
 
 watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (assetAnalysisPageState.metricQueryFormMode !== 'CREATE') {
+        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') {
             setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
-            setForm('unit', assetAnalysisPageState.metric?.unit || '');
+            setForm('unit', assetAnalysisPageState.metric?.unit);
         }
     } else {
         initForm();
@@ -185,15 +188,41 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
-                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
+                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"
+                               required
+                               :invalid="invalidState.resourceType"
+                               :invalid-text="invalidTexts.resourceType"
                                class="col-span-8"
                 >
-                    <p-text-input :value="unit"
+                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
+                                  :value="resourceType"
+                                  :invalid="invalidState.resourceType"
+                                  placeholder="aws.EC2.Instance"
+                                  @update:value="setForm('resourceType', $event)"
+                    />
+                    <p v-else
+                       class="text-label-md"
+                    >
+                        {{ assetAnalysisPageState.metric?.resource_type }}
+                    </p>
+                </p-field-group>
+                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
+                               :required="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
+                               class="col-span-8"
+                >
+                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
+                                  :value="unit"
+                                  placeholder="Count"
                                   @update:value="setForm('unit', $event)"
                     />
+                    <p v-else
+                       class="text-label-md"
+                    >
+                        {{ assetAnalysisPageState.metric?.unit }}
+                    </p>
                 </p-field-group>
                 <p-field-group class="query-field"
+                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.QUERY_OPTION')"
                                required
                 >
                     <p-text-editor :code="code"
@@ -220,12 +249,6 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                         </p-button>
                     </template>
                     <template v-else>
-                        <p-button style-type="tertiary"
-                                  :disabled="state.disableConfirmButton"
-                                  @click="handleOpenCustomMetricNameFormModal"
-                        >
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE_AS') }}
-                        </p-button>
                         <p-button style-type="primary"
                                   :disabled="state.disableConfirmButton"
                                   @click="() => {state.visibleSaveModal = true}"
@@ -236,10 +259,6 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                 </div>
             </template>
         </p-overlay-layout>
-        <asset-analysis-name-form-modal :visible.sync="state.saveAsModalVisible"
-                                        :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
-                                        @save-as="handleSaveAsCustomMetric"
-        />
         <delete-modal :header-title="$t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_TITLE')"
                       :visible.sync="state.visibleSaveModal"
                       :disabled="state.loading"
@@ -260,7 +279,7 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
         }
 
         .query-field {
-            @apply border rounded-lg col-span-12;
+            @apply col-span-12;
             overflow: hidden;
 
             :deep(.p-text-editor) {
