@@ -79,8 +79,6 @@ const handleClose = () => {
 </template>
 
 <style lang="postcss">
-
-
 .p-overlay-layout {
     @apply absolute;
     top: 0;
