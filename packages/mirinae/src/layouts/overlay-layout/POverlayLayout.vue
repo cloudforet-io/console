@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
     isFixedSize: false,
 });
 
-const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void;
+const emit = defineEmits<{(e: 'update:visible'): void;
 }>();
 
 const state = reactive({
@@ -87,10 +87,12 @@ const handleClose = () => {
     left: 0;
     width: 0;
     height: 0;
+    z-index: 1001;
 
     .layout {
         @apply fixed flex flex-col;
         height: 100vh;
+        top: 0;
         right: 0;
 
         .header {
@@ -167,6 +169,8 @@ const handleClose = () => {
         @apply bg-gray-900 bg-opacity-75 fixed;
         width: 100%;
         height: 100vh;
+        top: 0;
+        left: 0;
     }
 }
 </style>
