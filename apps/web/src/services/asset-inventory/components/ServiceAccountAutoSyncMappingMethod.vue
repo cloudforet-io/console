@@ -137,7 +137,7 @@ watch(() => state.formData, (formData) => {
 
 watch(() => serviceAccountPageState.originServiceAccountItem, (item) => {
     if (item) {
-        if (state.isAdminMode) state.workspaceMapping = item.sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
+        state.workspaceMapping = item.sync_options?.single_workspace_id ? 'singleWorkspace' : 'multipleWorkspaces';
         state.projectGroupMapping = item.sync_options?.skip_project_group ? 'skip' : 'projectGroups';
     }
 }, { immediate: true });
