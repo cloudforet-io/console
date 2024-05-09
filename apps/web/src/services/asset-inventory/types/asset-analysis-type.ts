@@ -2,6 +2,8 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { ManipulateType } from 'dayjs';
 
+import type { NamespaceCategory } from '@/schema/inventory/namespace/type';
+
 import type {
     GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,
 } from '@/services/asset-inventory/constants/asset-analysis-constant';
@@ -68,4 +70,6 @@ export interface NamespaceSubItemType {
     label: string;
     name: string;
     provider?: string;
+    category: NamespaceCategory;
+    icon: string;
 }
