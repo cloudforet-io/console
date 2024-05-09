@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -75,6 +75,7 @@ watch(() => route.params, async (params) => {
     } else if (assetAnalysisPageGetters.defaultMetricGroupByList) {
         assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
     }
+
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
@@ -85,6 +86,10 @@ watch([
     if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME) gnbStore.setFavoriteItemId(metricFavoriteOptions);
     if (route.name === ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME) gnbStore.setFavoriteItemId(metricExampleFavoriteOptions);
 }, { immediate: true });
+
+onUnmounted(() => {
+    gnbStore.setBreadcrumbs([]);
+});
 </script>
 
 <template>

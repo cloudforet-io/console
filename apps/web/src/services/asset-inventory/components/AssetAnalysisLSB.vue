@@ -3,10 +3,10 @@ import { useElementSize } from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRoute } from 'vue-router/composables';
 
 import {
-    PI, PSearch, PTextHighlighting, PDataLoader, PTextButton, PEmpty, PPopover, PButton, PCheckbox, PTooltip,
+    PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import { isEmpty } from 'lodash';
@@ -43,7 +43,6 @@ const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
 
 const route = useRoute();
-const router = useRouter();
 
 const assetInventorySettinsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
@@ -236,9 +235,6 @@ const handleSearchNamespace = (keyword: string) => {
 const handleClickNamespace = (namespace: NamespaceSubItemType) => {
     assetAnalysisPageStore.setSelectedNamespace(namespace);
 };
-const handleClickBackToHome = () => {
-    router.push(getProperRouteLocation({ name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME }));
-};
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
         assetInventorySettinsStore.setNotShowMetricSelectGuidePopover(true);
@@ -310,14 +306,6 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                :loader-backdrop-color="gray[100]"
                                class="namespace-data-loader"
                 >
-                    <p-text-button v-if="state.isDetailPage"
-                                   class="back-to-home-button"
-                                   icon-left="ic_arrow-left"
-                                   size="sm"
-                                   @click="handleClickBackToHome"
-                    >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.ASSET_ANALYSIS_HOME') }}
-                    </p-text-button>
                     <l-s-b-menu-item :menu-data="state.namespaceTopTitleMenu"
                                      :current-path="state.currentPath"
                                      :depth="1"
