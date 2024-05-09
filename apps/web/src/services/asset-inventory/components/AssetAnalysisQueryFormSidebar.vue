@@ -78,7 +78,10 @@ const {
         return true;
     },
     resourceType: (value: string) => {
+        if (assetAnalysisPageState.metricQueryFormMode === 'VIEW') return true;
         if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+        const regex = /^.+?\..+?\..+?$/;
+        if (!regex.test(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
         return true;
     },
     code: (value: string) => {
@@ -101,7 +104,7 @@ const createCustomMetric = async () => {
             name: name.value,
             unit: unit.value,
             metric_type: METRIC_TYPE.GAUGE,
-            resource_type: 'inventory.CloudService',
+            resource_type: `inventory.CloudService:${resourceType.value}`,
             query_options: jsonParsedQuery,
             namespace_id: assetAnalysisPageGetters.namespaceId || '',
         });
@@ -153,10 +156,9 @@ const handleSaveCustomMetric = async () => {
 
 watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (assetAnalysisPageState.metricQueryFormMode !== 'CREATE') {
+        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') {
             setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
-            setForm('unit', assetAnalysisPageState.metric?.unit || '');
-            setForm('resourceType', assetAnalysisPageState.metric?.resource_type || '');
+            setForm('unit', assetAnalysisPageState.metric?.unit);
         }
     } else {
         initForm();
@@ -185,6 +187,24 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
+                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"
+                               required
+                               :invalid="invalidState.resourceType"
+                               :invalid-text="invalidTexts.resourceType"
+                               class="col-span-8"
+                >
+                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
+                                  :value="resourceType"
+                                  :invalid="invalidState.resourceType"
+                                  placeholder="aws.EC2.Instance"
+                                  @update:value="setForm('resourceType', $event)"
+                    />
+                    <p v-else
+                       class="text-label-md"
+                    >
+                        {{ assetAnalysisPageState.metric?.resource_type }}
+                    </p>
+                </p-field-group>
                 <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
                                :required="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
                                class="col-span-8"
@@ -198,23 +218,6 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                        class="text-label-md"
                     >
                         {{ assetAnalysisPageState.metric?.unit }}
-                    </p>
-                </p-field-group>
-                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"
-                               required
-                               :invalid="invalidState.resourceType"
-                               :invalid-text="invalidTexts.resourceType"
-                               class="col-span-8"
-                >
-                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
-                                  :value="resourceType"
-                                  :invalid="invalidState.resourceType"
-                                  @update:value="setForm('resourceType', $event)"
-                    />
-                    <p v-else
-                       class="text-label-md"
-                    >
-                        {{ assetAnalysisPageState.metric?.resource_type }}
                     </p>
                 </p-field-group>
                 <p-field-group class="query-field"

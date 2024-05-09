@@ -2483,6 +2483,7 @@
 				"CANCEL": "キャンセル",
 				"CONFIRM": "確認",
 				"DUPLICATED": "メトリック名が重複しています。",
+				"INVALID_RESOURCE_TYPE": "",
 				"NAME": "名前",
 				"QUERY_OPTION": "",
 				"REQUIRED_FIELD": "必須入力項目です。",

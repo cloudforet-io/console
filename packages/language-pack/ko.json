@@ -2483,6 +2483,7 @@
 				"CANCEL": "취소",
 				"CONFIRM": "확인",
 				"DUPLICATED": "메트릭 이름이 중복되었습니다.",
+				"INVALID_RESOURCE_TYPE": "",
 				"NAME": "이름",
 				"QUERY_OPTION": "",
 				"REQUIRED_FIELD": "필수 입력 항목입니다.",

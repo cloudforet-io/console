@@ -2483,6 +2483,7 @@
 				"CANCEL": "Cancel",
 				"CONFIRM": "Confirm",
 				"DUPLICATED": "Metric name is duplicated.",
+				"INVALID_RESOURCE_TYPE": "Invalid Resource Type",
 				"NAME": "Name",
 				"QUERY_OPTION": "Query Option",
 				"REQUIRED_FIELD": "Required field",
