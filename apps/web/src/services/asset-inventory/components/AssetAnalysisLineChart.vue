@@ -69,10 +69,14 @@ const drawChart = () => {
 
     // set series
     props.legends.forEach((legend) => {
-        const seriesSettings = {
+        const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: legend.label as string,
             valueYField: legend.name,
         };
+        if (legend.color) {
+            seriesSettings.fill = chartHelper.color(legend.color);
+            seriesSettings.stroke = chartHelper.color(legend.color);
+        }
 
         // create series
         const series = chartHelper.createXYLineSeries(chart, seriesSettings);

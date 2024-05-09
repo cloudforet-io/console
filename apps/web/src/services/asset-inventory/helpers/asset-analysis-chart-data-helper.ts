@@ -59,6 +59,7 @@ export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>
             if (d.count) {
                 let _name = d[_groupBy];
                 let _label = referenceMap[_groupBy]?.[_name]?.label || d[_groupBy];
+                const _referenceColor = referenceMap[_groupBy]?.[_name]?.color;
                 if (!_name) {
                     _name = `no_${_groupBy}`;
                     _label = 'Unknown';
@@ -69,7 +70,7 @@ export const getMetricChartLegends = (referenceMap: Record<string, ReferenceMap>
                     name: _name,
                     label: _label,
                     disabled: false,
-                    color: _color,
+                    color: _referenceColor || _color,
                 });
             }
         });
@@ -139,10 +140,14 @@ export const getRefinedMetricRealtimeChartData = (referenceMap: Record<string, R
         const [backgroundColor, fontColor] = getTreemapChartColor(idx);
         if (_groupBy) {
             const _name = d[_groupBy];
+            const _referenceColor = referenceMap[_groupBy]?.[_name]?.color;
             chartData.push({
                 category: referenceMap[_groupBy]?.[_name]?.label || d[_groupBy] || 'Unknown',
                 value: d.count || undefined,
-                background_color: backgroundColor,
+                colorSettings: _referenceColor ? {
+                    fill: _referenceColor,
+                } : {},
+                background_color: referenceMap[_groupBy]?.[_name]?.color || backgroundColor,
                 font_color: fontColor,
             });
         } else {

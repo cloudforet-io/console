@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -50,10 +50,16 @@ const drawChart = () => {
     const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
 
     // set color
-    series.columns.template.adapters.add('fill', (fill, target) => {
-        const _index = series.columns.indexOf(target);
-        return props.colorSet[_index];
-    });
+    if (!isEmpty(props.chartData?.[0]?.colorSettings)) {
+        series.columns.template.setAll({
+            templateField: 'colorSettings',
+        });
+    } else {
+        series.columns.template.adapters.add('fill', (fill, target) => {
+            const _index = series.columns.indexOf(target);
+            return props.colorSet[_index];
+        });
+    }
 
     // set tooltip if showPassFindings is true
     const tooltip = chartHelper.createTooltip();
