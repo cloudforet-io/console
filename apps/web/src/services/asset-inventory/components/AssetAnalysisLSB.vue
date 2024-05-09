@@ -257,7 +257,6 @@ watch(() => route.params, async () => {
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
         const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
-        console.debug(targetNamespace);
         assetAnalysisPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
