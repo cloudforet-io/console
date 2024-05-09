@@ -121,6 +121,7 @@ const getAttachedGeneralAccountList = async () => {
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
+        await userWorkspaceStore.load();
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
