@@ -135,6 +135,7 @@ const updateCustomMetric = async () => {
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_UPDATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
         await assetAnalysisPageStore.loadMetric(state.currentMetricId);
+        assetAnalysisPageStore.setRefreshMetricData(true);
     } catch (e) {
         showErrorMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_E_UPDATE_METRIC'), e);
     } finally {
