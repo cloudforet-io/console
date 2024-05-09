@@ -281,7 +281,7 @@ const handleOpenEditQuery = () => {
                 <template v-if="!state.currentMetricExampleId">
                     <p-button v-if="!state.isManagedMetric"
                               class="mr-2"
-                              style-type="substitutive"
+                              style-type="tertiary"
                               icon-left="ic_editor-code"
                               @click="handleOpenEditQuery"
                     >

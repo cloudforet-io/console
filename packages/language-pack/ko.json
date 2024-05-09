@@ -2520,6 +2520,7 @@
 				"TITLE": "리소스 분석 시작하기",
 				"UPCOMING": "지원 예정"
 			},
+			"MAX_LENGTH_INVALID": "{max}자 이하로 입력해 주세요.",
 			"MONTHLY": "월별 데이터",
 			"NAME": "이름",
 			"NAME_DUPLICATED": "중복된 이름입니다.",

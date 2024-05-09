@@ -88,6 +88,7 @@ const {
 }, {
     name(value) {
         if (!value) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_REQUIRED');
+        if (value.length > 40) return i18n.t('INVENTORY.ASSET_ANALYSIS.MAX_LENGTH_INVALID', { max: 40 });
         if (state.existingNameList.find((d) => d === value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.NAME_DUPLICATED');
         return true;
     },
@@ -128,8 +129,8 @@ const updateMetricName = async () => {
             metric_id: state.currentMetricId,
             name: name.value,
         });
-        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         state.proxyVisible = false;
+        await assetAnalysisPageStore.loadMetric(state.currentMetricId);
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
@@ -141,8 +142,8 @@ const updateMetricExampleName = async () => {
             example_id: state.currentMetricExampleId,
             name: name.value,
         });
-        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         state.proxyVisible = false;
+        await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));

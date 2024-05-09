@@ -6,12 +6,7 @@ import {
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/utils';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import {
-    setXYSharedTooltipText,
-} from '@/common/composables/amcharts5/xy-chart-helper';
 
 import type { RealtimeChartData } from '@/services/asset-inventory/types/asset-analysis-type';
 
@@ -35,7 +30,6 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const valueFormatter = (val) => numberFormatter(val, { maximumFractionDigits: 0 }) as string;
 const drawChart = () => {
     // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
@@ -49,7 +43,6 @@ const drawChart = () => {
         xAxis,
         yAxis,
         baseAxis: yAxis,
-        stacked: true,
         stroke: undefined,
     };
 
@@ -64,7 +57,15 @@ const drawChart = () => {
 
     // set tooltip if showPassFindings is true
     const tooltip = chartHelper.createTooltip();
-    setXYSharedTooltipText(chart, tooltip, valueFormatter);
+    tooltip.label.adapters.add('text', (_, target) => {
+        let fieldName;
+        chart.series.each((s) => {
+            fieldName = s.get('valueXField') || '';
+        });
+        const targetName = target.dataItem?.dataContext?.category;
+        const value = target.dataItem?.dataContext?.[fieldName];
+        return `[fontSize: 14px;}]${targetName}:[/] [fontSize: 14px; bold]${value}[/]`;
+    });
     series.set('tooltip', tooltip);
 
     // add series to chart

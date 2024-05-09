@@ -56,6 +56,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
         refreshMetricPeriodDropdown: false,
+        periodText: undefined as string|undefined,
     });
     const getters = reactive({
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
@@ -144,6 +145,9 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
     const setRefreshMetricPeriodDropdown = (refresh: boolean) => {
         state.refreshMetricPeriodDropdown = refresh;
     };
+    const setPeriodText = (periodText: string) => {
+        state.periodText = periodText;
+    };
 
     /* Actions */
     const reset = () => {
@@ -225,6 +229,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         setShowMetricQueryFormSidebar,
         setRefreshMetricPeriodDropdown,
         setSelectedChartType,
+        setPeriodText,
     };
 
     return {

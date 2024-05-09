@@ -2520,6 +2520,7 @@
 				"TITLE": "リソース分析を開始する",
 				"UPCOMING": "今後の"
 			},
+			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
 			"MONTHLY": "月別データ",
 			"NAME": "名前",
 			"NAME_DUPLICATED": "重複した名前です。",

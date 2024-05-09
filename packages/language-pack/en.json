@@ -2520,6 +2520,7 @@
 				"TITLE": "Get stared with Asset Analysis",
 				"UPCOMING": "Upcoming"
 			},
+			"MAX_LENGTH_INVALID": "{max} characters in max.",
 			"MONTHLY": "Monthly",
 			"NAME": "Name",
 			"NAME_DUPLICATED": "Name is duplicated.",
