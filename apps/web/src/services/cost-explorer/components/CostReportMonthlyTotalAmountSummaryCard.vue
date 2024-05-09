@@ -12,7 +12,9 @@ import type { DataTableFieldType } from '@spaceone/design-system/src/data-displa
 import type { SelectButtonType } from '@spaceone/design-system/types/inputs/buttons/select-button-group/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, sum } from 'lodash';
+import {
+    cloneDeep, debounce, sum, sumBy,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -52,7 +54,6 @@ interface ChartData {
 }
 type CostReportDataAnalyzeResult = {
     [groupBy: string]: string | any;
-    date: string;
     value_sum: number;
 };
 
@@ -115,6 +116,31 @@ const state = reactive({
     ])),
 });
 
+/* Util */
+const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): AnalyzeResponse<CostReportDataAnalyzeResult> => {
+    const _results: CostReportDataAnalyzeResult[] = [];
+    const _totalAmount = sumBy(res.results, 'value_sum');
+    const _thresholdValue = _totalAmount * 0.02;
+    let _othersValueSum = 0;
+    res.results?.forEach((d) => {
+        if (d.value_sum < _thresholdValue) {
+            _othersValueSum += d.value_sum;
+        } else {
+            _results.push(d);
+        }
+    });
+    if (_othersValueSum > 0) {
+        _results.push({
+            [state.selectedTarget]: 'Others',
+            value_sum: _othersValueSum,
+        });
+    }
+    return {
+        more: res.more,
+        results: _results,
+    };
+};
+
 /* Api */
 const analyzeCostReportData = debounce(async () => {
     state.loading = true;
@@ -124,7 +150,7 @@ const analyzeCostReportData = debounce(async () => {
             start: state.currentDate?.format('YYYY-MM'),
             end: state.currentDate?.format('YYYY-MM'),
         };
-        state.data = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters>({
+        const res = await SpaceConnector.clientV2.costAnalysis.costReportData.analyze<CostReportDataAnalyzeParameters, AnalyzeResponse<CostReportDataAnalyzeResult>>({
             cost_report_config_id: costReportPageState.costReportConfig?.cost_report_config_id,
             is_confirmed: true,
             query: {
@@ -143,6 +169,7 @@ const analyzeCostReportData = debounce(async () => {
                 }],
             },
         });
+        state.data = getRefinedAnalyzeData(res);
     } catch (e) {
         state.data = {};
         ErrorHandler.handleError(e);
