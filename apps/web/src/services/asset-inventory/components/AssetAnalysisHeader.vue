@@ -331,7 +331,7 @@ const handleOpenEditQuery = () => {
             <asset-analysis-name-form-modal :visible.sync="state.metricNameFormModalVisible"
                                             :type="state.selectedNameFormModalType"
             />
-            <asset-analysis-query-form-sidebar v-show="assetAnalysisPageState.showMetricQueryFormSidebar" />
+            <asset-analysis-query-form-sidebar />
         </template>
     </p-heading>
 </template>

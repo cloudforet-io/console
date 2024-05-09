@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PFieldGroup, PTextInput, PTextEditor, PButton, PSidebar,
+    PFieldGroup, PTextInput, PTextEditor, PButton, POverlayLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -133,7 +133,7 @@ const updateCustomMetric = async () => {
 };
 
 /* Event */
-const handleCloseSidebar = () => {
+const handleClose = () => {
     assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
 };
 const handleCreateCustomMetric = async () => {
@@ -164,108 +164,92 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
 </script>
 
 <template>
-    <transition name="slide-left">
-        <div class="asset-analysis-query-form-sidebar">
-            <p-sidebar :visible="true"
-                       style-type="primary"
-                       size="xl"
-                       backdrop
-                       @close="handleCloseSidebar"
-            >
-                <main class="main">
-                    <slot />
-                </main>
-                <template #title>
-                    <span class="sidebar-title">{{ state.sidebarTitle }}</span> <br>
-                </template>
-                <template #sidebar>
-                    <div class="sidebar-contents">
-                        <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
-                                       :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.NAME')"
-                                       required
-                                       :invalid="invalidState.name"
-                                       :invalid-text="invalidTexts.name"
-                                       class="col-span-8"
+    <div class="asset-analysis-query-form-overlay">
+        <p-overlay-layout :visible="assetAnalysisPageState.showMetricQueryFormSidebar"
+                          style-type="primary"
+                          size="lg"
+                          :title="state.sidebarTitle"
+                          @update:visible="handleClose"
+        >
+            <div class="sidebar-contents">
+                <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
+                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.NAME')"
+                               required
+                               :invalid="invalidState.name"
+                               :invalid-text="invalidTexts.name"
+                               class="col-span-8"
+                >
+                    <p-text-input :value="name"
+                                  :invalid="invalidState.name"
+                                  @update:value="setForm('name', $event)"
+                    />
+                </p-field-group>
+                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
+                               class="col-span-8"
+                >
+                    <p-text-input :value="unit"
+                                  @update:value="setForm('unit', $event)"
+                    />
+                </p-field-group>
+                <p-field-group class="query-field"
+                               required
+                >
+                    <p-text-editor :code="code"
+                                   @update:code="setForm('code', $event)"
+                    />
+                </p-field-group>
+            </div>
+            <template #footer>
+                <div class="footer-wrapper">
+                    <p-button style-type="transparent"
+                              @click="handleClose"
+                    >
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CANCEL') }}
+                    </p-button>
+                    <template v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'">
+                        <p-button style-type="primary"
+                                  :disabled="state.disableConfirmButton"
+                                  @click="handleCreateCustomMetric"
                         >
-                            <p-text-input :value="name"
-                                          :invalid="invalidState.name"
-                                          @update:value="setForm('name', $event)"
-                            />
-                        </p-field-group>
-                        <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
-                                       class="col-span-8"
-                        >
-                            <p-text-input :value="unit"
-                                          @update:value="setForm('unit', $event)"
-                            />
-                        </p-field-group>
-                        <p-field-group class="query-field"
-                                       required
-                        >
-                            <p-text-editor :code="code"
-                                           @update:code="setForm('code', $event)"
-                            />
-                        </p-field-group>
-                    </div>
-                </template>
-                <template #footer>
-                    <div class="footer-wrapper">
-                        <p-button style-type="transparent"
-                                  @click="handleCloseSidebar"
-                        >
-                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CANCEL') }}
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CONFIRM') }}
                         </p-button>
-                        <template v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'">
-                            <p-button style-type="primary"
-                                      :disabled="state.disableConfirmButton"
-                                      @click="handleCreateCustomMetric"
-                            >
-                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.CONFIRM') }}
-                            </p-button>
-                        </template>
-                        <template v-else>
-                            <p-button style-type="tertiary"
-                                      :disabled="state.disableConfirmButton"
-                                      @click="handleOpenCustomMetricNameFormModal"
-                            >
-                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE_AS') }}
-                            </p-button>
-                            <p-button style-type="primary"
-                                      :disabled="state.disableConfirmButton"
-                                      @click="() => {state.visibleSaveModal = true}"
-                            >
-                                {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE') }}
-                            </p-button>
-                        </template>
-                    </div>
-                </template>
-            </p-sidebar>
-            <asset-analysis-name-form-modal :visible.sync="state.saveAsModalVisible"
-                                            :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
-                                            @save-as="handleSaveAsCustomMetric"
-            />
-            <delete-modal :header-title="$t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_TITLE')"
-                          :visible.sync="state.visibleSaveModal"
-                          :disabled="state.loading"
-                          @confirm="handleSaveCustomMetric"
-            >
-                {{ $t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_DESC') }}
-            </delete-modal>
-        </div>
-    </transition>
+                    </template>
+                    <template v-else>
+                        <p-button style-type="tertiary"
+                                  :disabled="state.disableConfirmButton"
+                                  @click="handleOpenCustomMetricNameFormModal"
+                        >
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE_AS') }}
+                        </p-button>
+                        <p-button style-type="primary"
+                                  :disabled="state.disableConfirmButton"
+                                  @click="() => {state.visibleSaveModal = true}"
+                        >
+                            {{ $t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.SAVE') }}
+                        </p-button>
+                    </template>
+                </div>
+            </template>
+        </p-overlay-layout>
+        <asset-analysis-name-form-modal :visible.sync="state.saveAsModalVisible"
+                                        :type="NAME_FORM_MODAL_TYPE.SAVE_AS_CUSTOM_METRIC"
+                                        @save-as="handleSaveAsCustomMetric"
+        />
+        <delete-modal :header-title="$t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_TITLE')"
+                      :visible.sync="state.visibleSaveModal"
+                      :disabled="state.loading"
+                      @confirm="handleSaveCustomMetric"
+        >
+            {{ $t('INVENTORY.ASSET_ANALYSIS.DETAIL.SAVE_DESC') }}
+        </delete-modal>
+    </div>
 </template>
 
 <style scoped lang="postcss">
-.asset-analysis-query-form-sidebar {
-    position: fixed;
-    top: calc($top-bar-height + $gnb-toolbox-height);
-    right: 0;
-    z-index: 100;
-    .sidebar-title {
-        @apply text-label-xl;
-    }
+.asset-analysis-query-form-overlay {
     .sidebar-contents {
-        position: relative;
+        width: 100%;
+        padding: 0 1.5rem;
         :deep(.p-text-input) {
             width: 100%;
         }
@@ -283,8 +267,6 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     }
     .footer-wrapper {
         @apply border-t border-gray-200;
-        position: absolute;
-        bottom: 0;
         display: flex;
         justify-content: flex-end;
         width: 100%;
