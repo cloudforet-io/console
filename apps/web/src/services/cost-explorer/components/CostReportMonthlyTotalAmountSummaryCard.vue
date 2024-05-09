@@ -37,7 +37,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { white } from '@/styles/colors';
+import { gray, white } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
@@ -65,6 +65,7 @@ const CHART_ROOT_OPTIONS: IRootSettings = {
         left: 1000,
     },
 };
+const OTHER_CATEGORY = 'Others';
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -99,9 +100,10 @@ const state = reactive({
         const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE
             ? storeState.workspaces[_category]?.label ?? d.workspace_id
             : storeState.providers[_category]?.name ?? d.provider;
-        const _color = state.selectedTarget === GROUP_BY.WORKSPACE
+        let _color = state.selectedTarget === GROUP_BY.WORKSPACE
             ? MASSIVE_CHART_COLORS[idx]
             : storeState.providers[_category]?.color ?? MASSIVE_CHART_COLORS[idx];
+        if (_category === OTHER_CATEGORY) _color = gray[500];
         return {
             category: _categoryLabel,
             value: d.value_sum,
@@ -131,7 +133,7 @@ const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>
     });
     if (_othersValueSum > 0) {
         _results.push({
-            [state.selectedTarget]: 'Others',
+            [state.selectedTarget]: OTHER_CATEGORY,
             value_sum: _othersValueSum,
         });
     }
@@ -139,6 +141,13 @@ const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>
         more: res.more,
         results: _results,
     };
+};
+const getLegendColor = (field: string, value: string, rowIndex: number) => {
+    if (value === OTHER_CATEGORY) return gray[500];
+    if (field === GROUP_BY.WORKSPACE) {
+        return MASSIVE_CHART_COLORS[rowIndex];
+    }
+    return storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex];
 };
 
 /* Api */
@@ -346,7 +355,7 @@ watch(() => state.currentDate, () => {
                         <template #col-format="{field, value, rowIndex}">
                             <span v-if="field.name === GROUP_BY.WORKSPACE">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': MASSIVE_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                 />
                                 <p-tooltip :contents="storeState.workspaces[value] ? storeState.workspaces[value].label : value"
                                            position="bottom"
@@ -356,7 +365,7 @@ watch(() => state.currentDate, () => {
                             </span>
                             <span v-else-if="field.name === GROUP_BY.PROVIDER">
                                 <span class="toggle-button"
-                                      :style="{ 'background-color': storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex] }"
+                                      :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                 />
                                 <p-tooltip :contents="storeState.providers[value] ? storeState.providers[value].name : value"
                                            position="bottom"
