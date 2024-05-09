@@ -13,8 +13,12 @@
                             <p-divider :vertical="true" />
                         </template>
                         <span class="label-text">Resource ID: </span>
-                        <p-copy-button>
-                            {{ resourceId }}
+                        <p-copy-button class="resource-id">
+                            <p-tooltip :contents="resourceId"
+                                       position="bottom"
+                            >
+                                <span>{{ resourceId }}</span>
+                            </p-tooltip>
                         </p-copy-button>
                     </div>
                 </template>
@@ -100,7 +104,7 @@ import type { PropType } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner,
+    PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner, PTooltip,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
@@ -152,6 +156,7 @@ export default defineComponent<Props>({
         PBadge,
         PDivider,
         PSpinner,
+        PTooltip,
     },
     props: {
         loading: {
@@ -279,6 +284,7 @@ export default defineComponent<Props>({
                 align-items: center;
                 float: right;
                 font-size: 0.875rem;
+                margin-left: auto;
                 .p-divider {
                     margin: 0 0.75rem;
                     height: 0.875rem;
@@ -286,6 +292,16 @@ export default defineComponent<Props>({
                 .label-text {
                     @apply text-gray-500;
                     padding-right: 0.25rem;
+                }
+                .resource-id {
+                    @apply flex items-center;
+                    .copy-text {
+                        max-width: 16.25rem;
+                        .has-tooltip {
+                            @apply block truncate;
+                            max-width: 16.25rem;
+                        }
+                    }
                 }
             }
         }

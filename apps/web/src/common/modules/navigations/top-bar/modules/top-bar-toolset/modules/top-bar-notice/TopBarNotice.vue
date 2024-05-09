@@ -16,6 +16,8 @@ import { useGrantScopeGuard } from '@/common/composables/grant-scope-guard';
 import TopBarNoticeContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notice/modules/TopBarNoticeContextMenu.vue';
 
+import { blue } from '@/styles/colors';
+
 
 interface Props {
     visible: boolean
@@ -33,6 +35,10 @@ const noticeGetters = noticeStore.getters;
 const state = reactive({
     hasNotice: computed(() => noticeGetters.unreadNoticeCount > 0),
     isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
+    iconColor: computed<string>(() => {
+        if (props.visible) return blue[600];
+        return 'inherit';
+    }),
 });
 
 /* Util */
@@ -81,10 +87,13 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
                   @click.stop="handleNotiButtonClick"
                   @keydown.enter="showNotiMenu"
             >
+                <span v-if="state.hasNotice"
+                      class="dot"
+                />
                 <p-i class="menu-icon"
                      :class="{ disabled: state.isNoRoleUser }"
-                     :name="state.hasNotice ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
-                     :color="state.hasNotice ? undefined : 'inherit'"
+                     name="ic_gnb_bell"
+                     :color="state.iconColor"
                      width="1.375rem"
                      height="1.375rem"
                 />
@@ -103,7 +112,7 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
     position: relative;
 
     .menu-button {
-        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        @apply relative inline-flex items-center justify-center text-gray-500 rounded-full;
         width: 2rem;
         height: 2rem;
         line-height: $top-bar-height;
@@ -111,6 +120,25 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
 
         .menu-icon {
             margin-bottom: -0.125rem;
+            &:hover {
+                @apply text-blue-600;
+            }
+        }
+        .dot {
+            @apply absolute rounded-full bg-white;
+            top: 6px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            &::before {
+                content: '';
+
+                @apply absolute rounded-full bg-blue-500;
+                top: 1px;
+                right: 1px;
+                width: 6px;
+                height: 6px;
+            }
         }
 
         &:hover {

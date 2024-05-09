@@ -35,6 +35,7 @@ const updateOpenedMenu = (visible: boolean) => {
 
 <style lang="postcss" scoped>
 .top-bar-my-page-toolset {
-    @apply flex items-center gap-3;
+    @apply flex items-center;
+    gap: 0.5rem;
 }
 </style>

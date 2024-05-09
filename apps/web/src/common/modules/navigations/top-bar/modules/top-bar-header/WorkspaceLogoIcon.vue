@@ -78,6 +78,9 @@ const state = reactive({
         @apply text-label-xl;
         width: 1.75rem;
         height: 1.75rem;
+        &.english-logo {
+            @apply text-label-xl;
+        }
         &.corporate-logo {
             @apply text-label-lg;
         }
@@ -86,9 +89,9 @@ const state = reactive({
         @apply text-display-lg;
         width: 3rem;
         height: 3rem;
-    }
-    &.english-logo {
-        @apply text-display-md;
+        &.english-logo {
+            @apply text-display-lg;
+        }
     }
     &.corporate-logo {
         @apply text-display-md;
