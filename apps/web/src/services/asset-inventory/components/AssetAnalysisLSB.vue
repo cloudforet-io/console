@@ -257,12 +257,13 @@ watch(() => route.params, async () => {
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
         const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
+        console.debug(targetNamespace);
         assetAnalysisPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
             provider: targetNamespace?.provider,
             category: targetNamespace.data.category,
-            icon: targetNamespace.data.icon,
+            icon: targetNamespace.data.category === 'COMMON' ? COMMON_NAMESPACE_ICON_PATH : targetNamespace.data.icon,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
@@ -282,7 +283,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </script>
 
 <template>
-    <fragment>
+    <div>
         <l-s-b ref="lsbRef"
                class="asset-analysis-l-s-b"
                :menu-set="state.menuSet"
@@ -413,7 +414,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                 </div>
             </template>
         </p-popover>
-    </fragment>
+    </div>
 </template>
 
 <style scoped lang="postcss">
