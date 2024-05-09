@@ -10,6 +10,7 @@ import {
 import type { TreeDisplayMap, TreeNode } from '@spaceone/design-system/src/data-display/tree/tree-view/type';
 import { isEmpty } from 'lodash';
 
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type {
     CloudServiceTypeItem,
@@ -17,7 +18,6 @@ import type {
 } from '@/store/reference/cloud-service-type-reference-store';
 import type { MetricReferenceItem } from '@/store/reference/metric-reference-store';
 
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { gray } from '@/styles/colors';
 
@@ -49,7 +49,7 @@ const storeState = reactive({
         });
         return res;
     }),
-    selectedNamespace: computed(() => assetAnalysisPageState.selectedNamespace),
+    selectedNamespace: computed<NamespaceSubItemType|undefined>(() => assetAnalysisPageState.selectedNamespace),
 });
 const state = reactive({
     selectedId: computed<string|undefined>(() => {
@@ -121,19 +121,6 @@ const state = reactive({
     }),
 });
 
-/* Util */
-const getNamespaceImageUrl = (namespace: NamespaceSubItemType): string|undefined => {
-    const provider = namespace.provider;
-    const formattedCloudServiceName = namespace.label.replace('/', ':');
-
-    if (provider) {
-        const key = `${provider}:${formattedCloudServiceName}`;
-        const icon = storeState.cloudServiceTypeToItemMap[key]?.icon;
-        if (icon) return assetUrlConverter(icon);
-    }
-    return undefined;
-};
-
 /* Event */
 const handleClickBackToNamespace = () => {
     assetAnalysisPageStore.setSelectedNamespace(undefined);
@@ -175,8 +162,14 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                    size="sm"
                                    @click="handleClickBackToNamespace"
                     />
-                    <p-lazy-img class="namespace-image"
-                                :src="getNamespaceImageUrl(storeState.selectedNamespace)"
+                    <img v-if="storeState.selectedNamespace?.category === 'COMMON'"
+                         class="namespace-image"
+                         :src="storeState.selectedNamespace?.icon"
+                         alt="common-namespace-image"
+                    >
+                    <p-lazy-img v-else
+                                class="namespace-image"
+                                :src="storeState.selectedNamespace?.icon"
                                 width="1.25rem"
                                 height="1.25rem"
                     />
@@ -243,6 +236,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                 width: calc(100% - 2rem);
 
                 .namespace-image {
+                    width: 1.25rem;
+                    height: 1.25rem;
                     min-width: 1.25rem;
                 }
 

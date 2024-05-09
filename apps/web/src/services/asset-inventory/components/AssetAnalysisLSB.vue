@@ -39,6 +39,8 @@ import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/ass
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
+const COMMON_NAMESPACE_ICON_PATH = '/src/assets/images/img_common-asset.svg';
+
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
 
@@ -188,23 +190,28 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
     const commonNamespaces = namespaces.filter((namespace) => namespace.data.category === 'COMMON').map((namespace) => ({
         label: namespace.name,
         name: namespace.key,
+        category: namespace.data.category || 'COMMON',
+        icon: COMMON_NAMESPACE_ICON_PATH,
     }));
     if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
         label: i18n.t('INVENTORY.ASSET_ANALYSIS.COMMON'),
+        icon: COMMON_NAMESPACE_ICON_PATH,
         subItems: commonNamespaces,
     }];
 };
 const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.category === 'ASSET').forEach((namespace) => {
+    namespaces.filter((namespace) => namespace.data.category !== 'COMMON').forEach((namespace) => {
         const providerData = storeState.providers[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
                 label: namespace.name,
                 name: namespace.key,
                 provider: namespace.provider,
+                category: namespace.data.category,
+                icon: namespace.data.icon,
             });
         } else {
             namespaceMap[namespace.provider] = {
@@ -215,6 +222,8 @@ const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferen
                     label: namespace.name,
                     name: namespace.key,
                     provider: namespace.provider,
+                    category: namespace.data.category,
+                    icon: namespace.data.icon,
                 }],
             };
         }
@@ -252,6 +261,8 @@ watch(() => route.params, async () => {
             label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
             provider: targetNamespace?.provider,
+            category: targetNamespace.data.category,
+            icon: targetNamespace.data.icon,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
