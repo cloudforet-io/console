@@ -121,7 +121,11 @@ const getAttachedGeneralAccountList = async () => {
 const handleChange = async (options?: ToolboxOptions) => {
     try {
         state.loading = true;
-        await userWorkspaceStore.load();
+        await Promise.allSettled([
+            userWorkspaceStore.load(),
+            allReferenceStore.load('project'),
+            allReferenceStore.load('service_account'),
+        ]);
         const convertOptions = {
             ...options,
             sortBy: state.sortBy,
