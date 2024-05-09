@@ -282,9 +282,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </script>
 
 <template>
-    <div>
+    <div class="asset-analysis-l-s-b">
         <l-s-b ref="lsbRef"
-               class="asset-analysis-l-s-b"
                :menu-set="state.menuSet"
         >
             <template #collapsible-contents-starred>
