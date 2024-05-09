@@ -197,12 +197,13 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
         label: i18n.t('INVENTORY.ASSET_ANALYSIS.COMMON'),
+        icon: COMMON_NAMESPACE_ICON_PATH,
         subItems: commonNamespaces,
     }];
 };
 const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.category === 'ASSET').forEach((namespace) => {
+    namespaces.filter((namespace) => namespace.data.category !== 'COMMON').forEach((namespace) => {
         const providerData = storeState.providers[namespace.provider];
         if (namespaceMap[namespace.provider]) {
             namespaceMap[namespace.provider].subItems.push({
