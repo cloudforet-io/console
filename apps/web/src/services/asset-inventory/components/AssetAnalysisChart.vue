@@ -134,23 +134,25 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
         return { more: false, results: [] };
     }
 };
-const setChartData = debounce(async () => {
+const setChartData = debounce(async (analyze = true) => {
     state.loading = true;
 
-    const rawData = await analyzeMetricData();
-    if (!rawData) return;
-    state.data = rawData;
+    if (analyze) {
+        const rawData = await analyzeMetricData();
+        if (!rawData) return;
+        state.data = rawData;
+    }
     setPeriodText();
 
     const _granularity = assetAnalysisPageState.granularity;
     const _period = assetAnalysisPageState.period as Period;
     const _groupBy = assetAnalysisPageState.selectedChartGroupBy;
 
-    state.legends = getMetricChartLegends(assetAnalysisPageGetters.labelKeysReferenceMap, assetAnalysisPageState.selectedChartType, rawData, _groupBy);
+    state.legends = getMetricChartLegends(assetAnalysisPageGetters.labelKeysReferenceMap, assetAnalysisPageState.selectedChartType, state.data, _groupBy);
     if (assetAnalysisPageGetters.isRealtimeChart) {
-        state.chartData = getRefinedMetricRealtimeChartData(assetAnalysisPageGetters.labelKeysReferenceMap, rawData, _groupBy);
+        state.chartData = getRefinedMetricRealtimeChartData(assetAnalysisPageGetters.labelKeysReferenceMap, state.data, _groupBy);
     } else {
-        state.chartData = getRefinedMetricXYChartData(rawData, _granularity, _period, _groupBy);
+        state.chartData = getRefinedMetricXYChartData(state.data, _granularity, _period, _groupBy);
     }
     state.loading = false;
 }, 300);
@@ -158,7 +160,12 @@ const setChartData = debounce(async () => {
 /* Event */
 const handleSelectButton = (selected: ChartType|string) => {
     state.loading = true;
-    setChartData();
+    let analyzeData = false;
+    if ((assetAnalysisPageGetters.isRealtimeChart && selected === CHART_TYPE.LINE)
+        || (!assetAnalysisPageGetters.isRealtimeChart && selected !== CHART_TYPE.LINE)) {
+        analyzeData = true;
+    }
+    setChartData(analyzeData);
     assetAnalysisPageStore.setSelectedChartType(selected);
 };
 const handleToggleSeries = (index: number) => {
