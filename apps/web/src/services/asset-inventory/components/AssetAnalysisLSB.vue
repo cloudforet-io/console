@@ -247,9 +247,11 @@ watch(() => route.params, async () => {
     state.loading = true;
     await allReferenceStore.load('metric');
     if (state.currentMetricIdByUrl) {
+        const targetNamespace = namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id);
         assetAnalysisPageStore.setSelectedNamespace({
-            label: namespaceState.namespaces.find((item) => item.key === namespaceState.selectedMetric?.data.namespace_id)?.name,
+            label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
+            provider: targetNamespace?.provider,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
