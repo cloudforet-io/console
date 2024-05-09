@@ -262,7 +262,7 @@ watch(() => route.params, async () => {
             name: namespaceState.selectedMetric.data.namespace_id,
             provider: targetNamespace?.provider,
             category: targetNamespace.data.category,
-            icon: targetNamespace.data.icon,
+            icon: targetNamespace.data.category === 'COMMON' ? COMMON_NAMESPACE_ICON_PATH : targetNamespace.data.icon,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
@@ -282,9 +282,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 </script>
 
 <template>
-    <fragment>
+    <div class="asset-analysis-l-s-b">
         <l-s-b ref="lsbRef"
-               class="asset-analysis-l-s-b"
                :menu-set="state.menuSet"
         >
             <template #collapsible-contents-starred>
@@ -413,7 +412,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                 </div>
             </template>
         </p-popover>
-    </fragment>
+    </div>
 </template>
 
 <style scoped lang="postcss">
