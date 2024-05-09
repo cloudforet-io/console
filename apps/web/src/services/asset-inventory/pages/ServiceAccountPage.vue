@@ -378,7 +378,7 @@ watch([() => tableState.selectedAccountType, () => state.grantLoading], () => {
                     />
                 </template>
                 <template #col-is_managed-format="{item}">
-                    <auto-sync-state v-if="item.trusted_account_id"
+                    <auto-sync-state v-if="item.trusted_account_id && item.is_managed"
                                      :state="state.trustedAccounts[item.trusted_account_id]?.data?.schedule?.state"
                                      size="xs"
                     />
