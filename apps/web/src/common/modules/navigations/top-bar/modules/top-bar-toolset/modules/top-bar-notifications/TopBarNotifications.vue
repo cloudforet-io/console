@@ -14,6 +14,8 @@ import { store } from '@/store';
 import TopBarNotificationsContextMenu
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-notifications/modules/TopBarNotificationsContextMenu.vue';
 
+import { blue } from '@/styles/colors';
+
 
 interface Props {
     visible: boolean
@@ -27,6 +29,10 @@ const state = reactive({
     hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
     isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
     notificationCount: 0,
+    iconColor: computed<string>(() => {
+        if (props.visible) return blue[600];
+        return 'inherit';
+    }),
 });
 
 /* Util */
@@ -91,10 +97,13 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
                   @click.stop="handleNotiButtonClick"
                   @keydown.enter="showNotiMenu"
             >
+                <span v-if="state.hasNotifications"
+                      class="dot"
+                />
                 <p-i class="menu-icon"
                      :class="{ disabled: state.isNoRoleUser }"
-                     :name="state.hasNotifications ? 'ic_gnb_notification-unread' : 'ic_gnb_notification'"
-                     :color="state.hasNotifications ? undefined : 'inherit'"
+                     name="ic_gnb_notification"
+                     :color="state.iconColor"
                      width="1.375rem"
                      height="1.375rem"
                 />
@@ -128,6 +137,28 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
 
         &.opened {
             @apply text-blue-600 bg-blue-200;
+        }
+
+        .menu-icon {
+            &:hover {
+                @apply text-blue-600;
+            }
+        }
+        .dot {
+            @apply absolute rounded-full bg-white;
+            top: 6px;
+            right: 7px;
+            width: 8px;
+            height: 8px;
+            &::before {
+                content: '';
+
+                @apply absolute rounded-full bg-blue-500;
+                top: 1px;
+                right: 1px;
+                width: 6px;
+                height: 6px;
+            }
         }
 
         .disabled {
