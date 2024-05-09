@@ -37,7 +37,7 @@ export interface Legend {
     disabled?: boolean;
 }
 
-export type QueryFormMode = 'CREATE' | 'UPDATE';
+export type QueryFormMode = 'CREATE' | 'UPDATE' | 'VIEW';
 
 /* Data */
 export type MetricDataAnalyzeResult = {

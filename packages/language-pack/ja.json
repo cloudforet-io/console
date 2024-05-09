@@ -2488,7 +2488,8 @@
 				"SAVE": "保存",
 				"SAVE_AS": "名前を付けて保存",
 				"UNIT": "ユニット",
-				"UPDATE_TITLE": "クエリでユーザー定義メトリックを変更する"
+				"UPDATE_TITLE": "クエリでユーザー定義メトリックを変更する",
+				"VIEW_TITLE": ""
 			},
 			"DAILY": "日別データ",
 			"DELETE_CUSTOM_METRIC": "ユーザー定義メトリックの削除",

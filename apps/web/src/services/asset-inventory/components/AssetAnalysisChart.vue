@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router/composables';
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import {
-    PSelectButton, PSkeleton, PTextEditor, PEmpty,
+    PSelectButton, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import { debounce, isEmpty } from 'lodash';
 
@@ -44,13 +44,11 @@ import type {
 } from '@/services/asset-inventory/types/asset-analysis-type';
 
 
-const QUERY_OPTIONS_TYPE = 'query_options';
 const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
     { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
     { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
-    { name: QUERY_OPTIONS_TYPE, icon: 'ic_editor-code' },
 ];
 
 const route = useRoute();
@@ -160,9 +158,7 @@ const setChartData = debounce(async () => {
 /* Event */
 const handleSelectButton = (selected: ChartType|string) => {
     state.loading = true;
-    if (selected !== QUERY_OPTIONS_TYPE) {
-        setChartData();
-    }
+    setChartData();
     assetAnalysisPageStore.setSelectedChartType(selected);
 };
 const handleToggleSeries = (index: number) => {
@@ -211,65 +207,57 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
             </div>
         </div>
         <div class="bottom-part">
-            <template v-if="assetAnalysisPageState.selectedChartType !== QUERY_OPTIONS_TYPE">
-                <div class="left-part">
-                    <p-skeleton v-if="state.loading"
-                                height="100%"
+            <div class="left-part">
+                <p-skeleton v-if="state.loading"
+                            height="100%"
+                />
+                <template v-else-if="state.chartData.length">
+                    <asset-analysis-line-chart
+                        v-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                        :color-set="state.chartColorSet"
                     />
-                    <template v-else-if="state.chartData.length">
-                        <asset-analysis-line-chart
-                            v-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE"
-                            :loading="state.loading"
-                            :chart.sync="state.chart"
-                            :chart-data="state.chartData"
-                            :legends="state.legends"
-                            :color-set="state.chartColorSet"
-                        />
-                        <asset-analysis-donut-chart
-                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT"
-                            :loading="state.loading"
-                            :chart.sync="state.chart"
-                            :chart-data="state.chartData"
-                            :legends="state.legends"
-                            :color-set="state.chartColorSet"
-                        />
-                        <asset-analysis-tree-map-chart
-                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.TREEMAP"
-                            :loading="state.loading"
-                            :chart-data="state.chartData"
-                            :legends="state.legends"
-                        />
-                        <asset-analysis-horizontal-column-chart
-                            v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.COLUMN"
-                            :loading="state.loading"
-                            :chart.sync="state.chart"
-                            :chart-data="state.chartData"
-                            :color-set="state.chartColorSet"
-                        />
-                    </template>
-                    <p-empty v-else
-                             class="empty-wrapper"
-                    >
-                        <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_DATA') }}</span>
-                    </p-empty>
-                </div>
-                <div class="right-part">
-                    <asset-analysis-chart-legends :legends.sync="state.legends"
-                                                  :loading="state.loading"
-                                                  :more="state.data?.more"
-                                                  :color-set="state.chartColorSet"
-                                                  @toggle-series="handleToggleSeries"
-                                                  @show-all-series="handleAllSeries('show')"
-                                                  @hide-all-series="handleAllSeries('hide')"
+                    <asset-analysis-donut-chart
+                        v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                        :color-set="state.chartColorSet"
                     />
-                </div>
-            </template>
-            <p-text-editor
-                v-if="assetAnalysisPageState.selectedChartType === QUERY_OPTIONS_TYPE"
-                :code="assetAnalysisPageState.metric?.query_options"
-                read-only
-                class="query-options-editor"
-            />
+                    <asset-analysis-tree-map-chart
+                        v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.TREEMAP"
+                        :loading="state.loading"
+                        :chart-data="state.chartData"
+                        :legends="state.legends"
+                    />
+                    <asset-analysis-horizontal-column-chart
+                        v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.COLUMN"
+                        :loading="state.loading"
+                        :chart.sync="state.chart"
+                        :chart-data="state.chartData"
+                        :color-set="state.chartColorSet"
+                    />
+                </template>
+                <p-empty v-else
+                         class="empty-wrapper"
+                >
+                    <span class="text-paragraph-md">{{ $t('INVENTORY.ASSET_ANALYSIS.NO_DATA') }}</span>
+                </p-empty>
+            </div>
+            <div class="right-part">
+                <asset-analysis-chart-legends :legends.sync="state.legends"
+                                              :loading="state.loading"
+                                              :more="state.data?.more"
+                                              :color-set="state.chartColorSet"
+                                              @toggle-series="handleToggleSeries"
+                                              @show-all-series="handleAllSeries('show')"
+                                              @hide-all-series="handleAllSeries('hide')"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -301,9 +289,6 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
         }
         .right-part {
             @apply col-span-3;
-        }
-        .query-options-editor {
-            @apply col-span-12;
         }
 
         /* custom design-system component - p-text-editor */

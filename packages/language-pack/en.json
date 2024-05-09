@@ -2488,7 +2488,8 @@
 				"SAVE": "Save",
 				"SAVE_AS": "Save as",
 				"UNIT": "Unit",
-				"UPDATE_TITLE": "Edit Custom Metric with Query"
+				"UPDATE_TITLE": "Edit Custom Metric with Query",
+				"VIEW_TITLE": "View Metric Query"
 			},
 			"DAILY": "Daily",
 			"DELETE_CUSTOM_METRIC": "Delete Custom Metric",

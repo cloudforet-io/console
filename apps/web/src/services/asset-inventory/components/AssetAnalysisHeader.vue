@@ -50,7 +50,6 @@ const state = reactive({
     currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     isManagedMetric: computed<boolean>(() => (assetAnalysisPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
     metricNameFormModalVisible: false,
-    metricQueryFormModalVisible: false,
     metricDeleteModalVisible: false,
     loadingDuplicate: false,
     selectedNameFormModalType: undefined as string|undefined,
@@ -74,6 +73,12 @@ const state = reactive({
             return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_METRIC_EXAMPLE');
         }
         return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_CUSTOM_METRIC');
+    }),
+    editQueryTitle: computed(() => {
+        if (state.isManagedMetric || state.currentMetricExampleId) {
+            return i18n.t('INVENTORY.ASSET_ANALYSIS.VIEW_QUERY');
+        }
+        return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_QUERY');
     }),
     existingMetricNameList: computed<string[]>(() => assetAnalysisPageGetters.metrics
         .map((metric) => metric.name)),
@@ -227,7 +232,11 @@ const handleClickMoreMenuButton = () => {
     else showContextMenu();
 };
 const handleOpenEditQuery = () => {
-    assetAnalysisPageStore.openMetricQueryFormSidebar('UPDATE');
+    if (state.isManagedMetric || state.currentMetricExampleId) {
+        assetAnalysisPageStore.openMetricQueryFormSidebar('VIEW');
+    } else {
+        assetAnalysisPageStore.openMetricQueryFormSidebar('UPDATE');
+    }
 };
 </script>
 
@@ -278,15 +287,14 @@ const handleOpenEditQuery = () => {
                  class="right-part"
             >
                 <!-- metric case -->
+                <p-button class="mr-2"
+                          style-type="tertiary"
+                          icon-left="ic_editor-code"
+                          @click="handleOpenEditQuery"
+                >
+                    {{ state.editQueryTitle }}
+                </p-button>
                 <template v-if="!state.currentMetricExampleId">
-                    <p-button v-if="!state.isManagedMetric"
-                              class="mr-2"
-                              style-type="tertiary"
-                              icon-left="ic_editor-code"
-                              @click="handleOpenEditQuery"
-                    >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.EDIT_QUERY') }}
-                    </p-button>
                     <p-button class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"
