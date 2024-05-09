@@ -26,7 +26,7 @@
             <p-field-group v-for="(schemaProperty, propertyIdx) in schemaProperties"
                            :key="`field-${schemaProperty.propertyName}`"
                            class="input-form-wrapper"
-                           :help-text="schemaProperty?.description"
+                           :help-text="schemaProperty.description"
                            :label="schemaProperty.title"
                            :required="requiredList.includes(schemaProperty.propertyName)"
                            :invalid="getPropertyInvalidState(schemaProperty)"
