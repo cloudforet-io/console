@@ -43,7 +43,8 @@ const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     sidebarTitle: computed<TranslateResult>(() => {
         if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ADD_TITLE');
-        return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UPDATE_TITLE');
+        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UPDATE_TITLE');
+        return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.VIEW_TITLE');
     }),
     disableConfirmButton: computed<boolean>(() => {
         if (state.loading) return true;
@@ -153,7 +154,7 @@ const handleSaveCustomMetric = async () => {
 
 watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') {
+        if (assetAnalysisPageState.metricQueryFormMode !== 'CREATE') {
             setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
             setForm('unit', assetAnalysisPageState.metric?.unit || '');
         }
@@ -184,7 +185,8 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
+                <p-field-group v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
+                               :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
                                class="col-span-8"
                 >
                     <p-text-input :value="unit"
@@ -195,11 +197,14 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                required
                 >
                     <p-text-editor :code="code"
+                                   :read-only="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
                                    @update:code="setForm('code', $event)"
                     />
                 </p-field-group>
             </div>
-            <template #footer>
+            <template v-if="assetAnalysisPageState.metricQueryFormMode !== 'VIEW'"
+                      #footer
+            >
                 <div class="footer-wrapper">
                     <p-button style-type="transparent"
                               @click="handleClose"
