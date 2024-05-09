@@ -192,7 +192,7 @@ const handleTreeChangeSelect = (selected: ProjectTreeItem[]) => {
     state._selectedProjectIds = state.selectedProjects.map((d) => d.id);
 
     if (!props.multiSelectable) {
-        if (state.visibleMenu) state.visibleMenu = false;
+        if (state.visibleMenu && state._selectedProjectIds[0] !== props.selectedProjectIds[0]) state.visibleMenu = false;
     }
 
     emit('select', state.selectedProjects);
