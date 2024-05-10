@@ -48,7 +48,7 @@ const state = reactive({
 
 const handleClickGoToMetric = () => {
     window.open(router.resolve(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
         params: {
             metricId: props.goToMetricServerPage ? METRIC_SERVER_ID : state.targetMetric.key,
         },
@@ -62,7 +62,7 @@ const handleClickGoToMetric = () => {
                        icon-right="ic_arrow-right-up"
                        @click="handleClickGoToMetric"
         >
-            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_IN_METRIC_EXPLORER') }}
+            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_IN_ASSET_ANALYSIS') }}
         </p-text-button>
     </div>
 </template>
