@@ -164,7 +164,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     />
                     <img v-if="storeState.selectedNamespace?.category === 'COMMON'"
                          class="namespace-image"
-                         :src="storeState.selectedNamespace?.icon"
+                         src="@/assets/images/img_common-asset@2x.png"
                          alt="common-namespace-image"
                     >
                     <p-lazy-img v-else
