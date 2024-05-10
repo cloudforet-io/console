@@ -110,6 +110,7 @@ const createAccount = async (): Promise<string|undefined> => {
         }
     }
     let secretData;
+    console.debug(formState.credentialForm.activeDataType);
     if (formState.credentialForm.activeDataType === 'json') {
         secretData = JSON.parse(formState.credentialForm.credentialJson ?? '');
     } else if (formState.credentialForm.activeDataType === 'input') {
@@ -143,8 +144,8 @@ const createAccount = async (): Promise<string|undefined> => {
                 provider: props.provider,
                 name: formState.baseInformationForm.accountName.trim(),
                 data,
-                secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
-                secret_data: secretData,
+                secret_schema_id: props.provider === 'kubernetes' ? undefined : formState.credentialForm?.selectedSecretSchema?.schema_id,
+                secret_data: props.provider === 'kubernetes' ? undefined : secretData,
                 tags: formState.baseInformationForm.tags,
                 trusted_account_id: attachedTrustedAccountId,
                 project_id: formState.baseInformationForm.projectForm.selectedProjectId,
