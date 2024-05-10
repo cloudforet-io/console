@@ -75,6 +75,7 @@ const state = reactive({
     more: false,
     metricResourceType: computed<string|undefined>(() => assetAnalysisPageState.metric?.resource_type),
     hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
+    metricAdditionalFilter: computed(() => (assetAnalysisPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key, v: d.value, o: d.operator })) ?? []),
 });
 
 /* Util */
@@ -185,17 +186,30 @@ const handleClickRow = (item) => {
 
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
+    let apiQuery: {
+        filters: string[],
+        default_filters?: string[],
+    } = {
+        filters: queryHelper.setFilters(_filters).rawQueryStrings,
+    };
+
     if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
         _params = { provider, group, name };
         _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
+
+        if (state.metricAdditionalFilter.length) {
+            apiQuery = {
+                ...apiQuery,
+                default_filters: state.metricAdditionalFilter.map((d) => JSON.stringify(d)),
+            };
+        }
     }
+
     window.open(router.resolve(getProperRouteLocation({
         name: _routeName,
         params: _params,
-        query: {
-            filters: queryHelper.setFilters(_filters).rawQueryStrings,
-        },
+        query: apiQuery,
     })).href, '_blank');
 };
 
