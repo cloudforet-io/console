@@ -2885,13 +2885,17 @@
 				"DELETE_WARNING": "サービスアカウントを削除すると、収集されたすべてのデータが削除されます.",
 				"DISCONNECTED_CLUSTER_TEXT": "クラスターはまだ接続されていません.",
 				"INACTIVE": "Inactive",
-				"RECONNECT": "再接続"
+				"RECONNECT": "再接続",
+				"RECONNECT_CAUTION": "クラスターを再接続すると、既存のクラスターへの接続が切断されます。",
+				"RECONNECT_DESCRIPTION": "{cluster} クラスターを再接続しますか？",
+				"RECONNECT_TITLE": "クラスター再接続"
 			},
 			"CLUSTER_MODAL": {
 				"CANCEL": "キャンセル",
 				"CHECKLIST_OPTION_LABEL": "クラスター接続前のチェックリスト",
 				"CLUSTER_NAME": "Cluster Name",
 				"CLUSTER_NAME_INFORMATION": "helm インストールとクラスター接続のために、まず Kubernetes クラスター名を教えてください。",
+				"CONFLICT_INFO": "システムにすでにインストールされている場合、問題が発生する可能性があります。",
 				"CONNECT_CLUSTER_WARNING": "システムにSpaceONE Helmリポジトリがインストールされている必要があります。",
 				"CONTINUE_BUTTON": "次へ",
 				"COPIED": "コピーしました",
@@ -2901,6 +2905,7 @@
 				"FIND_OUT_INFORMATION": "Kubernetesクラスターでkubectlが構成情報を伝達および修正する方法を調べてください。",
 				"FIRST_TITLE": "クラスターの基本情報に関する\n追加作業が必要です。",
 				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "以下のコマンドを入力すると、kube-state-metricsを見つけることができます。",
+				"LEARN_MORE": "詳細を見る",
 				"LOADING": "新しいキーを待っています...",
 				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "隠す",
 				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "詳しく調べる",

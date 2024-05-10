@@ -4,11 +4,13 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal,
+    PPaneLayout, PHeading, PButton, PEmpty, PDataLoader, PButtonModal, PDoubleCheckModal, PI,
 } from '@spaceone/design-system';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
-import { i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
+
+import { red } from '@/styles/colors';
 
 import ServiceAccountAddClusterModal from '@/services/asset-inventory/components/ServiceAccountAddClusterModal.vue';
 import ServiceAccountAddClusterScriptField
@@ -35,7 +37,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    title: computed(() => (storeState.isAgentCreated ? i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CLUSTER_DETAIL_HEADER') : i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER_HEADER'))),
+    title: computed(() => (storeState.isAgentCreated ? _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CLUSTER_DETAIL_HEADER') : _i18n.t('INVENTORY.SERVICE_ACCOUNT.AGENT.CONNECT_CLUSTER_HEADER'))),
     isClusterActive: computed(() => (storeState.agentData?.state === 'ENABLED')),
 });
 
@@ -43,6 +45,7 @@ const modalState = reactive({
     addClusterModalType: 'ADD' as 'ADD' | 'REGENERATE',
     addClusterModalVisible: false,
     connectionModalVisible: false,
+    reconnectModalVisible: false,
     deleteClusterModalVislble: false,
     deleteAgentScript: computed(() => 'helm uninstall spaceone-agent -n spaceone-agent helm repo remove spaceone-agent'),
 });
@@ -54,7 +57,11 @@ const handleOpenAddClusterModal = () => {
 const handleOpenClusterConnectionModal = () => {
     modalState.connectionModalVisible = true;
 };
+const handleOpenReconnectModal = () => {
+    modalState.reconnectModalVisible = true;
+};
 const handleOpenRegenerateClusterModal = async () => {
+    modalState.reconnectModalVisible = false;
     modalState.addClusterModalType = 'REGENERATE';
     modalState.addClusterModalVisible = true;
     await serviceAccountAgentStore.regenerateAgent(props.serviceAccountId);
@@ -103,7 +110,7 @@ onUnmounted(() => {
                     </p-button>
                     <p-button icon-left="ic_renew"
                               style-type="tertiary"
-                              @click="handleOpenRegenerateClusterModal"
+                              @click="handleOpenReconnectModal"
                     >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
                     </p-button>
@@ -159,6 +166,35 @@ onUnmounted(() => {
                         :header-title="state.isClusterActive ? $t('INVENTORY.SERVICE_ACCOUNT.AGENT.DEACTIVATE_MODAL_TEXT') : $t('INVENTORY.SERVICE_ACCOUNT.AGENT.ACTIVATE_MODAL_TEXT')"
                         @confirm="handleConfirmClusterConnection"
         />
+        <p-button-modal class="cluster-reconnect-modal"
+                        size="sm"
+                        :visible.sync="modalState.reconnectModalVisible"
+                        theme-color="primary"
+                        :header-title="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT_TITLE')"
+                        @confirm="handleOpenRegenerateClusterModal"
+        >
+            <template #body>
+                <p class="reconnect-description">
+                    <i18n path="INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT_DESCRIPTION">
+                        <template #cluster>
+                            <strong>{{ storeState.agentData?.options?.cluster_name }}</strong>
+                        </template>
+                    </i18n>
+                </p>
+                <div class="reconnect-caution">
+                    <p-i class="icon"
+                         name="ic_error-filled"
+                         width="1.25rem"
+                         height="1.25rem"
+                         :color="red[400]"
+                    />
+                    <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT_CAUTION') }}</p>
+                </div>
+            </template>
+            <template #confirm-button>
+                {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
+            </template>
+        </p-button-modal>
         <p-double-check-modal class="cluster-delete-modal"
                               modal-size="md"
                               :visible.sync="modalState.deleteClusterModalVislble"
@@ -213,6 +249,19 @@ onUnmounted(() => {
         }
     }
 
+    .cluster-reconnect-modal {
+        .reconnect-description {
+            @apply text-paragraph-lg text-gray-900;
+            margin-bottom: 0.875rem;
+        }
+        .reconnect-caution {
+            @apply text-paragraph-md text-gray-900 flex gap-1 rounded bg-red-100;
+            padding: 0.625rem 1rem;
+            .icon {
+                min-width: 1.25rem;
+            }
+        }
+    }
     .delete-agent-script {
         margin-bottom: 1.5rem;
     }
