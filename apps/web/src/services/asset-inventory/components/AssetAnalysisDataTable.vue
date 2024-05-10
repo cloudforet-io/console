@@ -12,7 +12,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { numberFormatter } from '@cloudforet/utils';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -80,6 +80,10 @@ const state = reactive({
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
+        if (typeof value !== 'number') return '--';
+        if (assetAnalysisPageState.metric?.unit === 'Bytes') {
+            return byteFormatter(value);
+        }
         return numberFormatter(value, { notation: 'compact' }) || '--';
     }
     return assetAnalysisPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
