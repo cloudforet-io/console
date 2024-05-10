@@ -191,6 +191,9 @@ onUnmounted(() => {
                     <p>{{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT_CAUTION') }}</p>
                 </div>
             </template>
+            <template #confirm-button>
+                {{ $t('INVENTORY.SERVICE_ACCOUNT.AGENT.RECONNECT') }}
+            </template>
         </p-button-modal>
         <p-double-check-modal class="cluster-delete-modal"
                               modal-size="md"
