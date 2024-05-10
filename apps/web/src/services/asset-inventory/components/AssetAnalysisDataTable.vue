@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import bytes from 'bytes';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -33,6 +34,8 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 
+
+const UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
 
 const router = useRouter();
 const route = useRoute();
@@ -81,8 +84,10 @@ const state = reactive({
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
         if (typeof value !== 'number') return '--';
-        if (assetAnalysisPageState.metric?.unit === 'Bytes') {
-            return byteFormatter(value);
+        const _unit = assetAnalysisPageState.metric?.unit;
+        const _originalVal = bytes.parse(`${value}${_unit}`);
+        if (_unit && UNITS.includes(_unit)) {
+            return byteFormatter(_originalVal);
         }
         return numberFormatter(value, { notation: 'compact' }) || '--';
     }
