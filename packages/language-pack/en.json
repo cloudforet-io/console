@@ -2885,13 +2885,17 @@
 				"DELETE_WARNING": "If you delete your account, you will lose all of your data.",
 				"DISCONNECTED_CLUSTER_TEXT": "A cluster has not been connected yet.",
 				"INACTIVE": "Inactive",
-				"RECONNECT": "Reconnect"
+				"RECONNECT": "Reconnect",
+				"RECONNECT_CAUTION": "If you reconnect the cluster, the connected cluster will be disconnected.",
+				"RECONNECT_DESCRIPTION": "Are you sure you want to reconnect {cluster}?",
+				"RECONNECT_TITLE": "Reconnect Cluster"
 			},
 			"CLUSTER_MODAL": {
 				"CANCEL": "Cancel",
 				"CHECKLIST_OPTION_LABEL": "Checklist - before connecting cluster",
 				"CLUSTER_NAME": "Cluster Name",
 				"CLUSTER_NAME_INFORMATION": "To install helm and connect cluster, let us know your Kubernetes cluster name first.",
+				"CONFLICT_INFO": "If already installed on your system, there might be an issue.",
 				"CONNECT_CLUSTER_WARNING": "You must have the SpaceONE Helm repository on your system before continuing.",
 				"CONTINUE_BUTTON": "Continue",
 				"COPIED": "Copied",
@@ -2901,6 +2905,7 @@
 				"FIND_OUT_INFORMATION": "Find out how Kubernetes cluster kubectl passes and modifies configuration information.",
 				"FIRST_TITLE": "To connect your cluster, \nyou need a few setups.",
 				"KUBE_STATE_METRIC_SCRIPT_GUIDE": "To find out the kube-state-metrics, enter the command below:",
+				"LEARN_MORE": "Learn more",
 				"LOADING": "Waiting for new key...",
 				"OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT": "hide",
 				"OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT": "Learn how to find out",
