@@ -38,7 +38,7 @@ const getTreemapChartColor = (idx: number) => {
         break;
     case [4, 5, 6, 7].includes(idx):
         backgroundColor = indigo[300];
-        fontColor = transparent;
+        fontColor = gray[900];
         break;
     default:
         backgroundColor = indigo[200];
