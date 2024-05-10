@@ -182,6 +182,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             state.period = { start: options.period.start, end: options.period.end };
         }
         state.filters = getRefinedFilters(options.filters);
+        state.displayDataType = options.display_data_type ?? 'cost';
 
         // check admin mode
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
@@ -202,6 +203,7 @@ export const useCostAnalysisPageStore = defineStore('page-cost-analysis', () => 
             relative_period: state.relativePeriod,
             group_by: state.groupBy,
             filters: getters.consoleFilters,
+            display_data_type: state.displayDataType,
             metadata: { filters_schema: { enabled_properties: state.enabledFiltersProperties ?? [] } },
         };
         let createdData;

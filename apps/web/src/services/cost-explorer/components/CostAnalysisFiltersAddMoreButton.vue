@@ -55,7 +55,6 @@ const {
     reloadMenu,
     showMoreMenu,
 } = useContextMenuController({
-    useFixedStyle: true,
     targetRef,
     contextMenuRef,
     useMenuFiltering: true,

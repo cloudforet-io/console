@@ -44,6 +44,8 @@ export type InnerJsonSchema = JsonSchema & {
     appearanceType?: InputAppearanceType;
     pageSize?: number;
     referenceHandler?: AutocompleteHandler;
+    description?: string;
+    markdown?: string;
 };
 
 export type CustomErrorMap = Record<string, string>;

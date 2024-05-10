@@ -200,11 +200,7 @@ watch(() => props.visible, async (visible) => {
                         <template #no-data>
                             <p-empty show-image
                                      :title="$t('PROJECT.LANDING.NO_GROUP_MEMBER')"
-                            >
-                                <div>
-                                    {{ $t('PROJECT.LANDING.MODAL_PROJECT_GROUP_MEMBER.NO_DATA_DESCRIPTION') }}
-                                </div>
-                            </p-empty>
+                            />
                         </template>
                         <template v-for="(userId, idx) in state.selectedUserIdList">
                             <div :key="`selected-member-${userId}`"

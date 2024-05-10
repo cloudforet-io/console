@@ -81,9 +81,8 @@ const handleToggleAdminMode = throttle(async () => {
 <style lang="postcss" scoped>
 .top-bar-admin-toggle-button {
     @apply relative inline-block cursor-pointer;
-    width: 6.875rem;
+    width: 4.875rem;
     height: 1.75rem;
-    padding: 0 1rem;
 
     .switch-input {
         opacity: 0;

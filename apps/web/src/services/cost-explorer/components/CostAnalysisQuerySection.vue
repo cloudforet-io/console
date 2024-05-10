@@ -99,6 +99,7 @@ const handleSaveQuerySet = async () => {
                 relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
                 filters: costAnalysisPageGetters.consoleFilters,
+                display_data_type: costAnalysisPageState.displayDataType,
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
