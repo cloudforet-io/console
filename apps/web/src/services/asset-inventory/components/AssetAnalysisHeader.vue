@@ -74,11 +74,17 @@ const state = reactive({
         }
         return i18n.t('INVENTORY.ASSET_ANALYSIS.DELETE_CUSTOM_METRIC');
     }),
-    editQueryTitle: computed(() => {
+    editQueryTitle: computed<TranslateResult>(() => {
         if (state.isManagedMetric || state.currentMetricExampleId) {
             return i18n.t('INVENTORY.ASSET_ANALYSIS.VIEW_QUERY');
         }
         return i18n.t('INVENTORY.ASSET_ANALYSIS.EDIT_QUERY');
+    }),
+    editQueryButtonIcon: computed<string>(() => {
+        if (state.isManagedMetric || state.currentMetricExampleId) {
+            return 'ic_editor-code';
+        }
+        return 'ic_edit';
     }),
     existingMetricNameList: computed<string[]>(() => assetAnalysisPageGetters.metrics
         .map((metric) => metric.name)),
@@ -289,7 +295,7 @@ const handleOpenEditQuery = () => {
                 <!-- metric case -->
                 <p-button class="mr-2"
                           style-type="tertiary"
-                          icon-left="ic_editor-code"
+                          :icon-left="state.editQueryButtonIcon"
                           @click="handleOpenEditQuery"
                 >
                     {{ state.editQueryTitle }}
