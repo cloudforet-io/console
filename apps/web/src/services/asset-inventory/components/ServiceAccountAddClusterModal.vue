@@ -9,6 +9,7 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import type { AgentModel } from '@/schema/identity/agent/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -286,30 +287,49 @@ watch(() => props.visible, (visible) => {
                                 </p-radio-group>
                             </div>
                         </div>
-                        <div class="lean-guide">
-                            <div v-if="!state.guideCollapsed"
-                                 class="guide-content"
-                            >
-                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metrics]"
-                                                                          highlightingt-term="kube-state-metric"
-                                                                          :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
-                                                                          script-height="3.5rem"
-                                />
-                                <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
-                                                                          highlightingt-term="prometheus-node-exporter"
-                                                                          :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
-                                                                          script-height="3.5rem"
-                                />
-                            </div>
-                            <p-collapsible-toggle :is-collapsed.sync="state.guideCollapsed">
-                                {{
-                                    state.guideCollapsed ?
-                                        $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT')
-                                        : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT')
-                                }}
-                            </p-collapsible-toggle>
-                        </div>
                     </p-field-group>
+                    <div class="information">
+                        <p-i class="info-icon"
+                             name="ic_info-circle"
+                             width="0.875rem"
+                             height="0.875rem"
+                        />
+                        <div class="description">
+                            <p>
+                                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.CONFLICT_INFO') }}
+                            </p>
+                            <p-link :href="`https://cloudforet.io/${store.state.user.language}/docs/guides/account-hierarchy/kubernetes`"
+                                    highlight
+                                    :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            >
+                                {{ $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.LEARN_MORE') }}
+                            </p-link>
+                        </div>
+                    </div>
+                    <p-divider class="divider second" />
+                    <div class="lean-guide">
+                        <div v-if="!state.guideCollapsed"
+                             class="guide-content"
+                        >
+                            <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.kube_state_metrics]"
+                                                                      highlightingt-term="kube-state-metric"
+                                                                      :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.KUBE_STATE_METRIC_SCRIPT_GUIDE')"
+                                                                      script-height="3.5rem"
+                            />
+                            <service-account-add-cluster-script-field :script="scriptState.optionGuideScript[OPEN_COST_OPTIONS.prometheus_node_exporter]"
+                                                                      highlightingt-term="prometheus-node-exporter"
+                                                                      :description="$t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.PROMETHEUS_NODE_EXPORTER_SCRIPT_GUIDE')"
+                                                                      script-height="3.5rem"
+                            />
+                        </div>
+                        <p-collapsible-toggle :is-collapsed.sync="state.guideCollapsed">
+                            {{
+                                state.guideCollapsed ?
+                                    $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_OPEN_TEXT')
+                                    : $t('INVENTORY.SERVICE_ACCOUNT.CLUSTER_MODAL.OPTIONS_SCRIPT_TOGGLE_CLOSE_TEXT')
+                            }}
+                        </p-collapsible-toggle>
+                    </div>
                 </div>
                 <div v-else-if="state.step === 2"
                      class="second-section"
@@ -419,6 +439,10 @@ watch(() => props.visible, (visible) => {
             }
             .divider {
                 margin: 1rem 0;
+
+                &.second {
+                    margin: 0.75rem 0;
+                }
             }
             .checklist-wrapper {
                 @apply flex flex-col gap-1;
