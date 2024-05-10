@@ -1,7 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type {
-    Granularity, GroupBy, Period, RelativePeriod,
+    Granularity, GroupBy, Period, RelativePeriod, DisplayDataType,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
@@ -11,6 +11,7 @@ export interface CostQuerySetOption {
     period?: Period;
     relative_period?: RelativePeriod;
     filters?: ConsoleFilter[];
+    display_data_type?: DisplayDataType;
     metadata?: {
         filters_schema?: {
             enabled_properties?: string[];

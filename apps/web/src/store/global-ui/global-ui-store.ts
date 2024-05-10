@@ -10,7 +10,7 @@ export const useGlobalUIStore = defineStore('global-ui', () => {
     });
 
     const getters = reactive({
-        appBodyHeight: computed<string>(() => `calc(100vh - ${state.topNotificationHeight}px - ${gnbHeight})`),
+        appBodyHeight: computed<string>(() => `calc(100vh - ${gnbHeight})`),
     });
 
     const actions = {

@@ -7,6 +7,8 @@ import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { screens } from '@/index';
 
+const MOBILE_WIDTH = '312';
+
 interface Props {
     height?: string;
     initWidth?: number;
@@ -27,6 +29,7 @@ const documentEventMount = (eventName: string, func: any) => {
 };
 
 const state = reactive({
+    isMobileSize: false,
     width: props.initWidth,
     resizing: false,
     clientX: null,
@@ -38,10 +41,13 @@ const state = reactive({
         'overflow-y': 'auto',
         'overflow-x': 'hidden',
         'border-right-width': state.hide ? 0 : '1px',
+        ...(state.isMobileSize && {
+            position: 'absolute',
+            zIndex: 1,
+        }),
     })),
     sidebarStyle: computed(() => ({
         width: 'auto',
-        // height: '100%',
         minWidth: `${props.minWidth}px`,
         maxWidth: `${props.maxWidth}px`,
         opacity: state.hide && !state.transition ? 0 : 1,
@@ -53,7 +59,7 @@ const state = reactive({
         left: `${state.width}px`,
     })),
     mainStyle: computed(() => ({
-        width: `calc( 100% - ${state.width}px )`,
+        width: state.isMobileSize ? '100%' : `calc( 100% - ${state.width}px )`,
         height: props.height,
     })),
 });
@@ -66,13 +72,12 @@ const isResizing = (event) => {
             return;
         }
         const delta = state.clientX - event.clientX;
-        const width = state.width - delta;
+        const width = (state.isMobileSize ? MOBILE_WIDTH : state.width) - delta;
         if (!(width <= props.minWidth || width > props.maxWidth)) {
             state.width = width;
         }
         state.clientX = event.clientX;
     }
-    // event.preventDefault();
 };
 const endResizing = () => {
     state.resizing = false;
@@ -84,14 +89,14 @@ const startResizing = () => {
 
 /* Toggle hide Sidebar */
 const offTransition = () => { state.transition = false; };
-const hideSidebar = () => {
+const handleSidebarToggle = () => {
     if (!state.hide) {
         state.hide = true;
         state.transition = true;
         state.width = 0;
         setTimeout(offTransition, 500);
     } else {
-        state.width = props.initWidth;
+        state.width = state.isMobileSize ? MOBILE_WIDTH : props.initWidth;
         state.transition = true;
         state.hide = false;
         setTimeout(offTransition, 500);
@@ -101,13 +106,14 @@ documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
 
 const detectWindowResizing = () => {
+    state.isMobileSize = window.innerWidth <= screens.mobile.max;
     if (!state.hide) {
-        if (window.innerWidth <= screens.mobile.max) {
+        if (state.isMobileSize) {
             state.hide = false;
-            hideSidebar();
+            handleSidebarToggle();
         } else {
             state.hide = true;
-            hideSidebar();
+            handleSidebarToggle();
         }
     }
 };
@@ -141,7 +147,7 @@ window.addEventListener('resize', detectWindowResizing);
                        position="right"
                        :class="{hide: state.hide}"
                        class="resizer"
-                       @click="hideSidebar"
+                       @click="handleSidebarToggle"
             >
                 <span class="resizer-button">
                     <slot name="resizer-button">
