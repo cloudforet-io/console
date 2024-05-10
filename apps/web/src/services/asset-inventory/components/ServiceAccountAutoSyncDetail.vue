@@ -68,6 +68,7 @@ const state = reactive({
 
 <style lang="postcss" scoped>
 .service-account-auto-sync-detail {
+    padding-right: 1rem;
     .hourly-schedule-field-group {
         margin-bottom: 1.875rem;
 

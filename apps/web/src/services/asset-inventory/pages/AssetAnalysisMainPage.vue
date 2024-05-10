@@ -63,13 +63,14 @@ const state = reactive({
     recentMetricCardList: computed(() => state.recentList.map((recent) => {
         const metric = storeState.metric[recent.data.id];
         const namespace = storeState.namespace[metric?.data?.namespace_id ?? ''];
+        if (metric?.label === undefined) return undefined;
         return ({
             id: recent.data.id,
             icon: namespace?.data?.icon,
             label: namespace?.label ?? '',
             metricName: metric?.label ?? undefined,
         });
-    })),
+    }).filter((recent) => recent !== undefined)),
 });
 
 const handleRouteToMetricDetail = (metricId: string) => {
