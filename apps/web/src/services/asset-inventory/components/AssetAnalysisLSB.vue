@@ -39,7 +39,7 @@ import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/ass
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
 
-const COMMON_NAMESPACE_ICON_PATH = '/src/assets/images/img_common-asset.svg';
+const COMMON_NAMESPACE_ICON_PATH = '/src/assets/images/img_common-asset@2x.png';
 
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
