@@ -212,6 +212,13 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
                 </span>
             </p-empty>
+            <p-empty v-else-if="!state.inputValue && !state.metricItems.length"
+                     class="keyword-search-empty"
+            >
+                <span>
+                    {{ $t('INVENTORY.ASSET_ANALYSIS.NO_ITEMS') }}
+                </span>
+            </p-empty>
         </div>
     </p-data-loader>
 </template>
