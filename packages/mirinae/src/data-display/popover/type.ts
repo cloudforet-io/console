@@ -19,6 +19,7 @@ export const POPOVER_TRIGGER = {
     CLICK: 'click',
     HOVER: 'hover',
     FOCUS: 'focus',
+    NONE: 'none',
 } as const;
 
 export type PopoverTrigger = typeof POPOVER_TRIGGER[keyof typeof POPOVER_TRIGGER];

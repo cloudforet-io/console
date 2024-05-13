@@ -37,31 +37,22 @@ const storeState = reactive({
 });
 const state = reactive({
     targetMetric: computed<MetricReferenceItem|undefined>(() => {
+        if (props.goToMetricServerPage) {
+            return Object.values(storeState.metrics).find((d) => d.key === METRIC_SERVER_ID);
+        }
         const _refinedResourceType = `inventory.CloudService:${props.provider}.${props.group}.${props.name}`;
         return Object.values(storeState.metrics).find((d) => d.data.resource_type === _refinedResourceType);
     }),
-    showMetricButton: computed<boolean>(() => {
-        if (props.goToMetricServerPage) return true;
-        return !!state.targetMetric;
-    }),
+    showMetricButton: computed<boolean>(() => !!state.targetMetric),
 });
 
 const handleClickGoToMetric = () => {
-    if (props.goToMetricServerPage) {
-        router.push(getProperRouteLocation({
-            name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
-            params: {
-                metricId: METRIC_SERVER_ID,
-            },
-        }));
-        return;
-    }
-    router.push(getProperRouteLocation({
-        name: ASSET_INVENTORY_ROUTE.METRIC_EXPLORER.DETAIL._NAME,
+    window.open(router.resolve(getProperRouteLocation({
+        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
         params: {
-            metricId: state.targetMetric.key,
+            metricId: props.goToMetricServerPage ? METRIC_SERVER_ID : state.targetMetric.key,
         },
-    }));
+    })).href, '_blank');
 };
 </script>
 
@@ -71,7 +62,7 @@ const handleClickGoToMetric = () => {
                        icon-right="ic_arrow-right-up"
                        @click="handleClickGoToMetric"
         >
-            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_IN_METRIC_EXPLORER') }}
+            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_IN_ASSET_ANALYSIS') }}
         </p-text-button>
     </div>
 </template>

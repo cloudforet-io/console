@@ -104,7 +104,7 @@ onUnmounted(() => {
         <p-empty
             show-image
             image-size="md"
-            :show-button="state.emptyData.to"
+            :show-button="!!state.emptyData.to"
             class="no-data"
         >
             <template #image>

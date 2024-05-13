@@ -55,9 +55,6 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
                 key: 'project_id',
                 name: 'Project',
                 type: 'text',
-                options: {
-                    translation_id: 'PAGE_SCHEMA.PROJECT',
-                },
                 reference: {
                     resource_type: 'identity.Project',
                     reference_key: 'project_id',
@@ -73,7 +70,6 @@ export const getDefaultDetailSchema = (fields: DynamicField[], options: {
                 name: 'Tags',
                 type: 'dict',
                 options: {
-                    translation_id: 'PAGE_SCHEMA.TAGS',
                     disable_copy: true,
                 },
             },
