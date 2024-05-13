@@ -15,7 +15,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
     totalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
-    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedIndices),
+    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedDataSourceIndices),
 });
 
 onMounted(() => {
@@ -43,7 +43,7 @@ onMounted(() => {
             </template>
         </p-heading>
         <div class="contents">
-            <data-source-management-table :selected-indices="storeState.selectedIndices" />
+            <data-source-management-table />
             <data-source-management-tabs v-if="storeState.selectedIndices.length > 0" />
             <span v-else
                   class="no-data"

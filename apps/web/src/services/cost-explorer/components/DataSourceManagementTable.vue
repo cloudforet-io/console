@@ -12,19 +12,13 @@ import { i18n } from '@/translations';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
-interface Props {
-    selectedIndices?: number[];
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    selectedIndices: undefined,
-});
-
 const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
+    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedDataSourceIndices),
 });
 const state = reactive({
     loading: false,
@@ -72,7 +66,7 @@ const userListApiQueryHelper = new ApiQueryHelper()
 let userListApiQuery = userListApiQueryHelper.data;
 
 const handleUpdateSelectIndex = (indices: number[]) => {
-    dataSourcesPageStore.setSelectedIndices(indices);
+    dataSourcesPageStore.selectedDataSourceIndices(indices);
 };
 const handleChange = (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
@@ -94,7 +88,7 @@ const handleChange = (options: any = {}) => {
                              sortable
                              sort-by="name"
                              :multi-select="false"
-                             :select-index="props.selectedIndices"
+                             :select-index="storeState.selectedIndices"
                              :fields="tableState.fields"
                              :items="storeState.dataSourceList"
                              :loading="state.loading"

@@ -8,6 +8,8 @@ import { durationFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
+import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';
+import type { CostDataSourceAccountUpdateParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/update';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
@@ -21,7 +23,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DataSourceItem, CostJobItem } from '@/services/cost-explorer/types/data-sources-type';
+import type { CostJobItem, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -31,11 +33,12 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         activeTab: 'detail',
         dataSourceList: [] as DataSourceModel[],
         dataSourceListTotalCount: 0,
-        selectedIndices: [] as number[],
+        selectedDataSourceIndices: [] as number[],
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
         linkedAccounts: [] as CostDataSourceAccountModel[],
         linkedAccountsTotalCount: 0,
+        selectedLinkedAccountsIndices: [] as number[],
     });
 
     const _getters = reactive({
@@ -61,9 +64,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             ...i,
             updated_at: dayjs.utc(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
         })))),
-        selectedItem: computed<DataSourceItem>(() => {
-            if (state.selectedIndices.length === 0) return {} as DataSourceItem;
-            const item = getters.dataSourceList[state.selectedIndices[0]];
+        selectedDataSourceItem: computed<DataSourceItem>(() => {
+            if (state.selectedDataSourceIndices.length === 0) return {} as DataSourceItem;
+            const item = getters.dataSourceList[state.selectedDataSourceIndices[0]];
             if (!item) return {} as DataSourceItem;
             const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];
             return {
@@ -74,8 +77,11 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const mutation = {
-        setSelectedIndices: (indices: number[]) => {
-            state.selectedIndices = indices;
+        selectedDataSourceIndices: (indices: number[]) => {
+            state.selectedDataSourceIndices = indices;
+        },
+        selectedLinkedAccountsIndices: (indices: number[]) => {
+            state.selectedLinkedAccountsIndices = indices;
         },
         setActiveTab: (tab: string) => {
             state.activeTab = tab;
@@ -116,6 +122,24 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 ErrorHandler.handleError(e);
                 state.linkedAccounts = [];
                 state.linkedAccountsTotalCount = 0;
+            }
+        },
+        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters, idx: number) => {
+            try {
+                state.linkedAccounts[idx] = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
+                    params,
+                );
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        resetLinkedAccount: async (params: CostDataSourceAccountResetParameters) => {
+            try {
+                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountResetParameters>(
+                    params,
+                );
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
     };
