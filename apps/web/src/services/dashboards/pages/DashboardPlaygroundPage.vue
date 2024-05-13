@@ -5,8 +5,9 @@ import {
     PSelectDropdown, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 
-import type { DashboardSettings, DashboardVariablesSchema, DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
-
+import type {
+    DashboardSettings, DashboardVariablesSchema, DashboardVariables, DataSource,
+} from '@/schema/dashboard/_types/dashboard-type';
 
 import VerticalBarChart from '@/common/modules/widgets/_base-widgets/vertical-bar-chart/VerticalBarChart.vue';
 
@@ -20,16 +21,18 @@ const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
-    dataSourceList: [
+    dataSources: [
         {
+            data_domain: 'Cost',
             resource_type: 'cost_analysis.Cost',
-            value: 'ds-3d5b2ed535c7',
+            value: ['ds-3d5b2ed535c7'],
         },
         {
+            data_domain: 'Asset',
             resource_type: 'inventory.MetricData',
-            value: 'metric-aws-ec2-instance-count',
+            value: ['metric-aws-ec2-instance-count'],
         },
-    ],
+    ] as DataSource[],
     variablesSchema: {} as DashboardVariablesSchema,
     variables: {} as DashboardVariables,
     settings: {
@@ -52,6 +55,8 @@ const formState = reactive({
     title: 'Vertical Bar Chart',
     description: '',
     selectedChartType: 'verticalBarChart',
+    dataMapping: {},
+    chartOptions: {},
 });
 </script>
 
@@ -65,23 +70,28 @@ const formState = reactive({
         </p>
         <br>
         <div class="grid grid-cols-12">
-            <vertical-bar-chart :all-reference-type-info="state.allReferenceTypeInfo"
-                                :data-source-list="state.dataSourceList"
-                                :settings="state.settings"
-                                size="lg"
-                                :variables-schema="state.variablesSchema"
-                                :variables="state.variables"
-                                :title="formState.title"
-                                class="col-span-8"
-            />
+            <div class="col-span-8">
+                <vertical-bar-chart v-if="formState.selectedChartType === 'verticalBarChart'"
+                                    :widget-name="formState.selectedChartType"
+                                    :widget-key="formState.selectedChartType"
+                                    :title="formState.title"
+                                    size="lg"
+                                    :description="formState.description"
+                                    :data-sources="state.dataSources"
+                                    :data-mapping="formState.dataMapping"
+                                    :chart-options="formState.chartOptions"
+                                    :variables-schema="state.variablesSchema"
+                                    :variables="state.variables"
+                />
+            </div>
             <div class="col-span-4 px-2">
                 <div class="pb-4">
                     <b>Data Source</b>
-                    <p v-for="dataSource in state.dataSourceList"
-                       :key="dataSource.value"
+                    <p v-for="dataSource in state.dataSources"
+                       :key="`${dataSource.data_domain}-${dataSource.resource_type}-${dataSource.value}`"
                        class="text-label-md"
                     >
-                        {{ dataSource.resource_type }} ({{ dataSource.value }})
+                        {{ dataSource.resource_type }} {{ dataSource.value }}
                     </p>
                 </div>
                 <div class="pb-4">
