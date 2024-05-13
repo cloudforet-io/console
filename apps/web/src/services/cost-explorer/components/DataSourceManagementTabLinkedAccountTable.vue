@@ -9,9 +9,11 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -39,6 +41,10 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
+const tableListApiQueryHelper = new ApiQueryHelper()
+    .setSort('name', true);
+let tableListApiQuery = tableListApiQueryHelper.data;
+
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
     totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
@@ -55,9 +61,9 @@ const tableState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
-            { name: 'name', label: 'Account ID' },
-            { name: 'tags.description', label: 'Workspace' },
-            { name: 'role_type', label: 'Auto Mapping' },
+            { name: 'account_id', label: 'Account ID' },
+            { name: 'workspace_id', label: 'Workspace' },
+            { name: 'is_sync', label: 'Auto Mapping' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
@@ -66,7 +72,11 @@ const tableState = reactive({
         { name: 'is_sync', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_AUTO_MAPPING'), sortable: false },
         { name: 'updated_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_UPDATED_AT'), sortable: false },
     ]),
-    valueHandlerMap: {},
+    valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id'),
+        workspace_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'workspace_id'),
+        is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync'),
+    })),
 });
 
 const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
@@ -77,8 +87,12 @@ const handleSelect = (index: number[]) => {
     dataSourcesPageStore.selectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
+    tableListApiQuery = getApiQueryWithToolboxOptions(tableListApiQueryHelper, options) ?? tableListApiQuery;
     if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
     if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
+    if (options.queryTags !== undefined) {
+        dataSourcesPageStore.setLinkedAccountsSearchFilters(tableListApiQueryHelper.filters);
+    }
     emit('confirm');
 };
 

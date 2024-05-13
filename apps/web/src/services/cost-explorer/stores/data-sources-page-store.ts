@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
@@ -49,6 +50,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         linkedAccounts: [] as CostDataSourceAccountModel[],
         linkedAccountsTotalCount: 0,
         selectedLinkedAccountsIndices: [] as number[],
+        linkedAccountsSearchFilters: [] as ConsoleFilter[],
 
         modal: {
             visible: false,
@@ -109,6 +111,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         setLinkedAccountsPageLimit: (pageLimit: number) => {
             state.linkedAccountsPageLimit = pageLimit;
+        },
+        setLinkedAccountsSearchFilters: (filters: ConsoleFilter[]) => {
+            state.linkedAccountsSearchFilters = filters;
         },
         setModal: (visible: boolean, type?: CostLinkedAccountModalType) => {
             state.modal = {
