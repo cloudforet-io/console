@@ -850,6 +850,8 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"DATA_SOURCES": {
+				"ALT_S_RESET": "",
+				"ALT_S_UPDATE": "",
 				"CANCELED": "취소됨",
 				"COL_ACCOUNT_ID": "계정 ID",
 				"COL_AUTO_MAPPING": "",
@@ -872,7 +874,10 @@
 				"ERROR_FOUND_TITLE": "",
 				"GUIDE": "",
 				"RESET": "초기화",
+				"RESETTING": "",
+				"RESET_MODAL_TITLE": "",
 				"SELECT": "선택하기",
+				"SELECT_WORKSPACE": "",
 				"SUCCESS": "성공",
 				"TAB_DETAILS_COLLECTION_JOB": "",
 				"TAB_DETAILS_TITLE": "상세 정보",
@@ -880,7 +885,9 @@
 				"TAB_LINKED_ACCOUNT_TITLE": "",
 				"TAB_NO_DATA": "",
 				"TIMEOUT": "",
-				"UPDATE": "수정"
+				"UPDATE": "수정",
+				"UPDATE_MODAL_TITLE": "",
+				"UPDATING": ""
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "문의하기",
