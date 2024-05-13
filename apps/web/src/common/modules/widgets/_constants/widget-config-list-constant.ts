@@ -27,6 +27,9 @@ import monthlyCost from '@/services/dashboards/widgets/cost-widgets/monthly-cost
 
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import type { BaseWidgetConfigKey, WidgetConfigKey } from '@/services/dashboards/widgets/_types/widget-list-type';
+import verticalBarChart from '@/common/modules/widgets/_base-widgets/vertical-bar-chart/widget-config';
+import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { NewWidgetConfigKey } from '@/common/modules/widgets/types/widget-list-type';
 
 export const BASE_WIDGET_CONFIG_KEYS = [
     'baseTrend',
@@ -55,6 +58,20 @@ export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'complianceStatus',
 ] as const;
 
+export const NEW_CONSOLE_WIDGET_CONFIG_KEYS = [
+    'number',
+    'verticalBarChart',
+    'lineChart',
+    'donutChart',
+    'treeMap',
+    'heatmap',
+    'regionMap',
+    'table',
+    'area',
+    'guage',
+    'progress',
+];
+
 
 export const CONSOLE_WIDGET_CONFIGS: Record<WidgetConfigKey, Partial<WidgetConfig>> = {
     // Cost Widgets
@@ -78,6 +95,9 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetConfigKey, Partial<WidgetConfi
     totalFailFindingsStatus,
     totalFailFindingsHistory,
     complianceStatus,
+};
+export const NEW_CONSOLE_WIDGET_CONFIG: Record<NewWidgetConfigKey, Partial<NewWidgetConfig>> = {
+    verticalBarChart,
 };
 
 export const BASE_WIDGET_CONFIGS: Record<BaseWidgetConfigKey, Partial<WidgetConfig>> = {

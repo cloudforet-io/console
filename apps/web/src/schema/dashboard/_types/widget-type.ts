@@ -112,6 +112,8 @@ interface LegendOptions {
     show_at?: 'table'|'chart';
 }
 
+export type DataMapping = Record<string, string|string[]>;
+
 /* widget filters */
 export interface WidgetFilter {
     k?: string;
@@ -155,4 +157,5 @@ export type InheritOptions = Partial<Record<WidgetOptionKey, {
     enabled?: boolean;
     variable_key?: string;
 }>>;
+
 
