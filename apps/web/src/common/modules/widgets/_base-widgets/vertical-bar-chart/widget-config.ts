@@ -16,7 +16,7 @@ import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-conf
 //     },
 // };
 
-const VerticalBarChartWidgetConfig: NewWidgetConfig = {
+const verticalBarChart: NewWidgetConfig = {
     widget_name: 'baseTrend',
     meta: {
         title: 'Base Trend',
@@ -44,4 +44,4 @@ const VerticalBarChartWidgetConfig: NewWidgetConfig = {
 };
 
 
-export default VerticalBarChartWidgetConfig;
+export default verticalBarChart;
