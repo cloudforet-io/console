@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PToolboxTable, PBadge, PSelectDropdown, PI,
@@ -30,7 +30,6 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 import { red } from '@/styles/colors';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
-import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -38,18 +37,14 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-    linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageGetters.linkedAccounts),
     totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
-    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
+    linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageGetters.linkedAccounts),
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
-});
-const state = reactive({
-    pageStart: 0,
-    pageLimit: 15,
-    loading: false,
+    linkedAccountsLoading: computed<boolean>(() => dataSourcesPageState.linkedAccountsLoading),
 });
 const dropdownState = reactive({
     visible: false,
@@ -82,29 +77,17 @@ const handleSelect = (index: number[]) => {
     dataSourcesPageStore.selectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
-    fetchLinkedAccountList();
+    if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
+    emit('confirm');
 };
 
-const listApiQueryHelper = new ApiQueryHelper();
 const workspaceListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
-const fetchLinkedAccountList = async () => {
-    state.loading = true;
-    try {
-        listApiQueryHelper.setPage(state.pageStart, state.pageLimit);
-        await dataSourcesPageStore.fetchLinkedAccount({
-            data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
-            query: listApiQueryHelper.data,
-        });
-    } finally {
-        state.loading = false;
-    }
-};
-const handleSelectDropdownItem = async (workspaceId: string, idx: number, menuItem: SelectDropdownMenuItem) => {
+
+const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem) => {
     const accountItem = storeState.linkedAccounts[idx];
     await dataSourcesPageStore.updateLinkedAccount({
         data_source_id: accountItem.data_source_id,
@@ -141,10 +124,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         dropdownState.loading = false;
     }
 };
-
-watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], async () => {
-    await fetchLinkedAccountList();
-}, { immediate: true });
 </script>
 
 <template>
@@ -154,7 +133,7 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
                      selectable
                      sortable
                      :placeholder="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SELECT')"
-                     :loading="state.loading"
+                     :loading="storeState.linkedAccountsLoading"
                      :items="storeState.linkedAccounts"
                      :select-index="storeState.selectedLinkedAccountsIndices"
                      :fields="tableState.fields"
@@ -166,7 +145,7 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
                      :query-tags="queryTags"
                      @select="handleSelect"
                      @change="handleChangeToolbox"
-                     @refresh="fetchLinkedAccountList()"
+                     @refresh="emit('confirm')"
     >
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style
@@ -180,7 +159,7 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
                                show-select-header
                                :handler="workspaceMenuHandler"
                                class="col-workspace-select-dropdown"
-                               @select="handleSelectDropdownItem(value, rowIndex, $event)"
+                               @select="handleSelectDropdownItem(rowIndex, $event)"
             >
                 <template #dropdown-button>
                     <div v-if="!!value"

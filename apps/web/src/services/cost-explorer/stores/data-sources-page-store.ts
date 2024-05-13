@@ -23,7 +23,11 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CostJobItem, DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
+import type {
+    CostJobItem,
+    CostLinkedAccountModalType,
+    DataSourceItem,
+} from '@/services/cost-explorer/types/data-sources-type';
 
 export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const allReferenceStore = useAllReferenceStore();
@@ -31,14 +35,25 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
 
     const state = reactive({
         activeTab: 'detail',
+
         dataSourceList: [] as DataSourceModel[],
         dataSourceListTotalCount: 0,
         selectedDataSourceIndices: [] as number[],
+
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
+
+        linkedAccountsLoading: false,
+        linkedAccountsPageStart: 0,
+        linkedAccountsPageLimit: 15,
         linkedAccounts: [] as CostDataSourceAccountModel[],
         linkedAccountsTotalCount: 0,
         selectedLinkedAccountsIndices: [] as number[],
+
+        modal: {
+            visible: false,
+            type: undefined as CostLinkedAccountModalType|undefined,
+        },
     });
 
     const _getters = reactive({
@@ -85,6 +100,21 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         setActiveTab: (tab: string) => {
             state.activeTab = tab;
+        },
+        setLinkedAccountsLoading: (loading: boolean) => {
+            state.linkedAccountsLoading = loading;
+        },
+        setLinkedAccountsPageStart: (pageStart: number) => {
+            state.linkedAccountsPageStart = pageStart;
+        },
+        setLinkedAccountsPageLimit: (pageLimit: number) => {
+            state.linkedAccountsPageLimit = pageLimit;
+        },
+        setModal: (visible: boolean, type?: CostLinkedAccountModalType) => {
+            state.modal = {
+                visible,
+                type,
+            };
         },
     };
 
@@ -135,7 +165,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         },
         resetLinkedAccount: async (params: CostDataSourceAccountResetParameters) => {
             try {
-                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountResetParameters>(
+                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.reset<CostDataSourceAccountResetParameters>(
                     params,
                 );
             } catch (e) {

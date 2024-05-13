@@ -17,3 +17,5 @@ export type CostJobStatusInfo = {
     color: string;
     text?: TranslateResult;
 };
+
+export type CostLinkedAccountModalType = 'RESET'|'UPDATE';
