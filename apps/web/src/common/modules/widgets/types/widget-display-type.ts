@@ -4,11 +4,13 @@ import type {
     DashboardLayoutWidgetInfo,
     DashboardSettings,
     DashboardVariables,
-    DashboardVariablesSchema,
+    DashboardVariablesSchema, DateRange,
+    DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type {
     InheritOptions,
     WidgetOptions, WidgetSize,
+    NewWidgetFilters,
 } from '@/schema/dashboard/_types/widget-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -40,21 +42,24 @@ export interface WidgetProps<T = any> {
 
 // TODO: remove this after replacing WidgetProps with NewWidgetProps
 export interface NewWidgetProps {
-    // widgetName: string;
-    loading?: boolean;
-    dataSourceList?: any[];
-    title?: string;
-    size?: WidgetSize;
+    widgetName: string;
+    title: string;
+    description: string;
+    size: WidgetSize;
+    filters?: NewWidgetFilters;
+    filtersSchemaProperties?: string[];
     width?: number;
-    // widgetInfo: DashboardLayoutWidgetInfo;
-    // editMode?: boolean;
-    // errorMode?: boolean;
-    // disableFullMode?: boolean;
-    // disableRefreshOnVariableChange?: boolean;
-    allReferenceTypeInfo: AllReferenceTypeInfo;
-    settings?: DashboardSettings;
-    variablesSchema?: DashboardVariablesSchema;
-    variables?: DashboardVariables;
+    theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
+    widgetKey: string; // unique widget key to identify widgets in layout
+    editMode?: boolean;
+    errorMode?: boolean;
+    dateRange: DateRange;
+    dashboardVariablesSchema?: DashboardVariablesSchema;
+    dashboardVariables?: DashboardVariables;
+    loading?: boolean;
+    dataSources: Pick<DataSource, 'resource_type'|'value'>[];
+    dataMapping: Record<string, string|string[]>;
+    chartOptions: Record<string, any>;
 }
 
 export interface WidgetEmit {

@@ -122,7 +122,7 @@ export interface WidgetFilter {
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
 /* widget options */
-export interface WidgetOptions {
+export interface WidgetOptions { // to be deprecated
     // cost
     cost_data_source?: string;
     cost_data_type?: string;
@@ -143,6 +143,8 @@ export interface WidgetOptions {
     data_criteria?: 'history'|'realtime';
     filters?: WidgetFiltersMap;
 }
+
+export type NewWidgetFilters = Record<string, string[]>;
 
 
 export interface InheritOption {

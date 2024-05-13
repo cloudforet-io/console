@@ -2,7 +2,9 @@ import type {
     REFRESH_INTERVAL_OPTIONS_MAP,
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import type {
+    InheritOptions, WidgetOptions, WidgetSize, NewWidgetFilters,
+} from '@/schema/dashboard/_types/widget-type';
 
 import type { VariableModelType } from '@/lib/variable-models';
 import type { Value } from '@/lib/variable-models/_base/types';
@@ -96,3 +98,29 @@ export interface DashboardLayoutWidgetInfo {
 }
 
 
+
+export interface NewDashboardLayoutWidgetInfo {
+    widget_name: string;
+    widget_key: string;
+    template_widget_id?: string;
+    title?: string;
+    size?: WidgetSize;
+    version: string;
+    schema_properties?: string[];
+    fixed_options?: Record<string, any>;
+
+    // Widget Options
+    data_sources: DataSource[],
+    data_mapping: Record<string, string|string[]>;
+    chart_options: Record<string, any>;
+    filters?: NewWidgetFilters;
+}
+
+
+export interface DataSource {
+    data_domain: string; // Cost/Asset/Security
+    data_source_from?: string; // cost_analysis
+    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
+    // TODO: create ResrouceType
+    value: string[];
+}
