@@ -5,20 +5,35 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
+import {
+    PI,
+} from '@spaceone/design-system';
+
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+
+import type { Currency } from '@/store/modules/settings/type';
+
+import type { WidgetTheme } from '@/common/modules/widgets/types/widget-display-type';
 
 
 interface WidgetFrameProps {
-    title?: TranslateResult;
-    size?: WidgetSize;
+    title: TranslateResult;
+    size: WidgetSize;
+    widgetSizes: WidgetSize[];
     width?: number;
+    widgetLink?: string;
     widgetLocation?: Location;
-    widgetConfigId?: string;
-    // noData?: boolean;
-    // editMode?: boolean;
-    // errorMode?: boolean;
-    // widgetKey: string;
+
+    dateRange?: DateRange;
+    noData?: boolean;
+    currency?: Currency;
+
+    editMode?: boolean;
+    errorMode?: boolean;
+    widgetKey: string;
+    theme?: WidgetTheme;
 }
 
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
@@ -27,7 +42,10 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     width: undefined,
     widgetLink: undefined,
     widgetLocation: undefined,
-    widgetConfigId: undefined,
+    dateRange: () => ({ start: undefined, end: undefined }),
+    noData: false,
+    currency: undefined,
+    theme: undefined,
 });
 
 // const emit = defineEmits<{(event: 'click-delete'): void;
@@ -49,6 +67,13 @@ const state = reactive({
             <h3 class="title">
                 {{ props.title }}
             </h3>
+            <div class="metadata-wrapper">
+                <p-i name="ic_info-circle"
+                     width="1rem"
+                     height="1rem"
+                />
+                <span class="metadata-text">Metadata</span>
+            </div>
         </div>
         <div class="body">
             <slot />
@@ -69,6 +94,7 @@ const state = reactive({
 
     .widget-header {
         @apply flex items-center;
+        padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
             overflow: hidden;
@@ -76,10 +102,17 @@ const state = reactive({
             display: block;
             -webkit-box-orient: vertical;
             font-weight: 500;
-            padding-right: 0.5rem;
         }
-
-        padding-bottom: 0.5rem;
+        .metadata-wrapper {
+            @apply text-gray-700;
+            display: flex;
+            align-items: center;
+            padding-left: 0.75rem;
+            .metadata-text {
+                @apply text-label-sm;
+                padding-left: 0.25rem;
+            }
+        }
     }
     .body {
         height: auto;
