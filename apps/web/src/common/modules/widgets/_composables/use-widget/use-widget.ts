@@ -2,25 +2,28 @@ import type {
     UnwrapRef,
 
     ComputedRef,
+    Ref,
 } from 'vue';
 import {
+    computed,
     reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange, DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { DataMapping, NewWidgetFilters } from '@/schema/dashboard/_types/widget-type';
 
-import type {
-    BaseWidgetState,
-} from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
-import { useBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
-import { useWidgetConsoleFilters } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-console-filters';
-import { useWidgetDateRange } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-date-range';
-import { useWidgetFrame } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-frame';
-import { useWidgetLocation } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-location';
-import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
+import type { Currency } from '@/store/modules/settings/type';
+
+import type { BaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/use-base-widget-state';
+import { useBaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/use-base-widget-state';
+import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget/use-widget-date-range';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import type { NewWidgetProps, WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
+
+
 
 export interface OverridableWidgetState {
     dateRange?: DateRange|ComputedRef<DateRange>; // overrides dateRange
@@ -37,9 +40,17 @@ export interface OverridableWidgetState {
     cloudServiceAnalyzeConsoleFilters?: ComputedRef<ConsoleFilter[]>; // overrides consoleFilters for both 'Asset' label and 'realtime' data criteria
 }
 export interface WidgetState extends BaseWidgetState {
-    dateRange: ComputedRef<DateRange>;
-    widgetLocation: ComputedRef<Location|undefined>; // widget location for link which is differentiated by widget labels(e.g. Cost, Asset)
-    consoleFilters: ComputedRef<ConsoleFilter[]>;
+    dateRange: ComputedRef<DateRange|undefined>;
+    // TODO: refactoring with dynamic data source
+    // widgetLocation: ComputedRef<Location|undefined>; // widget location for link which is differentiated by widget labels(e.g. Cost, Asset)
+    // consoleFilters: ComputedRef<ConsoleFilter[]>;
+
+    widgetFilters: NewWidgetFilters|undefined|Ref<NewWidgetFilters|undefined>; // widget options from the dashboard widget layout info.
+    filtersSchemaProperties?: string[]|Ref<string[]|undefined>; // widget schema properties from the dashboard widget layout info.
+    variablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
+    variables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
+    dataMapping: ComputedRef<DataMapping>;
+    currency: Ref<Currency|undefined>;
 }
 /**
  * @example
@@ -55,19 +66,26 @@ export interface WidgetState extends BaseWidgetState {
     assetWidgetLocation: undefined,
  });
  */
-export const useWidget = (props: WidgetProps, emit: WidgetEmit, overrides: OverridableWidgetState = {}) => {
+export const useWidget = (props: NewWidgetProps, emit: WidgetEmit, overrides: OverridableWidgetState = {}) => {
     const baseState = useBaseWidgetState(props);
 
     // additional states that can be overwritten by each widget
     const dateRange = useWidgetDateRange(props, baseState, overrides);
-    const widgetLocation = useWidgetLocation(props, baseState, dateRange, overrides);
-    const consoleFilters = useWidgetConsoleFilters(props, baseState, overrides);
+    // TODO: refactoring with dynamic data source
+    // const widgetLocation = useWidgetLocation(props, baseState, dateRange, overrides);
+    // const consoleFilters = useWidgetConsoleFilters(props, baseState, overrides);
 
-    const widgetState = reactive({
+    const widgetState = reactive<WidgetState>({
         ...toRefs(baseState),
         dateRange,
-        widgetLocation,
-        consoleFilters,
+
+        variables: computed(() => props.variables),
+        variablesSchema: computed(() => props.variablesSchema),
+
+        widgetFilters: computed<NewWidgetFilters>(() => props.filters || {}),
+        filtersSchemaProperties: computed<string[]>(() => props.filtersSchemaProperties || []),
+        currency: computed<Currency|undefined>(() => undefined),
+        dataMapping: computed(() => props.dataMapping),
     }) as UnwrapRef<WidgetState>;
 
     const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
