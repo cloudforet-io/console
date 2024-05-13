@@ -25,7 +25,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
+    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
     totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
     activeTab: computed<string>(() => dataSourcesPageState.activeTab),
@@ -37,6 +37,8 @@ const state = reactive({
     selectedJobItem: computed<CostJobItem|undefined>(() => storeState.jobList.find((item) => item.job_id === state.selectedJobId)),
 });
 const tableState = reactive({
+    pageStart: 0,
+    pageLimit: 15,
     fields: computed<DefinitionField[]>(() => [
         { name: 'job_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_ID') },
         { name: 'status', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_STATUS') },
@@ -87,18 +89,19 @@ const handleClickErrorDetail = (jobId: string) => {
 };
 
 const jobListApiQueryHelper = new ApiQueryHelper();
-const handleChangeToolbox = (options: ToolboxOptions) => {
-    if (options.pageStart !== undefined) jobListApiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) jobListApiQueryHelper.setPageLimit(options.pageLimit);
-    fetchJobList();
+const handleChangeToolbox = async (options: ToolboxOptions) => {
+    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
+    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
+    await fetchJobList();
 };
-const fetchJobList = () => {
+const fetchJobList = async () => {
     state.loading = true;
     try {
-        jobListApiQueryHelper.setFilters([
-            { k: 'status', v: 'IN_PROGRESS', o: '!=' },
-        ]);
-        dataSourcesPageStore.fetchJobList({
+        jobListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
+            .setFilters([
+                { k: 'status', v: 'IN_PROGRESS', o: '!=' },
+            ]);
+        await dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,
         });
@@ -107,8 +110,10 @@ const fetchJobList = () => {
     }
 };
 
-watch(() => storeState.activeTab, () => {
-    fetchJobList();
+watch([() => storeState.activeTab, () => storeState.selectedItem], async () => {
+    tableState.pageStart = 0;
+    tableState.pageLimit = 15;
+    await fetchJobList();
 }, { immediate: true });
 </script>
 
@@ -195,7 +200,8 @@ watch(() => storeState.activeTab, () => {
         }
     }
     .data-source-definition-table {
-        padding-top: 0.5rem;
+        margin-top: -4.25rem;
+        border: none;
         .icon-info {
             margin-right: 0.5rem;
         }
