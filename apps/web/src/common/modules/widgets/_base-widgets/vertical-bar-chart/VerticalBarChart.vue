@@ -15,11 +15,11 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 // import {
 //     getDateAxisSettings,
 // } from '@/common/modules/widgets/_helpers/widget-chart-helper';
-// import type {
-//     WidgetExpose,
-//     CostAnalyzeResponse,
-//     NewWidgetProps,
-// } from '@/common/modules/widgets/types/widget-display-type';
+import type {
+    // WidgetExpose,
+    // CostAnalyzeResponse,
+    NewWidgetProps,
+} from '@/common/modules/widgets/types/widget-display-type';
 
 
 
@@ -47,7 +47,7 @@ import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 // const DATE_FORMAT = 'YYYY-MM';
 // const DATE_FIELD_NAME = 'date';
 
-// const props = defineProps<NewWidgetProps>();
+const props = defineProps<NewWidgetProps>();
 // const emit = defineEmits<WidgetEmit>();
 
 // const chartContext = ref<HTMLElement|null>(null);
@@ -68,9 +68,9 @@ const state = reactive({
     // dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
     chartData: [],
     widgetFrameProps: computed(() => ({
-        // title: props.title,
-        // size: props.size,
-        // width: props.width,
+        title: props.title,
+        size: props.size,
+        width: props.width,
         // widgetLocation: props.widgetLocation,
         // widgetConfigId: props.widgetConfigId,
         // noData: props.noData,
