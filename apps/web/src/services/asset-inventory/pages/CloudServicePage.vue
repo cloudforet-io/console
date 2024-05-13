@@ -27,7 +27,7 @@
                 <p-empty
                     show-image
                     image-size="md"
-                    :show-button="emptyData.to"
+                    :show-button="!!emptyData.to"
                 >
                     <template #image>
                         <img v-if="isNoServiceAccounts"

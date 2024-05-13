@@ -69,6 +69,7 @@ const state = reactive({
             icon: namespace?.data?.icon,
             label: namespace?.label ?? '',
             metricName: metric?.label ?? undefined,
+            category: namespace.data.category,
         });
     }).filter((recent) => recent !== undefined)),
 });
@@ -151,7 +152,12 @@ const fetchRecentList = async () => {
                         >
                             <div class="card-contents">
                                 <span class="icon">
-                                    <p-lazy-img v-if="recent.icon"
+                                    <img v-if="recent?.category === 'COMMON'"
+                                         class="common-namespace-icon"
+                                         src="@/assets/images/img_common-asset@2x.png"
+                                         alt="common_namespace_icon"
+                                    >
+                                    <p-lazy-img v-else-if="recent.icon"
                                                 :src="recent.icon"
                                                 width="1.75rem"
                                                 height="1.75rem"
@@ -255,6 +261,11 @@ const fetchRecentList = async () => {
 
                     .card-contents {
                         @apply flex gap-2;
+
+                        .common-namespace-icon {
+                            width: 1.75rem;
+                            height: 1.75rem;
+                        }
 
                         .recent-desc {
                             display: inline-block;

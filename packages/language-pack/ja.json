@@ -1101,6 +1101,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "ワークスペースの作成",
 				"MANAGE_WORKSPACE": "ワークスペースの管理",
+				"NO_RESULTS_FOUND": "結果が見つかりませんでした。",
 				"WORKSPACES": "ワークスペース"
 			}
 		},
@@ -2856,8 +2857,10 @@
 				"CHANGE_PROJECT": "プロジェクト変更",
 				"CHECK_MODAL_DELETE_DESC": "本当に削除しますか？",
 				"CHECK_MODAL_DELETE_TITLE": "サーバ削除",
+				"CLEAR": "",
 				"COLLECT_DATA": "データ収集",
 				"CONSOLE": "コンソールに接続",
+				"DEFAULT_FILTER_DESC": "{count}",
 				"DELETE": "削除",
 				"NO_SELECTED_SERVER": "サーバーを選択すると、詳細な情報が表示されます",
 				"TAB_DETAILS": "詳細情報",

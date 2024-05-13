@@ -15,7 +15,7 @@ import type {
     DynamicLayout,
     DynamicLayoutOptions,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { isEmpty, get } from 'lodash';
+import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -135,6 +135,7 @@ const tableState = reactive({
         return tableState.schema.options.fields ?? [];
     }),
     hasAdminOrWorkspaceOwnerRole: computed(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
+    defaultSearchQuery: [],
 });
 
 const schemaQueryHelper = new QueryHelper();
@@ -285,8 +286,11 @@ const getQuery = (schema?) => {
 const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
+        const query = cloneDeep(getQuery(schema));
+        query.filter = query.filter ? query.filter.concat(tableState.defaultSearchQuery) : tableState.defaultSearchQuery;
+
         const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
-            query: getQuery(schema),
+            query,
         });
 
         // filtering select index
@@ -405,6 +409,12 @@ const handleUpdateVisible = (visible) => {
     excelState.visible = visible;
 };
 
+const handleClearDefaultFilter = async () => {
+    tableState.defaultSearchQuery = [];
+    replaceUrlQuery('default_filters', undefined);
+    await fetchTableData();
+};
+
 /* Watchers */
 watch(() => keyItemSets.value, (after) => {
     // initiate queryTags with keyItemSets
@@ -420,6 +430,8 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
 }, { immediate: true, debounce: 200 });
 
 (() => {
+    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : []);
+    tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined)).filter((d) => d);
     excelQuery.setFiltersAsRawQueryString(route.query.filters);
     cloudServiceDetailPageStore.$patch((_state) => {
         _state.searchFilters = excelQuery.filters;
@@ -501,6 +513,26 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                       @export="exportCloudServiceData"
                                       @click-settings="handleClickSettings"
                     >
+                        <template #toolbox-bottom>
+                            <div v-if="tableState.defaultSearchQuery.length"
+                                 class="default-filter"
+                            >
+                                <i18n path="INVENTORY.SERVER.MAIN.DEFAULT_FILTER_DESC"
+                                      tag="p"
+                                      class="desc"
+                                >
+                                    <template #count>
+                                        <strong>{{ tableState.defaultSearchQuery.length }}</strong>
+                                    </template>
+                                </i18n><p-text-button class="ml-1"
+                                                      style-type="highlight"
+                                                      size="sm"
+                                                      @click="handleClearDefaultFilter"
+                                >
+                                    {{ $t('INVENTORY.SERVER.MAIN.CLEAR') }}
+                                </p-text-button>
+                            </div>
+                        </template>
                         <template #col-workspace_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
@@ -582,6 +614,7 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"
                                    :hidden-filters="hiddenFilters"
                                    :cloud-service-list-fields="tableState.dynamicTableFields"
+                                   :default-filter="tableState.defaultSearchQuery"
                                    @update:visible="handleUpdateVisible"
         />
     </div>
@@ -591,6 +624,16 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
 /* custom design-system component - p-horizontal-layout */
 :deep(.p-horizontal-layout) .horizontal-contents {
     overflow: unset;
+}
+
+.default-filter {
+    @apply flex items-end;
+    padding: 0 1.5rem 1rem 1.5rem;
+    margin-top: -0.5rem;
+
+    .desc {
+        @apply text-label-md text-gray-900;
+    }
 }
 
 .filter-wrapper {

@@ -92,7 +92,7 @@ const handleClickConfirmButton = async () => {
         validationState.isVerificationCodeValid = false;
         validationState.verificationCode = '';
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-            await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
+            await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
             const defaultRoute = getDefaultRouteAfterSignIn(hasBoundWorkspace);

@@ -1101,6 +1101,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "새 워크스페이스 생성",
 				"MANAGE_WORKSPACE": "워크스페이스 관리",
+				"NO_RESULTS_FOUND": "검색 결과가 없습니다.",
 				"WORKSPACES": "워크스페이스"
 			}
 		},
@@ -2856,8 +2857,10 @@
 				"CHANGE_PROJECT": "프로젝트 변경",
 				"CHECK_MODAL_DELETE_DESC": "정말 삭제하시겠습니까?",
 				"CHECK_MODAL_DELETE_TITLE": "서버 삭제",
+				"CLEAR": "",
 				"COLLECT_DATA": "데이터 수집",
 				"CONSOLE": "콘솔 연결",
+				"DEFAULT_FILTER_DESC": "{count}",
 				"DELETE": "삭제",
 				"NO_SELECTED_SERVER": "서버를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"TAB_DETAILS": "상세 정보",

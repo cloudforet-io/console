@@ -47,7 +47,7 @@ const modalState = reactive({
     connectionModalVisible: false,
     reconnectModalVisible: false,
     deleteClusterModalVislble: false,
-    deleteAgentScript: computed(() => 'helm uninstall spaceone-agent -n spaceone-agent helm repo remove spaceone-agent'),
+    deleteAgentScript: computed(() => 'helm uninstall spaceone-agent -n spaceone-agent \nhelm repo remove spaceone-agent'),
 });
 
 const handleOpenAddClusterModal = () => {
@@ -206,7 +206,7 @@ onUnmounted(() => {
                 <service-account-add-cluster-script-field class="delete-agent-script"
                                                           :script="modalState.deleteAgentScript"
                                                           :description="$t('INVENTORY.SERVICE_ACCOUNT.AGENT.DELETE_AGENT_SCRIPT_DESCRIPTION')"
-                                                          script-height="3.5rem"
+                                                          script-height="5rem"
                 />
             </template>
         </p-double-check-modal>

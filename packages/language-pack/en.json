@@ -1101,6 +1101,7 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "Create New Workspace",
 				"MANAGE_WORKSPACE": "Manage Workspace",
+				"NO_RESULTS_FOUND": "No results found",
 				"WORKSPACES": "Workspaces"
 			}
 		},
@@ -2856,8 +2857,10 @@
 				"CHANGE_PROJECT": "Change Project",
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Server",
+				"CLEAR": "Clear",
 				"COLLECT_DATA": "Collect Data",
 				"CONSOLE": "Connect to Console",
+				"DEFAULT_FILTER_DESC": "{count} Advanced filters are applied.",
 				"DELETE": "Delete",
 				"NO_SELECTED_SERVER": "Select a server for more details.",
 				"TAB_DETAILS": "Details",
