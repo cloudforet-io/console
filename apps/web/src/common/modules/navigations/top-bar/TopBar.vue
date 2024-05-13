@@ -13,7 +13,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import type { MenuId } from '@/lib/menu/config';
 
-import TopBarHeader from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarHeader.vue';
+import TopBarHeader from '@/common/modules/navigations/top-bar/modules/top-bar-header/TopBarWorkspaces.vue';
 import TopBarSearch from '@/common/modules/navigations/top-bar/modules/top-bar-search/TopBarSearch.vue';
 import TopBarToolset from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/TopBarToolset.vue';
 
