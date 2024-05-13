@@ -8,9 +8,9 @@ import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 // import { cloneDeep } from 'lodash';
 
+// import { useAmcharts5 } from '@/common/composables/amcharts5';
 // import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-// import { useAmcharts5 } from '@/common/composables/amcharts5';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 // import {
 //     getDateAxisSettings,
@@ -22,14 +22,14 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-
 // interface DateRange {
 //     start?: string;
 //     end?: string;
 // }
 // const dataSourceFetcherMap = {
 //     'cost_analysis.Cost': SpaceConnector.clientV2.costAnalysis.cost.analyze,
-//     azure: SpaceConnector.clientV2.costAnalysis.cost.analyze,
+//     'cost_analysis.BudgetUsage': SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze,
+//     'inventory.MetricData': SpaceConnector.clientV2.inventory.metricData.analyze,
 // };
 
 // interface SubData { date: string; value: number }
@@ -104,12 +104,12 @@ const state = reactive({
 // const fetchCostAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 // const fetchData = async (): Promise<Response|null> => {
 //     try {
-//         if (!state.dataType) {
-//             throw new Error('data type is not defined');
-//         }
+//         // if (!state.dataType) {
+//         //     throw new Error('data type is not defined');
+//         // }
 //
-//         apiQueryHelper.setFilters(widgetState.consoleFilters);
-//         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+//         // apiQueryHelper.setFilters(widgetState.consoleFilters);
+//         // if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 //
 //         const dataField = [widgetState.dataField, 'date'];
 //         if (state.dataType === 'usage_quantity') {

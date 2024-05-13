@@ -2,50 +2,21 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardSettings,
     DashboardVariables,
-    DashboardVariablesSchema, DateRange,
-    DataSource,
+    DashboardVariablesSchema, DataSource, DateRange,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    InheritOptions,
-    WidgetOptions, WidgetSize,
-    NewWidgetFilters,
+    WidgetSize, NewWidgetFilters,
 } from '@/schema/dashboard/_types/widget-type';
 
-import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
-// TODO: replace with NewWidgetProps
-export interface WidgetProps<T = any> {
-    widgetConfigId: string;
-    title?: string;
-    options?: WidgetOptions;
-    inheritOptions?: InheritOptions;
-    schemaProperties?: string[];
-    size?: WidgetSize;
-    width?: number;
-    theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
-    widgetKey: string; // unique widget key to identify widgets in layout
-    editMode?: boolean;
-    errorMode?: boolean;
-    allReferenceTypeInfo: AllReferenceTypeInfo;
-    disableFullMode?: boolean;
-    disableRefreshOnVariableChange?: boolean;
-    dashboardSettings?: DashboardSettings;
-    dashboardVariablesSchema?: DashboardVariablesSchema;
-    dashboardVariables?: DashboardVariables;
-    loading?: boolean;
-    data?: T;
-}
-
-// TODO: remove this after replacing WidgetProps with NewWidgetProps
 export interface NewWidgetProps {
     widgetName: string;
-    title: string;
-    description: string;
-    size: WidgetSize;
+    title?: string;
+    description?: string;
+    size?: WidgetSize;
     filters?: NewWidgetFilters;
     filtersSchemaProperties?: string[];
     width?: number;
@@ -53,11 +24,11 @@ export interface NewWidgetProps {
     widgetKey: string; // unique widget key to identify widgets in layout
     editMode?: boolean;
     errorMode?: boolean;
-    dateRange: DateRange;
-    dashboardVariablesSchema?: DashboardVariablesSchema;
-    dashboardVariables?: DashboardVariables;
+    dateRange?: DateRange;
+    variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
     loading?: boolean;
-    dataSources: Pick<DataSource, 'resource_type'|'value'>[];
+    dataSources: DataSource[];
     dataMapping: Record<string, string|string[]>;
     chartOptions: Record<string, any>;
 }
