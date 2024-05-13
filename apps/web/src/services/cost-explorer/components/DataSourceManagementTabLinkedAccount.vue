@@ -7,6 +7,7 @@ import {
     PButton, PHeading,
 } from '@spaceone/design-system';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import DataSourceManagementModal from '@/services/cost-explorer/components/DataSourceManagementModal.vue';
@@ -29,6 +30,7 @@ const storeState = reactive({
     modalVisible: computed<boolean>(() => dataSourcesPageState.modal.visible),
     linkedAccountsPageStart: computed<number>(() => dataSourcesPageState.linkedAccountsPageStart),
     linkedAccountsPageLimit: computed<number>(() => dataSourcesPageState.linkedAccountsPageLimit),
+    linkedAccountsSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.linkedAccountsSearchFilters),
 });
 
 const handleClickAction = (action: CostLinkedAccountModalType) => {
@@ -38,7 +40,8 @@ const handleClickAction = (action: CostLinkedAccountModalType) => {
 const fetchLinkedAccountList = async () => {
     dataSourcesPageStore.setLinkedAccountsLoading(true);
     try {
-        listApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit);
+        listApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
+            .setFilters(storeState.linkedAccountsSearchFilters);
         await dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
             query: listApiQueryHelper.data,
