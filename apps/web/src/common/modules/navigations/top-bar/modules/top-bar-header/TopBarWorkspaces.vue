@@ -4,9 +4,11 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PTooltip, PI, PButton, PDivider,
+    PSelectDropdown, PTooltip, PI, PButton, PDivider, PTextHighlighting, PEmpty,
 } from '@spaceone/design-system';
+import { CONTEXT_MENU_TYPE } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { clone } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -111,6 +113,26 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         speed: 1,
     });
 };
+const formatMenuItems = (menuItems: WorkspaceModel[] = []): MenuItem[] => {
+    const result = menuItems.length > 0 ? [
+        { type: CONTEXT_MENU_TYPE.header, name: 'workspace_header', label: `${i18n.t('COMMON.GNB.WORKSPACE.WORKSPACES')} (${state.workspaceList.length})` },
+    ] : [] as MenuItem[];
+    menuItems.forEach((d) => {
+        result.push({
+            ...d,
+            type: CONTEXT_MENU_TYPE.item,
+            name: d.workspace_id || '',
+            label: d.name as string,
+        });
+    });
+    return result;
+};
+const menuHandler = async (inputText: string) => {
+    const _workspaceList = state.workspaceList.filter((w) => w.name.toLowerCase()?.includes(inputText.toLowerCase()));
+    return {
+        results: formatMenuItems(_workspaceList),
+    };
+};
 </script>
 
 <template>
@@ -133,8 +155,11 @@ const handleClickButton = (hasNoWorkspace?: string) => {
         <p-select-dropdown v-if="!props.isAdminMode"
                            :class="{'workspace-dropdown': true, 'is-domain-admin': state.isDomainAdmin}"
                            style-type="transparent"
-                           :menu="state.workspaceMenuList"
+                           :handler="menuHandler"
+                           :search-text.sync="state.searchText"
+                           is-filterable
                            hide-header-without-items
+                           show-delete-all-button
                            :selected="state.selectedWorkspace?.workspace_id"
                            @select="selectWorkspace"
         >
@@ -184,7 +209,10 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                                              :theme="item?.tags?.theme"
                                              size="xs"
                         />
-                        <span class="label-text">{{ item.label }}</span>
+                        <p-text-highlighting class="label-text"
+                                             :text="item.label"
+                                             :term="state.searchText"
+                        />
                     </div>
 
                     <!--                    TODO: will be applied after API completion-->
@@ -218,6 +246,17 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                             {{ $t("COMMON.GNB.WORKSPACE.MANAGE_WORKSPACE") }}
                         </p-button>
                     </div>
+                </div>
+            </template>
+            <template #no-data-area>
+                <div class="no-data-wrapper">
+                    <p class="title-wrapper">
+                        <span class="title">{{ $t('COMMON.GNB.WORKSPACE.WORKSPACES') }} </span>
+                        <span>({{ state.workspaceList.length }})</span>
+                    </p>
+                    <p-empty class="empty">
+                        {{ $t('COMMON.GNB.WORKSPACE.NO_RESULTS_FOUND') }}
+                    </p-empty>
                 </div>
             </template>
         </p-select-dropdown>
@@ -337,6 +376,19 @@ const handleClickButton = (hasNoWorkspace?: string) => {
                 .tool {
                     height: 1.5rem;
                 }
+            }
+        }
+
+        .no-data-wrapper {
+            .title-wrapper {
+                @apply text-paragraph-sm text-gray-500;
+                .title {
+                    @apply font-bold;
+                }
+            }
+            .empty {
+                padding-top: 0.75rem;
+                padding-bottom: 1.5rem;
             }
         }
 
