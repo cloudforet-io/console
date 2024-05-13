@@ -850,6 +850,8 @@
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"DATA_SOURCES": {
+				"ALT_S_RESET": "Reset successfully completed.",
+				"ALT_S_UPDATE": "Update successfully completed.",
 				"CANCELED": "Canceled",
 				"COL_ACCOUNT_ID": "Account ID",
 				"COL_AUTO_MAPPING": "Auto Mapping",
@@ -872,7 +874,10 @@
 				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
 				"RESET": "Reset",
+				"RESETTING": "Resetting... {count} of {totalCount}",
+				"RESET_MODAL_TITLE": "Are you sure you want to reset workspaces for {count} linked accounts?",
 				"SELECT": "Select",
+				"SELECT_WORKSPACE": "Select Workspace",
 				"SUCCESS": "Success",
 				"TAB_DETAILS_COLLECTION_JOB": "Recent Data Collection Job",
 				"TAB_DETAILS_TITLE": "Details",
@@ -880,7 +885,9 @@
 				"TAB_LINKED_ACCOUNT_TITLE": "Linked Account",
 				"TAB_NO_DATA": "Select an item for more details.",
 				"TIMEOUT": "Timeout",
-				"UPDATE": "Update"
+				"UPDATE": "Update",
+				"UPDATE_MODAL_TITLE": "Update workspace for {count} linked accounts",
+				"UPDATING": "Updating... {count} of {totalCount}"
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",
