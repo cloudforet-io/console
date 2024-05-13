@@ -5,7 +5,10 @@ import {
     PToolboxTable, PBadge, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
@@ -24,9 +27,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
+import { red } from '@/styles/colors';
+
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
-
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -100,12 +104,12 @@ const fetchLinkedAccountList = async () => {
         state.loading = false;
     }
 };
-const handleSelectDropdownItem = async (workspaceId: string, idx: number) => {
+const handleSelectDropdownItem = async (workspaceId: string, idx: number, menuItem: SelectDropdownMenuItem) => {
     const accountItem = storeState.linkedAccounts[idx];
     await dataSourcesPageStore.updateLinkedAccount({
         data_source_id: accountItem.data_source_id,
         account_id: accountItem.account_id,
-        workspace_id: workspaceId,
+        workspace_id: menuItem.name,
     }, idx);
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart, pageLimit = 10) => {
@@ -172,11 +176,11 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
                                :search-text.sync="dropdownState.searchText"
                                show-select-marker
                                is-filterable
-                               :selected="[{ name: value, label: getWorkspaceInfo(value)?.name}]"
+                               :selected="value ? [{ name: value, label: getWorkspaceInfo(value)?.name}] : undefined"
                                show-select-header
                                :handler="workspaceMenuHandler"
                                class="col-workspace-select-dropdown"
-                               @select="handleSelectDropdownItem(value, rowIndex)"
+                               @select="handleSelectDropdownItem(value, rowIndex, $event)"
             >
                 <template #dropdown-button>
                     <div v-if="!!value"
@@ -217,7 +221,9 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
         </template>
         <template #col-is_sync-format="{ value }">
             <p-badge badge-type="subtle"
-                     :style-type="!value ? 'gray100' : 'blue200'"
+                     :class="{'is-true': value}"
+                     class="col-sync"
+                     :style-type="!value ? 'gray100' : 'blue300'"
             >
                 {{ value.toString().replace(/^\w/, (c) => c.toUpperCase()) }}
             </p-badge>
@@ -255,6 +261,11 @@ watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], asy
             .description {
                 @apply text-label-md text-gray-500;
             }
+        }
+    }
+    .col-sync {
+        &.is-true {
+            @apply text-blue-700 text-blue;
         }
     }
 
