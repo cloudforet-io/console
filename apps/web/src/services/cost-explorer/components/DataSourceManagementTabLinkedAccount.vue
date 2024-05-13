@@ -16,12 +16,9 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 
 const storeState = reactive({
     totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
-    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
+    selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
 });
 
-const tableState = reactive({
-    selectedIndices: [] as number[],
-});
 </script>
 
 <template>
@@ -29,17 +26,21 @@ const tableState = reactive({
         <p-heading heading-type="sub"
                    use-total-count
                    use-selected-count
-                   :selected-count="tableState.selectedIndices.length"
+                   :selected-count="storeState.selectedLinkedAccountsIndices.length"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
                    :total-count="storeState.totalCount"
                    class="title"
         >
             <template #extra>
                 <div class="extra-wrapper">
-                    <p-button style-type="tertiary">
+                    <p-button style-type="tertiary"
+                              :disabled="storeState.selectedLinkedAccountsIndices.length === 0"
+                    >
                         {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESET') }}
                     </p-button>
-                    <p-button style-type="tertiary">
+                    <p-button style-type="tertiary"
+                              :disabled="storeState.selectedLinkedAccountsIndices.length === 0"
+                    >
                         {{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATE') }}
                     </p-button>
                 </div>

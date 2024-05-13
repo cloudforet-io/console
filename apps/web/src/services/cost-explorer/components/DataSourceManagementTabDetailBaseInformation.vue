@@ -18,7 +18,7 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
-    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
+    selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
 });
 
 const tableState = reactive({
