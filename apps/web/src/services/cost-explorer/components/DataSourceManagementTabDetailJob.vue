@@ -5,7 +5,7 @@ import {
 
 import {
     PButton, PButtonModal,
-    PDataTable, PHeading, PI, PTextEditor, PToolbox,
+    PToolboxTable, PHeading, PI, PTextEditor,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -119,20 +119,15 @@ watch(() => storeState.activeTab, () => {
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
                    :total-count="storeState.totalCount"
                    class="title"
-        >
-            <template #extra>
-                <p-toolbox :searchable="false"
-                           @change="handleChangeToolbox"
-                           @refresh="fetchJobList()"
-                />
-            </template>
-        </p-heading>
-        <p-data-table :fields="tableState.fields"
-                      :items="storeState.jobList"
-                      style-type="white"
-                      :loading="state.loading"
-                      class="data-source-definition-table"
-                      v-on="$listeners"
+        />
+        <p-toolbox-table :fields="tableState.fields"
+                         :searchable="false"
+                         :items="storeState.jobList"
+                         :loading="state.loading"
+                         class="data-source-definition-table"
+                         :total-count="storeState.totalCount"
+                         @refresh="fetchJobList()"
+                         @change="handleChangeToolbox"
         >
             <template #col-status-format="{value, item}">
                 <p-i :name="getStatusInfo(value).icon"
@@ -152,7 +147,7 @@ watch(() => storeState.activeTab, () => {
                     {{ getStatusInfo(value).text }}
                 </span>
             </template>
-        </p-data-table>
+        </p-toolbox-table>
         <p-button-modal
             :header-title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ERROR_FOUND_TITLE')"
             centered
