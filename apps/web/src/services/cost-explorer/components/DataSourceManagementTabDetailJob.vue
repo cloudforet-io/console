@@ -21,11 +21,14 @@ import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-so
 import type { DataSourceItem, CostJobItem, CostJobStatusInfo } from '@/services/cost-explorer/types/data-sources-type';
 
 const dataSourcesPageStore = useDataSourcesPageStore();
+const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     selectedItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedItem),
     jobList: computed<CostJobItem[]>(() => dataSourcesPageGetters.jobList),
+    totalCount: computed<number>(() => dataSourcesPageState.jobListTotalCount),
+    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
 });
 const state = reactive({
     loading: false,
@@ -92,6 +95,9 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
 const fetchJobList = () => {
     state.loading = true;
     try {
+        jobListApiQueryHelper.setFilters([
+            { k: 'status', v: 'IN_PROGRESS', o: '!=' },
+        ]);
         dataSourcesPageStore.fetchJobList({
             data_source_id: storeState.selectedItem?.data_source_id || '',
             query: jobListApiQueryHelper.data,
@@ -101,8 +107,7 @@ const fetchJobList = () => {
     }
 };
 
-watch(() => storeState.selectedItem, (selectedItem) => {
-    if (!selectedItem) return;
+watch(() => storeState.activeTab, () => {
     fetchJobList();
 }, { immediate: true });
 </script>
@@ -112,7 +117,7 @@ watch(() => storeState.selectedItem, (selectedItem) => {
         <p-heading heading-type="sub"
                    use-total-count
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_DETAILS_COLLECTION_JOB')"
-                   :total-count="storeState.jobList.length"
+                   :total-count="storeState.totalCount"
                    class="title"
         >
             <template #extra>

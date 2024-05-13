@@ -14,7 +14,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
-    totalCount: computed<number>(() => dataSourcesPageState.totalCount),
+    totalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
     selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedIndices),
 });
 
