@@ -7,7 +7,7 @@ export interface MetricModel {
     name: string;
     metric_type: MetricType;
     resource_type: string;
-    query_options: object;
+    query_options: Record<string, any>;
     date_field: string;
     unit: string;
     tags: Tags;
