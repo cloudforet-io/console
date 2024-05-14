@@ -10,15 +10,13 @@ import type { WidgetTheme } from '@/common/modules/widgets/types/widget-display-
 
 
 export interface WidgetFrameProps {
-    title: TranslateResult;
-    size: WidgetSize;
+    title?: TranslateResult;
     widgetSizes: WidgetSize[];
+    size?: WidgetSize;
     width?: number;
-    widgetLink?: string;
     widgetLocation?: Location;
 
     dateRange?: DateRange;
-    noData?: boolean;
     currency?: Currency;
 
     editMode?: boolean;
