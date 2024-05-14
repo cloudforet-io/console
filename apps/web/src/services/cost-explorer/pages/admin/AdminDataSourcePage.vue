@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { PHeading, PLink } from '@spaceone/design-system';
+import { PHeading, PHorizontalLayout, PLink } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -44,7 +44,11 @@ onMounted(() => {
             </template>
         </p-heading>
         <div class="contents">
-            <data-source-management-table />
+            <p-horizontal-layout class="data-source-table">
+                <template #container="{ height }">
+                    <data-source-management-table :table-height="height" />
+                </template>
+            </p-horizontal-layout>
             <data-source-management-tabs v-if="storeState.selectedIndices.length > 0" />
             <span v-else
                   class="no-data"
@@ -72,6 +76,14 @@ onMounted(() => {
         .no-data {
             @apply text-paragraph-md text-gray-300 text-center;
             padding-top: 3rem;
+        }
+    }
+
+
+    /* custom design-system component - p-horizontal-layout */
+    :deep(.data-source-table) {
+        .horizontal-contents {
+            overflow: unset;
         }
     }
 }

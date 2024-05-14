@@ -124,9 +124,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     };
 
     const actions = {
-        fetchDataSourceList: async () => {
+        fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>();
+                const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);
                 state.dataSourceList = results || [];
                 state.dataSourceListTotalCount = total_count || 0;
             } catch (e) {
