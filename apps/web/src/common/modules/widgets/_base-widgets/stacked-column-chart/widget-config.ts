@@ -1,10 +1,10 @@
 import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const verticalBarChart: NewWidgetConfig = {
-    widget_name: 'verticalBarChart',
+const stackedColumnChart: NewWidgetConfig = {
+    widget_name: 'stackedColumnChart',
     meta: {
-        title: 'Vertical Bar Chart',
+        title: 'Stacked Column Chart',
         sizes: ['lg', 'full'],
     },
     data_mapping_schema: {
@@ -28,4 +28,4 @@ const verticalBarChart: NewWidgetConfig = {
 };
 
 
-export default verticalBarChart;
+export default stackedColumnChart;

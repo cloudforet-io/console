@@ -47,7 +47,6 @@ const emit = defineEmits<WidgetEmit>();
 
 // const chartContext = ref<HTMLElement|null>(null);
 // const chartHelper = useAmcharts5(chartContext);
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const { widgetState } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
@@ -56,6 +55,7 @@ const { widgetState } = useWidget(props, emit, {
         return { start, end };
     }),
 });
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
 const state = reactive({
     loading: true,
