@@ -256,6 +256,7 @@ const postResetPassword = async (request) => {
 const initStatesByUrlSSOToken = async () => {
     try {
         const ssoAccessToken = getSSOTokenFromUrl();
+
         // When sso access token is not exist in url query string
         if (!ssoAccessToken) return;
         SpaceConnector.setToken(ssoAccessToken, '');
@@ -281,8 +282,13 @@ const initStatesByUrlSSOToken = async () => {
 })();
 
 onMounted(() => {
+    const ssoAccessToken = getSSOTokenFromUrl();
+    // Access by reset password email.
+    if (ssoAccessToken) return;
+
     const isResetPasswordPage = route.name === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME;
     const hasRequiredUpdatePassword = store.state.user.requiredActions?.includes('UPDATE_PASSWORD');
+    // Access by normal sign in
     if (isResetPasswordPage && !hasRequiredUpdatePassword) router.push(ROOT_ROUTE._NAME);
 });
 </script>
