@@ -9,9 +9,7 @@ export interface NewWidgetConfig {
     widget_name: string;
     meta: {
         title?: string;
-        description?: string;
         sizes: WidgetSize[];
-        chart_type: string;
         granularity?: Granularity;
     };
     data_mapping_schema: {
