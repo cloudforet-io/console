@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PLazyImg } from '@spaceone/design-system';
 
-import type { LSBItem } from '@/common/modules/navigations/lsb/type';
+import type { LSBCollapsibleItem } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    item: LSBItem;
+    item: LSBCollapsibleItem;
+    isSubItem?: boolean;
+    overrideCollapsed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    item: () => ({}) as LSBItem,
+    item: () => ({}) as LSBCollapsibleItem,
 });
+
 
 const state = reactive({
     isCollapsed: false,
@@ -20,11 +23,18 @@ const state = reactive({
 const handleClickCollapsibleTitle = () => {
     state.isCollapsed = !state.isCollapsed;
 };
+
+const updateCollapsedByForced = (collapsed: boolean) => {
+    state.isCollapsed = collapsed;
+};
+watch(() => props.overrideCollapsed, (changedCollapsed) => {
+    updateCollapsedByForced(!!changedCollapsed);
+}, { immediate: true });
 </script>
 
 <template>
     <div class="l-s-b-collapsible-menu-item"
-         :class="{ 'is-collapsed': state.isCollapsed }"
+         :class="{ 'is-collapsed': state.isCollapsed, 'is-sub-item': props.isSubItem }"
     >
         <div class="collapsible-title"
              @click="handleClickCollapsibleTitle"
@@ -35,6 +45,14 @@ const handleClickCollapsibleTitle = () => {
                  color="inherit transparent"
                  class="arrow-button"
             />
+            <slot name="left-image">
+                <p-lazy-img v-if="props.item.icon"
+                            class="title-image"
+                            :src="props.item.icon"
+                            width="1rem"
+                            height="1rem"
+                />
+            </slot>
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">
@@ -50,8 +68,12 @@ const handleClickCollapsibleTitle = () => {
     @apply flex flex-col text-label-md;
     .collapsible-title {
         @apply flex items-center font-bold;
+        height: 1.5rem;
         .arrow-button {
             transition: transform 0.3s ease-in-out;
+        }
+        .title-image {
+            margin-right: 0.25rem;
         }
     }
     .collapsible-contents {
@@ -60,6 +82,15 @@ const handleClickCollapsibleTitle = () => {
         opacity: 1;
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
+    &.is-sub-item {
+        .collapsible-title {
+            @apply text-gray-600;
+            height: 1.25rem;
+        }
+        .collapsible-contents {
+            padding-left: 0.75rem;
+        }
+    }
     &.is-collapsed {
         .collapsible-title {
             .arrow-button {
@@ -67,6 +98,7 @@ const handleClickCollapsibleTitle = () => {
             }
         }
         .collapsible-contents {
+            display: none;
             height: 0;
             margin: 0;
             padding: 0;

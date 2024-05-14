@@ -1,6 +1,6 @@
 import * as am5 from '@amcharts/amcharts5';
 
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 const addAmchartsLicense = (licenses: string[]) => {
     licenses.forEach((license) => {
@@ -11,7 +11,7 @@ const addAmchartsLicense = (licenses: string[]) => {
 export class Amcharts5GlobalTheme extends am5.Theme {
     setupDefaultRules() {
         this.rule('ColorSet').setAll({
-            colors: Array(5).fill(DEFAULT_CHART_COLORS.map((d) => am5.color(d))).flat(),
+            colors: Array(5).fill(MASSIVE_CHART_COLORS.map((d) => am5.color(d))).flat(),
         });
     }
 }

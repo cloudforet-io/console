@@ -415,13 +415,11 @@ section {
     padding-bottom: 2rem;
 
     /* custom design-system component - p-link */
-    :deep(.legend.p-link) {
-        @apply text-gray-900;
+    :deep(.p-link) {
+        @apply text-label-md text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
-        font-size: 0.875rem;
-        line-height: 1.5;
         vertical-align: text-bottom;
         margin-top: 0.625rem;
         margin-right: 1rem;

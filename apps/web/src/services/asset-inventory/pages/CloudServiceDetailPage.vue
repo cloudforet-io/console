@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider, PTextButton, PI,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -15,7 +15,7 @@ import type {
     DynamicLayout,
     DynamicLayoutOptions,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { isEmpty, get } from 'lodash';
+import { isEmpty, get, cloneDeep } from 'lodash';
 
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -50,9 +50,8 @@ import ExcelExportOptionModal
     from '@/services/asset-inventory/components/CloudServiceDetailExcelExportOptionModal.vue';
 import CloudServiceDetailTabs
     from '@/services/asset-inventory/components/CloudServiceDetailTabs.vue';
+import CloudServiceMetricButton from '@/services/asset-inventory/components/CloudServiceMetricButton.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
-import CloudServiceUsageOverview
-    from '@/services/asset-inventory/components/CloudServiceUsageOverview.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
@@ -60,6 +59,7 @@ import {
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
 
 interface Props {
     provider?: string;
@@ -80,7 +80,6 @@ const props = withDefaults(defineProps<Props>(), {
 const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const userWorkspaceStore = useUserWorkspaceStore();
 const appContextStore = useAppContextStore();
@@ -136,6 +135,7 @@ const tableState = reactive({
         return tableState.schema.options.fields ?? [];
     }),
     hasAdminOrWorkspaceOwnerRole: computed(() => store.getters['user/hasAdminOrWorkspaceOwnerRole']),
+    defaultSearchQuery: [],
 });
 
 const schemaQueryHelper = new QueryHelper();
@@ -286,8 +286,11 @@ const getQuery = (schema?) => {
 const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
+        const query = cloneDeep(getQuery(schema));
+        query.filter = query.filter ? query.filter.concat(tableState.defaultSearchQuery) : tableState.defaultSearchQuery;
+
         const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
-            query: getQuery(schema),
+            query,
         });
 
         // filtering select index
@@ -406,6 +409,12 @@ const handleUpdateVisible = (visible) => {
     excelState.visible = visible;
 };
 
+const handleClearDefaultFilter = async () => {
+    tableState.defaultSearchQuery = [];
+    replaceUrlQuery('default_filters', undefined);
+    await fetchTableData();
+};
+
 /* Watchers */
 watch(() => keyItemSets.value, (after) => {
     // initiate queryTags with keyItemSets
@@ -421,6 +430,8 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
 }, { immediate: true, debounce: 200 });
 
 (() => {
+    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : []);
+    tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined)).filter((d) => d);
     excelQuery.setFiltersAsRawQueryString(route.query.filters);
     cloudServiceDetailPageStore.$patch((_state) => {
         _state.searchFilters = excelQuery.filters;
@@ -437,7 +448,11 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                    :total-count="typeOptionState.totalCount"
                    :selected-count="tableState.selectedItems.length"
                    @click-back-button="$router.go(-1)"
-        />
+        >
+            <template #extra>
+                <cloud-service-metric-button go-to-metric-server-page />
+            </template>
+        </p-heading>
         <p-heading v-else-if="props.isSecurityPage"
                    :title="props.provider ? `[${allReferenceGetters.provider[props.provider].label}] ${props.name}` : $t('INVENTORY.SECURITY.MAIN.TITLE')"
                    use-total-count
@@ -454,7 +469,14 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                    :total-count="typeOptionState.totalCount"
                    :selected-count="tableState.selectedItems.length"
                    @click-back-button="$router.go(-1)"
-        />
+        >
+            <template #extra>
+                <cloud-service-metric-button :provider="props.provider"
+                                             :group="props.group"
+                                             :name="props.name"
+                />
+            </template>
+        </p-heading>
         <div v-if="!checkIsEmpty(overviewState.period)"
              class="filter-wrapper"
         >
@@ -491,6 +513,26 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                       @export="exportCloudServiceData"
                                       @click-settings="handleClickSettings"
                     >
+                        <template #toolbox-bottom>
+                            <div v-if="tableState.defaultSearchQuery.length"
+                                 class="default-filter"
+                            >
+                                <i18n path="INVENTORY.SERVER.MAIN.DEFAULT_FILTER_DESC"
+                                      tag="p"
+                                      class="desc"
+                                >
+                                    <template #count>
+                                        <strong>{{ tableState.defaultSearchQuery.length }}</strong>
+                                    </template>
+                                </i18n><p-text-button class="ml-1"
+                                                      style-type="highlight"
+                                                      size="sm"
+                                                      @click="handleClearDefaultFilter"
+                                >
+                                    {{ $t('INVENTORY.SERVER.MAIN.CLEAR') }}
+                                </p-text-button>
+                            </div>
+                        </template>
                         <template #col-workspace_id-format="{value, item}">
                             <p-text-button class="report-link"
                                            size="md"
@@ -530,19 +572,19 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
                             </p-button>
                         </template>
-                        <template v-if="!props.isServerPage &&!props.isSecurityPage"
-                                  #toolbox-bottom
-                        >
-                            <div class="mb-3">
-                                <p-divider />
-                            </div>
-                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
-                                                          :filters="searchFilters"
-                                                          :hidden-filters="hiddenFilters"
-                                                          :period="overviewState.period"
-                                                          :key-item-sets="keyItemSets"
-                            />
-                        </template>
+                        <!--                        <template v-if="!props.isServerPage &&!props.isSecurityPage"-->
+                        <!--                                  #toolbox-bottom-->
+                        <!--                        >-->
+                        <!--                            <div class="mb-3">-->
+                        <!--                                <p-divider />-->
+                        <!--                            </div>-->
+                        <!--                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"-->
+                        <!--                                                          :filters="searchFilters"-->
+                        <!--                                                          :hidden-filters="hiddenFilters"-->
+                        <!--                                                          :period="overviewState.period"-->
+                        <!--                                                          :key-item-sets="keyItemSets"-->
+                        <!--                            />-->
+                        <!--                        </template>-->
                     </p-dynamic-layout>
                 </template>
             </template>
@@ -572,6 +614,7 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"
                                    :hidden-filters="hiddenFilters"
                                    :cloud-service-list-fields="tableState.dynamicTableFields"
+                                   :default-filter="tableState.defaultSearchQuery"
                                    @update:visible="handleUpdateVisible"
         />
     </div>
@@ -581,6 +624,16 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
 /* custom design-system component - p-horizontal-layout */
 :deep(.p-horizontal-layout) .horizontal-contents {
     overflow: unset;
+}
+
+.default-filter {
+    @apply flex items-end;
+    padding: 0 1.5rem 1rem 1.5rem;
+    margin-top: -0.5rem;
+
+    .desc {
+        @apply text-label-md text-gray-900;
+    }
 }
 
 .filter-wrapper {

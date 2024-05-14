@@ -31,6 +31,7 @@ export const MENU_ID = Object.freeze({
     NOTIFICATIONS: 'notifications',
     INFO: 'info',
     NOTICE: 'notice',
+    ASSET_ANALYSIS: 'asset_analysis',
 } as const);
 
 export type MenuId = typeof MENU_ID[keyof typeof MENU_ID];

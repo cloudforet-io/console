@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PLazyImg, PSelectDropdown,
+    PLazyImg, PSelectDropdown, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -25,7 +25,10 @@ import LSB from '@/common/modules/navigations/lsb/LSB.vue';
 import type { LSBItem, LSBMenu } from '@/common/modules/navigations/lsb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lsb/type';
 
-import { gray } from '@/styles/colors';
+import {
+    yellow, gray,
+} from '@/styles/colors';
+
 
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -196,6 +199,28 @@ const handleSelectDataSource = (selected: string) => {
                         </div>
                     </template>
                 </p-select-dropdown>
+            </template>
+            <template #collapsible-contents-starred>
+                <div v-if="state.starredMenuSet.length > 0">
+                    <l-s-b-router-menu-item v-for="(menu, idx) of state.starredMenuSet"
+                                            :key="idx"
+                                            :item="menu"
+                                            :idx="idx"
+                                            :current-path="state.currentPath"
+                                            is-hide-favorite
+                    />
+                </div>
+                <span v-else
+                      class="no-data"
+                >
+                    <p-i class="menu-icon"
+                         name="ic_star-filled"
+                         height="1rem"
+                         width="1rem"
+                         :color="yellow[500]"
+                    />
+                    {{ $t('COMMON.STARRED_NO_DATA') }}
+                </span>
             </template>
         </l-s-b>
     </aside>

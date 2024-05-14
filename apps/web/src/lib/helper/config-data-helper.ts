@@ -2,10 +2,12 @@ import { find } from 'lodash';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap, MetricReferenceItem } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -154,6 +156,54 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
                 }],
                 updatedAt: d.updatedAt,
             });
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
+        }
+    });
+    return results;
+};
+
+export const convertMetricConfigToReferenceData = (config: ConfigData[]|null, metricReference: MetricReferenceMap) => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: MetricReferenceItem = metricReference[d.itemId];
+        if (resource) {
+            const result: ReferenceData = {
+                ...d,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
+                icon: d.itemId.startsWith('metric-managed-') ? 'ic_main-filled' : 'ic_sub',
+            };
+            results.push(result);
+        } else {
+            results.push({
+                ...d,
+                isDeleted: !resource,
+            });
+        }
+    });
+    return results;
+};
+
+export const convertMetricExampleConfigToReferenceData = (config: ConfigData[]|null, metricExampleList: MetricExampleModel[]) => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const resource: MetricExampleModel|undefined = metricExampleList.find((example) => example.example_id === d.itemId);
+        if (resource) {
+            const result: ReferenceData = {
+                ...d,
+                name: d.itemId,
+                label: resource?.name || d.itemId,
+                icon: 'ic_example-filled',
+            };
+            results.push(result);
         } else {
             results.push({
                 ...d,

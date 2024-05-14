@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PI, screens, PButton, PTextButton, PTooltip,
 } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { clone } from 'lodash';
+import { clone, isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
-// import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -28,43 +29,46 @@ import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-// import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
 interface GNBMenuType extends DisplayMenu {
     type: string;
     name?: string;
     disabled?: boolean;
 }
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
 const { getProperRouteLocation } = useProperRouteLocation();
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
 
-
 const storeState = reactive({
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
+    currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
 const state = reactive({
+    isInit: false as boolean|undefined,
     isHovered: false,
-    dataSource: [] as CostDataSourceModel[],
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     isMenuDescription: undefined as boolean | undefined,
-    gnbMenuList: computed<GNBMenuType[]>(() => {
+    gnbMenuList: computed<GNBMenuType[]|undefined>(() => {
         let results = [] as GNBMenuType[];
         const menuList = [...store.getters['display/GNBMenuList']];
-        if (state.dataSource.length === 0) {
+        if (state.isInit && isEmpty(storeState.costDataSource)) {
             results = refinedMenuList(menuList, MENU_ID.COST_EXPLORER);
         } else results = menuList;
         return results;
     }),
     visibleGnbMenuList: computed<GNBMenuType[]>(() => {
         let result = [] as GNBMenuType[];
-        state.gnbMenuList.forEach((menu) => {
+        state.gnbMenuList?.forEach((menu) => {
             result = [
                 ...result,
                 {
@@ -111,14 +115,6 @@ const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenu
     type: menuType,
     disabled: menuType === 'header' && menu.id.includes('cost'),
 }));
-const getDataSource = async () => {
-    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
-        query: {
-            sort: [{ key: 'workspace_id', desc: false }],
-        },
-    });
-    state.dataSource = response?.results || [];
-};
 const refinedMenuList = (list, value) => {
     const index = list.findIndex((d) => d.id === value);
     if (index !== -1) {
@@ -132,9 +128,9 @@ const refinedMenuList = (list, value) => {
     return list;
 };
 
-(async () => {
-    await getDataSource();
-})();
+onMounted(async () => {
+    state.isInit = true;
+});
 </script>
 
 <template>

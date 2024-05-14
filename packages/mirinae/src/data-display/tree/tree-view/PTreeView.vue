@@ -62,7 +62,7 @@ const handleUpdateTreeDisplayMap = (id: string|undefined, isOpen: boolean) => {
                      :key="item.id"
                      :node="item"
                      :selected-id="selectedId"
-                     :is-open="state.proxyTreeDisplayMap[item.id]?.isOpen"
+                     :is-open="state.proxyTreeDisplayMap[item.id] ? state.proxyTreeDisplayMap[item.id].isOpen : undefined"
                      :use-default-indent="useDefaultIndent"
                      @click-toggle="handleClickToggle"
                      @click-item="handleClickItem"

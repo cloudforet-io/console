@@ -48,6 +48,10 @@ export interface LSBItem {
     isSub?: boolean;
 }
 
+export interface LSBCollapsibleItem<T = any> extends LSBItem {
+    subItems?: T[];
+}
+
 export type LSBMenu = LSBItem[]|LSBItem;
 
 export interface BackLink {

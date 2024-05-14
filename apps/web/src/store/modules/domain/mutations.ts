@@ -10,6 +10,10 @@ export const setDomain = (state: DomainState, domainInfo: DomainState): void => 
     state.config = domainInfo.config;
 };
 
+export const setDomainConfigs = (state: DomainState, domainInfo: DomainState): void => {
+    state.config = domainInfo.config;
+};
+
 export const setExtraMenu = (state: DomainState, extraMenu: ExtraMenuSet) => {
     state.extraMenu = extraMenu;
 };
