@@ -23,15 +23,21 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     currency: undefined,
     theme: undefined,
 });
-
-// const emit = defineEmits<{(event: 'click-delete'): void;
-//     (event: 'click-expand'): void;
-//     (event: 'click-edit'): void;
-// }>();
+const emit = defineEmits<{(event: 'click-delete'): void;
+    (event: 'click-edit'): void;
+}>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
 });
+
+/* Event */
+const handleEditButtonClick = () => {
+    emit('click-edit');
+};
+const handleClickDeleteButton = () => {
+    emit('click-delete');
+};
 </script>
 
 <template>
@@ -51,14 +57,18 @@ const state = reactive({
                 <span class="metadata-text">Metadata</span>
             </div>
         </div>
-        <div class="action-button-wrapper">
+        <div v-if="props.editMode"
+             class="action-button-wrapper"
+        >
             <p-icon-button name="ic_edit"
                            style-type="transparent"
                            size="sm"
+                           @click="handleEditButtonClick"
             />
             <p-icon-button name="ic_delete"
                            style-type="transparent"
                            size="sm"
+                           @click="handleClickDeleteButton"
             />
         </div>
         <div class="body">
@@ -113,31 +123,6 @@ const state = reactive({
         overflow-y: auto;
         flex: 1 1;
         padding: 0 1.5rem;
-    }
-    .error-container {
-        @apply flex items-center flex-col h-full;
-        padding: 0 1.5625rem;
-
-        .error-title {
-            @apply text-gray-700 flex justify-center items-center;
-            font-size: 1.125rem;
-            height: 42%;
-            .error-icon-wrapper {
-                @apply text-red-400;
-                padding-right: 0.5rem;
-            }
-        }
-        .error-message {
-            @apply text-gray-700;
-            text-align: center;
-            margin-top: 2rem;
-            line-height: 1.25;
-            font-size: 0.875rem;
-        }
-        .edit-button {
-            z-index: 1;
-            margin: 1rem 0;
-        }
     }
     &.full {
         height: auto;

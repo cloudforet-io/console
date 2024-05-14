@@ -11,7 +11,8 @@ import type {
     DashboardSettings, DashboardVariablesSchema, DashboardVariables, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 
-import VerticalBarChart from '@/common/modules/widgets/_base-widgets/vertical-bar-chart/VerticalBarChart.vue';
+import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue';
+import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
 
@@ -39,18 +40,15 @@ const state = reactive({
         },
         refresh_interval_option: 'off',
     } as DashboardSettings,
-    chartTypeSelectDropdownMenu: [
-        { name: 'verticalBarChart', label: 'Vertical Bar Chart' },
-        { name: 'horizontalBarChart', label: 'Horizontal Bar Chart' },
-        { name: 'lineChart', label: 'Line Chart' },
-        { name: 'pieChart', label: 'Pie Chart' },
-        { name: 'treemapChart', label: 'Treemap Chart' },
-    ],
+    chartTypeSelectDropdownMenu: computed(() => NEW_CONSOLE_WIDGET_CONFIG_KEYS.map((d) => ({
+        name: d,
+        label: d,
+    }))),
 });
 const formState = reactive({
     title: '',
     description: '',
-    selectedChartName: 'verticalBarChart',
+    selectedChartName: 'stackedColumnChart',
     dataMapping: {},
     chartOptions: {},
 });
@@ -71,17 +69,17 @@ watch(() => state.widgetConfig, (_config) => {
         <br>
         <div class="grid grid-cols-12">
             <div class="col-span-8">
-                <vertical-bar-chart v-if="formState.selectedChartName === 'verticalBarChart'"
-                                    :widget-name="formState.selectedChartName"
-                                    :widget-key="formState.selectedChartName"
-                                    :title="formState.title"
-                                    size="lg"
-                                    :description="formState.description"
-                                    :data-sources="state.dataSources"
-                                    :data-mapping="formState.dataMapping"
-                                    :chart-options="formState.chartOptions"
-                                    :variables-schema="state.variablesSchema"
-                                    :variables="state.variables"
+                <stacked-column-chart v-if="formState.selectedChartName === 'stackedColumnChart'"
+                                      :widget-name="formState.selectedChartName"
+                                      :widget-key="formState.selectedChartName"
+                                      :title="formState.title"
+                                      size="lg"
+                                      :description="formState.description"
+                                      :data-sources="state.dataSources"
+                                      :data-mapping="formState.dataMapping"
+                                      :chart-options="formState.chartOptions"
+                                      :variables-schema="state.variablesSchema"
+                                      :variables="state.variables"
                 />
             </div>
             <div class="col-span-4 px-2">
