@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PTextInput, PFieldGroup,
@@ -10,17 +12,11 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import VerticalBarChart from '@/common/modules/widgets/_base-widgets/vertical-bar-chart/VerticalBarChart.vue';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
-import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
-import {
-    useAllReferenceTypeInfoStore,
-} from '@/services/dashboards/stores/all-reference-type-info-store';
-
-
-const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const state = reactive({
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
+    widgetConfig: computed(() => getWidgetConfig(formState.selectedChartName)),
     dataSources: [
         {
             data_domain: 'Cost',
@@ -52,12 +48,16 @@ const state = reactive({
     ],
 });
 const formState = reactive({
-    title: 'Vertical Bar Chart',
+    title: '',
     description: '',
-    selectedChartType: 'verticalBarChart',
+    selectedChartName: 'verticalBarChart',
     dataMapping: {},
     chartOptions: {},
 });
+
+watch(() => state.widgetConfig, (_config) => {
+    formState.title = _config?.meta.title;
+}, { immediate: true });
 </script>
 
 <template>
@@ -71,9 +71,9 @@ const formState = reactive({
         <br>
         <div class="grid grid-cols-12">
             <div class="col-span-8">
-                <vertical-bar-chart v-if="formState.selectedChartType === 'verticalBarChart'"
-                                    :widget-name="formState.selectedChartType"
-                                    :widget-key="formState.selectedChartType"
+                <vertical-bar-chart v-if="formState.selectedChartName === 'verticalBarChart'"
+                                    :widget-name="formState.selectedChartName"
+                                    :widget-key="formState.selectedChartName"
                                     :title="formState.title"
                                     size="lg"
                                     :description="formState.description"
@@ -114,8 +114,8 @@ const formState = reactive({
                     <div>
                         <p-select-dropdown
                             :menu="state.chartTypeSelectDropdownMenu"
-                            :selected="formState.selectedChartType"
-                            @select="formState.selectedChartType = $event"
+                            :selected="formState.selectedChartName"
+                            @select="formState.selectedChartName = $event"
                         />
                     </div>
                 </div>

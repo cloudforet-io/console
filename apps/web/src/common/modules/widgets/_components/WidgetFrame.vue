@@ -2,39 +2,15 @@
 import {
     reactive, computed,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
 
 import {
-    PI,
+    PI, PIconButton,
 } from '@spaceone/design-system';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
-import type { Currency } from '@/store/modules/settings/type';
+import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
-import type { WidgetTheme } from '@/common/modules/widgets/types/widget-display-type';
-
-
-interface WidgetFrameProps {
-    title: TranslateResult;
-    size: WidgetSize;
-    widgetSizes: WidgetSize[];
-    width?: number;
-    widgetLink?: string;
-    widgetLocation?: Location;
-
-    dateRange?: DateRange;
-    noData?: boolean;
-    currency?: Currency;
-
-    editMode?: boolean;
-    errorMode?: boolean;
-    widgetKey: string;
-    theme?: WidgetTheme;
-}
 
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
     title: undefined,
@@ -75,6 +51,16 @@ const state = reactive({
                 <span class="metadata-text">Metadata</span>
             </div>
         </div>
+        <div class="action-button-wrapper">
+            <p-icon-button name="ic_edit"
+                           style-type="transparent"
+                           size="sm"
+            />
+            <p-icon-button name="ic_delete"
+                           style-type="transparent"
+                           size="sm"
+            />
+        </div>
         <div class="body">
             <slot />
         </div>
@@ -93,7 +79,8 @@ const state = reactive({
     padding: 1rem;
 
     .widget-header {
-        @apply flex items-center;
+        display: flex;
+        align-items: center;
         padding-bottom: 0.5rem;
         .title {
             @apply truncate text-label-md;
@@ -113,6 +100,13 @@ const state = reactive({
                 padding-left: 0.25rem;
             }
         }
+    }
+    .action-button-wrapper {
+        @apply bg-gray-150 rounded-lg;
+        position: absolute;
+        right: 0.25rem;
+        top: 0.25rem;
+        padding: 0.25rem;
     }
     .body {
         height: auto;

@@ -3,26 +3,16 @@ import {
     computed, reactive,
 } from 'vue';
 
-// import type { Series } from '@amcharts/amcharts5';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-// import { cloneDeep } from 'lodash';
-
-// import { useAmcharts5 } from '@/common/composables/amcharts5';
-// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import dayjs from 'dayjs';
 
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-// import {
-//     getDateAxisSettings,
-// } from '@/common/modules/widgets/_helpers/widget-chart-helper';
 import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
+import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
-    // WidgetExpose,
-    // CostAnalyzeResponse,
     NewWidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 
@@ -57,8 +47,9 @@ const emit = defineEmits<WidgetEmit>();
 
 // const chartContext = ref<HTMLElement|null>(null);
 // const chartHelper = useAmcharts5(chartContext);
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+const { widgetState } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
         const end = dayjs().utc(widgetState.dateRange?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(3, 'month').format(DATE_FORMAT);
@@ -72,17 +63,6 @@ const state = reactive({
     chart: null as null | XYChart,
     // dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
     chartData: [],
-    widgetFrameProps: computed(() => ({
-        title: props.title,
-        size: props.size,
-        width: props.width,
-        // widgetLocation: props.widgetLocation,
-        // widgetConfigId: props.widgetConfigId,
-        // noData: props.noData,
-        // editMode: props.editMode,
-        // errorMode: props.errorMode,
-        // widgetKey: props.widgetKey,
-    })),
     // chartData: computed<ChartData[]>(() => {
     //     if (!state.data?.results) return [];
     //
@@ -251,7 +231,9 @@ const state = reactive({
 </script>
 
 <template>
-    <widget-frame v-bind="state.widgetFrameProps">
+    <widget-frame v-bind="widgetFrameProps"
+                  v-on="widgetFrameEventHandlers"
+    >
         <div class="data-container">
             <div v-if="state.data?.results?.length"
                  class="chart-wrapper"

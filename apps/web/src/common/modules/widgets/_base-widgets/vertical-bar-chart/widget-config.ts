@@ -1,27 +1,11 @@
 import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
-// const baseTrendWidgetConfig: WidgetConfig = {
-//     widget_config_id: 'baseTrend',
-//     scopes: ['PROJECT', 'WORKSPACE'],
-//     theme: {
-//         inherit: true,
-//     },
-//     sizes: ['lg', 'full'],
-//     options: {
-//         granularity: GRANULARITY.MONTHLY,
-//         pagination_options: {
-//             enabled: true,
-//             page_size: 5,
-//         },
-//     },
-// };
 
 const verticalBarChart: NewWidgetConfig = {
-    widget_name: 'baseTrend',
+    widget_name: 'verticalBarChart',
     meta: {
-        title: 'Base Trend',
+        title: 'Vertical Bar Chart',
         sizes: ['lg', 'full'],
-        chart_type: 'line',
     },
     data_mapping_schema: {
         data_field_y: {
