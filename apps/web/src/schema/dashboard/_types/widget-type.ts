@@ -76,36 +76,6 @@ export interface WidgetConfig {
     options_schema?: WidgetOptionsSchema;
 }
 
-export interface NewWidgetConfig {
-    widget_name: string;
-    meta: {
-        title?: string;
-        description?: string;
-        sizes: WidgetSize[];
-        chart_type: string;
-    };
-    data_mapping_schema: {
-        [key: string]: {
-            label?: string;
-            select_options?: { // group_by only
-                multiple?: boolean;
-                max?: number;
-            };
-            fixed_options?: { // group_by only
-                enabled: boolean;
-                value: string;
-            }
-        }
-    };
-    chart_options_schema: {
-        [key: string]: {
-            type: string;
-            label?: string;
-            fields?: string[]; // only for format_rules
-        }
-    }
-}
-
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface LegendOptions {
     enabled?: boolean;
