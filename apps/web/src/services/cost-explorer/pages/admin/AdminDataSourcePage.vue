@@ -79,7 +79,6 @@ onMounted(() => {
         }
     }
 
-
     /* custom design-system component - p-horizontal-layout */
     :deep(.data-source-table) {
         .horizontal-contents {
