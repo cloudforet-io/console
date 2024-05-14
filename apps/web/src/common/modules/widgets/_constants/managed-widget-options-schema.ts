@@ -16,8 +16,8 @@ export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
     },
 } as const;
 
-export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
-    // 'filters.workspace': {
+export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
+    // 'workspace': {
     //     key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace,
     //     name: 'Workspace',
     //     selection_type: 'MULTI',
@@ -27,7 +27,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
     //         { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.workspace },
     //     ],
     // },
-    'filters.provider': {
+    provider: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider,
         name: 'Provider',
         selection_type: 'MULTI',
@@ -36,7 +36,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.provider },
         ],
     },
-    'filters.project_group': {
+    project_group: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group,
         name: 'Project Group',
         selection_type: 'MULTI',
@@ -45,7 +45,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.project_group },
         ],
     },
-    'filters.project': {
+    project: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.project,
         name: 'Project',
         selection_type: 'MULTI',
@@ -54,7 +54,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.project },
         ],
     },
-    'filters.service_account': {
+    service_account: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account,
         name: 'Service Account',
         selection_type: 'MULTI',
@@ -63,7 +63,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.service_account },
         ],
     },
-    'filters.region': {
+    region: {
         key: MANAGED_VARIABLE_MODEL_KEY_MAP.region,
         name: 'Region',
         selection_type: 'MULTI',
@@ -72,7 +72,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.region },
         ],
     },
-    'filters.cost_product': {
+    cost_product: {
         key: 'cost_product',
         name: 'Product (Cost)',
         selection_type: 'MULTI',
@@ -81,7 +81,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'product' },
         ],
     },
-    'filters.cost_tag_value': {
+    cost_tag_value: {
         key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key,
         name: 'Cost Tag',
         selection_type: 'MULTI',
@@ -90,7 +90,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_tag_key },
         ],
     },
-    'filters.cost_additional_info_value': {
+    cost_additional_info_value: {
         key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key,
         name: 'Cost Additional Info',
         selection_type: 'MULTI',
@@ -99,7 +99,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost_additional_info_key },
         ],
     },
-    'filters.cost_usage_type': {
+    cost_usage_type: {
         key: 'cost_usage_type',
         name: 'Usage Type (Cost)',
         selection_type: 'MULTI',
@@ -108,7 +108,7 @@ export const MANAGED_WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
         ],
     },
-    'filters.asset_account': {
+    asset_account: {
         key: 'asset_account',
         name: 'AWS Account ID (Asset)',
         selection_type: 'MULTI',
