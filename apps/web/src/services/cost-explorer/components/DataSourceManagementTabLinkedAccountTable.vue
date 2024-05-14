@@ -41,6 +41,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
+const workspaceListApiQueryHelper = new ApiQueryHelper();
 const tableListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 let tableListApiQuery = tableListApiQueryHelper.data;
@@ -96,7 +97,6 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
     emit('confirm');
 };
 
-const workspaceListApiQueryHelper = new ApiQueryHelper();
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
@@ -218,7 +218,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      class="col-sync"
                      :style-type="!value ? 'gray100' : 'blue300'"
             >
-                {{ value.toString().replace(/^\w/, (c) => c.toUpperCase()) }}
+                {{ value ? value.toString().replace(/^\w/, (c) => c.toUpperCase()) : 'False' }}
             </p-badge>
         </template>
     </p-toolbox-table>
