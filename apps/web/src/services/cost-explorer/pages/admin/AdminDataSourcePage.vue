@@ -30,6 +30,7 @@ onMounted(() => {
                    use-selected-count
                    :total-count="storeState.totalCount"
                    :selected-count="storeState.selectedIndices.length"
+                   class="title"
         >
             <template #extra>
                 <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
@@ -56,6 +57,10 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .admin-data-source-page {
+    .title {
+        @apply items-center;
+    }
+
     /* custom design-system component - p-link */
     :deep(.p-link) {
         @apply flex items-center;

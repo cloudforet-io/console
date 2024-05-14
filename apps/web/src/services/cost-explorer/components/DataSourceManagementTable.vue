@@ -35,7 +35,7 @@ const tableState = reactive({
         },
         {
             name: 'data_source_id',
-            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_BILLING_ACCOUNT'),
+            label: 'ID',
             type: 'item',
             sortable: false,
         },
