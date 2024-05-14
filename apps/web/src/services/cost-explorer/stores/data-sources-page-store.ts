@@ -74,6 +74,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         })),
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
+            total_tasks: i.total_tasks || 0,
             created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
@@ -88,7 +89,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];
             return {
                 ...item,
-                description: pluginItem.description,
+                description: pluginItem.description || '',
             };
         }),
     });
