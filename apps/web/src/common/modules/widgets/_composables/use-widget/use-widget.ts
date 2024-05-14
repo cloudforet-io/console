@@ -42,7 +42,7 @@ export interface OverridableWidgetState {
 export interface WidgetState extends BaseWidgetState {
     dateRange: ComputedRef<DateRange|undefined>;
     // TODO: refactoring with dynamic data source
-    // widgetLocation: ComputedRef<Location|undefined>; // widget location for link which is differentiated by widget labels(e.g. Cost, Asset)
+    widgetLocation?: ComputedRef<Location|undefined>; // widget location for link which is differentiated by widget labels(e.g. Cost, Asset)
     // consoleFilters: ComputedRef<ConsoleFilter[]>;
 
     widgetFilters: NewWidgetFilters|undefined|Ref<NewWidgetFilters|undefined>; // widget options from the dashboard widget layout info.
