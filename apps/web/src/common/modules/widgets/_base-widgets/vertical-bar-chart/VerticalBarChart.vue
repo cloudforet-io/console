@@ -51,7 +51,7 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 const { widgetState } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs().utc(widgetState.dateRange?.end).format(DATE_FORMAT);
+        const end = dayjs.utc(widgetState.dateRange?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(3, 'month').format(DATE_FORMAT);
         return { start, end };
     }),

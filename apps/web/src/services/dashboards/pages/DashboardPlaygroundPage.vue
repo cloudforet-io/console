@@ -56,7 +56,7 @@ const formState = reactive({
 });
 
 watch(() => state.widgetConfig, (_config) => {
-    formState.title = _config?.meta.title;
+    formState.title = _config?.meta.title || '';
 }, { immediate: true });
 </script>
 
