@@ -75,9 +75,9 @@ const state = reactive({
     menuSet: computed(() => {
         const baseMenuSet = [
             {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: i18n.t('COMMON.STARRED'),
-                id: 'starred',
+                type: MENU_ITEM_TYPE.STARRED,
+                childItems: state.starredMenuSet,
+                currentPath: state.currentPath,
             },
             {
                 type: MENU_ITEM_TYPE.DIVIDER,

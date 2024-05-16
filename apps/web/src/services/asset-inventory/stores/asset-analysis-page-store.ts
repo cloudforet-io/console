@@ -75,7 +75,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         // below is the map of reference store for each reference label key
         labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
             const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
-            state.metric?.labels_info.filter((d) => !isEmpty(d.reference)).forEach((d) => {
+            state.metric?.label_keys?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
                 const _fieldName = d.key.replace('labels.', '');
                 _labelKeysMap[_fieldName] = d;
             });

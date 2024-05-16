@@ -204,24 +204,22 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                             :item="item"
                         />
                     </div>
-                    <div class="arrow-button-wrapper">
-                        <p-icon-button v-if="state.pageStart.provider !== 0"
-                                       class="arrow-button left"
-                                       name="ic_chevron-left"
-                                       color="inherit transparent"
-                                       width="1.5rem"
-                                       height="1.5rem"
-                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, -1)"
-                        />
-                        <p-icon-button v-if="state.pageStart.provider !== Number(state.pageMax.provider)"
-                                       class="arrow-button right"
-                                       name="ic_chevron-right"
-                                       color="inherit transparent"
-                                       width="1.5rem"
-                                       height="1.5rem"
-                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, 1)"
-                        />
-                    </div>
+                    <p-icon-button v-if="state.pageStart.provider !== 0"
+                                   class="arrow-button left"
+                                   name="ic_chevron-left"
+                                   color="inherit transparent"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, -1)"
+                    />
+                    <p-icon-button v-if="state.pageStart.provider !== Number(state.pageMax.provider)"
+                                   class="arrow-button right"
+                                   name="ic_chevron-right"
+                                   color="inherit transparent"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   @click="handleClickArrowButton(ARROW_BUTTON_TYPE.PROVIDER, 1)"
+                    />
                 </div>
                 <div class="daily-update-wrapper">
                     <p-field-title :label="$t('HOME.ASSET_SUMMARY_DAILY_UPDATE_TITLE')"
@@ -243,24 +241,22 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                                                              :item="item"
                             />
                         </div>
-                        <div class="arrow-button-wrapper">
-                            <p-icon-button v-if="state.pageStart.dailyUpdate !== 0"
-                                           class="arrow-button left"
-                                           name="ic_chevron-left"
-                                           color="inherit transparent"
-                                           width="1.5rem"
-                                           height="1.5rem"
-                                           @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, -1)"
-                            />
-                            <p-icon-button v-if="state.pageStart.dailyUpdate !== Number(state.pageMax.dailyUpdate)"
-                                           class="arrow-button right"
-                                           name="ic_chevron-right"
-                                           color="inherit transparent"
-                                           width="1.5rem"
-                                           height="1.5rem"
-                                           @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, 1)"
-                            />
-                        </div>
+                        <p-icon-button v-if="state.pageStart.dailyUpdate !== 0"
+                                       class="arrow-button left"
+                                       name="ic_chevron-left"
+                                       color="inherit transparent"
+                                       width="1.5rem"
+                                       height="1.5rem"
+                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, -1)"
+                        />
+                        <p-icon-button v-if="state.pageStart.dailyUpdate !== Number(state.pageMax.dailyUpdate)"
+                                       class="arrow-button right"
+                                       name="ic_chevron-right"
+                                       color="inherit transparent"
+                                       width="1.5rem"
+                                       height="1.5rem"
+                                       @click="handleClickArrowButton(ARROW_BUTTON_TYPE.DAILY_UPDATES, 1)"
+                        />
                     </div>
                     <p-empty v-else
                              show-image
@@ -323,24 +319,23 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
                 height: 100%;
                 background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, theme('colors.white') 50%);
             }
-            .arrow-button-wrapper {
-                @apply absolute flex;
+            .arrow-button {
+                @apply absolute bg-white border border-gray-300 rounded-full;
                 top: calc(50% - 1rem);
-                right: 0.75rem;
-                left: 0.5rem;
-                width: calc(100% - 1.25rem);
+                width: 2rem;
+                height: 2rem;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
                 z-index: 10;
-                .arrow-button {
-                    @apply bg-white border border-gray-300 rounded-full;
-                    width: 2rem;
-                    height: 2rem;
-                    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-                    &.left {
-                        margin-right: auto;
-                    }
-                    &.right {
-                        margin-left: auto;
-                    }
+                &.left {
+                    margin-right: auto;
+                    left: 0.5rem;
+                }
+                &.right {
+                    margin-left: auto;
+                    right: 0.75rem;
+                }
+                &:hover {
+                    @apply text-gray-900;
                 }
             }
 
