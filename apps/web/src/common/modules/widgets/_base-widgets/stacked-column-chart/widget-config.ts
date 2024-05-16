@@ -5,7 +5,7 @@ const stackedColumnChart: NewWidgetConfig = {
     widget_name: 'stackedColumnChart',
     meta: {
         title: 'Stacked Column Chart',
-        sizes: ['lg', 'full'],
+        sizes: ['full'],
         granularity: 'MONTHLY',
     },
     data_mapping_schema: {
