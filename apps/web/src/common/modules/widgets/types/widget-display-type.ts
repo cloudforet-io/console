@@ -3,7 +3,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type {
     DashboardLayoutWidgetInfo,
     DashboardVariables,
-    DashboardVariablesSchema, DataSource, DateRange,
+    DashboardVariablesSchema, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type {
     WidgetSize, NewWidgetFilters,
@@ -24,7 +24,7 @@ export interface NewWidgetProps {
     widgetKey: string; // unique widget key to identify widgets in layout
     editMode?: boolean;
     errorMode?: boolean;
-    dateRange?: DateRange;
+    baseOnDate?: string;
     variablesSchema?: DashboardVariablesSchema;
     variables?: DashboardVariables;
     loading?: boolean;
