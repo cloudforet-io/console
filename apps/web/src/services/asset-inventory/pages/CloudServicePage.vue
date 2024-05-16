@@ -80,7 +80,7 @@ const handlerState = reactive({
             { name: 'project_id', label: 'Project', valueSet: storeState.projects },
             { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
             { name: 'collection_info.service_account_id', label: 'Service Account', valueSet: storeState.serviceAccounts },
-            { name: 'account', label: 'Account ID' },
+            { name: 'account', label: 'Cloud Account ID' },
         ],
     }]),
     valueHandlerMap: {
