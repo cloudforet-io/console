@@ -152,7 +152,7 @@ onUnmounted(() => {
                 />
             </template>
         </p-horizontal-layout>
-        <workspaces-user-management-tab @select-action="handleSelectAction" />
+        <workspaces-user-management-tab />
         <workspaces-create-modal
             :visible.sync="modalState.createModalVisible"
             :create-type="modalState.createType"
