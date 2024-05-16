@@ -20,17 +20,18 @@ export const useWidgetFrame = (
         return widgetConfig.meta.sizes[0];
     });
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
+        widgetKey: props.widgetKey,
         title: title.value,
+        description: props.description,
         size: size.value,
-        widgetSizes: widgetConfig.meta.sizes,
-        width: props.width,
-        widgetLocation: widgetState?.widgetLocation,
+        loading: props.loading,
         dateRange: props.dateRange,
-        currency: widgetState?.currency,
+        width: props.width,
+        widgetSizes: widgetConfig.meta.sizes,
         editMode: props.editMode,
         errorMode: props.errorMode,
-        widgetKey: props.widgetKey,
-        theme: props.theme,
+        currency: widgetState?.currency,
+        widgetLocation: widgetState?.widgetLocation,
     }));
 
     const widgetFrameEventHandlers = {
