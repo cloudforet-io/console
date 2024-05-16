@@ -20,7 +20,7 @@ interface WidgetChartState {
     granularity?: Granularity;
 }
 
-export const useWidgetChart = (
+export const useWidgetChartState = (
     props: UnwrapRef<NewWidgetProps>,
 ): { widgetChartState: WidgetChartState } => {
     const widgetConfig = getWidgetConfig(props.widgetName);
