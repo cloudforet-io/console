@@ -43,6 +43,7 @@ const emit = defineEmits<WidgetEmit>();
 
 const { widgetState } = useWidget(props, emit);
 // const { widgetChartState } = useWidgetChart(props);
+// const { widgetDataState } = useWidgetDataState(props);
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
 const state = reactive({

@@ -118,9 +118,10 @@ export interface NewDashboardLayoutWidgetInfo {
 
 
 export interface DataSource {
-    data_domain: string; // Cost/Asset/Security
-    data_source_from?: string; // cost_analysis
-    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
+    // data_domain: string; // Cost/Asset/Security
+    // data_source_from?: string; // cost_analysis
+    // value: string[]; // Usage
     // TODO: create ResrouceType
-    value: string[];
+    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
+    value: string;
 }
