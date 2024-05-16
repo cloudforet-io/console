@@ -14,7 +14,7 @@ export const useWidgetDataState = (props: UnwrapRef<NewWidgetProps>) => {
         dataMapping: computed(() => props.dataMapping),
         filters: computed(() => props.filters),
         variables: computed(() => props.variables),
-        dateRange: computed(() => props.dateRange),
+        baseOnDate: computed(() => props.baseOnDate),
         granularity: computed(() => config.meta.granularity),
     });
 

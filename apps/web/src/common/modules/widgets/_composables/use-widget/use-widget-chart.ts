@@ -10,7 +10,7 @@ export const useWidgetChart = (
 ) => {
     const widgetConfig = getWidgetConfig(props.widgetName);
     const widgetChartState = computed(() => ({
-        dateRange: props.dateRange,
+        baseOnDate: props.baseOnDate,
         dateMapping: props.dataMapping,
         chartOptions: props.chartOptions,
         granularity: widgetConfig.meta.granularity,

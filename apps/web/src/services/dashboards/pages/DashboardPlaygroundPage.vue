@@ -8,7 +8,7 @@ import {
 } from '@spaceone/design-system';
 
 import type {
-    DashboardSettings, DashboardVariablesSchema, DashboardVariables, DataSource,
+    DashboardVariablesSchema, DashboardVariables, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue';
@@ -20,26 +20,17 @@ const state = reactive({
     widgetConfig: computed(() => getWidgetConfig(formState.selectedChartName)),
     dataSources: [
         {
-            data_domain: 'Cost',
             resource_type: 'cost_analysis.Cost',
-            value: ['ds-3d5b2ed535c7'],
+            value: 'ds-3d5b2ed535c7',
         },
         {
-            data_domain: 'Asset',
             resource_type: 'inventory.MetricData',
-            value: ['metric-aws-ec2-instance-count'],
+            value: 'metric-aws-ec2-instance-count',
         },
     ] as DataSource[],
     variablesSchema: {} as DashboardVariablesSchema,
     variables: {} as DashboardVariables,
-    settings: {
-        date_range: {
-            enabled: true,
-            start: '',
-            end: '',
-        },
-        refresh_interval_option: 'off',
-    } as DashboardSettings,
+    baseOnDate: '2024-05',
     chartTypeSelectDropdownMenu: computed(() => NEW_CONSOLE_WIDGET_CONFIG_KEYS.map((d) => ({
         name: d,
         label: d,
@@ -62,9 +53,9 @@ watch(() => state.widgetConfig, (_config) => {
     <div>
         <p>Widget Playground</p>
         <br>
-        <p>settings</p>
+        <p>Based on Date</p>
         <p class="text-label-md">
-            {{ state.settings }}
+            {{ state.baseOnDate }}
         </p>
         <br>
         <div class="grid grid-cols-12">
@@ -86,7 +77,7 @@ watch(() => state.widgetConfig, (_config) => {
                 <div class="pb-4">
                     <b>Data Source</b>
                     <p v-for="dataSource in state.dataSources"
-                       :key="`${dataSource.data_domain}-${dataSource.resource_type}-${dataSource.value}`"
+                       :key="`${dataSource.resource_type}-${dataSource.value}`"
                        class="text-label-md"
                     >
                         {{ dataSource.resource_type }} {{ dataSource.value }}

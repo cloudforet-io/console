@@ -1,7 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import type { Currency } from '@/store/modules/settings/type';
@@ -16,7 +15,7 @@ export interface WidgetFrameProps {
     width?: number;
     widgetLocation?: Location;
 
-    dateRange?: DateRange;
+    dateText?: string;
     currency?: Currency;
 
     editMode?: boolean;
