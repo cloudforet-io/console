@@ -278,6 +278,10 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
             </div>
             <p-divider class="divider" />
             <p-link highlight
+                    :to="{
+                        name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                        params: { metricId: 'metric-managed-created-count'},
+                    }"
                     action-icon="internal-link"
                     class="link"
             >
