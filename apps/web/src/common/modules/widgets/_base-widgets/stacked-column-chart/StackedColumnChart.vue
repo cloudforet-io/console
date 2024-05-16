@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    reactive,
 } from 'vue';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
-import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
@@ -17,10 +14,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-// interface DateRange {
-//     start?: string;
-//     end?: string;
-// }
 // const dataSourceFetcherMap = {
 //     'cost_analysis.Cost': SpaceConnector.clientV2.costAnalysis.cost.analyze,
 //     'cost_analysis.BudgetUsage': SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze,
@@ -39,7 +32,7 @@ import type {
 // }
 // type Response = CostAnalyzeResponse<Data>;
 
-const DATE_FORMAT = 'YYYY-MM';
+// const DATE_FORMAT = 'YYYY-MM';
 // const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<NewWidgetProps>();
@@ -48,13 +41,8 @@ const emit = defineEmits<WidgetEmit>();
 // const chartContext = ref<HTMLElement|null>(null);
 // const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.dateRange?.end).format(DATE_FORMAT);
-        const start = dayjs.utc(end).subtract(3, 'month').format(DATE_FORMAT);
-        return { start, end };
-    }),
-});
+const { widgetState } = useWidget(props, emit);
+// const { widgetChartState } = useWidgetChart(props);
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
 const state = reactive({
