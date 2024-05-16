@@ -77,7 +77,7 @@ const state = reactive({
     pageSize: 15,
     more: false,
     metricResourceType: computed<string|undefined>(() => assetAnalysisPageState.metric?.resource_type),
-    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
     metricAdditionalFilter: computed(() => (assetAnalysisPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key, v: d.value, o: d.operator })) ?? []),
 });
 

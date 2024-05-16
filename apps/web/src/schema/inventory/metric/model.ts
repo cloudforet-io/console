@@ -11,7 +11,7 @@ export interface MetricModel {
     date_field: string;
     unit: string;
     tags: Tags;
-    label_keys: MetricLabelKey[];
+    labels_info: MetricLabelKey[];
     is_managed: boolean;
     namespace_id: string;
     domain_id: string;
