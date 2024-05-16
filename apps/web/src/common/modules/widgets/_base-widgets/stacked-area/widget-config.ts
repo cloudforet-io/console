@@ -1,12 +1,11 @@
 import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const stackedColumnChart: NewWidgetConfig = {
-    widget_name: 'stackedColumnChart',
+const stackedArea: NewWidgetConfig = {
+    widget_name: 'stackedArea',
     meta: {
-        title: 'Stacked Column Chart',
+        title: 'Stacked Area',
         sizes: ['full'],
-        granularity: 'MONTHLY',
     },
     data_mapping_schema: {
         data_field_y: {
@@ -18,16 +17,17 @@ const stackedColumnChart: NewWidgetConfig = {
         },
     },
     chart_options_schema: {
-        max_group_by: {
-            type: 'number',
-            label: 'Maximum number of Group By',
-        },
         max_data_field_x: {
             type: 'number',
             label: 'Maximum number of Data Field (X Axis)',
+        },
+        format_rules: {
+            type: 'format_rules',
+            label: 'Format Rules',
+            fields: ['number', 'text', 'color'],
         },
     },
 };
 
 
-export default stackedColumnChart;
+export default stackedArea;
