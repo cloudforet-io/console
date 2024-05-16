@@ -5,6 +5,10 @@ import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-con
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
+interface DataField {
+    label?: string;
+    enable_granularity?: boolean;
+}
 export interface NewWidgetConfig {
     widget_name: string;
     meta: {
@@ -13,17 +17,9 @@ export interface NewWidgetConfig {
         granularity?: Granularity;
     };
     data_mapping_schema: {
-        [key: string]: {
-            label?: string;
-            select_options?: { // group_by only
-                multiple?: boolean;
-                max?: number;
-            };
-            fixed_options?: { // group_by only
-                enabled: boolean;
-                value: string;
-            }
-        }
+        data_field_x?: DataField;
+        data_field_y?: DataField;
+        data_field?: DataField;
     };
     chart_options_schema: {
         [key: string]: {

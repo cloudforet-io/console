@@ -6,7 +6,7 @@ import type {
     DashboardVariablesSchema, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    WidgetSize, NewWidgetFilters,
+    WidgetSize, NewWidgetFilters, DataMapping,
 } from '@/schema/dashboard/_types/widget-type';
 
 
@@ -29,7 +29,7 @@ export interface NewWidgetProps {
     variables?: DashboardVariables;
     loading?: boolean;
     dataSources: DataSource[];
-    dataMapping: Record<string, string|string[]>;
+    dataMapping: DataMapping;
     chartOptions: Record<string, any>;
 }
 

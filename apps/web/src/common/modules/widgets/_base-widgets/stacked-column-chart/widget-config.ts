@@ -14,6 +14,7 @@ const stackedColumnChart: NewWidgetConfig = {
         },
         data_field_x: {
             label: 'Data Field (X Axis)',
+            enable_granularity: true,
         },
     },
     chart_options_schema: {
@@ -21,9 +22,9 @@ const stackedColumnChart: NewWidgetConfig = {
             type: 'number',
             label: 'Maximum number of Group By',
         },
-        max_data_field_x: {
+        data_field_x_count: {
             type: 'number',
-            label: 'Maximum number of Data Field (X Axis)',
+            label: 'Count of Data Field (X Axis)',
         },
     },
 };
