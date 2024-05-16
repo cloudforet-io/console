@@ -4,18 +4,21 @@ import type { NewWidgetConfigKey } from '@/common/modules/widgets/types/widget-l
 
 
 export const NEW_CONSOLE_WIDGET_CONFIG_KEYS = [
-    'number',
+    'numberCard',
     'stackedColumnChart',
+    'clusteredColumnChart',
+    'stackedBarChart',
     'lineChart',
     'donutChart',
+    'pieChart',
     'treeMap',
     'heatmap',
     'regionMap',
     'table',
-    'area',
+    'stackedArea',
     'guage',
-    'progress',
-];
+    'progressCard',
+] as const;
 
 export const NEW_CONSOLE_WIDGET_CONFIG: Record<NewWidgetConfigKey, Partial<NewWidgetConfig>> = {
     stackedColumnChart,
