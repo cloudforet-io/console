@@ -12,6 +12,9 @@ const numberCard: NewWidgetConfig = {
         data_field: {
             label: 'Data Field',
         },
+        granularity_field: {
+            label: 'Granularity',
+        },
     },
     chart_options_schema: {
         comparison: {
