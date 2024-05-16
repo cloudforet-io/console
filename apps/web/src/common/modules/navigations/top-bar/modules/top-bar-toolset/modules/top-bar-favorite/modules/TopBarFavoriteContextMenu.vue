@@ -348,6 +348,7 @@ const init = async () => {
     state.loading = true;
     await Promise.allSettled([
         favoriteStore.fetchFavorite(),
+        gnbStore.fetchCostQuerySet(),
         dashboardStore.load(),
         // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
     ]);

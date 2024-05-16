@@ -107,11 +107,14 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
     if (state.selectedMenuId === MENU_ID.SECURITY) return;
-    await Promise.all([
-        gnbStore.setFavoriteItemId(state.favoriteOptions),
-        gnbStore.fetchMetricExample(),
-        gnbStore.fetchCostQuerySet(),
-    ]);
+
+    await gnbStore.setFavoriteItemId(state.favoriteOptions);
+
+    if (state.selectedMenuId === MENU_ID.ASSET_ANALYSIS) {
+        await gnbStore.fetchMetricExample();
+    } else if (state.selectedMenuId === MENU_ID.COST_ANALYSIS) {
+        await gnbStore.fetchCostQuerySet();
+    }
 }, { immediate: true });
 </script>
 
