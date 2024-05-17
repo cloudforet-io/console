@@ -129,7 +129,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 });
             } catch (e) {
                 await actions.createBookmarkInit();
-                throw e;
             }
         },
         fetchBookmarkFolderList: async () => {
@@ -202,7 +201,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
             }
         },
         createBookmarkFolder: async (name: string, isManaged?: boolean) => {
@@ -299,7 +297,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkFolderList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
             }
         },
         deleteBookmarkLink: async (id?: string) => {
@@ -310,7 +307,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 await actions.fetchBookmarkList();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
             }
         },
     };
