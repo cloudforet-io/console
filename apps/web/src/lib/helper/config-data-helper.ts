@@ -337,11 +337,6 @@ export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|null,
                 label: menu.name,
                 tags: menu.tags,
             });
-        } else {
-            results.push({
-                ...d,
-                isDeleted: !menu,
-            });
         }
     });
     return results;

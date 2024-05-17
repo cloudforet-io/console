@@ -75,6 +75,9 @@ watch(() => route.params, async (params) => {
     } else if (assetAnalysisPageGetters.defaultMetricGroupByList) {
         assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
     }
+    if (params.groupBy && assetAnalysisPageState.metric?.labels_info?.find((d) => d.key === 'labels.Provider')) {
+        assetAnalysisPageStore.setFilters({ 'labels.Provider': [params.groupBy] });
+    }
 
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
