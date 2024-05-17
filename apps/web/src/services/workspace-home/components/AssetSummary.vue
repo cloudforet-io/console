@@ -36,6 +36,7 @@ import type {
 const PROVIDER_DEFAULT_WIDTH = 184 + 8;
 const DAILY_UPDATE__DEFAULT_WIDTH = 136 + 8;
 const DEFAULT_PADDING = 24;
+const METRIC_MANAGED_CREATED_COUNT = 'metric-managed-created-count';
 
 const ARROW_BUTTON_TYPE = {
     PROVIDER: 'provider',
@@ -276,7 +277,7 @@ watch([() => storeState.currentWorkspaceId, () => storeState.providerMap], async
             <p-link highlight
                     :to="{
                         name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
-                        params: { metricId: 'metric-managed-created-count'},
+                        params: { metricId: METRIC_MANAGED_CREATED_COUNT},
                     }"
                     action-icon="internal-link"
                     class="link"
