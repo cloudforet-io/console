@@ -1,7 +1,5 @@
 import { i18n } from '@/translations';
 
-import getRandomId from '@/lib/random-id-generator';
-
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -22,22 +20,21 @@ export const DEFAULT_BOOKMARK = [
     {
         link: 'https://console.cloud.google.com/',
         name: 'GCP',
-        id: `console:bookmark:undefined:GCP-${getRandomId()}`,
         imgIcon: 'https://www.gstatic.com/devrel-devsite/prod/v2a398f8757b82183cb182aec0e7c4771ac1123a40d36fc97c8783f6df9b3c672/cloud/images/favicons/onecloud/favicon.ico',
     },
     {
         link: 'https://console.aws.amazon.com/',
         name: 'AWS Console',
-        id: `console:bookmark:undefined:AWS Console-${getRandomId()}`,
-        imgIcon: 'https://console.aws.amazon.com/favicon.ico',
     },
     {
         link: 'https://azure.microsoft.com/',
         name: 'Azure Portal',
-        id: `console:bookmark:undefined:Azure Portal-${getRandomId()}`,
-        imgIcon: 'https://azure.microsoft.com/favicon.ico',
     },
 ];
+export const BOOKMARK_SCOPE = {
+    MANAGED: 'managed',
+    PERSONAL: 'personal',
+};
 
 // Configs
 export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [

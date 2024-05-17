@@ -14,8 +14,7 @@ import { sumBy } from 'lodash';
 
 import { store } from '@/store';
 
-import { white } from '@/styles/colors';
-
+import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -52,6 +51,7 @@ const storeState = reactive({
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
@@ -206,6 +206,9 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
+                    <bookmark-managed-badge v-if="storeState.selectedBookmark?.isManaged"
+                                            class="managed-badge"
+                    />
                 </div>
             </template>
             <template v-if="storeState.isFileFullMode && !state.isMobileSize"
@@ -243,15 +246,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
-                    <span v-else-if="item.isManaged"
-                          class="is-managed"
-                    >
-                        <p-i name="ic_sparkle-filled"
-                             width="0.625rem"
-                             height="0.625rem"
-                             :color="white"
-                        />
-                    </span>
+                    <bookmark-managed-badge v-else-if="item.isManaged" />
                     <p-i v-else
                          name="ic_folder"
                          width="0.875rem"
@@ -380,11 +375,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             border: none;
             font-family: Noto Sans, Roboto, sans-serif;
             gap: 0.25rem;
-            .is-managed {
-                @apply block flex items-center justify-center text-white bg-violet-500 rounded-full;
-                width: 0.875rem;
-                height: 0.875rem;
-            }
             &.active {
                 @apply bg-blue-300;
                 &:hover {
@@ -424,9 +414,14 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             @apply items-center;
             gap: 0.375rem;
             .folder-icon-wrapper {
-                @apply flex items-center justify-center bg-blue-200 rounded;
+                @apply relative flex items-center justify-center bg-blue-200 rounded;
                 width: 1.5rem;
                 height: 1.5rem;
+                .managed-badge {
+                    @apply absolute;
+                    right: -0.125rem;
+                    bottom: -0.125rem;
+                }
             }
             .title-right-wrapper {
                 @apply flex text-gray-900;

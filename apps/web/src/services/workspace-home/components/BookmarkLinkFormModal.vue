@@ -5,6 +5,7 @@ import {
     PButton, PButtonModal, PFieldGroup, PI, PRadio, PRadioGroup, PTextInput,
 } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -12,7 +13,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
+import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
+import {
+    checkValidUrl,
+    convertUrlProtocol,
+    generateNewFolderName,
+} from '@/services/workspace-home/composables/use-bookmark';
+import { BOOKMARK_MODAL_TYPE, BOOKMARK_SCOPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
@@ -28,6 +35,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
@@ -35,8 +43,10 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    bookmarkScope: BOOKMARK_SCOPE.PERSONAL,
+    bookmarkFolderList: computed(() => props.bookmarkFolderList?.filter((item) => item.isManaged === (state.bookmarkScope === BOOKMARK_SCOPE.MANAGED))),
     selectedFolderIdx: undefined as number|undefined,
-    selectedFolder: computed<BookmarkItem|undefined>(() => (props.bookmarkFolderList ? props.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
+    selectedFolder: computed<BookmarkItem|undefined>(() => (state.bookmarkFolderList ? state.bookmarkFolderList[state.selectedFolderIdx] : undefined)),
 });
 
 const {
@@ -58,37 +68,7 @@ const {
     },
 });
 
-const isValidUrl = (url: string) => {
-    try {
-        new URL(url);
-        return true;
-    } catch (error) {
-        return false;
-    }
-};
-const convertUrlProtocol = (url: string): string => {
-    const trimmedUrl = url.trim();
 
-    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
-        return `http://${trimmedUrl}`;
-    }
-
-    return trimmedUrl;
-};
-const generateNewFolderName = (existingFolders) => {
-    const folderNumbers = existingFolders
-        .filter((n) => n.name.startsWith(i18n.t('HOME.FORM_NEW_FOLDER')))
-        .map((n) => parseInt(n.name.replace(i18n.t('HOME.FORM_NEW_FOLDER'), '')) || 0)
-        .sort((a, b) => a.name - b.name);
-
-    for (let i = 1; i <= folderNumbers.length; i++) {
-        if (!folderNumbers.includes(i)) {
-            return `${i18n.t('HOME.FORM_NEW_FOLDER')}${i}`;
-        }
-    }
-
-    return `${i18n.t('HOME.FORM_NEW_FOLDER')}${folderNumbers.length + 1}`;
-};
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
     state.selectedFolderIdx = undefined;
@@ -97,10 +77,11 @@ const handleClose = () => {
 const handleDeselectButton = () => {
     state.selectedFolderIdx = undefined;
 };
+
 const handleClickNewFolderButton = async () => {
     try {
-        const newFolder = generateNewFolderName(props.bookmarkFolderList);
-        await bookmarkStore.createBookmarkFolder(newFolder);
+        const newFolder = generateNewFolderName(state.bookmarkFolderList);
+        await bookmarkStore.createBookmarkFolder(newFolder, state.bookmarkScope === BOOKMARK_SCOPE.MANAGED);
         state.selectedFolderIdx = 0;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -109,7 +90,7 @@ const handleClickNewFolderButton = async () => {
 const handleConfirm = async () => {
     state.loading = true;
     let convertedLink = link.value;
-    if (!isValidUrl(link.value)) {
+    if (!checkValidUrl(link.value)) {
         convertedLink = convertUrlProtocol(link.value);
     }
 
@@ -120,12 +101,14 @@ const handleConfirm = async () => {
                 name: name.value,
                 link: convertedLink,
                 folder: state.selectedFolder?.id,
+                isManaged: state.bookmarkScope === BOOKMARK_SCOPE.MANAGED,
             });
         } else {
             await bookmarkStore.createBookmarkLink({
                 name: name.value,
                 link: convertedLink,
                 folder: state.selectedFolder?.id,
+                isManaged: state.bookmarkScope === BOOKMARK_SCOPE.MANAGED,
             });
             showSuccessMessage(i18n.t('HOME.ALT_S_ADD_LINK'), '');
         }
@@ -148,11 +131,12 @@ watch(() => storeState.modal.type, (type) => {
     if (storeState.modal.isEdit) {
         setForm('name', storeState.selectedBookmark?.name as string || '');
         setForm('link', storeState.selectedBookmark?.link || '');
-        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
+        state.bookmarkScope = storeState.selectedBookmark?.isManaged ? BOOKMARK_SCOPE.MANAGED : BOOKMARK_SCOPE.PERSONAL;
+        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
         return;
     }
     if (!storeState.modal.isNew && storeState.selectedBookmark) {
-        state.selectedFolderIdx = props.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
+        state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.id);
     }
 }, { immediate: true });
 </script>
@@ -198,22 +182,41 @@ watch(() => storeState.modal.type, (type) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
+                <p-field-group v-if="storeState.isDomainAdmin"
+                               :label="$t('HOME.FORM_SCOPE')"
+                               required
+                >
+                    <div class="bookmark-scope">
+                        <p-radio v-model="state.bookmarkScope"
+                                 :value="BOOKMARK_SCOPE.PERSONAL"
+                        >
+                            {{ $t('HOME.BOOKMARK_WORKSPACE') }}
+                        </p-radio>
+                        <p-radio v-model="state.bookmarkScope"
+                                 :value="BOOKMARK_SCOPE.MANAGED"
+                        >
+                            {{ $t('HOME.BOOKMARK_ALL_WORKSPACE') }}
+                        </p-radio>
+                    </div>
+                </p-field-group>
                 <p-field-group :label="$t('HOME.FORM_FOLDER')"
                                class="input-form"
                 >
                     <div class="folder-wrapper">
                         <p-radio-group :direction="'vertical'">
-                            <p-radio v-for="(item, idx) in props.bookmarkFolderList"
+                            <p-radio v-for="(item, idx) in state.bookmarkFolderList"
                                      :key="`bookmark-folder-${idx}`"
                                      v-model="state.selectedFolderIdx"
                                      :value="idx"
                             >
                                 <span class="radio-item">
-                                    <p-i name="ic_folder"
+                                    <p-i v-if="!item.isManaged"
+                                         name="ic_folder"
                                          color="inherit"
                                          width="1.25rem"
                                          height="1.25rem"
                                     />
+                                    <bookmark-managed-badge v-else />
                                     {{ item.name }}
                                 </span>
                             </p-radio>
@@ -246,14 +249,26 @@ watch(() => storeState.modal.type, (type) => {
 
 <style lang="postcss" scoped>
 .bookmark-link-form-modal {
+    .bookmark-scope {
+        @apply flex items-center;
+        gap: 1rem;
+    }
     .folder-wrapper {
         @apply flex flex-col border rounded-md border-gray-200;
         padding: 0.75rem;
         gap: 0.75rem;
         .radio-item {
-            @apply inline-flex items-center;
+            @apply flex items-center;
             margin-left: 0.25rem;
             gap: 0.25rem;
+        }
+
+        /* custom design-system component - p-radio */
+        :deep(.p-radio) {
+            @apply flex items-center;
+            .text {
+                @apply block;
+            }
         }
         .buttons-wrapper {
             @apply flex items-center;

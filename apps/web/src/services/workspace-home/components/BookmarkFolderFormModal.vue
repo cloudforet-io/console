@@ -77,6 +77,7 @@ const handleConfirm = async () => {
             await bookmarkStore.updateBookmarkFolder({
                 id: storeState.selectedBookmark?.id,
                 name: name.value,
+                isManaged: state.isManaged,
             });
             if (storeState.isFileFullMode) {
                 await bookmarkStore.setSelectedBookmark({
@@ -96,6 +97,7 @@ const handleConfirm = async () => {
 watch(() => storeState.modal.isEdit, (isEditModal) => {
     if (isEditModal) {
         setForm('name', state.bookmark as string || '');
+        state.isManaged = storeState.selectedBookmark?.isManaged || false;
     }
 }, { immediate: true });
 </script>
@@ -107,7 +109,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
-                    :disabled="(name === '' || invalidState.name) || state.bookmark === name"
+                    :disabled="(name === '' || invalidState.name)"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -128,7 +130,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-checkbox v-if="!storeState.modal.isEdit && storeState.isDomainAdmin"
+                <p-checkbox v-if="storeState.isDomainAdmin"
                             v-model="state.isManaged"
                             :value="true"
                             class="managed-checkbox"
