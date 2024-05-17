@@ -101,6 +101,7 @@ const handleConfirm = async () => {
                 name: name.value,
                 link: convertedLink,
                 folder: state.selectedFolder?.id,
+                isManaged: state.bookmarkScope === BOOKMARK_SCOPE.MANAGED,
             });
         } else {
             await bookmarkStore.createBookmarkLink({
@@ -130,6 +131,7 @@ watch(() => storeState.modal.type, (type) => {
     if (storeState.modal.isEdit) {
         setForm('name', storeState.selectedBookmark?.name as string || '');
         setForm('link', storeState.selectedBookmark?.link || '');
+        state.bookmarkScope = storeState.selectedBookmark?.isManaged ? BOOKMARK_SCOPE.MANAGED : BOOKMARK_SCOPE.PERSONAL;
         state.selectedFolderIdx = state.bookmarkFolderList?.findIndex((item) => item.id === storeState.selectedBookmark?.folder);
         return;
     }
@@ -180,7 +182,7 @@ watch(() => storeState.modal.type, (type) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group v-if="!storeState.modal.isEdit && storeState.isDomainAdmin"
+                <p-field-group v-if="storeState.isDomainAdmin"
                                :label="$t('HOME.FORM_SCOPE')"
                                required
                 >

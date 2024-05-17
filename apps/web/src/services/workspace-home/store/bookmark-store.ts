@@ -242,13 +242,14 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 throw e;
             }
         },
-        updateBookmarkFolder: async ({ id, name }: { id?: string, name: string }) => {
+        updateBookmarkFolder: async ({ id, name, isManaged }: { id?: string, name: string, isManaged?: boolean }) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
                     name: id || '',
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
+                        isManaged,
                     },
                 });
                 const foldersLinkItems = state.bookmarkData.filter((i) => i.folder === id);
@@ -267,8 +268,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
         },
         updateBookmarkLink: async ({
-            id, name, link, folder,
-        }: { id: string, name?: string|TranslateResult, link?: string, folder?: string}) => {
+            id, name, link, folder, isManaged,
+        }: { id: string, name?: string|TranslateResult, link?: string, folder?: string, isManaged?: boolean}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.update<UserConfigUpdateParameters, UserConfigModel>({
                     name: id,
@@ -277,6 +278,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         name,
                         folder,
                         link,
+                        isManaged,
                     },
                 });
                 await actions.fetchBookmarkList();
