@@ -9,8 +9,6 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { i18n } from '@/translations';
-
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
@@ -42,7 +40,7 @@ const tableState = reactive({
     fields: computed(() => [
         {
             name: 'name',
-            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_DATASOURCE'),
+            label: 'Data Source',
             type: 'item',
         },
         {
@@ -53,19 +51,19 @@ const tableState = reactive({
         },
         {
             name: 'data_source_account_count',
-            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_LINKED_ACCOUNT'),
+            label: 'Linked Account',
             type: 'item',
             sortable: false,
         },
         {
             name: 'connected_workspace_count',
-            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'),
+            label: 'Workspace',
             type: 'item',
             sortable: false,
         },
         {
             name: 'created_at',
-            label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME'),
+            label: 'Registered Time',
             type: 'item',
             sortable: false,
         },

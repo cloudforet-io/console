@@ -21,7 +21,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
-import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -68,10 +67,10 @@ const tableState = reactive({
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
-        { name: 'account_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_ACCOUNT_ID') },
-        { name: 'workspace_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_WORKSPACE'), sortable: false },
-        { name: 'is_sync', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_AUTO_MAPPING'), sortable: false },
-        { name: 'updated_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_UPDATED_AT'), sortable: false },
+        { name: 'account_id', label: 'Account ID' },
+        { name: 'workspace_id', label: 'Workspace', sortable: false },
+        { name: 'is_sync', label: 'Auto Mapping', sortable: false },
+        { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id'),

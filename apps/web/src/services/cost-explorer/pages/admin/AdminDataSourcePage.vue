@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive } from 'vue';
 
-import { PHeading, PHorizontalLayout, PLink } from '@spaceone/design-system';
+import {
+    PHeading, PHorizontalLayout, PLink, PI,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
+
+import { gray } from '@/styles/colors';
 
 import DataSourceManagementTable from '@/services/cost-explorer/components/DataSourceManagementTable.vue';
 import DataSourceManagementTabs from '@/services/cost-explorer/components/DataSourceManagementTabs.vue';
@@ -33,14 +37,21 @@ onMounted(() => {
                    class="title"
         >
             <template #extra>
-                <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
-                        :href="`https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/data-sources`"
-                        size="sm"
-                        icon-left="ic_info-circle"
-                        action-icon="external-link"
-                        new-tab
-                        class="guide-link"
-                />
+                <span class="extra">
+                    <p-i name="ic_info-circle"
+                         height="0.75rem"
+                         width="0.75rem"
+                         class="icon"
+                         :color="gray[900]"
+                    />
+                    <p-link :text="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.GUIDE')"
+                            :href="`https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/data-sources`"
+                            size="sm"
+                            action-icon="external-link"
+                            new-tab
+                            class="guide-link"
+                    />
+                </span>
             </template>
         </p-heading>
         <div class="contents">
@@ -63,6 +74,10 @@ onMounted(() => {
 .admin-data-source-page {
     .title {
         @apply items-center;
+        .extra {
+            @apply flex items-center;
+            gap: 0.125rem;
+        }
     }
 
     /* custom design-system component - p-link */

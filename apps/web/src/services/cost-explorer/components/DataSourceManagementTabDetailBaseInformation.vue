@@ -8,11 +8,8 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 
-import { i18n } from '@/translations';
-
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
-
 
 const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
@@ -24,9 +21,9 @@ const storeState = reactive({
 const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
         { name: 'data_source_id', label: 'ID' },
-        { name: 'name', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_NAME') },
-        { name: 'description', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_DESCRIPTION') },
-        { name: 'created_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_TIME') },
+        { name: 'name', label: 'Name' },
+        { name: 'description', label: 'Description' },
+        { name: 'created_at', label: 'Registered Time' },
     ]),
 });
 </script>
