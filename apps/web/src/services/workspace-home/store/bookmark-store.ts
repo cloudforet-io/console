@@ -134,8 +134,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                const managedResults = results?.filter((i) => i.data.isManaged);
-                const workspaceResults = _getters.isDomainAdmin ? results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId) : [];
+                const managedResults = _getters.isDomainAdmin ? results?.filter((i) => i.data.isManaged) : [];
+                const workspaceResults = results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId);
                 const resultsData = managedResults?.concat(workspaceResults || []) || [];
                 state.bookmarkFolderData = resultsData.map((i) => ({
                     ...i.data,
@@ -152,14 +152,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
-                    { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '!=' },
                 ]);
             try {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
+                const managedResults = _getters.isDomainAdmin ? results?.filter((i) => i.data.isManaged) : [];
+                const workspaceResults = _getters.isDomainAdmin ? results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId) : [];
+                const resultsData = managedResults?.concat(workspaceResults || []) || [];
+                const promises: Promise<BookmarkItem>[] = resultsData.map(async (item) => {
                     const imgIcon = await fetchFavicon(item.data.link);
                     return {
                         ...item.data as BookmarkItem,
@@ -190,13 +192,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 throw e;
             }
         },
-        createBookmarkLink: async ({ name, link, folder }: { name?: string|TranslateResult, link?: string, folder?: string}) => {
+        createBookmarkLink: async ({
+            name, link, folder, isManaged,
+        }: { name?: string|TranslateResult, link?: string, folder?: string, isManaged?: boolean}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
+                        isManaged,
                         folder,
                         link,
                     },

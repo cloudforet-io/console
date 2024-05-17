@@ -38,6 +38,10 @@ export const DEFAULT_BOOKMARK = [
         imgIcon: 'https://azure.microsoft.com/favicon.ico',
     },
 ];
+export const BOOKMARK_SCOPE = {
+    MANAGED: 'managed',
+    PERSONAL: 'personal',
+};
 
 // Configs
 export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
