@@ -29,6 +29,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
     const _getters = reactive({
+        isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
         userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
@@ -127,14 +128,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 .setFilters([
                     { k: 'user_id', v: _getters.userId, o: '=' },
                     { k: 'name', v: 'console:bookmark', o: '' },
-                    { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
                     { k: 'data.link', v: null, o: '=' },
                 ]);
             try {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                state.bookmarkFolderData = (results ?? []).map((i) => ({
+                const managedResults = results?.filter((i) => i.data.isManaged);
+                const workspaceResults = _getters.isDomainAdmin ? results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId) : [];
+                const resultsData = managedResults?.concat(workspaceResults || []) || [];
+                state.bookmarkFolderData = resultsData.map((i) => ({
                     ...i.data,
                     id: i.name,
                 } as BookmarkItem));
@@ -171,13 +174,14 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 state.bookmarkData = [];
             }
         },
-        createBookmarkFolder: async (name: string) => {
+        createBookmarkFolder: async (name: string, isManaged?: boolean) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:bookmark:${name}`,
                     data: {
                         workspaceId: _getters.currentWorkspaceId,
                         name,
+                        isManaged,
                     },
                 });
                 await actions.fetchBookmarkFolderList();

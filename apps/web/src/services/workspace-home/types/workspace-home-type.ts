@@ -41,6 +41,7 @@ export interface BookmarkItem {
     link?: string;
     isShowMore?: boolean;
     workspaceId?: string;
+    isManaged?: boolean;
 }
 export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
 export type BookmarkBoardSet = BookmarkItem & BoardSet;
