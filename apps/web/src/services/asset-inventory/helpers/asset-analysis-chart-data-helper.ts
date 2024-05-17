@@ -107,9 +107,9 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || undefined;
+                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || undefined;
+                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);
