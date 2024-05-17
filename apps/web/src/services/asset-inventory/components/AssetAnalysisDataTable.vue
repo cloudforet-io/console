@@ -84,13 +84,13 @@ const state = reactive({
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
-        if (typeof value !== 'number') return '--';
+        if (typeof value !== 'number') return 0;
         const _unit = assetAnalysisPageState.metric?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
         if (_unit && UNITS.includes(_unit)) {
             return byteFormatter(_originalVal);
         }
-        return numberFormatter(value, { notation: 'compact' }) || '--';
+        return numberFormatter(value, { notation: 'compact' }) || 0;
     }
     return assetAnalysisPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
 };
