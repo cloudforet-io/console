@@ -95,7 +95,7 @@ const selectWorkspace = (name: string): void => {
     const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
     const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
     userWorkspaceStore.setCurrentWorkspace(workspaceId);
-    router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } });
+    router.push({ name: MENU_INFO_MAP[targetMenuId].routeName, params: { workspaceId } }).catch(() => {});
 };
 const handleClickButton = (hasNoWorkspace?: string) => {
     appContextStore.enterAdminMode();

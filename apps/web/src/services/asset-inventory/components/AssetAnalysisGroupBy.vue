@@ -42,6 +42,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
                              use-fixed-menu-style
                              multi-selectable
                              size="sm"
+                             class="group-by-button"
                              @change="handleChangeDefaultGroupBy"
             >
                 {{ item.label }}
@@ -64,12 +65,12 @@ const handleChangeDefaultGroupBy = async (selectedItems: string[], isSelected: b
     row-gap: 0.5rem;
     align-items: center;
     font-size: 0.875rem;
-    padding: 1rem 0;
+    padding: 1.25rem 0;
 
     .left-part {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        .group-by-button {
+            margin: 0.125rem 0 0.125rem 0.5rem;
+        }
     }
 }
 </style>

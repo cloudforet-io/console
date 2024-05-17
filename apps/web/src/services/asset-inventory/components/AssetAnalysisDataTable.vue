@@ -77,20 +77,20 @@ const state = reactive({
     pageSize: 15,
     more: false,
     metricResourceType: computed<string|undefined>(() => assetAnalysisPageState.metric?.resource_type),
-    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
     metricAdditionalFilter: computed(() => (assetAnalysisPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key, v: d.value, o: d.operator })) ?? []),
 });
 
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
-        if (typeof value !== 'number') return '--';
+        if (typeof value !== 'number') return 0;
         const _unit = assetAnalysisPageState.metric?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
         if (_unit && UNITS.includes(_unit)) {
             return byteFormatter(_originalVal);
         }
-        return numberFormatter(value, { notation: 'compact' }) || '--';
+        return numberFormatter(value, { notation: 'compact' }) || 0;
     }
     return assetAnalysisPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
 };

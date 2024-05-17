@@ -88,10 +88,6 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
-        backdrop: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit, listeners }) {
         const state = reactive({
