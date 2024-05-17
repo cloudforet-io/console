@@ -299,6 +299,13 @@ const checkSelectedId = (id?: string) => {
                         width: 1.25rem !important;
                         height: 1.25rem !important;
                     }
+
+                    .error {
+                        svg {
+                            width: 1.25rem !important;
+                            height: 1.25rem !important;
+                        }
+                    }
                 }
 
                 .icon, svg {

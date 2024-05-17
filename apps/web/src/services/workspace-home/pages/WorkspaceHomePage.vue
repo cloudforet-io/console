@@ -34,6 +34,7 @@ const allReferenceStore = useAllReferenceStore();
 const allReferenceGetters = allReferenceStore.getters;
 
 const storeState = reactive({
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     getCurrentRoleInfo: computed<RoleInfo>(() => store.getters['user/getCurrentRoleInfo']),
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceGetters.currentWorkspaceId),
     recentList: computed<UserConfigModel[]>(() => workspaceHomePageState.recentList),
@@ -80,6 +81,11 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
     // summaries
     if (!state.isWorkspaceMember) {
         await workspaceHomePageStore.fetchCostReportConfig();
+    }
+}, { immediate: true });
+watch(() => storeState.isDomainAdmin, async () => {
+    if (storeState.isDomainAdmin) {
+        await bookmarkStore.fetchBookmarkInit();
     }
 }, { immediate: true });
 </script>

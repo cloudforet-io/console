@@ -8,6 +8,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserConfigDeleteParameters } from '@/schema/config/user-config/api-verbs/delete';
+import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
 import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
 import type { UserConfigUpdateParameters } from '@/schema/config/user-config/api-verbs/update';
@@ -64,7 +65,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 });
             } else {
                 filteredList = state.bookmarkData.filter((i) => !i.folder);
-                filteredList.unshift(...DefaultBookmarkData);
             }
             return filteredList;
         }),
@@ -122,6 +122,16 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             };
             state.selectedBookmarks = [];
         },
+        fetchBookmarkInit: async () => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
+                    name: 'console:bookmark-init',
+                });
+            } catch (e) {
+                await actions.createBookmarkInit();
+                throw e;
+            }
+        },
         fetchBookmarkFolderList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('created_at', false)
@@ -159,10 +169,10 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     query: bookmarkListApiQuery.data,
                 });
                 const managedResults = _getters.isDomainAdmin ? results?.filter((i) => i.data.isManaged) : [];
-                const workspaceResults = _getters.isDomainAdmin ? results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId) : [];
+                const workspaceResults = results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId);
                 const resultsData = managedResults?.concat(workspaceResults || []) || [];
                 const promises: Promise<BookmarkItem>[] = resultsData.map(async (item) => {
-                    const imgIcon = await fetchFavicon(item.data.link);
+                    const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
                     return {
                         ...item.data as BookmarkItem,
                         id: item.name,
@@ -174,6 +184,25 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
+            }
+        },
+        createBookmarkInit: async () => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
+                    name: 'console:bookmark-init',
+                    data: {},
+                });
+                await Promise.all(DefaultBookmarkData.map(async (item) => {
+                    await actions.createBookmarkLink({
+                        name: item.name as string || '',
+                        link: item.link || '',
+                        isManaged: true,
+                        imgIcon: item.imgIcon,
+                    });
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
             }
         },
         createBookmarkFolder: async (name: string, isManaged?: boolean) => {
@@ -193,8 +222,8 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             }
         },
         createBookmarkLink: async ({
-            name, link, folder, isManaged,
-        }: { name?: string|TranslateResult, link?: string, folder?: string, isManaged?: boolean}) => {
+            name, link, folder, isManaged, imgIcon,
+        }: { name?: string|TranslateResult, link?: string, folder?: string, isManaged?: boolean, imgIcon?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
@@ -204,6 +233,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         isManaged,
                         folder,
                         link,
+                        imgIcon,
                     },
                 });
                 await actions.fetchBookmarkList();
