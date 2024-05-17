@@ -40,11 +40,11 @@ const tableState = reactive({
     pageStart: 0,
     pageLimit: 15,
     fields: computed<DefinitionField[]>(() => [
-        { name: 'job_id', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_ID') },
-        { name: 'status', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_STATUS') },
-        { name: 'total_tasks', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_TOTAL_TASK') },
-        { name: 'created_at', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_CREATED_AT') },
-        { name: 'duration', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.COL_JOB_DURATION') },
+        { name: 'job_id', label: 'Job ID' },
+        { name: 'status', label: 'Status' },
+        { name: 'total_tasks', label: 'Total Task' },
+        { name: 'created_at', label: 'Created' },
+        { name: 'duration', label: 'Duration' },
     ]),
 });
 
