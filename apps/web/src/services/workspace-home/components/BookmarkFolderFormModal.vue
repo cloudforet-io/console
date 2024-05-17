@@ -3,12 +3,15 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput,
+    PButtonModal, PFieldGroup, PTextInput, PCheckbox, PTooltip, PI,
 } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { gray } from '@/styles/colors';
 
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
@@ -26,6 +29,7 @@ const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
 
 const storeState = reactive({
+    isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
@@ -33,6 +37,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    isManaged: false,
     bookmark: computed<string|undefined|TranslateResult>(() => storeState.selectedBookmark?.name || storeState.filterByFolder),
 });
 
@@ -64,6 +69,7 @@ const handleClose = () => {
     bookmarkStore.setModalType(undefined, false, false);
     initForm();
 };
+
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -79,7 +85,7 @@ const handleConfirm = async () => {
                 });
             }
         } else {
-            await bookmarkStore.createBookmarkFolder(name.value);
+            await bookmarkStore.createBookmarkFolder(name.value, state.isManaged);
         }
         await handleClose();
     } finally {
@@ -122,6 +128,23 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
+                <p-checkbox v-if="!storeState.modal.isEdit && storeState.isDomainAdmin"
+                            v-model="state.isManaged"
+                            :value="true"
+                            class="managed-checkbox"
+                >
+                    <span>{{ $t('HOME.BOOKMARK_MANAGED_CREATE') }}</span>
+                    <p-tooltip position="bottom"
+                               :contents="$t('HOME.BOOKMARK_MANAGED_CREATE_DESC')"
+                               class="tooltip"
+                    >
+                        <p-i name="ic_info-circle"
+                             width="1rem"
+                             height="1rem"
+                             :color="gray[500]"
+                        />
+                    </p-tooltip>
+                </p-checkbox>
             </div>
         </template>
         <template #confirm-button>
@@ -129,3 +152,17 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
         </template>
     </p-button-modal>
 </template>
+
+<style lang="postcss" scoped>
+.bookmark-folder-form-modal {
+    .form-contents {
+        .managed-checkbox {
+            @apply flex items-center;
+            gap: 0.25rem;
+            .tooltip {
+                margin-left: 0.25rem;
+            }
+        }
+    }
+}
+</style>

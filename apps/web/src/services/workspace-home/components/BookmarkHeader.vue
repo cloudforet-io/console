@@ -14,6 +14,8 @@ import { sumBy } from 'lodash';
 
 import { store } from '@/store';
 
+import { white } from '@/styles/colors';
+
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -241,6 +243,15 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
+                    <span v-else-if="item.isManaged"
+                          class="is-managed"
+                    >
+                        <p-i name="ic_sparkle-filled"
+                             width="0.625rem"
+                             height="0.625rem"
+                             :color="white"
+                        />
+                    </span>
                     <p-i v-else
                          name="ic_folder"
                          width="0.875rem"
@@ -369,6 +380,11 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             border: none;
             font-family: Noto Sans, Roboto, sans-serif;
             gap: 0.25rem;
+            .is-managed {
+                @apply block flex items-center justify-center text-white bg-violet-500 rounded-full;
+                width: 0.875rem;
+                height: 0.875rem;
+            }
             &.active {
                 @apply bg-blue-300;
                 &:hover {
