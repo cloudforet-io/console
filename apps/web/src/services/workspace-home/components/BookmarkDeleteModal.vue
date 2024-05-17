@@ -10,6 +10,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { gray } from '@/styles/colors';
 
+import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -114,8 +115,8 @@ const handleClose = () => {
                     >
                         <p-i v-if="!item.link"
                              name="ic_folder"
-                             width="0.875rem"
-                             height="0.875rem"
+                             width="1.25rem"
+                             height="1.25rem"
                         />
                         <p-lazy-img
                             v-else
@@ -125,6 +126,9 @@ const handleClose = () => {
                             error-icon="ic_globe-filled"
                             :error-icon-color="gray[500]"
                             class="icon"
+                        />
+                        <bookmark-managed-badge v-if="item.isManaged"
+                                                class="managed-badge"
                         />
                     </div>
                     <div class="text-wrapper">
@@ -152,9 +156,15 @@ const handleClose = () => {
             padding: 0.5rem;
             gap: 0.5rem;
             .icon-wrapper {
-                @apply flex items-center justify-center rounded-xl;
+                @apply relative flex items-center justify-center rounded-xl;
                 width: 2.5rem;
+                min-width: 2.5rem;
                 height: 2.5rem;
+                .managed-badge {
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                }
                 &.is-folder {
                     @apply bg-blue-200;
                 }
