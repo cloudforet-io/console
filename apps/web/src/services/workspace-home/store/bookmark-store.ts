@@ -29,6 +29,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStoreGetters = userWorkspaceStore.getters;
 
     const _getters = reactive({
+        isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
         userId: computed<string>(() => store.state.user.userId),
         currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStoreGetters.currentWorkspaceId),
     });
@@ -134,7 +135,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                     query: bookmarkListApiQuery.data,
                 });
                 const managedResults = results?.filter((i) => i.data.isManaged);
-                const workspaceResults = results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId);
+                const workspaceResults = _getters.isDomainAdmin ? results?.filter((i) => !i.data.isManaged && i.data.workspaceId === _getters.currentWorkspaceId) : [];
                 const resultsData = managedResults?.concat(workspaceResults || []) || [];
                 state.bookmarkFolderData = resultsData.map((i) => ({
                     ...i.data,
