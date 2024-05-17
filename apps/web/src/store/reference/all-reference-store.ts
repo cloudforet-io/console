@@ -84,24 +84,33 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const metricReferenceStore = useMetricReferenceStore();
 
     const getters = reactive({
+        // TODO: unify into one case (serviceAccount or service_account)
         cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
+        cloud_service_type: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
         collector: computed<CollectorReferenceMap>(() => collectorReferenceStore.getters.collectorItems),
         plugin: computed(() => pluginReferenceStore.getters.pluginItems),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
+        project_group: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
         project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
         protocol: computed(() => protocolReferenceStore.getters.protocolItems),
         provider: computed(() => providerReferenceStore.getters.providerItems),
         user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
+        cost_data_source: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
+        cloud_service_query_set: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
+        public_dashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
+        service_account: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
+        trusted_account: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
         secret: computed(() => secretReferenceStore.getters.secretItems),
         region: computed(() => regionReferenceStore.getters.regionItems),
         escalationPolicy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
+        escalation_policy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
         namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
         metric: computed(() => metricReferenceStore.getters.metricItems),
     });
