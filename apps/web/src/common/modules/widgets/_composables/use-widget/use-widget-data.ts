@@ -31,7 +31,7 @@ export const useWidgetData = (props: UnwrapRef<NewWidgetProps>): UseWidgetDataRe
         filters: computed(() => props.filters),
         variables: computed(() => props.variables),
         baseOnDate: computed(() => props.baseOnDate),
-        granularity: computed(() => config.meta.granularity),
+        granularity: computed(() => config.meta.default_granularity),
     });
 
     const fetcher = () => {

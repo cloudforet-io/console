@@ -9,6 +9,8 @@ import type {
     WidgetSize, NewWidgetFilters, DataMapping,
 } from '@/schema/dashboard/_types/widget-type';
 
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
@@ -26,6 +28,7 @@ export interface NewWidgetProps {
     errorMode?: boolean;
     baseOnDate?: string;
     variablesSchema?: DashboardVariablesSchema;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
     variables: DashboardVariables;
     loading?: boolean;
     dataSources: DataSource[];
