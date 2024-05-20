@@ -106,7 +106,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     try {
         analyzeApiQueryHelper.setFilters(assetAnalysisPageGetters.consoleFilters);
         const _groupBy = assetAnalysisPageState.selectedChartGroupBy ? [assetAnalysisPageState.selectedChartGroupBy] : [];
-        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'count', desc: true }] : [{ key: 'date', desc: true }];
         const _fieldGroup = assetAnalysisPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: state.currentMetricId,
