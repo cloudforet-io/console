@@ -10,6 +10,7 @@ import {
 import { i18n } from '@/translations';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { SuggestionItem } from '@/common/modules/navigations/top-bar/modules/top-bar-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/top-bar/modules/top-bar-search/type';
@@ -17,8 +18,10 @@ import type {
     FavoriteMenuItem,
 } from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-favorite/modules/TopBarFavoriteContextMenu.vue';
 
+import { gray, indigo, peacock } from '@/styles/colors';
+
 interface Props {
-    items: SuggestionItem[] | FavoriteMenuItem [];
+    items: SuggestionItem[] | FavoriteMenuItem[];
     inputText?: string;
     isFocused?: boolean;
     focusingDirection?: FocusingDirection;
@@ -43,10 +46,26 @@ const emit = defineEmits<{(event: 'select', item: SuggestionItem, index: number)
 const contextMenuRef = ref<any|null>(null);
 const state = reactive({
     refinedItems: computed(() => props.items.map((d) => ({
-        ...d, icon: undefined, itemIcon: d?.icon, disabled: d?.isDeleted,
+        ...d,
+        icon: undefined,
+        itemIcon: d?.icon,
+        disabled: d?.isDeleted,
+        iconColor: getIconColor(d.itemType),
     }))),
 });
 
+const getIconColor = (itemType: FavoriteType): string|undefined => {
+    if (itemType === FAVORITE_TYPE.PROJECT) {
+        return peacock[700];
+    }
+    if (itemType === FAVORITE_TYPE.PROJECT_GROUP) {
+        return indigo[500];
+    }
+    if (itemType === FAVORITE_TYPE.METRIC || itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
+        return gray[500];
+    }
+    return undefined;
+};
 const handleSelect = (item, index) => {
     emit('select', item, index);
 };
@@ -103,6 +122,7 @@ onUnmounted(() => {
                             :name="item.itemIcon"
                             width="1.25rem"
                             height="1.25rem"
+                            :color="item.iconColor"
                         />
                     </div>
                 </span>
