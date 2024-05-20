@@ -1,4 +1,4 @@
-import type { UnwrapRef } from 'vue';
+import type { UnwrapRef, ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import type { DashboardVariables, DataSource } from '@/schema/dashboard/_types/dashboard-type';
@@ -9,18 +9,23 @@ import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-displ
 
 
 interface WidgetDataState {
-    dataSources?: DataSource[];
-    dataMapping?: DataMapping;
-    filters?: NewWidgetFilters;
-    variables?: DashboardVariables;
-    baseOnDate?: string;
-    granularity?: Granularity;
+    dataSources?: ComputedRef<DataSource[]>;
+    dataMapping?: ComputedRef<DataMapping>;
+    filters?: ComputedRef<NewWidgetFilters|undefined>;
+    variables?: ComputedRef<DashboardVariables>;
+    baseOnDate?: ComputedRef<string|undefined>;
+    granularity?: ComputedRef<Granularity|undefined>;
 }
-export const useWidgetDataState = (props: UnwrapRef<NewWidgetProps>): { widgetDataState: WidgetDataState } => {
+interface UseWidgetDataReturnType {
+    itemList: any[];
+    fetcher: () => void;
+}
+
+export const useWidgetData = (props: UnwrapRef<NewWidgetProps>): UseWidgetDataReturnType => {
     const config = getWidgetConfig(props.widgetName);
     // TODO: 'useWidgetConsoleFilters' refactoring with dataSource
     // const consoleFilters = useWidgetConsoleFilters(props, baseState, overrides);
-    const widgetDataState = reactive({
+    const widgetDataState = reactive<WidgetDataState>({
         dataSources: computed(() => props.dataSources),
         dataMapping: computed(() => props.dataMapping),
         filters: computed(() => props.filters),
@@ -29,7 +34,12 @@ export const useWidgetDataState = (props: UnwrapRef<NewWidgetProps>): { widgetDa
         granularity: computed(() => config.meta.granularity),
     });
 
+    const fetcher = () => {
+        console.debug('fetch!', widgetDataState.dataSources);
+    };
+
     return {
-        widgetDataState,
+        itemList: [],
+        fetcher,
     };
 };
