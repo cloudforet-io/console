@@ -44,7 +44,7 @@ const { width: lsbWidth } = useElementSize(lsbRef);
 
 const route = useRoute();
 
-const assetInventorySettinsStore = useAssetInventorySettingsStore();
+const assetInventorySettingsStore = useAssetInventorySettingsStore();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
 const favoriteStore = useFavoriteStore();
@@ -244,7 +244,7 @@ const handleClickNamespace = (namespace: NamespaceSubItemType) => {
 };
 const handleConfirmMetricGuide = () => {
     if (guidePopoverState.noMore) {
-        assetInventorySettinsStore.setNotShowMetricSelectGuidePopover(true);
+        assetInventorySettingsStore.setNotShowMetricSelectGuidePopover(true);
     }
     guidePopoverState.metricGuideVisible = false;
     guidePopoverState.noMore = false;
@@ -271,7 +271,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
     if (selectedNamespace
         && state.isDetailPage
         && !state.currentMetrics.map((metric) => metric.key).includes(state.currentMetricIdByUrl)
-        && !assetInventorySettinsStore.getNotShowMetricSelectGuidePopover
+        && !assetInventorySettingsStore.getNotShowMetricSelectGuidePopover
     ) {
         guidePopoverState.metricGuideVisible = true;
     } else guidePopoverState.metricGuideVisible = false;
