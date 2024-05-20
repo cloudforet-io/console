@@ -87,7 +87,7 @@ const drawChart = () => {
         // set fill opacity if stacked
         if (props.stacked) {
             series.fills.template.setAll({
-                fillOpacity: 0.5,
+                fillOpacity: 0.3,
                 visible: true,
             });
         }
