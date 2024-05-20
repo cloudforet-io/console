@@ -25,7 +25,6 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/preference/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
-
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
@@ -92,7 +91,7 @@ const handleChange = async (options: any = {}) => {
     });
 };
 const handleClickButton = () => {
-    router.push({ name: makeAdminRouteName(IAM_ROUTE.USER._NAME) });
+    window.open(router.resolve({ name: makeAdminRouteName(IAM_ROUTE.USER._NAME) }).href, '_blank');
 };
 
 watch(() => workspacePageStore.selectedWorkspaces, async () => {
