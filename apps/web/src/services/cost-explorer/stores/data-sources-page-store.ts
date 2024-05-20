@@ -7,11 +7,13 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter } from '@cloudforet/utils';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DataSourceAccountAnalyzeParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/analyze';
 import type { CostDataSourceAccountListParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/list';
 import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';
 import type { CostDataSourceAccountUpdateParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/update';
-import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
+import type { CostDataSourceAccountModel, CostDataSourceAnalyzeModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
 import type { CostJobListParameters } from '@/schema/cost-analysis/job/api-verbs/list';
 import type { CostJobModel } from '@/schema/cost-analysis/job/model';
@@ -200,6 +202,25 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 );
             } catch (e) {
                 ErrorHandler.handleError(e);
+            }
+        },
+        fetchLinkedAccountAnalyze: async (): Promise<CostDataSourceAnalyzeModel | undefined> => {
+            try {
+                const { results } = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.analyze<DataSourceAccountAnalyzeParameters, AnalyzeResponse<CostDataSourceAnalyzeModel>>({
+                    query: {
+                        group_by: ['data_source_id'],
+                        fields: {
+                            workspaceList: {
+                                key: 'workspace_id',
+                                operator: 'push',
+                            },
+                        },
+                    },
+                });
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
             }
         },
     };
