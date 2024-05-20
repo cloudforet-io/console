@@ -61,18 +61,21 @@ const tableState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
+            { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
             { name: 'is_sync', label: 'Auto Mapping' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
+        { name: 'name', label: 'Name' },
         { name: 'account_id', label: 'Account ID' },
         { name: 'workspace_id', label: 'Workspace', sortable: false },
-        { name: 'is_sync', label: 'Auto Mapping', sortable: false },
+        { name: 'is_sync', label: 'Linked', sortable: false },
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name'),
         account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id'),
         workspace_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'workspace_id'),
         is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync'),

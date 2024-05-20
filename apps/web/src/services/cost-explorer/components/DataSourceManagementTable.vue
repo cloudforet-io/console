@@ -73,7 +73,7 @@ const tableState = reactive({
         items: [
             { name: 'name', label: 'Name' },
             { name: 'data_source_id', label: 'ID' },
-            { name: 'created_at', label: 'Created' },
+            { name: 'created_at', label: 'Registered Time', dataType: 'datetime' },
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
