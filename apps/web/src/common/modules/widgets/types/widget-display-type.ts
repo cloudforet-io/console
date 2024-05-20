@@ -26,7 +26,7 @@ export interface NewWidgetProps {
     errorMode?: boolean;
     baseOnDate?: string;
     variablesSchema?: DashboardVariablesSchema;
-    variables?: DashboardVariables;
+    variables: DashboardVariables;
     loading?: boolean;
     dataSources: DataSource[];
     dataMapping: DataMapping;

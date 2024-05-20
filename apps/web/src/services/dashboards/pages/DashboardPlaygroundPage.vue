@@ -15,8 +15,15 @@ import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-c
 import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
+import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
+import {
+    useAllReferenceTypeInfoStore,
+} from '@/services/dashboards/stores/all-reference-type-info-store';
+
+const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
 const state = reactive({
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetConfig: computed(() => getWidgetConfig(formState.selectedChartName)),
     dataSources: [
         {
