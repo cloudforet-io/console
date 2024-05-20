@@ -6,11 +6,11 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
+    AutocompleteHandler, SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -61,18 +61,21 @@ const tableState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
+            { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
             { name: 'is_sync', label: 'Auto Mapping' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
+        { name: 'name', label: 'Name' },
         { name: 'account_id', label: 'Account ID' },
         { name: 'workspace_id', label: 'Workspace', sortable: false },
-        { name: 'is_sync', label: 'Auto Mapping', sortable: false },
+        { name: 'is_sync', label: 'Linked', sortable: false },
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name'),
         account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id'),
         workspace_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'workspace_id'),
         is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync'),
@@ -100,19 +103,21 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 
-const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem) => {
+const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem|string) => {
     const accountItem = storeState.linkedAccounts[idx];
     await dataSourcesPageStore.updateLinkedAccount({
         data_source_id: accountItem.data_source_id,
         account_id: accountItem.account_id,
-        workspace_id: menuItem.name,
-    }, idx);
+        workspace_id: isObject(menuItem) ? menuItem?.name : menuItem,
+    });
+    await emit('confirm');
 };
-const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart, pageLimit = 10) => {
+const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
 
     workspaceListApiQueryHelper.setFilters([
         { k: 'name', v: inputText, o: '' },
+        { k: 'state', v: 'ENABLED', o: '=' },
     ]);
     try {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
@@ -122,16 +127,18 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
             label: i.name,
             name: i.workspace_id,
         }));
-        const slicedResults = refinedMenuItems?.slice((pageStart ?? 1) - 1, pageLimit);
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
 
         return {
             results: slicedResults,
-            more: pageLimit < refinedMenuItems.length,
+            more: totalCount < refinedMenuItems.length,
         };
     } catch (e) {
         ErrorHandler.handleError(e);
         return {
             results: [],
+            more: false,
         };
     } finally {
         dropdownState.loading = false;
@@ -163,6 +170,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style
                                style-type="transparent"
+                               page-size="10"
                                :visible-menu="dropdownState.visible"
                                :loading="dropdownState.loading"
                                :search-text.sync="dropdownState.searchText"

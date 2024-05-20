@@ -861,7 +861,7 @@
 				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
 				"RESET": "Reset",
-				"RESETTING": "Resetting... {count} of {totalCount}",
+				"RESETTING": "Resetting...",
 				"RESET_MODAL_TITLE": "Are you sure you want to reset workspaces for {count} linked accounts?",
 				"SELECT": "Select",
 				"SELECT_WORKSPACE": "Select Workspace",
@@ -874,7 +874,7 @@
 				"TIMEOUT": "Timeout",
 				"UPDATE": "Update",
 				"UPDATE_MODAL_TITLE": "Update workspace for {count} linked accounts",
-				"UPDATING": "Updating... {count} of {totalCount}"
+				"UPDATING": "Updating..."
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",

@@ -73,7 +73,7 @@ const tableState = reactive({
         items: [
             { name: 'name', label: 'Name' },
             { name: 'data_source_id', label: 'ID' },
-            { name: 'created_at', label: 'Created' },
+            { name: 'created_at', label: 'Registered Time', dataType: 'datetime' },
         ],
     }]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
@@ -128,7 +128,7 @@ const fetchDataSourceList = async () => {
                          :loading="state.loading"
                          :style="{height: `${props.tableHeight}px`}"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="fetchDataSourceList"
                          @update:select-index="handleUpdateSelectIndex"
         >
             <template #col-name-format="{value, item}">

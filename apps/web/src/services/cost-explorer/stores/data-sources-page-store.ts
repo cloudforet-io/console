@@ -75,6 +75,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
+            finished_at: dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
@@ -125,6 +126,29 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     };
 
     const actions = {
+        reset: () => {
+            state.activeTab = 'detail';
+
+            state.dataSourceList = [] as DataSourceModel[];
+            state.dataSourceListTotalCount = 0;
+            state.selectedDataSourceIndices = [] as number[];
+
+            state.jobList = [] as CostJobModel[];
+            state.jobListTotalCount = 0;
+
+            state.linkedAccountsLoading = false;
+            state.linkedAccountsPageStart = 0;
+            state.linkedAccountsPageLimit = 15;
+            state.linkedAccounts = [] as CostDataSourceAccountModel[];
+            state.linkedAccountsTotalCount = 0;
+            state.selectedLinkedAccountsIndices = [] as number[];
+            state.linkedAccountsSearchFilters = [] as ConsoleFilter[];
+
+            state.modal = {
+                visible: false,
+                type: undefined as CostLinkedAccountModalType|undefined,
+            };
+        },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);
@@ -160,9 +184,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 state.linkedAccountsTotalCount = 0;
             }
         },
-        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters, idx: number) => {
+        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters) => {
             try {
-                state.linkedAccounts[idx] = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
+                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
                     params,
                 );
             } catch (e) {
