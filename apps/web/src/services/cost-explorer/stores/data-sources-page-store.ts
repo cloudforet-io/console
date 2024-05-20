@@ -39,7 +39,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const state = reactive({
         activeTab: 'detail',
 
-        dataSourceList: [] as DataSourceModel[],
+        dataSourceList: [] as DataSourceItem[],
         dataSourceListTotalCount: 0,
         selectedDataSourceIndices: [] as number[],
 
@@ -154,7 +154,18 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);
-                state.dataSourceList = results || [];
+                const analyzeDataList = await actions.fetchLinkedAccountAnalyze();
+                state.dataSourceList = (results || []).map((item) => {
+                    const matchingItem = analyzeDataList?.find((entry) => entry.data_source_id === item.data_source_id);
+                    if (matchingItem) {
+                        const linkedCount = matchingItem.workspaceList?.filter((id) => id !== null).length;
+                        return {
+                            ...item,
+                            linked_count: linkedCount,
+                        };
+                    }
+                    return item;
+                });
                 state.dataSourceListTotalCount = total_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);

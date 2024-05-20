@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PToolboxTable, PLazyImg } from '@spaceone/design-system';
+import { PToolboxTable, PLazyImg, PI } from '@spaceone/design-system';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -10,6 +10,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useQueryTags } from '@/common/composables/query-tags';
+
+import { red } from '@/styles/colors';
 
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
@@ -141,8 +143,20 @@ const fetchDataSourceList = async () => {
                     <span>{{ value }}</span>
                 </div>
             </template>
-            <template #col-data_source_account_count-format="{value}">
-                <span>{{ value || 0 }}</span>
+            <template #col-data_source_account_count-format="{value, item}">
+                <div class="col-data-source-account-count">
+                    <p>
+                        <span v-if="item.linked_count !== undefined">{{ item.linked_count || 0 }} / </span>
+                        <span>{{ value || '-' }}</span>
+                    </p>
+                    <p-i v-if="item.linked_count !== item.data_source_account_count"
+                         class="menu-button"
+                         :name="'ic_error-filled'"
+                         height="0.875rem"
+                         width="0.875rem"
+                         :color="red[300]"
+                    />
+                </div>
             </template>
             <template #col-connected_workspace_count-format="{value}">
                 <span>{{ value || 0 }}</span>
@@ -157,6 +171,10 @@ const fetchDataSourceList = async () => {
         .col-name {
             @apply flex items-center;
             gap: 0.5rem;
+        }
+        .col-data-source-account-count {
+            @apply flex items-center;
+            gap: 0.25rem;
         }
     }
 }
