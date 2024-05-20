@@ -75,6 +75,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         jobList: computed<CostJobItem[]>(() => (state.jobList.map((i) => ({
             ...i,
             total_tasks: i.total_tasks || 0,
+            finished_at: dayjs.utc(i.finished_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             created_at: dayjs.utc(i.created_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
             duration: durationFormatter(i.created_at, i.finished_at, _getters.timezone) || '--',
         })))),
@@ -183,9 +184,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 state.linkedAccountsTotalCount = 0;
             }
         },
-        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters, idx: number) => {
+        updateLinkedAccount: async (params: CostDataSourceAccountUpdateParameters) => {
             try {
-                state.linkedAccounts[idx] = await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
+                await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
                     params,
                 );
             } catch (e) {
