@@ -14,7 +14,7 @@ export interface NewWidgetConfig {
     meta: {
         title?: string;
         sizes: WidgetSize[];
-        granularity?: Granularity;
+        default_granularity?: Granularity;
     };
     data_mapping_schema: {
         data_field_x?: DataField;
