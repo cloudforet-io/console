@@ -80,24 +80,29 @@ const handleConfirm = async () => {
         return updateLinkedAccount({
             ...defaultParams,
             workspace_id: dropdownState.selectedMenuId,
-        }, idx);
+        });
     });
 
     try {
         await Promise.allSettled(promises);
 
-        emit('confirm');
         if (storeState.type === 'RESET') {
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
         } else {
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
         }
 
+        await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+        });
+        emit('confirm');
+
         handleClose();
     } finally {
         state.loading = false;
     }
 };
+
 const handleClose = () => {
     dataSourcesPageStore.setModal(false, undefined);
     state.activeItemCount = 0;
@@ -121,7 +126,7 @@ const resetLinkedAccount = (params: CostDataSourceAccountResetParameters) => {
     dataSourcesPageStore.resetLinkedAccount(params)
         .then(() => hideLoadingMessage(loadingMessageId));
 };
-const updateLinkedAccount = (params: CostDataSourceAccountUpdateParameters, idx: number) => {
+const updateLinkedAccount = (params: CostDataSourceAccountUpdateParameters) => {
     const loadingMessageId = showLoadingMessage(i18n.t(
         'BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING',
         {
@@ -129,7 +134,7 @@ const updateLinkedAccount = (params: CostDataSourceAccountUpdateParameters, idx:
             totalCount: storeState.selectedLinkedAccountsIndices.length,
         },
     ), '');
-    dataSourcesPageStore.updateLinkedAccount(params, idx)
+    dataSourcesPageStore.updateLinkedAccount(params)
         .then(() => hideLoadingMessage(loadingMessageId));
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {

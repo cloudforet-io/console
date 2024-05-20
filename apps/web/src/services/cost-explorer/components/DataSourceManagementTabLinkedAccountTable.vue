@@ -6,11 +6,11 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type {
-    AutocompleteHandler,
-    SelectDropdownMenuItem,
+    AutocompleteHandler, SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -103,13 +103,14 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 
-const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem) => {
+const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem|string) => {
     const accountItem = storeState.linkedAccounts[idx];
     await dataSourcesPageStore.updateLinkedAccount({
         data_source_id: accountItem.data_source_id,
         account_id: accountItem.account_id,
-        workspace_id: menuItem.name,
-    }, idx);
+        workspace_id: isObject(menuItem) ? menuItem?.name : menuItem,
+    });
+    await emit('confirm');
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;

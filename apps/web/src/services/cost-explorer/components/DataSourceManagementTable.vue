@@ -128,7 +128,7 @@ const fetchDataSourceList = async () => {
                          :loading="state.loading"
                          :style="{height: `${props.tableHeight}px`}"
                          @change="handleChange"
-                         @refresh="handleChange()"
+                         @refresh="fetchDataSourceList"
                          @update:select-index="handleUpdateSelectIndex"
         >
             <template #col-name-format="{value, item}">
