@@ -6,7 +6,7 @@ import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-export function convertDistinctValueHandler(
+export function makeDataSourceDistinctValueHandler(
     filters?: ApiFilter[],
     workspaceList?: WorkspaceModel[],
 ): ValueHandler|undefined {
