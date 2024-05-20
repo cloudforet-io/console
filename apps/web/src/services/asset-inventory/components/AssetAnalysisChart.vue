@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
@@ -45,6 +47,7 @@ import type {
 
 
 const SELECT_BUTTON_ITEMS = [
+    { name: CHART_TYPE.LINE_AREA, icon: 'ic_chart-area' },
     { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
     { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
     { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
@@ -161,8 +164,9 @@ const setChartData = debounce(async (analyze = true) => {
 const handleSelectButton = (selected: ChartType|string) => {
     state.loading = true;
     let analyzeData = false;
-    if ((assetAnalysisPageGetters.isRealtimeChart && selected === CHART_TYPE.LINE)
-        || (!assetAnalysisPageGetters.isRealtimeChart && selected !== CHART_TYPE.LINE)) {
+    const timeSeriesChartList = [CHART_TYPE.LINE, CHART_TYPE.LINE_AREA];
+    if ((assetAnalysisPageGetters.isRealtimeChart && timeSeriesChartList.includes(selected))
+        || (!assetAnalysisPageGetters.isRealtimeChart && !timeSeriesChartList.includes(selected))) {
         analyzeData = true;
     }
     setChartData(analyzeData);
@@ -220,12 +224,13 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
                 />
                 <template v-else-if="state.chartData.length">
                     <asset-analysis-line-chart
-                        v-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE"
+                        v-if="!assetAnalysisPageGetters.isRealtimeChart"
                         :loading="state.loading"
                         :chart.sync="state.chart"
                         :chart-data="state.chartData"
                         :legends="state.legends"
                         :color-set="state.chartColorSet"
+                        :stacked="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE_AREA"
                     />
                     <asset-analysis-donut-chart
                         v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT"

@@ -64,6 +64,7 @@ export const METRIC_PERIOD_MENU_ITEM_MAP = {
 } as const;
 
 export const CHART_TYPE = {
+    LINE_AREA: 'LINE_AREA',
     LINE: 'LINE',
     COLUMN: 'COLUMN',
     TREEMAP: 'TREEMAP',

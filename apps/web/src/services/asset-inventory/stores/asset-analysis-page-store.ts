@@ -51,7 +51,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
-        selectedChartType: CHART_TYPE.LINE as ChartType|string,
+        selectedChartType: CHART_TYPE.LINE_AREA as ChartType,
         // display
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
@@ -105,14 +105,14 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
             });
             return results;
         }),
-        isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
+        isRealtimeChart: computed<boolean>(() => ![CHART_TYPE.LINE, CHART_TYPE.LINE_AREA].includes(state.selectedChartType)),
     });
 
     /* Mutations */
     const setSelectedNamespace = (namespace?: NamespaceSubItemType) => {
         state.selectedNamespace = namespace;
     };
-    const setSelectedChartType = (chartType: ChartType|string) => {
+    const setSelectedChartType = (chartType: ChartType) => {
         state.selectedChartType = chartType;
     };
     const setGranularity = (granularity: Granularity) => {

@@ -20,6 +20,7 @@ interface Props {
     chartData: XYChartData[];
     legends: Legend[];
     colorSet?: string[];
+    stacked?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     loading: true,
@@ -72,6 +73,7 @@ const drawChart = () => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: legend.label as string,
             valueYField: legend.name,
+            stacked: props.stacked,
         };
         if (legend.color) {
             seriesSettings.fill = chartHelper.color(legend.color);
@@ -81,6 +83,14 @@ const drawChart = () => {
         // create series
         const series = chartHelper.createXYLineSeries(chart, seriesSettings);
         chart.series.push(series);
+
+        // set fill opacity if stacked
+        if (props.stacked) {
+            series.fills.template.setAll({
+                fillOpacity: 0.5,
+                visible: true,
+            });
+        }
 
         // set data processor on series
         series.data.processor = chartHelper.createDataProcessor({
