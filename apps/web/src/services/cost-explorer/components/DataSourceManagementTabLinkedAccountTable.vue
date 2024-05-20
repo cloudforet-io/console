@@ -111,11 +111,12 @@ const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMen
         workspace_id: menuItem.name,
     }, idx);
 };
-const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart, pageLimit = 10) => {
+const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
 
     workspaceListApiQueryHelper.setFilters([
         { k: 'name', v: inputText, o: '' },
+        { k: 'state', v: 'ENABLED', o: '=' },
     ]);
     try {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>({
@@ -125,16 +126,18 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
             label: i.name,
             name: i.workspace_id,
         }));
-        const slicedResults = refinedMenuItems?.slice((pageStart ?? 1) - 1, pageLimit);
+        const totalCount = pageStart - 1 + Number(pageLimit);
+        const slicedResults = refinedMenuItems?.slice(pageStart - 1, totalCount);
 
         return {
             results: slicedResults,
-            more: pageLimit < refinedMenuItems.length,
+            more: totalCount < refinedMenuItems.length,
         };
     } catch (e) {
         ErrorHandler.handleError(e);
         return {
             results: [],
+            more: false,
         };
     } finally {
         dropdownState.loading = false;
@@ -166,6 +169,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style
                                style-type="transparent"
+                               page-size="10"
                                :visible-menu="dropdownState.visible"
                                :loading="dropdownState.loading"
                                :search-text.sync="dropdownState.searchText"
