@@ -30,7 +30,9 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { red } from '@/styles/colors';
 
+import { convertDistinctValueHandler } from '@/services/cost-explorer/composables/data-source-converter';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
+import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
@@ -51,6 +53,7 @@ const storeState = reactive({
     linkedAccounts: computed<CostDataSourceAccountModel[]>(() => dataSourcesPageGetters.linkedAccounts),
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
     linkedAccountsLoading: computed<boolean>(() => dataSourcesPageState.linkedAccountsLoading),
+    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
 });
 const dropdownState = reactive({
     visible: false,
@@ -75,10 +78,10 @@ const tableState = reactive({
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
-        name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name'),
-        account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id'),
-        workspace_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'workspace_id'),
-        is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync'),
+        name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+        account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+        workspace_id: convertDistinctValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }], storeState.workspaceList),
+        is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
     })),
 });
 
