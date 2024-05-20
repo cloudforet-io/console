@@ -35,6 +35,10 @@ const state = reactive({
         const locale = i18n.locale;
         return [
             {
+                name: METRIC_PERIOD_MENU.LAST_7_DAYS,
+                label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_7_DAYS'),
+            },
+            {
                 name: METRIC_PERIOD_MENU.LAST_14_DAYS,
                 label: i18n.t('INVENTORY.ASSET_ANALYSIS.PERIOD.LAST_14_DAYS'),
             },
@@ -101,7 +105,7 @@ const state = reactive({
             ...customItem,
         ];
     }),
-    selectedPeriod: METRIC_PERIOD_MENU.LAST_14_DAYS as MetricPeriodMenu,
+    selectedPeriod: METRIC_PERIOD_MENU.LAST_7_DAYS as MetricPeriodMenu,
     customDateModalVisible: false,
 });
 
