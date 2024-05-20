@@ -125,6 +125,29 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     };
 
     const actions = {
+        reset: () => {
+            state.activeTab = 'detail';
+
+            state.dataSourceList = [] as DataSourceModel[];
+            state.dataSourceListTotalCount = 0;
+            state.selectedDataSourceIndices = [] as number[];
+
+            state.jobList = [] as CostJobModel[];
+            state.jobListTotalCount = 0;
+
+            state.linkedAccountsLoading = false;
+            state.linkedAccountsPageStart = 0;
+            state.linkedAccountsPageLimit = 15;
+            state.linkedAccounts = [] as CostDataSourceAccountModel[];
+            state.linkedAccountsTotalCount = 0;
+            state.selectedLinkedAccountsIndices = [] as number[];
+            state.linkedAccountsSearchFilters = [] as ConsoleFilter[];
+
+            state.modal = {
+                visible: false,
+                type: undefined as CostLinkedAccountModalType|undefined,
+            };
+        },
         fetchDataSourceList: async (params?: CostDataSourceListParameters) => {
             try {
                 const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<DataSourceModel>>(params);

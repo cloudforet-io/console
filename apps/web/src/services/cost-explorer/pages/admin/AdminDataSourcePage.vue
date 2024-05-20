@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
 
 import {
     PHeading, PHorizontalLayout, PLink, PI,
@@ -24,6 +26,10 @@ const storeState = reactive({
 
 onMounted(() => {
     dataSourcesPageStore.fetchDataSourceList();
+});
+
+onUnmounted(() => {
+    dataSourcesPageStore.reset();
 });
 </script>
 
