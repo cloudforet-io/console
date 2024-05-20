@@ -9,8 +9,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CostDataSourceAccountResetParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/reset';
-import type { CostDataSourceAccountUpdateParameters } from '@/schema/cost-analysis/data-source-account/api-verbs/update';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
@@ -45,7 +43,6 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
-    activeItemCount: 0,
     headerTitle: computed<TranslateResult>(() => {
         if (storeState.type === 'RESET') {
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESET_MODAL_TITLE', { count: storeState.selectedLinkedAccountsIndices.length });
@@ -54,6 +51,12 @@ const state = reactive({
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATE_MODAL_TITLE', { count: storeState.selectedLinkedAccountsIndices.length });
         }
         return '';
+    }),
+    loadingMessage: computed<TranslateResult>(() => {
+        if (storeState.type === 'RESET') {
+            return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESETTING');
+        }
+        return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
     }),
 });
 const dropdownState = reactive({
@@ -68,24 +71,26 @@ const handleConfirm = async () => {
     state.loading = true;
 
     const promises = storeState.selectedLinkedAccountsIndices.map((idx) => {
-        state.activeItemCount += 1;
         const item = storeState.linkedAccounts[idx];
         const defaultParams = {
             data_source_id: item.data_source_id,
             account_id: item.account_id,
         };
         if (storeState.type === 'RESET') {
-            return resetLinkedAccount(defaultParams);
+            return dataSourcesPageStore.resetLinkedAccount(defaultParams);
         }
-        return updateLinkedAccount({
+        return dataSourcesPageStore.updateLinkedAccount({
             ...defaultParams,
             workspace_id: dropdownState.selectedMenuId,
         });
     });
 
     try {
+        const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
+
         await Promise.allSettled(promises);
 
+        hideLoadingMessage(loadingMessageId);
         if (storeState.type === 'RESET') {
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
         } else {
@@ -105,7 +110,6 @@ const handleConfirm = async () => {
 
 const handleClose = () => {
     dataSourcesPageStore.setModal(false, undefined);
-    state.activeItemCount = 0;
 };
 const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
     if (!id) return undefined;
@@ -115,28 +119,6 @@ const handleSelectDropdownItem = async (menuItem: string) => {
     dropdownState.selectedMenuId = menuItem;
 };
 
-const resetLinkedAccount = (params: CostDataSourceAccountResetParameters) => {
-    const loadingMessageId = showLoadingMessage(i18n.t(
-        'BILLING.COST_MANAGEMENT.DATA_SOURCES.RESETTING',
-        {
-            count: state.activeItemCount,
-            totalCount: storeState.selectedLinkedAccountsIndices.length,
-        },
-    ), '');
-    dataSourcesPageStore.resetLinkedAccount(params)
-        .then(() => hideLoadingMessage(loadingMessageId));
-};
-const updateLinkedAccount = (params: CostDataSourceAccountUpdateParameters) => {
-    const loadingMessageId = showLoadingMessage(i18n.t(
-        'BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING',
-        {
-            count: state.activeItemCount,
-            totalCount: storeState.selectedLinkedAccountsIndices.length,
-        },
-    ), '');
-    dataSourcesPageStore.updateLinkedAccount(params)
-        .then(() => hideLoadingMessage(loadingMessageId));
-};
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
 
