@@ -185,12 +185,13 @@ const handleAllSeries = (type: string) => {
 
 watch([
     () => state.currentMetricId,
+    () => assetAnalysisPageState.metricInitiated,
     () => assetAnalysisPageState.period,
     () => assetAnalysisPageState.selectedOperator,
     () => assetAnalysisPageState.selectedChartGroupBy,
     () => assetAnalysisPageGetters.consoleFilters,
-], async ([metricId]) => {
-    if (!metricId) return;
+], async ([metricId, metricInitiated]) => {
+    if (!metricId || !metricInitiated) return;
     await setChartData();
 }, { immediate: true });
 watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
