@@ -73,10 +73,6 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
     }
 
-    await new Promise((resolve) => {
-        setTimeout(resolve, 500);
-    });
-
     await fetchLinkedAccountList();
 };
 
