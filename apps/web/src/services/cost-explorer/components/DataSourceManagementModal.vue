@@ -16,8 +16,6 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -32,7 +30,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', promises: Promise<void>[]): void; }>();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -42,7 +40,6 @@ const storeState = reactive({
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
 });
 const state = reactive({
-    loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (storeState.type === 'RESET') {
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESET_MODAL_TITLE', { count: storeState.selectedLinkedAccountsIndices.length });
@@ -51,12 +48,6 @@ const state = reactive({
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATE_MODAL_TITLE', { count: storeState.selectedLinkedAccountsIndices.length });
         }
         return '';
-    }),
-    loadingMessage: computed<TranslateResult>(() => {
-        if (storeState.type === 'RESET') {
-            return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESETTING');
-        }
-        return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
     }),
 });
 const dropdownState = reactive({
@@ -67,9 +58,7 @@ const dropdownState = reactive({
     menu: computed(() => storeState.workspaceList.map((i) => ({ label: i.name, name: i.workspace_id }))),
 });
 
-const handleConfirm = async () => {
-    state.loading = true;
-
+const handleConfirm = () => {
     const promises = storeState.selectedLinkedAccountsIndices.map((idx) => {
         const item = storeState.linkedAccounts[idx];
         const defaultParams = {
@@ -85,32 +74,8 @@ const handleConfirm = async () => {
         });
     });
 
-    try {
-        const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
-
-        const delayHideLoadingMessage = new Promise((resolve) => {
-            setTimeout(resolve, 3000);
-        });
-
-        await Promise.all([Promise.allSettled(promises), delayHideLoadingMessage]);
-
-        hideLoadingMessage(loadingMessageId);
-
-        if (storeState.type === 'RESET') {
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
-        } else {
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
-        }
-
-        await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-        });
-        emit('confirm');
-
-        handleClose();
-    } finally {
-        state.loading = false;
-    }
+    handleClose();
+    emit('confirm', promises);
 };
 
 const handleClose = () => {
@@ -164,7 +129,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :loading="state.loading"
                     :theme-color="storeState.type === 'RESET' ? 'alert' : 'primary'"
                     :visible="storeState.visible"
                     @confirm="handleConfirm"
@@ -180,7 +144,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                 />
                 <p-select-dropdown use-fixed-menu-style
                                    page-size="10"
-                                   :visible-menu="dropdownState.visible"
+                                   :visible-menu.sync="dropdownState.visible"
                                    :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
                                    show-select-marker
