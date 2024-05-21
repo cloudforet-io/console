@@ -225,13 +225,14 @@ const handleClickRow = (item) => {
 watch(
     [
         () => state.currentMetricId,
+        () => assetAnalysisPageState.metricInitiated,
         () => assetAnalysisPageState.period,
         () => assetAnalysisPageState.selectedOperator,
         () => assetAnalysisPageState.selectedGroupByList,
         () => assetAnalysisPageGetters.consoleFilters,
     ],
-    async ([metricId]) => {
-        if (!metricId) return;
+    async ([metricId, metricInitiated]) => {
+        if (!metricId || !metricInitiated) return;
         state.thisPage = 1;
         await setDataTableData();
     },

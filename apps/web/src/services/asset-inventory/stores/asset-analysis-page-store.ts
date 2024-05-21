@@ -51,12 +51,14 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         selectedGroupByList: [] as string[],
         selectedChartGroupBy: undefined as string|undefined,
         selectedOperator: OPERATOR.SUM as Operator,
-        selectedChartType: CHART_TYPE.LINE as ChartType|string,
+        selectedChartType: CHART_TYPE.LINE_AREA as ChartType,
         // display
         metricQueryFormMode: 'CREATE' as QueryFormMode,
         showMetricQueryFormSidebar: false,
         refreshMetricPeriodDropdown: false,
         periodText: undefined as string|undefined,
+        // trigger
+        metricInitiated: false,
     });
     const getters = reactive({
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
@@ -66,7 +68,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
             if (_state.isAdminMode) {
                 return state.metric.labels_info;
             }
-            return state.metric.labels_info.filter((d) => d.key !== 'workspace_id');
+            return state.metric.labels_info?.filter((d) => d.key !== 'workspace_id');
         }),
         defaultMetricGroupByList: computed<string[]>(() => {
             const defaultLabelKeys = state.metric?.labels_info?.filter((d) => d.default) ?? [];
@@ -75,7 +77,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         // below is the map of reference store for each reference label key
         labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
             const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
-            state.metric?.labels_info.filter((d) => !isEmpty(d.reference)).forEach((d) => {
+            state.metric?.labels_info?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
                 const _fieldName = d.key.replace('labels.', '');
                 _labelKeysMap[_fieldName] = d;
             });
@@ -105,14 +107,14 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
             });
             return results;
         }),
-        isRealtimeChart: computed<boolean>(() => state.selectedChartType !== CHART_TYPE.LINE),
+        isRealtimeChart: computed<boolean>(() => ![CHART_TYPE.LINE, CHART_TYPE.LINE_AREA].includes(state.selectedChartType)),
     });
 
     /* Mutations */
     const setSelectedNamespace = (namespace?: NamespaceSubItemType) => {
         state.selectedNamespace = namespace;
     };
-    const setSelectedChartType = (chartType: ChartType|string) => {
+    const setSelectedChartType = (chartType: ChartType) => {
         state.selectedChartType = chartType;
     };
     const setGranularity = (granularity: Granularity) => {
@@ -129,6 +131,9 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
     };
     const setSelectedChartGroupBy = (groupBy: string|undefined) => {
         state.selectedChartGroupBy = groupBy;
+    };
+    const setMetricInitiated = (initiated: boolean) => {
+        state.metricInitiated = initiated;
     };
     const setFilters = (filters: MetricFilter) => {
         state.filters = filters;
@@ -153,6 +158,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
     const reset = () => {
         state.metric = undefined;
         state.refreshMetricPeriodDropdown = false;
+        state.metricInitiated = false;
         //
         state.granularity = GRANULARITY.DAILY;
         state.period = getInitialPeriodByGranularity(GRANULARITY.DAILY)[0];
@@ -230,6 +236,7 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         setRefreshMetricPeriodDropdown,
         setSelectedChartType,
         setPeriodText,
+        setMetricInitiated,
     };
 
     return {

@@ -11,6 +11,7 @@ export const OPERATOR = {
 } as const;
 
 export const METRIC_PERIOD_MENU = {
+    LAST_7_DAYS: 'LAST_7_DAYS',
     LAST_14_DAYS: 'LAST_14_DAYS',
     LAST_30_DAYS: 'LAST_30_DAYS',
     CURRENT_MONTH: 'CURRENT_MONTH',
@@ -24,6 +25,10 @@ export const METRIC_PERIOD_MENU = {
 
 export const METRIC_PERIOD_MENU_ITEM_MAP = {
     // DAILY
+    [METRIC_PERIOD_MENU.LAST_7_DAYS]: {
+        name: METRIC_PERIOD_MENU.LAST_7_DAYS,
+        relativePeriod: { unit: 'day', value: 6, include_today: true },
+    },
     [METRIC_PERIOD_MENU.LAST_14_DAYS]: {
         name: METRIC_PERIOD_MENU.LAST_14_DAYS,
         relativePeriod: { unit: 'day', value: 13, include_today: true },
@@ -64,6 +69,7 @@ export const METRIC_PERIOD_MENU_ITEM_MAP = {
 } as const;
 
 export const CHART_TYPE = {
+    LINE_AREA: 'LINE_AREA',
     LINE: 'LINE',
     COLUMN: 'COLUMN',
     TREEMAP: 'TREEMAP',
