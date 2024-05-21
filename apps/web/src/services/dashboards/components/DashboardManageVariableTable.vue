@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type {
     DashboardVariableSchemaProperty,
-    VariableType,
 } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;
-    manageable?: string;
+    manageable?: boolean;
 }
 interface EmitFn {
     (e: 'delete', value: string): void;
@@ -27,19 +27,30 @@ interface EmitFn {
     (e: 'clone', name: string): void;
 }
 
+type VariableType = 'ALL'|'MANAGED'|'CUSTOM';
+
 const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
+    filteredVariables: computed<VariablesPropertiesForManage[]>(() => {
+        if (state.selectedVariableType === 'ALL') {
+            return state.orderedVariables;
+        } if (state.selectedVariableType === 'MANAGED') {
+            return state.orderedVariables.filter((d) => d.variable_type === 'MANAGED');
+        }
+        return state.orderedVariables.filter((d) => d.variable_type !== 'MANAGED');
+    }),
     variableFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
     ]),
-    selectedVariableType: 'ALL',
+    selectedVariableType: 'ALL' as VariableType,
     variableFields: [
         { name: 'name', label: 'Name', width: '220px' },
         { name: 'selection_type', label: 'Selection Type' },
@@ -52,14 +63,14 @@ const state = reactive({
         SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
         MULTI: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
     })),
-    variableType: computed(() => ({
+    variableType: computed<Partial<Record<VariableType, TranslateResult>>>(() => ({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
 });
 
 /* EVENT */
-const handleSelectType = (selected) => {
+const handleSelectType = (selected: VariableType) => {
     state.selectedVariableType = selected;
 };
 const handleCloneVariable = (propertyName: string) => {
@@ -78,7 +89,7 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     state.orderedVariables[selectedIndex].use = !value;
 
     // change use in store
-    const _variablesSchema = cloneDeep(dashboardDetailState.variablesSchema);
+    const _variablesSchema = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
     _variablesSchema.properties[propertyName].use = !value;
     dashboardDetailStore.setVariablesSchema(_variablesSchema);
 };
@@ -89,48 +100,27 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
     return 'primary';
 };
 const convertAndUpdateVariablesForTable = (order: string[]) => {
-    const properties = dashboardDetailState.variablesSchema.properties;
-    const convertedVariables = order.map((d) => {
-        if (properties[d].variable_type === 'MANAGED') {
-            return {
-                ...properties[d],
-                propertyName: d,
-                description: MANAGED_DASH_VAR_SCHEMA.properties[d]?.description ?? properties[d].description ?? '',
-            };
-        }
-        return {
-            ...properties[d],
-            propertyName: d,
-            manageable: d,
-        };
-    });
-    if (state.selectedVariableType === 'ALL') {
-        state.orderedVariables = convertedVariables;
-    } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
+    const properties = dashboardDetailGetters.refinedVariablesSchema.properties;
+    state.orderedVariables = order.map((d) => ({
+        ...properties[d],
+        propertyName: d,
+        manageable: properties[d].variable_type !== 'MANAGED' ? true : undefined,
+    }));
 };
 
-watch([() => dashboardDetailState.variablesSchema.order, () => state.selectedVariableType], ([_order]) => {
-    convertAndUpdateVariablesForTable(_order);
+watch(() => dashboardDetailState.variablesSchema.order, (after, before) => {
+    if (isEqual(after, before)) return;
+    convertAndUpdateVariablesForTable(after);
 }, { immediate: true });
-
-const {
-    orderedVariables,
-    variableFilterList,
-    selectedVariableType,
-    variableFields,
-    selectionType,
-    variableType,
-} = toRefs(state);
-
 </script>
 
 <template>
     <div class="list-wrapper">
         <div class="variable-select-filter">
             <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-            <p-select-status v-for="(type, idx) in variableFilterList"
+            <p-select-status v-for="(type, idx) in state.variableFilterList"
                              :key="`variable-type-${idx}`"
-                             :selected="selectedVariableType"
+                             :selected="state.selectedVariableType"
                              :value="type.name"
                              @change="handleSelectType"
             >
@@ -138,22 +128,22 @@ const {
             </p-select-status>
         </div>
         <p-data-table class="variable-table"
-                      :items="orderedVariables"
-                      :fields="variableFields"
+                      :items="state.filteredVariables"
+                      :fields="state.variableFields"
         >
             <template #col-selection_type-format="{ value }">
-                <span>{{ selectionType[value] }}</span>
+                <span>{{ state.selectionType[value] }}</span>
             </template>
             <template #col-variable_type-format="{ value }">
                 <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
                          badge-type="solid-outline"
                 >
-                    {{ variableType[value] }}
+                    {{ state.variableType[value] ? state.variableType[value] : state.variableType.CUSTOM }}
                 </p-badge>
             </template>
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
-                                 :disabled="item.disabled || item.required"
+                                 :disabled="item.disabled || item.required || item.fixed || item.readonly"
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>
@@ -165,19 +155,19 @@ const {
                     {{ $t(value) }}
                 </p-collapsible-panel>
             </template>
-            <template #col-manageable-format="{ value }">
+            <template #col-manageable-format="{ item, value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
                     <p-icon-button name="ic_duplicate"
-                                   @click="handleCloneVariable(value)"
+                                   @click="handleCloneVariable(item.percentage)"
                     />
                     <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(value)"
+                                   @click="handleEditVariable(item.percentage)"
                     />
                     <p-icon-button name="ic_delete"
                                    style-type="negative-transparent"
-                                   @click="handleDeleteVariable(value)"
+                                   @click="handleDeleteVariable(item.percentage)"
                     />
                 </div>
             </template>

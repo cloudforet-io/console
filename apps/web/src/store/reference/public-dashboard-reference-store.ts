@@ -12,10 +12,8 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap,
 } from '@/store/reference/type';
-
-
 
 
 interface PublicDashboardResourceItemData {

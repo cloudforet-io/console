@@ -12,8 +12,11 @@ import {
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
@@ -25,6 +28,7 @@ import DashboardToolsetDateDropdown from '@/services/dashboards/components/Dashb
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/constants/dashboard-constant';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
@@ -41,9 +45,13 @@ const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
 const route = useRoute();
 
+const { getProperRouteLocation } = useProperRouteLocation();
+const appContextStore = useAppContextStore();
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    templateName: computed(() => DASHBOARD_TEMPLATES[dashboardDetailState.templateId]?.name),
     dashboardScope: computed(() => dashboardDetailState.dashboardScope),
     dashboardMiddleRouteLabel: computed(() => {
         if (state.dashboardScope === DASHBOARD_SCOPE.WORKSPACE) return i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
@@ -58,6 +66,7 @@ const state = reactive({
             params: { workspaceId: route.params.workspaceId },
             query: { scope: state.dashboardScope },
         });
+        if (state.isAdminMode) return _breadcrumbs;
         const dashboardMiddleRoute = {
             name: state.dashboardMiddleRouteLabel,
             to: { path: customMiddleRoute.fullPath },
@@ -75,7 +84,7 @@ const getDashboardData = async (dashboardId: string) => {
         await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE._NAME });
+        await SpaceRouter.router.push(getProperRouteLocation({ name: DASHBOARDS_ROUTE._NAME }));
     }
 };
 
@@ -118,7 +127,9 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <dashboard-detail-header :dashboard-id="props.dashboardId" />
+        <dashboard-detail-header :dashboard-id="props.dashboardId"
+                                 :template-name="state.templateName"
+        />
         <div class="filter-box">
             <dashboard-labels editable
                               @update-labels="handleUpdateLabels"
@@ -144,6 +155,7 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-detail-page {
+
     .divider {
         @apply mb-6;
     }

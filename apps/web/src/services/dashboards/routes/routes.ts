@@ -14,6 +14,8 @@ const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsM
 const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardCreatePage.vue');
 const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
+//
+const DashboardPlaygroundPage = () => import('@/services/dashboards/pages/DashboardPlaygroundPage.vue');
 
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
@@ -75,6 +77,11 @@ const dashboardsRoute: RouteConfig = {
             },
             props: true,
             component: DashboardCustomizePage,
+        },
+        {
+            path: 'playground',
+            name: DASHBOARDS_ROUTE.PLAYGROUND._NAME,
+            component: DashboardPlaygroundPage,
         },
     ],
 };

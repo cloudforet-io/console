@@ -13,14 +13,24 @@ import type { MetricExampleModel } from '@/schema/inventory/metric-example/model
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
 import getRandomId from '@/lib/random-id-generator';
-import { VariableModel } from '@/lib/variable-models';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+import { VariableModelFactory } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import {
+    MANAGED_VARIABLE_MODEL_KEY_MAP,
+    MANAGED_VARIABLE_MODELS,
+} from '@/lib/variable-models/managed-model-config/base-managed-model-config';
+import type {
+    VariableModelMenuHandlerInfo,
+} from '@/lib/variable-models/variable-model-menu-handler';
+import {
+    getVariableModelMenuHandler,
+} from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import type { MetricFilter } from '@/services/asset-inventory/types/asset-analysis-type';
+
 
 
 const props = defineProps<{
@@ -53,28 +63,29 @@ const state = reactive({
 /* Util */
 const getMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     try {
-        let variableModel: VariableModel | undefined;
+        let variableModelInfo: VariableModelMenuHandlerInfo;
         if (isEmpty(labelKey.reference)) {
-            variableModel = new VariableModel({
-                type: 'RESOURCE_VALUE',
-                resource_type: 'inventory.MetricData',
-                reference_key: labelKey.key,
-                name: labelKey.key,
-            });
+            const MetricVariableModel = new VariableModelFactory(
+                { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
+            );
+            MetricVariableModel[labelKey.key] = MetricVariableModel.generateProperty({ key: labelKey.key });
+            variableModelInfo = {
+                variableModel: MetricVariableModel,
+                dataKey: labelKey.key,
+            };
         } else {
             const _resourceType = labelKey.reference?.resource_type;
-            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODEL_CONFIGS)
-                .find((d) => (d.resourceType === _resourceType));
+            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === _resourceType));
             if (targetModelConfig) {
-                variableModel = new VariableModel({
-                    type: 'MANAGED',
-                    key: targetModelConfig.key,
-                });
+                variableModelInfo = {
+                    variableModel: new VariableModelFactory(
+                        { type: 'MANAGED', managedModelKey: targetModelConfig.meta.key as ManagedVariableModelKey },
+                    ),
+                };
             }
         }
-        if (!variableModel) return async () => ({ results: [] });
-
-        const handler = getVariableModelMenuHandler(variableModel);
+        if (!variableModelInfo) return async () => ({ results: [] });
+        const handler = getVariableModelMenuHandler([variableModelInfo]);
         return async (...args) => {
             try {
                 state.loading = true;

@@ -11,7 +11,7 @@ import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import { DASHBOARD_TYPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type {
-    DashboardType,
+    DashboardType, TemplateType,
 } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -47,6 +47,7 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const {
     forms: {
@@ -92,15 +93,15 @@ const createDashboard = async () => {
     try {
         const params: CreateDashboardParameters = {
             name: name.value,
-            // HACK: get dynamic template_id, template_type after implementing template feature
-            template_id: 'blank',
-            template_type: 'MANAGED',
-            layouts: props.dashboard?.layouts,
+            template_id: props.dashboard?.template_id as string,
+            template_type: props.dashboard?.template_type as TemplateType,
             labels: props.dashboard?.labels,
             settings: props.dashboard?.settings,
+            layouts: props.dashboard?.layouts,
             variables: props.dashboard?.variables,
             variables_schema: props.dashboard?.variables_schema,
             tags: { created_by: store.state.user.userId },
+            display_info: dashboardDetailGetters.displayInfo,
         };
         if (storeState.isAdminMode) {
             state.dashboardType = DASHBOARD_TYPE.PUBLIC;

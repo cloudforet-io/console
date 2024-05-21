@@ -12,10 +12,10 @@ import type { RegionModel } from '@/schema/inventory/region/model';
 import { store } from '@/store';
 
 import type {
-    ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
+    ReferenceItem, ReferenceLoadOptions, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -78,9 +78,9 @@ export const useRegionReferenceStore = defineStore('reference-region', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         regionTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.region.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
+            type: MANAGED_VARIABLE_MODELS.region.meta.key,
+            key: MANAGED_VARIABLE_MODELS.region.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.region.meta.name,
             referenceMap: getters.regionItems,
         })),
     });

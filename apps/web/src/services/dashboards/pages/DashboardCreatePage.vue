@@ -26,18 +26,22 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useGoBack } from '@/common/composables/go-back';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
+import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
-import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
-import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -48,8 +52,11 @@ interface Step {
     step: number;
     description?: string;
 }
+const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 const {
     forms: { dashboardTemplate, dashboardProject },
     setForm,
@@ -68,12 +75,18 @@ const {
 });
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: false,
-    steps: computed<Step[]>(() => [
+    adminSteps: computed<Step[]>(() => [
+        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
+        { step: 2 },
+    ]),
+    userSteps: computed<Step[]>(() => [
         { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
         { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
         { step: 3 },
     ]),
+    steps: computed(() => (state.isAdminMode ? state.adminSteps : state.userSteps)),
     currentStep: 1,
     isValid: computed(() => {
         if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
@@ -83,7 +96,9 @@ const state = reactive({
 });
 
 const goStep = (direction: 'prev'|'next') => {
-    if (state.currentStep === 2 && direction === 'next') {
+    if (state.isAdminMode && (state.currentStep === 1 && direction === 'next')
+        || !state.isAdminMode && (state.currentStep === 2 && direction === 'next')
+    ) {
         saveCurrentStateToStore();
     }
     if (direction === 'prev') state.currentStep--;
@@ -101,30 +116,30 @@ const createDashboard = async () => {
 
         const apiParam: CreateDashboardParameters = {
             name: dashboardDetailState.name,
-            // HACK: get dynamic template_id, template_type after implementing template feature
-            template_id: 'blank',
-            template_type: 'MANAGED',
+            template_id: dashboardDetailState.templateId,
+            template_type: dashboardDetailState.templateType,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
             variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
+            variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
+            display_info: dashboardDetailGetters.displayInfo,
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            (apiParam as PublicDashboardCreateParameters).resource_group = dashboardDetailState.dashboardScope;
+            apiParam.resource_group = state.isAdminMode ? RESOURCE_GROUP.DOMAIN : dashboardDetailState.dashboardScope;
         }
         if (dashboardDetailState.dashboardScope === 'PROJECT') {
             (apiParam as PublicDashboardCreateParameters).project_id = dashboardDetailState.projectId;
         }
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
-        await SpaceRouter.router.push({
+        await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
             },
-        });
+        })).catch(() => {});
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     } finally {
@@ -132,89 +147,63 @@ const createDashboard = async () => {
     }
 };
 
+/* Event */
 const handleClickClose = () => {
     state.closeConfirmModalVisible = true;
 };
+const handleSelectTemplate = (template: DashboardModel) => {
+    setForm('dashboardTemplate', template);
+    goStep('next');
+};
 
-const { setPathFrom, handleClickBackButton } = useGoBack({
+const handleSelectProject = (project: ProjectTreeNodeData) => {
+    setForm('dashboardProject', project);
+};
+
+const { setPathFrom, handleClickBackButton } = useGoBack(getProperRouteLocation({
     name: DASHBOARDS_ROUTE._NAME,
-});
+}));
 
 defineExpose({ setPathFrom });
 </script>
 
 <template>
     <div class="dashboard-create-page"
-         :class="`step-${state.currentStep}`"
+         :class="[`step-${state.currentStep}`, { 'admin-mode': state.isAdminMode }]"
     >
-        <div v-if="state.currentStep === state.steps[0].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    @click="$router.go(-1)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!state.isValid"
-                    @click="goStep('next')"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[1].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
-            <dashboard-template-form
-                :dashboard-scope="dashboardDetailState.dashboardScope"
-                @set-template="setForm('dashboardTemplate', $event)"
+        <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
+                                  :description="state.steps[state.currentStep - 1].description"
+                                  :total-steps="state.steps.length"
+                                  :current-step="state.currentStep"
+                                  show-step
+                                  show-close-button
+                                  @close="handleClickClose"
+        />
+        <dashboard-create-step1 v-if="state.currentStep === 1"
+                                @select-template="handleSelectTemplate"
+        />
+        <template v-else-if="!state.isAdminMode && state.currentStep === 2">
+            <dashboard-create-step2 :selected-template="dashboardTemplate"
+                                    @select-project="handleSelectProject"
             />
             <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    icon-left="ic_arrow-left"
-                    @click="goStep('prev')"
+                <p-button style-type="transparent"
+                          size="lg"
+                          icon-left="ic_arrow-left"
+                          @click="goStep('prev')"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!isAllValid"
-                    @click="goStep('next')"
+                <p-button style-type="primary"
+                          size="lg"
+                          :disabled="!isAllValid"
+                          @click="goStep('next')"
                 >
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[2].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
+        </template>
+        <div v-if="state.currentStep === 3 || (state.isAdminMode && state.currentStep === 2)">
             <dashboard-customize :loading="state.loading"
                                  :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
                                  hide-cancel-button
@@ -230,12 +219,16 @@ defineExpose({ setPathFrom });
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    min-width: 25rem;
+    &.step-1 {
+        width: 60rem;
+    }
     &.step-2 {
-        @apply absolute;
-        top: 2rem;
-        width: 100%;
-        max-width: 1000px;
+        width: 45rem;
+        &.admin-mode {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 8rem);
+        }
     }
     &.step-3 {
         width: 100%;

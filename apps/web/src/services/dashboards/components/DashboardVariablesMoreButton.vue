@@ -32,6 +32,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const route = useRoute();
 const router = useRouter();
@@ -41,7 +42,7 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any | null,
     searchText: '',
-    variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailState.variablesSchema),
+    variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailGetters.refinedVariablesSchema),
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
@@ -124,7 +125,7 @@ const beforeSelect = (item: MenuItem, idx: number, isSelected: boolean): boolean
     if (!property) return false;
     if (property.fixed || property.readonly) return false;
 
-    if (property.variable_type !== 'CUSTOM') return true;
+    if (property.variable_type === 'MANAGED') return true;
     if (isSelected) return true;
 
     state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(key);
@@ -188,7 +189,7 @@ const handleSelectVariable = (item: MenuItem, idx: number, isSelected: boolean) 
 };
 
 const handleClearSelection = () => {
-    const variablesSchema: DashboardVariablesSchema = cloneDeep(dashboardDetailState.variablesSchema);
+    const variablesSchema: DashboardVariablesSchema = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
     Object.keys(variablesSchema.properties).forEach((k) => {
         const property = variablesSchema.properties[k];
         if (property.readonly || property.fixed) return;
