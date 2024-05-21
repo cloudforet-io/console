@@ -45,12 +45,14 @@ watch(() => props.overrideCollapsed, (changedCollapsed) => {
                  color="inherit transparent"
                  class="arrow-button"
             />
-            <p-lazy-img v-if="props.item.icon"
-                        class="title-image"
-                        :src="props.item.icon"
-                        width="1rem"
-                        height="1rem"
-            />
+            <slot name="left-image">
+                <p-lazy-img v-if="props.item.icon"
+                            class="title-image"
+                            :src="props.item.icon"
+                            width="1rem"
+                            height="1rem"
+                />
+            </slot>
             <span>{{ props.item.label }}</span>
         </div>
         <div class="collapsible-contents">

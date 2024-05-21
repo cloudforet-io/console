@@ -114,24 +114,6 @@ export const getSidebarArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    backdrop: {
-        name: 'backdrop',
-        type: { name: 'boolean', required: true },
-        description: 'Show backdrop or not',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     'v-model': {
         name: 'v-model',
         type: { name: 'boolean', required: false },

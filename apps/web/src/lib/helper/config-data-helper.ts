@@ -1,6 +1,7 @@
 import { find } from 'lodash';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
@@ -14,11 +15,11 @@ import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import type { FavoriteConfig, FavoriteItem } from '@/common/modules/favorites/favorite-button/type';
+import type { RecentConfig } from '@/common/modules/navigations/type';
 
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
-
-type Config = FavoriteConfig;
+type Config = FavoriteConfig & RecentConfig;
 
 export interface ConfigData extends Config {
     [key: string]: any;
@@ -319,6 +320,26 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
     });
 
     return results.filter((result) => result);
+};
+
+export const convertWorkspaceConfigToReferenceData = (config: ConfigData[]|null, menuList: WorkspaceModel[]): ReferenceData[] => {
+    const results: ReferenceData[] = [];
+    if (!config) return results;
+
+    config.forEach((d) => {
+        const menu = find(menuList, { workspace_id: d.itemId });
+        if (menu) {
+            results.push({
+                ...d,
+                itemType: FAVORITE_TYPE.WORKSPACE,
+                itemId: menu.workspace_id,
+                name: menu.workspace_id,
+                label: menu.name,
+                tags: menu.tags,
+            });
+        }
+    });
+    return results;
 };
 
 export const getCompoundKeyWithManagedCostQuerySetFavoriteKey = (dataSourceId:string, costQuerySetId: string): string => `managed_${dataSourceId}_${costQuerySetId}`;

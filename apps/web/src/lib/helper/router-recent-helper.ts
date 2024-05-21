@@ -29,6 +29,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         if (isPublicDashboard) return { itemType: RECENT_TYPE.DASHBOARD, workspaceId, itemId: dashboardId };
         return undefined;
     }
+
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {
         const provider = to?.params?.provider;
@@ -38,16 +39,25 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
         return { itemType: RECENT_TYPE.CLOUD_SERVICE_TYPE, workspaceId, itemId: `${provider}.${group}.${name}` };
     }
 
+    /* SECURITY */
+    if (to.name === ASSET_INVENTORY_ROUTE.SECURITY.DETAIL._NAME) {
+        const provider = to?.params?.provider;
+        const group = to?.params?.group;
+        const name = to?.params?.name;
+        if (!provider || !group || !name) return undefined;
+        return { itemType: RECENT_TYPE.SECURITY, workspaceId, itemId: `${provider}.${group}.${name}` };
+    }
+
     /* PROJECT GROUP */
     if (to.name === PROJECT_ROUTE._NAME) {
-        const projectGroupId = to?.query?.select_pg;
+        const projectGroupId = to?.params?.projectGroupId;
         if (projectGroupId?.length) {
             return { itemType: RECENT_TYPE.PROJECT_GROUP, workspaceId, itemId: projectGroupId as string };
         }
     }
 
     /* PROJECT */
-    if (to.name === PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME) {
+    if (to.name === PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME) {
         const projectId = to?.params?.id;
         if (!projectId) return undefined;
         return { itemType: RECENT_TYPE.PROJECT, workspaceId, itemId: projectId };
@@ -77,7 +87,6 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* MENU */
-
     const menu = to.meta?.menuId && MENU_INFO_MAP[to.meta?.menuId as MenuId];
     if (menu) {
         return { itemType: RECENT_TYPE.SERVICE, workspaceId, itemId: to.meta?.menuId as MenuId };

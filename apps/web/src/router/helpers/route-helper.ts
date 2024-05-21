@@ -7,7 +7,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { ERROR_ROUTE, ROOT_ROUTE, ROUTE_SCOPE } from '@/router/constant';
+import {
+    ERROR_ROUTE, ROOT_ROUTE, ROUTE_SCOPE,
+} from '@/router/constant';
 import type { RouteScopeType } from '@/router/type';
 
 
@@ -17,10 +19,8 @@ import type { MenuId } from '@/lib/menu/config';
 import { getLastAccessedWorkspaceId, setCurrentAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-
-
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { WORKSPACE_HOME_ROUTE } from '@/services/workspace-home/routes/route-constant';
 
 export const makeAdminRouteName = (routeName: string): string => {
     if (routeName.startsWith('admin.')) return routeName;
@@ -73,6 +73,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
 
     const ROOT_REDIRECT_SKIP_ROUTE_NAMES = [
         AUTH_ROUTE.SIGN_OUT._NAME,
+        AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         ERROR_ROUTE._NAME,
         ROOT_ROUTE.COST_REPORT._NAME,
     ];
@@ -85,7 +86,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
     return true;
 };
 export const processRouteIntegrityCheck = (to: Route, next: NavigationGuardNext): boolean => {
-    const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i, /^\/dashboard(?:\/(?=$))?$/i];
+    const OLD_PATHS = [/^\/home-dashboard(?:\/(?=$))?$/i, /^\/dashboard(?:\/(?=$))?$/i, /^\/home(?:\/(?=$))?$/i];
     const { rol: prevRole } = getDecodedDataFromAccessToken();
 
     // Abnormal Route Check
@@ -114,7 +115,7 @@ export const processWorkspaceAccessValidation = async (to: Route, next: Navigati
     const { wid: prevWorkspaceId } = getDecodedDataFromAccessToken();
 
     if (!workspaceList.length) {
-        next({ name: MY_PAGE_ROUTE._NAME });
+        next({ name: LANDING_ROUTE._NAME });
         return false;
     }
 
@@ -167,7 +168,7 @@ export const verifyPageAccessAndRedirect = (to: Route, next: NavigationGuardNext
         });
     } else {
         next({
-            name: HOME_DASHBOARD_ROUTE._NAME,
+            name: WORKSPACE_HOME_ROUTE._NAME,
             params: { workspaceId },
         });
     }

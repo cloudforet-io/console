@@ -87,8 +87,9 @@
 import type { ComponentPublicInstance, ComputedRef } from 'vue';
 import {
     computed,
-    getCurrentInstance, reactive, ref,
+    getCurrentInstance, onMounted, reactive, ref,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 import type { Vue } from 'vue/types/vue';
 
 import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
@@ -104,7 +105,7 @@ import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ERROR_ROUTE } from '@/router/constant';
+import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
 import type { UserState } from '@/store/modules/user/type';
 
@@ -135,6 +136,8 @@ const props = withDefaults(defineProps<Props>(), {
 const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 
 const vm = getCurrentInstance()?.proxy as Vue;
+const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
     loading: false,
@@ -253,6 +256,7 @@ const postResetPassword = async (request) => {
 const initStatesByUrlSSOToken = async () => {
     try {
         const ssoAccessToken = getSSOTokenFromUrl();
+
         // When sso access token is not exist in url query string
         if (!ssoAccessToken) return;
         SpaceConnector.setToken(ssoAccessToken, '');
@@ -276,6 +280,17 @@ const initStatesByUrlSSOToken = async () => {
         await initStatesByUrlSSOToken();
     }
 })();
+
+onMounted(() => {
+    const ssoAccessToken = getSSOTokenFromUrl();
+    // Access by reset password email.
+    if (ssoAccessToken) return;
+
+    const isResetPasswordPage = route.name === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME;
+    const hasRequiredUpdatePassword = store.state.user.requiredActions?.includes('UPDATE_PASSWORD');
+    // Access by normal sign in
+    if (isResetPasswordPage && !hasRequiredUpdatePassword) router.push(ROOT_ROUTE._NAME);
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -230,7 +230,7 @@
 					"TAG_ADD": "Add tags",
 					"TAG_DESC_1": "Click a button to add tags.",
 					"TAG_DESC_2": "Click a button below to add tags.",
-					"TAG_LABEL": "Tags"
+					"TAG_LABEL": "Tag"
 				},
 				"CANCEL": "Cancel",
 				"CHECK_MODAL": {
@@ -643,7 +643,7 @@
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"START_DATE": "Start Date",
-				"TAGS": "Tags",
+				"TAGS": "Tag",
 				"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
@@ -956,7 +956,7 @@
 			"DEFAULT": "Default",
 			"RECOMMEND_SORT": "Recommendation",
 			"SEARCH_ATTRIBUTE_COL": "Search attribute columns",
-			"SEARCH_TAG": "Search Tags",
+			"SEARCH_TAG": "Search Tag",
 			"SELECT_TAG": "Select tags",
 			"SORT_BY": "Sort by",
 			"TAG": "(Tag)",
@@ -1035,7 +1035,7 @@
 				"FAVORITES_HELP_TEXT": "Add frequently visited pages to your favorites.",
 				"GO_TO_CLOUD_SERVICE": "Go to Cloud Service",
 				"GO_TO_PROJECT": "Go to Project",
-				"MENU": "MENU",
+				"MENU": "Menu",
 				"SHOW_ALL": "Show all"
 			},
 			"MY_PAGE": {
@@ -1101,6 +1101,8 @@
 			"WORKSPACE": {
 				"CREATE_WORKSPACE": "Create New Workspace",
 				"MANAGE_WORKSPACE": "Manage Workspace",
+				"NO_RESULTS_FOUND": "No Results Found",
+				"VIEW_WORKSPACES": "View All Workspaces",
 				"WORKSPACES": "Workspaces"
 			}
 		},
@@ -1248,10 +1250,10 @@
 		"STARRED_NO_DATA": "No starred items",
 		"TAGS": {
 			"ADD": "Add",
-			"ADD_TAG": "Add Tags",
+			"ADD_TAG": "Add Tag",
 			"ADD_TAG_DESC": "Add associated tags.",
-			"ALT_E_UPDATE": "Failed to Update Tags",
-			"ALT_S_UPDATE": "Tags successfully updated ",
+			"ALT_E_UPDATE": "Failed to Update Tag",
+			"ALT_S_UPDATE": "Tag successfully updated ",
 			"CANCEL": "Cancel",
 			"CLICK_TO_ADD_TAG": "Click a button to add tags.",
 			"EDIT": "Edit",
@@ -1259,7 +1261,7 @@
 			"KEY_VALUE_DESC": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 			"NO_TAGS": "No associated tags found.",
 			"SAVE": "Save",
-			"TITLE": "Tags",
+			"TITLE": "Tag",
 			"VALUE": "Value"
 		},
 		"TREE_MODAL": {
@@ -1449,7 +1451,7 @@
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",
 			"TOOLTIP_EDIT": "Edit",
-			"VIEW_ALL": "View All Dashboards",
+			"VIEW_ALL": "All Dashboards",
 			"WORKSPACE": "Workspace"
 		},
 		"CREATE": {
@@ -1780,6 +1782,76 @@
 			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
 		}
 	},
+	"HOME": {
+		"ACTIVATION_REQUIRED": "Activation Required",
+		"ACTIVATION_REQUIRED_DESC": "This contains Cost Analysis, Budget, and Cost Report.",
+		"ALT_E_DUPLICATED_NAME": "Folder name is duplicated.",
+		"ALT_E_INVALID_LINK": "Sorry could not save bookmark. Please check if the link is a valid URL.",
+		"ALT_E_MAX_LENGTH_INVALID": "{max} characters in max",
+		"ALT_E_VALIDATION_NAME": "Must be longer than 2 characters",
+		"ALT_S_ADD_LINK": "Link successfully Added ",
+		"ASSET_SUMMARY_CREATED": "{count} created",
+		"ASSET_SUMMARY_DAILY_UPDATE_DESC": "00:00 ~ present (Local Time)",
+		"ASSET_SUMMARY_DAILY_UPDATE_TITLE": "Daily Updates",
+		"ASSET_SUMMARY_DATABASE": "Database",
+		"ASSET_SUMMARY_DELETED": "{count} deleted",
+		"ASSET_SUMMARY_SERVER": "Server",
+		"ASSET_SUMMARY_SHOW_MORE_DAILY_UPDATE": "Show More Daily Updates ",
+		"ASSET_SUMMARY_STORAGE": "Storage",
+		"ASSET_SUMMARY_TITLE": "Asset Summary",
+		"BOOKMARK_ADD": "Add",
+		"BOOKMARK_ADD_LINK": "Add Link",
+		"BOOKMARK_ALL_WORKSPACE": "All Workspaces",
+		"BOOKMARK_CREATE": "Create",
+		"BOOKMARK_CREATE_FOLDER": "Create Folder",
+		"BOOKMARK_DELETE": "Delete",
+		"BOOKMARK_DELETE_FOLDER_TITLE": "Delete Folder",
+		"BOOKMARK_DELETE_LINK_TITLE": "Delete Link",
+		"BOOKMARK_DELETE_MULTI_ITEMS": "Delete Selected Items",
+		"BOOKMARK_EDIT": "Edit",
+		"BOOKMARK_EDIT_FOLDER": "Edit Folder",
+		"BOOKMARK_EDIT_LINK": "Edit Link",
+		"BOOKMARK_MANAGED_CREATE": "Add to all workspaces",
+		"BOOKMARK_MANAGED_CREATE_DESC": "Add this to the top of all workspaces, and allow only admins to edit and delete this.",
+		"BOOKMARK_MORE": "More",
+		"BOOKMARK_SELECTED": "{count} selected",
+		"BOOKMARK_TITLE": "Added Link",
+		"BOOKMARK_VIEW_ALL": "View All",
+		"BOOKMARK_WORKSPACE": "This workspace",
+		"CONFIG_RECENT_TITLE": "Recent Visits",
+		"CONFIG_STARRED_ALL": "All",
+		"CONFIG_STARRED_TITLE": "Starred",
+		"COST_SUMMARY_GO_TO_REPORT": "Go to Cost Report",
+		"COST_SUMMARY_RECENT": "Recent Cost Report for {date}",
+		"COST_SUMMARY_TITLE": "Cost Summary",
+		"COST_SUMMARY_TOTAL_SPEND": "Last Month Total Spend:",
+		"EMPTY_LINK": "No Link",
+		"FORM_DESELECT": "Deselect",
+		"FORM_FOLDER": "Folder",
+		"FORM_NAME": "Name",
+		"FORM_NEW_FOLDER": "New Folder",
+		"FORM_SCOPE": "Scope",
+		"INFO_APPS": "apps",
+		"INFO_CREATE_APP": "Create App",
+		"INFO_INVITE_USER": "Invite User",
+		"INFO_USERS": "users",
+		"LEARN_MORE": "Learn more",
+		"NO_ACCOUNT": "No Service Accounts",
+		"NO_ACCOUNT_ADD_NEW": "Add Service Accounts",
+		"NO_ACCOUNT_DESC": "No service account has been added in this workspace.",
+		"NO_COLLECTOR": "No collector has been set up yet",
+		"NO_COLLECTOR_CREATE_NEW": "Create New Collector",
+		"NO_COLLECTOR_DESC": "Create or use suitable collectors to \nstart collecting resources.",
+		"NO_COST_DATA": "No Cost Data",
+		"NO_COST_DATA_DESC": "Cost summary is displayed\nbased on Cost Report.",
+		"NO_STARRED_DESC1": "By starring pages from:",
+		"NO_STARRED_TITLE": "Quickly access your favorite services",
+		"TOGGLE_MORE": "show more",
+		"WELCOME_BUTTON": "Get Started",
+		"WELCOME_DESC": "Connect your relevant cloud accounts to this workspace and start optimizing resource management and cost savings today.",
+		"WELCOME_TITLE": "Welcome",
+		"WELCOME_TITLE_USER_NAME": "Welcome, {user_name} "
+	},
 	"IAM": {
 		"ALT_E_TAG_DUPLICATION": "Duplicated ‘key:value’",
 		"ALT_E_TAG_FORMAT": "Invalid key:value format",
@@ -1801,7 +1873,7 @@
 				"COL_NAME": "Name",
 				"COL_ROLE_ID": "Role ID",
 				"COL_STATE": "State",
-				"COL_TAG": "Tags",
+				"COL_TAG": "Tag",
 				"COL_WORKSPACE_ROLE": "Workspace Owner Role",
 				"CREATE_TITLE": "Create App",
 				"DELETE_DESC": "You cannot undo this action.",
@@ -1994,7 +2066,7 @@
 		"USER": {
 			"ADD": "Add",
 			"FORM": {
-				"ADD_TAG": "Add Tags",
+				"ADD_TAG": "Add Tag",
 				"ADD_WORKSPACE": "New users will have access to",
 				"ADMIN_ROLE_HELP_TEXT": "New users will have comprehensive access to the entire domain, including admin mode and all workspaces with a role",
 				"ALT_E_INVALID_FULL_NAME": "Keep typing a full email.",
@@ -2026,7 +2098,7 @@
 				"ROLE_TITLE": "Invite with a role:",
 				"SELECT_ROLE": "Select a Role",
 				"SELECT_WORKSPACE": "Select one workspace or more",
-				"TAGS": "Tags",
+				"TAGS": "Tag",
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "Already being used.",
@@ -2099,7 +2171,7 @@
 				"ROLE_TYPE": "Role Type",
 				"STATE": "State",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAG": "Tags",
+				"TAG": "Tag",
 				"TIMEZONE": "Time Zone",
 				"TODAY": "Today",
 				"USER_ID": "ID",
@@ -2240,10 +2312,10 @@
 				"SERVICE_ACCOUNT": "Service Account",
 				"TAB_INPUT": "Input Form",
 				"TAB_JSON": "Json Code",
-				"TAG_ADD": "Add Tags",
+				"TAG_ADD": "Add Tag",
 				"TAG_DESC_1": "Set {name}'s tag.",
 				"TAG_DESC_2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
-				"TAG_LABEL": "Tags",
+				"TAG_LABEL": "Tag",
 				"TITLE": "Create {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
@@ -2672,9 +2744,9 @@
 				"CHANGE_PROJECT": "Change Project",
 				"COLLECT_DATA": "Collect Data",
 				"CONSOLE": "Connect to Console",
-				"CUSTOM_TAGS": "Custom Tags",
+				"CUSTOM_TAGS": "Custom Tag",
 				"DELETE": "Delete",
-				"EDIT_CUSTOM_TAGS": "Edit Custom Tags",
+				"EDIT_CUSTOM_TAGS": "Edit Custom Tag",
 				"NO_SELECTED": "Select a cloud service for more details.",
 				"PROVIDER": "Provider",
 				"TAB_DATA": "Data ",
@@ -2773,7 +2845,7 @@
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",
 				"NAME": "Name",
-				"NO_TAG": "No Tags",
+				"NO_TAG": "No Tag",
 				"PAGE_NOTIFICATION": "This collector's settings can only be in admin mode",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
@@ -2870,8 +2942,10 @@
 				"CHANGE_PROJECT": "Change Project",
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Server",
+				"CLEAR": "Clear",
 				"COLLECT_DATA": "Collect Data",
 				"CONSOLE": "Connect to Console",
+				"DEFAULT_FILTER_DESC": "{count} Advanced filters are applied.",
 				"DELETE": "Delete",
 				"NO_SELECTED_SERVER": "Select a server for more details.",
 				"TAB_DETAILS": "Details",
@@ -2966,6 +3040,24 @@
 			}
 		}
 	},
+	"LADING": {
+		"ALL_WORKSPACE": "All Workspaces",
+		"BANNER_DESC": "Would you like to \nCreate a new workspace?",
+		"CREATE": "Create",
+		"CREATE_WORKSPACE": "Create New Workspace",
+		"DESC_ACCESSIBLE_WORKSPACE": "You are accessible to {cnt} workspaces.",
+		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "You have {cnt} workspaces in your domain.",
+		"DESC_CLICK": "Click one to enter.",
+		"DESC_CLICK_OR_CREATE": "Click one to enter or Create a new workspace.",
+		"DESC_CREATE_WORKSPACE": "Create one by clicking the \"Create\" button.",
+		"NOT_FOUND_DESC": "Looks like you don’t have any workspace.",
+		"RECENT": "Recent Visits",
+		"ROLE_TYPE_MEMBER": "Member",
+		"ROLE_TYPE_OWNER": "Owner",
+		"SEARCH_WORKSPACE": "Search Workspaces",
+		"SHOW_ALL": "Show All",
+		"TITLE": "Which Workspace?"
+	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
@@ -3057,7 +3149,6 @@
 		"DASHBOARDS_PROJECT": "Project Dashboard",
 		"DASHBOARDS_WORKSPACE": "Workspace Dashboard",
 		"DISMISS": "Dismiss",
-		"HOME_DASHBOARD": "Home",
 		"INFO": "Info",
 		"INFO_NOTICE": "Notice",
 		"LEARN_MORE": "Learn more",
@@ -3067,7 +3158,8 @@
 		"MY_PAGE_API_KEY": "Access with API & CLI",
 		"MY_PAGE_NOTIFICATIONS": "Notifications Channel",
 		"PROJECT": "Project",
-		"PROVIDER": "Provider"
+		"PROVIDER": "Provider",
+		"WORKSPACE_HOME": "Home"
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "Are you sure remove following member from project? ",
 	"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
@@ -3406,7 +3498,7 @@
 		"CREATED_AT": "First Collected",
 		"DELETED_AT": "Deleted",
 		"FIELD_DESC": {
-			"TAGS": "(Tags)"
+			"TAGS": "(Tag)"
 		},
 		"HARDWARE": "Hardware",
 		"HYPER_THREADING": "Hyper-threading",
@@ -3434,7 +3526,7 @@
 		"SERVER_TYPE": "Server Type",
 		"SERVICE_ACCOUNT": "Service Accounts",
 		"SERVICE_ACCOUNT_TYPE": "Account Type",
-		"TAGS": "Tags",
+		"TAGS": "Tag",
 		"UPDATED_AT": "Updated",
 		"WORKSPACE": "Workspaces"
 	},
@@ -3456,7 +3548,7 @@
 					"PREV": "Prev",
 					"STEP": "Step {step}"
 				},
-				"TAB_ADD_TAG": "Add Tags",
+				"TAB_ADD_TAG": "Add Tag",
 				"TAB_SET_COLLECTOR": "Type Base Information",
 				"TITLE": "Create Collector"
 			},
@@ -3618,7 +3710,19 @@
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "Set Notification Policy",
 				"STEP": "STEP",
 				"TIME": "time | times",
-				"UPDATE": "Update"
+				"UPDATE": "Update",
+				"WEB_HOOK": {
+					"SUCCEED_MODAL": {
+						"COPY_WEBHOOK_URL": "Copy the Webhook URL",
+						"DESC": "Now, Copy the Webhook URL and follow {guide}",
+						"GUIDE": "the Guide",
+						"NAME": "Name",
+						"STATE": "State",
+						"TITLE": "Webhook Successfully Created!",
+						"VERSION": "Version",
+						"WEBHOOK_URL": "Webhook URL"
+					}
+				}
 			},
 			"ALT_E_ACTIVATE_ALERT": "Failed to Activate Alert",
 			"ALT_E_ADD_MEMBER": "Failed to Add Member",
@@ -3648,6 +3752,9 @@
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_TYPE": "Project Access successfully updated ",
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
+			"DASHBOARD": {
+				"DASHBOARD": "Dashboard"
+			},
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
 			"INVITE_ONLY": "Invite only",
@@ -3675,9 +3782,9 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
-				"PRIVATE_MEMBER_DESC": "Only Workspace Owners, Project Group Members & Invited Workspace Members can have access to this project based on the {settings}",
+				"PRIVATE_MEMBER_DESC": "Only people invited can be access to this project based on {settings}",
 				"PROJECT_SETTINGS": "project settings",
-				"PUBLIC_MEMBER_DESC": "Everyone in this workspace can access this project, based on the {settings}",
+				"PUBLIC_MEMBER_DESC": "Everyone at this workspace is considered a member of this project based on {settings}",
 				"REMOVE": "Remove",
 				"ROLE": "Role",
 				"ROLE_HELP_TEXT": "Set a role for selected member",
@@ -3686,7 +3793,7 @@
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"USER_ID": "User ID"
 			},
-			"MEMBER_TITLE": "Member",
+			"MEMBER_TITLE": "Project Member",
 			"MODAL_CREATE_PROJECT_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_PLACEHOLDER": "Project Name",
 			"MODAL_CREATE_PROJECT_TITLE": "Create Project",
@@ -3746,7 +3853,7 @@
 			},
 			"TAB_ALERT": "Alert",
 			"TAB_NOTIFICATIONS": "Notifications",
-			"TAB_PROEJCT_MEMBER": "Project Member",
+			"TAB_PROJECT_MEMBER": "Project Member",
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
 			"TAB_TAG": "Tag",
@@ -3883,6 +3990,7 @@
 				"EDIT": "Edit"
 			},
 			"SEARCH": "Search ",
+			"SEARCH_EMPTY_TEXT": "No results found.\nTry again with different term.",
 			"SEARCH_PROJECT_GROUP": "Project Group",
 			"SERVER": "Server",
 			"SERVICE_ACCOUNTS": "Service Accounts",

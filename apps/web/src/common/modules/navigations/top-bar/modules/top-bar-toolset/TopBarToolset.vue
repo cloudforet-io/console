@@ -76,8 +76,7 @@ const updateOpenedMenu = (menu: string, visible: boolean) => {
                             @update:visible="updateOpenedMenu('notice', $event)"
             />
         </div>
-        <p-tooltip v-if="state.isDomainAdmin"
-                   :contents="state.tooltipTexts.adminToggle"
+        <p-tooltip :contents="state.tooltipTexts.adminToggle"
                    position="bottom"
         >
             <top-bar-admin-toggle-button />

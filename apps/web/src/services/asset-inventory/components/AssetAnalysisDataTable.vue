@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import bytes from 'bytes';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -12,7 +13,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { numberFormatter } from '@cloudforet/utils';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { MetricDataAnalyzeParameters } from '@/schema/inventory/metric-data/api-verbs/analyze';
@@ -33,6 +34,8 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/asset-analysis-type';
 
+
+const UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
 
 const router = useRouter();
 const route = useRoute();
@@ -74,13 +77,20 @@ const state = reactive({
     pageSize: 15,
     more: false,
     metricResourceType: computed<string|undefined>(() => assetAnalysisPageState.metric?.resource_type),
-    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.label_keys.filter((d) => !!d.search_key?.length) ?? []),
+    hasSearchKeyLabelKeys: computed<MetricLabelKey[]>(() => assetAnalysisPageState.metric?.labels_info.filter((d) => !!d.search_key?.length) ?? []),
+    metricAdditionalFilter: computed(() => (assetAnalysisPageState.metric?.query_options?.filter ?? []).map((d) => ({ k: d.key, v: d.value, o: d.operator })) ?? []),
 });
 
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
-        return numberFormatter(value, { notation: 'compact' }) || '--';
+        if (typeof value !== 'number') return 0;
+        const _unit = assetAnalysisPageState.metric?.unit;
+        const _originalVal = bytes.parse(`${value}${_unit}`);
+        if (_unit && UNITS.includes(_unit)) {
+            return byteFormatter(_originalVal);
+        }
+        return numberFormatter(value, { notation: 'compact' }) || 0;
     }
     return assetAnalysisPageGetters.labelKeysReferenceMap?.[field.name]?.[value]?.label || value;
 };
@@ -185,17 +195,30 @@ const handleClickRow = (item) => {
 
     let _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME;
     let _params = {};
+    let apiQuery: {
+        filters: string[],
+        default_filters?: string[],
+    } = {
+        filters: queryHelper.setFilters(_filters).rawQueryStrings,
+    };
+
     if (state.metricResourceType.startsWith('inventory.CloudService:')) {
         const [provider, group, name] = state.metricResourceType.replace('inventory.CloudService:', '').split('.');
         _params = { provider, group, name };
         _routeName = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
+
+        if (state.metricAdditionalFilter.length) {
+            apiQuery = {
+                ...apiQuery,
+                default_filters: state.metricAdditionalFilter.map((d) => JSON.stringify(d)),
+            };
+        }
     }
+
     window.open(router.resolve(getProperRouteLocation({
         name: _routeName,
         params: _params,
-        query: {
-            filters: queryHelper.setFilters(_filters).rawQueryStrings,
-        },
+        query: apiQuery,
     })).href, '_blank');
 };
 

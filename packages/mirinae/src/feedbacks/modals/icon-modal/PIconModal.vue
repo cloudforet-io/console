@@ -21,6 +21,12 @@
                              width="5rem"
                              height="5rem"
                         />
+                        <p-lazy-img v-if="props.imageUrl"
+                                    class="block"
+                                    :src="props.imageUrl"
+                                    width="5rem"
+                                    height="5rem"
+                        />
                         <span v-else-if="props.emoji"
                               class="wave"
                         >{{ props.emoji }}</span>
@@ -33,10 +39,14 @@
                             >
                                 {{ props.headerTitle }}
                             </p>
-                            <span v-if="props.headerDesc"
+                            <span v-if="props.headerDesc || $slots['header-desc']"
                                   class="header-desc"
                             >
-                                {{ props.headerDesc }}
+                                <slot name="header-desc"
+                                      v-bind="{desc: props.headerDesc}"
+                                >
+                                    {{ props.headerDesc }}
+                                </slot>
                             </span>
                         </div>
                         <div class="body-wrapper">
@@ -62,6 +72,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
@@ -74,6 +85,7 @@ interface IconModalProps {
     visible?: boolean;
     iconName?: string;
     iconColor?: string;
+    imageUrl?: string;
     emoji?: string;
     headerTitle?: string;
     headerDesc?: string;
@@ -88,6 +100,7 @@ const props = withDefaults(defineProps<IconModalProps>(), {
     buttonStyleType: BUTTON_STYLE.tertiary,
     backdrop: true,
     iconName: undefined,
+    imageUrl: undefined,
     iconColor: undefined,
     emoji: undefined,
     headerTitle: undefined,

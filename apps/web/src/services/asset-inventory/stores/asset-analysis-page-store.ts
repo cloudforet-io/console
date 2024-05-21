@@ -64,20 +64,20 @@ export const useAssetAnalysisPageStore = defineStore('page-asset-analysis', () =
         namespaceId: computed<string|undefined>(() => state.metric?.namespace_id),
         metrics: computed<MetricReferenceItem[]>(() => Object.values(_state.metrics).filter((metric) => metric.data.namespace_id === getters.namespaceId)),
         refinedMetricLabelKeys: computed<MetricLabelKey[]>(() => {
-            if (!state.metric?.label_keys?.length) return [];
+            if (!state.metric?.labels_info?.length) return [];
             if (_state.isAdminMode) {
-                return state.metric.label_keys;
+                return state.metric.labels_info;
             }
-            return state.metric.label_keys.filter((d) => d.key !== 'workspace_id');
+            return state.metric.labels_info.filter((d) => d.key !== 'workspace_id');
         }),
         defaultMetricGroupByList: computed<string[]>(() => {
-            const defaultLabelKeys = state.metric?.label_keys?.filter((d) => d.default) ?? [];
+            const defaultLabelKeys = state.metric?.labels_info?.filter((d) => d.default) ?? [];
             return defaultLabelKeys.map((d) => d.key);
         }),
         // below is the map of reference store for each reference label key
         labelKeysReferenceMap: computed<Record<string, ReferenceMap>>(() => {
             const _labelKeysMap: Record<string, MetricLabelKey> = {}; // e.g. [{ 'Region': {...} }, { 'project_id': {...} }]
-            state.metric?.label_keys.filter((d) => !isEmpty(d.reference)).forEach((d) => {
+            state.metric?.label_keys?.filter((d) => !isEmpty(d.reference)).forEach((d) => {
                 const _fieldName = d.key.replace('labels.', '');
                 _labelKeysMap[_fieldName] = d;
             });

@@ -10,8 +10,10 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectType } from '@/schema/identity/project/type';
 // eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
+
 
 import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
@@ -28,6 +30,7 @@ interface ProjectResourceItemData {
         name: string;
     };
     users: string[];
+    projectType: ProjectType;
 }
 export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
@@ -89,7 +92,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
 
         const params: ProjectListParameters = {
             query: {
-                only: ['project_id', 'name', 'project_group_id', 'users'],
+                only: ['project_id', 'name', 'project_group_id', 'users', 'project_type'],
             },
         };
         const res = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
@@ -112,6 +115,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                         name: projectGroup.name,
                     } : undefined,
                     users: projectInfo.users || [],
+                    projectType: projectInfo.project_type,
                 },
             };
         });
@@ -135,6 +139,7 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
                         name: projectGroup.name,
                     } : undefined,
                     users: project.users || [],
+                    projectType: project.project_type,
                 },
             },
         };

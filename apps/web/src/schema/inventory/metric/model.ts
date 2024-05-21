@@ -7,11 +7,11 @@ export interface MetricModel {
     name: string;
     metric_type: MetricType;
     resource_type: string;
-    query_options: object;
+    query_options: Record<string, any>;
     date_field: string;
     unit: string;
     tags: Tags;
-    label_keys: MetricLabelKey[];
+    labels_info: MetricLabelKey[];
     is_managed: boolean;
     namespace_id: string;
     domain_id: string;

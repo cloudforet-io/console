@@ -164,7 +164,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                     />
                     <img v-if="storeState.selectedNamespace?.category === 'COMMON'"
                          class="namespace-image"
-                         :src="storeState.selectedNamespace?.icon"
+                         src="@/assets/images/img_common-asset@2x.png"
                          alt="common-namespace-image"
                     >
                     <p-lazy-img v-else
@@ -210,6 +210,13 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
             >
                 <span>
                     {{ $t('INVENTORY.ASSET_ANALYSIS.EMPTY_TEXT') }}
+                </span>
+            </p-empty>
+            <p-empty v-else-if="!state.inputValue && !state.metricItems.length"
+                     class="keyword-search-empty"
+            >
+                <span>
+                    {{ $t('INVENTORY.ASSET_ANALYSIS.NO_ITEMS') }}
                 </span>
             </p-empty>
         </div>

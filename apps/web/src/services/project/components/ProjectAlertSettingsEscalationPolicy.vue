@@ -71,12 +71,12 @@ const state = reactive({
         const escalationPolicyId: string|undefined = get(props.escalationPolicy, 'escalation_policy_id');
         if (!escalationPolicyId) return undefined;
         filters.push({ k: 'escalation_policy_id', o: '=', v: escalationPolicyId });
-        return {
+        return getProperRouteLocation({
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
             query: {
                 filters: queryHelper.setFilters(filters).rawQueryStrings,
             },
-        };
+        });
     }),
 });
 
@@ -119,7 +119,7 @@ onActivated(async () => {
             <p-link class="value"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="getProperRouteLocation(state.escalationPolicyLink)"
+                    :to="state.escalationPolicyLink"
                     highlight
             >
                 {{ state.escalationPolicyName }}

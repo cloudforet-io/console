@@ -17,13 +17,13 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import type { ReferenceData } from '@/lib/helper/config-data-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import type { FavoriteType } from '@/common/modules/favorites/favorite-button/type';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 
 const favoriteListApiQuery = new ApiQueryHelper().setSort('updated_at', true);
 
 interface FavoriteState {
     favoriteMenuList: UserConfigModel[];
+    favoriteWorkspaceMenuList: UserConfigModel[];
     total_count: number;
 }
 
@@ -36,7 +36,8 @@ export const useFavoriteStore = defineStore('favorite', () => {
     });
 
     const state = reactive<FavoriteState>({
-        favoriteMenuList: [] as UserConfigModel[],
+        favoriteMenuList: [] as UserConfigModel<ReferenceData>[],
+        favoriteWorkspaceMenuList: [] as UserConfigModel<ReferenceData>[],
         total_count: 0,
     });
 
@@ -51,17 +52,18 @@ export const useFavoriteStore = defineStore('favorite', () => {
         dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.DASHBOARD)),
         costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.COST_ANALYSIS)),
         securityItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.SECURITY)),
+        workspaceItems: computed(() => state.favoriteWorkspaceMenuList.map((item) => item.data)),
     });
 
     const actions = {
         fetchFavorite: async () => {
             favoriteListApiQuery.setFilters([
-                { k: 'name', v: 'console:favorite:', o: '' },
-                { k: 'data.workspaceId', v: _getters.currentWorkspaceId, o: '=' },
                 { k: 'user_id', v: _getters.userId, o: '=' },
+                { k: 'name', v: 'console:favorite:', o: '' },
+                { k: 'data.workspaceId', v: _getters.currentWorkspaceId || '', o: '=' },
             ]);
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
+                const { results, total_count } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<ReferenceData>>>({
                     query: favoriteListApiQuery.data,
                 });
                 state.favoriteMenuList = results ?? [];
@@ -69,33 +71,51 @@ export const useFavoriteStore = defineStore('favorite', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.favoriteMenuList = [];
-                return [];
             }
-            return state.favoriteMenuList;
+        },
+        fetchWorkspaceFavorite: async () => {
+            favoriteListApiQuery.setFilters([
+                { k: 'user_id', v: _getters.userId, o: '=' },
+                { k: 'name', v: `console:favorite:${FAVORITE_TYPE.WORKSPACE}`, o: '' },
+            ]);
+            try {
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<ReferenceData>>>({
+                    query: favoriteListApiQuery.data,
+                });
+                state.favoriteWorkspaceMenuList = results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.favoriteWorkspaceMenuList = [];
+            }
         },
         createFavorite: async (param: ReferenceData) => {
             const { itemType, workspaceId, itemId } = param;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
-                    name: `console:favorite:${itemType}:${workspaceId}:${itemId}`,
+                    name: itemType === FAVORITE_TYPE.WORKSPACE
+                        ? `console:favorite:${itemType}:${itemId}`
+                        : `console:favorite:${itemType}:${workspaceId}:${itemId}`,
                     data: {
                         ...param,
                         type: 'item',
                     },
                 });
                 await actions.fetchFavorite();
+                if (itemType === FAVORITE_TYPE.WORKSPACE) await actions.fetchWorkspaceFavorite();
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
-        deleteFavorite: async ({
-            itemType, workspaceId, itemId,
-        }:{itemType: FavoriteType, workspaceId:string, itemId:string}) => {
+        deleteFavorite: async (param: ReferenceData) => {
+            const { itemType, workspaceId, itemId } = param;
             try {
                 await SpaceConnector.clientV2.config.userConfig.delete<UserConfigDeleteParameters>({
-                    name: `console:favorite:${itemType}:${workspaceId}:${itemId}`,
+                    name: itemType === FAVORITE_TYPE.WORKSPACE
+                        ? `console:favorite:${itemType}:${itemId}`
+                        : `console:favorite:${itemType}:${workspaceId}:${itemId}`,
                 });
                 await actions.fetchFavorite();
+                if (itemType === FAVORITE_TYPE.WORKSPACE) await actions.fetchWorkspaceFavorite();
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

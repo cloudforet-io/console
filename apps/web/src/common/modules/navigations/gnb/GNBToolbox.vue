@@ -54,7 +54,7 @@ const state = reactive({
         let routes: Breadcrumb[] = [];
         if (!storeState.isAdminMode) {
             routes.push({
-                name: i18n.t('MENU.HOME_DASHBOARD'),
+                name: i18n.t('MENU.WORKSPACE_HOME'),
                 to: {
                     name: ROOT_ROUTE.WORKSPACE._NAME,
                     params: {
@@ -72,7 +72,7 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
         return targetMenuId;
     }),
     currentMenuId: computed(() => route.matched[route.matched.length - 1].meta?.menuId),
@@ -106,12 +106,15 @@ watch(() => state.selectedMenuId, async (selectedMenuId) => {
     await gnbStore.setFavoriteItemId(state.favoriteOptions);
 }, { immediate: true });
 watch(() => state.currentMenuId, async () => {
-    if (state.selectedMenuId === MENU_ID.COST_ANALYSIS || state.selectedMenuId === MENU_ID.SECURITY) return;
-    await Promise.all([
-        gnbStore.setFavoriteItemId(state.favoriteOptions),
-        gnbStore.fetchMetricExample(),
-        gnbStore.fetchCostQuerySet(),
-    ]);
+    if (state.selectedMenuId === MENU_ID.SECURITY) return;
+
+    await gnbStore.setFavoriteItemId(state.favoriteOptions);
+
+    if (state.selectedMenuId === MENU_ID.ASSET_ANALYSIS) {
+        await gnbStore.fetchMetricExample();
+    } else if (state.selectedMenuId === MENU_ID.COST_ANALYSIS) {
+        await gnbStore.fetchCostQuerySet();
+    }
 }, { immediate: true });
 </script>
 
@@ -134,7 +137,7 @@ watch(() => state.currentMenuId, async () => {
                            @click="handleClickBreadcrumbsItem"
                            @click-dropdown-menu-item="handleClickBreadcrumbsDropdownItem"
             />
-            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.HOME_DASHBOARD"
+            <favorite-button v-if="state.routes.length > 0 && !isEmpty(gnbGetters.favoriteItem) && state.currentMenuId !== MENU_ID.WORKSPACE_HOME"
                              :item-id="gnbGetters.favoriteItem.id || ''"
                              :favorite-type="gnbGetters.favoriteItem.type || ''"
                              scale="0.8"

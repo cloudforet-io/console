@@ -112,13 +112,13 @@ const handleConfirm = async () => {
                     theme: state.selectedTheme ?? 'blue',
                 },
             });
-            await userWorkspaceStore.load();
             showSuccessMessage(i18n.t('Workspace successfully created'), '');
             emit('confirm', {
                 id: response.workspace_id,
                 name: response.name,
             });
         }
+        await userWorkspaceStore.load();
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -187,7 +187,7 @@ watch(() => props.visible, (visible) => {
             </p-field-group>
         </template>
         <template #confirm-button>
-            <span>{{ $t('IAM.WORKSPACES.CREATE') }}</span>
+            <span v-if="props.createType === 'CREATE'">{{ $t('IAM.WORKSPACES.CREATE') }}</span>
         </template>
     </p-button-modal>
 </template>

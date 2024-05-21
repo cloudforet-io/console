@@ -1,22 +1,27 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { useElementSize } from '@vueuse/core';
+import type { Ref } from 'vue';
+import {
+    computed, reactive, ref,
+} from 'vue';
 import type { Location } from 'vue-router';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PLazyImg, PTooltip } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import type { MenuId } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import type { LSBMenu, LSBIcon } from '@/common/modules/navigations/lsb/type';
+import type { LSBIcon, LSBItem } from '@/common/modules/navigations/lsb/type';
 
 interface Props {
-    item: LSBMenu;
-    depth?: number;
+    item: LSBItem;
     isAdminMode?: boolean;
     idx?: number | string;
     currentPath?: string;
@@ -25,14 +30,21 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const itemEl = ref<HTMLElement | null>(null);
+const textEL = ref<HTMLElement | null>(null);
+
 const state = reactive({
-    hoveredItem: '',
+    itemWidth: computed<Ref<number>>(() => useElementSize(itemEl.value).width),
+    textWidth: computed<Ref<number>>(() => useElementSize(textEL.value).width),
+    hoveredItem: '' as MenuId | string,
+    isEllipsis: computed<boolean>(() => state.hoveredItem === props.item.id && (state.itemWidth.value - 20 === state.textWidth.value)),
 });
 
-const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
-const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
+const getIsHovered = (itemId?: MenuId | string) => state.hoveredItem && state.hoveredItem === itemId;
+const isSelectedMenu = (selectedMenuRoute?: Location): boolean => {
     let currentPath = props.currentPath;
-    if (!currentPath) return false;
+    if (!currentPath || !selectedMenuRoute) return false;
 
     const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
     if (!resolved) return false;
@@ -47,12 +59,12 @@ const getIconName = (icon: LSBIcon): string => {
     if (typeof icon === 'string') return icon;
     return icon.name;
 };
-
 </script>
 
 <template>
-    <router-link class="l-s-b-router-menu-item "
-                 :class="[{'second-depth': depth === 2, 'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
+    <router-link ref="itemEl"
+                 class="l-s-b-router-menu-item "
+                 :class="[{'selected': isSelectedMenu(item.to), 'is-hide-favorite': props.isHideFavorite}]"
                  :target="openNewTab ? '_blank' : '_self'"
                  :to="item.to"
                  @click.native="$event.stopImmediatePropagation()"
@@ -62,17 +74,34 @@ const getIconName = (icon: LSBIcon): string => {
         <slot name="before-text"
               v-bind="{...props, item, index: idx}"
         />
-        <div class="text-wrapper">
+        <div ref="textEL"
+             class="text-wrapper"
+        >
             <p-i v-if="item.icon"
                  :name="getIconName(item.icon)"
-                 :color="item.icon.color"
+                 :color="item.icon?.color"
                  width="1rem"
                  height="1rem"
                  class="icon"
             />
-            <span class="text">
-                <slot name="text">{{ item.label }}</slot>
-            </span>
+            <p-lazy-img
+                v-if="item.imgIcon"
+                :src="assetUrlConverter(item.imgIcon)"
+                width="1rem"
+                height="1rem"
+                class="icon"
+            />
+            <slot>
+                <div class="text">
+                    <p-tooltip v-if="state.isEllipsis"
+                               position="bottom-start"
+                               :contents="item.label"
+                    >
+                        {{ item.label }}
+                    </p-tooltip>
+                    <span v-else>{{ item.label }}</span>
+                </div>
+            </slot>
             <slot name="after-text"
                   v-bind="{...props, item, index: idx}"
             />
@@ -108,9 +137,6 @@ const getIconName = (icon: LSBIcon): string => {
     outline: 0;
     height: 2rem;
 
-    &.second-depth {
-        padding-left: 1.25rem;
-    }
     &:focus, &:focus-within, &:active {
         @apply bg-white border-secondary1;
         box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);

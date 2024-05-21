@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PI, screens, PButton, PTextButton, PTooltip,
 } from '@spaceone/design-system';
 import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
-import { clone } from 'lodash';
+import { clone, isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
-// import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -23,11 +24,10 @@ import { MENU_ID } from '@/lib/menu/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import UpdateMark from '@/common/components/marks/UpdateMark.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
-// import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 interface GNBMenuType extends DisplayMenu {
     type: string;
@@ -35,34 +35,40 @@ interface GNBMenuType extends DisplayMenu {
     disabled?: boolean;
 }
 
+const allReferenceStore = useAllReferenceStore();
+const allReferenceGetters = allReferenceStore.getters;
+const { getProperRouteLocation } = useProperRouteLocation();
 const gnbStore = useGnbStore();
 const gnbGetters = gnbStore.getters;
+const userWorkspaceStore = useUserWorkspaceStore();
+const userWorkspaceGetters = userWorkspaceStore.getters;
 
 const route = useRoute();
 const router = useRouter();
 const { width } = useWindowSize();
 
-
 const storeState = reactive({
     isHideNavRail: computed(() => gnbGetters.isHideNavRail),
     isMinimizeNavRail: computed(() => gnbGetters.isMinimizeNavRail),
+    currentWorkspaceId: computed(() => userWorkspaceGetters.currentWorkspaceId),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceGetters.costDataSource),
 });
 const state = reactive({
+    isInit: false as boolean|undefined,
     isHovered: false,
-    dataSource: [] as CostDataSourceModel[],
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     isMenuDescription: undefined as boolean | undefined,
-    gnbMenuList: computed<GNBMenuType[]>(() => {
+    gnbMenuList: computed<GNBMenuType[]|undefined>(() => {
         let results = [] as GNBMenuType[];
         const menuList = [...store.getters['display/GNBMenuList']];
-        if (state.dataSource.length === 0) {
+        if (state.isInit && isEmpty(storeState.costDataSource)) {
             results = refinedMenuList(menuList, MENU_ID.COST_EXPLORER);
         } else results = menuList;
         return results;
     }),
     visibleGnbMenuList: computed<GNBMenuType[]>(() => {
         let result = [] as GNBMenuType[];
-        state.gnbMenuList.forEach((menu) => {
+        state.gnbMenuList?.forEach((menu) => {
             result = [
                 ...result,
                 {
@@ -80,7 +86,7 @@ const state = reactive({
     selectedMenuId: computed(() => {
         const reversedMatched = clone(route.matched).reverse();
         const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
-        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
+        const targetMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.WORKSPACE_HOME;
         if (route.name === COST_EXPLORER_ROUTE.LANDING._NAME) {
             return '';
         }
@@ -95,9 +101,9 @@ const handleMouseEvent = (value: boolean) => {
 const handleMenuDescription = (value?: boolean) => {
     state.isMenuDescription = value;
     if (value) {
-        router.push({
+        router.push(getProperRouteLocation({
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
-        });
+        }));
     }
 };
 const handleMinimizedGnbRail = () => {
@@ -109,14 +115,6 @@ const convertGNBMenuToMenuItem = (menuList: DisplayMenu[], menuType: ContextMenu
     type: menuType,
     disabled: menuType === 'header' && menu.id.includes('cost'),
 }));
-const getDataSource = async () => {
-    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list({
-        query: {
-            sort: [{ key: 'workspace_id', desc: false }],
-        },
-    });
-    state.dataSource = response?.results || [];
-};
 const refinedMenuList = (list, value) => {
     const index = list.findIndex((d) => d.id === value);
     if (index !== -1) {
@@ -130,9 +128,9 @@ const refinedMenuList = (list, value) => {
     return list;
 };
 
-(async () => {
-    await getDataSource();
-})();
+onMounted(async () => {
+    state.isInit = true;
+});
 </script>
 
 <template>
@@ -181,7 +179,7 @@ const refinedMenuList = (list, value) => {
                         >
                             {{ item.label }}
                         </span>
-                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeNavRail"
+                        <p-button v-if="item.disabled && !state.isMenuDescription"
                                   icon-right="ic_arrow-right"
                                   style-type="tertiary"
                                   size="sm"
@@ -356,6 +354,9 @@ const refinedMenuList = (list, value) => {
         }
         .service-menu {
             width: 2.25rem;
+            .learn-more-button {
+                @apply hidden;
+            }
             &:hover:not(.is-only-label) {
                 @apply bg-violet-200;
             }
@@ -372,6 +373,9 @@ const refinedMenuList = (list, value) => {
             }
             .service-menu {
                 width: 100%;
+                .learn-more-button {
+                    @apply block;
+                }
                 &:hover:not(.is-only-label) {
                     @apply bg-violet-100;
                 }
@@ -379,6 +383,12 @@ const refinedMenuList = (list, value) => {
                     @apply bg-violet-100;
                 }
             }
+            .menu-description {
+                @apply flex;
+            }
+        }
+        .menu-description {
+            @apply hidden;
         }
     }
     .menu-description {

@@ -8,6 +8,8 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { isEmpty } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
@@ -26,8 +28,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray, indigo } from '@/styles/colors';
 
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-
 
 interface Props {
     visible?: boolean;
@@ -45,7 +45,6 @@ const emit = defineEmits<{(e: 'confirm', project?: ProjectModel): void;
 
 const router = useRouter();
 const projectStore = useProjectReferenceStore();
-const projectPageStore = useProjectPageStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     projectNames: [] as string[],
@@ -65,6 +64,7 @@ const state = reactive({
     ])),
     selectedAccess: 'PRIVATE' as ProjectType,
     loading: false,
+    isConfirmed: false,
 });
 const {
     forms: { projectName },
@@ -76,6 +76,7 @@ const {
     projectName: undefined as string|undefined,
 }, {
     projectName: (val: string) => {
+        if (state.isConfirmed) return true;
         if (!val?.length) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
         if (val.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
         if (state.projectNames.includes(val)) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
@@ -92,9 +93,11 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
             project_type: state.selectedAccess,
         };
         if (props.projectGroupId) params.project_group_id = props.projectGroupId;
-        const createdProject: ProjectModel = await projectPageStore.createProject(params);
+        const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
+            ...params,
+        });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
-        return createdProject;
+        return res;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
         return undefined;
@@ -103,28 +106,35 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
     }
 };
 const updateProject = async (): Promise<ProjectModel|undefined> => {
+    state.loading = true;
     try {
         const params: ProjectUpdateParameters = {
-            project_id: props.project.project_id || router.currentRoute.params.id,
+            project_id: props.project?.project_id || router.currentRoute.params.id,
             name: projectName.value?.trim() as string,
         };
-        const updatedProject = await projectPageStore.updateProject(params);
+        const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
+            ...params,
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
-        return updatedProject;
+        return res;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
         return undefined;
+    } finally {
+        state.loading = false;
     }
 };
 const updateProjectType = async (): Promise<ProjectModel|undefined> => {
     try {
         const params: ProjectUpdateProjectTypeParameters = {
-            project_id: props.project.project_id || router.currentRoute.params.id,
+            project_id: props.project?.project_id || router.currentRoute.params.id,
             project_type: state.selectedAccess,
         };
-        const updatedProject = await projectPageStore.updateProjectType(params);
+        const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
+            ...params,
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
-        return updatedProject;
+        return res;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
         return undefined;
@@ -135,6 +145,8 @@ const updateProjectType = async (): Promise<ProjectModel|undefined> => {
 const confirm = async () => {
     if (state.loading) return;
     if (!isAllValid.value) return;
+
+    state.isConfirmed = true;
 
     if (props.project) { // update project
         const updatedProject1 = await updateProject();
@@ -158,6 +170,10 @@ const handleSelectAccess = (selectedAccess: ProjectType) => {
     state.selectedAccess = selectedAccess;
 };
 
+watch(() => state.proxyVisible, (visible) => {
+    if (!visible) return;
+    state.isConfirmed = false;
+}, { immediate: true });
 watch(() => props.project, async (project) => {
     if (project) {
         setForm('projectName', project?.name);

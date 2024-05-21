@@ -3,7 +3,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 export const MENU_LIST: Menu[] = [
     {
-        id: MENU_ID.HOME_DASHBOARD,
+        id: MENU_ID.WORKSPACE_HOME,
         needPermissionByRole: true,
     },
     {
@@ -71,7 +71,7 @@ export const MENU_LIST: Menu[] = [
 export const ADMIN_MENU_LIST: Menu[] = [
     // HACK: hide for now
     // {
-    //     id: MENU_ID.HOME_DASHBOARD,
+    //     id: MENU_ID.WORKSPACE_HOME,
     // },
     {
         id: MENU_ID.DASHBOARDS,

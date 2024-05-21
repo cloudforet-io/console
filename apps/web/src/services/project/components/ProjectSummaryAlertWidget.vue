@@ -93,7 +93,7 @@ const state = reactive({
 
 /* util */
 const alertLinkFormatter = (alertState): Location => ({
-    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+    name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
     query: {
         state: alertState,
     } as AlertListPageUrlQuery,

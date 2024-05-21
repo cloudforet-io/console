@@ -11,6 +11,8 @@ export const RECENT_TYPE = {
     CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     COST_ANALYSIS: 'COST_ANALYSIS',
     ASSET_ANALYSIS: 'ASSET_ANALYSIS',
+    SECURITY: 'SECURITY',
+    WORKSPACE: 'WORKSPACE',
 } as const;
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 export const recentNSearchTabMap = {
@@ -24,6 +26,12 @@ export const recentNSearchTabMap = {
     costAnalysis: RECENT_TYPE.COST_ANALYSIS,
     assetAnalysis: RECENT_TYPE.ASSET_ANALYSIS,
 } as const;
+
+export interface RecentConfig {
+    itemType: RecentType;
+    workspaceId: string;
+    itemId: string;
+}
 
 export type RecentItem = UserConfigModel<{
     id: string;

@@ -6,7 +6,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip,
+    PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import { isEmpty } from 'lodash';
@@ -38,8 +38,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { useAssetAnalysisPageStore } from '@/services/asset-inventory/stores/asset-analysis-page-store';
 import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import type { NamespaceSubItemType } from '@/services/asset-inventory/types/asset-analysis-type';
-
-const COMMON_NAMESPACE_ICON_PATH = '/src/assets/images/img_common-asset.svg';
 
 const lsbRef = ref<HTMLElement|null>(null);
 const { width: lsbWidth } = useElementSize(lsbRef);
@@ -77,9 +75,9 @@ const state = reactive({
     menuSet: computed(() => {
         const baseMenuSet = [
             {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: i18n.t('COMMON.STARRED'),
-                id: 'starred',
+                type: MENU_ITEM_TYPE.STARRED,
+                childItems: state.starredMenuSet,
+                currentPath: state.currentPath,
             },
             {
                 type: MENU_ITEM_TYPE.DIVIDER,
@@ -191,13 +189,13 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
         label: namespace.name,
         name: namespace.key,
         category: namespace.data.category || 'COMMON',
-        icon: COMMON_NAMESPACE_ICON_PATH,
+        icon: 'COMMON',
     }));
     if (commonNamespaces.length === 0) return [];
     return [{
         type: MENU_ITEM_TYPE.COLLAPSIBLE,
         label: i18n.t('INVENTORY.ASSET_ANALYSIS.COMMON'),
-        icon: COMMON_NAMESPACE_ICON_PATH,
+        icon: 'COMMON',
         subItems: commonNamespaces,
     }];
 };
@@ -262,7 +260,7 @@ watch(() => route.params, async () => {
             name: namespaceState.selectedMetric.data.namespace_id,
             provider: targetNamespace?.provider,
             category: targetNamespace.data.category,
-            icon: targetNamespace.data.category === 'COMMON' ? COMMON_NAMESPACE_ICON_PATH : targetNamespace.data.icon,
+            icon: targetNamespace.data.category === 'COMMON' ? 'COMMON' : targetNamespace.data.icon,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
@@ -334,6 +332,19 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                                      :item="item"
                                                      is-sub-item
                         >
+                            <template #left-image>
+                                <img v-if="item.icon === 'COMMON'"
+                                     class="title-image"
+                                     src="@/assets/images/img_common-asset@2x.png"
+                                     alt="common-namespace-image"
+                                >
+                                <p-lazy-img v-else
+                                            class="title-image"
+                                            :src="item.icon"
+                                            width="1rem"
+                                            height="1rem"
+                                />
+                            </template>
                             <template #collapsible-contents="{ item: _item }">
                                 <div v-for="(_menu, _idx) in _item.subItems"
                                      :key="`${_menu.label}-${_idx}`"
@@ -429,6 +440,11 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
 
             .category-menu-item {
                 padding: 0 0.25rem;
+                .title-image {
+                    width: 1rem;
+                    height: 1rem;
+                    min-width: 1rem;
+                }
                 .namespace-menu-item {
                     @apply inline-flex items-center w-full text-gray-800;
                     height: 2rem;

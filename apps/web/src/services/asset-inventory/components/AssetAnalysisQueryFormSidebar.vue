@@ -157,10 +157,8 @@ const handleSaveCustomMetric = async () => {
 
 watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        if (assetAnalysisPageState.metricQueryFormMode === 'UPDATE') {
-            setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
-            setForm('unit', assetAnalysisPageState.metric?.unit);
-        }
+        setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
+        setForm('unit', assetAnalysisPageState.metric?.unit);
     } else {
         initForm();
     }

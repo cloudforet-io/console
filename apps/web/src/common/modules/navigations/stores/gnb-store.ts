@@ -64,7 +64,7 @@ export const useGnbStore = defineStore('gnb', () => {
         isMinimizeNavRail: computed<boolean|undefined>(() => state.isMinimizeNavRail),
     });
 
-    const actions = {
+    const mutations = {
         setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => {
             state.breadcrumbs = breadcrumbs;
         },
@@ -77,6 +77,9 @@ export const useGnbStore = defineStore('gnb', () => {
         setFavoriteItemId: (favoriteItem?: FavoriteOptions) => {
             state.favoriteItem = favoriteItem;
         },
+    };
+
+    const actions = {
         fetchNavRailStatus: async () => {
             try {
                 const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
@@ -91,23 +94,23 @@ export const useGnbStore = defineStore('gnb', () => {
             }
         },
         createMinimizeNavRail: async (isMinimizeNavRail?: boolean) => {
-            state.isMinimizeNavRail = isMinimizeNavRail;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: 'console:gnb:navRail',
                     data: { isMinimizeNavRail },
                 });
+                state.isMinimizeNavRail = isMinimizeNavRail;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
         createHideNavRail: async (isHideNavRail?: boolean) => {
-            state.isHideNavRail = isHideNavRail;
             try {
                 await SpaceConnector.clientV2.config.userConfig.set({
                     name: 'console:gnb:navRail',
                     data: { isHideNavRail },
                 });
+                state.isHideNavRail = isHideNavRail;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -163,6 +166,7 @@ export const useGnbStore = defineStore('gnb', () => {
     return {
         state,
         getters,
+        ...mutations,
         ...actions,
     };
 });

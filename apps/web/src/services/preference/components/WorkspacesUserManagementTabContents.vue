@@ -2,9 +2,10 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PStatus, PToolboxTable, PHeading, PTooltip,
+    PStatus, PToolboxTable, PHeading, PTooltip, PButton,
 } from '@spaceone/design-system';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -12,17 +13,22 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
     calculateTime, userStateFormatter, useRoleFormatter,
 } from '@/services/iam/composables/refined-table-data';
 import { USER_STATE } from '@/services/iam/constants/user-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/preference/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
+
+const router = useRouter();
 
 const workspaceUserListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspacePageState.usersPageStart).setPageLimit(workspacePageState.usersPageLimit)
@@ -31,8 +37,11 @@ let workspaceUserListApiQuery = workspaceUserListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: WORKSPACES_USER_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const storeState = reactive({
+    currentWorkspace: computed(() => workspacePageStore.selectedWorkspaces[0]),
+});
 const state = reactive({
-    currentWorkspaceId: computed(() => workspacePageStore.selectedWorkspaces[0]?.workspace_id),
+    currentWorkspaceId: computed(() => storeState.currentWorkspace?.workspace_id),
     refinedUserItems: computed(() => workspacePageState.workspaceUsers.map((user) => ({
         ...user,
         role: workspacePageStore.roleMap[workspacePageStore.roleBindingMap[user.role_binding_info.role_binding_id].role_id],
@@ -81,6 +90,9 @@ const handleChange = async (options: any = {}) => {
         query: workspaceUserListApiQuery,
     });
 };
+const handleClickButton = () => {
+    window.open(router.resolve({ name: makeAdminRouteName(IAM_ROUTE.USER._NAME) }).href, '_blank');
+};
 
 watch(() => workspacePageStore.selectedWorkspaces, async () => {
     await handleChange();
@@ -94,7 +106,18 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
                    use-total-count
                    heading-type="sub"
                    :total-count="workspacePageState.usersTotalCount"
-        />
+        >
+            <template #extra>
+                <div class="heading-toolset">
+                    <p-button style-type="tertiary"
+                              icon-left="ic_settings"
+                              @click="handleClickButton"
+                    >
+                        {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-heading>
         <p-toolbox-table
             class="workspace-user-management-table"
             search-type="query"
@@ -151,6 +174,10 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
 
 <style lang="postcss" scoped>
 .workspace-user-management-tab-contents {
+    .heading-toolset {
+        @apply flex;
+        gap: 0.5rem;
+    }
     .workspace-user-management-table {
         @apply border-0;
     }
