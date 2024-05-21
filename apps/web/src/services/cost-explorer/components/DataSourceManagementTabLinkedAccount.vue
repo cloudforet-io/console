@@ -2,6 +2,7 @@
 import {
     computed, onMounted, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PHeading,
@@ -9,6 +10,10 @@ import {
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { i18n } from '@/translations';
+
+import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DataSourceManagementModal from '@/services/cost-explorer/components/DataSourceManagementModal.vue';
 import DataSourceManagementTabLinkedAccountTable
@@ -24,21 +29,55 @@ const listApiQueryHelper = new ApiQueryHelper();
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
-    selectedDataSourceIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
-    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
-    totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
-    selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
     modalVisible: computed<boolean>(() => dataSourcesPageState.modal.visible),
-    linkedAccountsPageStart: computed<number>(() => dataSourcesPageState.linkedAccountsPageStart),
-    linkedAccountsPageLimit: computed<number>(() => dataSourcesPageState.linkedAccountsPageLimit),
-    linkedAccountsSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.linkedAccountsSearchFilters),
+    type: computed<CostLinkedAccountModalType|undefined>(() => dataSourcesPageState.modal.type),
+
     dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
     dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
     dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
+    selectedDataSourceIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
+    selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
+
+    selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
+    linkedAccountsTotalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
+    linkedAccountsPageStart: computed<number>(() => dataSourcesPageState.linkedAccountsPageStart),
+    linkedAccountsPageLimit: computed<number>(() => dataSourcesPageState.linkedAccountsPageLimit),
+    linkedAccountsSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.linkedAccountsSearchFilters),
+});
+const state = reactive({
+    loadingMessage: computed<TranslateResult>(() => {
+        if (storeState.type === 'RESET') {
+            return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESETTING');
+        }
+        return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
+    }),
 });
 
 const handleClickAction = (action: CostLinkedAccountModalType) => {
     dataSourcesPageStore.setModal(true, action);
+};
+const handleConfirmModal = async (promises: Promise<void>[]) => {
+    const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
+
+    const delayHideLoadingMessage = new Promise((resolve) => {
+        setTimeout(resolve, 1500);
+    });
+
+    await Promise.all([Promise.allSettled(promises), delayHideLoadingMessage]);
+
+    hideLoadingMessage(loadingMessageId);
+
+    if (storeState.type === 'RESET') {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
+    } else {
+        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
+    }
+
+    await new Promise((resolve) => {
+        setTimeout(resolve, 500);
+    });
+
+    await fetchLinkedAccountList();
 };
 
 const fetchLinkedAccountList = async () => {
@@ -80,7 +119,7 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
                    use-selected-count
                    :selected-count="storeState.selectedLinkedAccountsIndices.length"
                    :title="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.TAB_LINKED_ACCOUNT_TITLE')"
-                   :total-count="storeState.totalCount"
+                   :total-count="storeState.linkedAccountsTotalCount"
                    class="title"
         >
             <template #extra>
@@ -101,7 +140,9 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
             </template>
         </p-heading>
         <data-source-management-tab-linked-account-table @confirm="fetchLinkedAccountList" />
-        <data-source-management-modal @confirm="fetchLinkedAccountList" />
+        <data-source-management-modal v-if="storeState.modalVisible"
+                                      @confirm="handleConfirmModal"
+        />
     </div>
 </template>
 

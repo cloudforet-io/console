@@ -16,8 +16,6 @@ import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
-import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
@@ -32,7 +30,7 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', promises: Promise<void>[]): void; }>();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -51,12 +49,6 @@ const state = reactive({
         }
         return '';
     }),
-    loadingMessage: computed<TranslateResult>(() => {
-        if (storeState.type === 'RESET') {
-            return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESETTING');
-        }
-        return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
-    }),
 });
 const dropdownState = reactive({
     visible: false,
@@ -66,7 +58,7 @@ const dropdownState = reactive({
     menu: computed(() => storeState.workspaceList.map((i) => ({ label: i.name, name: i.workspace_id }))),
 });
 
-const handleConfirm = async () => {
+const handleConfirm = () => {
     const promises = storeState.selectedLinkedAccountsIndices.map((idx) => {
         const item = storeState.linkedAccounts[idx];
         const defaultParams = {
@@ -82,32 +74,8 @@ const handleConfirm = async () => {
         });
     });
 
-    try {
-        handleClose();
-
-        const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
-
-        const delayHideLoadingMessage = new Promise((resolve) => {
-            setTimeout(resolve, 1500);
-        });
-
-        await Promise.all([Promise.allSettled(promises), delayHideLoadingMessage]);
-
-        hideLoadingMessage(loadingMessageId);
-
-        if (storeState.type === 'RESET') {
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
-        } else {
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_UPDATE'), '');
-        }
-
-        await new Promise((resolve) => {
-            setTimeout(resolve, 500);
-        });
-        emit('confirm');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    handleClose();
+    emit('confirm', promises);
 };
 
 const handleClose = () => {
@@ -176,7 +144,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                 />
                 <p-select-dropdown use-fixed-menu-style
                                    page-size="10"
-                                   :visible-menu="dropdownState.visible"
+                                   :visible-menu.sync="dropdownState.visible"
                                    :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
                                    show-select-marker
