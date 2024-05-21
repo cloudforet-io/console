@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import {
-    PSelectButton, PSkeleton, PEmpty,
-} from '@spaceone/design-system';
-import { debounce, isEmpty } from 'lodash';
+import { PEmpty, PSelectButton, PSkeleton } from '@spaceone/design-system';
+import { debounce, isEmpty, sumBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -53,6 +49,7 @@ const SELECT_BUTTON_ITEMS = [
     { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
 ];
+const OTHER_CATEGORY = 'Others';
 
 const route = useRoute();
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
@@ -97,6 +94,30 @@ const setPeriodText = () => {
         periodText = `${assetAnalysisPageState.period.start} ~ ${assetAnalysisPageState.period.end}`;
     }
     assetAnalysisPageStore.setPeriodText(periodText);
+};
+const getRefinedDonutChartData = (res: AnalyzeResponse<MetricDataAnalyzeResult>): AnalyzeResponse<MetricDataAnalyzeResult> => {
+    const _results: MetricDataAnalyzeResult[] = [];
+    const _totalAmount = sumBy(res.results, 'count');
+    const _thresholdValue = _totalAmount * 0.02;
+    let _othersValueSum = 0;
+    const _refinedGroupByKey = assetAnalysisPageState.selectedChartGroupBy?.replace('labels.', '') as string;
+    res.results?.forEach((d) => {
+        if (typeof d.count === 'number' && (d.count < _thresholdValue)) {
+            _othersValueSum += d.count;
+        } else {
+            _results.push(d);
+        }
+    });
+    if (_othersValueSum > 0) {
+        _results.push({
+            [_refinedGroupByKey]: OTHER_CATEGORY,
+            count: _othersValueSum,
+        });
+    }
+    return {
+        more: res.more,
+        results: _results,
+    };
 };
 
 /* Api */
@@ -145,6 +166,10 @@ const setChartData = debounce(async (analyze = true) => {
         if (!rawData) return;
         state.data = rawData;
     }
+    if (assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT) {
+        state.data = getRefinedDonutChartData(state.data as AnalyzeResponse<MetricDataAnalyzeResult>);
+    }
+
     setPeriodText();
 
     const _granularity = assetAnalysisPageState.granularity;
