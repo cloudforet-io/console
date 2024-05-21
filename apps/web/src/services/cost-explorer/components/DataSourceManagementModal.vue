@@ -88,9 +88,14 @@ const handleConfirm = async () => {
     try {
         const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
 
-        await Promise.allSettled(promises);
+        const delayHideLoadingMessage = new Promise((resolve) => {
+            setTimeout(resolve, 3000);
+        });
+
+        await Promise.all([Promise.allSettled(promises), delayHideLoadingMessage]);
 
         hideLoadingMessage(loadingMessageId);
+
         if (storeState.type === 'RESET') {
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALT_S_RESET'), '');
         } else {

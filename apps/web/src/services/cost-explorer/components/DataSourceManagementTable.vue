@@ -42,7 +42,7 @@ const tableState = reactive({
     fields: computed(() => [
         {
             name: 'name',
-            label: 'Data Source',
+            label: 'Name',
             type: 'item',
         },
         {
@@ -148,7 +148,7 @@ const fetchDataSourceList = async () => {
                 <div class="col-data-source-account-count">
                     <p>
                         <span v-if="item.linked_count !== undefined">{{ item.linked_count || 0 }} / </span>
-                        <span>{{ value || '-' }}</span>
+                        <span>{{ value || 0 }}</span>
                     </p>
                     <p-i v-if="item.linked_count !== item.data_source_account_count"
                          class="menu-button"
