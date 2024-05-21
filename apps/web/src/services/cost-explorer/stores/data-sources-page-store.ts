@@ -101,7 +101,7 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         selectedDataSourceIndices: (indices: number[]) => {
             state.selectedDataSourceIndices = indices;
         },
-        selectedLinkedAccountsIndices: (indices: number[]) => {
+        setSelectedLinkedAccountsIndices: (indices: number[]) => {
             state.selectedLinkedAccountsIndices = indices;
         },
         setActiveTab: (tab: string) => {
