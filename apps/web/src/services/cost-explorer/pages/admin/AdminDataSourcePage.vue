@@ -21,7 +21,7 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const storeState = reactive({
     language: computed<string>(() => store.state.user.language),
     totalCount: computed<number>(() => dataSourcesPageState.dataSourceListTotalCount),
-    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedDataSourceIndices),
+    selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
 });
 
 onMounted(() => {
@@ -39,7 +39,7 @@ onUnmounted(() => {
                    use-total-count
                    use-selected-count
                    :total-count="storeState.totalCount"
-                   :selected-count="storeState.selectedIndices.length"
+                   :selected-count="storeState.selectedIndices ? 1 : undefined"
                    class="title"
         >
             <template #extra>
@@ -66,7 +66,7 @@ onUnmounted(() => {
                     <data-source-management-table :table-height="height" />
                 </template>
             </p-horizontal-layout>
-            <data-source-management-tabs v-if="storeState.selectedIndices.length > 0" />
+            <data-source-management-tabs v-if="storeState.selectedIndices !== undefined" />
             <span v-else
                   class="no-data"
             >

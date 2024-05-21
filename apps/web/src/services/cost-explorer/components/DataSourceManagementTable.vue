@@ -91,7 +91,7 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 const handleUpdateSelectIndex = (indices: number[]) => {
-    dataSourcesPageStore.selectedDataSourceIndices(indices);
+    dataSourcesPageStore.setSelectedDataSourceIndices(indices[0]);
 };
 const handleChange = (options: any = {}) => {
     datasourceListApiQuery = getApiQueryWithToolboxOptions(datasourceListApiQueryHelper, options) ?? datasourceListApiQuery;
@@ -122,7 +122,7 @@ const fetchDataSourceList = async () => {
                          sort-by="name"
                          :multi-select="false"
                          :sort-desc="true"
-                         :select-index="storeState.selectedIndices"
+                         :select-index="[storeState.selectedIndices]"
                          :fields="tableState.fields"
                          :items="storeState.dataSourceList"
                          :key-item-sets="tableState.keyItemSets"
