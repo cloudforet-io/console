@@ -39,9 +39,12 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const state = reactive({
         activeTab: 'detail',
 
+        dataSourceListPageStart: 0,
+        dataSourceListPageLimit: 15,
         dataSourceList: [] as DataSourceItem[],
         dataSourceListTotalCount: 0,
-        selectedDataSourceIndices: [] as number[],
+        dataSourceListSearchFilters: [] as ConsoleFilter[],
+        selectedDataSourceIndices: undefined as number|undefined,
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -86,8 +89,8 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             updated_at: dayjs.utc(i.updated_at).tz(_getters.timezone).format('YYYY-MM-DD HH:mm:ss'),
         })))),
         selectedDataSourceItem: computed<DataSourceItem>(() => {
-            if (state.selectedDataSourceIndices.length === 0) return {} as DataSourceItem;
-            const item = getters.dataSourceList[state.selectedDataSourceIndices[0]];
+            if (state.selectedDataSourceIndices === undefined) return {} as DataSourceItem;
+            const item = getters.dataSourceList[state.selectedDataSourceIndices];
             if (!item) return {} as DataSourceItem;
             const pluginItem = _getters.plugin[item.plugin_info?.plugin_id || ''];
             return {
@@ -98,10 +101,19 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const mutation = {
-        selectedDataSourceIndices: (indices: number[]) => {
+        setDataSourceListPageStart: (pageStart: number) => {
+            state.dataSourceListPageStart = pageStart;
+        },
+        setDataSourceListPageLimit: (pageLimit: number) => {
+            state.dataSourceListPageLimit = pageLimit;
+        },
+        setDataSourceListSearchFilters: (filters: ConsoleFilter[]) => {
+            state.dataSourceListSearchFilters = filters;
+        },
+        setSelectedDataSourceIndices: (indices: number) => {
             state.selectedDataSourceIndices = indices;
         },
-        selectedLinkedAccountsIndices: (indices: number[]) => {
+        setSelectedLinkedAccountsIndices: (indices: number[]) => {
             state.selectedLinkedAccountsIndices = indices;
         },
         setActiveTab: (tab: string) => {
@@ -131,20 +143,20 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
         reset: () => {
             state.activeTab = 'detail';
 
-            state.dataSourceList = [] as DataSourceModel[];
+            state.dataSourceList = [];
             state.dataSourceListTotalCount = 0;
-            state.selectedDataSourceIndices = [] as number[];
+            state.selectedDataSourceIndices = undefined;
 
-            state.jobList = [] as CostJobModel[];
+            state.jobList = [];
             state.jobListTotalCount = 0;
 
             state.linkedAccountsLoading = false;
             state.linkedAccountsPageStart = 0;
             state.linkedAccountsPageLimit = 15;
-            state.linkedAccounts = [] as CostDataSourceAccountModel[];
+            state.linkedAccounts = [];
             state.linkedAccountsTotalCount = 0;
-            state.selectedLinkedAccountsIndices = [] as number[];
-            state.linkedAccountsSearchFilters = [] as ConsoleFilter[];
+            state.selectedLinkedAccountsIndices = [];
+            state.linkedAccountsSearchFilters = [];
 
             state.modal = {
                 visible: false,

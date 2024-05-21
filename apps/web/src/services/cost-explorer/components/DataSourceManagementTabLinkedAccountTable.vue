@@ -90,7 +90,7 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
     return storeState.workspaceList.find((i) => i.workspace_id === id);
 };
 const handleSelect = (index: number[]) => {
-    dataSourcesPageStore.selectedLinkedAccountsIndices(index);
+    dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     tableListApiQuery = getApiQueryWithToolboxOptions(tableListApiQueryHelper, options) ?? tableListApiQuery;

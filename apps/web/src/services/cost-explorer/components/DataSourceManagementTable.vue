@@ -30,15 +30,15 @@ const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const storeState = reactive({
     dataSourceList: computed<DataSourceItem[]>(() => dataSourcesPageGetters.dataSourceList),
-    selectedIndices: computed<number[]>(() => dataSourcesPageState.selectedDataSourceIndices),
+    selectedIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
+    dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
+    dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
+    dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
 });
 const state = reactive({
     loading: false,
 });
 const tableState = reactive({
-    pageStart: 0,
-    pageLimit: 15,
-    searchFilters: [] as ConsoleFilter[],
     fields: computed(() => [
         {
             name: 'name',
@@ -91,21 +91,21 @@ const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
 
 const handleUpdateSelectIndex = (indices: number[]) => {
-    dataSourcesPageStore.selectedDataSourceIndices(indices);
+    dataSourcesPageStore.setSelectedDataSourceIndices(indices[0]);
 };
 const handleChange = (options: any = {}) => {
     datasourceListApiQuery = getApiQueryWithToolboxOptions(datasourceListApiQueryHelper, options) ?? datasourceListApiQuery;
     if (options.queryTags !== undefined) {
-        tableState.searchFilters = datasourceListApiQueryHelper.filters;
+        dataSourcesPageStore.setDataSourceListSearchFilters(datasourceListApiQueryHelper.filters);
     }
-    if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-    if (options.pageLimit !== undefined) tableState.pageLimit = options.pageLimit;
+    if (options.pageStart !== undefined) dataSourcesPageStore.setDataSourceListPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) dataSourcesPageStore.setDataSourceListPageLimit(options.pageLimit);
     fetchDataSourceList();
 };
 
 const fetchDataSourceList = async () => {
-    datasourceListApiQueryHelper.setPage(tableState.pageStart, tableState.pageLimit)
-        .setFilters(tableState.searchFilters);
+    datasourceListApiQueryHelper.setPage(storeState.dataSourceListPageStart, storeState.dataSourceListPageLimit)
+        .setFilters(storeState.dataSourceListSearchFilters);
     await dataSourcesPageStore.fetchDataSourceList({
         query: datasourceListApiQueryHelper.data,
     });
@@ -120,8 +120,9 @@ const fetchDataSourceList = async () => {
                          selectable
                          sortable
                          sort-by="name"
+                         :multi-select="false"
                          :sort-desc="true"
-                         :select-index="storeState.selectedIndices"
+                         :select-index="[storeState.selectedIndices]"
                          :fields="tableState.fields"
                          :items="storeState.dataSourceList"
                          :key-item-sets="tableState.keyItemSets"
