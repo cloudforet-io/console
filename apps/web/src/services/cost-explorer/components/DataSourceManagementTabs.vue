@@ -37,13 +37,17 @@ const handleChangeTab = (tab: string) => {
            class="data-source-management-tabs"
            @change="handleChangeTab"
     >
-        <template #detail>
+        <template v-if="storeState.activeTab === 'detail'"
+                  #detail
+        >
             <div class="data-source-management-tab-detail">
                 <data-source-management-tab-detail-base-information />
                 <data-source-management-tab-detail-job />
             </div>
         </template>
-        <template #linked_account>
+        <template v-else
+                  #linked_account
+        >
             <data-source-management-tab-linked-account />
         </template>
     </p-tab>

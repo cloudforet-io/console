@@ -39,9 +39,11 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     const state = reactive({
         activeTab: 'detail',
 
+        dataSourceListPageStart: 0,
+        dataSourceListPageLimit: 15,
         dataSourceList: [] as DataSourceItem[],
         dataSourceListTotalCount: 0,
-        selectedDataSourceIndices: [] as number[],
+        dataSourceListSearchFilters: [] as ConsoleFilter[],
 
         jobList: [] as CostJobModel[],
         jobListTotalCount: 0,
@@ -98,7 +100,16 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
     });
 
     const mutation = {
-        selectedDataSourceIndices: (indices: number[]) => {
+        setDataSourceListPageStart: (pageStart: number) => {
+            state.dataSourceListPageStart = pageStart;
+        },
+        setDataSourceListPageLimit: (pageLimit: number) => {
+            state.dataSourceListPageLimit = pageLimit;
+        },
+        setDataSourceListSearchFilters: (filters: ConsoleFilter[]) => {
+            state.dataSourceListSearchFilters = filters;
+        },
+        setSelectedDataSourceIndices: (indices: number) => {
             state.selectedDataSourceIndices = indices;
         },
         setSelectedLinkedAccountsIndices: (indices: number[]) => {

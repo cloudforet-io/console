@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -21,9 +21,10 @@ const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
 const listApiQueryHelper = new ApiQueryHelper();
+const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
-    activeTab: computed<string>(() => dataSourcesPageState.activeTab),
+    selectedDataSourceIndices: computed<number|undefined>(() => dataSourcesPageState.selectedDataSourceIndices),
     selectedDataSourceItem: computed<DataSourceItem>(() => dataSourcesPageGetters.selectedDataSourceItem),
     totalCount: computed<number>(() => dataSourcesPageState.linkedAccountsTotalCount),
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
@@ -31,6 +32,9 @@ const storeState = reactive({
     linkedAccountsPageStart: computed<number>(() => dataSourcesPageState.linkedAccountsPageStart),
     linkedAccountsPageLimit: computed<number>(() => dataSourcesPageState.linkedAccountsPageLimit),
     linkedAccountsSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.linkedAccountsSearchFilters),
+    dataSourceListPageStart: computed<number>(() => dataSourcesPageState.dataSourceListPageStart),
+    dataSourceListPageLimit: computed<number>(() => dataSourcesPageState.dataSourceListPageLimit),
+    dataSourceListSearchFilters: computed<ConsoleFilter[]>(() => dataSourcesPageState.dataSourceListSearchFilters),
 });
 
 const handleClickAction = (action: CostLinkedAccountModalType) => {
@@ -48,10 +52,23 @@ const fetchLinkedAccountList = async () => {
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
+        await fetchDataSourceList();
     }
 };
+const fetchDataSourceList = async () => {
+    datasourceListApiQueryHelper.setPage(storeState.dataSourceListPageStart, storeState.dataSourceListPageLimit)
+        .setFilters(storeState.dataSourceListSearchFilters);
+    await dataSourcesPageStore.fetchDataSourceList({
+        query: datasourceListApiQueryHelper.data,
+    });
+};
 
-watch([() => storeState.activeTab, () => storeState.selectedDataSourceItem], async () => {
+onMounted(async () => {
+    await fetchLinkedAccountList();
+});
+
+watch(() => storeState.selectedDataSourceIndices, async () => {
+    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
     await fetchLinkedAccountList();
 }, { immediate: true });
 </script>
