@@ -42,7 +42,7 @@ const tableState = reactive({
     fields: computed(() => [
         {
             name: 'name',
-            label: 'Data Source',
+            label: 'Name',
             type: 'item',
         },
         {
