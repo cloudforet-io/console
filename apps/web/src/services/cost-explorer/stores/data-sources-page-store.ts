@@ -214,8 +214,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.update<CostDataSourceAccountUpdateParameters, CostDataSourceAccountModel>(
                     params,
                 );
-            } catch (e) {
-                ErrorHandler.handleError(e);
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
             }
         },
         resetLinkedAccount: async (params: CostDataSourceAccountResetParameters) => {
@@ -223,8 +224,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
                 await SpaceConnector.clientV2.costAnalysis.dataSourceAccount.reset<CostDataSourceAccountResetParameters>(
                     params,
                 );
-            } catch (e) {
-                ErrorHandler.handleError(e);
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
             }
         },
         fetchLinkedAccountAnalyze: async (): Promise<CostDataSourceAnalyzeModel | undefined> => {

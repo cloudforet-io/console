@@ -101,9 +101,7 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
             </template>
         </p-heading>
         <data-source-management-tab-linked-account-table @confirm="fetchLinkedAccountList" />
-        <data-source-management-modal v-if="storeState.modalVisible"
-                                      @confirm="fetchLinkedAccountList"
-        />
+        <data-source-management-modal @confirm="fetchLinkedAccountList" />
     </div>
 </template>
 

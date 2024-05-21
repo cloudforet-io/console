@@ -42,7 +42,6 @@ const storeState = reactive({
     selectedLinkedAccountsIndices: computed<number[]>(() => dataSourcesPageState.selectedLinkedAccountsIndices),
 });
 const state = reactive({
-    loading: false,
     headerTitle: computed<TranslateResult>(() => {
         if (storeState.type === 'RESET') {
             return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.RESET_MODAL_TITLE', { count: storeState.selectedLinkedAccountsIndices.length });
@@ -68,8 +67,6 @@ const dropdownState = reactive({
 });
 
 const handleConfirm = async () => {
-    state.loading = true;
-
     const promises = storeState.selectedLinkedAccountsIndices.map((idx) => {
         const item = storeState.linkedAccounts[idx];
         const defaultParams = {
@@ -86,10 +83,12 @@ const handleConfirm = async () => {
     });
 
     try {
+        handleClose();
+
         const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
 
         const delayHideLoadingMessage = new Promise((resolve) => {
-            setTimeout(resolve, 3000);
+            setTimeout(resolve, 1500);
         });
 
         await Promise.all([Promise.allSettled(promises), delayHideLoadingMessage]);
@@ -106,10 +105,8 @@ const handleConfirm = async () => {
             setTimeout(resolve, 500);
         });
         emit('confirm');
-
-        handleClose();
-    } finally {
-        state.loading = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
 };
 
@@ -164,7 +161,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     size="sm"
                     :fade="true"
                     :backdrop="true"
-                    :loading="state.loading"
                     :theme-color="storeState.type === 'RESET' ? 'alert' : 'primary'"
                     :visible="storeState.visible"
                     @confirm="handleConfirm"
