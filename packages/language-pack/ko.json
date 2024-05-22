@@ -935,7 +935,7 @@
 			"ISSUE_DATE": "발행일자 ",
 			"REPORT_NUMBER": "리포트 번호",
 			"SUBTOTAL": "소계 ",
-			"TO": "발신자",
+			"TO": "수신자",
 			"TOTAL": "총합계 ",
 			"TOTAL_AMOUNT_BY_PROVIDER": "프로바이더별 총합계 "
 		},

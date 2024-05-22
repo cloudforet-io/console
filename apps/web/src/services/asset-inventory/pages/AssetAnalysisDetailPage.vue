@@ -79,6 +79,7 @@ watch(() => route.params, async (params) => {
         assetAnalysisPageStore.setFilters({ 'labels.Provider': [params.groupBy] });
     }
 
+    assetAnalysisPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
