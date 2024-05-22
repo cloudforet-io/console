@@ -50,7 +50,7 @@ export const getRefinedDailyPeriod = (yearMonth: string): Period => ({
 export const getInitialPeriodByGranularity = (granularity: Granularity): [Period, RelativePeriod|undefined] => {
     let periodMenu: MetricPeriodMenu = METRIC_PERIOD_MENU.LAST_6_MONTHS;
     if (granularity === GRANULARITY.DAILY) {
-        periodMenu = METRIC_PERIOD_MENU.LAST_14_DAYS;
+        periodMenu = METRIC_PERIOD_MENU.LAST_7_DAYS;
     }
     const relativePeriod: RelativePeriod = METRIC_PERIOD_MENU_ITEM_MAP[periodMenu].relativePeriod;
     return [convertRelativePeriodToPeriod(granularity, relativePeriod), relativePeriod];

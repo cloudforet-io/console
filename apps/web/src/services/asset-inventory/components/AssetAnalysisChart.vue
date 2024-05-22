@@ -4,10 +4,8 @@ import { useRoute } from 'vue-router/composables';
 
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import {
-    PSelectButton, PSkeleton, PEmpty,
-} from '@spaceone/design-system';
-import { debounce, isEmpty } from 'lodash';
+import { PEmpty, PSelectButton, PSkeleton } from '@spaceone/design-system';
+import { debounce, isEmpty, sumBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -45,11 +43,13 @@ import type {
 
 
 const SELECT_BUTTON_ITEMS = [
+    { name: CHART_TYPE.LINE_AREA, icon: 'ic_chart-area' },
     { name: CHART_TYPE.LINE, icon: 'ic_chart-line' },
     { name: CHART_TYPE.COLUMN, icon: 'ic_chart-bar' },
     { name: CHART_TYPE.TREEMAP, icon: 'ic_chart-treemap' },
     { name: CHART_TYPE.DONUT, icon: 'ic_chart-donut' },
 ];
+const OTHER_CATEGORY = 'Others';
 
 const route = useRoute();
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
@@ -95,6 +95,30 @@ const setPeriodText = () => {
     }
     assetAnalysisPageStore.setPeriodText(periodText);
 };
+const getRefinedDonutChartData = (res: AnalyzeResponse<MetricDataAnalyzeResult>): AnalyzeResponse<MetricDataAnalyzeResult> => {
+    const _results: MetricDataAnalyzeResult[] = [];
+    const _totalAmount = sumBy(res.results, 'count');
+    const _thresholdValue = _totalAmount * 0.02;
+    let _othersValueSum = 0;
+    const _refinedGroupByKey = assetAnalysisPageState.selectedChartGroupBy?.replace('labels.', '') as string;
+    res.results?.forEach((d) => {
+        if (typeof d.count === 'number' && (d.count < _thresholdValue)) {
+            _othersValueSum += d.count;
+        } else {
+            _results.push(d);
+        }
+    });
+    if (_othersValueSum > 0) {
+        _results.push({
+            [_refinedGroupByKey]: OTHER_CATEGORY,
+            count: _othersValueSum,
+        });
+    }
+    return {
+        more: res.more,
+        results: _results,
+    };
+};
 
 /* Api */
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
@@ -103,7 +127,7 @@ const analyzeMetricData = async (): Promise<AnalyzeResponse<MetricDataAnalyzeRes
     try {
         analyzeApiQueryHelper.setFilters(assetAnalysisPageGetters.consoleFilters);
         const _groupBy = assetAnalysisPageState.selectedChartGroupBy ? [assetAnalysisPageState.selectedChartGroupBy] : [];
-        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'date', desc: true }] : [{ key: '_total_count', desc: true }];
+        const _sort = assetAnalysisPageGetters.isRealtimeChart ? [{ key: 'count', desc: true }] : [{ key: 'date', desc: true }];
         const _fieldGroup = assetAnalysisPageGetters.isRealtimeChart ? [] : ['date'];
         const { status, response } = await fetcher({
             metric_id: state.currentMetricId,
@@ -142,6 +166,10 @@ const setChartData = debounce(async (analyze = true) => {
         if (!rawData) return;
         state.data = rawData;
     }
+    if (assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT) {
+        state.data = getRefinedDonutChartData(state.data as AnalyzeResponse<MetricDataAnalyzeResult>);
+    }
+
     setPeriodText();
 
     const _granularity = assetAnalysisPageState.granularity;
@@ -161,8 +189,9 @@ const setChartData = debounce(async (analyze = true) => {
 const handleSelectButton = (selected: ChartType|string) => {
     state.loading = true;
     let analyzeData = false;
-    if ((assetAnalysisPageGetters.isRealtimeChart && selected === CHART_TYPE.LINE)
-        || (!assetAnalysisPageGetters.isRealtimeChart && selected !== CHART_TYPE.LINE)) {
+    const timeSeriesChartList = [CHART_TYPE.LINE, CHART_TYPE.LINE_AREA];
+    if ((assetAnalysisPageGetters.isRealtimeChart && timeSeriesChartList.includes(selected))
+        || (!assetAnalysisPageGetters.isRealtimeChart && !timeSeriesChartList.includes(selected))) {
         analyzeData = true;
     }
     setChartData(analyzeData);
@@ -181,12 +210,13 @@ const handleAllSeries = (type: string) => {
 
 watch([
     () => state.currentMetricId,
+    () => assetAnalysisPageState.metricInitiated,
     () => assetAnalysisPageState.period,
     () => assetAnalysisPageState.selectedOperator,
     () => assetAnalysisPageState.selectedChartGroupBy,
     () => assetAnalysisPageGetters.consoleFilters,
-], async ([metricId]) => {
-    if (!metricId) return;
+], async ([metricId, metricInitiated]) => {
+    if (!metricId || !metricInitiated) return;
     await setChartData();
 }, { immediate: true });
 watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
@@ -220,12 +250,13 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
                 />
                 <template v-else-if="state.chartData.length">
                     <asset-analysis-line-chart
-                        v-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE"
+                        v-if="!assetAnalysisPageGetters.isRealtimeChart"
                         :loading="state.loading"
                         :chart.sync="state.chart"
                         :chart-data="state.chartData"
                         :legends="state.legends"
                         :color-set="state.chartColorSet"
+                        :stacked="assetAnalysisPageState.selectedChartType === CHART_TYPE.LINE_AREA"
                     />
                     <asset-analysis-donut-chart
                         v-else-if="assetAnalysisPageState.selectedChartType === CHART_TYPE.DONUT"

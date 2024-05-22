@@ -76,6 +76,7 @@ watch(() => route.params, async (params) => {
         assetAnalysisPageStore.setSelectedGroupByList(assetAnalysisPageGetters.defaultMetricGroupByList);
     }
 
+    assetAnalysisPageStore.setMetricInitiated(true);
     gnbStore.setBreadcrumbs(state.breadCrumbs);
 }, { immediate: true });
 
