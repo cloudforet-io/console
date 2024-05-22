@@ -14,6 +14,12 @@ interface Props {
     item?: ProviderResourceDataItem;
 }
 
+const MANAGED_TARGET_TYPE = {
+    SERVER: 'server',
+    DATABASE: 'database',
+    STORAGE: 'storage',
+} as const;
+
 const props = withDefaults(defineProps<Props>(), {
     item: undefined,
 });
@@ -22,7 +28,10 @@ const router = useRouter();
 
 const handleClickButton = (type: string) => {
     if (!props.item) return;
-    const target = `metric-managed-${type}-service`;
+    let target = '';
+    if (type === MANAGED_TARGET_TYPE.STORAGE) target = `metric-managed-${type}-size`;
+    else target = `metric-managed-${type}-count`;
+
     router.push({
         name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
         params: { metricId: target, groupBy: props.item.key },
@@ -45,21 +54,21 @@ const handleClickButton = (type: string) => {
         <div class="data-wrapper">
             <p-text-button class="data-row"
                            size="sm"
-                           @click="handleClickButton('server')"
+                           @click="handleClickButton(MANAGED_TARGET_TYPE.SERVER)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_SERVER') }}</span>
                 <span>{{ numberFormatter(props.item.server) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
                            size="sm"
-                           @click="handleClickButton('database')"
+                           @click="handleClickButton(MANAGED_TARGET_TYPE.DATABASE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_DATABASE') }}</span>
                 <span>{{ numberFormatter(props.item.database) || 0 }}</span>
             </p-text-button>
             <p-text-button class="data-row"
                            size="sm"
-                           @click="handleClickButton('storage')"
+                           @click="handleClickButton(MANAGED_TARGET_TYPE.STORAGE)"
             >
                 <span class="label">{{ $t('HOME.ASSET_SUMMARY_STORAGE') }}</span>
                 <span>{{ byteFormatter(props.item.storage) || 0 }}</span>
