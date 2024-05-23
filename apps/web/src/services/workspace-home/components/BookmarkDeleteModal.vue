@@ -10,7 +10,6 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { gray } from '@/styles/colors';
 
-import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -127,9 +126,6 @@ const handleClose = () => {
                             :error-icon-color="gray[500]"
                             class="icon"
                         />
-                        <bookmark-managed-badge v-if="item.isManaged"
-                                                class="managed-badge"
-                        />
                     </div>
                     <div class="text-wrapper">
                         <span>{{ item?.name }}</span>
@@ -160,11 +156,6 @@ const handleClose = () => {
                 width: 2.5rem;
                 min-width: 2.5rem;
                 height: 2.5rem;
-                .managed-badge {
-                    position: absolute;
-                    right: 0;
-                    bottom: 0;
-                }
                 &.is-folder {
                     @apply bg-blue-200;
                 }

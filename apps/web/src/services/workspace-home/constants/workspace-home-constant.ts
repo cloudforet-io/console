@@ -31,10 +31,6 @@ export const DEFAULT_BOOKMARK = [
         name: 'Azure Portal',
     },
 ];
-export const BOOKMARK_SCOPE = {
-    MANAGED: 'managed',
-    PERSONAL: 'personal',
-};
 
 // Configs
 export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [

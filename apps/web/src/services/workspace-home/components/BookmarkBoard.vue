@@ -17,7 +17,6 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { blue, gray } from '@/styles/colors';
 
-import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
 import {
     BOOKMARK_MODAL_TYPE,
 } from '@/services/workspace-home/constants/workspace-home-constant';
@@ -176,9 +175,6 @@ const checkSelectedId = (id?: string) => {
                              height="1.25rem"
                              :color="blue[800]"
                         />
-                        <bookmark-managed-badge v-if="item.isManaged"
-                                                class="managed-badge"
-                        />
                     </div>
                     <div v-else
                          class="image-wrapper"
@@ -188,9 +184,6 @@ const checkSelectedId = (id?: string) => {
                                     error-icon="ic_globe-filled"
                                     :error-icon-color="gray[500]"
                                     class="icon"
-                        />
-                        <bookmark-managed-badge v-if="item.isManaged"
-                                                class="managed-badge"
                         />
                         <div v-else-if="item.icon"
                              class="show-more"
@@ -287,12 +280,6 @@ const checkSelectedId = (id?: string) => {
                 height: 2rem;
                 border-radius: 0.375rem;
 
-                .managed-badge {
-                    @apply absolute;
-                    right: 0;
-                    bottom: 0;
-                }
-
                 /* custom design-system component - p-lazy-img */
                 :deep(.p-lazy-img) {
                     img {
@@ -382,11 +369,6 @@ const checkSelectedId = (id?: string) => {
                     .image-wrapper {
                         width: 1.25rem;
                         height: 1.25rem;
-
-                        .managed-badge {
-                            right: -0.25rem;
-                            bottom: -0.25rem;
-                        }
 
                         .icon, img {
                             width: 1.25rem !important;
