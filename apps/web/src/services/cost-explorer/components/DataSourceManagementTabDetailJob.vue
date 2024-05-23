@@ -44,7 +44,7 @@ const tableState = reactive({
         { name: 'status', label: 'Status' },
         { name: 'total_tasks', label: 'Total Task' },
         { name: 'created_at', label: 'Created' },
-        { name: 'finished_at', label: 'Finished at' },
+        { name: 'finished_at', label: 'Finished' },
         { name: 'duration', label: 'Duration' },
     ]),
 });
