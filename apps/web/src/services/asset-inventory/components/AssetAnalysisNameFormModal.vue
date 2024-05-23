@@ -23,6 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 
 import { NAME_FORM_MODAL_TYPE } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
@@ -44,6 +45,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 const router = useRouter();
 const route = useRoute();
 const { getProperRouteLocation } = useProperRouteLocation();
+
+const gnbStore = useGnbStore();
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
 const assetAnalysisPageState = assetAnalysisPageStore.state;
 const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
@@ -112,6 +115,7 @@ const createMetricExample = async () => {
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_ADD_METRIC_EXAMPLE'), '');
         state.proxyVisible = false;
         await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
+        await gnbStore.fetchMetricExample();
         await router.replace(getProperRouteLocation({
             name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
             params: {
@@ -144,6 +148,7 @@ const updateMetricExampleName = async () => {
         });
         state.proxyVisible = false;
         await assetAnalysisPageStore.loadMetricExamples(assetAnalysisPageGetters.namespaceId);
+        await gnbStore.fetchMetricExample();
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_UPDATE_METRIC_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_E_UPDATE_METRIC_NAME'));
