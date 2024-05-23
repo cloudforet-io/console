@@ -24,7 +24,7 @@ export const getLastAccessedWorkspaceId = async (): Promise<string | undefined> 
         const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
             name: LAST_ACCESSED_WORKSPACE_KEY,
         });
-        if (!results) {
+        if (!results?.length) {
             return undefined;
         }
         return results[0].data.workspace_id;

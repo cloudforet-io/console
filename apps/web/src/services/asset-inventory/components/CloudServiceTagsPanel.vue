@@ -144,10 +144,10 @@ watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceT
         </template>
         <template #col-provider-format="{ value }">
             <p-badge v-if="storeState.providers[value]"
-                     :background-color="storeState.providers[value].color"
+                     :background-color="storeState.providers[value]?.color"
                      text-color="white"
             >
-                {{ storeState.providers[value].label }}
+                {{ storeState.providers[value]?.label }}
             </p-badge>
         </template>
     </tags-panel>

@@ -554,10 +554,10 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                         </template>
                         <template #col-provider-format="{value}">
                             <p-badge v-if="storeState.providers[value]"
-                                     :background-color="storeState.providers[value].color"
+                                     :background-color="storeState.providers[value]?.color"
                                      text-color="white"
                             >
-                                {{ storeState.providers[value].label }}
+                                {{ storeState.providers[value]?.label }}
                             </p-badge>
                         </template>
                         <template #col-project_id-format="{value, item}">
