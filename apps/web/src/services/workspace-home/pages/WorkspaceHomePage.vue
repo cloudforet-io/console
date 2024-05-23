@@ -83,11 +83,6 @@ watch(() => storeState.currentWorkspaceId, async (currentWorkspaceId) => {
         await workspaceHomePageStore.fetchCostReportConfig();
     }
 }, { immediate: true });
-watch(() => storeState.isDomainAdmin, async () => {
-    if (storeState.isDomainAdmin) {
-        await bookmarkStore.fetchBookmarkInit();
-    }
-}, { immediate: true });
 </script>
 
 <template>

@@ -14,7 +14,6 @@ import { sumBy } from 'lodash';
 
 import { store } from '@/store';
 
-import BookmarkManagedBadge from '@/services/workspace-home/components/BookmarkManagedBadge.vue';
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalType, MoreMenuItem } from '@/services/workspace-home/types/workspace-home-type';
@@ -206,9 +205,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
-                    <bookmark-managed-badge v-if="storeState.selectedBookmark?.isManaged"
-                                            class="managed-badge"
-                    />
                 </div>
             </template>
             <template v-if="storeState.isFileFullMode && !state.isMobileSize"
@@ -246,7 +242,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                          width="0.875rem"
                          height="0.875rem"
                     />
-                    <bookmark-managed-badge v-else-if="item.isManaged" />
                     <p-i v-else
                          name="ic_folder"
                          width="0.875rem"
@@ -417,11 +412,6 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
                 @apply relative flex items-center justify-center bg-blue-200 rounded;
                 width: 1.5rem;
                 height: 1.5rem;
-                .managed-badge {
-                    @apply absolute;
-                    right: -0.125rem;
-                    bottom: -0.125rem;
-                }
             }
             .title-right-wrapper {
                 @apply flex text-gray-900;
