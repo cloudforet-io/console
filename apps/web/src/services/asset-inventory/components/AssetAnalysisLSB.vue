@@ -165,14 +165,16 @@ const namespaceState = reactive({
         if (isEmpty(storeState.providers)) return [];
         return [
             ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
-            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+            // NOTE: Temporarily hide asset namespace
+            // ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
         ];
     }),
     namespaceItemsByKeyword: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
         return [
             ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
-            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+            // NOTE: Temporarily hide asset namespace
+            // ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
 });
@@ -199,35 +201,35 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
         subItems: commonNamespaces,
     }];
 };
-const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.category !== 'COMMON').forEach((namespace) => {
-        const providerData = storeState.providers[namespace.provider];
-        if (namespaceMap[namespace.provider]) {
-            namespaceMap[namespace.provider].subItems.push({
-                label: namespace.name,
-                name: namespace.key,
-                provider: namespace.provider,
-                category: namespace.data.category,
-                icon: namespace.data.icon,
-            });
-        } else {
-            namespaceMap[namespace.provider] = {
-                type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: providerData.label,
-                icon: providerData.icon,
-                subItems: [{
-                    label: namespace.name,
-                    name: namespace.key,
-                    provider: namespace.provider,
-                    category: namespace.data.category,
-                    icon: namespace.data.icon,
-                }],
-            };
-        }
-    });
-    return Object.values(namespaceMap);
-};
+// const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+//     const namespaceMap = {};
+//     namespaces.filter((namespace) => namespace.data.category !== 'COMMON').forEach((namespace) => {
+//         const providerData = storeState.providers[namespace.provider];
+//         if (namespaceMap[namespace.provider]) {
+//             namespaceMap[namespace.provider].subItems.push({
+//                 label: namespace.name,
+//                 name: namespace.key,
+//                 provider: namespace.provider,
+//                 category: namespace.data.category,
+//                 icon: namespace.data.icon,
+//             });
+//         } else {
+//             namespaceMap[namespace.provider] = {
+//                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
+//                 label: providerData.label,
+//                 icon: providerData.icon,
+//                 subItems: [{
+//                     label: namespace.name,
+//                     name: namespace.key,
+//                     provider: namespace.provider,
+//                     category: namespace.data.category,
+//                     icon: namespace.data.icon,
+//                 }],
+//             };
+//         }
+//     });
+//     return Object.values(namespaceMap);
+// };
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
     if (!storeState.selectedNamespace) return false;
     return storeState.selectedNamespace.name === namespace.name
