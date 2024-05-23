@@ -102,7 +102,12 @@ const state = reactive({
     }),
     menuSet: computed<LSBMenu[]>(() => (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet)),
     favoriteOptions: computed<FavoriteOptions>(() => {
-        if (!state.isCloudServiceDetailPage) return {} as FavoriteOptions;
+        if (!state.isCloudServiceDetailPage) {
+            return {
+                type: FAVORITE_TYPE.MENU,
+                id: 'cloud_service',
+            };
+        }
         return {
             type: FAVORITE_TYPE.CLOUD_SERVICE,
             id: cloudServiceDetailPageState.selectedCloudServiceType?.cloud_service_type_key || '',
