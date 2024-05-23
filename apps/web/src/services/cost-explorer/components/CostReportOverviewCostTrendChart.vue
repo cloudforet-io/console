@@ -108,7 +108,6 @@ const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>
         value_sum: [],
     };
     res.results?.forEach((d) => {
-        console.log(d);
         if (d._total_value_sum && (d._total_value_sum < _thresholdValue)) {
             _othersResult._total_value_sum += d._total_value_sum;
             d.value_sum?.forEach((v) => {
