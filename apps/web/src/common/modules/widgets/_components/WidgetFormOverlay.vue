@@ -143,7 +143,7 @@ const handleClickGenerate = () => {
     width: 100%;
     display: flex;
     gap: 1rem;
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem 1rem 1.5rem;
     .left-part {
         @apply bg-gray-150 rounded-md;
         flex-grow: 1;
@@ -155,7 +155,7 @@ const handleClickGenerate = () => {
         }
         .view-table-wrapper {
             @apply rounded-md;
-            max-height: 20rem;
+            max-height: 18.75rem;
             .toolbox-left-wrapper {
                 display: flex;
                 align-items: center;
