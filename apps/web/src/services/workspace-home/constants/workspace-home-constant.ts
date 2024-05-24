@@ -50,7 +50,7 @@ export const STARRED_SERVICE_ITEMS: StarredServiceItem[] = [
         to: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
     },
     {
-        icon: 'ic_service_cost-anlaysis',
+        icon: 'ic_service_cost-analysis',
         label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
         to: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
     },

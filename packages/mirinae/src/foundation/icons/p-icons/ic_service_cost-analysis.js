@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_service_cost-anlaysis': {
+  'ic_service_cost-analysis': {
     width: 24,
     height: 24,
     viewBox: '0 0 24 24',

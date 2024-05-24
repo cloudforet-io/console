@@ -78,7 +78,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-anlaysis',
+        icon: 'ic_service_cost-analysis',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
