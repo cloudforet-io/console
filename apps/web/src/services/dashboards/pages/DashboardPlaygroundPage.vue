@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PTextInput, PFieldGroup,
+    PSelectDropdown, PTextInput, PFieldGroup, PButton,
 } from '@spaceone/design-system';
 
 import type {
@@ -12,6 +12,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue';
+import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 
@@ -19,6 +20,7 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 import {
     useAllReferenceTypeInfoStore,
 } from '@/services/dashboards/stores/all-reference-type-info-store';
+
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
@@ -42,6 +44,7 @@ const state = reactive({
         name: d,
         label: d,
     }))),
+    addWidgetOverlayVisible: false,
 });
 const formState = reactive({
     title: '',
@@ -50,6 +53,11 @@ const formState = reactive({
     dataMapping: {},
     chartOptions: {},
 });
+
+/* Event */
+const handleClickAddWidget = () => {
+    state.addWidgetOverlayVisible = true;
+};
 
 watch(() => state.widgetConfig, (_config) => {
     formState.title = _config?.meta.title || '';
@@ -65,6 +73,12 @@ watch(() => state.widgetConfig, (_config) => {
             {{ state.baseOnDate }}
         </p>
         <br>
+        <p-button style-type="tertiary"
+                  class="mb-2"
+                  @click="handleClickAddWidget"
+        >
+            Add Widget
+        </p-button>
         <div class="grid grid-cols-12">
             <div class="col-span-8">
                 <stacked-column-chart v-if="formState.selectedChartName === 'stackedColumnChart'"
@@ -73,10 +87,10 @@ watch(() => state.widgetConfig, (_config) => {
                                       :title="formState.title"
                                       size="lg"
                                       :description="formState.description"
+                                      :base-on-date="state.baseOnDate"
                                       :data-sources="state.dataSources"
                                       :data-mapping="formState.dataMapping"
                                       :chart-options="formState.chartOptions"
-                                      :variables-schema="state.variablesSchema"
                                       :variables="state.variables"
                 />
             </div>
@@ -129,5 +143,8 @@ watch(() => state.widgetConfig, (_config) => {
                 </div>
             </div>
         </div>
+        <widget-form-overlay :visible="state.addWidgetOverlayVisible"
+                             @update:visible="state.addWidgetOverlayVisible = $event"
+        />
     </div>
 </template>

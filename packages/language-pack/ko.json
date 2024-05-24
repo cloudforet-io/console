@@ -1750,6 +1750,19 @@
 			},
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_SELECTED_ITEM": "1개 이상의 옵션을 선택해 주세요.",
+			"OVERLAY": {
+				"STEP_1": {
+					"ADD_WIDGET": "위젯 추가",
+					"CHART_TYPE": "차트 유형",
+					"CONTINUE": "계속하기",
+					"DATA_SOURCE_NAME": "",
+					"DATA_TABLE": "",
+					"EDIT_WIDGET": "",
+					"EMPTY_DESC": "",
+					"GENERATE": "",
+					"SELECT_A_DATA_SOURCE": ""
+				}
+			},
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "프로젝트별 이슈 발생, 인지 또는 안전과 같은 활동 현황을 빠르게 확인할 수 있는 위젯. "
 			},
