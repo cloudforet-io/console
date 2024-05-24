@@ -1750,6 +1750,19 @@
 			},
 			"NO_DATA": "No Data",
 			"NO_SELECTED_ITEM": "One of the options must be selected.",
+			"OVERLAY": {
+				"STEP_1": {
+					"ADD_WIDGET": "Add Widget",
+					"CHART_TYPE": "Chart Type",
+					"CONTINUE": "Continue",
+					"DATA_SOURCE_NAME": "Data Source Name",
+					"DATA_TABLE": "Data Table",
+					"EDIT_WIDGET": "Edit Widget",
+					"EMPTY_DESC": "Selectable chart types for the widget are available.",
+					"GENERATE": "Generate",
+					"SELECT_A_DATA_SOURCE": "Select a data source"
+				}
+			},
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "Displays the status of each project's activities such as triggered, acknowledged, or healthy."
 			},

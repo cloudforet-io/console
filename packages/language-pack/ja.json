@@ -1750,6 +1750,19 @@
 			},
 			"NO_DATA": "データがありません",
 			"NO_SELECTED_ITEM": "オプションのうちの一つを選択する必要があります。",
+			"OVERLAY": {
+				"STEP_1": {
+					"ADD_WIDGET": "",
+					"CHART_TYPE": "チャートタイプ",
+					"CONTINUE": "次へ",
+					"DATA_SOURCE_NAME": "",
+					"DATA_TABLE": "",
+					"EDIT_WIDGET": "",
+					"EMPTY_DESC": "",
+					"GENERATE": "",
+					"SELECT_A_DATA_SOURCE": ""
+				}
+			},
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "各プロジェクト別のトリガー、認知、安全などを素早く確認できます。"
 			},
