@@ -19,9 +19,15 @@ export const Template = (args, { argTypes }) => ({
     components: { PPopover, PButton },
     template: `
         <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
-            <p-popover :position="proxyPosition" :isVisible="proxyIsVisible"
-                       :ignore-target-click="ignoreTargetClick" :trigger="trigger"
+            <p-popover :position="proxyPosition"
+                       :isVisible="proxyIsVisible"
+                       :tag="tag"
+                       :ignore-target-click="ignoreTargetClick"
+                       :trigger="trigger"
                        :ignore-outside-click="ignoreOutsideClick"
+                       :hide-padding="hidePadding"
+                       :hide-close-button="hideCloseButton"
+                       :hide-arrow="hideArrow"
             >
                 <div v-if="defaultSlot" v-html="defaultSlot" />
                 <p-button v-else @click="handleClick">default</p-button>
@@ -173,6 +179,29 @@ export const Template = (args, { argTypes }) => ({
             </p-popover>
         </div>
     `,
+        }}
+    </Story>
+</Canvas>
+
+## Hide Arrow
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Hide Arrow">
+        {{
+            components: { PPopover, PTextInput, PButton },
+            template: `
+                <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
+                    <p-popover hide-arrow>
+                        <p-button>click me (hide arrow)</p-button>
+                        <template #content>
+                            <p>This popover hides arrow</p>
+                        </template>
+                    </p-popover>
+                </div>
+            `,
         }}
     </Story>
 </Canvas>
