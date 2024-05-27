@@ -237,7 +237,6 @@ export default defineComponent<PopoverProps>({
         }
         > .popper-content-wrapper {
             @apply flex w-full;
-            z-index: 1;
 
             .close-icon {
                 position: absolute;
