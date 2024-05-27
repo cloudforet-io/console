@@ -85,6 +85,7 @@ const handleSelectPopperCondition = (condition: PopperCondition) => {
 };
 const handleConfirmDataSource = () => {
     state.showPopover = false;
+    // TODO: create data table
 };
 
 watch(() => state.showPopover, (val) => {
@@ -97,9 +98,8 @@ watch(() => state.showPopover, (val) => {
 
 <template>
     <p-popover class="data-source-popover"
-               :is-visible="state.showPopover"
+               :is-visible.sync="state.showPopover"
                position="right-start"
-               ignore-target-click
                hide-close-button
                hide-padding
                :trigger="POPOVER_TRIGGER.NONE"
@@ -138,16 +138,23 @@ watch(() => state.showPopover, (val) => {
                                        @click="handleClickDataSourceDomain(domainItem.name)"
                         />
                     </div>
-                    <widget-form-cost-data-source-popper
-                        v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
-                        :selected-cost-data-source-id.sync="state.selectedCostDataSourceId"
-                        :selected-cost-data-type.sync="state.selectedCostDataType"
-                    />
-                    <widget-form-asset-security-data-source-popper
-                        v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
-                        :data-source-domain="state.selectedDataSourceDomain"
-                        :selected-metric-id.sync="state.selectedMetricId"
-                    />
+                    <template v-if="state.selectedDataSourceDomain">
+                        <widget-form-cost-data-source-popper
+                            v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
+                            :selected-cost-data-source-id.sync="state.selectedCostDataSourceId"
+                            :selected-cost-data-type.sync="state.selectedCostDataType"
+                        />
+                        <widget-form-asset-security-data-source-popper
+                            v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
+                            :data-source-domain="state.selectedDataSourceDomain"
+                            :selected-metric-id.sync="state.selectedMetricId"
+                        />
+                    </template>
+                    <template v-else>
+                        <div class="empty-wrapper">
+                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.SELECT_DATA_SOURCE_TYPE') }}
+                        </div>
+                    </template>
                 </div>
                 <div class="popover-footer">
                     <p-button style-type="substitutive"
@@ -201,9 +208,14 @@ watch(() => state.showPopover, (val) => {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
-                width: 11.5rem;
+                min-width: 11.5rem;
                 height: 100%;
                 padding: 1rem 0.75rem;
+            }
+            .empty-wrapper {
+                @apply flex justify-center items-center text-gray-300;
+                width: 100%;
+                height: 100%;
             }
         }
     }
@@ -216,18 +228,14 @@ watch(() => state.showPopover, (val) => {
 
 /* custom design-system component - p-select-card */
 :deep(.p-select-card) {
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 /* custom design-system component - p-context-menu */
 :deep(.p-context-menu) {
     border: none;
-}
-
-/* custom design-system component - p-popover */
-:deep(.p-popover) {
-    .popper {
-        padding: 0;
+    .menu-container {
+        height: 23.25rem;
     }
 }
 </style>

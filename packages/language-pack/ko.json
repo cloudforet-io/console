@@ -1771,7 +1771,8 @@
 					"METRIC": "",
 					"NAMESPACE": "네임스페이스",
 					"SECURITY": "보안",
-					"SELECT_A_DATA_SOURCE": ""
+					"SELECT_A_DATA_SOURCE": "",
+					"SELECT_DATA_SOURCE_TYPE": ""
 				}
 			},
 			"PROJECT_ACTIVITY_SUMMARY": {

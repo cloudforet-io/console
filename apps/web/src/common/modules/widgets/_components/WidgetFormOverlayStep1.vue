@@ -2,13 +2,12 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PToolboxTable, PFieldGroup, PTextInput, PFieldTitle, PEmpty, PI,
+    PButton, PToolboxTable, PFieldTitle, PEmpty, PI,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
 
-import { useFormValidator } from '@/common/composables/form-validator';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 
 
@@ -32,21 +31,6 @@ const state = reactive({
         { name: 'regionMap', label: 'Region Map', icon: '' },
     ]),
     selectedChartType: undefined as string|undefined,
-});
-const {
-    forms: { dataSourceName },
-    invalidState,
-    invalidTexts,
-    setForm,
-} = useFormValidator({
-    dataSourceName: '',
-}, {
-    dataSourceName: (val: string) => {
-        if (val?.length < 2) {
-            return 'sdfsdff';
-        }
-        return true;
-    },
 });
 
 /* Event */
@@ -90,19 +74,6 @@ const handleClickChartType = (chartType: string) => {
             </p-toolbox-table>
         </div>
         <div class="right-part">
-            <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DATA_SOURCE_NAME')"
-                           :invalid="invalidState.dataSourceName"
-                           :invalid-text="invalidTexts.dataSourceName"
-                           required
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="dataSourceName"
-                                  :invalid="invalid"
-                                  placeholder="Data Table"
-                                  @update:value="setForm('dataSourceName', $event)"
-                    />
-                </template>
-            </p-field-group>
             <div class="chart-type-wrapper">
                 <p-field-title :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CHART_TYPE')" />
                 <div class="chart-type-select-wrapper">

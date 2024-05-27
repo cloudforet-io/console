@@ -1771,7 +1771,8 @@
 					"METRIC": "",
 					"NAMESPACE": "",
 					"SECURITY": "セキュリティ",
-					"SELECT_A_DATA_SOURCE": ""
+					"SELECT_A_DATA_SOURCE": "",
+					"SELECT_DATA_SOURCE_TYPE": ""
 				}
 			},
 			"PROJECT_ACTIVITY_SUMMARY": {
