@@ -1755,7 +1755,9 @@
 					"ADD_WIDGET": "Add Widget",
 					"ASSET": "Asset",
 					"BUDGET": "Budget",
+					"CATEGORY": "Category",
 					"CHART_TYPE": "Chart Type",
+					"COMMON": "Common",
 					"CONTINUE": "Continue",
 					"COST": "Cost",
 					"COST_ANALYSIS": "Cost Analysis",
@@ -1766,6 +1768,8 @@
 					"EDIT_WIDGET": "Edit Widget",
 					"EMPTY_DESC": "Selectable chart types for the widget are available.",
 					"GENERATE": "Generate",
+					"METRIC": "Metric",
+					"NAMESPACE": "Namespace",
 					"SECURITY": "Security",
 					"SELECT_A_DATA_SOURCE": "Select a data source"
 				}

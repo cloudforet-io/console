@@ -1755,7 +1755,9 @@
 					"ADD_WIDGET": "",
 					"ASSET": "アセット",
 					"BUDGET": "予算",
+					"CATEGORY": "",
 					"CHART_TYPE": "チャートタイプ",
+					"COMMON": "",
 					"CONTINUE": "次へ",
 					"COST": "費用",
 					"COST_ANALYSIS": "コスト分析",
@@ -1766,6 +1768,8 @@
 					"EDIT_WIDGET": "",
 					"EMPTY_DESC": "",
 					"GENERATE": "",
+					"METRIC": "",
+					"NAMESPACE": "",
 					"SECURITY": "セキュリティ",
 					"SELECT_A_DATA_SOURCE": ""
 				}
