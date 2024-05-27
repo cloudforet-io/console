@@ -182,11 +182,18 @@ export default defineComponent<PopoverProps>({
                 bindEventToTargetRef('blur', handleTargetHideEvent, true);
             }
         };
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                hidePopover();
+            }
+        };
 
         onMounted(() => {
             if (state.targetRef && state.contentRef) {
                 popperObject = createPopper(state.targetRef, state.contentRef, state.popperOptions);
                 addEvent();
+
+                document.addEventListener('keydown', handleEscKey);
 
                 watch(() => props.isVisible, (value) => {
                     if (state.proxyIsVisible === value) return;
@@ -197,8 +204,10 @@ export default defineComponent<PopoverProps>({
             }
         });
 
-        onUnmounted(() => popperObject?.destroy());
-
+        onUnmounted(() => {
+            popperObject?.destroy();
+            document.removeEventListener('keydown', handleEscKey);
+        });
 
         return {
             ...toRefs(state),
