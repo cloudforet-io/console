@@ -10,7 +10,7 @@ interface Props {
     visible: boolean;
     title?: string;
     styleType?: 'primary' | 'secondary';
-    size?: 'md' | 'lg';
+    size?: 'md' | 'lg' | 'full';
     isFixedSize?: boolean;
 }
 
@@ -122,6 +122,9 @@ const handleClose = () => {
         &.lg {
             width: 90%;
         }
+        &.full {
+            width: 100%;
+        }
 
         &.primary {
             @apply bg-white;
@@ -136,6 +139,9 @@ const handleClose = () => {
                 width: 100%;
             }
             &.lg {
+                width: 100%;
+            }
+            &.full {
                 width: 100%;
             }
         }

@@ -1755,7 +1755,9 @@
 					"ADD_WIDGET": "위젯 추가",
 					"ASSET": "에셋",
 					"BUDGET": "예산",
+					"CATEGORY": "",
 					"CHART_TYPE": "차트 유형",
+					"COMMON": "",
 					"CONTINUE": "계속하기",
 					"COST": "비용",
 					"COST_ANALYSIS": "비용 분석",
@@ -1766,6 +1768,8 @@
 					"EDIT_WIDGET": "",
 					"EMPTY_DESC": "",
 					"GENERATE": "",
+					"METRIC": "",
+					"NAMESPACE": "네임스페이스",
 					"SECURITY": "보안",
 					"SELECT_A_DATA_SOURCE": ""
 				}
