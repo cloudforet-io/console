@@ -13,6 +13,7 @@ export default class CostDataSourceVariableModel extends ResourceVariableModel<C
         resourceType: 'cost_analysis.DataSource',
         idKey: 'data_source_id',
         nameKey: 'name',
+        _searchTargets: ['name'],
     };
 
     constructor(config: VariableModelConstructorConfig = {}) {
