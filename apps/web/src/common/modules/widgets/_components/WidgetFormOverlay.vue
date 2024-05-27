@@ -43,7 +43,7 @@ const handleClickContinue = () => {
     <div>
         <p-overlay-layout :visible.sync="state.proxyVisible"
                           style-type="primary"
-                          size="lg"
+                          size="full"
                           :title="state.sidebarTitle"
         >
             <widget-form-overlay-step1 />
