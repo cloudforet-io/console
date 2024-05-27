@@ -1,7 +1,9 @@
 <script setup lang="ts">
 
+import { computed, reactive } from 'vue';
+
 import {
-    PFieldGroup, PDivider, PIconButton, PTextButton, PI,
+    PFieldGroup, PDivider, PIconButton, PTextButton, PI, PButton, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
 import { violet, white } from '@/styles/colors';
@@ -12,6 +14,18 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const state = reactive({
+    dataFormatItems: computed(() => [
+        { label: 'Time-series', value: 'time-series' },
+        { label: 'Accumulated', value: 'accumulated' },
+    ]),
+    selectedDataFormat: 'time-series',
+});
+
+const handleSelectDataFormat = (dataFormat: string) => {
+    state.selectedDataFormat = dataFormat;
+};
 
 </script>
 
@@ -45,13 +59,29 @@ const props = defineProps<Props>();
                 </div>
             </div>
             <div class="options-form">
-                <p-field-group label="Group by"
-                               required
-                />
+                <p-field-group label="Group by" />
                 <p-field-group label="Data Format"
                                required
-                />
+                >
+                    <p-radio-group>
+                        <p-radio v-for="dataFormat in state.dataFormatItems"
+                                 :key="dataFormat.value"
+                                 :selected="state.selectedDataFormat"
+                                 :value="dataFormat.value"
+                                 class="provider-item"
+                                 @change="handleSelectDataFormat"
+                        >
+                            {{ dataFormat.label }}
+                        </p-radio>
+                    </p-radio-group>
+                </p-field-group>
                 <p-divider class="filter-divider" />
+                <p-button style-type="tertiary"
+                          icon-left="ic_plus_bold"
+                          block
+                >
+                    Add Filter
+                </p-button>
             </div>
         </div>
         <div v-if="props.latestAdded"
