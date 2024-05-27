@@ -13,7 +13,6 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -40,11 +39,9 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm', queryHelper: ApiQueryHelper): void; }>();
+const emit = defineEmits<{(e: 'confirm', options?: ToolboxOptions): void; }>();
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
-const tableListApiQueryHelper = new ApiQueryHelper();
-let tableListApiQuery = tableListApiQueryHelper.data;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -92,14 +89,7 @@ const handleSelect = (index: number[]) => {
     dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    tableListApiQuery = getApiQueryWithToolboxOptions(tableListApiQueryHelper, options) ?? tableListApiQuery;
-
-    if (options.queryTags !== undefined) {
-        dataSourcesPageStore.setLinkedAccountsSearchFilters(tableListApiQueryHelper.filters);
-    }
-    if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
-    emit('confirm', tableListApiQueryHelper);
+    emit('confirm', options);
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
@@ -113,7 +103,7 @@ const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMen
         account_id: accountItem.account_id,
         workspace_id: isObject(menuItem) ? menuItem?.name : menuItem,
     });
-    await emit('confirm', tableListApiQueryHelper);
+    await emit('confirm');
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
@@ -168,7 +158,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      :query-tags="queryTags"
                      @select="handleSelect"
                      @change="handleChangeToolbox"
-                     @refresh="emit('confirm', tableListApiQueryHelper)"
+                     @refresh="emit('confirm')"
     >
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style

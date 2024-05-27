@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PHeading,
 } from '@spaceone/design-system';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -25,7 +27,8 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-let listApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
+let linkedAccountListApiQueryHelper: ApiQueryHelper;
+let linkedAccountListApiQuery;
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
@@ -56,6 +59,22 @@ const state = reactive({
 const handleClickAction = (action: CostLinkedAccountModalType) => {
     dataSourcesPageStore.setModal(true, action);
 };
+const handleChangeLinkedAccountToolbox = (options: ToolboxOptions) => {
+    if (options) {
+        linkedAccountListApiQuery = getApiQueryWithToolboxOptions(linkedAccountListApiQueryHelper, options) ?? linkedAccountListApiQuery;
+
+        if (options.sortBy !== undefined) {
+            linkedAccountListApiQueryHelper.setSort(options.sortBy, options.sortDesc);
+        }
+        if (options.queryTags !== undefined) {
+            dataSourcesPageStore.setLinkedAccountsSearchFilters(linkedAccountListApiQueryHelper.filters);
+        }
+        if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
+        if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
+    }
+
+    fetchLinkedAccountList();
+};
 const handleConfirmModal = async (promises: Promise<void>[]) => {
     const loadingMessageId = showLoadingMessage(state.loadingMessage, '');
 
@@ -76,17 +95,14 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
     await fetchLinkedAccountList();
 };
 
-const fetchLinkedAccountList = async (tableListApiQueryHelper?: ApiQueryHelper) => {
-    if (tableListApiQueryHelper) {
-        listApiQueryHelper = tableListApiQueryHelper;
-    }
+const fetchLinkedAccountList = async () => {
     dataSourcesPageStore.setLinkedAccountsLoading(true);
     try {
-        listApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
+        linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
             .setFilters(storeState.linkedAccountsSearchFilters);
         await dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
-            query: listApiQueryHelper.data,
+            query: linkedAccountListApiQuery,
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
@@ -101,12 +117,10 @@ const fetchDataSourceList = async () => {
     });
 };
 
-onMounted(async () => {
-    await fetchLinkedAccountList();
-});
-
 watch(() => storeState.selectedDataSourceIndices, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
+    linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
+    linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
     await fetchLinkedAccountList();
 }, { immediate: true });
 </script>
@@ -138,7 +152,7 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
                 </div>
             </template>
         </p-heading>
-        <data-source-management-tab-linked-account-table @confirm="fetchLinkedAccountList" />
+        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox" />
         <data-source-management-modal v-if="storeState.modalVisible"
                                       @confirm="handleConfirmModal"
         />
