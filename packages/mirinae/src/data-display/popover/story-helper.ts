@@ -117,6 +117,42 @@ export const getPopoverArgTypes = () => {
                 type: 'boolean',
             },
         },
+        hidePadding: {
+            name: 'hidePadding',
+            type: { name: 'boolean' },
+            description: 'If the value is true, do not apply padding to the popover.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        hideCloseButton: {
+            name: 'hideCloseButton',
+            type: { name: 'boolean' },
+            description: 'If the value is true, hide the close button.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         // model
         'v-model': {
             name: 'v-model',

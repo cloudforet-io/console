@@ -26,7 +26,7 @@ import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-con
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type PickedCostDataSourceModel = Pick<CostDataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'|'workspace_id'>;
+type PickedCostDataSourceModel = Pick<CostDataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'|'cost_data_keys'|'workspace_id'>;
 export type CostDataSourceItems = Required<Pick<ReferenceItem<PickedCostDataSourceModel>, 'key'|'label'|'name'|'data'>>;
 export type CostDataSourceReferenceMap = ReferenceMap<CostDataSourceItems>;
 

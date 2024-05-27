@@ -1,13 +1,16 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
-    PI, PPopover, PButton, PFieldTitle, PContextMenu,
+    PI, PPopover,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
+
+import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 
 
 const DATA_SOURCE_DOMAIN = {
@@ -16,11 +19,7 @@ const DATA_SOURCE_DOMAIN = {
     SECURITY: 'SECURITY',
 };
 type DataSourceDomain = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
-const COST_SOURCE_FROM = {
-    COST_ANALYSIS: 'COST_ANALYSIS',
-    BUDGET: 'BUDGET',
-    COST_REPORT: 'COST_REPORT',
-};
+
 const state = reactive({
     showPopover: false,
     dataSourceDomainItems: computed(() => ([
@@ -41,28 +40,6 @@ const state = reactive({
         },
     ])),
     selectedDataSourceDomain: undefined as undefined|DataSourceDomain,
-    // cost
-    costDataSourceFromMenuItems: computed<MenuItem[]>(() => [
-        {
-            type: 'item',
-            name: COST_SOURCE_FROM.COST_ANALYSIS,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_ANALYSIS'),
-            icon: 'ic_service_cost-analysis',
-        },
-        {
-            type: 'item',
-            name: COST_SOURCE_FROM.BUDGET,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.BUDGET'),
-            icon: 'ic_service_budget',
-        },
-        {
-            type: 'item',
-            name: COST_SOURCE_FROM.COST_REPORT,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_REPORT'),
-            icon: 'ic_service_cost-report',
-        },
-    ]),
-    selectedDataSource: undefined,
 });
 
 /* Event */
@@ -72,10 +49,17 @@ const handleClickAddDataSourceButton = () => {
 const handleClickDataSourceDomain = (domainName: DataSourceDomain) => {
     state.selectedDataSourceDomain = domainName;
 };
-const handleConfirmDataSource = () => {
-    // TODO: add event
+const handleSelectCostDataSource = (costDataSourceId: string, costDataType: string) => {
+    // TODO: add event handler
+    console.log('select-cost-data-source', costDataSourceId, costDataType);
     state.showPopover = false;
 };
+
+watch(() => state.showPopover, (val) => {
+    if (!val) {
+        state.selectedDataSourceDomain = undefined;
+    }
+});
 </script>
 
 <template>
@@ -84,6 +68,8 @@ const handleConfirmDataSource = () => {
                position="right-start"
                ignore-outside-click
                ignore-target-click
+               hide-close-button
+               hide-padding
                :trigger="POPOVER_TRIGGER.NONE"
     >
         <div class="add-data-source-button"
@@ -115,47 +101,9 @@ const handleConfirmDataSource = () => {
                     <p>{{ domainItem.label }}</p>
                 </div>
             </div>
-            <div v-else
-                 class="data-source-popover-content"
-                 :class="[`domain-${state.selectedDataSourceDomain?.toLowerCase()}`]"
-            >
-                <!-- Cost -->
-                <div class="top-part">
-                    <div class="data-source-select-col">
-                        <p-field-title :label="i18n.t('Source From')"
-                                       required
-                        />
-                        <p-context-menu ref="contextMenuRef"
-                                        :menu="state.costDataSourceFromMenuItems"
-                        />
-                    </div>
-                    <div class="data-source-select-col">
-                        <p-field-title :label="i18n.t('Source')"
-                                       required
-                        />
-                        <p-context-menu ref="contextMenuRef"
-                                        :menu="[]"
-                                        searchable
-                        />
-                    </div>
-                    <div class="data-source-select-col">
-                        <p-field-title :label="i18n.t('Data Type')"
-                                       required
-                        />
-                        <p-context-menu ref="contextMenuRef"
-                                        :menu="[]"
-                        />
-                    </div>
-                </div>
-                <div class="popover-footer">
-                    <p-button style-type="substitutive"
-                              :disabled="!state.selectedDataSource"
-                              @click="handleConfirmDataSource"
-                    >
-                        {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
-                    </p-button>
-                </div>
-            </div>
+            <widget-form-cost-data-source-popper v-else
+                                                 @select-cost-data-source="handleSelectCostDataSource"
+            />
         </template>
     </p-popover>
 </template>
@@ -164,6 +112,11 @@ const handleConfirmDataSource = () => {
 .data-source-popover {
     display: inline-block;
     position: relative;
+    :deep(&.p-popover) {
+        .popper {
+            padding: 0;
+        }
+    }
     .add-data-source-button {
         @apply bg-primary2 rounded-full text-white border border-primary-1;
         width: 2rem;
@@ -178,6 +131,7 @@ const handleConfirmDataSource = () => {
         flex-direction: column;
         gap: 0.5rem;
         width: 11.25rem;
+        padding: 1rem;
         .data-source-item {
             @apply border border-gray-200 rounded-md;
             display: flex;
@@ -189,35 +143,6 @@ const handleConfirmDataSource = () => {
             .icon-wrapper {
                 @apply bg-violet-150 rounded;
             }
-        }
-    }
-    .data-source-popover-content {
-        display: flex;
-        flex-direction: column;
-        height: 30rem;
-        &.domain-cost {
-            width: 57rem;
-            .top-part {
-                @apply grid grid-cols-12;
-                .data-source-select-col {
-                    @apply col-span-4 border-r border-gray-200;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    padding: 0.75rem;
-                    &:last-child {
-                        @apply border-r-0;
-                    }
-                }
-            }
-        }
-        .top-part {
-            flex: 1;
-        }
-        .popover-footer {
-            @apply border-t border-gray-200;
-            text-align: right;
-            padding: 0.75rem;
         }
     }
 }

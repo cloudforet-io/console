@@ -28,7 +28,7 @@ export const Template = (args, { argTypes }) => ({
                 <template #content>
                     <div v-if="contentRefSlot" v-html="contentRefSlot" />
                     <div v-else>
-                        <p style="margin-top:12px">content: {{defaultContentValue}}</p>
+                        <p>content: {{defaultContentValue}}</p>
                     </div>
                 </template>
             </p-popover>
@@ -61,7 +61,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 <Canvas>
-    <Story name="Basic">
+    <Story name="Basic Popover">
         {{
             components: { PPopover, PTextInput, PButton },
             template: `
@@ -71,7 +71,7 @@ export const Template = (args, { argTypes }) => ({
             <p-popover>
                 <p-button>default</p-button>
                 <template #content>
-                    <p style="margin-top:12px">content slot</p>
+                    <p>content slot</p>
                 </template>
             </p-popover>
             <br/>
@@ -81,7 +81,7 @@ export const Template = (args, { argTypes }) => ({
             <p-popover trigger="hover">
                 <p-button>default</p-button>
                 <template #content>
-                    <p style="margin-top:12px">content slot</p>
+                    <p>content slot</p>
                 </template>
             </p-popover>
             <br/>
@@ -91,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
             <p-popover trigger="focus">
                 <p-text-input style-type="primary" :outline="true">default</p-text-input>
                 <template #content>
-                    <p style="margin-top:12px">content slot</p>
+                    <p>content slot</p>
                 </template>
             </p-popover>
         </div>
@@ -114,14 +114,61 @@ export const Template = (args, { argTypes }) => ({
             <p-popover ignore-outside-click>
                 <p-button>click me (ignore outside click)</p-button>
                 <template #content>
-                    <p style="margin-top:12px">This popover ignores outside click</p>
+                    <p>This popover ignores outside click</p>
                 </template>
             </p-popover>
             <div style="height: 100px;"/>
             <p-popover>
                 <p-button>click me (default)</p-button>
                 <template #content>
-                    <p style="margin-top:12px">This popover will be closed when you click outside</p>
+                    <p>This popover will be closed when you click outside</p>
+                </template>
+            </p-popover>
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+## Hide Close Button
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Hide Close Button">
+{{
+    components: { PPopover, PTextInput, PButton },
+    template: `
+        <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
+            <p-popover hide-close-button>
+                <p-button>click me (hide close button)</p-button>
+                <template #content>
+                    <p>This popover hides close button</p>
+                </template>
+            </p-popover>
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+
+## Hide Padding
+
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Hide Padding">
+        {{
+            components: { PPopover, PTextInput, PButton },
+            template: `
+        <div class="w-full overflow p-8 flex flex-col gap-4" style="height: 300px;">
+            <p-popover hide-padding hide-close-button>
+                <p-button>click me (hide padding)</p-button>
+                <template #content>
+                    <p>This popover hides padding and close button</p>
                 </template>
             </p-popover>
         </div>
