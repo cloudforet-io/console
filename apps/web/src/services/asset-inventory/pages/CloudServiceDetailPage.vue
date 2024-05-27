@@ -430,7 +430,7 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
 }, { immediate: true, debounce: 200 });
 
 (() => {
-    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : []);
+    const defaultSearchQuery = (Array.isArray(route.query.default_filters) ? route.query.default_filters : [route.query.default_filters]);
     tableState.defaultSearchQuery = defaultSearchQuery.map((d) => (d ? JSON.parse(d) : undefined)).filter((d) => d);
     excelQuery.setFiltersAsRawQueryString(route.query.filters);
     cloudServiceDetailPageStore.$patch((_state) => {
