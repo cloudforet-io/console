@@ -123,7 +123,7 @@ watch(() => props.src, (src, before) => {
     @apply inline-block relative;
     z-index: 0;
     .img-container {
-        @apply inline-block w-full h-full absolute rounded-md overflow-hidden;
+        @apply inline-flex items-center w-full h-full absolute rounded-md overflow-hidden;
         z-index: 1;
         left: 0;
         &.error {
