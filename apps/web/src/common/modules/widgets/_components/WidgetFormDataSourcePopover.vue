@@ -222,7 +222,6 @@ const handleConfirmDataSource = () => {
     }
 }
 
-
 /* custom design-system component - p-context-menu */
 :deep(.p-context-menu) {
     border: none;
