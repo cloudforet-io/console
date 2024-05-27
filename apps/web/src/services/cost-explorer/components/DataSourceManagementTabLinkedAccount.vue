@@ -119,7 +119,9 @@ const fetchDataSourceList = async () => {
 
 watch(() => storeState.selectedDataSourceIndices, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
-    linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
+    linkedAccountListApiQueryHelper = new ApiQueryHelper()
+        .setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
+        .setSort('workspace_id', false);
     linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
     await fetchLinkedAccountList();
 }, { immediate: true });
