@@ -23,7 +23,8 @@
                                @click="handleClickCloseIcon"
                 />
             </div>
-            <div class="arrow"
+            <div v-if="!hideArrow"
+                 class="arrow"
                  data-popper-arrow
             />
         </div>
@@ -52,6 +53,9 @@ interface PopoverProps {
     trigger?: PopoverTrigger;
     ignoreTargetClick?: boolean;
     ignoreOutsideClick?: boolean;
+    hidePadding?: boolean;
+    hideCloseButton?: boolean;
+    hideArrow?: boolean
 }
 
 export default defineComponent<PopoverProps>({
@@ -107,6 +111,10 @@ export default defineComponent<PopoverProps>({
             type: Boolean,
             default: false,
         },
+        hideArrow: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         let popperObject: Instance|undefined;
@@ -120,7 +128,7 @@ export default defineComponent<PopoverProps>({
                     {
                         name: 'offset',
                         options: {
-                            offset: [0, 21],
+                            offset: [0, props.hideArrow ? 11 : 21],
                         },
                     },
                 ],
@@ -174,11 +182,18 @@ export default defineComponent<PopoverProps>({
                 bindEventToTargetRef('blur', handleTargetHideEvent, true);
             }
         };
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                hidePopover();
+            }
+        };
 
         onMounted(() => {
             if (state.targetRef && state.contentRef) {
                 popperObject = createPopper(state.targetRef, state.contentRef, state.popperOptions);
                 addEvent();
+
+                document.addEventListener('keydown', handleEscKey);
 
                 watch(() => props.isVisible, (value) => {
                     if (state.proxyIsVisible === value) return;
@@ -189,8 +204,10 @@ export default defineComponent<PopoverProps>({
             }
         });
 
-        onUnmounted(() => popperObject?.destroy());
-
+        onUnmounted(() => {
+            popperObject?.destroy();
+            document.removeEventListener('keydown', handleEscKey);
+        });
 
         return {
             ...toRefs(state),
