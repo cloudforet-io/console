@@ -133,6 +133,14 @@ const handleClickChartType = (chartType: string) => {
                     >
                         {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.EMPTY_DESC') }}
                     </p-empty>
+
+                    <div v-if="state.selectedChartType"
+                         class="selected-data-info-pannel"
+                    >
+                        <p class="info-text">
+                            Create a <strong>{{ state.selectedChartType }}</strong> widget with <strong>Data Source 01</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -179,7 +187,7 @@ const handleClickChartType = (chartType: string) => {
             display: flex;
             flex-direction: column;
             .chart-type-select-wrapper {
-                flex: 1;
+                @apply flex flex-col justify-between h-full;
                 .button-wrapper {
                     @apply grid gap-3;
                     grid-template-columns: repeat(3, 1fr);
@@ -206,6 +214,14 @@ const handleClickChartType = (chartType: string) => {
                 }
                 .empty-box {
                     height: 100%;
+                }
+                .selected-data-info-pannel {
+                    @apply border border-indigo-200 bg-indigo-100 rounded-lg w-full;
+                    height: 2.625rem;
+                    padding: 0.75rem 1rem;
+                    .info-text {
+                        @apply text-label-md text-indigo-600;
+                    }
                 }
             }
         }
