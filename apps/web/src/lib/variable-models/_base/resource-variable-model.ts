@@ -124,12 +124,12 @@ export default class ResourceVariableModel<T=any> implements IResourceVariableMo
         ]);
 
         if (query.search) {
-            const orFilters = this.#searchTargets.map((key) => ({
+            const searchFilters = this.#searchTargets.map((key) => ({
                 k: key,
                 v: query.search ?? '',
                 o: '' as ConsoleFilterOperator,
             }));
-            apiQueryHelper.setOrFilters(orFilters);
+            apiQueryHelper.setFilters(searchFilters);
         }
         if (query.start !== undefined && query.limit !== undefined) {
             apiQueryHelper.setPage(query.start, query.limit);
