@@ -1771,7 +1771,8 @@
 					"METRIC": "Metric",
 					"NAMESPACE": "Namespace",
 					"SECURITY": "Security",
-					"SELECT_A_DATA_SOURCE": "Select a data source"
+					"SELECT_A_DATA_SOURCE": "Select a data source",
+					"SELECT_DATA_SOURCE_TYPE": "Select Data Source Type"
 				}
 			},
 			"PROJECT_ACTIVITY_SUMMARY": {
