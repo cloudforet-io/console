@@ -8,6 +8,7 @@ import { violet, white } from '@/styles/colors';
 
 interface Props {
     selected: boolean;
+    latestAdded: boolean;
 }
 
 const props = defineProps<Props>();
@@ -53,7 +54,9 @@ const props = defineProps<Props>();
                 <p-divider class="filter-divider" />
             </div>
         </div>
-        <div class="add-data-source-floating-button">
+        <div v-if="props.latestAdded"
+             class="add-data-source-floating-button"
+        >
             <button class="add-button">
                 <p-i name="ic_plus"
                      width="1.5rem"
@@ -68,7 +71,6 @@ const props = defineProps<Props>();
 <style lang="postcss" scoped>
 .widget-form-data-source-card {
     @apply relative flex;
-    width: 28rem;
 
     .selected-icon {
         @apply absolute;
