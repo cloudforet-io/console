@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PButton, PToolboxTable, PFieldGroup, PTextInput, PFieldTitle, PEmpty,
+    PButton, PToolboxTable, PFieldGroup, PTextInput, PFieldTitle, PEmpty, PI,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -18,6 +18,20 @@ const state = reactive({
         { name: 'key', label: 'something', type: 'item' },
         { name: 'value', label: 'table', type: 'item' },
     ]),
+    selectedData: undefined as string|undefined,
+    chartTypes: computed(() => [
+        { name: 'table', label: 'Table', icon: '' },
+        { name: 'area', label: 'Area', icon: '' },
+        { name: 'verticalBar', label: 'Vertical Bar', icon: '' },
+        { name: 'line', label: 'Line', icon: '' },
+        { name: 'donut', label: 'Donut', icon: '' },
+        { name: 'pie', label: 'Pie', icon: '' },
+        { name: 'treemap', label: 'Treemap', icon: '' },
+        { name: 'heatmap', label: 'Heatmap', icon: '' },
+        { name: 'number', label: 'Number', icon: '' },
+        { name: 'regionMap', label: 'Region Map', icon: '' },
+    ]),
+    selectedChartType: undefined as string|undefined,
 });
 const {
     forms: { dataSourceName },
@@ -39,6 +53,11 @@ const {
 const handleClickGenerate = () => {
     // TODO: add event
 };
+
+const handleClickChartType = (chartType: string) => {
+    state.selectedChartType = chartType;
+};
+
 </script>
 
 <template>
@@ -46,6 +65,7 @@ const handleClickGenerate = () => {
         <div class="left-part">
             <div class="data-source-wrapper">
                 <widget-form-data-source-popover />
+                <!--                <widget-form-data-source-card />-->
             </div>
             <p-toolbox-table :fields="state.fields"
                              :items="[]"
@@ -86,13 +106,41 @@ const handleClickGenerate = () => {
             <div class="chart-type-wrapper">
                 <p-field-title :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CHART_TYPE')" />
                 <div class="chart-type-select-wrapper">
-                    <p-empty show-image
+                    <div v-if="!state.selectedData"
+                         class="button-wrapper"
+                    >
+                        <button v-for="chartType in state.chartTypes"
+                                :key="chartType.name"
+                                class="chart-type-button"
+                                :class="{ 'disabled': false, 'selected': state.selectedChartType === chartType.name }"
+                                @click="handleClickChartType(chartType.name)"
+                        >
+                            <p-i :name="chartType.icon" />
+                            {{ chartType.label }}
+                            <p-i v-if="state.selectedChartType === chartType.name"
+                                 class="selected-icon"
+                                 name="ic_checkbox-circle-selected"
+                                 width="1.25rem"
+                                 height="1.25rem"
+                            />
+                        </button>
+                    </div>
+                    <p-empty v-else
+                             show-image
                              image-size="sm"
                              class="empty-box"
                              :title="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.SELECT_A_DATA_SOURCE')"
                     >
                         {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.EMPTY_DESC') }}
                     </p-empty>
+
+                    <div v-if="state.selectedChartType"
+                         class="selected-data-info-pannel"
+                    >
+                        <p class="info-text">
+                            Create a <strong>{{ state.selectedChartType }}</strong> widget with <strong>Data Source 01</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -139,9 +187,41 @@ const handleClickGenerate = () => {
             display: flex;
             flex-direction: column;
             .chart-type-select-wrapper {
-                flex: 1;
+                @apply flex flex-col justify-between h-full;
+                .button-wrapper {
+                    @apply grid gap-3;
+                    grid-template-columns: repeat(3, 1fr);
+                    padding-top: 1rem;
+
+                    .chart-type-button {
+                        @apply relative border border-gray-200 rounded-lg flex flex-col items-center justify-center text-label-md cursor-pointer;
+                        height: 6.25rem;
+
+                        &.disabled {
+                            cursor: not-allowed;
+                            opacity: 0.3;
+                        }
+
+                        .selected-icon {
+                            @apply absolute;
+                            left: 0.5rem;
+                            top: 0.5rem;
+                        }
+                        &.selected {
+                            @apply border-blue-600 text-blue-600;
+                        }
+                    }
+                }
                 .empty-box {
                     height: 100%;
+                }
+                .selected-data-info-pannel {
+                    @apply border border-indigo-200 bg-indigo-100 rounded-lg w-full;
+                    height: 2.625rem;
+                    padding: 0.75rem 1rem;
+                    .info-text {
+                        @apply text-label-md text-indigo-600;
+                    }
                 }
             }
         }
