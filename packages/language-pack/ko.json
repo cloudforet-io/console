@@ -1753,13 +1753,20 @@
 			"OVERLAY": {
 				"STEP_1": {
 					"ADD_WIDGET": "위젯 추가",
+					"ASSET": "에셋",
+					"BUDGET": "예산",
 					"CHART_TYPE": "차트 유형",
 					"CONTINUE": "계속하기",
+					"COST": "비용",
+					"COST_ANALYSIS": "비용 분석",
+					"COST_REPORT": "비용 리포트",
 					"DATA_SOURCE_NAME": "",
 					"DATA_TABLE": "",
+					"DONE": "완료",
 					"EDIT_WIDGET": "",
 					"EMPTY_DESC": "",
 					"GENERATE": "",
+					"SECURITY": "보안",
 					"SELECT_A_DATA_SOURCE": ""
 				}
 			},

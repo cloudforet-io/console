@@ -9,6 +9,7 @@ import { i18n } from '@/translations';
 
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 
 
 const state = reactive({
@@ -44,7 +45,7 @@ const handleClickGenerate = () => {
     <div class="sidebar-contents">
         <div class="left-part">
             <div class="data-source-wrapper">
-                data source!
+                <widget-form-data-source-popover />
             </div>
             <p-toolbox-table :fields="state.fields"
                              :items="[]"
@@ -112,6 +113,8 @@ const handleClickGenerate = () => {
         padding: 0.125rem;
         .data-source-wrapper {
             flex: 1;
+            overflow: auto;
+            padding: 1rem;
         }
         .view-table-wrapper {
             @apply rounded-md;
