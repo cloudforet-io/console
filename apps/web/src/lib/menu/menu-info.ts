@@ -93,6 +93,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         highlightTag: 'new',
         icon: 'ic_service_cost-report',
     },
+    [MENU_ID.DATA_SOURCES]: {
+        menuId: MENU_ID.DATA_SOURCES,
+        routeName: COST_EXPLORER_ROUTE.DATA_SOURCES._NAME,
+        translationId: 'MENU.COST_EXPLORER_DATA_SOURCES',
+        highlightTag: 'new',
+        icon: 'ic_service_data-sources',
+    },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
         routeName: ALERT_MANAGER_ROUTE._NAME,

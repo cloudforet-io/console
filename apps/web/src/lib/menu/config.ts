@@ -15,6 +15,7 @@ export const MENU_ID = Object.freeze({
     COST_ANALYSIS: 'cost_analysis',
     BUDGET: 'budget',
     COST_REPORT: 'cost_report',
+    DATA_SOURCES: 'data_sources',
     ALERT_MANAGER: 'alert_manager',
     ALERT_MANAGER_DASHBOARD: 'alert_manager_dashboard',
     ALERT: 'alert',

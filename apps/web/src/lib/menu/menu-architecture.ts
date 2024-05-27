@@ -92,6 +92,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
             { id: MENU_ID.COST_ANALYSIS },
             { id: MENU_ID.BUDGET },
             { id: MENU_ID.COST_REPORT },
+            { id: MENU_ID.DATA_SOURCES },
         ],
     },
     {
