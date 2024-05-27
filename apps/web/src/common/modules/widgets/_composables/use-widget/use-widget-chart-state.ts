@@ -1,6 +1,7 @@
 import type { UnwrapRef } from 'vue';
 import { reactive } from 'vue';
 
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
@@ -14,7 +15,7 @@ import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-displ
 interface WidgetChartState {
     dateRange?: DateRange;
     dateFormat?: string;
-    timeUnit?: string;
+    timeUnit: TimeUnit;
     dataMapping: DataMapping;
     chartOptions: Record<string, any>;
     granularity?: Granularity;

@@ -124,8 +124,5 @@ const handleClickDeleteButton = () => {
         flex: 1 1;
         padding: 0 1.5rem;
     }
-    &.full {
-        height: auto;
-    }
 }
 </style>
