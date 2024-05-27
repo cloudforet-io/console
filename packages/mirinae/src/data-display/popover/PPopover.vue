@@ -11,11 +11,12 @@
         </span>
         <div ref="contentRef"
              class="popper"
-             :class="{ 'visible': proxyIsVisible }"
+             :class="{ 'visible': proxyIsVisible, 'hide-padding': hidePadding }"
         >
             <div class="popper-content-wrapper">
                 <slot name="content" />
-                <p-icon-button name="ic_close"
+                <p-icon-button v-if="!hideCloseButton"
+                               name="ic_close"
                                color="inherit"
                                size="sm"
                                class="close-icon"
@@ -95,6 +96,14 @@ export default defineComponent<PopoverProps>({
             default: true,
         },
         ignoreOutsideClick: {
+            type: Boolean,
+            default: false,
+        },
+        hidePadding: {
+            type: Boolean,
+            default: false,
+        },
+        hideCloseButton: {
             type: Boolean,
             default: false,
         },
@@ -197,19 +206,25 @@ export default defineComponent<PopoverProps>({
 <style lang="postcss">
 .p-popover {
     > .popper {
-        @apply bg-white border rounded-md border-gray-300 py-3 pl-4 pr-2;
+        @apply bg-white border rounded-md border-gray-300;
         display: none;
         filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.08));
         z-index: 99;
+        padding: 1rem;
 
         &[data-show] {
             display: block;
+        }
+        &.hide-padding {
+            padding: 0;
         }
         > .popper-content-wrapper {
             @apply flex w-full;
 
             .close-icon {
-                margin: 0.5rem;
+                position: absolute;
+                right: 0.25rem;
+                top: 0.25rem;
             }
         }
 
