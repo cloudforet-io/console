@@ -4,7 +4,9 @@ import { ROUTE_SCOPE } from '@/router/constant';
 
 import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
-const LandingPage = () => import('@/services/landing/pages/LandingPage.vue');
+const LandingContainer = () => import('@/services/landing/components/LandingContainer.vue');
+const WorkspaceLandingPage = () => import('@/services/landing/pages/WorkspaceLandingPage.vue');
+const DomainLandingPage = () => import('@/services/landing/pages/DomainLandingPage.vue');
 
 
 const landingPageRoutes: RouteConfig = {
@@ -13,7 +15,25 @@ const landingPageRoutes: RouteConfig = {
     meta: {
         scope: ROUTE_SCOPE.USER,
     },
-    component: LandingPage,
+    component: LandingContainer,
+    children: [
+        {
+            path: 'workspace',
+            name: LANDING_ROUTE.WORKSPACE._NAME,
+            meta: {
+                scope: ROUTE_SCOPE.USER,
+            },
+            component: WorkspaceLandingPage,
+        },
+        {
+            path: 'domain',
+            name: LANDING_ROUTE.DOMAIN._NAME,
+            meta: {
+                scope: ROUTE_SCOPE.USER,
+            },
+            component: DomainLandingPage,
+        },
+    ],
 };
 
 export default landingPageRoutes;
