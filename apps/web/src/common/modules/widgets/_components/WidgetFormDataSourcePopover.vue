@@ -10,6 +10,8 @@ import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popove
 
 import { i18n } from '@/translations';
 
+import WidgetFormAssetSecurityDataSourcePopper
+    from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 
 
@@ -52,6 +54,11 @@ const handleClickDataSourceDomain = (domainName: DataSourceDomain) => {
 const handleSelectCostDataSource = (costDataSourceId: string, costDataType: string) => {
     // TODO: add event handler
     console.log('select-cost-data-source', costDataSourceId, costDataType);
+    state.showPopover = false;
+};
+const handleSelectMetricId = (metricId: string) => {
+    // TODO: add event handler
+    console.log('select-metric-id', metricId);
     state.showPopover = false;
 };
 
@@ -101,8 +108,13 @@ watch(() => state.showPopover, (val) => {
                     <p>{{ domainItem.label }}</p>
                 </div>
             </div>
-            <widget-form-cost-data-source-popper v-else
+            <widget-form-cost-data-source-popper v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
                                                  @select-cost-data-source="handleSelectCostDataSource"
+            />
+            <widget-form-asset-security-data-source-popper
+                v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
+                :data-source-domain="state.selectedDataSourceDomain"
+                @select-metric-id="handleSelectMetricId"
             />
         </template>
     </p-popover>
