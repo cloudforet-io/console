@@ -25,7 +25,7 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const listApiQueryHelper = new ApiQueryHelper();
+let listApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
@@ -76,7 +76,10 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
     await fetchLinkedAccountList();
 };
 
-const fetchLinkedAccountList = async () => {
+const fetchLinkedAccountList = async (tableListApiQueryHelper?: ApiQueryHelper) => {
+    if (tableListApiQueryHelper) {
+        listApiQueryHelper = tableListApiQueryHelper;
+    }
     dataSourcesPageStore.setLinkedAccountsLoading(true);
     try {
         listApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)

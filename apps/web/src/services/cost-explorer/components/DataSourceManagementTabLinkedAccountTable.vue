@@ -40,11 +40,10 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', queryHelper: ApiQueryHelper): void; }>();
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
-const tableListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
+const tableListApiQueryHelper = new ApiQueryHelper();
 let tableListApiQuery = tableListApiQueryHelper.data;
 
 const storeState = reactive({
@@ -67,7 +66,7 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
-            { name: 'is_sync', label: 'Auto Mapping' },
+            { name: 'is_sync', label: 'Linked' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
@@ -94,12 +93,13 @@ const handleSelect = (index: number[]) => {
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
     tableListApiQuery = getApiQueryWithToolboxOptions(tableListApiQueryHelper, options) ?? tableListApiQuery;
-    if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
+
     if (options.queryTags !== undefined) {
         dataSourcesPageStore.setLinkedAccountsSearchFilters(tableListApiQueryHelper.filters);
     }
-    emit('confirm');
+    if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
+    emit('confirm', tableListApiQueryHelper);
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
@@ -113,7 +113,7 @@ const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMen
         account_id: accountItem.account_id,
         workspace_id: isObject(menuItem) ? menuItem?.name : menuItem,
     });
-    await emit('confirm');
+    await emit('confirm', tableListApiQueryHelper);
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
@@ -160,15 +160,15 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      :items="storeState.linkedAccounts"
                      :select-index="storeState.selectedLinkedAccountsIndices"
                      :fields="tableState.fields"
-                     sort-by="name"
-                     :sort-desc="true"
+                     sort-by="workspace_id"
+                     :sort-desc="false"
                      :total-count="storeState.totalCount"
                      :key-item-sets="tableState.keyItemSets"
                      :value-handler-map="tableState.valueHandlerMap"
                      :query-tags="queryTags"
                      @select="handleSelect"
                      @change="handleChangeToolbox"
-                     @refresh="emit('confirm')"
+                     @refresh="emit('confirm', tableListApiQueryHelper)"
     >
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style
