@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, toRef,
+    computed, reactive, toRef, watch,
 } from 'vue';
 
 import {
-    PButton, PFieldTitle, PContextMenu, useContextMenuController,
+    PFieldTitle, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -23,6 +23,8 @@ import {
     getVariableModelMenuHandler,
 } from '@/lib/variable-models/variable-model-menu-handler';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 const COST_SOURCE_FROM = {
     COST_ANALYSIS: 'COST_ANALYSIS',
@@ -31,7 +33,13 @@ const COST_SOURCE_FROM = {
 };
 type CostSourceFrom = typeof COST_SOURCE_FROM[keyof typeof COST_SOURCE_FROM];
 
-const emit = defineEmits<{(e: 'select-cost-data-source', costDataSourceId: string, costDataType: string): void;
+interface Props {
+    selectedCostDataSourceId?: string;
+    selectedCostDataType?: string;
+}
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: 'update:selected-cost-data-source-id', costDataSourceId: string): void;
+    (e: 'update:selected-cost-data-type', costDataType: string): void;
 }>();
 
 /* Util */
@@ -47,6 +55,8 @@ const storeState = reactive({
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
+    proxySelectedCostDataSourceId: useProxyValue('selectedCostDataSourceId', props, emit),
+    proxySelectedCostDataType: useProxyValue('selectedCostDataType', props, emit),
     // source from
     costDataSourceFromMenuItems: computed<MenuItem[]>(() => [
         {
@@ -120,81 +130,66 @@ const handleUpdateCostDataSourceSearchText = debounce((text: string) => {
     state.dataSourceSearchText = text;
     reloadMenu();
 }, 200);
-const handleConfirmDataSource = () => {
-    emit('select-cost-data-source', state.selectedDataSource[0].name, state.selectedDataType[0].name);
-};
 const handleSelectDataSource = () => {
     state.selectedDataType = [];
 };
+
+/* Watcher */
+watch(() => state.selectedDataSource, (val) => {
+    state.proxySelectedCostDataSourceId = val[0]?.name;
+});
+watch(() => state.selectedDataType, (val) => {
+    state.proxySelectedCostDataType = val[0]?.name;
+});
 </script>
 
 <template>
-    <div class="data-source-popover-content">
-        <div class="top-part">
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('Source From')"
-                               required
-                />
-                <p-context-menu :menu="state.costDataSourceFromMenuItems"
-                                @select="handleSelectCostDataSourceFrom"
-                />
-            </div>
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('Source')"
-                               required
-                />
-                <p-context-menu :menu="refinedMenu"
-                                :search-text="state.dataSourceSearchText"
-                                searchable
-                                :selected.sync="state.selectedDataSource"
-                                @update:search-text="handleUpdateCostDataSourceSearchText"
-                                @select="handleSelectDataSource"
-                />
-            </div>
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('Data Type')"
-                               required
-                />
-                <p-context-menu :menu="state.dataTypeMenuItems"
-                                :selected.sync="state.selectedDataType"
-                />
-            </div>
+    <div class="widget-form-cost-data-source-popper">
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('Source From')"
+                           required
+            />
+            <p-context-menu :menu="state.costDataSourceFromMenuItems"
+                            @select="handleSelectCostDataSourceFrom"
+            />
         </div>
-        <div class="popover-footer">
-            <p-button style-type="substitutive"
-                      :disabled="!state.selectedDataSource.length || !state.selectedDataType.length"
-                      @click="handleConfirmDataSource"
-            >
-                {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
-            </p-button>
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('Source')"
+                           required
+            />
+            <p-context-menu :menu="refinedMenu"
+                            :search-text="state.dataSourceSearchText"
+                            searchable
+                            :selected.sync="state.selectedDataSource"
+                            @update:search-text="handleUpdateCostDataSourceSearchText"
+                            @select="handleSelectDataSource"
+            />
+        </div>
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('Data Type')"
+                           required
+            />
+            <p-context-menu :menu="state.dataTypeMenuItems"
+                            :selected.sync="state.selectedDataType"
+            />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.data-source-popover-content {
-    display: flex;
-    flex-direction: column;
-    width: 57rem;
-    height: 30rem;
-    .top-part {
-        @apply grid grid-cols-12;
-        flex: 1;
-        .data-source-select-col {
-            @apply col-span-4 border-r border-gray-200;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            &:last-child {
-                @apply border-r-0;
-            }
-        }
-    }
-    .popover-footer {
-        @apply border-t border-gray-200;
-        text-align: right;
+.widget-form-cost-data-source-popper {
+    @apply grid grid-cols-12;
+    width: 100%;
+    flex: 1;
+    .data-source-select-col {
+        @apply col-span-4 border-r border-gray-200;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
         padding: 0.75rem;
+        &:last-child {
+            @apply border-r-0;
+        }
     }
 }
 

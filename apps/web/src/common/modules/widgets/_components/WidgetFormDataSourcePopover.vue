@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PPopover,
+    PButton, PI, PPopover, PSelectCard,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 
@@ -15,6 +15,11 @@ import WidgetFormAssetSecurityDataSourcePopper
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 
 
+const POPPER_CONDITION = {
+    NEW_DATA_SOURCE: 'NEW_DATA_SOURCE',
+    COMBINE_DATA_SOURCE: 'COMBINE_DATA_SOURCE',
+};
+type PopperCondition = typeof POPPER_CONDITION[keyof typeof POPPER_CONDITION];
 const DATA_SOURCE_DOMAIN = {
     COST: 'COST',
     ASSET: 'ASSET',
@@ -24,6 +29,7 @@ type DataSourceDomain = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAI
 
 const state = reactive({
     showPopover: false,
+    selectedPopperCondition: undefined as undefined|PopperCondition,
     dataSourceDomainItems: computed(() => ([
         {
             name: DATA_SOURCE_DOMAIN.COST,
@@ -42,29 +48,49 @@ const state = reactive({
         },
     ])),
     selectedDataSourceDomain: undefined as undefined|DataSourceDomain,
+    disableConfirmButton: computed(() => {
+        if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
+            return !state.selectedCostDataSourceId || !state.selectedCostDataType;
+        }
+        if ([DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)) {
+            return !state.selectedMetricId;
+        }
+        return true;
+    }),
+    // cost
+    selectedCostDataSourceId: undefined as undefined|string,
+    selectedCostDataType: undefined as undefined|string,
+    // asset & security
+    selectedMetricId: undefined as undefined|string,
 });
+
+/* Util */
+const resetSelectedDataSource = () => {
+    state.selectedCostDataSourceId = undefined;
+    state.selectedCostDataType = undefined;
+    state.selectedMetricId = undefined;
+};
 
 /* Event */
 const handleClickAddDataSourceButton = () => {
     state.showPopover = !state.showPopover;
 };
 const handleClickDataSourceDomain = (domainName: DataSourceDomain) => {
+    if (state.selectedDataSourceDomain === domainName) return;
     state.selectedDataSourceDomain = domainName;
+    resetSelectedDataSource();
 };
-const handleSelectCostDataSource = (costDataSourceId: string, costDataType: string) => {
-    // TODO: add event handler
-    console.log('select-cost-data-source', costDataSourceId, costDataType);
-    state.showPopover = false;
+const handleSelectPopperCondition = (condition: PopperCondition) => {
+    state.selectedPopperCondition = condition;
 };
-const handleSelectMetricId = (metricId: string) => {
-    // TODO: add event handler
-    console.log('select-metric-id', metricId);
+const handleConfirmDataSource = () => {
     state.showPopover = false;
 };
 
 watch(() => state.showPopover, (val) => {
     if (!val) {
         state.selectedDataSourceDomain = undefined;
+        state.selectedPopperCondition = undefined;
     }
 });
 </script>
@@ -73,7 +99,6 @@ watch(() => state.showPopover, (val) => {
     <p-popover class="data-source-popover"
                :is-visible="state.showPopover"
                position="right-start"
-               ignore-outside-click
                ignore-target-click
                hide-close-button
                hide-padding
@@ -90,32 +115,49 @@ watch(() => state.showPopover, (val) => {
             />
         </div>
         <template #content>
-            <div v-if="!state.selectedDataSourceDomain"
-                 class="data-source-domain-popover-content"
+            <div v-if="!state.selectedPopperCondition"
+                 class="data-source-popper-condition-wrapper"
             >
-                <div v-for="domainItem in state.dataSourceDomainItems"
-                     :key="`domain-${domainItem.name}`"
-                     class="data-source-item"
-                     @click="handleClickDataSourceDomain(domainItem.name)"
-                >
-                    <div class="icon-wrapper">
-                        <p-i :name="domainItem.icon"
-                             height="1.5rem"
-                             width="1.5rem"
-                             color="inherit"
+                <p-select-card :label="i18n.t('Add New Data Source')"
+                               @click="handleSelectPopperCondition(POPPER_CONDITION.NEW_DATA_SOURCE)"
+                />
+                <p-select-card :label="i18n.t('Combine Data Source')"
+                               @click="handleSelectPopperCondition(POPPER_CONDITION.COMBINE_DATA_SOURCE)"
+                />
+            </div>
+            <div v-else
+                 class="data-source-popover-content"
+            >
+                <div class="top-part">
+                    <div class="data-source-domain-col">
+                        <p-select-card v-for="domainItem in state.dataSourceDomainItems"
+                                       :key="`data-source-domain-${domainItem.name}`"
+                                       :label="domainItem.label"
+                                       :value="domainItem.name"
+                                       :selected="state.selectedDataSourceDomain"
+                                       @click="handleClickDataSourceDomain(domainItem.name)"
                         />
                     </div>
-                    <p>{{ domainItem.label }}</p>
+                    <widget-form-cost-data-source-popper
+                        v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
+                        :selected-cost-data-source-id.sync="state.selectedCostDataSourceId"
+                        :selected-cost-data-type.sync="state.selectedCostDataType"
+                    />
+                    <widget-form-asset-security-data-source-popper
+                        v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
+                        :data-source-domain="state.selectedDataSourceDomain"
+                        :selected-metric-id.sync="state.selectedMetricId"
+                    />
+                </div>
+                <div class="popover-footer">
+                    <p-button style-type="substitutive"
+                              :disabled="state.disableConfirmButton"
+                              @click="handleConfirmDataSource"
+                    >
+                        {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
+                    </p-button>
                 </div>
             </div>
-            <widget-form-cost-data-source-popper v-if="state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST"
-                                                 @select-cost-data-source="handleSelectCostDataSource"
-            />
-            <widget-form-asset-security-data-source-popper
-                v-if="[DATA_SOURCE_DOMAIN.ASSET, DATA_SOURCE_DOMAIN.SECURITY].includes(state.selectedDataSourceDomain)"
-                :data-source-domain="state.selectedDataSourceDomain"
-                @select-metric-id="handleSelectMetricId"
-            />
         </template>
     </p-popover>
 </template>
@@ -138,25 +180,43 @@ watch(() => state.showPopover, (val) => {
         justify-content: center;
         cursor: pointer;
     }
-    .data-source-domain-popover-content {
+    .data-source-popper-condition-wrapper {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 11.25rem;
+        width: 16.25rem;
         padding: 1rem;
-        .data-source-item {
-            @apply border border-gray-200 rounded-md;
+    }
+    .data-source-popover-content {
+        display: flex;
+        flex-direction: column;
+        width: 57rem;
+        height: 30rem;
+        .top-part {
             display: flex;
-            gap: 0.25rem;
-            align-items: center;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 0.5rem 1.25rem;
-            .icon-wrapper {
-                @apply bg-violet-150 rounded;
+            width: 100%;
+            flex: 1;
+            .data-source-domain-col {
+                @apply border-r border-gray-200;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 11.5rem;
+                height: 100%;
+                padding: 1rem 0.75rem;
             }
         }
     }
+    .popover-footer {
+        @apply border-t border-gray-200;
+        text-align: right;
+        padding: 0.75rem;
+    }
+}
+
+/* custom design-system component - p-select-card */
+:deep(.p-select-card) {
+    padding: 1rem;
 }
 
 /* custom design-system component - p-context-menu */

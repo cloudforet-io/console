@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PFieldTitle, PContextMenu,
+    PFieldTitle, PContextMenu,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -15,12 +15,15 @@ import type { MetricReferenceMap } from '@/store/reference/metric-reference-stor
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 interface Props {
     dataSourceDomain: string;
+    selectedMetricId?: string;
 }
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'select-metric-id', metricId: string): void;
+const emit = defineEmits<{(e: 'update:selected-metric-id', metricId: string): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
@@ -30,6 +33,7 @@ const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
 });
 const state = reactive({
+    proxySelectedMetricId: useProxyValue('selectedMetricId', props, emit),
     // category
     categoryMenuItems: computed<MenuItem[]>(() => {
         const _commonMenuItems: MenuItem = {
@@ -97,110 +101,85 @@ const state = reactive({
         }));
     }),
     metricSearchText: '',
-    selectedMetricId: undefined as undefined|string,
 });
 
 /* Event */
 const handleSelectCategory = (item: MenuItem) => {
     state.selectedCategory = item.name;
     state.selectedNamespaceId = undefined;
-    state.selectedMetricId = undefined;
+    state.proxySelectedMetricId = undefined;
 };
 const handleSelectNamespace = (item: MenuItem) => {
     state.selectedNamespaceId = item.name;
-    state.selectedMetricId = undefined;
+    state.proxySelectedMetricId = undefined;
 };
 const handleSelectMetric = (item: MenuItem) => {
-    state.selectedMetricId = item.name;
-};
-const handleConfirmDataSource = () => {
-    emit('select-metric-id', state.selectedMetricId);
+    state.proxySelectedMetricId = item.name;
 };
 </script>
 
 <template>
-    <div class="data-source-popover-content">
-        <div class="top-part">
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
-                               required
-                />
-                <p-context-menu :menu="state.categoryMenuItems"
-                                @select="handleSelectCategory"
-                >
-                    <template #item--format="{ item }">
-                        <div v-if="item.name === 'COMMON'"
-                             class="flex gap-1"
-                        >
-                            <img src="@/assets/images/img_common-asset@2x.png"
-                                 alt="common-namespace-image"
-                                 class="common-category-image"
-                            >
-                            {{ item.label }}
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
-                               required
-                />
-                <p-context-menu :menu="state.namespaceMenuItems"
-                                :search-text.sync="state.namespaceSearchText"
-                                searchable
-                                @select="handleSelectNamespace"
-                />
-            </div>
-            <div class="data-source-select-col">
-                <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
-                               required
-                />
-                <p-context-menu :menu="state.metricMenuItems"
-                                :search-text.sync="state.metricSearchText"
-                                searchable
-                                @select="handleSelectMetric"
-                />
-            </div>
-        </div>
-        <div class="popover-footer">
-            <p-button style-type="substitutive"
-                      :disabled="!state.selectedMetricId"
-                      @click="handleConfirmDataSource"
+    <div class="widget-form-asset-security-data-source-popper">
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CATEGORY')"
+                           required
+            />
+            <p-context-menu :menu="state.categoryMenuItems"
+                            @select="handleSelectCategory"
             >
-                {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DONE') }}
-            </p-button>
+                <template #item--format="{ item }">
+                    <div v-if="item.name === 'COMMON'"
+                         class="flex gap-1"
+                    >
+                        <img src="@/assets/images/img_common-asset@2x.png"
+                             alt="common-namespace-image"
+                             class="common-category-image"
+                        >
+                        {{ item.label }}
+                    </div>
+                </template>
+            </p-context-menu>
+        </div>
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.NAMESPACE')"
+                           required
+            />
+            <p-context-menu :menu="state.namespaceMenuItems"
+                            :search-text.sync="state.namespaceSearchText"
+                            searchable
+                            @select="handleSelectNamespace"
+            />
+        </div>
+        <div class="data-source-select-col">
+            <p-field-title :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.METRIC')"
+                           required
+            />
+            <p-context-menu :menu="state.metricMenuItems"
+                            :search-text.sync="state.metricSearchText"
+                            searchable
+                            @select="handleSelectMetric"
+            />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.data-source-popover-content {
-    display: flex;
-    flex-direction: column;
-    width: 57rem;
-    height: 30rem;
-    .top-part {
-        @apply grid grid-cols-12;
-        flex: 1;
-        .data-source-select-col {
-            @apply col-span-4 border-r border-gray-200;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            &:last-child {
-                @apply border-r-0;
-            }
-            .common-category-image {
-                width: 1rem;
-                height: 1rem;
-            }
-        }
-    }
-    .popover-footer {
-        @apply border-t border-gray-200;
-        text-align: right;
+.widget-form-asset-security-data-source-popper {
+    @apply grid grid-cols-12;
+    flex: 1;
+    .data-source-select-col {
+        @apply col-span-4 border-r border-gray-200;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
         padding: 0.75rem;
+        &:last-child {
+            @apply border-r-0;
+        }
+        .common-category-image {
+            width: 1rem;
+            height: 1rem;
+        }
     }
 }
 
