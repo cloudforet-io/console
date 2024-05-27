@@ -130,7 +130,6 @@ const handleSelectDataSource = () => {
 
 <template>
     <div class="data-source-popover-content">
-        <!-- Cost -->
         <div class="top-part">
             <div class="data-source-select-col">
                 <p-field-title :label="i18n.t('Source From')"
@@ -158,7 +157,6 @@ const handleSelectDataSource = () => {
                 />
                 <p-context-menu :menu="state.dataTypeMenuItems"
                                 :selected.sync="state.selectedDataType"
-                                reset-selec
                 />
             </div>
         </div>
