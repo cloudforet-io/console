@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DomainLandingStartBanner from '@/services/landing/components/DomainLandingStartBanner.vue';
 import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle.vue';
 
 </script>
@@ -6,6 +7,7 @@ import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle
 <template>
     <div class="domain-landing-page">
         <domain-landing-title />
+        <domain-landing-start-banner />
     </div>
 </template>
 
