@@ -76,7 +76,7 @@ const handleLogin = async () => {
     align-items: center;
     justify-content: center;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-    height: 2.5rem;
+    height: 2rem;
     width: 100%;
     font-family: Roboto, sans-serif;
     padding: 0 1rem;
