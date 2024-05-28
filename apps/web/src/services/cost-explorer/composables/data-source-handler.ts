@@ -1,42 +1,33 @@
+import type { KeyItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import type { ValueHandler } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import { cloneDeep, keyBy } from 'lodash';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+import { map } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-export function makeDataSourceDistinctValueHandler(
+export const makeDataSourceDistinctValueHandler = (
     filters?: ApiFilter[],
     workspaceList?: WorkspaceModel[],
-): ValueHandler|undefined {
-    const workspaceListMap = keyBy(workspaceList, 'workspace_id');
-
-    const staticParam: any = {
-        resource_type: 'cost_analysis.DataSourceAccount',
-        options: { limit: 10 },
-        distinct_key: 'workspace_id',
-    };
+): ValueHandler|undefined => {
+    const workspaceListMap = map(workspaceList);
 
     return async (inputText: string|number) => {
-        const param = cloneDeep(staticParam);
-        param.search = inputText;
-
-        if (filters) {
-            param.options.filter = filters;
-        }
-
+        let resultMenuItems: KeyItem[] = [];
         try {
-            const { results, total_count } = await SpaceConnector.client.addOns.autocomplete.distinct(param);
-
-            const convertResults = results.map((i) => ({
-                name: i.key,
-                label: workspaceListMap[i.key] ? workspaceListMap[i.key].name : null,
+            resultMenuItems = workspaceListMap.map((i) => ({
+                name: i.workspace_id,
+                label: i.name,
             }));
 
+            if (inputText) {
+                resultMenuItems = resultMenuItems.filter((item) => item.label.includes(inputText as string));
+            }
+
             return {
-                results: convertResults,
-                totalCount: total_count,
+                results: resultMenuItems,
+                totalCount: workspaceList?.length || 0,
             };
         } catch (e) {
             return {
@@ -45,4 +36,16 @@ export function makeDataSourceDistinctValueHandler(
             };
         }
     };
-}
+};
+
+export const convertWorkspaceSearchValue = (options, workspaceList?: WorkspaceModel[]): ToolboxOptions => {
+    const { queryTags } = options;
+    if (queryTags.length === 0) return options;
+    const workspaceOptionIndex = queryTags.findIndex((tag) => tag.key.name === 'workspace_id');
+    const workspaceOption = queryTags[workspaceOptionIndex];
+    const searchedWorkspace = workspaceList?.filter((workspace) => workspace.name.includes(workspaceOption.value.name))[0];
+    if (searchedWorkspace) {
+        queryTags[workspaceOptionIndex].value.name = searchedWorkspace.workspace_id;
+    }
+    return options;
+};

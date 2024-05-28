@@ -29,7 +29,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { red } from '@/styles/colors';
 
-import { makeDataSourceDistinctValueHandler } from '@/services/cost-explorer/composables/data-source-handler';
+import {
+    convertWorkspaceSearchValue,
+    makeDataSourceDistinctValueHandler,
+} from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
@@ -89,7 +92,7 @@ const handleSelect = (index: number[]) => {
     dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    emit('confirm', options);
+    emit('confirm', convertWorkspaceSearchValue(options, storeState.workspaceList));
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
