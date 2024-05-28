@@ -263,7 +263,7 @@ watch(() => state.favoriteOptions, (favoriteOptions) => {
             gap: 0.25rem;
             padding-left: 0.25rem;
             .selected-wrapper {
-                @apply block;
+                @apply flex items-center;
             }
         }
     }

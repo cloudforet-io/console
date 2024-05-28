@@ -31,6 +31,8 @@ export interface DataSourceModel {
     capability: Record<string, any>;
     plugin_info?: DataSourcePluginModel;
     tags: Tags;
+    data_source_account_count?: number;
+    connected_workspace_count?: number;
     domain_id: string;
     created_at: string;
 }
