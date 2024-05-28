@@ -19,9 +19,12 @@ const router = useRouter();
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
 });
+const state = reactive({
+    isDomainLandingPage: computed<boolean>(() => storeState.workspaceList.length === 0),
+});
 
-watch(() => storeState.workspaceList, (workspaceList) => {
-    if (workspaceList.length === 0) {
+watch(() => storeState.workspaceList, () => {
+    if (state.isDomainLandingPage) {
         router.push({ name: LANDING_ROUTE.DOMAIN._NAME });
     } else {
         router.push({ name: LANDING_ROUTE.WORKSPACE._NAME });
@@ -31,7 +34,7 @@ watch(() => storeState.workspaceList, (workspaceList) => {
 
 <template>
     <div class="lading-container">
-        <landing-header />
+        <landing-header :is-domain-landing-page="state.isDomainLandingPage" />
         <div class="scroll-contents">
             <router-view />
             <f-n-b class="fnb" />
