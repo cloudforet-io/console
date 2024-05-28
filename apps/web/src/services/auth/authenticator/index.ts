@@ -8,7 +8,7 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 
 abstract class Authenticator {
-    static async signIn(credentials: Record<string, any>, authType: AuthType, verifyCode?: string): Promise<void> {
+    static async signIn(credentials: Record<string, any>, authType: AuthType | 'SAML', verifyCode?: string): Promise<void> {
         const userWorkspaceStore = useUserWorkspaceStore();
         await store.dispatch('user/signIn', {
             domainId: store.state.domain.domainId,

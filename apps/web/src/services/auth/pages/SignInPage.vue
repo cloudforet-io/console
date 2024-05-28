@@ -64,6 +64,9 @@ const state = reactive({
     }),
     showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
 });
+
+// Note: 아래 메서드는 모든 LoginPage(e.g. KeycloakPage, SAMLRedirectPage ...)에서 로그인 성공 이후 동일 적용되어야하는 핸들러입니다.
+// Note: This method should be applied to all LoginPage (e.g. KeycloakPage, SAMLRedirectPage ...) after login success.
 const onSignIn = async (userId:string) => {
     appContextStore.setGlobalGrantLoading(true);
     try {
