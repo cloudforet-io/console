@@ -165,13 +165,15 @@ const handleSelectMetric = (item: MenuItem) => {
 
 <style lang="scss" scoped>
 .widget-form-asset-security-data-source-popper {
-    @apply grid grid-cols-12;
+    display: flex;
+    width: 48rem;
     flex: 1;
     .data-source-select-col {
-        @apply col-span-4 border-r border-gray-200;
+        @apply border-r border-gray-200;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        width: 16rem;
         padding: 0.75rem;
         &:last-child {
             @apply border-r-0;

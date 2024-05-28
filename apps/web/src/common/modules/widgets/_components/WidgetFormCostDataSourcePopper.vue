@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, toRef, watch,
+    computed, onMounted, reactive, toRef, watch,
 } from 'vue';
 
 import {
@@ -26,13 +26,6 @@ import {
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
-const COST_SOURCE_FROM = {
-    COST_ANALYSIS: 'COST_ANALYSIS',
-    BUDGET: 'BUDGET',
-    COST_REPORT: 'COST_REPORT',
-};
-type CostSourceFrom = typeof COST_SOURCE_FROM[keyof typeof COST_SOURCE_FROM];
-
 interface Props {
     selectedCostDataSourceId?: string;
     selectedCostDataType?: string;
@@ -42,13 +35,6 @@ const emit = defineEmits<{(e: 'update:selected-cost-data-source-id', costDataSou
     (e: 'update:selected-cost-data-type', costDataType: string): void;
 }>();
 
-/* Util */
-const getCostMenuHandler = (): AutocompleteHandler => {
-    const variableModelInfo: VariableModelMenuHandlerInfo = {
-        variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cost_data_source' }),
-    };
-    return getVariableModelMenuHandler([variableModelInfo]);
-};
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
@@ -57,38 +43,14 @@ const storeState = reactive({
 const state = reactive({
     proxySelectedCostDataSourceId: useProxyValue('selectedCostDataSourceId', props, emit),
     proxySelectedCostDataType: useProxyValue('selectedCostDataType', props, emit),
-    // source from
-    costDataSourceFromMenuItems: computed<MenuItem[]>(() => [
-        {
-            type: 'item',
-            name: COST_SOURCE_FROM.COST_ANALYSIS,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_ANALYSIS'),
-            icon: 'ic_service_cost-analysis',
-        },
-        {
-            type: 'item',
-            name: COST_SOURCE_FROM.BUDGET,
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.BUDGET'),
-            icon: 'ic_service_budget',
-        },
-        // {
-        //     type: 'item',
-        //     name: COST_SOURCE_FROM.COST_REPORT,
-        //     label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_REPORT'),
-        //     icon: 'ic_service_cost-report',
-        // },
-    ]),
-    selectedCostDataSourceFrom: undefined as undefined|CostSourceFrom,
     // data source
     selectedDataSource: [] as MenuItem[],
-    dataSourceMenuHandlerMap: computed<Record<CostSourceFrom, AutocompleteHandler>>(() => {
-        const handlerMaps: Record<CostSourceFrom, AutocompleteHandler> = {};
-        Object.values(COST_SOURCE_FROM).forEach((sourceFrom: string) => {
-            handlerMaps[sourceFrom] = getCostMenuHandler();
-        });
-        return handlerMaps;
+    dataSourceMenuHandler: computed<AutocompleteHandler>(() => {
+        const variableModelInfo: VariableModelMenuHandlerInfo = {
+            variableModel: new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'cost_data_source' }),
+        };
+        return getVariableModelMenuHandler([variableModelInfo]);
     }),
-    dataSourceMenuHandler: computed<AutocompleteHandler>(() => state.dataSourceMenuHandlerMap[state.selectedCostDataSourceFrom]),
     dataSourceSearchText: '',
     // data type
     dataTypeMenuItems: computed<MenuItem[]>(() => {
@@ -120,12 +82,6 @@ const {
 });
 
 /* Event */
-const handleSelectCostDataSourceFrom = (item: MenuItem) => {
-    state.selectedCostDataSourceFrom = item.name as CostSourceFrom;
-    state.selectedDataSource = [];
-    state.selectedDataType = [];
-    initiateMenu();
-};
 const handleUpdateCostDataSourceSearchText = debounce((text: string) => {
     state.dataSourceSearchText = text;
     reloadMenu();
@@ -133,6 +89,12 @@ const handleUpdateCostDataSourceSearchText = debounce((text: string) => {
 const handleSelectDataSource = () => {
     state.selectedDataType = [];
 };
+
+onMounted(() => {
+    state.selectedDataSource = [];
+    state.selectedDataType = [];
+    initiateMenu();
+});
 
 /* Watcher */
 watch(() => state.selectedDataSource, (val) => {
@@ -145,14 +107,6 @@ watch(() => state.selectedDataType, (val) => {
 
 <template>
     <div class="widget-form-cost-data-source-popper">
-        <div class="data-source-select-col">
-            <p-field-title :label="i18n.t('Source From')"
-                           required
-            />
-            <p-context-menu :menu="state.costDataSourceFromMenuItems"
-                            @select="handleSelectCostDataSourceFrom"
-            />
-        </div>
         <div class="data-source-select-col">
             <p-field-title :label="i18n.t('Source')"
                            required
@@ -178,14 +132,15 @@ watch(() => state.selectedDataType, (val) => {
 
 <style lang="scss" scoped>
 .widget-form-cost-data-source-popper {
-    @apply grid grid-cols-12;
-    width: 100%;
+    display: flex;
+    width: 16rem;
     flex: 1;
     .data-source-select-col {
-        @apply col-span-4 border-r border-gray-200;
+        @apply border-r border-gray-200;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        width: 16rem;
         padding: 0.75rem;
         &:last-child {
             @apply border-r-0;

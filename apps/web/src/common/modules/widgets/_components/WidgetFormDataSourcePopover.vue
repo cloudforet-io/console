@@ -110,10 +110,14 @@ watch(() => state.showPopover, (val) => {
             <div v-if="!state.selectedPopperCondition"
                  class="data-source-popper-condition-wrapper"
             >
-                <p-select-card :label="i18n.t('Add New Data Source')"
+                <p-select-card :label="i18n.t('Add Data Table')"
+                               icon="ic_service_data-sources"
+                               block
                                @click="handleSelectPopperCondition(POPPER_CONDITION.NEW_DATA_SOURCE)"
                 />
-                <p-select-card :label="i18n.t('Combine Data Source')"
+                <p-select-card :label="i18n.t('Add Transformation')"
+                               icon="ic_link"
+                               block
                                @click="handleSelectPopperCondition(POPPER_CONDITION.COMBINE_DATA_SOURCE)"
                 />
             </div>
@@ -122,12 +126,26 @@ watch(() => state.showPopover, (val) => {
             >
                 <div class="top-part">
                     <div class="data-source-domain-col">
-                        <p-select-card v-for="domainItem in state.dataSourceDomainItems"
-                                       :key="`data-source-domain-${domainItem.name}`"
-                                       :label="domainItem.label"
-                                       :value="domainItem.name"
+                        <p class="data-source-domain-title">
+                            {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST_EXPLORER') }}
+                        </p>
+                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COST')"
+                                       :value="DATA_SOURCE_DOMAIN.COST"
                                        :selected="state.selectedDataSourceDomain"
-                                       @click="handleClickDataSourceDomain(domainItem.name)"
+                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.COST)"
+                        />
+                        <p class="data-source-domain-title mt-2">
+                            {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.INVENTORY') }}
+                        </p>
+                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ASSET')"
+                                       :value="DATA_SOURCE_DOMAIN.ASSET"
+                                       :selected="state.selectedDataSourceDomain"
+                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.ASSET)"
+                        />
+                        <p-select-card :label="i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.SECURITY')"
+                                       :value="DATA_SOURCE_DOMAIN.SECURITY"
+                                       :selected="state.selectedDataSourceDomain"
+                                       @click="handleClickDataSourceDomain(DATA_SOURCE_DOMAIN.SECURITY)"
                         />
                     </div>
                     <template v-if="state.selectedDataSourceDomain">
@@ -180,7 +198,7 @@ watch(() => state.showPopover, (val) => {
     .data-source-popover-content {
         display: flex;
         flex-direction: column;
-        width: 57rem;
+        min-width: 43.5rem;
         height: 30rem;
         .top-part {
             display: flex;
@@ -190,10 +208,16 @@ watch(() => state.showPopover, (val) => {
                 @apply border-r border-gray-200;
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem;
                 min-width: 11.5rem;
                 height: 100%;
                 padding: 1rem 0.75rem;
+                .data-source-domain-title {
+                    @apply text-label-sm font-bold text-gray-700;
+                    margin-bottom: 0.5rem;
+                }
+                .p-select-card {
+                    margin-bottom: 0.5rem;
+                }
             }
             .empty-wrapper {
                 @apply flex justify-center items-center text-gray-300;
