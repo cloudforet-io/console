@@ -15,6 +15,7 @@ import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-c
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -23,6 +24,7 @@ import {
 
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
+const widgetGenerateStore = useWidgetGenerateStore();
 
 const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
@@ -44,7 +46,6 @@ const state = reactive({
         name: d,
         label: d,
     }))),
-    addWidgetOverlayVisible: false,
 });
 const formState = reactive({
     title: '',
@@ -56,7 +57,7 @@ const formState = reactive({
 
 /* Event */
 const handleClickAddWidget = () => {
-    state.addWidgetOverlayVisible = true;
+    widgetGenerateStore.setShowOverlay(true);
 };
 
 watch(() => state.widgetConfig, (_config) => {
@@ -143,8 +144,6 @@ watch(() => state.widgetConfig, (_config) => {
                 </div>
             </div>
         </div>
-        <widget-form-overlay :visible="state.addWidgetOverlayVisible"
-                             @update:visible="state.addWidgetOverlayVisible = $event"
-        />
+        <widget-form-overlay overlay-type="ADD" />
     </div>
 </template>

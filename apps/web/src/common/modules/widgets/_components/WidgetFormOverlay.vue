@@ -7,24 +7,21 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
 import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 
 interface Props {
-    visible: boolean;
     overlayType?: 'ADD' | 'EDIT';
 }
 const props = withDefaults(defineProps<Props>(), {
-    visible: false,
     overlayType: 'ADD',
 });
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-}>();
 
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
     sidebarTitle: computed(() => {
         if (props.overlayType === 'ADD') {
             const _title = i18n.t('DASHBOARDS.WIDGET.OVERLAY.ADD_WIDGET');
@@ -43,14 +40,18 @@ const state = reactive({
 const handleClickContinue = () => {
     state.currentStep += 1;
 };
+const handleUpdateVisible = (value: boolean) => {
+    widgetGenerateStore.setShowOverlay(value);
+};
 </script>
 
 <template>
     <div>
-        <p-overlay-layout :visible.sync="state.proxyVisible"
+        <p-overlay-layout :visible="widgetGenerateState.showOverlay"
                           style-type="primary"
                           size="full"
                           :title="state.sidebarTitle"
+                          @update:visible="handleUpdateVisible"
         >
             <widget-form-overlay-step1 v-if="state.currentStep === 1" />
             <widget-form-overlay-step2 v-if="state.currentStep === 2" />
