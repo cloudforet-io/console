@@ -22,12 +22,14 @@ import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/w
 interface Props {
     widgetKey?: string;
     widgetConfigId?: string;
+    templateWidgetId?: string;
     visible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
+    templateWidgetId: undefined,
 });
 const emit = defineEmits<{(e: 'close', save: boolean): void;
     (e: 'update:widget-info', widgetInfo: UpdatableWidgetInfo): void;
@@ -36,6 +38,7 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
@@ -44,7 +47,7 @@ const state = reactive({
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
         const nonInheritedWidgetOptions = getNonInheritedWidgetOptionNamesAmongUsedVariables(
-            dashboardDetailState.variablesSchema,
+            dashboardDetailGetters.refinedVariablesSchema,
             widgetFormState.inheritOptions,
             widgetFormState.schemaProperties,
         );
@@ -126,6 +129,7 @@ watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllO
                         <dashboard-widget-form :key="state.contextKey"
                                                :widget-config-id="props.widgetConfigId"
                                                :widget-key="props.widgetKey"
+                                               :template-widget-id="props.templateWidgetId"
                         />
                     </div>
                 </template>

@@ -12,6 +12,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import {
+    checkValidUrl,
+    convertUrlProtocol,
+    generateNewFolderName,
+} from '@/services/workspace-home/composables/use-bookmark';
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
@@ -31,7 +36,6 @@ const storeState = reactive({
     modal: computed<BookmarkModalStateType>(() => bookmarkState.modal),
     selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     isFullMode: computed<boolean|undefined>(() => bookmarkState.isFullMode),
-    isFileFullMode: computed<boolean|undefined>(() => bookmarkState.isFileFullMode),
 });
 const state = reactive({
     loading: false,
@@ -58,37 +62,7 @@ const {
     },
 });
 
-const isValidUrl = (url: string) => {
-    try {
-        new URL(url);
-        return true;
-    } catch (error) {
-        return false;
-    }
-};
-const convertUrlProtocol = (url: string): string => {
-    const trimmedUrl = url.trim();
 
-    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
-        return `http://${trimmedUrl}`;
-    }
-
-    return trimmedUrl;
-};
-const generateNewFolderName = (existingFolders) => {
-    const folderNumbers = existingFolders
-        .filter((n) => n.name.startsWith(i18n.t('HOME.FORM_NEW_FOLDER')))
-        .map((n) => parseInt(n.name.replace(i18n.t('HOME.FORM_NEW_FOLDER'), '')) || 0)
-        .sort((a, b) => a.name - b.name);
-
-    for (let i = 1; i <= folderNumbers.length; i++) {
-        if (!folderNumbers.includes(i)) {
-            return `${i18n.t('HOME.FORM_NEW_FOLDER')}${i}`;
-        }
-    }
-
-    return `${i18n.t('HOME.FORM_NEW_FOLDER')}${folderNumbers.length + 1}`;
-};
 const handleClose = () => {
     bookmarkStore.setModalType(undefined);
     state.selectedFolderIdx = undefined;
@@ -97,6 +71,7 @@ const handleClose = () => {
 const handleDeselectButton = () => {
     state.selectedFolderIdx = undefined;
 };
+
 const handleClickNewFolderButton = async () => {
     try {
         const newFolder = generateNewFolderName(props.bookmarkFolderList);
@@ -109,7 +84,7 @@ const handleClickNewFolderButton = async () => {
 const handleConfirm = async () => {
     state.loading = true;
     let convertedLink = link.value;
-    if (!isValidUrl(link.value)) {
+    if (!checkValidUrl(link.value)) {
         convertedLink = convertUrlProtocol(link.value);
     }
 
@@ -251,9 +226,17 @@ watch(() => storeState.modal.type, (type) => {
         padding: 0.75rem;
         gap: 0.75rem;
         .radio-item {
-            @apply inline-flex items-center;
+            @apply flex items-center;
             margin-left: 0.25rem;
             gap: 0.25rem;
+        }
+
+        /* custom design-system component - p-radio */
+        :deep(.p-radio) {
+            @apply flex items-center;
+            .text {
+                @apply block;
+            }
         }
         .buttons-wrapper {
             @apply flex items-center;

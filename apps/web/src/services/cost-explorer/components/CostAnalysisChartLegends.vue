@@ -7,11 +7,11 @@ import {
     PTextButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, sum } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+import { MASSIVE_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
@@ -34,11 +34,6 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
-    filtersLength: computed<number>(() => {
-        const selectedValues = Object.values(costAnalysisPageState.filters);
-        return sum(selectedValues.map((v) => v?.length || 0));
-    }),
-    //
     proxyLegends: useProxyValue('legends', props, emit),
     groupByMenuItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
@@ -55,7 +50,7 @@ const getLegendIconColor = (index) => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     if (legend?.color) return legend.color;
-    return DEFAULT_CHART_COLORS[index];
+    return MASSIVE_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
     const legend = props.legends[index];

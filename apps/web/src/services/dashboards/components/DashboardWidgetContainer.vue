@@ -249,7 +249,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-refresh-on-variable-change="widgetFullModeState.visibleFullMode"
                                :dashboard-settings="dashboardDetailState.settings"
-                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"
                                @mounted="handleWidgetMounted(widget.widget_key)"
@@ -273,6 +273,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                      :widget-config-id="widgetEditState.targetWidget.widget_name"
                                      :visible="widgetEditState.visibleModal"
                                      :widget-key="widgetEditState.targetWidget.widget_key"
+                                     :template-widget-id="widgetEditState.targetWidget.template_widget_id"
                                      @cancel="handleWidgetEditModalCancel"
                                      @confirm="handleWidgetEditModalConfirm"
         />

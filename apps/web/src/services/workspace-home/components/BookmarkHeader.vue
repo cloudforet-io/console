@@ -50,6 +50,7 @@ const storeState = reactive({
     filterByFolder: computed<string|undefined|TranslateResult>(() => bookmarkState.filterByFolder),
     isFullMode: computed<boolean>(() => bookmarkState.isFullMode),
     isFileFullMode: computed<boolean>(() => bookmarkState.isFileFullMode),
+    selectedBookmark: computed<BookmarkItem|undefined>(() => bookmarkState.selectedBookmark),
     selectedBookmarks: computed<BookmarkItem[]>(() => bookmarkState.selectedBookmarks),
 });
 const state = reactive({
@@ -408,7 +409,7 @@ watch([() => storeState.isFullMode, () => storeState.isFileFullMode], () => {
             @apply items-center;
             gap: 0.375rem;
             .folder-icon-wrapper {
-                @apply flex items-center justify-center bg-blue-200 rounded;
+                @apply relative flex items-center justify-center bg-blue-200 rounded;
                 width: 1.5rem;
                 height: 1.5rem;
             }

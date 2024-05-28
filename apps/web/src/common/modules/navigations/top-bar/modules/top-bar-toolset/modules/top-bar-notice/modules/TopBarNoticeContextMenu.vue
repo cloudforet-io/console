@@ -109,9 +109,9 @@ callApiWithGrantGuard();
 
 <template>
     <div class="top-bar-notice-context-menu">
-        <p-data-loader :data="state.items"
+        <p-data-loader :data="state.noticeData"
                        :loading="state.loading"
-                       :class="{ loading: state.loading && !state.items.length }"
+                       :class="{ loading: state.loading && !state.noticeData.length }"
         >
             <div class="content-wrapper">
                 <template v-if="!!state.pinnedItems.length">
@@ -131,7 +131,9 @@ callApiWithGrantGuard();
                                        :writer="item.writer"
                                        @select="handleSelectNotice(item.postId)"
                     />
-                    <p-divider class="divider" />
+                    <p-divider v-if="state.items.length > 0"
+                               class="divider"
+                    />
                 </template>
                 <top-bar-noti-item v-for="(item, idx) in state.items"
                                    :key="`${item.postId}-${idx}`"

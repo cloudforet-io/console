@@ -10,6 +10,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
@@ -23,7 +24,6 @@ import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget
 import type {
     WidgetExpose, WidgetProps, WidgetEmit,
 } from '@/services/dashboards/widgets/_types/widget-type';
-
 
 import type {
     AnalyzeRawData, TreemapChartData,
@@ -103,7 +103,8 @@ const drawChart = (chartData: TreemapChartData[]) => {
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency);
+    const valueFormatter = (val) => numberFormatter(val, { minimumFractionDigits: 2 }) as string;
+    chartHelper.setTreemapTooltipText(series, tooltip, valueFormatter);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });

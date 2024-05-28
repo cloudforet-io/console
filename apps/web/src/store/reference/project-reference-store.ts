@@ -19,7 +19,7 @@ import type {
     ReferenceLoadOptions, ReferenceItem, ReferenceMap, ReferenceTypeInfo,
 } from '@/store/reference/type';
 
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODELS } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -74,9 +74,9 @@ export const useProjectReferenceStore = defineStore('reference-project', () => {
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            type: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
-            key: MANAGED_VARIABLE_MODEL_CONFIGS.project.idKey as string,
-            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
+            type: MANAGED_VARIABLE_MODELS.project.meta.key,
+            key: MANAGED_VARIABLE_MODELS.project.meta.idKey,
+            name: MANAGED_VARIABLE_MODELS.project.meta.name,
             referenceMap: getters.projectItems,
         })),
     });

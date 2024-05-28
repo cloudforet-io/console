@@ -15,7 +15,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
 import { RECENT_TYPE } from '@/common/modules/navigations/type';
 
-import { indigo, peacock } from '@/styles/colors';
+import { gray, indigo, peacock } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -41,6 +41,9 @@ const state = reactive({
         }
         if (props.item?.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
             return indigo[500];
+        }
+        if (props.item?.itemType === FAVORITE_TYPE.METRIC || props.item?.itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
+            return gray[500];
         }
         return undefined;
     }),

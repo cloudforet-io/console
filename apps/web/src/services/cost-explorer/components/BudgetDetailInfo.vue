@@ -23,16 +23,13 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 import { gray } from '@/styles/colors';
 
 import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/components/BudgetDetailInfoAmountPlanningTypePopover.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
-const { isAdminMode } = useProperRouteLocation();
 const allReferenceStore = useAllReferenceStore();
 const { getProperRouteLocation } = useProperRouteLocation();
-
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
@@ -74,14 +71,15 @@ const state = reactive({
                 { resource_type: 'identity.Project' },
             );
         }
-        if (isAdminMode.value) {
-            return ({
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-                params: {
-                    workspaceId: state.budgetData?.workspace_id,
-                },
-            });
-        }
+        // HACK: This is a temporary solution. It should be changed to the proper route.
+        // if (isAdminMode.value) {
+        //     return ({
+        //         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        //         params: {
+        //             workspaceId: state.budgetData?.workspace_id,
+        //         },
+        //     });
+        // }
         return undefined;
     }),
     isTextTruncate: undefined as boolean|undefined,

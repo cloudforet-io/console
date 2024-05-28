@@ -73,6 +73,7 @@ export const processTokenVerification = (to: Route, next: NavigationGuardNext, r
 
     const ROOT_REDIRECT_SKIP_ROUTE_NAMES = [
         AUTH_ROUTE.SIGN_OUT._NAME,
+        AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
         ERROR_ROUTE._NAME,
         ROOT_ROUTE.COST_REPORT._NAME,
     ];

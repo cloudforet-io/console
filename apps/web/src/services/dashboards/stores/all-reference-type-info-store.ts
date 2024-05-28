@@ -6,6 +6,8 @@ import { useCloudServiceTypeReferenceStore } from '@/store/reference/cloud-servi
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import { useCollectorReferenceStore } from '@/store/reference/collector-reference-store';
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
+import { useMetricReferenceStore } from '@/store/reference/metric-reference-store';
+import { useNamespaceReferenceStore } from '@/store/reference/namespace-reference-store';
 import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
@@ -19,7 +21,7 @@ import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWebhookReferenceStore } from '@/store/reference/webhook-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 
 
 export type ReferenceType = Extract<ManagedVariableModelKey,
@@ -37,6 +39,9 @@ export type ReferenceType = Extract<ManagedVariableModelKey,
     | 'cost_data_source'
     | 'cloud_service_query_set'
     | 'workspace'
+    | 'collector'
+    | 'namespace'
+    | 'metric'
 >;
 export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
@@ -56,6 +61,8 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
     const webhookReferenceStore = useWebhookReferenceStore();
     const secretReferenceStore = useSecretReferenceStore();
     const regionReferenceStore = useRegionReferenceStore();
+    const namespaceReferenceStore = useNamespaceReferenceStore();
+    const metricReferenceStore = useMetricReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -74,6 +81,8 @@ export const useAllReferenceTypeInfoStore = defineStore('all-reference-type-info
             webhook: webhookReferenceStore.getters.webhookTypeInfo,
             secret: secretReferenceStore.getters.secretTypeInfo,
             region: regionReferenceStore.getters.regionTypeInfo,
+            namespace: namespaceReferenceStore.getters.namespaceTypeInfo,
+            metric: metricReferenceStore.getters.metricTypeInfo,
         })),
     });
 

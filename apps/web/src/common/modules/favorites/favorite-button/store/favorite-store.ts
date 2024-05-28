@@ -47,6 +47,8 @@ export const useFavoriteStore = defineStore('favorite', () => {
         projectItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT)),
         projectGroupItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.PROJECT_GROUP)),
         cloudServiceItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.CLOUD_SERVICE)),
+        metricItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.METRIC)),
+        metricExampleItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.METRIC_EXAMPLE)),
         dashboardItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.DASHBOARD)),
         costAnalysisItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.COST_ANALYSIS)),
         securityItems: computed(() => getters.favoriteMenuList.filter((item) => item.itemType === FAVORITE_TYPE.SECURITY)),

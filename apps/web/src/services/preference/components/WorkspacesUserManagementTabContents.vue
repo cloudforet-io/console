@@ -2,9 +2,10 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PStatus, PToolboxTable, PHeading, PTooltip, PButton, PIconButton, PDivider,
+    PStatus, PToolboxTable, PHeading, PTooltip, PButton,
 } from '@spaceone/design-system';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
@@ -12,19 +13,22 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import {
     calculateTime, userStateFormatter, useRoleFormatter,
 } from '@/services/iam/composables/refined-table-data';
 import { USER_STATE } from '@/services/iam/constants/user-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { WORKSPACES_USER_SEARCH_HANDLERS } from '@/services/preference/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/preference/store/workspace-page-store';
 
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
-const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
+const router = useRouter();
 
 const workspaceUserListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(workspacePageState.usersPageStart).setPageLimit(workspacePageState.usersPageLimit)
@@ -86,8 +90,8 @@ const handleChange = async (options: any = {}) => {
         query: workspaceUserListApiQuery,
     });
 };
-const handleClickButton = (type: string) => {
-    emit('select-action', type);
+const handleClickButton = () => {
+    window.open(router.resolve({ name: makeAdminRouteName(IAM_ROUTE.USER._NAME) }).href, '_blank');
 };
 
 watch(() => workspacePageStore.selectedWorkspaces, async () => {
@@ -105,29 +109,12 @@ watch(() => workspacePageStore.selectedWorkspaces, async () => {
         >
             <template #extra>
                 <div class="heading-toolset">
-                    <p-button v-if="storeState.currentWorkspace.state === 'DISABLED'"
-                              style-type="tertiary"
-                              @click="handleClickButton('enable')"
+                    <p-button style-type="tertiary"
+                              icon-left="ic_settings"
+                              @click="handleClickButton"
                     >
-                        {{ $t('IAM.WORKSPACES.ENABLE') }}
+                        {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
-                    <p-button v-else
-                              style-type="tertiary"
-                              @click="handleClickButton('disable')"
-                    >
-                        {{ $t('IAM.WORKSPACES.DISABLE') }}
-                    </p-button>
-                    <p-divider vertical />
-                    <p-icon-button name="ic_edit"
-                                   shape="square"
-                                   style-type="tertiary"
-                                   @click="handleClickButton('edit')"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   shape="square"
-                                   style-type="tertiary"
-                                   @click="handleClickButton('delete')"
-                    />
                 </div>
             </template>
         </p-heading>

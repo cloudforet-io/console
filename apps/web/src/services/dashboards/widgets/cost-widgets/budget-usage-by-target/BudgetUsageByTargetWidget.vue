@@ -48,7 +48,7 @@ const state = reactive({
     data: undefined as Response | undefined,
     tableFields: computed<Field[]>(() => [
         { label: 'Budget', name: 'name' },
-        { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
+        { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'project_group' } },
         {
             label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' }, textAlign: 'right',
         },

@@ -179,12 +179,11 @@ const checkSelectedId = (id?: string) => {
                     <div v-else
                          class="image-wrapper"
                     >
-                        <p-lazy-img
-                            v-if="item.imgIcon"
-                            :src="assetUrlConverter(item.imgIcon)"
-                            error-icon="ic_globe-filled"
-                            :error-icon-color="gray[500]"
-                            class="icon"
+                        <p-lazy-img v-if="item.imgIcon"
+                                    :src="assetUrlConverter(item.imgIcon)"
+                                    error-icon="ic_globe-filled"
+                                    :error-icon-color="gray[500]"
+                                    class="icon"
                         />
                         <div v-else-if="item.icon"
                              class="show-more"
@@ -276,7 +275,7 @@ const checkSelectedId = (id?: string) => {
             }
 
             .image-wrapper {
-                @apply flex items-center justify-center;
+                @apply relative flex items-center justify-center;
                 width: 2rem;
                 height: 2rem;
                 border-radius: 0.375rem;
@@ -286,6 +285,13 @@ const checkSelectedId = (id?: string) => {
                     img {
                         width: 1.25rem !important;
                         height: 1.25rem !important;
+                    }
+
+                    .error {
+                        svg {
+                            width: 1.25rem !important;
+                            height: 1.25rem !important;
+                        }
                     }
                 }
 
@@ -303,6 +309,7 @@ const checkSelectedId = (id?: string) => {
 
             .text-wrapper {
                 max-width: calc(100% - 2.5rem);
+                line-height: 1rem;
 
                 .bookmark-label {
                     @apply truncate;

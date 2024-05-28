@@ -7,16 +7,13 @@ import {
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { chain, cloneDeep, isEqual } from 'lodash';
 
 import type { WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
 
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 
-interface MenuItem {
-    name: string;
-    label: string;
-}
 
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
@@ -28,12 +25,15 @@ const state = reactive({
         return Object.entries(properties);
     }),
     widgetOptionMenuItems: computed<MenuItem[]>(() => {
-        const _refinedMenu = refinedMenu.value.map((d) => {
+        const _refinedMenu: MenuItem[] = [];
+        refinedMenu.value.forEach((d) => {
             const schemaProperty = widgetFormGetters.widgetConfig?.options_schema?.properties?.[d.name];
+            if (schemaProperty?.hidden) return;
             if (schemaProperty?.fixed || schemaProperty?.readonly) {
-                return { ...d, disabled: true };
+                _refinedMenu.push({ ...d, disabled: true });
+                return;
             }
-            return d;
+            _refinedMenu.push(d);
         });
         return _refinedMenu;
     }),
@@ -69,7 +69,7 @@ const handleSelectWidgetOption = (selected: MenuItem, index: number, isSelected:
     // only manage delete case
     if (!isSelected) {
         const _widgetOptions = cloneDeep(widgetFormState.widgetOptions);
-        const propertyName = selected.name;
+        const propertyName = selected.name as string;
         const dataName = propertyName.replace('filters.', '');
         if (propertyName.startsWith('filters.')) {
             delete _widgetOptions.filters?.[dataName];

@@ -6,6 +6,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -18,8 +19,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { getProperRouteLocation } = useProperRouteLocation();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const state = reactive({
     loading: false,
@@ -39,15 +42,15 @@ const updateDashboardData = async () => {
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
             variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
+            variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
         });
-        await SpaceRouter.router.push({
+        await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: props.dashboardId as string,
             },
-        });
+        }));
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     } finally {

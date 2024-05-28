@@ -15,8 +15,10 @@ import DashboardVariableDropdown from '@/services/dashboards/components/Dashboar
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 interface Props {
     isManageable?: boolean;
@@ -31,6 +33,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 
@@ -38,14 +41,14 @@ const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
-    order: computed(() => dashboardDetailState.variablesSchema.order),
+    variableProperties: computed(() => dashboardDetailGetters.refinedVariablesSchema.properties),
+    order: computed(() => dashboardDetailGetters.refinedVariablesSchema.order),
     allReferenceTypeInfo: computed(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     modifiedVariablesSchemaProperties: computed<string[]>(() => {
         if (props.disableSaveButton) return [];
         const results: string[] = [];
         const prevUsedProperties = Object.entries(dashboardDetailState.dashboardInfo?.variables_schema.properties ?? {}).filter(([, v]) => v.use);
-        const currUsedProperties = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, v]) => v.use);
+        const currUsedProperties = Object.entries(dashboardDetailGetters.refinedVariablesSchema.properties).filter(([, v]) => v.use);
         // check variables changed
         currUsedProperties.forEach(([k]) => {
             if (!isEqual(dashboardDetailState.dashboardInfo?.variables?.[k], dashboardDetailState.variables?.[k])) {
@@ -76,10 +79,9 @@ const handleClickSaveButton = () => {
     updateDashboardVariables();
 };
 const handleResetVariables = () => {
-    dashboardDetailStore.resetVariables(
-        props.originVariables ?? dashboardDetailState.dashboardInfo?.variables,
-        props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema,
-    );
+    const _originVariables = props.originVariables ?? dashboardDetailState.dashboardInfo?.variables ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables;
+    const _originVariablesSchema = props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema ?? DASHBOARD_TEMPLATES[dashboardDetailState.templateId].variables_schema;
+    dashboardDetailStore.resetVariables(_originVariables, _originVariablesSchema);
 };
 
 </script>

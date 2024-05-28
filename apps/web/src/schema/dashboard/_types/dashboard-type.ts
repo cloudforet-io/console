@@ -1,28 +1,34 @@
 import type {
-    REFRESH_INTERVAL_OPTIONS_MAP, DASHBOARD_LABEL,
+    REFRESH_INTERVAL_OPTIONS_MAP,
     DASHBOARD_TYPE,
 } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
+import type {
+    InheritOptions, WidgetOptions, WidgetSize, NewWidgetFilters,
+} from '@/schema/dashboard/_types/widget-type';
 
-import type { ManagedVariableModelConfig } from '@/lib/variable-models';
-import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
+import type { VariableModelType } from '@/lib/variable-models';
+import type { Value } from '@/lib/variable-models/_base/types';
 
 
-export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = typeof DASHBOARD_TYPE[keyof typeof DASHBOARD_TYPE];
 
 // dashboard variable schema types
-export type VariableSelectionType = 'SINGLE' | 'MULTI';
+type VariableSelectionType = 'SINGLE' | 'MULTI';
 
-export type VariableType = 'MANAGED' | 'CUSTOM';
+export type TemplateType = 'MANAGED'|'EXTENSION';
 
-export type DashboardVariableOptions = ManagedVariableModelConfig|EnumVariableModelConfig|ResourceValueVariableModelConfig;
+interface DashboardVariableOptions {
+    type: VariableModelType;
+    key: string;
+    dataKey?: string;
+    values?: Value[];
+}
 
 export interface DashboardVariableSchemaProperty {
-    name: string;
-    variable_type: VariableType;
+    name?: string;
+    variable_type: VariableModelType;
     use: boolean;
-    selection_type: VariableSelectionType;
+    selection_type?: VariableSelectionType;
     description?: string;
     readonly?: boolean; // can not edit value
     options?: DashboardVariableOptions[];
@@ -30,11 +36,12 @@ export interface DashboardVariableSchemaProperty {
     required?: boolean; // value is required
 }
 
-export type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
+type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
 
 export interface DashboardVariablesSchema {
     properties: DashboardVariableSchemaProperties;
     order: string[];
+    fixed_options?: Record<string, any>;
 }
 
 // dashboard variables types
@@ -67,18 +74,54 @@ export interface DashboardTemplate {
     variables: DashboardVariables;
     settings: DashboardSettings;
     variables_schema: DashboardVariablesSchema;
-    labels: (DashboardLabel|string)[];
+    labels: string[];
+    template_id: string;
+    template_type: TemplateType;
+    plugin_ids?: string[];
+    display_info?: {
+        icon?: string;
+        preview_image?: string;
+    }
 }
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
     widget_key: string; // widget unique key. used for layout key binding.
+    template_widget_id?: string; // widget id included in template. used to find widget settings to refer to when resetting widgets.
     title?: string; // widget title
     widget_options?: WidgetOptions;
     size?: WidgetSize;
     version: string; // widget config version
     inherit_options?: InheritOptions; // inherit information for the widget option
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
+    fixed_options?: Record<string, any>; // fixed options for the widget
 }
 
 
+
+export interface NewDashboardLayoutWidgetInfo {
+    widget_name: string;
+    widget_key: string;
+    template_widget_id?: string;
+    title?: string;
+    size?: WidgetSize;
+    version: string;
+    schema_properties?: string[];
+    fixed_options?: Record<string, any>;
+
+    // Widget Options
+    data_sources: DataSource[],
+    data_mapping: Record<string, string|string[]>;
+    chart_options: Record<string, any>;
+    filters?: NewWidgetFilters;
+}
+
+
+export interface DataSource {
+    // data_domain: string; // Cost/Asset/Security
+    // data_source_from?: string; // cost_analysis
+    // value: string[]; // Usage
+    // TODO: create ResrouceType
+    resource_type: any; // 'cost_analysis.Cost' || 'inventory.MetricData'
+    value: string;
+}

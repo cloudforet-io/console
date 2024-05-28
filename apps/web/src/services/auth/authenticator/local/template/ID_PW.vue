@@ -76,7 +76,7 @@ const signIn = async () => {
         await loadAuth().signIn(credentials, 'LOCAL');
         await store.dispatch('display/hideSignInErrorMessage');
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-            await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
+            await router.push({ name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME });
         } else {
             emit('sign-in', state.userId);
         }

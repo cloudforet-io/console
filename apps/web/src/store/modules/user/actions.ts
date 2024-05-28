@@ -54,9 +54,10 @@ const getUserInfo = async (): Promise<Partial<UserState>> => {
 };
 
 const updateUser = async (userType: string, userRequest: UpdateUserRequest): Promise<void> => {
-    const request: any = {};
+    const request: UserProfileUpdateParameters = {};
 
     if (userRequest.name) request.name = userRequest.name;
+    if (userRequest.name === '') request.name = ' '; // NOTE: discussed solution by detour way in case of name removal
     if (userRequest.password) request.password = userRequest.password;
     if (userRequest.email) request.email = userRequest.email;
     if (userRequest.language) request.language = userRequest.language;
@@ -134,6 +135,7 @@ export const grantRoleAndLoadReferenceData: Action<UserState, any> = async ({ co
             commit('error/setGrantAccessFailStatus', false, { root: true });
         }
     } catch (error) {
+        console.error(error);
         /*
         * Unlike other cases where the ErrorHandler is used for error handling,
         * in the grant logic scenario, there can be instances where the Router
@@ -226,7 +228,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
 
     const convertRequestType = (): UserState => ({
         userId: userRequest.user_id || state.userId,
-        name: userRequest.name || state.name,
+        name: userRequest.name === undefined ? state.name : userRequest.name,
         email: userRequest.email || state.email,
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,

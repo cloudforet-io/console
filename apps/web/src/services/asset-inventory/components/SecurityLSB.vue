@@ -150,7 +150,7 @@ watch(() => state.securityNavigation, async (securityNavigation) => {
 </script>
 
 <template>
-    <p-data-loader :loading="storeState.loading"
+    <p-data-loader :loading="false"
                    :data="storeState.loading ? true : storeState.cloudServiceTypeList"
                    :loader-backdrop-color="BACKGROUND_COLOR"
                    class="security-l-s-b"

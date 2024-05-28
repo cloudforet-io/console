@@ -11,6 +11,7 @@ import {
 import type { ContextMenuType, MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -19,6 +20,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -27,7 +29,7 @@ import {
     convertCloudServiceConfigToReferenceData,
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData,
+    convertMenuConfigToReferenceData, convertMetricConfigToReferenceData, convertMetricExampleConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
     getParsedKeysWithManagedCostQueryFavoriteKey,
@@ -79,6 +81,8 @@ const storeState = reactive({
     currentWorkspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
@@ -115,6 +119,13 @@ const state = reactive({
                 name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_CLOUD_SERVICE'), type: 'header', itemType: FAVORITE_TYPE.CLOUD_SERVICE,
             });
             results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
+        }
+        if (state.favoriteMetricItems.length) {
+            if (results.length !== 0) results.push({ type: 'divider' });
+            results.push({
+                name: 'title', label: i18n.t('MENU.ASSET_INVENTORY_ASSET_ANALYSIS'), type: 'header', itemType: FAVORITE_TYPE.METRIC,
+            });
+            results.push(...state.favoriteMetricItems.slice(0, FAVORITE_LIMIT));
         }
         if (state.favoriteSecurityItems.length) {
             if (results.length !== 0) results.push({ type: 'divider' });
@@ -196,6 +207,16 @@ const state = reactive({
             storeState.cloudServiceTypes,
         ) : [];
     }),
+    favoriteMetricItems: computed<FavoriteItem[]>(() => {
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_ANALYSIS, store.getters['user/pageAccessPermissionList']);
+        if (!isUserAccessible) return [];
+        const favoriteMetricItems = convertMetricConfigToReferenceData(favoriteGetters.metricItems ?? [], storeState.metrics);
+        const favoriteMetricExampleItems = convertMetricExampleConfigToReferenceData(favoriteGetters.metricExampleItems ?? [], storeState.metricExamples);
+        return [
+            ...favoriteMetricItems,
+            ...favoriteMetricExampleItems,
+        ];
+    }),
     favoriteProjects: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
         if (!isUserAccessible) return [];
@@ -218,6 +239,7 @@ const getItemLength = (type: FavoriteType): number => {
     if (type === FAVORITE_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
     if (type === FAVORITE_TYPE.PROJECT) return state.favoriteProjects.length;
     if (type === FAVORITE_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
+    if (type === FAVORITE_TYPE.METRIC) return state.favoriteMetricItems.length;
     if (type === FAVORITE_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
     if (type === FAVORITE_TYPE.SECURITY) return state.favoriteSecurityItems.length;
     return 0;
@@ -273,6 +295,23 @@ const handleSelect = (item: FavoriteMenuItem) => {
                 name: itemInfo[2],
             },
         }).catch(() => {});
+    } else if (item.itemType === FAVORITE_TYPE.METRIC) {
+        router.push({
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+            params: {
+                metricId: item.name || '',
+            },
+        }).catch(() => {});
+    } else if (item.itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
+        const metricId = storeState.metricExamples.find((example) => example.example_id === item.name)?.metric_id;
+        if (!metricId) return;
+        router.push({
+            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+            params: {
+                metricId,
+                metricExampleId: item.name || '',
+            },
+        }).catch(() => {});
     } else if (item.itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
         const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
@@ -309,6 +348,8 @@ const init = async () => {
     state.loading = true;
     await Promise.allSettled([
         favoriteStore.fetchFavorite(),
+        gnbStore.fetchMetricExample(),
+        gnbStore.fetchCostQuerySet(),
         dashboardStore.load(),
         // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
     ]);

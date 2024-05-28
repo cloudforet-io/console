@@ -63,7 +63,6 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 });
             } else {
                 filteredList = state.bookmarkData.filter((i) => !i.folder);
-                filteredList.unshift(...DefaultBookmarkData);
             }
             return filteredList;
         }),
@@ -156,8 +155,12 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
+                if (!results || results.length === 0) {
+                    await actions.createDefaultBookmark();
+                    return;
+                }
                 const promises: Promise<BookmarkItem>[] = (results ?? []).map(async (item) => {
-                    const imgIcon = await fetchFavicon(item.data.link);
+                    const imgIcon = item.data.imgIcon || await fetchFavicon(item.data.link);
                     return {
                         ...item.data as BookmarkItem,
                         id: item.name,
@@ -169,6 +172,19 @@ export const useBookmarkStore = defineStore('bookmark', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.bookmarkData = [];
+            }
+        },
+        createDefaultBookmark: async () => {
+            try {
+                await Promise.all(DefaultBookmarkData.map(async (item) => {
+                    await actions.createBookmarkLink({
+                        name: item.name as string || '',
+                        link: item.link || '',
+                        imgIcon: item.imgIcon,
+                    });
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
         createBookmarkFolder: async (name: string) => {
@@ -186,7 +202,9 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                 throw e;
             }
         },
-        createBookmarkLink: async ({ name, link, folder }: { name?: string|TranslateResult, link?: string, folder?: string}) => {
+        createBookmarkLink: async ({
+            name, link, folder, imgIcon,
+        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string}) => {
             try {
                 await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters, UserConfigModel>({
                     name: `console:bookmark:${folder}:${name}-${getRandomId()}`,
@@ -195,6 +213,7 @@ export const useBookmarkStore = defineStore('bookmark', () => {
                         name,
                         folder,
                         link,
+                        imgIcon,
                     },
                 });
                 await actions.fetchBookmarkList();

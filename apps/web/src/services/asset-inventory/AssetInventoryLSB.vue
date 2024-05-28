@@ -6,6 +6,7 @@ import { clone } from 'lodash';
 
 import { MENU_ID } from '@/lib/menu/config.js';
 
+import AssetAnalysisLSB from '@/services/asset-inventory/components/AssetAnalysisLSB.vue';
 import CloudServiceLSB from '@/services/asset-inventory/components/CloudServiceLSB.vue';
 import SecurityLSB from '@/services/asset-inventory/components/SecurityLSB.vue';
 
@@ -23,6 +24,7 @@ const state = reactive({
 <template>
     <fragment>
         <cloud-service-l-s-b v-if="state.menuId === MENU_ID.CLOUD_SERVICE" />
-        <security-l-s-b v-if="state.menuId === MENU_ID.SECURITY" />
+        <asset-analysis-l-s-b v-else-if="state.menuId === MENU_ID.ASSET_ANALYSIS" />
+        <security-l-s-b v-else-if="state.menuId === MENU_ID.SECURITY" />
     </fragment>
 </template>

@@ -23,6 +23,9 @@ const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
 const SecurityPage = () => import('@/services/asset-inventory/pages/SecurityPage.vue');
 
+const AssetAnalysisMainPage = () => import('@/services/asset-inventory/pages/AssetAnalysisMainPage.vue');
+const AssetAnalysisDetailPage = () => import('@/services/asset-inventory/pages/AssetAnalysisDetailPage.vue');
+
 const CollectorMainPage = () => import('@/services/asset-inventory/pages/CollectorMainPage.vue');
 const CreateCollectorPage = () => import('@/services/asset-inventory/pages/CollectorCreatePage.vue');
 
@@ -198,6 +201,42 @@ const assetInventoryRoute: RouteConfig = {
                     },
                     props: true,
                     component: ServiceAccountAddPage as any,
+                },
+            ],
+        },
+        {
+            path: 'asset-analysis',
+            meta: { menuId: MENU_ID.ASSET_ANALYSIS, translationId: MENU_INFO_MAP[MENU_ID.ASSET_ANALYSIS].translationId },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME,
+                    meta: { menuId: MENU_ID.ASSET_ANALYSIS, lsbVisible: true },
+                    component: AssetAnalysisMainPage as any,
+                },
+                {
+                    path: ':metricId',
+                    name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                    meta: { label: ({ params }) => params.metricId, lsbVisible: true },
+                    props: true,
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: '/',
+                            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL._NAME,
+                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                            props: true,
+                            component: AssetAnalysisDetailPage as any,
+                        },
+                        {
+                            path: ':metricExampleId',
+                            name: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS.DETAIL.EXAMPLE._NAME,
+                            meta: { label: ({ params }) => params.metricExampleId, lsbVisible: true },
+                            props: true,
+                            component: AssetAnalysisDetailPage as any,
+                        },
+                    ],
                 },
             ],
         },

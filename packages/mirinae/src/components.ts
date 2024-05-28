@@ -89,6 +89,7 @@ export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PCenteredLayout } from './layouts/centered-layout/PCenteredLayout.vue';
 export { default as PCenteredLayoutHeader } from './layouts/centered-layout/centered-layout-header/PCenteredLayoutHeader.vue';
+export { default as POverlayLayout } from './layouts/overlay-layout/POverlayLayout.vue';
 
 /* Navigation */
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';

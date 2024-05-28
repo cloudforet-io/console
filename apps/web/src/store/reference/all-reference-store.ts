@@ -17,6 +17,8 @@ import {
 } from '@/store/reference/cost-data-source-reference-store';
 import type { EscalationPolicyReferenceMap } from '@/store/reference/escalation-policy-reference-store';
 import { useEscalationPolicyReferenceStore } from '@/store/reference/escalation-policy-reference-store';
+import { useMetricReferenceStore } from '@/store/reference/metric-reference-store';
+import { useNamespaceReferenceStore } from '@/store/reference/namespace-reference-store';
 import { usePluginReferenceStore } from '@/store/reference/plugin-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
@@ -55,7 +57,9 @@ type PiniaStoreReferenceType =
     |'user'
     |'webhook'
     |'workspace'
-    |'escalation_policy';
+    |'escalation_policy'
+    |'metric'
+    |'namespace';
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const cloudServiceTypeReferenceStore = useCloudServiceTypeReferenceStore();
@@ -76,26 +80,39 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const secretReferenceStore = useSecretReferenceStore();
     const regionReferenceStore = useRegionReferenceStore();
     const escalationPolicyReferenceStore = useEscalationPolicyReferenceStore();
+    const namespaceReferenceStore = useNamespaceReferenceStore();
+    const metricReferenceStore = useMetricReferenceStore();
 
     const getters = reactive({
+        // TODO: unify into one case (serviceAccount or service_account)
         cloudServiceType: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
+        cloud_service_type: computed<CloudServiceTypeReferenceMap>(() => cloudServiceTypeReferenceStore.getters.cloudServiceTypeItems),
         collector: computed<CollectorReferenceMap>(() => collectorReferenceStore.getters.collectorItems),
         plugin: computed(() => pluginReferenceStore.getters.pluginItems),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
+        project_group: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
         project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
         protocol: computed(() => protocolReferenceStore.getters.protocolItems),
         provider: computed(() => providerReferenceStore.getters.providerItems),
         user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
+        cost_data_source: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
         cloudServiceQuerySet: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
+        cloud_service_query_set: computed<CloudServiceQuerySetReferenceMap>(() => cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetItems),
         workspace: computed<WorkspaceReferenceMap>(() => workspaceReferenceStore.getters.workspaceItems),
         publicDashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
+        public_dashboard: computed(() => publicDashboardReferenceStore.getters.publicDashboardItems),
         serviceAccount: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
+        service_account: computed(() => serviceAccountReferenceStore.getters.serviceAccountItems),
         webhook: computed(() => webhookReferenceStore.getters.webhookItems),
         trustedAccount: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
+        trusted_account: computed(() => trustedAccountReferenceStore.getters.trustedAccountItems),
         secret: computed(() => secretReferenceStore.getters.secretItems),
         region: computed(() => regionReferenceStore.getters.regionItems),
         escalationPolicy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
+        escalation_policy: computed<EscalationPolicyReferenceMap>(() => escalationPolicyReferenceStore.getters.escalationPolicyItems),
+        namespace: computed(() => namespaceReferenceStore.getters.namespaceItems),
+        metric: computed(() => metricReferenceStore.getters.metricItems),
     });
 
     const actions = {
@@ -133,6 +150,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await regionReferenceStore.sync(data); break;
             case 'escalation_policy':
                 await escalationPolicyReferenceStore.sync(data); break;
+            case 'namespace':
+                await namespaceReferenceStore.sync(data); break;
+            case 'metric':
+                await metricReferenceStore.sync(data); break;
             default: break;
             }
         },
@@ -174,6 +195,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await regionReferenceStore.load(options); break;
             case 'escalation_policy':
                 await escalationPolicyReferenceStore.load(options); break;
+            case 'namespace':
+                await namespaceReferenceStore.load(options); break;
+            case 'metric':
+                await metricReferenceStore.load(options); break;
             default: break;
             }
         },
@@ -196,6 +221,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             secretReferenceStore.flush();
             regionReferenceStore.flush();
             escalationPolicyReferenceStore.flush();
+            namespaceReferenceStore.flush();
+            metricReferenceStore.flush();
         },
     };
 

@@ -11,6 +11,8 @@ export const FAVORITE_TYPE = {
     DASHBOARD: 'DASHBOARD',
     COST_ANALYSIS: 'COST_ANALYSIS',
     SECURITY: 'SECURITY',
+    METRIC: 'METRIC',
+    METRIC_EXAMPLE: 'METRIC_EXAMPLE',
     WORKSPACE: 'WORKSPACE',
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];

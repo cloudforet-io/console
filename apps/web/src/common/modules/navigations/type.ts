@@ -10,6 +10,7 @@ export const RECENT_TYPE = {
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     CLOUD_SERVICE_TYPE: 'CLOUD_SERVICE_TYPE',
     COST_ANALYSIS: 'COST_ANALYSIS',
+    ASSET_ANALYSIS: 'ASSET_ANALYSIS',
     SECURITY: 'SECURITY',
     WORKSPACE: 'WORKSPACE',
 } as const;
@@ -23,6 +24,7 @@ export const recentNSearchTabMap = {
     cloudService: RECENT_TYPE.CLOUD_SERVICE,
     cloudServiceType: RECENT_TYPE.CLOUD_SERVICE_TYPE,
     costAnalysis: RECENT_TYPE.COST_ANALYSIS,
+    assetAnalysis: RECENT_TYPE.ASSET_ANALYSIS,
 } as const;
 
 export interface RecentConfig {

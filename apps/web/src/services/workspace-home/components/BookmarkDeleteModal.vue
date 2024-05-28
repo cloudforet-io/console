@@ -114,8 +114,8 @@ const handleClose = () => {
                     >
                         <p-i v-if="!item.link"
                              name="ic_folder"
-                             width="0.875rem"
-                             height="0.875rem"
+                             width="1.25rem"
+                             height="1.25rem"
                         />
                         <p-lazy-img
                             v-else
@@ -152,8 +152,9 @@ const handleClose = () => {
             padding: 0.5rem;
             gap: 0.5rem;
             .icon-wrapper {
-                @apply flex items-center justify-center rounded-xl;
+                @apply relative flex items-center justify-center rounded-xl;
                 width: 2.5rem;
+                min-width: 2.5rem;
                 height: 2.5rem;
                 &.is-folder {
                     @apply bg-blue-200;

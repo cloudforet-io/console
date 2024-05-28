@@ -64,6 +64,7 @@ const state = reactive({
     ])),
     selectedAccess: 'PRIVATE' as ProjectType,
     loading: false,
+    isConfirmed: false,
 });
 const {
     forms: { projectName },
@@ -75,6 +76,7 @@ const {
     projectName: undefined as string|undefined,
 }, {
     projectName: (val: string) => {
+        if (state.isConfirmed) return true;
         if (!val?.length) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
         if (val.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
         if (state.projectNames.includes(val)) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
@@ -104,6 +106,7 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
     }
 };
 const updateProject = async (): Promise<ProjectModel|undefined> => {
+    state.loading = true;
     try {
         const params: ProjectUpdateParameters = {
             project_id: props.project?.project_id || router.currentRoute.params.id,
@@ -117,6 +120,8 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
         return undefined;
+    } finally {
+        state.loading = false;
     }
 };
 const updateProjectType = async (): Promise<ProjectModel|undefined> => {
@@ -141,6 +146,8 @@ const confirm = async () => {
     if (state.loading) return;
     if (!isAllValid.value) return;
 
+    state.isConfirmed = true;
+
     if (props.project) { // update project
         const updatedProject1 = await updateProject();
         const updatedProject2 = await updateProjectType();
@@ -163,6 +170,10 @@ const handleSelectAccess = (selectedAccess: ProjectType) => {
     state.selectedAccess = selectedAccess;
 };
 
+watch(() => state.proxyVisible, (visible) => {
+    if (!visible) return;
+    state.isConfirmed = false;
+}, { immediate: true });
 watch(() => props.project, async (project) => {
     if (project) {
         setForm('projectName', project?.name);

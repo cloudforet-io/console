@@ -78,7 +78,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         menuId: MENU_ID.COST_ANALYSIS,
         routeName: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
-        icon: 'ic_service_cost-anlaysis',
+        icon: 'ic_service_cost-analysis',
     },
     [MENU_ID.BUDGET]: {
         menuId: MENU_ID.BUDGET,
@@ -92,6 +92,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.COST_EXPLORER_REPORT',
         highlightTag: 'new',
         icon: 'ic_service_cost-report',
+    },
+    [MENU_ID.DATA_SOURCES]: {
+        menuId: MENU_ID.DATA_SOURCES,
+        routeName: COST_EXPLORER_ROUTE.DATA_SOURCES._NAME,
+        translationId: 'MENU.COST_EXPLORER_DATA_SOURCES',
+        highlightTag: 'new',
+        icon: 'ic_service_data-sources',
     },
     [MENU_ID.ALERT_MANAGER]: {
         menuId: MENU_ID.ALERT_MANAGER,
@@ -188,5 +195,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: INFO_ROUTE.NOTICE._NAME,
         translationId: 'MENU.INFO_NOTICE',
         icon: 'ic_gnb_bell',
+    },
+    [MENU_ID.ASSET_ANALYSIS]: {
+        menuId: MENU_ID.ASSET_ANALYSIS,
+        routeName: ASSET_INVENTORY_ROUTE.ASSET_ANALYSIS._NAME,
+        translationId: 'MENU.ASSET_INVENTORY_ASSET_ANALYSIS',
+        highlightTag: 'new',
+        icon: 'ic_service_metric-explorer',
     },
 });

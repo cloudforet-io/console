@@ -83,7 +83,7 @@ const handleSelect = (id: string, selected: string) => {
             </div>
             <template v-for="(menuData, idx) in props.menuSet">
                 <div v-if="menuData.type === MENU_ITEM_TYPE.SLOT"
-                     :key="`${idx}-${getRandomId()}`"
+                     :key="`${idx}-${menuData.id}`"
                      class="slot-menu-wrapper"
                 >
                     <slot :name="`slot-${menuData.id}`"

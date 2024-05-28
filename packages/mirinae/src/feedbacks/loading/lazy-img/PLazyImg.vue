@@ -1,3 +1,70 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+
+import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
+import PI from '@/foundation/icons/PI.vue';
+
+interface Props {
+    height?: string;
+    width?: string;
+    src?: string;
+    errorIcon?: string;
+    errorIconColor?: string;
+    loading?: boolean;
+    alt?: string;
+}
+
+enum LOAD_STATUS {
+    loading = 'loading',
+    succeed = 'succeed',
+    errored = 'errored'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    height: '2rem',
+    width: '2rem',
+    src: undefined,
+    errorIcon: 'ic_resource_hexagon',
+    errorIconColor: '',
+    loading: undefined,
+    alt: undefined,
+});
+
+const imageRef = ref<HTMLImageElement|null>(null);
+
+const state = reactive({
+    status: LOAD_STATUS.loading,
+    imageWidth: 0,
+    imageHeight: 0,
+    isRectangle: computed<boolean>(() => state.imageWidth !== state.imageHeight),
+});
+
+const onLoad = () => {
+    if (!props.loading) {
+        state.status = LOAD_STATUS.succeed;
+    }
+    if (imageRef.value) {
+        state.imageWidth = imageRef.value.naturalWidth;
+        state.imageHeight = imageRef.value.naturalHeight;
+    }
+};
+const onError = () => {
+    if (!props.loading) {
+        state.status = LOAD_STATUS.errored;
+    }
+};
+
+watch(() => props.src, (src, before) => {
+    if (!src && src === before) {
+        state.status = LOAD_STATUS.errored;
+    } else {
+        state.status = LOAD_STATUS.loading;
+    }
+}, { immediate: true });
+</script>
+
 <template>
     <transition-group name="fade-in"
                       tag="span"
@@ -8,15 +75,20 @@
               key="img"
               class="img-container"
         >
-            <img v-show="status === LOAD_STATUS.succeed"
-                 :style="{height, width}"
-                 :src="src || ''"
+            <img v-show="state.status === LOAD_STATUS.succeed"
+                 ref="imageRef"
+                 :style="{
+                     height: state.isRectangle ? 'auto' : height,
+                     width,
+                     'max-height': height,
+                 }"
+                 :src="props.src || ''"
                  :alt="alt"
                  @load="onLoad"
                  @error="onError"
             >
         </span>
-        <span v-show="!loading && status === LOAD_STATUS.errored"
+        <span v-show="!loading && state.status === LOAD_STATUS.errored"
               key="error-img"
               class="img-container error"
         >
@@ -31,7 +103,7 @@
                 />
             </slot>
         </span>
-        <span v-show="loading || status === LOAD_STATUS.loading"
+        <span v-show="loading || state.status === LOAD_STATUS.loading"
               key="loader"
               class="img-container"
         >
@@ -46,105 +118,12 @@
     </transition-group>
 </template>
 
-<script lang="ts">
-import {
-    defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
-import PI from '@/foundation/icons/PI.vue';
-
-interface Props {
-    height?: string;
-    width?: string;
-    src: string;
-    errorIcon?: string;
-    errorIconColor?: string;
-    loading?: boolean;
-    alt?: string;
-}
-
-enum LOAD_STATUS {
-    loading = 'loading',
-    succeed = 'succeed',
-    errored = 'errored'
-}
-
-export default defineComponent<Props>({
-    name: 'PLazyImg',
-    components: {
-        PSkeleton,
-        PI,
-    },
-    props: {
-        height: {
-            type: String,
-            default: '2rem',
-        },
-        width: {
-            type: String,
-            default: '2rem',
-        },
-        src: {
-            type: String,
-            default: undefined,
-        },
-        errorIcon: {
-            type: String,
-            default: 'ic_resource_hexagon',
-        },
-        errorIconColor: {
-            type: String,
-            default: '',
-        },
-        loading: {
-            type: Boolean,
-            default: undefined,
-        },
-        alt: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props: Props) {
-        const state = reactive({
-            status: LOAD_STATUS.loading,
-        });
-
-
-        watch(() => props.src, (src, before) => {
-            if (!src && src === before) {
-                state.status = LOAD_STATUS.errored;
-            } else {
-                state.status = LOAD_STATUS.loading;
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            onLoad() {
-                if (!props.loading) {
-                    state.status = LOAD_STATUS.succeed;
-                }
-            },
-            onError() {
-                if (!props.loading) {
-                    state.status = LOAD_STATUS.errored;
-                }
-            },
-            LOAD_STATUS,
-        };
-    },
-});
-</script>
-
 <style lang="postcss">
 .p-lazy-img {
     @apply inline-block relative;
     z-index: 0;
     .img-container {
-        @apply inline-block w-full h-full absolute rounded-md overflow-hidden;
+        @apply inline-flex items-center w-full h-full absolute rounded-md overflow-hidden;
         z-index: 1;
         left: 0;
         &.error {

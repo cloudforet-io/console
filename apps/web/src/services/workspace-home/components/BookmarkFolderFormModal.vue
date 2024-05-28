@@ -10,6 +10,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
@@ -64,6 +65,7 @@ const handleClose = () => {
     bookmarkStore.setModalType(undefined, false, false);
     initForm();
 };
+
 const handleConfirm = async () => {
     state.loading = true;
     try {
@@ -101,7 +103,7 @@ watch(() => storeState.modal.isEdit, (isEditModal) => {
                     :fade="true"
                     :backdrop="true"
                     :visible="storeState.modal.type === BOOKMARK_MODAL_TYPE.FOLDER"
-                    :disabled="(name === '' || invalidState.name) || state.bookmark === name"
+                    :disabled="(name === '' || invalidState.name)"
                     :loading="state.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"

@@ -14,13 +14,15 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     DashboardTemplate,
+    TemplateType,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import getRandomId from '@/lib/random-id-generator';
 
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
+import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -45,16 +47,18 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
     },
 });
 
-const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    let projectPropertySchema = {
-        ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema): DashboardVariablesSchema => {
+    const projectSchemaProperty: DashboardVariableSchemaProperty = {
+        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project, use: true, readonly: true, fixed: true,
     };
-    if (labels?.includes('Asset')) {
-        projectPropertySchema = {
-            ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
-        };
-    }
-    const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
+    const projectGroupSchemaProperty: DashboardVariableSchemaProperty = {
+        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties.project_group, use: false, fixed: true,
+    };
+    const properties = {
+        ...variablesSchemaInfo.properties,
+        project: projectSchemaProperty,
+        project_group: projectGroupSchemaProperty,
+    };
 
     const order = [...variablesSchemaInfo.order];
     const projectIdx = variablesSchemaInfo.order.findIndex((property) => property === 'project');
@@ -64,6 +68,7 @@ const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVar
     return {
         properties,
         order,
+        fixed_options: variablesSchemaInfo.fixed_options,
     };
 };
 const refineProjectDashboardVariables = (variables: DashboardVariables, projectId: string): DashboardVariables => {
@@ -93,6 +98,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         labels: [] as string[],
         dashboardType: 'PUBLIC' as DashboardType,
         dashboardScope: 'WORKSPACE' as DashboardScope,
+        // template info
+        templateId: 'blank', // "templateId" exists in new dashboard, but not in existing dashboard.
+        templateType: 'MANAGED' as TemplateType,
         // widget info states
         dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
         loadingWidgets: false,
@@ -104,6 +112,39 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
+        refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
+            const _storedVariablesSchema = cloneDeep(state.variablesSchema);
+            const _refinedVariablesSchema: DashboardVariablesSchema = {
+                properties: {},
+                order: _storedVariablesSchema.order,
+                fixed_options: _storedVariablesSchema.fixed_options,
+            };
+            Object.entries<DashboardVariableSchemaProperty>(_storedVariablesSchema.properties).forEach(([propertyName, property]) => {
+                if (property.variable_type === 'MANAGED') {
+                    _refinedVariablesSchema.properties[propertyName] = {
+                        ...MANAGED_DASHBOARD_VARIABLES_SCHEMA.properties[propertyName],
+                        use: property.use,
+                    };
+                    if (typeof property.fixed === 'boolean') {
+                        _refinedVariablesSchema.properties[propertyName].fixed = property.fixed;
+                    }
+                    if (typeof property.readonly === 'boolean') {
+                        _refinedVariablesSchema.properties[propertyName].readonly = property.readonly;
+                    }
+                } else {
+                    _refinedVariablesSchema.properties[propertyName] = property;
+                }
+            });
+            return _refinedVariablesSchema;
+        }),
+        displayInfo: computed<DashboardTemplate['display_info']>(() => {
+            if (!state.templateId || state.templateId === 'blank') return {};
+            const _template = DASHBOARD_TEMPLATES[state.templateId];
+            return {
+                icon: state.dashboardInfo?.display_info?.icon ?? _template.display_info?.icon ?? '',
+                preview_image: state.dashboardInfo?.display_info?.preview_image ?? _template.display_info?.preview_image ?? '',
+            };
+        }),
     });
 
     /* Mutations */
@@ -144,7 +185,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardScope = dashboardScope;
     };
     const setProjectId = (projectId?: string) => { state.projectId = projectId; };
-
+    const setTemplateId = (templateId: string) => { state.templateId = templateId; };
+    const setTemplateType = (templateType: TemplateType) => { state.templateType = templateType; };
     /* Actions */
     const reset = () => {
         // set default value of all state
@@ -181,7 +223,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
         let _variables = _template.variables ?? {};
         if (state.projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _template.labels);
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
             _variables = refineProjectDashboardVariables(_variables, state.projectId);
         }
         setVariablesSchema(_variablesSchema);
@@ -198,6 +240,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        setTemplateId(_template.template_id);
+        setTemplateType(_template.template_type);
     };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
@@ -228,13 +272,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setProjectId(_projectId);
 
         // variables, variables schema
-        let _variablesSchema = {
+        let _variablesSchema: DashboardVariablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order,
+            fixed_options: _dashboardInfo.variables_schema?.fixed_options,
         };
         let _variables = _dashboardInfo.variables ?? {};
         if (_projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
             _variables = refineProjectDashboardVariables(_variables, _projectId);
         }
         const _variablesInitMap = {};
@@ -251,6 +296,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        setTemplateId(_dashboardInfo.template_id);
+        setTemplateType(_dashboardInfo.template_type);
     };
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
@@ -350,9 +397,24 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetValidMap[widgetKey] = isValid;
     };
     //
+    const refineSchemaProperties = (properties: Record<string, DashboardVariableSchemaProperty>): Record<string, DashboardVariableSchemaProperty> => Object.entries(properties)
+        .reduce((acc, [property, propertyInfo]) => {
+            acc[property] = propertyInfo.variable_type === 'MANAGED'
+                ? { variable_type: 'MANAGED', use: propertyInfo.use, fixed: !!propertyInfo.fixed }
+                : propertyInfo;
+            return acc;
+        }, {});
     const createDashboard = async (params: CreateDashboardParameters, dashboardType?: DashboardType): Promise<DashboardModel> => {
+        const _params = {
+            ...params,
+            variables_schema: {
+                order: params.variables_schema?.order ?? [],
+                properties: refineSchemaProperties(params.variables_schema?.properties ?? {}),
+                fixed_options: params.variables_schema?.fixed_options,
+            },
+        };
         const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
-        const res = await dashboardStore.createDashboard(_dashboardType, params);
+        const res = await dashboardStore.createDashboard(_dashboardType, _params);
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
@@ -361,6 +423,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ...params,
             [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
         };
+        if (params.variables_schema) {
+            _params.variables_schema = {
+                order: params.variables_schema.order,
+                properties: refineSchemaProperties(params.variables_schema.properties),
+            };
+        }
         const res = await dashboardStore.updateDashboard(dashboardId, _params);
         _setDashboardInfoStoreState(res);
     };

@@ -7,6 +7,7 @@ import { PI } from '@spaceone/design-system';
 
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -15,6 +16,7 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CloudServiceTypeReferenceMap } from '@/store/reference/cloud-service-type-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
@@ -24,6 +26,8 @@ import {
     convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
+    convertMetricConfigToReferenceData,
+    convertMetricExampleConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
     convertWorkspaceConfigToReferenceData,
@@ -72,6 +76,8 @@ const storeState = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => allReferenceStore.getters.cloudServiceType),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metricExamples: computed<MetricExampleModel[]>(() => gnbStoreGetters.metricExamples),
     costQuerySets: computed<CostQuerySetModel[]>(() => gnbStoreGetters.costQuerySets),
 });
 const state = reactive({
@@ -116,6 +122,12 @@ const convertFavoriteToReferenceData = (favoriteConfig: ConfigData) => {
     }
     if (itemType === FAVORITE_TYPE.CLOUD_SERVICE || itemType === FAVORITE_TYPE.SECURITY) {
         return convertCloudServiceConfigToReferenceData([favoriteConfig], storeState.cloudServiceTypes)[0];
+    }
+    if (itemType === FAVORITE_TYPE.METRIC) {
+        return convertMetricConfigToReferenceData([favoriteConfig], storeState.metrics)[0];
+    }
+    if (itemType === FAVORITE_TYPE.METRIC_EXAMPLE) {
+        return convertMetricExampleConfigToReferenceData([favoriteConfig], storeState.metricExamples)[0];
     }
     if (itemType === FAVORITE_TYPE.COST_ANALYSIS) {
         return convertCostAnalysisConfigToReferenceData([favoriteConfig], storeState.costQuerySets, storeState.costDataSource)[0];

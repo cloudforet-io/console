@@ -6,12 +6,13 @@ import {
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
-import { isEmpty } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 
-interface DateOption {
+const DATE_3_YEARS_TO_MONTHS = 36;
+const DATE_1_YEAR_TO_MONTHS = 12;
+interface DateSetting {
     minDate?: string;
     maxDate?: string;
 }
@@ -20,18 +21,17 @@ interface Props {
     datetimePickerDataType?: DATA_TYPE;
     start?: string;
     end?: string;
-    startDateSetting?: DateOption;
-    endDateSetting?: DateOption;
-    hideHelpText?: boolean;
+    /* Restricted mode applies a limit of '12 months' for month type, and '1 month' for day type */
+    useRestrictedMode?: boolean;
+    disableFuture?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    datetimePickerDataType: 'yearToDate',
-    hideHelpText: false,
+    datetimePickerDataType: 'yearToMonth',
     start: undefined,
     end: undefined,
-    startDateSetting: () => ({}),
-    endDateSetting: () => ({}),
+    useRestrictedMode: false,
+    disableFuture: false,
 });
 
 const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
@@ -39,6 +39,7 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
     (event: 'cancel'): void;
 }>();
 
+const today = dayjs.utc();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     invalid: computed(() => {
@@ -46,17 +47,40 @@ const state = reactive({
         const timeUnit = props.datetimePickerDataType === 'yearToDate' ? 'day' : 'month';
         const startDate = dayjs.utc(state.startDates[0]);
         const endDate = dayjs.utc(state.endDates[0]);
-        return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, 'year') >= 1;
+
+        const diffUnit = props.datetimePickerDataType === 'yearToDate' ? 'month' : 'year';
+        return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, diffUnit) >= 1;
     }),
     startDates: [] as string[],
     endDates: [] as string[],
-    endDateSetting: computed<DateOption>(() => {
-        if (!isEmpty(props.endDateSetting)) return props.endDateSetting;
-        if (!state.startDates.length) return {};
+    dateFormat: computed<string>(() => (props.datetimePickerDataType === 'yearToDate' ? 'YYYY-MM-DD' : 'YYYY-MM')),
+    startDateSetting: computed<DateSetting|undefined>(() => {
+        if (!props.useRestrictedMode) return undefined;
+        const minDate = today.subtract(DATE_3_YEARS_TO_MONTHS - 1, 'month').format(state.dateFormat);
+        const maxDate = today.format(state.dateFormat);
+        return { minDate, maxDate };
+    }),
+    endDateSetting: computed<DateSetting|undefined>(() => {
+        if (!state.startDates.length) return undefined;
+        if (!props.useRestrictedMode) {
+            const startDate = dayjs.utc(state.startDates[0]);
+            const minDate = startDate.format(state.dateFormat);
+            return { minDate };
+        }
 
+        let maxDate: string;
         const startDate = dayjs.utc(state.startDates[0]);
-        const minDate = startDate.format('YYYY-MM');
-        return { minDate };
+        const minDate = startDate.format(state.dateFormat);
+
+        let maxRawData = startDate.add(DATE_1_YEAR_TO_MONTHS - 1, 'month');
+        if (props.datetimePickerDataType === 'yearToDate') {
+            maxRawData = startDate.add(1, 'month').subtract(1, 'day');
+        }
+
+        if (props.disableFuture && maxRawData.isAfter(dayjs.utc())) {
+            maxDate = dayjs.utc().format(state.dateFormat);
+        } else maxDate = maxRawData.format(state.dateFormat);
+        return { minDate, maxDate };
     }),
 });
 
@@ -66,9 +90,8 @@ const handleUpdateVisible = (visible: boolean) => {
 };
 const handleConfirm = () => {
     state.proxyVisible = false;
-    // const period: Period = {};
-    const start = dayjs.utc(state.startDates[0]).format('YYYY-MM');
-    const end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM');
+    const start = dayjs.utc(state.startDates[0]).format(state.dateFormat);
+    const end = dayjs.utc(state.endDates[0]).format(state.dateFormat);
     emit('confirm', start, end);
 };
 const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
@@ -116,15 +139,15 @@ watch(() => props.visible, (visible) => {
         <template #body>
             <p-field-group class="period-select"
                            :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
-                           :help-text="props.hideHelpText ? '': $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS')"
+                           :help-text="props.useRestrictedMode ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS') : ''"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
                                    :selected-dates="state.startDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
-                                   :min-date="props.startDateSetting?.minDate"
-                                   :max-date="props.startDateSetting?.maxDate"
-                                   data-type="yearToMonth"
+                                   :min-date="state.startDateSetting?.minDate"
+                                   :max-date="state.startDateSetting?.maxDate"
+                                   :data-type="props.datetimePickerDataType"
                                    @update:selected-dates="handleUpdateSelectedDates('start', $event)"
                 />
             </p-field-group>
@@ -137,7 +160,7 @@ watch(() => props.visible, (visible) => {
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.endDateSetting?.minDate"
                                    :max-date="state.endDateSetting?.maxDate"
-                                   data-type="yearToMonth"
+                                   :data-type="props.datetimePickerDataType"
                                    @update:selected-dates="handleUpdateSelectedDates('end', $event)"
                 />
             </p-field-group>

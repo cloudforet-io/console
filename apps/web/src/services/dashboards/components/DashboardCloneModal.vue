@@ -4,14 +4,14 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PRadio, PTextInput, PI,
+    PButtonModal, PFieldGroup, PTextInput, PToggleButton,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import { DASHBOARD_TYPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type {
-    DashboardType,
+    DashboardType, TemplateType,
 } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -23,8 +23,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { gray } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -49,6 +47,7 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const {
     forms: {
@@ -75,10 +74,7 @@ const storeState = reactive({
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     dashboardType: 'PRIVATE' as DashboardType,
-    filteredVisibilityList: computed(() => [
-        { name: 'PRIVATE', label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
-        { name: 'PUBLIC', label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC') },
-    ]),
+    isPrivate: false,
     projectId: computed<string|undefined>(() => {
         if (props.dashboard?.project_id !== '*') return props.dashboard?.project_id;
         return undefined;
@@ -97,21 +93,21 @@ const createDashboard = async () => {
     try {
         const params: CreateDashboardParameters = {
             name: name.value,
-            // HACK: get dynamic template_id, template_type after implementing template feature
-            template_id: 'blank',
-            template_type: 'MANAGED',
-            layouts: props.dashboard?.layouts,
+            template_id: props.dashboard?.template_id as string,
+            template_type: props.dashboard?.template_type as TemplateType,
             labels: props.dashboard?.labels,
             settings: props.dashboard?.settings,
+            layouts: props.dashboard?.layouts,
             variables: props.dashboard?.variables,
             variables_schema: props.dashboard?.variables_schema,
             tags: { created_by: store.state.user.userId },
+            display_info: dashboardDetailGetters.displayInfo,
         };
         if (storeState.isAdminMode) {
             state.dashboardType = DASHBOARD_TYPE.PUBLIC;
             params.resource_group = RESOURCE_GROUP.DOMAIN;
         } else if (state.dashboardType !== 'PRIVATE') {
-            params.resource_group = props.dashboard?.resource_group; // workspace, project
+            params.resource_group = props.dashboard?.resource_group || RESOURCE_GROUP.WORKSPACE;
             if (props.dashboard?.project_id && props.dashboard?.project_id !== '*') {
                 params.project_id = props.dashboard?.project_id;
             }
@@ -124,8 +120,10 @@ const createDashboard = async () => {
     return undefined;
 };
 
-const handleChangeDashboardType = (value: DashboardType) => {
-    state.dashboardType = value;
+/* Event */
+const handleChangePrivate = (val: boolean) => {
+    state.isPrivate = val;
+    state.dashboardType = val ? 'PRIVATE' : 'PUBLIC';
 };
 const handleConfirm = async () => {
     if (!isAllValid) return;
@@ -141,6 +139,7 @@ const handleConfirm = async () => {
 
 const init = () => {
     initForm('name', `Clone - ${props.dashboard?.name}`);
+    state.isPrivate = !!props.dashboard?.private_dashboard_id;
 };
 
 watch(() => props.visible, (visible) => {
@@ -172,26 +171,13 @@ watch(() => props.visible, (visible) => {
                 </template>
             </p-field-group>
             <p-field-group v-if="!storeState.isAdminMode"
-                           :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
+                           :label="$t('DASHBOARDS.FORM.LABEL_MAKE_PRIVATE')"
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name: visibilityName, label, icon } in state.filteredVisibilityList"
-                         :key="visibilityName"
-                         :value="visibilityName"
-                         :selected="state.dashboardType"
-                         class="radio-group"
-                         @change="handleChangeDashboardType"
-                >
-                    <p-i v-if="icon"
-                         :name="icon"
-                         width="0.875rem"
-                         height="0.875rem"
-                         :color="gray[500]"
-                         class="ml-1"
-                    />
-                    <span class="ml-1">{{ label }}</span>
-                </p-radio>
+                <p-toggle-button :value="state.isPrivate"
+                                 @change-toggle="handleChangePrivate"
+                />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -199,10 +185,6 @@ watch(() => props.visible, (visible) => {
 
 <style lang="postcss" scoped>
 .dashboard-clone-modal {
-    .radio-group {
-        @apply inline-block;
-        margin-bottom: 0.625rem;
-    }
     .p-text-input {
         @apply w-full;
     }
