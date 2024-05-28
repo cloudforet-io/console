@@ -40,7 +40,7 @@ export const makeDataSourceDistinctValueHandler = (
 
 export const convertWorkspaceSearchValue = (options, workspaceList?: WorkspaceModel[]): ToolboxOptions => {
     const { queryTags } = options;
-    if (queryTags.length === 0) return options;
+    if (!queryTags || queryTags.length === 0) return options;
     const workspaceOptionIndex = queryTags.findIndex((tag) => tag.key.name === 'workspace_id');
     const workspaceOption = queryTags[workspaceOptionIndex];
     const searchedWorkspace = workspaceList?.filter((workspace) => workspace.name.includes(workspaceOption.value.name))[0];
