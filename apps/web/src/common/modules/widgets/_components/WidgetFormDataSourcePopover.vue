@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PI, PPopover, PSelectCard,
+    PButton, PPopover, PSelectCard,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 
@@ -13,6 +13,7 @@ import { i18n } from '@/translations';
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
+import WidgetFormDataSourceAddButton from '@/common/modules/widgets/_components/WidgetFormDataSourceAddButton.vue';
 
 
 const POPPER_CONDITION = {
@@ -104,16 +105,7 @@ watch(() => state.showPopover, (val) => {
                hide-padding
                :trigger="POPOVER_TRIGGER.NONE"
     >
-        <div class="add-data-source-button"
-             @click="handleClickAddDataSourceButton"
-        >
-            <p-i name="ic_plus"
-                 class="link-mark"
-                 height="1rem"
-                 width="1rem"
-                 color="inherit"
-            />
-        </div>
+        <widget-form-data-source-add-button @click-add="handleClickAddDataSourceButton" />
         <template #content>
             <div v-if="!state.selectedPopperCondition"
                  class="data-source-popper-condition-wrapper"
@@ -177,15 +169,6 @@ watch(() => state.showPopover, (val) => {
         .popper {
             padding: 0;
         }
-    }
-    .add-data-source-button {
-        @apply bg-primary2 rounded-full text-white border border-primary-1;
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
     }
     .data-source-popper-condition-wrapper {
         display: flex;
