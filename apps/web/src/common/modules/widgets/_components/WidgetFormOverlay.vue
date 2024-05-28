@@ -9,6 +9,7 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormOverlayStep1 from '@/common/modules/widgets/_components/WidgetFormOverlayStep1.vue';
+import WidgetFormOverlayStep2 from '@/common/modules/widgets/_components/WidgetFormOverlayStep2.vue';
 
 
 interface Props {
@@ -26,16 +27,21 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     sidebarTitle: computed(() => {
         if (props.overlayType === 'ADD') {
-            // TODO: add sub title
-            return i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.ADD_WIDGET');
+            const _title = i18n.t('DASHBOARDS.WIDGET.OVERLAY.ADD_WIDGET');
+            let _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_DATA_SOURCE');
+            if (state.currentStep === 2) {
+                _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_CHART_OPTIONS');
+            }
+            return `${_title} - ${_subTitle}`;
         }
-        return i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.EDIT_WIDGET');
+        return i18n.t('DASHBOARDS.WIDGET.OVERLAY.EDIT_WIDGET');
     }),
+    currentStep: 1,
 });
 
 /* Event */
 const handleClickContinue = () => {
-    // TODO: add event
+    state.currentStep += 1;
 };
 </script>
 
@@ -46,7 +52,8 @@ const handleClickContinue = () => {
                           size="full"
                           :title="state.sidebarTitle"
         >
-            <widget-form-overlay-step1 />
+            <widget-form-overlay-step1 v-if="state.currentStep === 1" />
+            <widget-form-overlay-step2 v-if="state.currentStep === 2" />
             <template #footer>
                 <div class="footer-wrapper">
                     <p-button style-type="substitutive"

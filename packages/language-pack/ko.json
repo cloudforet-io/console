@@ -1778,8 +1778,11 @@
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_SELECTED_ITEM": "1개 이상의 옵션을 선택해 주세요.",
 			"OVERLAY": {
+				"ADD_WIDGET": "위젯 추가",
+				"EDIT_WIDGET": "",
+				"SET_CHART_OPTIONS": "",
+				"SET_DATA_SOURCE": "",
 				"STEP_1": {
-					"ADD_WIDGET": "위젯 추가",
 					"ASSET": "에셋",
 					"BUDGET": "예산",
 					"CATEGORY": "",
@@ -1792,7 +1795,6 @@
 					"DATA_SOURCE_NAME": "",
 					"DATA_TABLE": "",
 					"DONE": "완료",
-					"EDIT_WIDGET": "",
 					"EMPTY_DESC": "",
 					"GENERATE": "",
 					"METRIC": "",
@@ -1800,6 +1802,16 @@
 					"SECURITY": "보안",
 					"SELECT_A_DATA_SOURCE": "",
 					"SELECT_DATA_SOURCE_TYPE": ""
+				},
+				"STEP_2": {
+					"CHART_OPTIONS": "",
+					"CHART_TYPE": "",
+					"DATA_MAPPING": "",
+					"DATA_TABLE": "",
+					"DESCRIPTION": "설명",
+					"EDIT": "",
+					"TITLE": "",
+					"WIDGET_INFO": ""
 				}
 			},
 			"PROJECT_ACTIVITY_SUMMARY": {
