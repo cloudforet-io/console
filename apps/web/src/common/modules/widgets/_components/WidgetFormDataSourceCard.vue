@@ -6,9 +6,10 @@ import {
     PFieldGroup, PDivider, PIconButton, PTextButton, PI, PButton, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
-import { violet, white } from '@/styles/colors';
+import { gray, violet, white } from '@/styles/colors';
 
 interface Props {
+    dataTableId: string;
     selected: boolean;
     latestAdded: boolean;
 }
@@ -21,8 +22,13 @@ const state = reactive({
         { label: 'Accumulated', value: 'accumulated' },
     ]),
     selectedDataFormat: 'time-series',
+    selectedDataTable: undefined as string | undefined,
 });
 
+/* Events */
+const handleSelectDataTable = (dataTable: string) => {
+    state.selectedDataTable = dataTable;
+};
 const handleSelectDataFormat = (dataFormat: string) => {
     state.selectedDataFormat = dataFormat;
 };
@@ -31,19 +37,18 @@ const handleSelectDataFormat = (dataFormat: string) => {
 
 <template>
     <div class="widget-form-data-source-card">
-        <p-i v-if="props.selected"
-             class="selected-icon"
-             name="ic_checkbox-circle-selected"
-             :color="violet[500]"
-             width="2rem"
-             height="2rem"
-        />
         <div class="card-wrapper"
              :class="{ 'selected': props.selected }"
         >
             <div class="card-header">
                 <div class="title-wrapper">
                     <div class="title">
+                        <p-icon-button class="selected-radio-icon"
+                                       :name="props.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
+                                       :color="props.selected ? violet[500] : gray[400]"
+                                       size="sm"
+                                       @click="handleSelectDataTable(props.dataTableId)"
+                        />
                         <p>Data Source 1</p>
                         <p-icon-button class="edit-button"
                                        style-type="transparent"
@@ -82,6 +87,11 @@ const handleSelectDataFormat = (dataFormat: string) => {
                 >
                     Add Filter
                 </p-button>
+                <p-button class="save-changes-button"
+                          style-type="secondary"
+                >
+                    Save Changes
+                </p-button>
             </div>
         </div>
         <div v-if="props.latestAdded"
@@ -101,13 +111,6 @@ const handleSelectDataFormat = (dataFormat: string) => {
 <style lang="postcss" scoped>
 .widget-form-data-source-card {
     @apply relative flex;
-
-    .selected-icon {
-        @apply absolute;
-        left: -0.75rem;
-        top: -0.75rem;
-        z-index: 1;
-    }
 
     .card-wrapper {
         @apply relative border border-gray-300 rounded-lg w-full;
@@ -138,6 +141,10 @@ const handleSelectDataFormat = (dataFormat: string) => {
             .filter-divider {
                 margin: 0.75rem 0;
             }
+        }
+        .save-changes-button {
+            @apply relative;
+            margin-top: 0.75rem;
         }
     }
 
