@@ -1751,8 +1751,11 @@
 			"NO_DATA": "No Data",
 			"NO_SELECTED_ITEM": "One of the options must be selected.",
 			"OVERLAY": {
+				"ADD_WIDGET": "Add Widget",
+				"EDIT_WIDGET": "Edit Widget",
+				"SET_CHART_OPTIONS": "Set Chart Options",
+				"SET_DATA_SOURCE": "Set Data Source",
 				"STEP_1": {
-					"ADD_WIDGET": "Add Widget",
 					"ASSET": "Asset",
 					"BUDGET": "Budget",
 					"CATEGORY": "Category",
@@ -1765,7 +1768,6 @@
 					"DATA_SOURCE_NAME": "Data Source Name",
 					"DATA_TABLE": "Data Table",
 					"DONE": "Done",
-					"EDIT_WIDGET": "Edit Widget",
 					"EMPTY_DESC": "Selectable chart types for the widget are available.",
 					"GENERATE": "Generate",
 					"METRIC": "Metric",
@@ -1773,6 +1775,16 @@
 					"SECURITY": "Security",
 					"SELECT_A_DATA_SOURCE": "Select a data source",
 					"SELECT_DATA_SOURCE_TYPE": "Select Data Source Type"
+				},
+				"STEP_2": {
+					"CHART_OPTIONS": "Chart Options",
+					"CHART_TYPE": "Chart Type",
+					"DATA_MAPPING": "Data Mapping",
+					"DATA_TABLE": "Data Table",
+					"DESCRIPTION": "Description",
+					"EDIT": "Edit",
+					"TITLE": "Title",
+					"WIDGET_INFO": "Widget Info"
 				}
 			},
 			"PROJECT_ACTIVITY_SUMMARY": {
