@@ -12,7 +12,9 @@ const storeState = reactive({
 
 <template>
     <div class="domain-landing-title">
-        <h1>{{ $t('LADING.DOMAIN.WELCOME_TITLE', {'domain_name': storeState.domainName}) }}</h1>
+        <h1 class="welcome-title">
+            {{ $t('LADING.DOMAIN.WELCOME_TITLE', {'domain_name': storeState.domainName}) }}
+        </h1>
         <i18n class="title"
               path="LADING.DOMAIN.TITLE"
         >
@@ -41,6 +43,9 @@ const storeState = reactive({
 .domain-landing-title {
     @apply flex flex-col;
     gap: 1rem;
+    .welcome-title {
+        @apply text-label-xl;
+    }
     .title {
         @apply text-display-lg font-normal;
         max-width: 55rem;

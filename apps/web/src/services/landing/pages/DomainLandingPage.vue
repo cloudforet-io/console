@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DomainLandingRecommendation from '@/services/landing/components/DomainLandingRecommendation.vue';
 import DomainLandingStartBanner from '@/services/landing/components/DomainLandingStartBanner.vue';
 import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle.vue';
 
@@ -8,6 +9,7 @@ import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle
     <div class="domain-landing-page">
         <domain-landing-title />
         <domain-landing-start-banner />
+        <domain-landing-recommendation />
     </div>
 </template>
 
@@ -15,6 +17,7 @@ import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle
 .domain-landing-page {
     @apply flex flex-col;
     width: 100%;
+    max-width: 87rem;
     padding-top: 7rem;
     gap: 4rem;
 }
