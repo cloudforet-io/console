@@ -13,7 +13,6 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 import { isObject } from 'lodash';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -30,7 +29,10 @@ import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-
 
 import { red } from '@/styles/colors';
 
-import { makeDataSourceDistinctValueHandler } from '@/services/cost-explorer/composables/data-source-handler';
+import {
+    convertWorkspaceSearchValue,
+    makeDataSourceDistinctValueHandler,
+} from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
 
@@ -40,12 +42,9 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const emit = defineEmits<{(e: 'confirm', options?: ToolboxOptions): void; }>();
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
-const tableListApiQueryHelper = new ApiQueryHelper()
-    .setSort('name', true);
-let tableListApiQuery = tableListApiQueryHelper.data;
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => userWorkspaceGetters.workspaceList),
@@ -67,7 +66,7 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
-            { name: 'is_sync', label: 'Auto Mapping' },
+            { name: 'is_sync', label: 'Linked' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
@@ -93,13 +92,7 @@ const handleSelect = (index: number[]) => {
     dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
 };
 const handleChangeToolbox = (options: ToolboxOptions) => {
-    tableListApiQuery = getApiQueryWithToolboxOptions(tableListApiQueryHelper, options) ?? tableListApiQuery;
-    if (options.pageStart !== undefined) dataSourcesPageStore.setLinkedAccountsPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) dataSourcesPageStore.setLinkedAccountsPageLimit(options.pageLimit);
-    if (options.queryTags !== undefined) {
-        dataSourcesPageStore.setLinkedAccountsSearchFilters(tableListApiQueryHelper.filters);
-    }
-    emit('confirm');
+    emit('confirm', convertWorkspaceSearchValue(options, storeState.workspaceList));
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
@@ -160,8 +153,8 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      :items="storeState.linkedAccounts"
                      :select-index="storeState.selectedLinkedAccountsIndices"
                      :fields="tableState.fields"
-                     sort-by="name"
-                     :sort-desc="true"
+                     sort-by="workspace_id"
+                     :sort-desc="false"
                      :total-count="storeState.totalCount"
                      :key-item-sets="tableState.keyItemSets"
                      :value-handler-map="tableState.valueHandlerMap"
