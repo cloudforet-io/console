@@ -31,7 +31,7 @@ import { red } from '@/styles/colors';
 
 import {
     convertWorkspaceSearchValue,
-    makeDataSourceDistinctValueHandler,
+    makeDataSourceDistinctValueHandler, makeDataSourceSyncValueHandler,
 } from '@/services/cost-explorer/composables/data-source-handler';
 import { useDataSourcesPageStore } from '@/services/cost-explorer/stores/data-sources-page-store';
 import type { DataSourceItem } from '@/services/cost-explorer/types/data-sources-type';
@@ -80,7 +80,7 @@ const tableState = reactive({
         name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         workspace_id: makeDataSourceDistinctValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }], storeState.workspaceList),
-        is_sync: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'is_sync', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+        is_sync: makeDataSourceSyncValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
     })),
 });
 
