@@ -24,27 +24,6 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-// const dataSourceFetcherMap = {
-//     'cost_analysis.Cost': SpaceConnector.clientV2.costAnalysis.cost.analyze,
-//     'cost_analysis.BudgetUsage': SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze,
-//     'inventory.MetricData': SpaceConnector.clientV2.inventory.metricData.analyze,
-// };
-
-// interface SubData { date: string; value: number }
-// interface Data {
-//     value_sum: SubData[];
-//     _total_value_sum: number;
-//     [parsedDataField: string]: any; // provider: aws or provider: azure
-// }
-// interface ChartData {
-//     date: string;
-//     [parsedDataField: string]: any; // e.g. aws: 12333 or azure: 1234
-// }
-// type Response = CostAnalyzeResponse<Data>;
-
-// const DATE_FORMAT = 'YYYY-MM';
-// const DATE_FIELD_NAME = 'date';
-
 const props = defineProps<NewWidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
@@ -60,8 +39,6 @@ use([
 ]);
 
 const { widgetState } = useWidget(props, emit);
-// const { widgetChartState } = useWidgetChart(props);
-// const { widgetDataState } = useWidgetDataState(props);
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
 const state = reactive({
@@ -84,27 +61,23 @@ const state = reactive({
             {
                 name: 'project1',
                 type: 'bar',
-                stack: 'product',
-                barMaxWidth: 50,
+                barMaxWidth: 24,
+                barGap: 0,
                 data: [100, 200, 300, 400, 220, 300, 500],
             },
             {
                 name: 'project2',
                 type: 'bar',
-                stack: 'product',
+                barMaxWidth: 24,
+                barGap: 0,
                 data: [150, 232, 201, 154, 190, 330, 410],
             },
             {
                 name: 'project3',
                 type: 'bar',
-                stack: 'product',
+                barMaxWidth: 24,
+                barGap: 0,
                 data: [23, 200, 24, 400, 220, 45, 500],
-            },
-            {
-                name: 'project4',
-                type: 'bar',
-                stack: 'product',
-                data: [23, 346, 24, 400, 220, 4, 500],
             },
         ],
     } as EChartsOption,
