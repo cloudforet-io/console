@@ -18,19 +18,17 @@
             />
         </div>
         <div class="version">
-            <p-badge style-type="primary"
-                     badge-type="solid-outline"
+            <p-badge style-type="gray200"
+                     badge-type="subtle"
                      shape="square"
             >
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ state.version }}
             </p-badge>
-            <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
-                <a :href="state.contactLink ? state.contactLink : 'mailto:support@cloudforet.io'"
-                   target="_blank"
-                >
-                    <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
-                </a>
-            </span>
+            <a :href="state.contactLink ? state.contactLink : 'mailto:support@cloudforet.io'"
+               target="_blank"
+            >
+                <span class="text-blue-700 text-label-md">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
+            </a>
         </div>
     </div>
 </template>
@@ -76,17 +74,12 @@ const state = reactive({
 
     .version {
         display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
         align-items: center;
         margin-left: 2.5rem;
         margin-bottom: 2.5rem;
         line-height: 140%;
-        .help-msg {
-            @apply text-gray-500;
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.875rem;
-            margin-left: 1rem;
-        }
     }
 
     @screen md {
