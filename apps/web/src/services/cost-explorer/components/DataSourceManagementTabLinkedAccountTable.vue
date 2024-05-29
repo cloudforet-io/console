@@ -72,7 +72,7 @@ const tableState = reactive({
     fields: computed<DefinitionField[]>(() => [
         { name: 'name', label: 'Name' },
         { name: 'account_id', label: 'Account ID' },
-        { name: 'workspace_id', label: 'Workspace', sortable: false },
+        { name: 'workspace_id', label: 'Workspace' },
         { name: 'is_sync', label: 'Linked', sortable: false },
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
@@ -91,13 +91,12 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
 const handleSelect = (index: number[]) => {
     dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
 };
-const handleChangeToolbox = (options: ToolboxOptions) => {
+const handleChangeToolbox = (options: ToolboxOptions = {}) => {
     emit('confirm', convertWorkspaceSearchValue(options, storeState.workspaceList));
 };
 
 const queryTagHelper = useQueryTags({ keyItemSets: tableState.keyItemSets });
 const { queryTags } = queryTagHelper;
-
 
 const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMenuItem|string) => {
     const accountItem = storeState.linkedAccounts[idx];
@@ -148,6 +147,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      searchable
                      selectable
                      sortable
+                     disabled
                      :placeholder="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SELECT')"
                      :loading="storeState.linkedAccountsLoading"
                      :items="storeState.linkedAccounts"
@@ -161,7 +161,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      :query-tags="queryTags"
                      @select="handleSelect"
                      @change="handleChangeToolbox"
-                     @refresh="emit('confirm')"
+                     @refresh="handleChangeToolbox()"
     >
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style

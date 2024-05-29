@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -93,6 +93,7 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
     }
 
     await fetchLinkedAccountList();
+    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
 };
 
 const fetchLinkedAccountList = async () => {
@@ -102,7 +103,13 @@ const fetchLinkedAccountList = async () => {
             .setFilters(storeState.linkedAccountsSearchFilters);
         await dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
-            query: linkedAccountListApiQuery,
+            query: {
+                ...linkedAccountListApiQuery,
+                sort: [
+                    ...linkedAccountListApiQuery.sort,
+                    { key: 'created_at', desc: true },
+                ],
+            },
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
@@ -125,6 +132,10 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
     linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
     await fetchLinkedAccountList();
 }, { immediate: true });
+
+onUnmounted(() => {
+    dataSourcesPageStore.linkedAccountsReset();
+});
 </script>
 
 <template>
