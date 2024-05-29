@@ -11,6 +11,8 @@ import type {
     DashboardVariablesSchema, DateRange,
 } from '@/schema/dashboard/_types/dashboard-type';
 
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -24,6 +26,7 @@ const FORM_TITLE_MAP = {
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const widgetGenerateStore = useWidgetGenerateStore();
 const state = reactive({
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -54,7 +57,7 @@ const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
 };
 const handleClickEditDataTable = () => {
-    // back to step
+    widgetGenerateStore.setOverlayStep(1);
 };
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
@@ -184,12 +187,15 @@ onBeforeMount(() => {
     .left-part {
         @apply bg-gray-150 rounded-md;
         flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         padding: 1rem;
         .dashboard-settings-wrapper {
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
+            padding-bottom: 1rem;
             .divider {
                 height: 1rem;
             }
