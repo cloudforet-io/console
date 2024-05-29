@@ -17,6 +17,7 @@ import DomainLandingTitle from '@/services/landing/components/DomainLandingTitle
 .domain-landing-page {
     @apply flex flex-col;
     width: 100%;
+    max-width: 87rem;
     padding-top: 7rem;
     gap: 4rem;
 }
