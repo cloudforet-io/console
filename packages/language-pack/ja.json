@@ -866,6 +866,7 @@
 				"SELECT": "選択する",
 				"SELECT_WORKSPACE": "ワークスペースの選択",
 				"SUCCESS": "成功",
+				"SYNC_TOOLTIP": "",
 				"TAB_DETAILS_COLLECTION_JOB": "最近のデータ収集結果",
 				"TAB_DETAILS_TITLE": "詳細情報",
 				"TAB_DETAIL_BASE_INFORMATION": "基本情報",

@@ -866,6 +866,7 @@
 				"SELECT": "Select",
 				"SELECT_WORKSPACE": "Select Workspace",
 				"SUCCESS": "Success",
+				"SYNC_TOOLTIP": "Sync with Cost Data",
 				"TAB_DETAILS_COLLECTION_JOB": "Recent Data Collection Job",
 				"TAB_DETAILS_TITLE": "Details",
 				"TAB_DETAIL_BASE_INFORMATION": "Base Information",

@@ -866,6 +866,7 @@
 				"SELECT": "선택하기",
 				"SELECT_WORKSPACE": "워크스페이스 선택",
 				"SUCCESS": "성공",
+				"SYNC_TOOLTIP": "",
 				"TAB_DETAILS_COLLECTION_JOB": "최근 데이터 수집 결과",
 				"TAB_DETAILS_TITLE": "상세 정보",
 				"TAB_DETAIL_BASE_INFORMATION": "기본 정보",
