@@ -26,19 +26,19 @@ const state = reactive({
         if (props.overlayType === 'ADD') {
             const _title = i18n.t('DASHBOARDS.WIDGET.OVERLAY.ADD_WIDGET');
             let _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_DATA_SOURCE');
-            if (state.currentStep === 2) {
+            if (widgetGenerateState.overlayStep === 2) {
                 _subTitle = i18n.t('DASHBOARDS.WIDGET.OVERLAY.SET_CHART_OPTIONS');
             }
             return `${_title} - ${_subTitle}`;
         }
         return i18n.t('DASHBOARDS.WIDGET.OVERLAY.EDIT_WIDGET');
     }),
-    currentStep: 1,
 });
 
 /* Event */
 const handleClickContinue = () => {
-    state.currentStep += 1;
+    const _nextStep = widgetGenerateState.overlayStep + 1;
+    widgetGenerateStore.setOverlayStep(_nextStep);
 };
 const handleUpdateVisible = (value: boolean) => {
     widgetGenerateStore.setShowOverlay(value);
@@ -53,8 +53,8 @@ const handleUpdateVisible = (value: boolean) => {
                           :title="state.sidebarTitle"
                           @update:visible="handleUpdateVisible"
         >
-            <widget-form-overlay-step1 v-if="state.currentStep === 1" />
-            <widget-form-overlay-step2 v-if="state.currentStep === 2" />
+            <widget-form-overlay-step1 v-if="widgetGenerateState.overlayStep === 1" />
+            <widget-form-overlay-step2 v-if="widgetGenerateState.overlayStep === 2" />
             <template #footer>
                 <div class="footer-wrapper">
                     <p-button style-type="substitutive"
