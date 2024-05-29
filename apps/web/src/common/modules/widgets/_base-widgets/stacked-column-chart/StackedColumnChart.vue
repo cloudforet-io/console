@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import {
-    reactive,
+    onMounted, reactive, ref,
 } from 'vue';
-import VChart from 'vue-echarts';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
-import { PieChart } from 'echarts/charts';
 import {
-    TooltipComponent, LegendComponent,
+    PDataLoader,
+} from '@spaceone/design-system';
+import { init } from 'echarts';
+import type { EChartsOption } from 'echarts';
+import { BarChart } from 'echarts/charts';
+import {
+    TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -44,12 +48,13 @@ import type {
 const props = defineProps<NewWidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-// const chartContext = ref<HTMLElement|null>(null);
-// const chartHelper = useAmcharts5(chartContext);
+const chartContext = ref<HTMLElement|null>(null);
 
 use([
     CanvasRenderer,
-    PieChart,
+    GridComponent,
+    DatasetComponent,
+    BarChart,
     TooltipComponent,
     LegendComponent,
 ]);
@@ -60,47 +65,53 @@ const { widgetState } = useWidget(props, emit);
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
 
 const state = reactive({
-    loading: true,
+    loading: false,
     data: null as Response | null,
     chart: null as null | XYChart,
     chartData: [],
     chartOptions: {
-        title: {
-            text: 'Traffic Sources',
-            left: 'center',
-        },
-        tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)',
-        },
         legend: {
-            orient: 'vertical',
-            left: 'right',
-            data: ['Direct', 'Email', 'Ad Networks', 'Video Ads', 'Search Engines'],
+            bottom: 0,
+            left: 0,
+            icon: 'circle',
+            itemWidth: 10,
+            itemHeight: 10,
         },
+        tooltip: {},
+        xAxis: { type: 'category', data: ['AmazonEC2', 'AmazonQuickSight', 'AWSELB', 'DocumentDB'] },
+        yAxis: { type: 'value' },
         series: [
             {
-                name: 'Traffic Sources',
-                type: 'pie',
-                radius: '55%',
-                center: ['50%', '60%'],
-                data: [
-                    { value: 335, name: 'Direct' },
-                    { value: 310, name: 'Email' },
-                    { value: 234, name: 'Ad Networks' },
-                    { value: 135, name: 'Video Ads' },
-                    { value: 1548, name: 'Search Engines' },
-                ],
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    },
-                },
+                name: 'project1',
+                type: 'bar',
+                stack: 'product',
+                barMaxWidth: 50,
+                data: [100, 200, 300, 400, 220, 300, 500],
+            },
+            {
+                name: 'project2',
+                type: 'bar',
+                stack: 'product',
+                data: [150, 232, 201, 154, 190, 330, 410],
+            },
+            {
+                name: 'project3',
+                type: 'bar',
+                stack: 'product',
+                data: [23, 200, 24, 400, 220, 45, 500],
+            },
+            {
+                name: 'project4',
+                type: 'bar',
+                stack: 'product',
+                data: [23, 346, 24, 400, 220, 4, 500],
             },
         ],
-    },
+    } as EChartsOption,
+});
+
+onMounted(() => {
+    init(chartContext.value).setOption(state.chartOptions);
 });
 </script>
 
@@ -108,23 +119,25 @@ const state = reactive({
     <widget-frame v-bind="widgetFrameProps"
                   v-on="widgetFrameEventHandlers"
     >
-        <v-chart class="chart"
-                 :option="state.chartOptions"
-                 autoresize
-        />
+        <p-data-loader class="chart-loader"
+                       :loading="state.loading"
+                       loader-type="skeleton"
+                       disable-empty-case
+                       :loader-backdrop-opacity="1"
+                       show-data-from-scratch
+        >
+            <div ref="chartContext"
+                 class="chart"
+            />
+        </p-data-loader>
     </widget-frame>
 </template>
 
 <style lang="postcss" scoped>
-.data-container {
-    display: flex;
-    flex-direction: column;
+.chart-loader {
     height: 100%;
     .chart {
-        height: 12rem;
-    }
-    .chart-loader {
-        height: 12rem;
+        height: 100%;
     }
 }
 </style>
