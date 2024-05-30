@@ -8,7 +8,7 @@ import type { DomainState } from './type';
 import { DOMAIN_CONFIG_TYPE } from './type';
 
 
-export const extendedAuthTypeLabel = (state: DomainState): string => extendedAuthTypes[state.extendedAuthType as string] || state.extendedAuthType;
+export const extendedAuthTypeLabel = (state: DomainState): string => extendedAuthTypes[state.extendedAuthType as string] || (`${state.extendedAuthType} (${state.authOptions?.identity_provider})`);
 
 export const domainExtraMenu: Getter<DomainState, any> = (state): any => state.config?.settings?.[DOMAIN_CONFIG_TYPE.EXTRA_MENU];
 

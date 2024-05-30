@@ -4,7 +4,7 @@ import {
     reactive,
 } from 'vue';
 
-import { PLazyImg } from '@spaceone/design-system';
+import { PLazyImg, PButton } from '@spaceone/design-system';
 
 import type { Metadata } from '@/schema/identity/domain/api-verbs/get-auth-info';
 import { store } from '@/store';
@@ -30,10 +30,11 @@ const handleLogin = () => {
 </script>
 
 <template>
-    <div class="saml-wrapper"
-         @click="handleLogin"
+    <p-button class="saml-wrapper"
+              style-type="tertiary"
+              @click="handleLogin"
     >
-        <button class="saml-signin-button">
+        <div class="saml-signin-button">
             <p-lazy-img :src="state.authOptions?.icon ?? ''"
                         width="1rem"
                         height="1rem"
@@ -43,27 +44,18 @@ const handleLogin = () => {
                 </template>
             </p-lazy-img>
             <span class="saml-signin-button-label"> {{ state.authOptions.label ?? 'SAML' }} </span>
-        </button>
-    </div>
+        </div>
+    </p-button>
 </template>
 
 <style lang="postcss" scoped>
 .saml-wrapper {
-    @apply bg-white text-gray-900 rounded-md border border-gray-400;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
     height: 2rem;
     width: 100%;
-    font-family: Roboto, sans-serif;
-    padding: 0 1rem;
-    cursor: pointer;
-}
 
-.saml-wrapper:hover {
-    @apply bg-blue-100 border-gray-400;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    .saml-signin-button {
+        @apply flex items-center gap-1;
+    }
 }
 
 .saml-wrapper:focus {
