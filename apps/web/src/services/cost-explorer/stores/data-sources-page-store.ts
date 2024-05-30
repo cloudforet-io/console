@@ -150,6 +150,9 @@ export const useDataSourcesPageStore = defineStore('page-data-sources', () => {
             state.jobList = [];
             state.jobListTotalCount = 0;
 
+            actions.linkedAccountsReset();
+        },
+        linkedAccountsReset: () => {
             state.linkedAccountsLoading = false;
             state.linkedAccountsPageStart = 0;
             state.linkedAccountsPageLimit = 15;

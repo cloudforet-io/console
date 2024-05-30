@@ -40,7 +40,6 @@ const state = reactive({
         height: '100%',
         'overflow-y': 'auto',
         'overflow-x': 'hidden',
-        'border-right-width': state.hide ? 0 : '1px',
         ...(state.isMobileSize && {
             position: 'absolute',
             zIndex: 1,
@@ -57,6 +56,7 @@ const state = reactive({
     })),
     resizerStyle: computed(() => ({
         left: `${state.width}px`,
+        'border-left-width': state.hide ? 0 : '1px',
     })),
     mainStyle: computed(() => ({
         width: state.isMobileSize ? '100%' : `calc( 100% - ${state.width}px )`,
@@ -178,7 +178,7 @@ window.addEventListener('resize', detectWindowResizing);
     margin: unset;
 
     > .sidebar-container {
-        @apply bg-white border-gray-200;
+        @apply bg-white;
         &.transition {
             transition: width 0.2s;
         }
@@ -208,10 +208,10 @@ window.addEventListener('resize', detectWindowResizing);
             transition: left 0.2s;
         }
         &.line {
-            @apply border-l border-transparent;
+            @apply border-gray-200;
             background-color: transparent;
             &:hover {
-                @apply border-l;
+                @apply border-blue-500;
                 cursor: ew-resize;
             }
         }

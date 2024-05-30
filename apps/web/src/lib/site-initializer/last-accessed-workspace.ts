@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 
@@ -20,10 +21,13 @@ export const setCurrentAccessedWorkspaceId = async (workspaceId?: string): Promi
 
 export const getLastAccessedWorkspaceId = async (): Promise<string | undefined> => {
     try {
-        const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
+        const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
             name: LAST_ACCESSED_WORKSPACE_KEY,
         });
-        return response.data.workspace_id;
+        if (!results?.length) {
+            return undefined;
+        }
+        return results[0].data.workspace_id;
     } catch (e) {
         // ErrorHandler.handleError(e);
         return undefined;
