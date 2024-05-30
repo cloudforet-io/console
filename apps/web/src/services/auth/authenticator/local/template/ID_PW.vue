@@ -112,7 +112,7 @@ const signIn = async () => {
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="state.userId"
-                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                  :placeholder="!isMobile() ? 'Email Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkUserId"
