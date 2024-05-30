@@ -11,6 +11,7 @@ import type {
     DashboardVariablesSchema, DashboardVariables, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 
+import PieChart from '@/common/modules/widgets/_base-widgets/pie-chart/PieChart.vue';
 import StackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue';
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
@@ -93,6 +94,18 @@ watch(() => state.widgetConfig, (_config) => {
                                       :data-mapping="formState.dataMapping"
                                       :chart-options="formState.chartOptions"
                                       :variables="state.variables"
+                />
+                <pie-chart v-if="formState.selectedChartName === 'pieChart'"
+                           :widget-name="formState.selectedChartName"
+                           :widget-key="formState.selectedChartName"
+                           :title="formState.title"
+                           size="lg"
+                           :description="formState.description"
+                           :base-on-date="state.baseOnDate"
+                           :data-sources="state.dataSources"
+                           :data-mapping="formState.dataMapping"
+                           :chart-options="formState.chartOptions"
+                           :variables="state.variables"
                 />
             </div>
             <div class="col-span-4 px-2">
