@@ -23,7 +23,7 @@ export const makeDataSourceDistinctValueHandler = (
             }));
 
             if (inputText) {
-                resultMenuItems = resultMenuItems.filter((item) => item.label.includes(inputText as string));
+                resultMenuItems = resultMenuItems.filter((item) => item.label.toLowerCase().includes((inputText as string).toLowerCase()));
             }
 
             return {
