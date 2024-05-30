@@ -18,10 +18,12 @@ export type WidgetType = string; // TODO: make this widget type enum
 export interface DataTableModel {
     data_table_id: string;
     name: string;
+    action: DataTableAction;
     source_type: DataTableSourceType;
-    options: Record<string, any>;
+    operator: DataTableOperator;
+    options: DataTableOptions;
     tags: Tags;
-    labels_info: Record<string, any>;
+    data_info: DataInfo;
     widget_id: string;
     workspace_id: string;
     domain_id: string;
@@ -29,53 +31,57 @@ export interface DataTableModel {
     updated_at: string;
 }
 
-/* Data Table Options Example
-*
-*  - Cost
-*  {
-*      resource_type: "cost_analysis.Cost",
-*      data_source_id: "ds-xxxx",
-*      data_field: "cost",
-*      query: <TimeSeriesAnalyzeQuery>,
-*      inherits: [<var_keys>, <var_keys>]
-*  }
-*
-*  - Budget
-*  {
-*      resource_type: "cost_analysis.BudgetUsage",
-*      data_source_id: "ds-xxxx",
-*      query: <TimeSeriesAnalyzeQuery>,
-*      inherits: [<var_keys>, <var_keys>]
-*  }
-*
-*  - Asset
-*  {
-*      resource_type: "inventory.Metric",
-*      metric_id: "metric-xxxx",
-*      query: <TimeSeriesAnalyzeQuery>,
-*      inherits: [<var_keys>, <var_keys>]
-*  }
-*
-*  - Concat
-*  {
-*      operator: "concat",
-*      data_tables: [<data_table_id>, <data_table_id>],
-*  }
-*
-*  - Join
-*  {
-*      operator: "join",
-*      data_tables: [<data_table_id>, <data_table_id>],
-*      data_table_indexes: [1, 0],
-*      join_type: "LEFT" | "RIGHT" | "INNER" | "OUTER",
-*  }
-*
-*  - Where
-*  {
-*      operator: "where",
-*      data_table_id: <data_table_id>,
-*      formula: <formula>, // "a>0" - pandas spec
-*  }
-* */
+export type DataTableSourceType = 'ASSET' | 'COST';
+export type DataTableAction = 'ADD' | 'TRANSFORM';
+export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
+export type AdditionalLabels = Record<string, string>;
+export type TimeDiff = Record<string, any>;
+export type TimeSeriesAnalyzeQuery = Record<string, any>;
+export type DataInfo = Record<string, { unit: string }>;
+export type DataTableAddOptions = MetricOptions | CostOptions;
+export type DataTableTransformOptions = ConcatOptions | JoinOptions | WhereOptions | AggregateOptions | EvalOptions;
+export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
 
-export type DataTableSourceType = 'DATA_SOURCE' | 'DATA_TABLE';
+/* ADD Action Options */
+export interface MetricOptions {
+    metric_id: string;
+    data_name: string;
+    additional_labels: AdditionalLabels;
+    time_diff: TimeDiff;
+    query: TimeSeriesAnalyzeQuery;
+}
+
+export interface CostOptions {
+    data_source_id: string;
+    data_key: string;
+    data_name: string;
+    additional_labels: AdditionalLabels;
+    time_diff: TimeDiff;
+    query: TimeSeriesAnalyzeQuery;
+}
+
+/* TRANSFORM Action Options */
+export interface ConcatOptions {
+    data_tables: string[];
+    data_table_indexes: number[];
+}
+
+export interface JoinOptions {
+    data_tables: string[];
+    on: 'LEFT' | 'RIGHT' | 'INNER' | 'OUTER';
+}
+
+export interface WhereOptions {
+    data_table_id: string;
+    conditions: string[];
+}
+
+export interface AggregateOptions {
+    data_table_id: string;
+    group_by: string[];
+}
+
+export interface EvalOptions {
+    data_table_id: string;
+    formulas: any[]; // TODO: define formula type
+}
