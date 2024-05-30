@@ -3,7 +3,6 @@ import {
     onMounted, reactive, ref,
 } from 'vue';
 
-import type { XYChart } from '@amcharts/amcharts5/xy';
 import {
     PDataLoader,
 } from '@spaceone/design-system';
@@ -44,7 +43,6 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 const state = reactive({
     loading: false,
     data: null as Response | null,
-    chart: null as null | XYChart,
     chartData: [],
     chartOptions: {
         legend: {

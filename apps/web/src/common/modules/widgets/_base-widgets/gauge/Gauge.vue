@@ -44,13 +44,6 @@ const state = reactive({
     data: null as Response | null,
     chartData: [],
     chartOptions: {
-        legend: {
-            bottom: 0,
-            left: 0,
-            icon: 'circle',
-            itemWidth: 10,
-            itemHeight: 10,
-        },
         series: [
             {
                 type: 'gauge',
