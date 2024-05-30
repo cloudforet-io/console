@@ -7,4 +7,37 @@ export const WIDGET_COMPONENTS: Record<NewWidgetConfigKey, AsyncComponent> = {
     stackedColumnChart: () => ({
         component: import('@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue'),
     }),
+    clusteredColumnChart: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/clustered-column-chart/ClusteredColumnChart.vue'),
+    }),
+    stackedHorizontalBarChart: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/stacked-horizontal-bar-chart/StackedHorizontalBarChart.vue'),
+    }),
+    lineChart: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/line-chart/LineChart.vue'),
+    }),
+    pieChart: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/pie-chart/PieChart.vue'),
+    }),
+    treemap: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/treemap/Treemap.vue'),
+    }),
+    heatmap: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/heatmap/Heatmap.vue'),
+    }),
+    geoMap: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/geo-map/GeoMap.vue'),
+    }),
+    // table: () => ({
+    //     component: import('@/common/modules/widgets/_base-widgets/table/Table.vue'),
+    // }),
+    stackedAreaChart: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/stacked-area-chart/StackedAreaChart.vue'),
+    }),
+    gauge: () => ({
+        component: import('@/common/modules/widgets/_base-widgets/gauge/Gauge.vue'),
+    }),
+    // progressCard: () => ({
+    //     component: import('@/common/modules/widgets/_base-widgets/progress-card/ProgressCard.vue'),
+    // }),
 };
