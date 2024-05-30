@@ -8,9 +8,9 @@ import {
 } from '@spaceone/design-system';
 import { init } from 'echarts';
 import type { EChartsOption } from 'echarts';
-import { LineChart } from 'echarts/charts';
+import { HeatmapChart } from 'echarts/charts';
 import {
-    TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
+    TooltipComponent, LegendComponent, GridComponent, VisualMapComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -31,8 +31,8 @@ const chartContext = ref<HTMLElement|null>(null);
 use([
     CanvasRenderer,
     GridComponent,
-    DatasetComponent,
-    LineChart,
+    VisualMapComponent,
+    HeatmapChart,
     TooltipComponent,
     LegendComponent,
 ]);
@@ -45,56 +45,69 @@ const state = reactive({
     data: null as Response | null,
     chartData: [],
     chartOptions: {
-        legend: {
-            bottom: 0,
-            left: 0,
-            icon: 'circle',
-            itemWidth: 10,
-            itemHeight: 10,
-        },
-        tooltip: {
-            trigger: 'axis',
-        },
         xAxis: {
             type: 'category',
-            boundaryGap: false,
-            data: ['AmazonEC2', 'AmazonQuickSight', 'AWSELB', 'DocumentDB'],
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         },
         yAxis: {
-            type: 'value',
+            type: 'category',
+            data: ['project1', 'project2', 'project3', 'project4', 'project5'],
+            splitArea: {
+                show: true,
+            },
+        },
+        tooltip: {
+            position: 'top',
+        },
+        visualMap: {
+            min: 0,
+            max: 10,
+            calculable: true,
+            orient: 'horizontal',
+            left: 'left',
+            bottom: 0,
         },
         series: [
             {
-                name: 'project1',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [100, 200, 300, 400, 220, 300, 500],
-            },
-            {
-                name: 'project2',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [150, 232, 201, 154, 190, 330, 410],
-            },
-            {
-                name: 'project3',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [23, 200, 24, 400, 220, 45, 500],
-            },
-            {
-                name: 'project4',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                label: {
-                    show: true,
-                    position: 'top',
-                },
-                data: [23, 346, 24, 400, 220, 4, 500],
+                name: 'project',
+                type: 'heatmap',
+                data: [
+                    [0, 0, 5],
+                    [0, 1, 1],
+                    [0, 2, 6],
+                    [0, 3, 10],
+                    [0, 4, 20],
+                    [1, 0, 2],
+                    [1, 1, 1],
+                    [1, 2, 7],
+                    [1, 3, 11],
+                    [1, 4, 2],
+                    [2, 0, 3],
+                    [2, 1, 4],
+                    [2, 2, 8],
+                    [2, 3, 12],
+                    [2, 4, 0],
+                    [3, 0, 4],
+                    [3, 1, 6],
+                    [3, 2, 9],
+                    [3, 3, 13],
+                    [3, 4, 5],
+                    [4, 0, 5],
+                    [4, 1, 7],
+                    [4, 2, 10],
+                    [4, 3, 15],
+                    [4, 4, 40],
+                    [5, 0, 6],
+                    [5, 1, 8],
+                    [5, 2, 11],
+                    [5, 3, 17],
+                    [5, 4, 4],
+                    [6, 0, 7],
+                    [6, 1, 9],
+                    [6, 2, 12],
+                    [6, 3, 18],
+                    [6, 4, 0],
+                ],
             },
         ],
     } as EChartsOption,
