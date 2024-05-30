@@ -66,21 +66,24 @@ const tableState = reactive({
             { name: 'name', label: 'Name' },
             { name: 'account_id', label: 'Account ID' },
             { name: 'workspace_id', label: 'Workspace' },
-            { name: 'is_sync', label: 'Linked' },
+            { name: 'is_linked', label: 'Status' },
+            { name: 'is_sync', label: 'Sync' },
         ],
     }]),
     fields: computed<DefinitionField[]>(() => [
         { name: 'name', label: 'Name' },
         { name: 'account_id', label: 'Account ID' },
         { name: 'workspace_id', label: 'Workspace' },
-        { name: 'is_sync', label: 'Linked', sortable: false },
+        { name: 'is_linked', label: 'Status' },
+        { name: 'is_sync', label: 'Sync' },
         { name: 'updated_at', label: 'Updated', sortable: false },
     ]),
     valueHandlerMap: computed<ValueHandlerMap>(() => ({
         name: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'name', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         account_id: makeDistinctValueHandler('cost_analysis.DataSourceAccount', 'account_id', 'string', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         workspace_id: makeDataSourceDistinctValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }], storeState.workspaceList),
-        is_sync: makeDataSourceSyncValueHandler([{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+        is_linked: makeDataSourceSyncValueHandler('is_linked', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
+        is_sync: makeDataSourceSyncValueHandler('is_sync', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
     })),
 });
 
@@ -214,6 +217,30 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                     </div>
                 </template>
             </p-select-dropdown>
+        </template>
+        <template #th-is_sync-format="{ field }">
+            <div class="th-tooltip">
+                <span>{{ field.label }}</span>
+                <p-tooltip
+                    :contents="$t('BILLING.COST_MANAGEMENT.DATA_SOURCES.SYNC_TOOLTIP')"
+                    position="bottom-end"
+                    class="tooltip"
+                >
+                    <p-i name="ic_info-circle"
+                         class="title-tooltip"
+                         height="1rem"
+                         width="1rem"
+                         :color="gray[500]"
+                    />
+                </p-tooltip>
+            </div>
+        </template>
+        <template #col-is_linked-format="{ value }">
+            <p-badge badge-type="subtle"
+                     :style-type="!value ? 'red100' : 'green200'"
+            >
+                {{ value ? 'Linked' : 'Not Linked' }}
+            </p-badge>
         </template>
         <template #col-is_sync-format="{ value }">
             <p-badge badge-type="subtle"
