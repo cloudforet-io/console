@@ -27,8 +27,8 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-let linkedAccountListApiQueryHelper: ApiQueryHelper;
-let linkedAccountListApiQuery;
+const linkedAccountListApiQueryHelper = new ApiQueryHelper();
+let linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
@@ -54,10 +54,14 @@ const state = reactive({
         }
         return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
     }),
+    selectedStatusFilter: 'all',
 });
 
 const handleClickAction = (action: CostLinkedAccountModalType) => {
     dataSourcesPageStore.setModal(true, action);
+};
+const handleChangedSelectFilter = (filters: string) => {
+    state.selectedStatusFilter = filters;
 };
 const handleChangeLinkedAccountToolbox = (options: ToolboxOptions) => {
     if (options) {
@@ -98,18 +102,14 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
 
 const fetchLinkedAccountList = async () => {
     dataSourcesPageStore.setLinkedAccountsLoading(true);
+    linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
+        .addFilter(...storeState.linkedAccountsSearchFilters)
+        .setSort('workspace_id', false);
+
     try {
-        linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
-            .setFilters(storeState.linkedAccountsSearchFilters);
         await dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
-            query: {
-                ...linkedAccountListApiQuery,
-                sort: [
-                    ...linkedAccountListApiQuery.sort,
-                    { key: 'created_at', desc: true },
-                ],
-            },
+            query: linkedAccountListApiQueryHelper.data,
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
@@ -124,12 +124,20 @@ const fetchDataSourceList = async () => {
     });
 };
 
+watch(() => state.selectedStatusFilter, async (selectedStatusFilter) => {
+    if (selectedStatusFilter === 'all') {
+        linkedAccountListApiQueryHelper.setOrFilters([
+            { k: 'is_linked', v: true, o: '=' },
+            { k: 'is_linked', v: false, o: '=' },
+        ]);
+    } else {
+        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked', o: '=' }]);
+    }
+
+    await fetchLinkedAccountList();
+}, { immediate: true });
 watch(() => storeState.selectedDataSourceIndices, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
-    linkedAccountListApiQueryHelper = new ApiQueryHelper()
-        .setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
-        .setSort('workspace_id', false);
-    linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
     await fetchLinkedAccountList();
 }, { immediate: true });
 
@@ -165,7 +173,9 @@ onUnmounted(() => {
                 </div>
             </template>
         </p-heading>
-        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox" />
+        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox"
+                                                         @select-filter="handleChangedSelectFilter"
+        />
         <data-source-management-modal v-if="storeState.modalVisible"
                                       @confirm="handleConfirmModal"
         />

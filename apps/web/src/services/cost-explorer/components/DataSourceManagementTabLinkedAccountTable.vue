@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PToolboxTable, PBadge, PSelectDropdown, PI,
+    PToolboxTable, PBadge, PSelectDropdown, PI, PTooltip, PSelectStatus,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type {
@@ -20,6 +20,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CostDataSourceAccountModel } from '@/schema/cost-analysis/data-source-account/model';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -27,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 import WorkspaceLogoIcon from '@/common/modules/navigations/top-bar/modules/top-bar-header/WorkspaceLogoIcon.vue';
 
-import { red } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import {
     convertWorkspaceSearchValue,
@@ -42,7 +43,9 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const emit = defineEmits<{(e: 'confirm', options?: ToolboxOptions): void; }>();
+const emit = defineEmits<{(e: 'confirm', options?: ToolboxOptions): void;
+    (e: 'select-filter', filter?: string): void;
+}>();
 
 const workspaceListApiQueryHelper = new ApiQueryHelper();
 
@@ -85,6 +88,12 @@ const tableState = reactive({
         is_linked: makeDataSourceSyncValueHandler('is_linked', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         is_sync: makeDataSourceSyncValueHandler('is_sync', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
     })),
+    filterFields: [
+        { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALL') },
+        { name: 'linked', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.LINKED') },
+        { name: 'notLinked', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.NOT_LINKED') },
+    ],
+    selectedFilter: ['all'] as string[],
 });
 
 const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
@@ -93,6 +102,9 @@ const getWorkspaceInfo = (id: string): WorkspaceModel|undefined => {
 };
 const handleSelect = (index: number[]) => {
     dataSourcesPageStore.setSelectedLinkedAccountsIndices(index);
+};
+const handleSelectStatus = (selected: string[]) => {
+    tableState.selectedFilter = selected;
 };
 const handleChangeToolbox = (options: ToolboxOptions = {}) => {
     emit('confirm', convertWorkspaceSearchValue(options, storeState.workspaceList));
@@ -109,6 +121,7 @@ const handleSelectDropdownItem = async (idx: number, menuItem: SelectDropdownMen
         workspace_id: isObject(menuItem) ? menuItem?.name : menuItem,
     });
     await emit('confirm');
+    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
 };
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, pageStart = 1, pageLimit = 10) => {
     dropdownState.loading = true;
@@ -142,6 +155,10 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         dropdownState.loading = false;
     }
 };
+
+watch(() => tableState.selectedFilter, (selectedFilter) => {
+    emit('select-filter', selectedFilter[0]);
+});
 </script>
 
 <template>
@@ -156,7 +173,7 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      :items="storeState.linkedAccounts"
                      :select-index="storeState.selectedLinkedAccountsIndices"
                      :fields="tableState.fields"
-                     sort-by="workspace_id"
+                     sort-by="created_at"
                      :sort-desc="false"
                      :total-count="storeState.totalCount"
                      :key-item-sets="tableState.keyItemSets"
@@ -166,6 +183,20 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
                      @change="handleChangeToolbox"
                      @refresh="handleChangeToolbox()"
     >
+        <template #toolbox-bottom>
+            <div class="status-box">
+                <span class="label">{{ $t('BILLING.COST_MANAGEMENT.DATA_SOURCES.STATUS') }}</span>
+                <p-select-status v-for="(status, idx) in tableState.filterFields"
+                                 :key="idx"
+                                 :selected="tableState.selectedFilter"
+                                 :value="status.name"
+                                 :multi-selectable="false"
+                                 @change="handleSelectStatus"
+                >
+                    {{ status.label }}
+                </p-select-status>
+            </div>
+        </template>
         <template #col-workspace_id-format="{ value, rowIndex }">
             <p-select-dropdown use-fixed-menu-style
                                style-type="transparent"
@@ -244,8 +275,6 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
         </template>
         <template #col-is_sync-format="{ value }">
             <p-badge badge-type="subtle"
-                     :class="{'is-true': value}"
-                     class="col-sync"
                      :style-type="!value ? 'gray100' : 'blue300'"
             >
                 {{ value ? value.toString().replace(/^\w/, (c) => c.toUpperCase()) : 'False' }}
@@ -257,6 +286,19 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
 <style scoped lang="postcss">
 .data-source-management-tab-linked-account-table {
     border: none;
+    .status-box {
+        @apply relative inline-flex gap-4 items-center;
+        height: 1.25rem;
+        font-size: 0.875rem;
+        margin-top: -0.5rem;
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+
+        .label {
+            @apply text-gray-500;
+            font-size: 0.875rem;
+        }
+    }
     .col-workspace-select-dropdown {
         .workspace-wrapper, .select-wrapper {
             @apply flex items-center;
@@ -286,9 +328,11 @@ const workspaceMenuHandler: AutocompleteHandler = async (inputText: string, page
             }
         }
     }
-    .col-sync {
-        &.is-true {
-            @apply text-blue-700 text-blue;
+    .th-tooltip {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .tooltip {
+            margin-top: -0.125rem;
         }
     }
 
