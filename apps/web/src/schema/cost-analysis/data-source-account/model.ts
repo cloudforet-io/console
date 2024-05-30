@@ -4,6 +4,7 @@ export interface CostDataSourceAccountModel {
     data_source_id: string;
     name: string;
     is_sync: boolean;
+    is_linked: boolean;
     v_service_account_id: string;
     v_project_id: string;
     v_workspace_id: string;
