@@ -1,10 +1,10 @@
 import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const stackedArea: NewWidgetConfig = {
-    widget_name: 'stackedArea',
+const stackedAreaChart: NewWidgetConfig = {
+    widget_name: 'stackedAreaChart',
     meta: {
-        title: 'Stacked Area',
+        title: 'Stacked Area Chart',
         sizes: ['full'],
     },
     data_mapping_schema: {
@@ -30,4 +30,4 @@ const stackedArea: NewWidgetConfig = {
 };
 
 
-export default stackedArea;
+export default stackedAreaChart;
