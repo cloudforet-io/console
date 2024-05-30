@@ -1,10 +1,10 @@
 import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const donutChart: NewWidgetConfig = {
-    widget_name: 'donutChart',
+const pieChart: NewWidgetConfig = {
+    widget_name: 'pieChart',
     meta: {
-        title: 'Donut Chart',
+        title: 'Pie Chart',
         sizes: ['md'],
     },
     data_mapping_schema: {
@@ -21,4 +21,4 @@ const donutChart: NewWidgetConfig = {
 };
 
 
-export default donutChart;
+export default pieChart;
