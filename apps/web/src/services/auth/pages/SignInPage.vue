@@ -132,7 +132,7 @@ watch(() => route.name, () => {
         margin-bottom: 1.5rem;
     }
     .btn-divider {
-        @apply flex items-center text-gray-200;
+        @apply flex items-center text-gray-200 justify-center;
         flex-basis: 100%;
         font-size: 0.75rem;
         line-height: 120%;
@@ -142,9 +142,9 @@ watch(() => route.name, () => {
             margin: 0.5rem;
         }
         &::before, &::after {
-            @apply bg-gray-200;
+            @apply bg-gray-300;
             content: "";
-            flex-grow: 1;
+            width: 5.5rem;
             height: 1px;
         }
     }

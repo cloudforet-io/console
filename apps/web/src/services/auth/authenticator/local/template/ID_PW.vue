@@ -127,6 +127,7 @@ const signIn = async () => {
                     <p-text-input v-model="state.password"
                                   type="password"
                                   placeholder="Password"
+                                  appearance-type="masking"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkPassword"
