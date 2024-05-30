@@ -59,6 +59,11 @@ const handleLogin = () => {
     font-family: Roboto, sans-serif;
     padding: 0 1rem;
     cursor: pointer;
+
+    .saml-signin-button {
+        @apply flex items-center gap-1;
+        cursor: pointer;
+    }
 }
 
 .saml-wrapper:hover {
