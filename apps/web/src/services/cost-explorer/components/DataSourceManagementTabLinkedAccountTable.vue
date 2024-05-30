@@ -88,11 +88,11 @@ const tableState = reactive({
         is_linked: makeDataSourceSyncValueHandler('is_linked', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
         is_sync: makeDataSourceSyncValueHandler('is_sync', [{ k: 'data_source_id', v: storeState.selectedDataSourceItem.data_source_id, o: 'eq' }]),
     })),
-    filterFields: [
+    filterFields: computed(() => [
         { name: 'all', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.ALL') },
         { name: 'linked', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.LINKED') },
         { name: 'notLinked', label: i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.NOT_LINKED') },
-    ],
+    ]),
     selectedFilter: ['all'] as string[],
 });
 
