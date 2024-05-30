@@ -27,7 +27,7 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-const linkedAccountListApiQueryHelper = new ApiQueryHelper();
+let linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
 let linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
@@ -103,8 +103,7 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
 const fetchLinkedAccountList = async () => {
     dataSourcesPageStore.setLinkedAccountsLoading(true);
     linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
-        .addFilter(...storeState.linkedAccountsSearchFilters)
-        .setSort('workspace_id', false);
+        .addFilter(...storeState.linkedAccountsSearchFilters);
 
     try {
         await dataSourcesPageStore.fetchLinkedAccount({
@@ -138,6 +137,7 @@ watch(() => state.selectedStatusFilter, async (selectedStatusFilter) => {
 }, { immediate: true });
 watch(() => storeState.selectedDataSourceIndices, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
+    linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('workspace_id', false);
     await fetchLinkedAccountList();
 }, { immediate: true });
 
