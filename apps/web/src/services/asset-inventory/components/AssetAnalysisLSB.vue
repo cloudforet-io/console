@@ -268,6 +268,7 @@ watch(() => route.params, async () => {
             group: targetNamespace?.data.group,
             category: targetNamespace.data.category,
             icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
+            resourceType: targetNamespace.data.resource_type,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
