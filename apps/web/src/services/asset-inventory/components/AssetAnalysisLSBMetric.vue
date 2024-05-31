@@ -162,7 +162,7 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                    size="sm"
                                    @click="handleClickBackToNamespace"
                     />
-                    <img v-if="storeState.selectedNamespace?.category === 'COMMON'"
+                    <img v-if="storeState.selectedNamespace?.group === 'Common'"
                          class="namespace-image"
                          src="@/assets/images/img_common-asset@2x.png"
                          alt="common-namespace-image"
@@ -181,7 +181,8 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                         <span class="type">{{ storeState.selectedNamespace?.label.split('/')[1] }}</span>
                     </p-tooltip>
                 </div>
-                <p-icon-button style-type="tertiary"
+                <p-icon-button v-if="storeState.selectedNamespace?.group !== 'Common'"
+                               style-type="tertiary"
                                name="ic_plus"
                                shape="square"
                                size="sm"
