@@ -1,15 +1,15 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const heatmap: NewWidgetConfig = {
-    widget_name: 'heatmap',
+const heatmap: WidgetConfig = {
+    widgetName: 'heatmap',
     meta: {
         title: 'Heatmap',
         sizes: ['full'],
     },
-    data_mapping_schema: {
+    dataMappingSchema: {
     },
-    chart_options_schema: {
+    advancedOptionsSchema: {
     },
 };
 

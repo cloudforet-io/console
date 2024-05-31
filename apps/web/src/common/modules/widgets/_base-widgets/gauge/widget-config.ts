@@ -10,7 +10,7 @@ const gauge: WidgetConfig = {
     dataMappingSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'data_field',
+            componentType: 'dropdown',
             required: true,
         },
         min: {
@@ -20,7 +20,7 @@ const gauge: WidgetConfig = {
         },
         max: {
             label: 'Max',
-            type: 'number',
+            componentType: 'number',
             required: true,
         },
         formatRules: {
