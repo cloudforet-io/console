@@ -2159,7 +2159,7 @@
 				"NO_DATA": "No Data",
 				"NO_ROLE": "No Role",
 				"NO_USER": "No User",
-				"NO_USER_DESC": "Add a user or more",
+				"NO_USER_DESC": "Type a user ID / name and then press Enter",
 				"NO_WORKSPACE": "No Workspace",
 				"OWNER": "Owner",
 				"PASSWORD": "Password",
@@ -2224,7 +2224,7 @@
 					"DISABLE_TITLE": "Disable User",
 					"ENABLE_DESC": "Are you sure you want to enable selected user below?",
 					"ENABLE_TITLE": "Enable User",
-					"INVITE_TITLE": "Invite Users to {workspace_name}",
+					"INVITE_TITLE": "Invite Users to '{workspace_name}'",
 					"REMOVE_TITLE": "Are you sure you want to remove following user from this workspace?",
 					"REMOVE_WORKSPACE_TITLE": "Are you sure you want to remove this user from the workspace?",
 					"UPDATE_TITLE": "Edit User"
