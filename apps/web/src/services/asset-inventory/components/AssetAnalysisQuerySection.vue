@@ -118,7 +118,7 @@ watch(() => route.params, async () => {
                 >
                     <p-icon-button style-type="secondary"
                                    name="ic_renew"
-                                   shape="squre"
+                                   shape="square"
                                    :disabled="assetAnalysisPageState.refreshMetricData"
                                    @click="handleClickRun"
                     />
