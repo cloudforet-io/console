@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PLink, PDivider, PCard, PButton,
+    PLink, PDivider, PCard, PButton, PI,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+
+const router = useRouter();
 
 const CARD_TYPE = [
     {
@@ -14,7 +22,6 @@ const CARD_TYPE = [
         title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
         desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
         button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
-        to: '',
         image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
         srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
     },
@@ -23,7 +30,6 @@ const CARD_TYPE = [
         title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
         desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
         button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
-        to: '',
         image: '/images/domain-landing/domain-landing_admin_role-type.png',
         srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
     },
@@ -32,7 +38,6 @@ const CARD_TYPE = [
         title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
         desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
         button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
-        to: '',
         image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
         srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
     },
@@ -40,6 +45,26 @@ const CARD_TYPE = [
 const storeState = reactive({
     language: computed(() => store.state.user.language),
 });
+
+const handleClickCardButton = (type: string) => {
+    let url = '';
+
+    if (type === 'quick-start-guide') {
+        url = `https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`;
+    } else if (type === 'role-type') {
+        url = router.resolve({
+            name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),
+        }).href;
+    } else if (type === 'auto-sync') {
+        url = router.resolve({
+            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME),
+        }).href;
+    }
+
+    if (url) {
+        window.open(url, '_blank');
+    }
+};
 </script>
 
 <template>
@@ -69,12 +94,17 @@ const storeState = reactive({
                         <p-button style-type="tertiary"
                                   :icon-left="item.type === 'quick-start-guide' ? 'ic_rocket-filled' : undefined"
                                   class="link-button"
+                                  @click="handleClickCardButton(item.type)"
                         >
-                            <p-link :text="item.button"
-                                    :to="item.to"
-                                    size="sm"
-                                    :action-icon="item.type === 'quick-start-guide' ? 'external-link' : undefined"
-                                    new-tab
+                            <span>
+                                {{ item.button }}
+                            </span>
+                            <p-i v-if="item.type === 'quick-start-guide'"
+                                 name="ic_external-link"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                                 class="info-icon"
                             />
                         </p-button>
                     </div>
@@ -100,17 +130,19 @@ const storeState = reactive({
         margin-top: 0.375rem;
     }
     .card-wrapper {
-        @apply flex;
+        @apply flex overflow-y-auto;
         padding-top: 0.875rem;
         gap: 1rem;
 
         .card {
-            @apply relative;
             flex: 1;
+            min-width: 25rem;
             .card-inner-wrapper {
+                @apply relative;
                 padding: 3.625rem 1.125rem;
                 .inner-contents {
-                    z-index: 1;
+                    @apply relative;
+                    z-index: 2;
                     .title {
                         @apply text-label-xl font-medium;
                     }
@@ -120,13 +152,25 @@ const storeState = reactive({
                         margin-top: 0.75rem;
                     }
                     .link-button {
+                        @apply flex text-label-md font-bold;
+                        gap: 0.25rem;
                         margin-top: 1.5rem;
+                    }
+
+                    /* custom design-system component - p-button */
+                    :deep(.p-button) {
+                        svg {
+                            margin: 0;
+                        }
                     }
                 }
                 .card-image {
                     @apply absolute;
-                    top: 0;
-                    right: 0;
+                    top: -0.75rem;
+                    right: 0.125rem;
+                    width: 25rem;
+                    height: 16rem;
+                    z-index: 1;
                 }
             }
         }

@@ -1,25 +1,16 @@
 <script setup lang="ts">
-import Vue from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
-
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
-const appContextStore = useAppContextStore();
-
 const router = useRouter();
 
 const handleClickButton = (type: string) => {
-    appContextStore.enterAdminMode();
-
     if (type === 'create') {
         window.open(router.resolve({
             name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
@@ -35,14 +26,6 @@ const handleClickButton = (type: string) => {
             },
         }).href, '_blank');
     }
-
-    Vue.notify({
-        group: 'toastTopCenter',
-        type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
-        duration: 2000,
-        speed: 1,
-    });
 };
 </script>
 
