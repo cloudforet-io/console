@@ -106,8 +106,6 @@ const createCustomMetric = async () => {
             name: name.value,
             unit: unit.value,
             metric_type: METRIC_TYPE.GAUGE,
-            // resource_type: `inventory.CloudService:${resourceType.value}`,
-            resource_type: assetAnalysisPageState.selectedNamespace?.resourceType,
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: jsonParsedQuery,
             namespace_id: assetAnalysisPageGetters.namespaceId || '',

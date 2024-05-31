@@ -337,7 +337,6 @@ watch(() => storeState.selectedNamespace, (selectedNamespace) => {
                                                      v-show="!namespaceState.inputValue"
                                                      :key="`namespace-${idx}`"
                                                      class="category-menu-item"
-                                                     :override-collapsed="item.icon !== 'COMMON'"
                                                      :item="item"
                                                      is-sub-item
                         >
