@@ -5,7 +5,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserConfigGetParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
 import type { CostQuerySetListParameters } from '@/schema/cost-analysis/cost-query-set/api-verbs/list';
 import type { CostQuerySetModel } from '@/schema/cost-analysis/cost-query-set/model';
@@ -82,15 +82,27 @@ export const useGnbStore = defineStore('gnb', () => {
     const actions = {
         fetchNavRailStatus: async () => {
             try {
-                const response = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel>({
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel>>({
                     name: 'console:gnb:navRail',
                 });
-                state.isMinimizeNavRail = response.data.isMinimizeNavRail;
-                state.isHideNavRail = response.data.isHideNavRail;
+                if (!results) {
+                    await actions.createNavRailInit();
+                } else {
+                    state.isMinimizeNavRail = results[0].data?.isMinimizeNavRail;
+                    state.isHideNavRail = results[0].data?.isHideNavRail;
+                }
+            } catch (e: any) {
+                await actions.createNavRailInit();
+            }
+        },
+        createNavRailInit: async () => {
+            try {
+                await SpaceConnector.clientV2.config.userConfig.set({
+                    name: 'console:gnb:navRail',
+                    data: { isMinimizeNavRail: false, isHideNavRail: false },
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.isMinimizeNavRail = undefined;
-                state.isHideNavRail = undefined;
             }
         },
         createMinimizeNavRail: async (isMinimizeNavRail?: boolean) => {

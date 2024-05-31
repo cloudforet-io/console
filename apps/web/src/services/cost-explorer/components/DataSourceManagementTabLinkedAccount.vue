@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, onUnmounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -27,8 +27,8 @@ const dataSourcesPageStore = useDataSourcesPageStore();
 const dataSourcesPageState = dataSourcesPageStore.state;
 const dataSourcesPageGetters = dataSourcesPageStore.getters;
 
-let linkedAccountListApiQueryHelper: ApiQueryHelper;
-let linkedAccountListApiQuery;
+let linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+let linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
 const datasourceListApiQueryHelper = new ApiQueryHelper();
 
 const storeState = reactive({
@@ -54,10 +54,14 @@ const state = reactive({
         }
         return i18n.t('BILLING.COST_MANAGEMENT.DATA_SOURCES.UPDATING');
     }),
+    selectedStatusFilter: 'all',
 });
 
 const handleClickAction = (action: CostLinkedAccountModalType) => {
     dataSourcesPageStore.setModal(true, action);
+};
+const handleChangedSelectFilter = (filters: string) => {
+    state.selectedStatusFilter = filters;
 };
 const handleChangeLinkedAccountToolbox = (options: ToolboxOptions) => {
     if (options) {
@@ -93,16 +97,18 @@ const handleConfirmModal = async (promises: Promise<void>[]) => {
     }
 
     await fetchLinkedAccountList();
+    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
 };
 
 const fetchLinkedAccountList = async () => {
     dataSourcesPageStore.setLinkedAccountsLoading(true);
+    linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
+        .addFilter(...storeState.linkedAccountsSearchFilters);
+
     try {
-        linkedAccountListApiQueryHelper.setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
-            .setFilters(storeState.linkedAccountsSearchFilters);
         await dataSourcesPageStore.fetchLinkedAccount({
             data_source_id: storeState.selectedDataSourceItem?.data_source_id || '',
-            query: linkedAccountListApiQuery,
+            query: linkedAccountListApiQueryHelper.data,
         });
     } finally {
         dataSourcesPageStore.setLinkedAccountsLoading(false);
@@ -117,14 +123,27 @@ const fetchDataSourceList = async () => {
     });
 };
 
-watch(() => storeState.selectedDataSourceIndices, async () => {
-    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
-    linkedAccountListApiQueryHelper = new ApiQueryHelper()
-        .setPage(storeState.linkedAccountsPageStart, storeState.linkedAccountsPageLimit)
-        .setSort('workspace_id', false);
-    linkedAccountListApiQuery = linkedAccountListApiQueryHelper.data;
+watch(() => state.selectedStatusFilter, async (selectedStatusFilter) => {
+    if (selectedStatusFilter === 'all') {
+        linkedAccountListApiQueryHelper.setOrFilters([
+            { k: 'is_linked', v: true, o: '=' },
+            { k: 'is_linked', v: false, o: '=' },
+        ]);
+    } else {
+        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked', o: '=' }]);
+    }
+
     await fetchLinkedAccountList();
 }, { immediate: true });
+watch(() => storeState.selectedDataSourceIndices, async () => {
+    await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
+    linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+    await fetchLinkedAccountList();
+}, { immediate: true });
+
+onUnmounted(() => {
+    dataSourcesPageStore.linkedAccountsReset();
+});
 </script>
 
 <template>
@@ -154,7 +173,9 @@ watch(() => storeState.selectedDataSourceIndices, async () => {
                 </div>
             </template>
         </p-heading>
-        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox" />
+        <data-source-management-tab-linked-account-table @confirm="handleChangeLinkedAccountToolbox"
+                                                         @select-filter="handleChangedSelectFilter"
+        />
         <data-source-management-modal v-if="storeState.modalVisible"
                                       @confirm="handleConfirmModal"
         />

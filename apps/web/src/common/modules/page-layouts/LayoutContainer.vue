@@ -40,8 +40,8 @@ watch(() => storeState.visibleSidebar, (visibleSidebar) => {
     }
 }, { immediate: true });
 
-onBeforeMount(() => {
-    gnbStore.fetchNavRailStatus();
+onBeforeMount(async () => {
+    await gnbStore.fetchNavRailStatus();
 });
 </script>
 

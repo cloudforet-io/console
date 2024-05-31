@@ -137,31 +137,19 @@ const state = reactive({
         });
         return results;
     }),
-    menuSet: computed<LSBMenu[]>(() => {
-        const defaultMenuSet = !isAdminMode.value ? [
-            {
-                type: MENU_ITEM_TYPE.STARRED,
-                childItems: state.starredMenuItems,
-                currentPath: state.currentPath,
-            },
-            { type: MENU_ITEM_TYPE.DIVIDER },
-        ] : [];
-
-        if (state.isCloudServiceDetailPage) {
-            return [
-                ...defaultMenuSet,
-                ...state.cloudServiceDetailMenuSet,
-            ];
+    menuSet: computed<LSBMenu[]>(() => (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : state.cloudServiceMainMenuSet)),
+    favoriteOptions: computed<FavoriteOptions>(() => {
+        if (!state.isCloudServiceDetailPage) {
+            return {
+                type: FAVORITE_TYPE.MENU,
+                id: 'cloud_service',
+            };
         }
-        return [
-            ...defaultMenuSet,
-            ...state.cloudServiceMainMenuSet,
-        ];
+        return {
+            type: FAVORITE_TYPE.CLOUD_SERVICE,
+            id: cloudServiceDetailPageState.selectedCloudServiceType?.cloud_service_type_key || '',
+        };
     }),
-    favoriteOptions: computed<FavoriteOptions>(() => ({
-        type: FAVORITE_TYPE.CLOUD_SERVICE,
-        id: cloudServiceDetailPageState.selectedCloudServiceType?.cloud_service_type_key || '',
-    })),
 });
 const providerState = reactive({
     contextMenuItems: computed(() => [

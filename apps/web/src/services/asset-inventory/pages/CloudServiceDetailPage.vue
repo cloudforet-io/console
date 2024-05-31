@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PTextButton, PI, PBadge,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -34,6 +34,7 @@ import { store } from '@/store';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProviderReferenceMap } from '@/store/reference/provider-reference-store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
@@ -88,6 +89,10 @@ assetInventorySettingsStore.initState();
 
 const route = useRoute();
 const router = useRouter();
+
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+});
 
 /* Main Table */
 const queryTagsHelper = useQueryTags({});
@@ -546,6 +551,14 @@ debouncedWatch([() => props.group, () => props.name, () => props.provider], asyn
                                      color="inherit"
                                 />
                             </p-text-button>
+                        </template>
+                        <template #col-provider-format="{value}">
+                            <p-badge v-if="storeState.providers[value]"
+                                     :background-color="storeState.providers[value]?.color"
+                                     text-color="white"
+                            >
+                                {{ storeState.providers[value]?.label }}
+                            </p-badge>
                         </template>
                         <template #col-project_id-format="{value, item}">
                             <p-text-button class="report-link"
