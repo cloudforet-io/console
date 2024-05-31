@@ -10,18 +10,21 @@ const numberCard: WidgetConfig = {
     dataMappingSchema: {
         dataField: {
             label: 'Data Field',
-            type: 'data_field',
+            componentType: 'dropdown',
             required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
     },
     advancedOptionsSchema: {
         icon: {
             label: 'Icon',
-            type: 'icon',
+            componentType: 'icon',
         },
         comparison: {
             label: 'Comparison',
-            type: 'comparison',
+            componentType: 'comparison',
         },
     },
 };

@@ -10,21 +10,26 @@ const clusteredColumnChart: WidgetConfig = {
     dataMappingSchema: {
         dataField: {
             label: 'Data Field',
-            type: 'data_field',
-            multiSelectable: true,
+            componentType: 'dropdown',
             required: true,
+            options: {
+                dataTarget: 'data_field',
+                multiSelectable: true,
+            },
         },
         xAxisField: {
             label: 'X-Axis Field',
-            type: 'label_field',
-            enableMaxCount: true,
+            componentType: 'dropdownWithCount',
             required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
     },
     advancedOptionsSchema: {
         legend: {
             label: 'Legend',
-            type: 'legend',
+            componentType: 'toggle',
         },
     },
 };

@@ -10,20 +10,25 @@ const pieChart: WidgetConfig = {
     dataMappingSchema: {
         dataField: {
             label: 'Data Field',
-            type: 'data_field',
+            componentType: 'dropdown',
             required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
         groupBy: {
             label: 'Group By',
-            type: 'label_field',
-            enableMaxCount: true,
+            componentType: 'dropdownWithCount',
             required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
     },
     advancedOptionsSchema: {
         legend: {
             label: 'Legend',
-            type: 'legend',
+            componentType: 'toggle',
         },
     },
 };

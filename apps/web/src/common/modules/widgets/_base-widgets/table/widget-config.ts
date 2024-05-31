@@ -10,38 +10,46 @@ const table: WidgetConfig = {
     dataMappingSchema: {
         dataField: {
             label: 'Data Field',
-            type: 'data_field',
+            componentType: 'dropdown',
             required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
         xAxisField: {
             label: 'X-Axis Field',
-            type: 'label_field',
-            enableMaxCount: true,
+            componentType: 'dropdownWithCount',
             required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
         groupBy: {
             label: 'Group By',
-            type: 'label_field',
-            multiSelectable: true,
+            componentType: 'dropdownWithCount',
             required: true,
+            options: {
+                dataTarget: 'label_field',
+                multiSelectable: true,
+            },
         },
     },
     advancedOptionsSchema: {
         comparison: {
             label: 'Comparison',
-            type: 'comparison',
+            componentType: 'comparison',
         },
         subTotal: {
             label: 'Sub Total',
-            type: 'sub_total',
+            componentType: 'toggle',
         },
         total: {
             label: 'Total',
-            type: 'total',
+            componentType: 'toggle',
         },
         progressBar: {
             label: 'Progress Bar',
-            type: 'progress_bar',
+            componentType: 'toggle',
         },
     },
 };

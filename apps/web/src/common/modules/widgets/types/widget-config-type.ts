@@ -33,26 +33,32 @@ export interface NewWidgetConfig {
     }
 }
 
-interface FormatRules {
+interface DropdownOptions {
+    dataTarget?: string; // e.g. label_field, data_field
+    multiSelectable?: boolean;
+}
+interface DropdownWithCountOptions {
+    dataTarget?: string;
+    multiSelectable?: boolean;
+}
+interface FormatRulesOptions {
     fields: string[];
 }
-interface Comparison {
-    fields: string[]; // TODO: have to fix
-}
-type WidgetFieldOptions = FormatRules | Comparison;
-interface WidgetFieldType {
-    type: string;
+// interface ProgressBarOptions { // TODO: set after the schema is defined
+//     dataTargetList: string[];
+// }
+type WidgetFieldOptions = DropdownOptions | DropdownWithCountOptions | FormatRulesOptions;
+type WidgetFieldComponent = 'dropdown' | 'dropdownWithCount' | 'number' | 'formatRules' | 'comparison' | 'icon' | 'toggle';
+interface WidgetFieldSchema {
+    componentType: WidgetFieldComponent;
     label: string;
-    multiSelectable?: boolean;
-    enableMaxCount?: boolean;
     required?: boolean;
     options?: Partial<WidgetFieldOptions>;
 }
 
-type WidgetFieldName = 'dataField' | 'xAxisField' | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy' | 'totalField' | 'basisField' | 'min' | 'max'
+type WidgetFieldName = 'dataField' | 'xAxisField' | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
+    | 'totalField' | 'basisField' | 'min' | 'max'
     | 'icon' | 'comparison' | 'legend' | 'subTotal' | 'total' | 'progressBar' | 'formatRules';
-
-type WidgetFieldSchema = Partial<Record<WidgetFieldName, WidgetFieldType>>;
 
 export interface WidgetConfig {
     widgetName: string;
@@ -60,6 +66,6 @@ export interface WidgetConfig {
         title?: string;
         sizes: WidgetSize[];
     };
-    dataMappingSchema: WidgetFieldSchema;
-    advancedOptionsSchema: WidgetFieldSchema;
+    dataMappingSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
+    advancedOptionsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
 }
