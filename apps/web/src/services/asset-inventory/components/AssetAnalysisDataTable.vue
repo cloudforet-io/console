@@ -169,7 +169,6 @@ const handleExport = async () => {
 };
 const queryHelper = new QueryHelper();
 const handleClickRow = (item) => {
-    if (!assetAnalysisPageState.selectedGroupByList.length) return;
     const _filters: ConsoleFilter[] = [];
 
     // set filters from groupBy
@@ -256,7 +255,7 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
                      :searchable="false"
                      :page-size.sync="state.pageSize"
                      row-height-fixed
-                     :row-cursor-pointer="!!assetAnalysisPageState.selectedGroupByList.length"
+                     row-cursor-pointer
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
@@ -286,13 +285,6 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
 .cell-text {
     &.raised {
         @apply text-alert;
-    }
-}
-
-.no-link {
-    /* custom design-system component - p-link */
-    :deep(.p-link) {
-        @apply cursor-auto;
     }
 }
 </style>
