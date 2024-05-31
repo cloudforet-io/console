@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
 const storeState = reactive({
     domainName: computed<string>(() => store.state.domain.name),
+    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    language: computed(() => store.state.user.language),
 });
+
+const handleClickStartButton = () => {
+    window.open(`https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`, '_blank');
+};
 </script>
 
 <template>
@@ -20,9 +26,10 @@ const storeState = reactive({
         >
             <template #domain_icon>
                 <p-i name="ic_three-boxes-with-sparkles"
-                     width="2rem"
-                     height="2rem"
+                     width="2.5rem"
+                     height="2.5rem"
                      color="inherit"
+                     class="icon"
                 />
             </template>
             <template #domain_name>
@@ -30,12 +37,22 @@ const storeState = reactive({
             </template>
             <template #boost_icon>
                 <p-i name="ic_arrow-right-up-with-sparkles"
-                     width="2rem"
-                     height="2rem"
+                     width="2.5rem"
+                     height="2.5rem"
                      color="inherit"
+                     class="icon"
                 />
             </template>
         </i18n>
+        <p-button v-if="!storeState.isDomainAdmin"
+                  style-type="primary"
+                  icon-left="ic_rocket-filled"
+                  class="start-button"
+                  size="lg"
+                  @click="handleClickStartButton"
+        >
+            {{ $t('LADING.DOMAIN.QUICK_GUIDE_BUTTON') }}
+        </p-button>
     </div>
 </template>
 
@@ -49,6 +66,20 @@ const storeState = reactive({
     .title {
         @apply text-display-lg font-normal;
         max-width: 55rem;
+    }
+    .start-button {
+        width: 9.25rem;
+    }
+
+    @screen tablet {
+        .title {
+            @apply text-display-md;
+            max-width: 40.5rem;
+            .icon {
+                width: 2rem !important;
+                height: 2rem !important;
+            }
+        }
     }
 }
 </style>

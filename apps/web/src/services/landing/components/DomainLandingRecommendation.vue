@@ -1,61 +1,123 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PLink, PDivider, PCard, PButton,
+    PLink, PDivider, PCard, PButton, PI, screens,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-const CARD_TYPE = [
-    {
-        type: 'quick-start-guide',
-        title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
-        button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
-        to: '',
-        image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
-    },
-    {
-        type: 'role-type',
-        title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
-        button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
-        to: '',
-        image: '/images/domain-landing/domain-landing_admin_role-type.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
-    },
-    {
-        type: 'auto-sync',
-        title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
-        button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
-        to: '',
-        image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
-    },
-];
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
+
+const router = useRouter();
+
+const { width } = useWindowSize();
+
 const storeState = reactive({
     language: computed(() => store.state.user.language),
+    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
 });
+const state = reactive({
+    isTabletSize: computed(() => width.value < screens.tablet.max),
+    isMobileSize: computed(() => width.value < screens.mobile.max),
+    isXsSize: computed(() => width.value < 478),
+    adminCardType: computed(() => ([
+        {
+            type: 'quick-start-guide',
+            title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
+            button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
+        },
+        {
+            type: 'role-type',
+            title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
+            button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_role-type.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
+        },
+        {
+            type: 'auto-sync',
+            title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
+            button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
+        },
+    ])),
+    userCardType: computed(() => ([
+        {
+            type: 'create-project',
+            title: i18n.t('LADING.DOMAIN.CREATE_PROJECT_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.CREATE_PROJECT_DESC'),
+            image: '/images/domain-landing/domain-landing_create-project.png',
+            srcSet: '/images/domain-landing/domain-landing_create-project@2x.png 2x, /images/domain-landing/domain-landing_create-project@3x.png 3x',
+        },
+        {
+            type: 'customize-dashboard',
+            title: i18n.t('LADING.DOMAIN.DASHBOARD_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.DASHBOARD_DESC'),
+            image: '/images/domain-landing/domain-landing_customize-dashboard.png',
+            srcSet: '/images/domain-landing/domain-landing_customize-dashboard@2x.png 2x, /images/domain-landing/domain-landing_customize-dashboard@3x.png 3x',
+        },
+        {
+            type: 'manage-alert',
+            title: i18n.t('LADING.DOMAIN.MANAGED_ALERT_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.MANAGED_ALERT_DESC'),
+            image: '/images/domain-landing/domain-landing_manage-alert.png',
+            srcSet: '/images/domain-landing/domain-landing_manage-alert@2x.png 2x, /images/domain-landing/domain-landing_manage-alert@3x.png 3x',
+        },
+    ])),
+    cardType: computed(() => (storeState.isDomainAdmin ? state.adminCardType : state.userCardType)),
+});
+
+const handleClickCardButton = (type: string) => {
+    let url = '';
+
+    if (type === 'quick-start-guide') {
+        url = `https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`;
+    } else if (type === 'role-type') {
+        url = router.resolve({
+            name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),
+        }).href;
+    } else if (type === 'auto-sync') {
+        url = router.resolve({
+            name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME),
+        }).href;
+    }
+
+    if (url) {
+        window.open(url, '_blank');
+    }
+};
 </script>
 
 <template>
     <div class="domain-landing-recommendation">
-        <h2>{{ $t('LADING.DOMAIN.RECOMMENDED_TITLE') }}</h2>
-        <p-link :text="i18n.t('LADING.DOMAIN.HELP_LINK')"
-                :href="`https://help.spaceone.megazone.com/hc/${storeState.language}`"
-                size="md"
-                highlight
-                action-icon="external-link"
-                new-tab
-                class="help-link"
-        />
+        <div class="title-wrapper">
+            <h2>{{ state.isTabletSize ? $t('LADING.DOMAIN.RECOMMENDED_TITLE_SHORT') : $t('LADING.DOMAIN.RECOMMENDED_TITLE') }}</h2>
+            <p-link :text="i18n.t('LADING.DOMAIN.HELP_LINK')"
+                    :href="`https://help.spaceone.megazone.com/hc/${storeState.language}`"
+                    size="md"
+                    highlight
+                    action-icon="external-link"
+                    new-tab
+                    class="help-link"
+            />
+        </div>
         <p-divider class="divider" />
-        <div class="card-wrapper">
-            <p-card v-for="(item, idx) in CARD_TYPE"
+        <div class="card-wrapper"
+             :class="{'is-user-mode': !storeState.isDomainAdmin}"
+        >
+            <p-card v-for="(item, idx) in state.cardType"
                     :key="`p-card-${idx}`"
                     :header="false"
                     class="card"
@@ -66,19 +128,26 @@ const storeState = reactive({
                             {{ item.title }}
                         </p>
                         <span class="desc">{{ item.desc }}</span>
-                        <p-button style-type="tertiary"
+                        <p-button v-if="item.button"
+                                  style-type="tertiary"
                                   :icon-left="item.type === 'quick-start-guide' ? 'ic_rocket-filled' : undefined"
                                   class="link-button"
+                                  @click="handleClickCardButton(item.type)"
                         >
-                            <p-link :text="item.button"
-                                    :to="item.to"
-                                    size="sm"
-                                    :action-icon="item.type === 'quick-start-guide' ? 'external-link' : undefined"
-                                    new-tab
+                            <span>
+                                {{ item.button }}
+                            </span>
+                            <p-i v-if="item.type === 'quick-start-guide'"
+                                 name="ic_external-link"
+                                 width="1rem"
+                                 height="1rem"
+                                 color="inherit"
+                                 class="info-icon"
                             />
                         </p-button>
                     </div>
-                    <img class="card-image"
+                    <img v-if="!state.isXsSize"
+                         class="card-image"
                          :src="item.image"
                          :srcset="item.srcSet"
                          alt="card-image"
@@ -93,23 +162,41 @@ const storeState = reactive({
 .domain-landing-recommendation {
     @apply flex flex-col;
     gap: 0.375rem;
-    .help-link {
-        margin-left: auto;
+    .title-wrapper {
+        @apply flex justify-between;
+        .help-link {
+            margin-left: auto;
+            padding-top: 0.375rem;
+        }
     }
     .divider {
         margin-top: 0.375rem;
     }
     .card-wrapper {
-        @apply flex;
+        @apply flex overflow-y-auto;
         padding-top: 0.875rem;
         gap: 1rem;
 
+        /* custom design-system component - p-card */
+        :deep(.p-card) {
+            .body {
+                @apply relative border-none;
+                height: 100%;
+                padding: 0;
+            }
+        }
+
         .card {
-            @apply relative;
+            @apply overflow-y-hidden;
             flex: 1;
+            min-width: 25rem;
             .card-inner-wrapper {
-                padding: 3.625rem 1.125rem;
+                @apply relative overflow-hidden border border-gray-200;
+                height: 100%;
+                padding: 4.375rem 2rem 2rem 2rem;
+                border-radius: 0.375rem;
                 .inner-contents {
+                    @apply relative;
                     z-index: 1;
                     .title {
                         @apply text-label-xl font-medium;
@@ -120,14 +207,61 @@ const storeState = reactive({
                         margin-top: 0.75rem;
                     }
                     .link-button {
+                        @apply flex text-label-md font-bold;
+                        gap: 0.25rem;
                         margin-top: 1.5rem;
+                    }
+
+                    /* custom design-system component - p-button */
+                    :deep(.p-button) {
+                        svg {
+                            margin: 0;
+                        }
                     }
                 }
                 .card-image {
                     @apply absolute;
                     top: 0;
                     right: 0;
+                    width: 25rem;
+                    height: 16rem;
+                    z-index: 0;
                 }
+            }
+        }
+
+        &.is-user-mode {
+            .card {
+                .card-inner-wrapper {
+                    padding: 6.5rem 2rem 2rem 2rem;
+                }
+            }
+        }
+    }
+
+    @screen tablet {
+        .card-wrapper {
+            @apply flex-col;
+            .card {
+                .card-inner-wrapper {
+                    padding: 1.25rem 1.125rem;
+                }
+            }
+            &.is-user-mode {
+                .card {
+                    .card-inner-wrapper {
+                        height: 11.375rem;
+                        padding: 2rem;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 478px) {
+        .card-wrapper {
+            .card {
+                min-width: unset;
             }
         }
     }

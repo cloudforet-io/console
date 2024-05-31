@@ -37,8 +37,8 @@ watch(() => storeState.workspaceList, () => {
         <landing-header :is-domain-landing-page="state.isDomainLandingPage" />
         <div class="scroll-contents">
             <router-view />
-            <f-n-b class="fnb" />
         </div>
+        <f-n-b class="fnb" />
     </div>
 </template>
 
@@ -48,8 +48,9 @@ watch(() => storeState.workspaceList, () => {
     .scroll-contents {
         @apply flex flex-col items-center overflow-y-auto;
         padding-right: 1.5rem;
-        padding-bottom: calc($fnb-height + 5.375rem);
+        padding-bottom: 2rem;
         padding-left: 1.5rem;
+        flex: 1;
         .fnb {
             @apply absolute w-full bg-gray-100;
             bottom: 0;
