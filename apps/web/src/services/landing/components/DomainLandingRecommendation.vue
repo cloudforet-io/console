@@ -19,39 +19,64 @@ const router = useRouter();
 
 const { width } = useWindowSize();
 
-const CARD_TYPE = [
-    {
-        type: 'quick-start-guide',
-        title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
-        button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
-        image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
-    },
-    {
-        type: 'role-type',
-        title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
-        button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
-        image: '/images/domain-landing/domain-landing_admin_role-type.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
-    },
-    {
-        type: 'auto-sync',
-        title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
-        desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
-        button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
-        image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
-        srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
-    },
-];
-
 const storeState = reactive({
     language: computed(() => store.state.user.language),
+    isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
 });
 const state = reactive({
     isTabletSize: computed(() => width.value < screens.tablet.max),
+    isMobileSize: computed(() => width.value < screens.mobile.max),
     isXsSize: computed(() => width.value < 478),
+    adminCardType: computed(() => ([
+        {
+            type: 'quick-start-guide',
+            title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
+            button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
+        },
+        {
+            type: 'role-type',
+            title: i18n.t('LADING.DOMAIN.ROLE_TYPE_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.ROLE_TYPE_DESC'),
+            button: i18n.t('LADING.DOMAIN.ROLE_TYPE_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_role-type.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_role-type@2x.png 2x, /images/domain-landing/domain-landing_admin_role-type@3x.png 3x',
+        },
+        {
+            type: 'auto-sync',
+            title: i18n.t('LADING.DOMAIN.AUTO_SYNC_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.AUTO_SYNC_DESC'),
+            button: i18n.t('LADING.DOMAIN.AUTO_SYNC_BUTTON'),
+            image: '/images/domain-landing/domain-landing_admin_auto-sync.png',
+            srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
+        },
+    ])),
+    userCardType: computed(() => ([
+        {
+            type: 'create-project',
+            title: i18n.t('LADING.DOMAIN.CREATE_PROJECT_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.CREATE_PROJECT_DESC'),
+            image: '/images/domain-landing/domain-landing_create-project.png',
+            srcSet: '/images/domain-landing/domain-landing_create-project@2x.png 2x, /images/domain-landing/domain-landing_create-project@3x.png 3x',
+        },
+        {
+            type: 'customize-dashboard',
+            title: i18n.t('LADING.DOMAIN.DASHBOARD_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.DASHBOARD_DESC'),
+            image: '/images/domain-landing/domain-landing_customize-dashboard.png',
+            srcSet: '/images/domain-landing/domain-landing_customize-dashboard@2x.png 2x, /images/domain-landing/domain-landing_customize-dashboard@3x.png 3x',
+        },
+        {
+            type: 'manage-alert',
+            title: i18n.t('LADING.DOMAIN.MANAGED_ALERT_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.MANAGED_ALERT_DESC'),
+            image: '/images/domain-landing/domain-landing_manage-alert.png',
+            srcSet: '/images/domain-landing/domain-landing_manage-alert@2x.png 2x, /images/domain-landing/domain-landing_manage-alert@3x.png 3x',
+        },
+    ])),
+    cardType: computed(() => (storeState.isDomainAdmin ? state.adminCardType : state.userCardType)),
 });
 
 const handleClickCardButton = (type: string) => {
@@ -89,8 +114,10 @@ const handleClickCardButton = (type: string) => {
             />
         </div>
         <p-divider class="divider" />
-        <div class="card-wrapper">
-            <p-card v-for="(item, idx) in CARD_TYPE"
+        <div class="card-wrapper"
+             :class="{'is-user-mode': !storeState.isDomainAdmin}"
+        >
+            <p-card v-for="(item, idx) in state.cardType"
                     :key="`p-card-${idx}`"
                     :header="false"
                     class="card"
@@ -101,7 +128,8 @@ const handleClickCardButton = (type: string) => {
                             {{ item.title }}
                         </p>
                         <span class="desc">{{ item.desc }}</span>
-                        <p-button style-type="tertiary"
+                        <p-button v-if="item.button"
+                                  style-type="tertiary"
                                   :icon-left="item.type === 'quick-start-guide' ? 'ic_rocket-filled' : undefined"
                                   class="link-button"
                                   @click="handleClickCardButton(item.type)"
@@ -149,15 +177,27 @@ const handleClickCardButton = (type: string) => {
         padding-top: 0.875rem;
         gap: 1rem;
 
+        /* custom design-system component - p-card */
+        :deep(.p-card) {
+            .body {
+                @apply relative border-none;
+                height: 100%;
+                padding: 0;
+            }
+        }
+
         .card {
+            @apply overflow-y-hidden;
             flex: 1;
             min-width: 25rem;
             .card-inner-wrapper {
-                @apply relative;
-                padding: 3.625rem 1.125rem 1.25rem 1.125rem;
+                @apply relative overflow-hidden border border-gray-200;
+                height: 100%;
+                padding: 4.375rem 2rem 2rem 2rem;
+                border-radius: 0.375rem;
                 .inner-contents {
                     @apply relative;
-                    z-index: 2;
+                    z-index: 1;
                     .title {
                         @apply text-label-xl font-medium;
                     }
@@ -181,11 +221,19 @@ const handleClickCardButton = (type: string) => {
                 }
                 .card-image {
                     @apply absolute;
-                    top: -0.75rem;
-                    right: 0.125rem;
+                    top: 0;
+                    right: 0;
                     width: 25rem;
                     height: 16rem;
-                    z-index: 1;
+                    z-index: 0;
+                }
+            }
+        }
+
+        &.is-user-mode {
+            .card {
+                .card-inner-wrapper {
+                    padding: 6.5rem 2rem 2rem 2rem;
                 }
             }
         }
@@ -197,6 +245,14 @@ const handleClickCardButton = (type: string) => {
             .card {
                 .card-inner-wrapper {
                     padding: 1.25rem 1.125rem;
+                }
+            }
+            &.is-user-mode {
+                .card {
+                    .card-inner-wrapper {
+                        height: 11.375rem;
+                        padding: 2rem;
+                    }
                 }
             }
         }
