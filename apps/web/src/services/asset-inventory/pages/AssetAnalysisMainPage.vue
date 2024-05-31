@@ -69,7 +69,7 @@ const state = reactive({
             icon: namespace?.data?.icon,
             label: namespace?.label ?? '',
             metricName: metric?.label ?? undefined,
-            category: namespace.data.category,
+            category: namespace?.data?.category,
         });
     }).filter((recent) => recent !== undefined)),
 });
