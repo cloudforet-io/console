@@ -32,3 +32,26 @@ export interface NewWidgetConfig {
         }
     }
 }
+interface WidgetFieldType {
+    type: string;
+    label: string;
+    multiSelectable?: boolean;
+    enableMaxCount?: boolean;
+    required?: boolean;
+    options?: any;
+}
+
+type WidgetFieldName = 'dataField' | 'xAxisField' | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy' | 'totalField' | 'basisField' | 'min' | 'max'
+    | 'icon' | 'comparison' | 'legend' | 'subTotal' | 'total' | 'progressBar' | 'formatRules';
+
+type WidgetFieldSchema = Partial<Record<WidgetFieldName, WidgetFieldType>>;
+
+export interface WidgetConfig {
+    widgetName: string;
+    meta: {
+        title?: string;
+        sizes: WidgetSize[];
+    };
+    dataMappingSchema: WidgetFieldSchema;
+    advancedOptionsSchema: WidgetFieldSchema;
+}
