@@ -1,30 +1,27 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const numberCard: NewWidgetConfig = {
-    widget_name: 'numberCard',
+const numberCard: WidgetConfig = {
+    widgetName: 'numberCard',
     meta: {
         title: 'Number Card',
         sizes: ['sm'],
-        granularity: 'MONTHLY',
     },
-    data_mapping_schema: {
-        data_field: {
+    dataMappingSchema: {
+        dataField: {
             label: 'Data Field',
-        },
-        granularity_field: {
-            label: 'Granularity',
+            type: 'data_field',
+            required: true,
         },
     },
-    chart_options_schema: {
-        comparison: {
-            type: 'comparison',
-            label: 'Comparison',
+    advancedOptionsSchema: {
+        icon: {
+            label: 'Icon',
+            type: 'icon',
         },
-        format_rules: {
-            type: 'format_rules',
-            label: 'Format Rules',
-            fields: ['icon', 'color'],
+        comparison: {
+            label: 'Comparison',
+            type: 'comparison',
         },
     },
 };

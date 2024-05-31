@@ -1,46 +1,47 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const table: NewWidgetConfig = {
-    widget_name: 'table',
+const table: WidgetConfig = {
+    widgetName: 'table',
     meta: {
         title: 'Table',
         sizes: ['md', 'full'],
     },
-    data_mapping_schema: {
-        data_field_y: {
-            label: 'Data Field (Y Axis)',
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            type: 'data_field',
+            required: true,
         },
-        data_field_x: {
-            label: 'Data Field (X Axis)',
-            enable_granularity: true,
+        xAxisField: {
+            label: 'X-Axis Field',
+            type: 'label_field',
+            enableMaxCount: true,
+            required: true,
+        },
+        groupBy: {
+            label: 'Group By',
+            type: 'label_field',
+            multiSelectable: true,
+            required: true,
         },
     },
-    chart_options_schema: {
-        max_data_field_x: {
-            type: 'number',
-            label: 'Maximum number of Group By',
-        },
+    advancedOptionsSchema: {
         comparison: {
-            type: 'comparison',
             label: 'Comparison',
+            type: 'comparison',
         },
-        sub_total: {
-            type: 'boolean',
+        subTotal: {
             label: 'Sub Total',
+            type: 'sub_total',
         },
         total: {
-            type: 'boolean',
             label: 'Total',
+            type: 'total',
         },
-        progress: {
-            type: 'boolean',
-            label: 'Progress',
-        },
-        format_rules: {
-            type: 'format_rules',
-            label: 'Format Rules',
-            fields: ['text', 'color'],
+        progressBar: {
+            label: 'Progress Bar',
+            type: 'progress_bar',
         },
     },
 };

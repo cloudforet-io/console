@@ -1,25 +1,35 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const lineChart: NewWidgetConfig = {
-    widget_name: 'lineChart',
+const lineChart: WidgetConfig = {
+    widgetName: 'lineChart',
     meta: {
         title: 'Line Chart',
         sizes: ['full'],
     },
-    data_mapping_schema: {
-        data_field_y: {
-            label: 'Data Field (Y Axis)',
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            type: 'data_field',
+            required: true,
         },
-        data_field_x: {
-            label: 'Data Field (X Axis)',
-            enable_granularity: true,
+        xAxisField: {
+            label: 'X-Axis Field',
+            type: 'label_field',
+            enableMaxCount: true,
+            required: true,
+        },
+        lineBy: {
+            label: 'Line By',
+            type: 'label_field',
+            enableMaxCount: true,
+            required: true,
         },
     },
-    chart_options_schema: {
-        max_data_field_x: {
-            type: 'number',
-            label: 'Maximum number of Data Field (X Axis)',
+    advancedOptionsSchema: {
+        legend: {
+            label: 'Legend',
+            type: 'legend',
         },
     },
 };

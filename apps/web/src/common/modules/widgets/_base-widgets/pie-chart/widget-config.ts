@@ -1,21 +1,29 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const pieChart: NewWidgetConfig = {
-    widget_name: 'pieChart',
+const pieChart: WidgetConfig = {
+    widgetName: 'pieChart',
     meta: {
         title: 'Pie Chart',
         sizes: ['md'],
     },
-    data_mapping_schema: {
-        data_field: {
+    dataMappingSchema: {
+        dataField: {
             label: 'Data Field',
+            type: 'data_field',
+            required: true,
+        },
+        groupBy: {
+            label: 'Group By',
+            type: 'label_field',
+            enableMaxCount: true,
+            required: true,
         },
     },
-    chart_options_schema: {
-        max_group_by: {
-            type: 'number',
-            label: 'Maximum number of Group By',
+    advancedOptionsSchema: {
+        legend: {
+            label: 'Legend',
+            type: 'legend',
         },
     },
 };

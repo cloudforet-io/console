@@ -32,13 +32,21 @@ export interface NewWidgetConfig {
         }
     }
 }
+
+interface FormatRules {
+    fields: string[];
+}
+interface Comparison {
+    fields: string[]; // TODO: have to fix
+}
+type WidgetFieldOptions = FormatRules | Comparison;
 interface WidgetFieldType {
     type: string;
     label: string;
     multiSelectable?: boolean;
     enableMaxCount?: boolean;
     required?: boolean;
-    options?: any;
+    options?: Partial<WidgetFieldOptions>;
 }
 
 type WidgetFieldName = 'dataField' | 'xAxisField' | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy' | 'totalField' | 'basisField' | 'min' | 'max'

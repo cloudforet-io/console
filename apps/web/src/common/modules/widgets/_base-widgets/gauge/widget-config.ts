@@ -1,15 +1,38 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const gauge: NewWidgetConfig = {
-    widget_name: 'gauge',
+const gauge: WidgetConfig = {
+    widgetName: 'gauge',
     meta: {
         title: 'Gauge',
         sizes: ['full'],
     },
-    data_mapping_schema: {
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            type: 'data_field',
+            required: true,
+        },
+        min: {
+            label: 'Min',
+            type: 'number',
+            required: true,
+        },
+        max: {
+            label: 'Max',
+            type: 'number',
+            required: true,
+        },
+        formatRules: {
+            label: 'Format Rules',
+            type: 'format_rules',
+            options: {
+                fields: ['threshold', 'color'],
+            },
+            required: true,
+        },
     },
-    chart_options_schema: {
+    advancedOptionsSchema: {
     },
 };
 
