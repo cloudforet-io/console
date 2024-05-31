@@ -34,6 +34,7 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
+    refreshing: false,
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: computed(() => {
@@ -58,10 +59,13 @@ const handleClickFilter = () => {
 };
 const handleClickRun = async () => {
     try {
+        state.refreshing = true;
         await runMetric();
         assetAnalysisPageStore.setRefreshMetricData(true);
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.refreshing = false;
     }
 };
 
@@ -119,7 +123,7 @@ watch(() => route.params, async () => {
                     <p-icon-button style-type="secondary"
                                    name="ic_renew"
                                    shape="square"
-                                   :disabled="assetAnalysisPageState.refreshMetricData"
+                                   :disabled="state.refreshing"
                                    @click="handleClickRun"
                     />
                 </p-tooltip>
