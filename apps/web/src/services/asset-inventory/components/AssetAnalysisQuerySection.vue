@@ -8,7 +8,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PButton, PPopover, PBadge, PTooltip,
+    PButton, PPopover, PBadge, PTooltip, PIconButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -116,12 +116,12 @@ watch(() => route.params, async () => {
                 <p-tooltip :contents="$t('INVENTORY.ASSET_ANALYSIS.UPDATE_WITH_THE_LATEST_DATA')"
                            position="bottom"
                 >
-                    <p-button style-type="secondary"
-                              icon-left="ic_renew"
-                              @click="handleClickRun"
-                    >
-                        {{ $t('INVENTORY.ASSET_ANALYSIS.REFRESH_DATA') }}
-                    </p-button>
+                    <p-icon-button style-type="secondary"
+                                   name="ic_renew"
+                                   shape="squre"
+                                   :disabled="assetAnalysisPageState.refreshMetricData"
+                                   @click="handleClickRun"
+                    />
                 </p-tooltip>
             </div>
         </div>
