@@ -11,6 +11,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { MetricExampleDeleteParameters } from '@/schema/inventory/metric-example/api-verbs/delete';
 import type { MetricExampleUpdateParameters } from '@/schema/inventory/metric-example/api-verbs/update';
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -44,6 +45,7 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
 const assetAnalysisPageState = assetAnalysisPageStore.state;
 const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
@@ -136,7 +138,9 @@ const duplicateMetric = async () => {
             namespace_id: assetAnalysisPageState.metric.namespace_id || '',
             unit: assetAnalysisPageState.metric.unit,
             metric_type: assetAnalysisPageState.metric.metric_type,
-            resource_type: 'inventory.CloudService',
+            // resource_type: 'inventory.CloudService',
+            resource_type: assetAnalysisPageState.selectedNamespace?.resourceType,
+            resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: assetAnalysisPageState.metric.query_options,
         });
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.ALT_S_DUPLICATE_METRIC'), '');
@@ -301,7 +305,8 @@ const handleOpenEditQuery = () => {
                     {{ state.editQueryTitle }}
                 </p-button>
                 <template v-if="!state.currentMetricExampleId">
-                    <p-button class="mr-2"
+                    <p-button v-if="assetAnalysisPageState.selectedNamespace?.group !== 'Common'"
+                              class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"
                               :loading="state.loadingDuplicate"
