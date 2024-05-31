@@ -168,7 +168,9 @@ watch(() => props.visible, (visible) => {
                             :placeholder="$t('IAM.WORKSPACES.FORM.PLACEHOLDER_DESC')"
                 />
             </p-field-group>
-            <p-field-group :label="$t('IAM.WORKSPACES.FORM.LABEL_THEME')">
+            <p-field-group :label="$t('IAM.WORKSPACES.FORM.LABEL_THEME')"
+                           required
+            >
                 <div class="theme-wrapper">
                     <button v-for="(theme, idx) in state.themes"
                             :key="`${theme}-${idx}`"
@@ -179,7 +181,7 @@ watch(() => props.visible, (visible) => {
                              class="background-area"
                         />
                         <workspace-logo-icon :theme="theme"
-                                             text="A"
+                                             :text="state.name ? state.name[0] : 'A'"
                                              size="md"
                         />
                     </button>

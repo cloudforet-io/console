@@ -58,15 +58,16 @@ const handleOpenedMenu = (visible: boolean) => {
 
 <style scoped lang="postcss">
 .landing-header {
+    @apply flex justify-between;
     .landing-left-wrapper {
-        @apply absolute;
-        top: -0.5rem;
-        left: 0.375rem;
+        margin-top: -0.5rem;
+        margin-left: 0.375rem;
     }
     .landing-right-wrapper {
-        @apply absolute flex items-center;
-        top: 0.652rem;
-        right: 1.5rem;
+        @apply flex items-center;
+        margin-top: 0.652rem;
+        margin-right: 1.5rem;
+        margin-left: auto;
         gap: 0.5rem;
     }
 

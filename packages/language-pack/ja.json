@@ -2159,7 +2159,7 @@
 				"NO_DATA": "データがありません",
 				"NO_ROLE": "役割Roleなし",
 				"NO_USER": "ユーザーがいません",
-				"NO_USER_DESC": "ユーザーを追加してください",
+				"NO_USER_DESC": "",
 				"NO_WORKSPACE": "ワークスペースなし",
 				"OWNER": "オーナー",
 				"PASSWORD": "パスワード",
@@ -2224,7 +2224,7 @@
 					"DISABLE_TITLE": "ユーザ無効化",
 					"ENABLE_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
 					"ENABLE_TITLE": "ユーザー有効化",
-					"INVITE_TITLE": "ユーザーを{workspace_name}に招待",
+					"INVITE_TITLE": "ユーザーを'{workspace_name}'に招待",
 					"REMOVE_TITLE": "このユーザーをこのワークスペースから削除してもよろしいですか？",
 					"REMOVE_WORKSPACE_TITLE": "このユーザーをワークスペースから削除してもよろしいですか？",
 					"UPDATE_TITLE": "ユーザーを編集"
