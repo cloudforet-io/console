@@ -11,6 +11,12 @@ import {
     PButton, PPopover, PBadge, PIconButton,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/run';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import AssetAnalysisFiltersPopper from '@/services/asset-inventory/components/AssetAnalysisFiltersPopper.vue';
 import AssetAnalysisGranularityDropdown from '@/services/asset-inventory/components/AssetAnalysisGranularityDropdown.vue';
 import AssetAnalysisOperatorDropdown from '@/services/asset-inventory/components/AssetAnalysisOperatorDropdown.vue';
@@ -27,6 +33,7 @@ const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
+    currentMetricId: computed<string>(() => route.params.metricId),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: computed(() => {
@@ -38,11 +45,26 @@ const state = reactive({
     }),
 });
 
-/* event */
+/* Api */
+const runMetric = async () => {
+    try {
+        await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
+            metric_id: state.currentMetricId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+/* Event */
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
 const handleClickRefresh = () => {
+    assetAnalysisPageStore.setRefreshMetricData(true);
+};
+const handleClickRun = async () => {
+    await runMetric();
     assetAnalysisPageStore.setRefreshMetricData(true);
 };
 
@@ -91,6 +113,11 @@ watch(() => route.params, async () => {
                 </p-popover>
             </div>
             <div class="right-part">
+                <p-button style-type="tertiary"
+                          @click="handleClickRun"
+                >
+                    Run!
+                </p-button>
                 <span class="period-text">
                     {{ assetAnalysisPageState.periodText }}
                 </span>
