@@ -305,7 +305,7 @@ const handleOpenEditQuery = () => {
                     {{ state.editQueryTitle }}
                 </p-button>
                 <template v-if="!state.currentMetricExampleId">
-                    <p-button v-if="assetAnalysisPageState.selectedNamespace?.group !== 'Common'"
+                    <p-button v-if="assetAnalysisPageState.selectedNamespace?.group !== 'common'"
                               class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"

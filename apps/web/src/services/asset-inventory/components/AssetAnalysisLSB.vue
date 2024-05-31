@@ -9,7 +9,7 @@ import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import { isEmpty } from 'lodash';
+import { isEmpty, startCase, toLower } from 'lodash';
 
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -185,11 +185,11 @@ const guidePopoverState = reactive({
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const commonNamespaces = namespaces.filter((namespace) => namespace.data.group === 'Common').map((namespace) => ({
+    const commonNamespaces = namespaces.filter((namespace) => namespace.data.group === 'common').map((namespace) => ({
         label: namespace.name,
         name: namespace.key,
         category: namespace.data.category,
-        group: namespace.data.group || 'Common',
+        group: namespace.data.group || 'common',
         resourceType: namespace.data.resource_type,
         icon: 'COMMON',
     }));
@@ -203,7 +203,7 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
 };
 const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.group !== 'Common').forEach((namespace) => {
+    namespaces.filter((namespace) => namespace.data.group !== 'common').forEach((namespace) => {
         const group = namespace.data.group || '';
         const providerData = storeState.providers[group];
         if (namespaceMap[group]) {
@@ -215,10 +215,12 @@ const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceIte
                 icon: namespace.data.icon,
             });
         } else {
+            const label = providerData ? providerData.label : customSnakeToTitleCase(group);
+            const icon = providerData ? providerData.icon : undefined;
             namespaceMap[group] = {
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: providerData.label,
-                icon: providerData.icon,
+                label,
+                icon,
                 subItems: [{
                     label: namespace.name,
                     name: namespace.key,
@@ -236,6 +238,8 @@ const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
     return storeState.selectedNamespace.name === namespace.name
         && storeState.selectedNamespace.group === namespace.group;
 };
+
+const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
@@ -263,7 +267,7 @@ watch(() => route.params, async () => {
             name: namespaceState.selectedMetric.data.namespace_id,
             group: targetNamespace?.data.group,
             category: targetNamespace.data.category,
-            icon: targetNamespace.data.group === 'Common' ? 'COMMON' : targetNamespace.data.icon,
+            icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;
