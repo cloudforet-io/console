@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const ENGLISH_REGEX = /^[A-Za-z]/;
-const CORPORATE_REGEX = /\(([^)]+)\)/;
+const CORPORATE_REGEX = /\(([^)])\)/;
 
 const state = reactive({
     theme: computed(() => props.theme),
@@ -25,7 +25,7 @@ const state = reactive({
         if (match) {
             return `(${match[1]})`;
         }
-        return props.text.slice(0, 1).toUpperCase();
+        return props.text.replace(/\([^)]*\)/, '').trim().slice(0, 1).toUpperCase();
     }),
     isLogoStartsWithEnglish: computed(() => ENGLISH_REGEX.test(state.logoText)),
     isLogoStartsWithCorporate: computed(() => CORPORATE_REGEX.test(state.logoText)),
