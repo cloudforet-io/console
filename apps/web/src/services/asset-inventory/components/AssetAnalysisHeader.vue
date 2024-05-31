@@ -138,8 +138,6 @@ const duplicateMetric = async () => {
             namespace_id: assetAnalysisPageState.metric.namespace_id || '',
             unit: assetAnalysisPageState.metric.unit,
             metric_type: assetAnalysisPageState.metric.metric_type,
-            // resource_type: 'inventory.CloudService',
-            resource_type: assetAnalysisPageState.selectedNamespace?.resourceType,
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: assetAnalysisPageState.metric.query_options,
         });
