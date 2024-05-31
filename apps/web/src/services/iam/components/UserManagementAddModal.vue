@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PButtonModal } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -32,9 +33,10 @@ import { USER_MODAL_TYPE } from '@/services/iam/constants/user-constant';
 import { useUserPageStore } from '@/services/iam/store/user-page-store';
 import type { AddModalMenuItem } from '@/services/iam/types/user-type';
 
-
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+
+const route = useRoute();
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -173,6 +175,12 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
 };
 
+watch(() => route.query, (query) => {
+    if (!query) return;
+    if (query.isAddUser) {
+        state.isSetAdminRole = true;
+    }
+}, { immediate: true });
 </script>
 
 <template>

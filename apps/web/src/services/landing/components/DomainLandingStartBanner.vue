@@ -10,22 +10,32 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
-
-
 
 const appContextStore = useAppContextStore();
 
 const router = useRouter();
 
-const handleClickCreateWorkspace = () => {
+const handleClickButton = (type: string) => {
     appContextStore.enterAdminMode();
-    window.open(router.resolve({
-        name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
-        query: {
-            hasNoWorkspace: 'true',
-        },
-    }).href, '_blank');
+
+    if (type === 'create') {
+        window.open(router.resolve({
+            name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
+            query: {
+                hasNoWorkspace: 'true',
+            },
+        }).href, '_blank');
+    } else if (type === 'invite') {
+        window.open(router.resolve({
+            name: makeAdminRouteName(IAM_ROUTE.USER._NAME),
+            query: {
+                isAddUser: 'true',
+            },
+        }).href, '_blank');
+    }
+
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',
@@ -46,12 +56,13 @@ const handleClickCreateWorkspace = () => {
             <div class="buttons-wrapper">
                 <p-button style-type="primary"
                           size="lg"
-                          @click="handleClickCreateWorkspace"
+                          @click="handleClickButton('create')"
                 >
                     {{ $t('LADING.DOMAIN.CREATE_WORKSPACE_BUTTON') }}
                 </p-button>
                 <p-button style-type="substitutive"
                           size="lg"
+                          @click="handleClickButton('invite')"
                 >
                     {{ $t('LADING.DOMAIN.INVITE_ADMINS') }}
                 </p-button>
