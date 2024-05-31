@@ -6,7 +6,7 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     const config = getWidgetConfig(widgetConfigId);
     if (!config) throw new Error(`No matching widget configuration found. ${widgetConfigId} does not exist.`);
-    const widgetComponent = WIDGET_COMPONENTS[config.widget_name];
+    const widgetComponent = WIDGET_COMPONENTS[config.widgetName];
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
     return widgetComponent;

@@ -1,15 +1,15 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const geoMap: NewWidgetConfig = {
-    widget_name: 'geoMap',
+const geoMap: WidgetConfig = {
+    widgetName: 'geoMap',
     meta: {
         title: 'Geo Map',
         sizes: ['full'],
     },
-    data_mapping_schema: {
+    dataMappingSchema: {
     },
-    chart_options_schema: {
+    advancedOptionsSchema: {
     },
 };
 

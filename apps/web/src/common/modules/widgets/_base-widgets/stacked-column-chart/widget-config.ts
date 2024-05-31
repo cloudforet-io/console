@@ -1,30 +1,42 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const stackedColumnChart: NewWidgetConfig = {
-    widget_name: 'stackedColumnChart',
+const stackedColumnChart: WidgetConfig = {
+    widgetName: 'stackedColumnChart',
     meta: {
         title: 'Stacked Column Chart',
         sizes: ['full'],
-        granularity: 'MONTHLY',
     },
-    data_mapping_schema: {
-        data_field_y: {
-            label: 'Data Field (Y Axis)',
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            componentType: 'dropdown',
+            required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
-        data_field_x: {
-            label: 'Data Field (X Axis)',
-            enable_granularity: true,
+        xAxisField: {
+            label: 'X-Axis Field',
+            componentType: 'dropdownWithCount',
+            required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
+        },
+        stackBy: {
+            label: 'Stack By',
+            componentType: 'dropdownWithCount',
+            required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
     },
-    chart_options_schema: {
-        max_group_by: {
-            type: 'number',
-            label: 'Maximum number of Group By',
-        },
-        max_data_field_x: {
-            type: 'number',
-            label: 'Maximum number of Data Field (X Axis)',
+    advancedOptionsSchema: {
+        legend: {
+            label: 'Legend',
+            componentType: 'toggle',
         },
     },
 };

@@ -1,31 +1,50 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const stackedAreaChart: NewWidgetConfig = {
-    widget_name: 'stackedAreaChart',
+const stackedAreaChart: WidgetConfig = {
+    widgetName: 'stackedAreaChart',
     meta: {
         title: 'Stacked Area Chart',
         sizes: ['full'],
     },
-    data_mapping_schema: {
-        data_field_y: {
-            label: 'Data Field (Y Axis)',
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            componentType: 'dropdown',
+            required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
-        data_field_x: {
-            label: 'Data Field (X Axis)',
-            enable_granularity: true,
+        xAxisField: {
+            label: 'X-Axis Field',
+            componentType: 'dropdownWithCount',
+            required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
+        },
+        lineBy: {
+            label: 'Line By',
+            componentType: 'dropdownWithCount',
+            required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
     },
-    chart_options_schema: {
-        max_data_field_x: {
-            type: 'number',
-            label: 'Maximum number of Data Field (X Axis)',
+    advancedOptionsSchema: {
+        legend: {
+            label: 'Legend',
+            componentType: 'toggle',
         },
-        format_rules: {
-            type: 'format_rules',
-            label: 'Format Rules',
-            fields: ['number', 'text', 'color'],
-        },
+        // formatRules: {
+        //     type: 'format_rules',
+        //     label: 'Format Rules',
+        //     options: {
+        //         fields: ['number', 'text', 'color'],
+        //     },
+        // },
     },
 };
 

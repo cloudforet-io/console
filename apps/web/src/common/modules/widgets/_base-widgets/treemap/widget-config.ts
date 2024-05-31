@@ -1,26 +1,31 @@
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const treemap: NewWidgetConfig = {
-    widget_name: 'treemap',
+const treemap: WidgetConfig = {
+    widgetName: 'treemap',
     meta: {
         title: 'Treemap',
         sizes: ['full'],
     },
-    data_mapping_schema: {
-        data_field_y: {
-            label: 'Data Field (Y Axis)',
+    dataMappingSchema: {
+        dataField: {
+            label: 'Data Field',
+            componentType: 'dropdown',
+            required: true,
+            options: {
+                dataTarget: 'data_field',
+            },
         },
-        data_field_x: {
-            label: 'Data Field (X Axis)',
-            enable_granularity: true,
+        categoryBy: {
+            label: 'Category By',
+            componentType: 'dropdown',
+            required: true,
+            options: {
+                dataTarget: 'label_field',
+            },
         },
     },
-    chart_options_schema: {
-        max_data_field_x: {
-            type: 'number',
-            label: 'Maximum number of Data Field (X Axis)',
-        },
+    advancedOptionsSchema: {
     },
 };
 
