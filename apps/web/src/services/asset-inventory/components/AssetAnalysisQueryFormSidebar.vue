@@ -108,7 +108,7 @@ const createCustomMetric = async () => {
             metric_type: METRIC_TYPE.GAUGE,
             resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: jsonParsedQuery,
-            namespace_id: assetAnalysisPageGetters.namespaceId || '',
+            namespace_id: assetAnalysisPageState.selectedNamespace?.name || '',
         });
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);

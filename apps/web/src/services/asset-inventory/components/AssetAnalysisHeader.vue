@@ -20,6 +20,8 @@ import type { MetricDeleteParameters } from '@/schema/inventory/metric/api-verbs
 import type { MetricModel } from '@/schema/inventory/metric/model';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -45,9 +47,16 @@ const { getProperRouteLocation } = useProperRouteLocation();
 const assetAnalysisPageStore = useAssetAnalysisPageStore();
 const assetAnalysisPageState = assetAnalysisPageStore.state;
 const assetAnalysisPageGetters = assetAnalysisPageStore.getters;
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    namespaces: computed(() => allReferenceStore.getters.namespace),
+    currentMetric: computed(() => assetAnalysisPageState.metric),
+});
 
 const state = reactive({
     currentMetricId: computed<string>(() => route.params.metricId),
+    isDuplicateEnabled: computed<boolean>(() => Object.values(storeState.namespaces).find((d) => d.key === storeState.currentMetric?.namespace_id)?.data.group !== 'common'),
     currentMetricExampleId: computed<string|undefined>(() => route.params.metricExampleId),
     currentMetricExample: computed<MetricExampleModel|undefined>(() => assetAnalysisPageState.metricExamples.find((d) => d.example_id === state.currentMetricExampleId)),
     isManagedMetric: computed<boolean>(() => (assetAnalysisPageState.metric?.is_managed && !state.currentMetricExampleId) || false),
@@ -303,7 +312,7 @@ const handleOpenEditQuery = () => {
                     {{ state.editQueryTitle }}
                 </p-button>
                 <template v-if="!state.currentMetricExampleId">
-                    <p-button v-if="assetAnalysisPageState.selectedNamespace?.group !== 'common'"
+                    <p-button v-if="state.isDuplicateEnabled"
                               class="mr-2"
                               style-type="tertiary"
                               icon-left="ic_duplicate"
