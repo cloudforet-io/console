@@ -2580,6 +2580,7 @@
 				"THIS_MONTH": "이번 달",
 				"THIS_YEAR": "올해"
 			},
+			"REFRESH_DATA": "",
 			"RESET": "초기화",
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장",
@@ -2597,6 +2598,7 @@
 			"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 			"TOTAL_COUNT": "총합",
 			"UNIT": "단위",
+			"UPDATE_WITH_THE_LATEST_DATA": "최신 데이터로 업데이트",
 			"VIEW_QUERY": "쿼리 확인"
 		},
 		"CLOUD_SERVICE": {
