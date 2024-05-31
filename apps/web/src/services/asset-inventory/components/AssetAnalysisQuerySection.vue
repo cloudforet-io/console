@@ -8,7 +8,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PButton, PPopover, PBadge, PIconButton,
+    PButton, PPopover, PBadge, PTooltip,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -47,25 +47,22 @@ const state = reactive({
 
 /* Api */
 const runMetric = async () => {
-    try {
-        await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
-            metric_id: state.currentMetricId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
+    await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
+        metric_id: state.currentMetricId,
+    });
 };
 
 /* Event */
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
-const handleClickRefresh = () => {
-    assetAnalysisPageStore.setRefreshMetricData(true);
-};
 const handleClickRun = async () => {
-    await runMetric();
-    assetAnalysisPageStore.setRefreshMetricData(true);
+    try {
+        await runMetric();
+        assetAnalysisPageStore.setRefreshMetricData(true);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 /* watch */
@@ -113,20 +110,19 @@ watch(() => route.params, async () => {
                 </p-popover>
             </div>
             <div class="right-part">
-                <p-button style-type="tertiary"
-                          @click="handleClickRun"
-                >
-                    Run!
-                </p-button>
                 <span class="period-text">
                     {{ assetAnalysisPageState.periodText }}
                 </span>
-                <p-icon-button name="ic_renew"
-                               style-type="tertiary"
-                               shape="square"
-                               :disabled="assetAnalysisPageState.refreshMetricData"
-                               @click="handleClickRefresh"
-                />
+                <p-tooltip :contents="$t('INVENTORY.ASSET_ANALYSIS.UPDATE_WITH_THE_LATEST_DATA')"
+                           position="bottom"
+                >
+                    <p-button style-type="secondary"
+                              icon-left="ic_renew"
+                              @click="handleClickRun"
+                    >
+                        {{ $t('INVENTORY.ASSET_ANALYSIS.REFRESH_DATA') }}
+                    </p-button>
+                </p-tooltip>
             </div>
         </div>
     </div>
