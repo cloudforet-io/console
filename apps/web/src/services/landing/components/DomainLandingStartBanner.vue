@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton, screens } from '@spaceone/design-system';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
@@ -9,6 +11,13 @@ import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const router = useRouter();
+
+const { width } = useWindowSize();
+
+const state = reactive({
+    isTabletSize: computed(() => width.value < screens.tablet.max),
+    isMobileSize: computed(() => width.value < screens.mobile.max),
+});
 
 const handleClickButton = (type: string) => {
     if (type === 'create') {
@@ -35,7 +44,9 @@ const handleClickButton = (type: string) => {
             <p class="title">
                 {{ $t('LADING.DOMAIN.GET_STARTED_TITLE') }}
             </p>
-            <span class="desc">{{ $t('LADING.DOMAIN.GET_STARTED_DESC') }}</span>
+            <span v-if="!state.isTabletSize"
+                  class="desc"
+            >{{ $t('LADING.DOMAIN.GET_STARTED_DESC') }}</span>
             <div class="buttons-wrapper">
                 <p-button style-type="primary"
                           size="lg"
@@ -51,7 +62,9 @@ const handleClickButton = (type: string) => {
                 </p-button>
             </div>
         </div>
-        <div class="image-wrapper">
+        <div v-if="!state.isMobileSize"
+             class="image-wrapper"
+        >
             <img alt="get-started-illustration"
                  src="/images/domain-landing/domain-landing_admin_hero-image.png"
                  srcset="/images/domain-landing/domain-landing_admin_hero-image@2x.png 2x,
@@ -79,12 +92,12 @@ const handleClickButton = (type: string) => {
             max-width: 29.5rem;
         }
         .desc {
-            @apply text-paragraph-lg text-gray-700;
+            @apply block text-paragraph-lg text-gray-700;
             max-width: 40rem;
+            flex: 1;
         }
         .buttons-wrapper {
-            @apply flex;
-            margin-top: 0.5rem;
+            @apply flex items-end;
             gap: 1rem;
         }
     }
@@ -95,6 +108,62 @@ const handleClickButton = (type: string) => {
             width: 28rem;
             height: 25rem;
             margin-bottom: -4.5rem;
+        }
+    }
+
+    @screen laptop {
+        height: 19.5rem;
+    }
+
+    @screen tablet {
+        height: 17.75rem;
+        .text-section {
+            .title {
+                flex: 1;
+            }
+            .buttons-wrapper {
+                @apply block;
+                button {
+                    @apply block;
+                    & + button {
+                        margin-top: 1rem;
+                    }
+                }
+            }
+        }
+    }
+
+    @screen mobile {
+        height: 12.5rem;
+        .text-section {
+            .title {
+                flex: 1;
+            }
+            .buttons-wrapper {
+                @apply flex;
+                gap: 1rem;
+                button {
+                    @apply block;
+                    & + button {
+                        margin-top: 1rem;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 478px) {
+        height: 19.5rem;
+        .text-section {
+            .buttons-wrapper {
+                @apply block;
+                button {
+                    @apply block;
+                    & + button {
+                        margin-top: 1rem;
+                    }
+                }
+            }
         }
     }
 }

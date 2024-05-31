@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PLink, PDivider, PCard, PButton, PI,
+    PLink, PDivider, PCard, PButton, PI, screens,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -15,6 +16,8 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import { IAM_ROUTE } from '@/services/iam/routes/route-constant';
 
 const router = useRouter();
+
+const { width } = useWindowSize();
 
 const CARD_TYPE = [
     {
@@ -42,8 +45,13 @@ const CARD_TYPE = [
         srcSet: '/images/domain-landing/domain-landing_admin_auto-sync@2x.png 2x, /images/domain-landing/domain-landing_admin_auto-sync@3x.png 3x',
     },
 ];
+
 const storeState = reactive({
     language: computed(() => store.state.user.language),
+});
+const state = reactive({
+    isTabletSize: computed(() => width.value < screens.tablet.max),
+    isXsSize: computed(() => width.value < 478),
 });
 
 const handleClickCardButton = (type: string) => {
@@ -69,15 +77,17 @@ const handleClickCardButton = (type: string) => {
 
 <template>
     <div class="domain-landing-recommendation">
-        <h2>{{ $t('LADING.DOMAIN.RECOMMENDED_TITLE') }}</h2>
-        <p-link :text="i18n.t('LADING.DOMAIN.HELP_LINK')"
-                :href="`https://help.spaceone.megazone.com/hc/${storeState.language}`"
-                size="md"
-                highlight
-                action-icon="external-link"
-                new-tab
-                class="help-link"
-        />
+        <div class="title-wrapper">
+            <h2>{{ state.isTabletSize ? $t('LADING.DOMAIN.RECOMMENDED_TITLE_SHORT') : $t('LADING.DOMAIN.RECOMMENDED_TITLE') }}</h2>
+            <p-link :text="i18n.t('LADING.DOMAIN.HELP_LINK')"
+                    :href="`https://help.spaceone.megazone.com/hc/${storeState.language}`"
+                    size="md"
+                    highlight
+                    action-icon="external-link"
+                    new-tab
+                    class="help-link"
+            />
+        </div>
         <p-divider class="divider" />
         <div class="card-wrapper">
             <p-card v-for="(item, idx) in CARD_TYPE"
@@ -108,7 +118,8 @@ const handleClickCardButton = (type: string) => {
                             />
                         </p-button>
                     </div>
-                    <img class="card-image"
+                    <img v-if="!state.isXsSize"
+                         class="card-image"
                          :src="item.image"
                          :srcset="item.srcSet"
                          alt="card-image"
@@ -123,8 +134,12 @@ const handleClickCardButton = (type: string) => {
 .domain-landing-recommendation {
     @apply flex flex-col;
     gap: 0.375rem;
-    .help-link {
-        margin-left: auto;
+    .title-wrapper {
+        @apply flex justify-between;
+        .help-link {
+            margin-left: auto;
+            padding-top: 0.375rem;
+        }
     }
     .divider {
         margin-top: 0.375rem;
@@ -139,7 +154,7 @@ const handleClickCardButton = (type: string) => {
             min-width: 25rem;
             .card-inner-wrapper {
                 @apply relative;
-                padding: 3.625rem 1.125rem;
+                padding: 3.625rem 1.125rem 1.25rem 1.125rem;
                 .inner-contents {
                     @apply relative;
                     z-index: 2;
@@ -172,6 +187,25 @@ const handleClickCardButton = (type: string) => {
                     height: 16rem;
                     z-index: 1;
                 }
+            }
+        }
+    }
+
+    @screen tablet {
+        .card-wrapper {
+            @apply flex-col;
+            .card {
+                .card-inner-wrapper {
+                    padding: 1.25rem 1.125rem;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 478px) {
+        .card-wrapper {
+            .card {
+                min-width: unset;
             }
         }
     }
