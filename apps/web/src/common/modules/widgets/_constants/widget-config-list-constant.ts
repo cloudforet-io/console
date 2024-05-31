@@ -11,11 +11,11 @@ import stackedColumnChart from '@/common/modules/widgets/_base-widgets/stacked-c
 import stackedHorizontalBarChart from '@/common/modules/widgets/_base-widgets/stacked-horizontal-bar-chart/widget-config';
 import table from '@/common/modules/widgets/_base-widgets/table/widget-config';
 import treemap from '@/common/modules/widgets/_base-widgets/treemap/widget-config';
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
-import type { NewWidgetConfigKey } from '@/common/modules/widgets/types/widget-list-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfigKey } from '@/common/modules/widgets/types/widget-list-type';
 
 
-export const NEW_CONSOLE_WIDGET_CONFIG_KEYS = [
+export const CONSOLE_WIDGET_CONFIG_KEYS = [
     'numberCard',
     'stackedColumnChart',
     'clusteredColumnChart',
@@ -31,7 +31,7 @@ export const NEW_CONSOLE_WIDGET_CONFIG_KEYS = [
     'progressCard',
 ] as const;
 
-export const NEW_CONSOLE_WIDGET_CONFIG: Record<NewWidgetConfigKey, Partial<NewWidgetConfig>> = {
+export const CONSOLE_WIDGET_CONFIG: Record<WidgetConfigKey, Partial<WidgetConfig>> = {
     numberCard,
     stackedColumnChart,
     clusteredColumnChart,

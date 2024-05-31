@@ -12,7 +12,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
-import { NEW_CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -30,7 +30,7 @@ const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
     widgetConfig: computed(() => getWidgetConfig(state.selectedChartName)),
     variables: {} as DashboardVariables,
-    chartTypeSelectDropdownMenu: computed(() => NEW_CONSOLE_WIDGET_CONFIG_KEYS.map((d) => ({
+    chartTypeSelectDropdownMenu: computed(() => CONSOLE_WIDGET_CONFIG_KEYS.map((d) => ({
         name: d,
         label: d,
     }))),

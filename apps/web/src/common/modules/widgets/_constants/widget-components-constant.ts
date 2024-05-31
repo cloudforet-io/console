@@ -1,9 +1,9 @@
 import type { AsyncComponent } from 'vue';
 
-import type { NewWidgetConfigKey } from '@/common/modules/widgets/types/widget-list-type';
+import type { WidgetConfigKey } from '@/common/modules/widgets/types/widget-list-type';
 
 
-export const WIDGET_COMPONENTS: Record<NewWidgetConfigKey, AsyncComponent> = {
+export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     stackedColumnChart: () => ({
         component: import('@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue'),
     }),

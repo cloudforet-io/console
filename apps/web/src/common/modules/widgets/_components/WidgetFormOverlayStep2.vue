@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { onBeforeMount, reactive } from 'vue';
+import { computed, onBeforeMount, reactive } from 'vue';
 
 import {
     PDivider, PFieldGroup, PSelectButton, PSelectDropdown, PTextButton, PI, PTextInput, PTextarea,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
 import type {
@@ -11,6 +12,7 @@ import type {
     DashboardVariablesSchema, DateRange,
 } from '@/schema/dashboard/_types/dashboard-type';
 
+import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
@@ -33,6 +35,11 @@ const state = reactive({
         { label: 'Actual', name: 'ACTUAL' },
     ],
     selectedWidgetSize: 'FULL',
+    chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
+        name: d.widgetName,
+        label: d.meta?.title || d.widgetName,
+    }))),
+    selectedChartType: 'table',
     //
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
@@ -55,6 +62,10 @@ const initSnapshot = () => {
 /* Event */
 const handleChangeWidgetSize = (widgetSize: string) => {
     state.selectedWidgetSize = widgetSize;
+};
+const handleSelectChartType = (chartType: string) => {
+    console.log('chartType', chartType);
+    state.selectedChartType = chartType;
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
@@ -113,7 +124,10 @@ onBeforeMount(() => {
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CHART_TYPE')"
                                required
                 >
-                    <p-select-dropdown :options="[]" />
+                    <p-select-dropdown :menu="state.chartTypeMenuItems"
+                                       :selected="state.selectedChartType"
+                                       @select="handleSelectChartType"
+                    />
                 </p-field-group>
             </div>
             <!-- widget info -->
@@ -221,6 +235,15 @@ onBeforeMount(() => {
             .p-select-dropdown {
                 width: 100%;
             }
+
+            /* custom design-system component - p-field-group */
+            :deep(.p-field-group) {
+                .title {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
         }
     }
 
@@ -245,15 +268,6 @@ onBeforeMount(() => {
         .form-wrapper {
             padding: 0 1.25rem 1.25rem 1.25rem;
         }
-    }
-}
-
-/* custom design-system component - p-field-group */
-:deep(.p-field-group) {
-    .title {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
     }
 }
 </style>
