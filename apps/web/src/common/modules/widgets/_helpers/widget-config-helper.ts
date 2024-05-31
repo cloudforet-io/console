@@ -1,13 +1,13 @@
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
-import type { NewWidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
-const consoleWidgetConfigCacheMap = new Map<string, NewWidgetConfig>();
+const consoleWidgetConfigCacheMap = new Map<string, WidgetConfig>();
 
-export const getWidgetConfig = (widgetName: string): NewWidgetConfig => {
-    if (consoleWidgetConfigCacheMap.has(widgetName)) return consoleWidgetConfigCacheMap.get(widgetName) as NewWidgetConfig;
+export const getWidgetConfig = (widgetName: string): WidgetConfig => {
+    if (consoleWidgetConfigCacheMap.has(widgetName)) return consoleWidgetConfigCacheMap.get(widgetName) as WidgetConfig;
 
-    const config = CONSOLE_WIDGET_CONFIG[widgetName] as NewWidgetConfig;
+    const config = CONSOLE_WIDGET_CONFIG[widgetName] as WidgetConfig;
     consoleWidgetConfigCacheMap.set(widgetName, config);
     return config;
 };
