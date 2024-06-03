@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fieldOptions: computed<GroupByFieldOptions>(() => props.widgetFieldSchema?.options || {}),
+    fieldOptions: computed<GroupByFieldOptions|undefined>(() => props.widgetFieldSchema?.options as GroupByFieldOptions),
 });
 </script>
 

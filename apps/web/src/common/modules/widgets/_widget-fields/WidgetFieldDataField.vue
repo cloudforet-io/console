@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fieldOptions: computed<DataFieldOptions>(() => props.widgetFieldSchema?.options || {}),
+    fieldOptions: computed<DataFieldOptions|undefined>(() => props.widgetFieldSchema?.options as DataFieldOptions),
 });
 </script>
 
