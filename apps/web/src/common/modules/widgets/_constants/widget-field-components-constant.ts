@@ -10,6 +10,9 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     xAxisField: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue'),
     }),
+    yAxisField: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldYAxis.vue'),
+    }),
     stackBy: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldStackBy.vue'),
     }),
@@ -33,5 +36,8 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     }),
     max: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldMax.vue'),
+    }),
+    formatRules: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldFormatRules.vue'),
     }),
 };
