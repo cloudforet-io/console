@@ -1,6 +1,5 @@
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 
-
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
 interface DropdownOptions {
@@ -18,19 +17,9 @@ interface FormatRulesOptions {
 //     dataTargetList: string[];
 // }
 type WidgetFieldOptions = DropdownOptions | DropdownWithCountOptions | FormatRulesOptions;
-type WidgetFieldComponent = 'dropdown' | 'dropdownWithCount'
-    | 'number'
-    | 'formatRules' | 'formatRulesWithLegend'
-    | 'comparison'
-    | 'icon'
-    | 'legend'
-    | 'total'
-    | 'progressBar';
 
 interface WidgetFieldSchema {
-    componentType: WidgetFieldComponent;
     label: string;
-    required?: boolean;
     options?: Partial<WidgetFieldOptions>;
 }
 
@@ -49,6 +38,6 @@ export interface WidgetConfig {
         title?: string;
         sizes: WidgetSize[];
     };
-    dataMappingSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
-    advancedOptionsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
+    requiredFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
+    optionalFieldsSchema: Partial<Record<WidgetFieldName, WidgetFieldSchema>>;
 }
