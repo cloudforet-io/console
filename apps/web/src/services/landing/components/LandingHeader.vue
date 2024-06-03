@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PTooltip,
@@ -15,30 +16,32 @@ import TopBarProfile
     from '@/common/modules/navigations/top-bar/modules/top-bar-toolset/modules/top-bar-profile/TopBarProfile.vue';
 
 import ConsoleLogo from '@/services/auth/components/ConsoleLogo.vue';
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
 
-interface props {
-    isDomainLandingPage: boolean;
-}
-
-const props = withDefaults(defineProps<props>(), {
-    isDomainLandingPage: false,
-});
+const route = useRoute();
 
 const storeState = reactive({
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
 });
 
 const state = reactive({
+    isDomainLandingPage: false,
     openedProfileMenu: false,
 });
 const handleOpenedMenu = (visible: boolean) => {
     state.openedProfileMenu = visible;
 };
+
+watch(() => route.name, (name) => {
+    if (name === LANDING_ROUTE.DOMAIN._NAME) {
+        state.isDomainLandingPage = true;
+    }
+}, { immediate: true });
 </script>
 
 <template>
     <div class="landing-header">
-        <console-logo v-if="props.isDomainLandingPage"
+        <console-logo v-if="state.isDomainLandingPage"
                       class="landing-left-wrapper"
                       :size-ratio="0.57"
         />

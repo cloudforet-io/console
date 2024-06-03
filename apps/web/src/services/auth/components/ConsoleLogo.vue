@@ -16,6 +16,9 @@ const props = withDefaults(defineProps<Props>(), {
     isHiddenIfTablet: true,
 });
 
+
+const emit = defineEmits<{(e: 'click'): void; }>();
+
 const state = reactive({
     symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
@@ -38,6 +41,7 @@ const state = reactive({
     <div class="ci-wrapper"
          :class="{ 'hidden-option': props.isHiddenIfTablet }"
          :style="{ position: props.positionFixed ? 'fixed' : 'static'}"
+         @click="emit('click')"
     >
         <!--logo image-->
         <img v-if="state.symbolImage"

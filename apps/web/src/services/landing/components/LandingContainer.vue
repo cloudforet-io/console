@@ -34,7 +34,7 @@ watch(() => storeState.workspaceList, () => {
 
 <template>
     <div class="lading-container">
-        <landing-header :is-domain-landing-page="state.isDomainLandingPage" />
+        <landing-header />
         <div class="scroll-contents">
             <router-view />
         </div>
