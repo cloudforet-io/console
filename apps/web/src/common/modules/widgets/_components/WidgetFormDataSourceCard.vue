@@ -3,20 +3,24 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PFieldGroup, PDivider, PIconButton, PTextButton, PI, PButton, PRadioGroup, PRadio,
+    PFieldGroup, PDivider, PIconButton, PTextButton, PButton, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
-import { gray, violet, white } from '@/styles/colors';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
+
+import { gray, violet } from '@/styles/colors';
 
 interface Props {
-    dataTableId: string;
-    selected: boolean;
-    latestAdded: boolean;
+    item: DataTableModel;
 }
 
 const props = defineProps<Props>();
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateGetters = widgetGenerateStore.getters;
 
 const state = reactive({
+    selected: computed(() => widgetGenerateGetters.selectedDataTableId === props.item.data_table_id),
     dataFormatItems: computed(() => [
         { label: 'Time-series', value: 'time-series' },
         { label: 'Accumulated', value: 'accumulated' },
@@ -26,8 +30,9 @@ const state = reactive({
 });
 
 /* Events */
-const handleSelectDataTable = (dataTable: string) => {
-    state.selectedDataTable = dataTable;
+const handleSelectDataTable = async (dataTableId: string) => {
+    widgetGenerateStore.setSelectedDataTable(dataTableId);
+    await widgetGenerateStore.loadDataTable(dataTableId);
 };
 const handleSelectDataFormat = (dataFormat: string) => {
     state.selectedDataFormat = dataFormat;
@@ -38,16 +43,16 @@ const handleSelectDataFormat = (dataFormat: string) => {
 <template>
     <div class="widget-form-data-source-card">
         <div class="card-wrapper"
-             :class="{ 'selected': props.selected }"
+             :class="{ 'selected': state.selected }"
         >
             <div class="card-header">
                 <div class="title-wrapper">
                     <div class="title">
                         <p-icon-button class="selected-radio-icon"
-                                       :name="props.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
-                                       :color="props.selected ? violet[500] : gray[400]"
+                                       :name="state.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
+                                       :color="state.selected ? violet[500] : gray[400]"
                                        size="sm"
-                                       @click="handleSelectDataTable(props.dataTableId)"
+                                       @click="handleSelectDataTable(props.item.data_table_id)"
                         />
                         <p>Data Source 1</p>
                         <p-icon-button class="edit-button"
@@ -93,17 +98,6 @@ const handleSelectDataFormat = (dataFormat: string) => {
                     Save Changes
                 </p-button>
             </div>
-        </div>
-        <div v-if="props.latestAdded"
-             class="add-data-source-floating-button"
-        >
-            <button class="add-button">
-                <p-i name="ic_plus"
-                     width="1.5rem"
-                     height="1.5rem"
-                     :color="white"
-                />
-            </button>
         </div>
     </div>
 </template>
