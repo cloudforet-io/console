@@ -45,8 +45,12 @@ export interface MaxOptions {
     default?: number;
 }
 
-interface FormatRulesOptions {
-    fields: string[];
+type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
+export interface FormatRulesOptions {
+    fields: FormatRulesField[];
+    legendOptions?: {
+        dataTarget?: string;
+    }
 }
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
