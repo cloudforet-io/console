@@ -18,12 +18,12 @@ interface FormatRulesOptions {
 // }
 type WidgetFieldOptions = DropdownOptions | DropdownWithCountOptions | FormatRulesOptions;
 
-interface WidgetFieldSchema {
+export interface WidgetFieldSchema {
     label: string;
     options?: Partial<WidgetFieldOptions>;
 }
 
-type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField'
+export type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField'
     | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
     | 'totalField' | 'basisField'
     | 'min' | 'max'
