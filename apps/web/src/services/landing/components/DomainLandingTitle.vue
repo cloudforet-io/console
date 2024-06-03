@@ -65,7 +65,7 @@ const handleClickStartButton = () => {
     }
     .title {
         @apply text-display-lg font-normal;
-        max-width: 55rem;
+        max-width: 60rem;
     }
     .start-button {
         width: 9.25rem;
