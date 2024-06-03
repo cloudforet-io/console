@@ -5,7 +5,7 @@ const progressCard: WidgetConfig = {
     widgetName: 'progressCard',
     meta: {
         title: 'Progress Card',
-        sizes: ['full'],
+        sizes: ['sm'],
     },
     requiredFieldsSchema: {
         totalField: {

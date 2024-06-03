@@ -4,6 +4,9 @@ import type { WidgetConfigKey } from '@/common/modules/widgets/types/widget-list
 
 
 export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
+    numberCard: () => ({
+        component: import('@/common/modules/widgets/_widgets/number-card/NumberCard.vue'),
+    }),
     stackedColumnChart: () => ({
         component: import('@/common/modules/widgets/_widgets/stacked-column-chart/StackedColumnChart.vue'),
     }),
@@ -28,16 +31,16 @@ export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     geoMap: () => ({
         component: import('@/common/modules/widgets/_widgets/geo-map/GeoMap.vue'),
     }),
-    // table: () => ({
-    //     component: import('@/common/modules/widgets/_widgets/table/Table.vue'),
-    // }),
+    table: () => ({
+        component: import('@/common/modules/widgets/_widgets/table/Table.vue'),
+    }),
     stackedAreaChart: () => ({
         component: import('@/common/modules/widgets/_widgets/stacked-area-chart/StackedAreaChart.vue'),
     }),
     gauge: () => ({
         component: import('@/common/modules/widgets/_widgets/gauge/Gauge.vue'),
     }),
-    // progressCard: () => ({
-    //     component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
-    // }),
+    progressCard: () => ({
+        component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
+    }),
 };

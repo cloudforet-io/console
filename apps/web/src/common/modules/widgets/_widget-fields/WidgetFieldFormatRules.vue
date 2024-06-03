@@ -6,6 +6,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import type { WidgetFieldSchema, FormatRulesOptions } from '@/common/modules/widgets/types/widget-config-type';
 
 import { gray } from '@/styles/colors';
@@ -80,11 +81,10 @@ onMounted(() => {
                               type="number"
                               placeholder="Threshold"
                 />
-                <input v-if="state.fields.includes('color')"
-                       v-model="formatRule.color"
-                       type="color"
-                       class="color-input"
-                >
+                <color-input v-if="state.fields.includes('color')"
+                             :value="formatRule.color"
+                             @update:value="formatRule.color = $event"
+                />
                 <p-icon-button name="ic_delete"
                                style-type="negative-transparent"
                                size="sm"
@@ -112,12 +112,6 @@ onMounted(() => {
     .p-text-input {
         flex: 1;
         width: 100%;
-    }
-    .color-input {
-        @apply rounded-sm border border-gray-200;
-        width: 2rem;
-        height: 2rem;
-        padding: 0 0.125rem;
     }
     .delete-button {
         width: 2rem;

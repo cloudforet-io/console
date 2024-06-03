@@ -5,7 +5,7 @@ const heatmap: WidgetConfig = {
     widgetName: 'heatmap',
     meta: {
         title: 'Heatmap',
-        sizes: ['full'],
+        sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
         dataField: {
