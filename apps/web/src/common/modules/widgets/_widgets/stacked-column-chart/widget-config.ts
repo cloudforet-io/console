@@ -15,7 +15,7 @@ const stackedColumnChart: WidgetConfig = {
             },
         },
         xAxisField: {
-            label: 'X-Axis Field',
+            label: 'X-Axis',
             options: {
                 dataTarget: 'label_field',
             },

@@ -87,6 +87,7 @@ const handleClickAddWidget = () => {
                         <component :is="getWidgetFieldComponent(fieldName)"
                                    :key="`required-field-${fieldName}`"
                                    :widget-field-schema="fieldSchema"
+                                   :required="true"
                         />
                     </template>
                     <br>
@@ -95,6 +96,7 @@ const handleClickAddWidget = () => {
                         <component :is="getWidgetFieldComponent(fieldName)"
                                    :key="`optional-field-${fieldName}`"
                                    :widget-field-schema="fieldSchema"
+                                   :required="false"
                         />
                     </template>
                 </div>
