@@ -10,9 +10,6 @@ const numberCard: WidgetConfig = {
     requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            options: {
-                dataTarget: 'data_field',
-            },
         },
     },
     optionalFieldsSchema: {

@@ -10,9 +10,6 @@ const table: WidgetConfig = {
     requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            options: {
-                dataTarget: 'data_field',
-            },
         },
         xAxisField: {
             label: 'X-Axis Field',

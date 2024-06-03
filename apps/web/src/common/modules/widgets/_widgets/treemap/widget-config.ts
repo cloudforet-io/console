@@ -10,9 +10,6 @@ const treemap: WidgetConfig = {
     requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            options: {
-                dataTarget: 'data_field',
-            },
         },
         categoryBy: {
             label: 'Category By',

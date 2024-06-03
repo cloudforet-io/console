@@ -10,9 +10,6 @@ const pieChart: WidgetConfig = {
     requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            options: {
-                dataTarget: 'data_field',
-            },
         },
         groupBy: {
             label: 'Group By',

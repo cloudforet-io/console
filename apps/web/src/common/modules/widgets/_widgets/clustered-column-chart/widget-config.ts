@@ -11,7 +11,6 @@ const clusteredColumnChart: WidgetConfig = {
         dataField: {
             label: 'Data Field',
             options: {
-                dataTarget: 'data_field',
                 multiSelectable: true,
             },
         },

@@ -4,7 +4,6 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
 
 export interface DataFieldOptions {
-    dataTarget?: string;
     multiSelectable?: boolean;
 }
 export interface XAxisFieldOptions {
