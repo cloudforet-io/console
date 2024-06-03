@@ -18,7 +18,15 @@ interface FormatRulesOptions {
 //     dataTargetList: string[];
 // }
 type WidgetFieldOptions = DropdownOptions | DropdownWithCountOptions | FormatRulesOptions;
-type WidgetFieldComponent = 'dropdown' | 'dropdownWithCount' | 'number' | 'formatRules' | 'comparison' | 'icon' | 'toggle';
+type WidgetFieldComponent = 'dropdown' | 'dropdownWithCount'
+    | 'number'
+    | 'formatRules' | 'formatRulesWithLegend'
+    | 'comparison'
+    | 'icon'
+    | 'legend'
+    | 'total'
+    | 'progressBar';
+
 interface WidgetFieldSchema {
     componentType: WidgetFieldComponent;
     label: string;
@@ -26,9 +34,14 @@ interface WidgetFieldSchema {
     options?: Partial<WidgetFieldOptions>;
 }
 
-type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField' | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
-    | 'totalField' | 'basisField' | 'min' | 'max'
-    | 'icon' | 'comparison' | 'legend' | 'subTotal' | 'total' | 'progressBar' | 'formatRules';
+type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField'
+    | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
+    | 'totalField' | 'basisField'
+    | 'min' | 'max'
+    | 'icon' | 'comparison' | 'legend'
+    | 'subTotal' | 'total'
+    | 'progressBar'
+    | 'formatRules';
 
 export interface WidgetConfig {
     widgetName: string;
