@@ -123,22 +123,17 @@ const fetchDataSourceList = async () => {
     });
 };
 
-watch(() => state.selectedStatusFilter, async (selectedStatusFilter) => {
+watch([() => state.selectedStatusFilter, () => storeState.selectedDataSourceIndices], async ([selectedStatusFilter]) => {
     if (selectedStatusFilter === 'all') {
-        linkedAccountListApiQueryHelper.setOrFilters([
-            { k: 'is_linked', v: true, o: '=' },
-            { k: 'is_linked', v: false, o: '=' },
-        ]);
+        linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
     } else {
-        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked', o: '=' }]);
+        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked' || null, o: '=' }]);
     }
 
     await fetchLinkedAccountList();
 }, { immediate: true });
 watch(() => storeState.selectedDataSourceIndices, async () => {
     await dataSourcesPageStore.setSelectedLinkedAccountsIndices([]);
-    linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
-    await fetchLinkedAccountList();
 }, { immediate: true });
 
 onUnmounted(() => {
