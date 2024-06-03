@@ -35,7 +35,7 @@ const state = reactive({
                          height="1.25rem"
                     />
                     <p class="text">
-                        <strong class="title">{{ $t('LADING.DOMAIN.ALT_W_TITLE') }}</strong>
+                        <strong class="title">{{ $t('LADING.NOT_FOUND_DESC') }}</strong>
                         <span class="desc">{{ $t('LADING.DOMAIN.ALT_W_DESC') }}</span>
                     </p>
                 </div>

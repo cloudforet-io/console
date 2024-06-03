@@ -3125,7 +3125,6 @@
 		"DESC_CREATE_WORKSPACE": "[+ 새 워크스페이스 생성] 버튼을 클릭하여 워크스페이스 생성을 시작하세요.",
 		"DOMAIN": {
 			"ALT_W_DESC": "",
-			"ALT_W_TITLE": "",
 			"AUTO_SYNC_BUTTON": "",
 			"AUTO_SYNC_DESC": "",
 			"AUTO_SYNC_TITLE": "",
