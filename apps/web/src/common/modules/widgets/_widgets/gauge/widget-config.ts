@@ -5,7 +5,7 @@ const gauge: WidgetConfig = {
     widgetName: 'gauge',
     meta: {
         title: 'Gauge',
-        sizes: ['full'],
+        sizes: ['md'],
     },
     requiredFieldsSchema: {
         dataField: {
