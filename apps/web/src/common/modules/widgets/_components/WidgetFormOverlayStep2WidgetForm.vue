@@ -18,13 +18,13 @@ const FORM_TITLE_MAP = {
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
     }))),
-    selectedChartType: 'table',
-    widgetConfig: computed(() => getWidgetConfig(state.selectedChartType)),
+    widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedChartType)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
@@ -39,8 +39,7 @@ const state = reactive({
 
 /* Event */
 const handleSelectChartType = (chartType: string) => {
-    console.log('chartType', chartType);
-    state.selectedChartType = chartType;
+    widgetGenerateStore.setSelectedChartType(chartType);
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
@@ -72,7 +71,7 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
                        required
         >
             <p-select-dropdown :menu="state.chartTypeMenuItems"
-                               :selected="state.selectedChartType"
+                               :selected="widgetGenerateState.selectedChartType"
                                @select="handleSelectChartType"
             />
         </p-field-group>
