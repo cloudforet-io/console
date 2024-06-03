@@ -1811,12 +1811,12 @@
 					"SELECT_DATA_SOURCE_TYPE": "Select Data Source Type"
 				},
 				"STEP_2": {
-					"CHART_OPTIONS": "Chart Options",
 					"CHART_TYPE": "Chart Type",
-					"DATA_MAPPING": "Data Mapping",
 					"DATA_TABLE": "Data Table",
 					"DESCRIPTION": "Description",
-					"EDIT": "Edit",
+					"EDIT_DATA": "Edit Data",
+					"OPTIONAL_FIELDS": "Optional Fields",
+					"REQUIRED_FIELDS": "Required Fields",
 					"TITLE": "Title",
 					"WIDGET_INFO": "Widget Info"
 				}
