@@ -3,9 +3,9 @@ import type { Tags } from '@/schema/_common/model';
 import type {
     DataTableOperator,
     DataTableOptions,
-} from '@/common/modules/widgets/types/model';
+} from '@/common/modules/widgets/types/widget-model';
 
-export interface PublicDataTableTransformParameters {
+export interface DataTableTransformParameters {
     widget_id: string;
     name?: string;
     operator: DataTableOperator;
