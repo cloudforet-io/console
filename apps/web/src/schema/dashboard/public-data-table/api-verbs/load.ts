@@ -1,6 +1,6 @@
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
-export interface PublicDataTableLoadParameters {
+export interface DataTableLoadParameters {
     data_table_id: string;
     granularity: Granularity;
     start?: string;

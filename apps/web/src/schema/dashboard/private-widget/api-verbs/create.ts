@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { WidgetType } from '@/common/modules/widgets/types/model';
+import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 export interface PrivateWidgetCreateParameters {
     private_dashboard_id: string;

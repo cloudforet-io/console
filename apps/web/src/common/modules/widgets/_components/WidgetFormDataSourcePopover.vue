@@ -8,19 +8,18 @@ import {
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 
+import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import { i18n } from '@/translations';
 
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 import WidgetFormDataSourceAddButton from '@/common/modules/widgets/_components/WidgetFormDataSourceAddButton.vue';
+import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/widget-constant';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
 
-const POPPER_CONDITION = {
-    NEW_DATA_SOURCE: 'NEW_DATA_SOURCE',
-    COMBINE_DATA_SOURCE: 'COMBINE_DATA_SOURCE',
-};
-type PopperCondition = typeof POPPER_CONDITION[keyof typeof POPPER_CONDITION];
 const DATA_SOURCE_DOMAIN = {
     COST: 'COST',
     ASSET: 'ASSET',
@@ -28,9 +27,11 @@ const DATA_SOURCE_DOMAIN = {
 };
 type DataSourceDomain = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 
+const widgetGenerateStore = useWidgetGenerateStore();
+
 const state = reactive({
     showPopover: false,
-    selectedPopperCondition: undefined as undefined|PopperCondition,
+    selectedPopperCondition: undefined as undefined|DataTableDataType,
     dataSourceDomainItems: computed(() => ([
         {
             name: DATA_SOURCE_DOMAIN.COST,
@@ -81,12 +82,36 @@ const handleClickDataSourceDomain = (domainName: DataSourceDomain) => {
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
 };
-const handleSelectPopperCondition = (condition: PopperCondition) => {
+const handleSelectPopperCondition = (condition: DataTableDataType) => {
     state.selectedPopperCondition = condition;
 };
-const handleConfirmDataSource = () => {
+const handleConfirmDataSource = async () => {
+    if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADD) {
+        const addParameters = {
+            source_type: state.selectedDataSourceDomain,
+        } as DataTableAddParameters;
+        const costOptions = {
+            COST: {
+                data_source_id: state.selectedCostDataSourceId,
+                data_key: state.selectedCostDataType,
+            },
+        };
+        const assetOptions = {
+            ASSET: {
+                metric_id: state.selectedMetricId,
+            },
+        };
+        await widgetGenerateStore.createAddDataTable({
+            ...addParameters,
+            options: {
+                ...state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST ? costOptions : assetOptions,
+            },
+        });
+    } else {
+        // TODO: implement transform data table
+        await widgetGenerateStore.createTransformDataTable({});
+    }
     state.showPopover = false;
-    // TODO: create data table
 };
 
 watch(() => state.showPopover, (val) => {
@@ -113,12 +138,12 @@ watch(() => state.showPopover, (val) => {
                 <p-select-card :label="i18n.t('Add Data Table')"
                                icon="ic_service_data-sources"
                                block
-                               @click="handleSelectPopperCondition(POPPER_CONDITION.NEW_DATA_SOURCE)"
+                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADD)"
                 />
                 <p-select-card :label="i18n.t('Add Transformation')"
                                icon="ic_link"
                                block
-                               @click="handleSelectPopperCondition(POPPER_CONDITION.COMBINE_DATA_SOURCE)"
+                               @click="handleSelectPopperCondition(DATA_TABLE_TYPE.ADD)"
                 />
             </div>
             <div v-else

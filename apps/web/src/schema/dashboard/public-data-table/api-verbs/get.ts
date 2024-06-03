@@ -1,3 +1,3 @@
-export interface PublicDataTableGetParameters {
+export interface DataTableGetParameters {
     data_table_id: string;
 }

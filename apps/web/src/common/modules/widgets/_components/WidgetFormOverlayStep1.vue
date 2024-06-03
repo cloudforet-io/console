@@ -9,9 +9,18 @@ import {
 
 import { i18n } from '@/translations';
 
+import WidgetFormDataSourceCard from '@/common/modules/widgets/_components/WidgetFormDataSourceCard.vue';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 
 const dataTableContentsRef = ref<HTMLElement|null>(null);
+
+const storeState = reactive({
+    dataTables: computed(() => widgetGenerateState.dataTables),
+});
 
 const state = reactive({
     // data table
@@ -102,8 +111,11 @@ documentEventMount('mouseup', endResizing);
              class="data-table-contents"
         >
             <div class="data-source-wrapper">
+                <widget-form-data-source-card v-for="(dataTable) in storeState.dataTables"
+                                              :key="`data-table-${dataTable.data_table_id}`"
+                                              :item="dataTable"
+                />
                 <widget-form-data-source-popover />
-                <!--                <widget-form-data-source-card />-->
             </div>
             <div class="resizer-area"
                  :style="displayState.resizerStyle"
@@ -125,7 +137,7 @@ documentEventMount('mouseup', endResizing);
                 </p-tooltip>
             </div>
             <div class="data-table-area"
-                 :class="{ 'transition': displayState.transition }"
+                 :class="{ 'transition': displayState.transition, 'unselectable': displayState.resizing }"
                  :style="displayState.tableContainerStyle"
             >
                 <div class="data-table-wrapper">
@@ -164,6 +176,7 @@ documentEventMount('mouseup', endResizing);
         flex-direction: column;
         padding: 0.125rem;
         .data-source-wrapper {
+            @apply flex gap-4;
             flex: 1;
             overflow: auto;
             padding: 1rem;
@@ -224,6 +237,9 @@ documentEventMount('mouseup', endResizing);
             &.transition {
                 transition: height 0.2s;
             }
+            &.unselectable {
+                user-select: none;
+            }
 
             .data-table-wrapper {
                 height: 100%;
@@ -232,9 +248,15 @@ documentEventMount('mouseup', endResizing);
                 .view-table-wrapper {
                     @apply rounded-md;
 
+                    :deep(.p-toolbox) {
+                        padding: 1rem 1rem 0;
+                        .toolbox-left {
+                            @apply h-full;
+                        }
+                    }
+
                     .toolbox-left-wrapper {
-                        display: flex;
-                        align-items: center;
+                        @apply flex items-center;
                         gap: 0.5rem;
                         .view-table-title {
                             @apply text-label-lg font-bold;

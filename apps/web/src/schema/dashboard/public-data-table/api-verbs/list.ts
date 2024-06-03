@@ -1,6 +1,6 @@
-import type { DataTableSourceType, DataTableDataType, DataTableOperator } from '@/common/modules/widgets/types/model';
+import type { DataTableSourceType, DataTableOperator, DataTableDataType } from '@/common/modules/widgets/types/widget-model';
 
-export interface PublicDataTableListParameters {
+export interface DataTableListParameters {
     widget_id: string;
     query?: Record<string, any>;
     data_table_id?: string;
