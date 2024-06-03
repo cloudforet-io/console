@@ -12,7 +12,7 @@ import type {
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<GroupByFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -23,7 +23,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fieldOptions: computed<GroupByFieldOptions|undefined>(() => props.widgetFieldSchema?.options as GroupByFieldOptions),
 });
 </script>
 
@@ -34,7 +33,7 @@ const state = reactive({
         >
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems"
-                                   :multi-selectable="state.fieldOptions?.multiSelectable"
+                                   :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
                 />
                 <p-text-input type="number"
                               :min="0"

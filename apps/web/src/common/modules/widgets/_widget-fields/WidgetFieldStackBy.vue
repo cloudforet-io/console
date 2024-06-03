@@ -7,12 +7,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type {
-    WidgetFieldSchema,
+    StackByFieldOptions, WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<StackByFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {

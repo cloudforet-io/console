@@ -12,7 +12,7 @@ import { gray } from '@/styles/colors';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<FormatRulesOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -29,8 +29,7 @@ interface FormatRule {
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fieldOptions: computed<FormatRulesOptions|undefined>(() => props.widgetFieldSchema.options as FormatRulesOptions),
-    fields: computed(() => state.fieldOptions?.fields || []),
+    fields: computed<string[]>(() => props.widgetFieldSchema.options?.fields || []),
     formatRules: [] as FormatRule[],
 });
 

@@ -4,11 +4,11 @@ import { computed, reactive } from 'vue';
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type { WidgetFieldSchema } from '@/common/modules/widgets/types/widget-config-type';
+import type { TotalFieldOptions, WidgetFieldSchema } from '@/common/modules/widgets/types/widget-config-type';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<TotalFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
