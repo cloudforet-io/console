@@ -1811,13 +1811,20 @@
 					"SELECT_DATA_SOURCE_TYPE": "Select Data Source Type"
 				},
 				"STEP_2": {
+					"ADD_RULE": "Add Rule",
+					"BASIS_FIELD": "Basis Field",
 					"CHART_TYPE": "Chart Type",
 					"DATA_TABLE": "Data Table",
 					"DESCRIPTION": "Description",
 					"EDIT_DATA": "Edit Data",
+					"FIELD_NAME": "Field Name",
+					"FORMAT_RULES": "Format Rules",
 					"OPTIONAL_FIELDS": "Optional Fields",
+					"PROGRESS_BAR_DESCRIPTION_1": "The percentage is calculated as:",
+					"PROGRESS_BAR_DESCRIPTION_2": "[Basis Field ÷ Total Field x 100]",
 					"REQUIRED_FIELDS": "Required Fields",
 					"TITLE": "Title",
+					"TOTAL_FIELD": "Total Field",
 					"WIDGET_INFO": "Widget Info"
 				}
 			},
