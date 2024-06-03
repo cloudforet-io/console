@@ -15,17 +15,10 @@ import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
 import WidgetFormDataSourceAddButton from '@/common/modules/widgets/_components/WidgetFormDataSourceAddButton.vue';
-import { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/widget-constant';
+import { DATA_SOURCE_DOMAIN, DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/widget-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { DataTableDataType } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableDataType, DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
 
-
-const DATA_SOURCE_DOMAIN = {
-    COST: 'COST',
-    ASSET: 'ASSET',
-    SECURITY: 'SECURITY',
-};
-type DataSourceDomain = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 
 const widgetGenerateStore = useWidgetGenerateStore();
 
@@ -49,7 +42,7 @@ const state = reactive({
             icon: '_ic-ds-security',
         },
     ])),
-    selectedDataSourceDomain: undefined as undefined|DataSourceDomain,
+    selectedDataSourceDomain: undefined as undefined|DataTableSourceType,
     disableConfirmButton: computed(() => {
         if (state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST) {
             return !state.selectedCostDataSourceId || !state.selectedCostDataType;
@@ -77,7 +70,7 @@ const resetSelectedDataSource = () => {
 const handleClickAddDataSourceButton = () => {
     state.showPopover = !state.showPopover;
 };
-const handleClickDataSourceDomain = (domainName: DataSourceDomain) => {
+const handleClickDataSourceDomain = (domainName: DataTableSourceType) => {
     if (state.selectedDataSourceDomain === domainName) return;
     state.selectedDataSourceDomain = domainName;
     resetSelectedDataSource();
