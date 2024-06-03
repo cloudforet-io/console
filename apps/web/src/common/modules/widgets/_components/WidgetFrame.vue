@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core/index';
 import {
-    reactive, computed,
+    reactive, computed, ref,
 } from 'vue';
 
 import {
-    PI, PIconButton,
+    PI, PIconButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import { i18n } from '@/translations';
 
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
@@ -29,7 +32,35 @@ const emit = defineEmits<{(event: 'click-delete'): void;
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+    etcDropdownMenuItems: computed<MenuItem[]>(() => ([
+        {
+            type: 'item',
+            name: 'expandAndEdit',
+            label: i18n.t('Expand & Edit'),
+        },
+        {
+            type: 'item',
+            name: 'fullData',
+            label: i18n.t('Full Data'),
+            link: props.widgetLink,
+        },
+    ])),
 });
+const contextMenuRef = ref<any|null>(null);
+const targetRef = ref<HTMLElement | null>(null);
+const {
+    visibleMenu: visibleContextMenu,
+    contextMenuStyle,
+    hideContextMenu,
+    toggleContextMenu,
+} = useContextMenuController({
+    targetRef,
+    contextMenuRef,
+    useFixedStyle: true,
+    position: 'right',
+    menu: state.etcDropdownMenuItems,
+});
+onClickOutside(targetRef, hideContextMenu);
 
 /* Event */
 const handleEditButtonClick = () => {
@@ -38,11 +69,21 @@ const handleEditButtonClick = () => {
 const handleClickDeleteButton = () => {
     emit('click-delete');
 };
+const handleClickEtcButton = () => {
+    toggleContextMenu();
+};
+const handleSelectEtc = (item: MenuItem) => {
+    if (item.name === 'expandAndEdit') {
+        emit('click-edit');
+    } else if (item.name === 'fullData') {
+        window.open(props.widgetLink, '_blank');
+    }
+};
 </script>
 
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull }"
+         :class="{ full: state.isFull, 'show-etc': visibleContextMenu }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
@@ -55,8 +96,23 @@ const handleClickDeleteButton = () => {
                      height="1rem"
                 />
                 <span class="metadata-text">Metadata</span>
+                <div class="metadata-content">
+                    Metadata
+                </div>
             </div>
         </div>
+        <p-icon-button ref="targetRef"
+                       name="ic_ellipsis-horizontal"
+                       shape="square"
+                       class="etc-button"
+                       @click="handleClickEtcButton"
+        />
+        <p-context-menu v-show="visibleContextMenu"
+                        ref="contextMenuRef"
+                        :style="contextMenuStyle"
+                        :menu="state.etcDropdownMenuItems"
+                        @select="handleSelectEtc"
+        />
         <div v-if="props.editMode"
              class="action-button-wrapper"
         >
@@ -87,6 +143,11 @@ const handleClickDeleteButton = () => {
     display: inline-flex;
     flex-direction: column;
     padding: 1rem;
+    &:hover, &.show-etc {
+        .etc-button {
+            display: block;
+        }
+    }
 
     .widget-header {
         display: flex;
@@ -105,11 +166,32 @@ const handleClickDeleteButton = () => {
             display: flex;
             align-items: center;
             padding-left: 0.75rem;
+            &:hover {
+                .metadata-content {
+                    display: block;
+                }
+            }
             .metadata-text {
                 @apply text-label-sm;
                 padding-left: 0.25rem;
             }
+            .metadata-content {
+                @apply bg-white border rounded-lg border-gray-200;
+                position: absolute;
+                top: 2.25rem;
+                display: none;
+                padding: 1.25rem 1rem;
+            }
         }
+    }
+    .etc-button {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        display: none;
+    }
+    .p-context-menu {
+        z-index: 100;
     }
     .action-button-wrapper {
         @apply bg-gray-150 rounded-lg;
