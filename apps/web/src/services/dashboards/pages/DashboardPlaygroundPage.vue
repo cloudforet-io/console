@@ -13,9 +13,10 @@ import type {
 
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
-import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
+import { getWidgetComponent, getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -35,6 +36,8 @@ const state = reactive({
         label: d,
     }))),
     selectedChartName: 'stackedColumnChart',
+    widgetRequiredFieldSchema: computed<WidgetConfig['requiredFieldsSchema']>(() => state.widgetConfig.requiredFieldsSchema),
+    widgetOptionalFieldSchema: computed(() => state.widgetConfig.optionalFieldsSchema),
 });
 
 /* Event */
@@ -77,6 +80,23 @@ const handleClickAddWidget = () => {
                             @select="state.selectedChartName = $event"
                         />
                     </div>
+                </div>
+                <div>
+                    <p>Required Field Schema</p>
+                    <template v-for="[fieldName, fieldSchema] in Object.entries(state.widgetRequiredFieldSchema)">
+                        <component :is="getWidgetFieldComponent(fieldName)"
+                                   :key="`required-field-${fieldName}`"
+                                   :widget-field-schema="fieldSchema"
+                        />
+                    </template>
+                    <br>
+                    <p>Optional Field Schema</p>
+                    <template v-for="[fieldName, fieldSchema] in Object.entries(state.widgetOptionalFieldSchema)">
+                        <component :is="getWidgetFieldComponent(fieldName)"
+                                   :key="`optional-field-${fieldName}`"
+                                   :widget-field-schema="fieldSchema"
+                        />
+                    </template>
                 </div>
             </div>
         </div>
