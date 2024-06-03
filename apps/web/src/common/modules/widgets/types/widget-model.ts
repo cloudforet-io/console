@@ -1,5 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 
+import type { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/widget-constant';
+
 export interface WidgetModel {
     widget_id: string;
     name: string;
@@ -19,10 +21,10 @@ export interface DataTableModel {
     data_table_id: string;
     name: string;
     data_type: DataTableDataType;
-    source_type: DataTableSourceType;
-    operator: DataTableOperator;
+    source_type?: DataTableSourceType;
+    operator?: DataTableOperator;
     options: DataTableOptions;
-    tags: Tags;
+    tags?: Tags;
     labels_info: LabelsInfo;
     data_info: DataInfo;
     widget_id: string;
@@ -33,8 +35,8 @@ export interface DataTableModel {
 }
 
 export type DataTableSourceType = 'ASSET' | 'COST';
-export type DataTableDataType = 'ADD' | 'TRANSFORM';
 export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
+export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, number>; // year|month|day
 export type TimeDiff = Record<string, any>;
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
@@ -60,11 +62,11 @@ export interface DataTableDataKey {
 export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
-    group_by: string[];
-    data_name: string;
-    date_format: 'SINGLE'|'SEPARATE';
-    additional_labels: AdditionalLabels;
-    time_diff: TimeDiff;
+    group_by?: string[];
+    data_name?: string;
+    date_format?: 'SINGLE'|'SEPARATE';
+    additional_labels?: AdditionalLabels;
+    time_diff?: TimeDiff;
 }
 export interface AssetOptions {
     metric_id: string;
