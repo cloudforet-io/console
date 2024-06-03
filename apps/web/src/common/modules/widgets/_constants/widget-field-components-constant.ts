@@ -3,7 +3,7 @@ import type { AsyncComponent } from 'vue';
 import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-config-type';
 
 
-export const WIDGET_FIELD_COMPONENTS: Record<WidgetFieldName, AsyncComponent> = {
+export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComponent> = {
     dataField: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue'),
     }),
@@ -27,5 +27,11 @@ export const WIDGET_FIELD_COMPONENTS: Record<WidgetFieldName, AsyncComponent> = 
     }),
     basisField: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldBasisField.vue'),
+    }),
+    min: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldMin.vue'),
+    }),
+    max: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldMax.vue'),
     }),
 };
