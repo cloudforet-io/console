@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
 import {
     onMounted, reactive, ref,
 } from 'vue';
@@ -7,13 +8,14 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import { init } from 'echarts';
-import type { EChartsOption } from 'echarts';
+import type { EChartsOption, EChartsType } from 'echarts';
 import { HeatmapChart } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GridComponent, VisualMapComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
@@ -43,11 +45,12 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 const state = reactive({
     loading: false,
     data: null as Response | null,
+    chart: null as null | EChartsType,
     chartData: [],
     chartOptions: {
         xAxis: {
             type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: ['AmazonEC2', 'AmazonRDS', 'AmazonS3', 'AmazonVPC', 'AmazonRoute53', 'AmazonEC2', 'AmazonRDS', 'AmazonS3', 'AmazonVPC', 'AmazonRoute53'],
         },
         yAxis: {
             type: 'category',
@@ -55,7 +58,14 @@ const state = reactive({
             splitArea: {
                 show: true,
             },
+            // axisLabel: {
+            //     interval: 0,
+            // },
         },
+        // label: {
+        //     show: true,
+        //     formatter: '{a}',
+        // },
         tooltip: {
             position: 'top',
         },
@@ -114,8 +124,13 @@ const state = reactive({
 });
 
 onMounted(() => {
-    init(chartContext.value).setOption(state.chartOptions);
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions);
 });
+
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>

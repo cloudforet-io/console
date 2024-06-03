@@ -5,39 +5,39 @@ import type { WidgetConfigKey } from '@/common/modules/widgets/types/widget-list
 
 export const WIDGET_COMPONENTS: Record<WidgetConfigKey, AsyncComponent> = {
     stackedColumnChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/stacked-column-chart/StackedColumnChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/stacked-column-chart/StackedColumnChart.vue'),
     }),
     clusteredColumnChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/clustered-column-chart/ClusteredColumnChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/clustered-column-chart/ClusteredColumnChart.vue'),
     }),
     stackedHorizontalBarChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/stacked-horizontal-bar-chart/StackedHorizontalBarChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/stacked-horizontal-bar-chart/StackedHorizontalBarChart.vue'),
     }),
     lineChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/line-chart/LineChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/line-chart/LineChart.vue'),
     }),
     pieChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/pie-chart/PieChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/pie-chart/PieChart.vue'),
     }),
     treemap: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/treemap/Treemap.vue'),
+        component: import('@/common/modules/widgets/_widgets/treemap/Treemap.vue'),
     }),
     heatmap: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/heatmap/Heatmap.vue'),
+        component: import('@/common/modules/widgets/_widgets/heatmap/Heatmap.vue'),
     }),
     geoMap: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/geo-map/GeoMap.vue'),
+        component: import('@/common/modules/widgets/_widgets/geo-map/GeoMap.vue'),
     }),
     // table: () => ({
-    //     component: import('@/common/modules/widgets/_base-widgets/table/Table.vue'),
+    //     component: import('@/common/modules/widgets/_widgets/table/Table.vue'),
     // }),
     stackedAreaChart: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/stacked-area-chart/StackedAreaChart.vue'),
+        component: import('@/common/modules/widgets/_widgets/stacked-area-chart/StackedAreaChart.vue'),
     }),
     gauge: () => ({
-        component: import('@/common/modules/widgets/_base-widgets/gauge/Gauge.vue'),
+        component: import('@/common/modules/widgets/_widgets/gauge/Gauge.vue'),
     }),
     // progressCard: () => ({
-    //     component: import('@/common/modules/widgets/_base-widgets/progress-card/ProgressCard.vue'),
+    //     component: import('@/common/modules/widgets/_widgets/progress-card/ProgressCard.vue'),
     // }),
 };
