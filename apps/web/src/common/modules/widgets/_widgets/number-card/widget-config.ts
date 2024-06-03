@@ -7,24 +7,17 @@ const numberCard: WidgetConfig = {
         title: 'Number Card',
         sizes: ['sm'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'dropdown',
-            required: true,
-            options: {
-                dataTarget: 'data_field',
-            },
         },
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
         icon: {
             label: 'Icon',
-            componentType: 'icon',
         },
         comparison: {
             label: 'Comparison',
-            componentType: 'comparison',
         },
     },
 };

@@ -7,29 +7,23 @@ const clusteredColumnChart: WidgetConfig = {
         title: 'Clustered Column Chart',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'dropdown',
-            required: true,
             options: {
-                dataTarget: 'data_field',
                 multiSelectable: true,
             },
         },
         xAxisField: {
             label: 'X-Axis Field',
-            componentType: 'dropdownWithCount',
-            required: true,
             options: {
                 dataTarget: 'label_field',
             },
         },
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
         legend: {
             label: 'Legend',
-            componentType: 'toggle',
         },
     },
 };

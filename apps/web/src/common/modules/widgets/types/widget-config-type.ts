@@ -2,21 +2,42 @@ import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-dis
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
-interface DropdownOptions {
-    dataTarget?: string; // e.g. label_field, data_field
+
+export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
-interface DropdownWithCountOptions {
+export interface XAxisFieldOptions {
+    dataTarget?: string;
+}
+export interface YAxisFieldOptions {
+    dataTarget?: string;
+}
+export interface LineByFieldOptions {
+    dataTarget?: string;
+}
+export interface StackByFieldOptions {
+    dataTarget?: string;
+}
+export interface GroupByFieldOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
+}
+export interface CategoryByFieldOptions {
+    dataTarget?: string;
+}
+export interface TotalFieldOptions {
+    dataTarget?: string;
+}
+export interface BasisFieldOptions {
+    dataTarget?: string;
 }
 interface FormatRulesOptions {
     fields: string[];
 }
-// interface ProgressBarOptions { // TODO: set after the schema is defined
-//     dataTargetList: string[];
-// }
-type WidgetFieldOptions = DropdownOptions | DropdownWithCountOptions | FormatRulesOptions;
+type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
+    | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
+    | TotalFieldOptions | BasisFieldOptions
+    | FormatRulesOptions;
 
 export interface WidgetFieldSchema {
     label: string;

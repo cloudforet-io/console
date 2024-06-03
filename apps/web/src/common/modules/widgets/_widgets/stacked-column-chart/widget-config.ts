@@ -10,12 +10,9 @@ const stackedColumnChart: WidgetConfig = {
     requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            options: {
-                dataTarget: 'data_field',
-            },
         },
         xAxisField: {
-            label: 'X-Axis Field',
+            label: 'X-Axis',
             options: {
                 dataTarget: 'label_field',
             },

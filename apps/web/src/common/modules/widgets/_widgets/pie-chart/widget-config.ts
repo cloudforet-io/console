@@ -7,28 +7,20 @@ const pieChart: WidgetConfig = {
         title: 'Pie Chart',
         sizes: ['md'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'dropdown',
-            required: true,
-            options: {
-                dataTarget: 'data_field',
-            },
         },
         groupBy: {
             label: 'Group By',
-            componentType: 'dropdownWithCount',
-            required: true,
             options: {
                 dataTarget: 'label_field',
             },
         },
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
         legend: {
             label: 'Legend',
-            componentType: 'toggle',
         },
     },
 };
