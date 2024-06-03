@@ -2,9 +2,9 @@
 import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-
 import { throttle } from 'lodash';
 
+import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -14,13 +14,17 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import { getLastAccessedWorkspaceId } from '@/lib/site-initializer/last-accessed-workspace';
 
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+
 const appContextStore = useAppContextStore();
 const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreGetters = userWorkspaceStore.getters;
 const router = useRouter();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     globalGrantLoading: computed(() => appContextStore.getters.globalGrantLoading),
+    workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
     loading: false,
 });
 const handleToggleAdminMode = throttle(async () => {
@@ -32,18 +36,25 @@ const handleToggleAdminMode = throttle(async () => {
     appContextStore.setGlobalGrantLoading(true);
     if (state.isAdminMode) {
         await userWorkspaceStore.load();
+        if (state.workspaceList.length === 0) {
+            await router.push({ name: LANDING_ROUTE._NAME });
+            return;
+        }
         appContextStore.exitAdminMode();
         const lastAccessedWorkspaceId = await getLastAccessedWorkspaceId();
         if (lastAccessedWorkspaceId) {
-            router.push({
+            await router.push({
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 params: { workspaceId: lastAccessedWorkspaceId },
             });
-        } else router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        } else {
+            await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        }
+
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
-            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_WORKSPACE'),
+            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_WORKSPACE') as string,
             duration: 2000,
             speed: 1,
         });

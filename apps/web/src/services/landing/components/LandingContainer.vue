@@ -25,9 +25,9 @@ const state = reactive({
 
 watch(() => storeState.workspaceList, () => {
     if (state.isDomainLandingPage) {
-        router.push({ name: LANDING_ROUTE.DOMAIN._NAME });
+        router.push({ name: LANDING_ROUTE.DOMAIN._NAME }).catch(() => {});
     } else {
-        router.push({ name: LANDING_ROUTE.WORKSPACE._NAME });
+        router.push({ name: LANDING_ROUTE.WORKSPACE._NAME }).catch(() => {});
     }
 }, { immediate: true });
 </script>
