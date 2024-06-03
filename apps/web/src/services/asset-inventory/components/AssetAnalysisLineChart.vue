@@ -7,6 +7,8 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/utils';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
@@ -100,7 +102,8 @@ const drawChart = () => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip);
+        const valueFormatter = (val) => numberFormatter(val) as string;
+        chartHelper.setXYSharedTooltipText(chart, tooltip, valueFormatter);
         series.set('tooltip', tooltip);
 
         // set data on series

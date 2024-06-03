@@ -97,19 +97,27 @@ export const getRefinedMetricXYChartData = (rawData: AnalyzeResponse<MetricDataA
         _groupBy = groupBy.split('.')[1]; // (ex. additional_info.Transfer In -> Transfer In)
     }
 
+    const today = dayjs.utc();
     let now = dayjs.utc(period.start).clone();
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         const _date = now.format(dateFormat);
         const chartDataByDate: XYChartData = { date: _date };
+        // eslint-disable-next-line no-loop-func
         rawData.results.forEach((d) => {
+            let val = d.count?.find((c) => c.date === _date)?.value;
+            if (today.isSame(now, timeUnit) && val === undefined) {
+                val = undefined;
+            } else {
+                val = val || 0;
+            }
             if (_groupBy) {
                 let groupByName = d[_groupBy];
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d.count?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate[groupByName] = val;
             } else {
-                chartDataByDate.totalCount = d.count?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCount = val;
             }
         });
         chartData.push(chartDataByDate);

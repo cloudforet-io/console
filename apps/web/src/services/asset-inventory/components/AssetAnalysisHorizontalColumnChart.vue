@@ -6,6 +6,8 @@ import {
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { cloneDeep, isEmpty } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/utils';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import type { RealtimeChartData } from '@/services/asset-inventory/types/asset-analysis-type';
@@ -70,7 +72,7 @@ const drawChart = () => {
         });
         const targetName = target.dataItem?.dataContext?.category;
         const value = target.dataItem?.dataContext?.[fieldName];
-        return `[fontSize: 14px;}]${targetName}:[/] [fontSize: 14px; bold]${value}[/]`;
+        return `[fontSize: 14px;}]${targetName}:[/] [fontSize: 14px; bold]${numberFormatter(value)}[/]`;
     });
     series.set('tooltip', tooltip);
 

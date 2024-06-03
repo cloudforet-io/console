@@ -6,6 +6,8 @@ import {
 import type * as am5percent from '@amcharts/amcharts5/percent';
 import { isEmpty } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/utils';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { gray } from '@/styles/colors';
@@ -63,9 +65,10 @@ const drawChart = () => {
     chartHelper.setChartColors(chart, props.colorSet);
 
     // tooltip
+    const valueFormatter = (val) => numberFormatter(val) as string;
     if (props.chartData.some((d) => typeof d.value === 'number' && d.value > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip);
+        chartHelper.setPieTooltipText(series, tooltip, valueFormatter);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(props.chartData);
     }

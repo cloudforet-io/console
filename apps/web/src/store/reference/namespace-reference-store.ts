@@ -19,7 +19,7 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export type NamespaceReferenceItem = Required<Pick<ReferenceItem<Partial<NamespaceModel>>, 'key'|'label'|'name'|'provider'|'data'>>;
+export type NamespaceReferenceItem = Required<Pick<ReferenceItem<Partial<NamespaceModel>>, 'key'|'label'|'name'|'data'>>;
 export type NamespaceReferenceMap = ReferenceMap<NamespaceReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
@@ -57,7 +57,7 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
         try {
             const response = await SpaceConnector.clientV2.inventory.namespace.list<NamespaceListParameters, ListResponse<NamespaceModel>>({
                 query: {
-                    only: ['namespace_id', 'name', 'provider', 'category', 'icon'],
+                    only: ['namespace_id', 'name', 'category', 'icon', 'group', 'resource_type'],
                 },
             }, { timeout: 3000 });
 
@@ -66,10 +66,11 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
                     key: namespaceInfo.namespace_id,
                     label: namespaceInfo.name,
                     name: namespaceInfo.name,
-                    provider: namespaceInfo.provider,
                     data: {
                         category: namespaceInfo.category,
                         icon: namespaceInfo.icon,
+                        group: namespaceInfo.group,
+                        resource_type: namespaceInfo.resource_type,
                     },
                 };
             });
@@ -87,10 +88,11 @@ export const useNamespaceReferenceStore = defineStore('reference-namespace', () 
                 key: namespaceInfo.namespace_id,
                 label: namespaceInfo.name,
                 name: namespaceInfo.name,
-                provider: namespaceInfo.provider,
                 data: {
                     category: namespaceInfo.category,
                     icon: namespaceInfo.icon,
+                    group: namespaceInfo.group,
+                    resource_type: namespaceInfo.resource_type,
                 },
             },
         };

@@ -9,6 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { MetricCreateParameters } from '@/schema/inventory/metric/api-verbs/create';
 import type { MetricUpdateParameters } from '@/schema/inventory/metric/api-verbs/update';
 import { METRIC_TYPE } from '@/schema/inventory/metric/constant';
@@ -49,7 +50,8 @@ const state = reactive({
         if (assetAnalysisPageState.metricQueryFormMode === 'CREATE') {
             return !isAllValid.value;
         }
-        return !!invalidState.name || !!invalidState.resourceType;
+        return !!invalidState.name;
+        // || !!invalidState.resourceType;
     }),
     visibleSaveModal: false,
 });
@@ -57,7 +59,7 @@ const state = reactive({
 const {
     forms: {
         name,
-        resourceType,
+        // resourceType,
         unit,
         code,
     },
@@ -68,7 +70,7 @@ const {
     initForm,
 } = useFormValidator({
     name: '',
-    resourceType: '',
+    // resourceType: '',
     unit: '',
     code: '',
 }, {
@@ -77,13 +79,13 @@ const {
         if (storeState.metricNameList.includes(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.DUPLICATED');
         return true;
     },
-    resourceType: (value: string) => {
-        if (assetAnalysisPageState.metricQueryFormMode === 'VIEW') return true;
-        if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
-        const regex = /^.+?\..+?\..+?$/;
-        if (!regex.test(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
-        return true;
-    },
+    // resourceType: (value: string) => {
+    //     if (assetAnalysisPageState.metricQueryFormMode === 'VIEW') return true;
+    //     if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
+    //     const regex = /^.+?\..+?\..+?$/;
+    //     if (!regex.test(value)) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.INVALID_RESOURCE_TYPE');
+    //     return true;
+    // },
     code: (value: string) => {
         if (!value.length) return i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.REQUIRED_FIELD');
         try {
@@ -104,9 +106,9 @@ const createCustomMetric = async () => {
             name: name.value,
             unit: unit.value,
             metric_type: METRIC_TYPE.GAUGE,
-            resource_type: `inventory.CloudService:${resourceType.value}`,
+            resource_group: RESOURCE_GROUP.WORKSPACE,
             query_options: jsonParsedQuery,
-            namespace_id: assetAnalysisPageGetters.namespaceId || '',
+            namespace_id: assetAnalysisPageState.selectedNamespace?.name || '',
         });
         showSuccessMessage(i18n.t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.ALT_S_CREATE_METRIC'), '');
         assetAnalysisPageStore.setShowMetricQueryFormSidebar(false);
@@ -157,8 +159,10 @@ const handleSaveCustomMetric = async () => {
 
 watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
     if (visible) {
-        setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
-        setForm('unit', assetAnalysisPageState.metric?.unit);
+        if (assetAnalysisPageState.metricQueryFormMode !== 'CREATE') {
+            setForm('code', JSON.stringify(assetAnalysisPageState.metric?.query_options));
+            setForm('unit', assetAnalysisPageState.metric?.unit);
+        }
     } else {
         initForm();
     }
@@ -186,24 +190,24 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
                                   @update:value="setForm('name', $event)"
                     />
                 </p-field-group>
-                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"
-                               required
-                               :invalid="invalidState.resourceType"
-                               :invalid-text="invalidTexts.resourceType"
-                               class="col-span-8"
-                >
-                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"
-                                  :value="resourceType"
-                                  :invalid="invalidState.resourceType"
-                                  placeholder="aws.EC2.Instance"
-                                  @update:value="setForm('resourceType', $event)"
-                    />
-                    <p v-else
-                       class="text-label-md"
-                    >
-                        {{ assetAnalysisPageState.metric?.resource_type }}
-                    </p>
-                </p-field-group>
+                <!--                <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.RESOURCE_TYPE')"-->
+                <!--                               required-->
+                <!--                               :invalid="invalidState.resourceType"-->
+                <!--                               :invalid-text="invalidTexts.resourceType"-->
+                <!--                               class="col-span-8"-->
+                <!--                >-->
+                <!--                    <p-text-input v-if="assetAnalysisPageState.metricQueryFormMode === 'CREATE'"-->
+                <!--                                  :value="resourceType"-->
+                <!--                                  :invalid="invalidState.resourceType"-->
+                <!--                                  placeholder="aws.EC2.Instance"-->
+                <!--                                  @update:value="setForm('resourceType', $event)"-->
+                <!--                    />-->
+                <!--                    <p v-else-->
+                <!--                       class="text-label-md"-->
+                <!--                    >-->
+                <!--                        {{ assetAnalysisPageState.metric?.resource_type }}-->
+                <!--                    </p>-->
+                <!--                </p-field-group>-->
                 <p-field-group :label="$t('INVENTORY.ASSET_ANALYSIS.CUSTOM_METRIC.UNIT')"
                                :required="assetAnalysisPageState.metricQueryFormMode === 'VIEW'"
                                class="col-span-8"

@@ -5,6 +5,8 @@ import {
 
 import { cloneDeep } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/utils';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import type {
@@ -44,8 +46,9 @@ const drawChart = () => {
 
     // tooltip
     const tooltip = chartHelper.createTooltip();
+    const valueFormatter = (val) => numberFormatter(val) as string;
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip);
+    chartHelper.setTreemapTooltipText(series, tooltip, valueFormatter);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });
