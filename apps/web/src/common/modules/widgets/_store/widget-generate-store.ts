@@ -19,7 +19,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         overlayStep: 1,
         // Widget
         widgetId: '',
-        selectedChartType: 'stackedColumnChart',
+        selectedWidgetName: 'stackedColumnChart',
         title: '',
         description: '',
         // Data Table
@@ -44,8 +44,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setDescription = (description: string) => {
         state.description = description;
     };
-    const setSelectedChartType = (chartType: string) => {
-        state.selectedChartType = chartType;
+    const setSelectedWidgetName = (widgetName: string) => {
+        state.selectedWidgetName = widgetName;
     };
 
     const mutations = {
@@ -54,7 +54,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSelectedDataTable: (dataTableId: string) => {
             state.selectedDataTable = state.dataTables.find((dataTable) => dataTable.data_table_id === dataTableId);
         },
-        setSelectedChartType,
+        setSelectedWidgetName,
         setTitle,
         setDescription,
     };

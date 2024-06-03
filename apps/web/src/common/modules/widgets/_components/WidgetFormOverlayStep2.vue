@@ -85,8 +85,8 @@ onBeforeMount(() => {
             <div class="widget-wrapper"
                  :class="{ 'full-size': state.selectedWidgetSize === 'FULL' }"
             >
-                <component :is="getWidgetComponent(widgetGenerateState.selectedChartType)"
-                           :widget-name="widgetGenerateState.selectedChartType"
+                <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
+                           :widget-name="widgetGenerateState.selectedWidgetName"
                            :widget-id="widgetGenerateState.widgetId"
                            size="lg"
                            :title="widgetGenerateState.title"
