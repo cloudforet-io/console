@@ -116,9 +116,9 @@ const handleLanguageDropdownClick = () => {
 const handleClickGoToMyPage = () => {
     appContextStore.setGlobalGrantLoading(true);
     let currentWorkspace:string|undefined;
-    if (route.name !== LANDING_ROUTE._NAME) {
-        currentWorkspace = route.params?.workspaceId ?? 'admin';
-    }
+    if (route.name === LANDING_ROUTE.DOMAIN._NAME || route.name === LANDING_ROUTE.WORKSPACE._NAME) {
+        currentWorkspace = 'landing';
+    } else currentWorkspace = route.params?.workspaceId ?? 'admin';
     router.push({
         name: MY_PAGE_ROUTE._NAME,
         ...(currentWorkspace && {

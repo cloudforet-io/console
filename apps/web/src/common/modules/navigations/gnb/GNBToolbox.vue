@@ -30,6 +30,9 @@ import type { FavoriteOptions } from '@/common/modules/favorites/favorite-button
 import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
+import { LANDING_ROUTE } from '@/services/landing/routes/route-constant';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
 const userWorkspaceStore = useUserWorkspaceStore();
 const userWorkspaceGetters = userWorkspaceStore.getters;
 const gnbStore = useGnbStore();
@@ -52,7 +55,14 @@ const state = reactive({
     isMobileSize: computed<boolean>(() => width.value < screens.mobile.max),
     routes: computed(() => {
         let routes: Breadcrumb[] = [];
-        if (!storeState.isAdminMode) {
+        if (route.name?.includes(MY_PAGE_ROUTE._NAME)) {
+            routes.push({
+                name: i18n.t('MENU.CONSOLE_HOME'),
+                to: {
+                    name: LANDING_ROUTE._NAME,
+                },
+            });
+        } else if (!storeState.isAdminMode && storeState.currentWorkspaceId) {
             routes.push({
                 name: i18n.t('MENU.WORKSPACE_HOME'),
                 to: {
