@@ -15,6 +15,7 @@ const table: WidgetConfig = {
             label: 'X-Axis Field',
             options: {
                 dataTarget: 'label_field',
+                multiSelectable: true,
             },
         },
         groupBy: {

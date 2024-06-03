@@ -8,6 +8,7 @@ export interface DataFieldOptions {
 }
 export interface XAxisFieldOptions {
     dataTarget?: string;
+    multiSelectable?: boolean;
 }
 export interface YAxisFieldOptions {
     dataTarget?: string;
