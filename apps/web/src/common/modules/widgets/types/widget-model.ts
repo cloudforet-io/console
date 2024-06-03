@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { DATA_TABLE_TYPE } from '@/common/modules/widgets/_constants/widget-constant';
+import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/widget-constant';
 
 export interface WidgetModel {
     widget_id: string;
@@ -34,7 +34,7 @@ export interface DataTableModel {
     updated_at: string;
 }
 
-export type DataTableSourceType = 'ASSET' | 'COST';
+export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
 export type AdditionalLabels = Record<string, number>; // year|month|day

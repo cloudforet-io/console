@@ -53,6 +53,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const mutations = {
         setShowOverlay,
         setOverlayStep,
+    };
+    const actions = {
         setSelectedDataTable: (dataTableId: string) => {
             state.selectedDataTable = state.dataTables.find((dataTable) => dataTable.data_table_id === dataTableId);
         },
