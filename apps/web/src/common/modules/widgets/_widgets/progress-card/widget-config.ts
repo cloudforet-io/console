@@ -7,9 +7,9 @@ const progressCard: WidgetConfig = {
         title: 'Progress Card',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
     },
 };
 

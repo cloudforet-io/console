@@ -7,9 +7,9 @@ const geoMap: WidgetConfig = {
         title: 'Geo Map',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
     },
 };
 

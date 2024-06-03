@@ -7,9 +7,9 @@ const heatmap: WidgetConfig = {
         title: 'Heatmap',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
     },
 };
 

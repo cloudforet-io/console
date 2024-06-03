@@ -7,32 +7,24 @@ const gauge: WidgetConfig = {
         title: 'Gauge',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'dropdown',
-            required: true,
         },
         min: {
             label: 'Min',
-            componentType: 'number',
-            required: true,
         },
         max: {
             label: 'Max',
-            componentType: 'number',
-            required: true,
         },
         formatRules: {
             label: 'Format Rules',
-            componentType: 'formatRules',
             options: {
                 fields: ['threshold', 'color'],
             },
-            required: true,
         },
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
     },
 };
 

@@ -7,25 +7,21 @@ const treemap: WidgetConfig = {
         title: 'Treemap',
         sizes: ['full'],
     },
-    dataMappingSchema: {
+    requiredFieldsSchema: {
         dataField: {
             label: 'Data Field',
-            componentType: 'dropdown',
-            required: true,
             options: {
                 dataTarget: 'data_field',
             },
         },
         categoryBy: {
             label: 'Category By',
-            componentType: 'dropdown',
-            required: true,
             options: {
                 dataTarget: 'label_field',
             },
         },
     },
-    advancedOptionsSchema: {
+    optionalFieldsSchema: {
     },
 };
 
