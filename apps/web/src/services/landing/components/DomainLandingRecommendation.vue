@@ -128,23 +128,25 @@ const handleClickCardButton = (type: string) => {
                             {{ item.title }}
                         </p>
                         <span class="desc">{{ item.desc }}</span>
-                        <p-button v-if="item.button"
-                                  style-type="tertiary"
-                                  :icon-left="item.type === 'quick-start-guide' ? 'ic_rocket-filled' : undefined"
-                                  class="link-button"
-                                  @click="handleClickCardButton(item.type)"
-                        >
-                            <span>
-                                {{ item.button }}
-                            </span>
-                            <p-i v-if="item.type === 'quick-start-guide'"
-                                 name="ic_external-link"
-                                 width="1rem"
-                                 height="1rem"
-                                 color="inherit"
-                                 class="info-icon"
-                            />
-                        </p-button>
+                        <div>
+                            <p-button v-if="item.button"
+                                      style-type="tertiary"
+                                      :icon-left="item.type === 'quick-start-guide' ? 'ic_rocket-filled' : undefined"
+                                      class="link-button"
+                                      @click="handleClickCardButton(item.type)"
+                            >
+                                <span>
+                                    {{ item.button }}
+                                </span>
+                                <p-i v-if="item.type === 'quick-start-guide'"
+                                     name="ic_external-link"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
+                                     class="info-icon"
+                                />
+                            </p-button>
+                        </div>
                     </div>
                     <img v-if="!state.isXsSize"
                          class="card-image"
@@ -196,7 +198,8 @@ const handleClickCardButton = (type: string) => {
                 padding: 4.375rem 2rem 2rem 2rem;
                 border-radius: 0.375rem;
                 .inner-contents {
-                    @apply relative;
+                    @apply relative flex flex-col;
+                    height: 100%;
                     z-index: 1;
                     .title {
                         @apply text-label-xl font-medium;
@@ -204,6 +207,7 @@ const handleClickCardButton = (type: string) => {
                     .desc {
                         @apply block text-paragraph-md;
                         max-width: 13rem;
+                        flex: 1;
                         margin-top: 0.75rem;
                     }
                     .link-button {

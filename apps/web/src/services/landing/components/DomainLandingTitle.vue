@@ -19,7 +19,7 @@ const handleClickStartButton = () => {
 <template>
     <div class="domain-landing-title">
         <h1 class="welcome-title">
-            {{ $t('LADING.DOMAIN.WELCOME_TITLE', {'domain_name': storeState.domainName}) }}
+            {{ $t('LADING.DOMAIN.WELCOME_TITLE') }}
         </h1>
         <i18n class="title"
               path="LADING.DOMAIN.TITLE"
