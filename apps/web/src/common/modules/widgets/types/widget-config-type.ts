@@ -26,11 +26,18 @@ export interface GroupByFieldOptions {
 export interface CategoryByFieldOptions {
     dataTarget?: string;
 }
+export interface TotalFieldOptions {
+    dataTarget?: string;
+}
+export interface BasisFieldOptions {
+    dataTarget?: string;
+}
 interface FormatRulesOptions {
     fields: string[];
 }
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
+    | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions;
 
 export interface WidgetFieldSchema {

@@ -22,4 +22,10 @@ export const WIDGET_FIELD_COMPONENTS: Record<WidgetFieldName, AsyncComponent> = 
     categoryBy: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldCategoryBy.vue'),
     }),
+    totalField: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldTotalField.vue'),
+    }),
+    basisField: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldBasisField.vue'),
+    }),
 };
