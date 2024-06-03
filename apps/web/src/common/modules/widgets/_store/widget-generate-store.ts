@@ -10,7 +10,9 @@ import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-t
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
+
 
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const state = reactive({
@@ -86,6 +88,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         },
         loadDataTable: async (dataTableId: string) => {
             console.debug('loadDataTable', dataTableId);
+        },
+        initWidgetForm: (widgetName = 'table') => {
+            state.selectedWidgetName = widgetName;
+            const _widgetConfig = getWidgetConfig(widgetName);
+            state.title = _widgetConfig.meta.title || '';
+            state.description = '';
         },
     };
 
