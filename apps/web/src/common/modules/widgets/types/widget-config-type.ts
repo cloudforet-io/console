@@ -8,6 +8,7 @@ export interface DataFieldOptions {
 }
 export interface XAxisFieldOptions {
     dataTarget?: string;
+    multiSelectable?: boolean;
 }
 export interface YAxisFieldOptions {
     dataTarget?: string;
@@ -44,8 +45,12 @@ export interface MaxOptions {
     default?: number;
 }
 
-interface FormatRulesOptions {
-    fields: string[];
+type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
+export interface FormatRulesOptions {
+    fields: FormatRulesField[];
+    legendOptions?: {
+        dataTarget?: string;
+    }
 }
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions

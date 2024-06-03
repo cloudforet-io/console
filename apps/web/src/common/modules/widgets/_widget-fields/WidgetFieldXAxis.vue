@@ -7,12 +7,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type {
-    WidgetFieldSchema,
+    WidgetFieldSchema, XAxisFieldOptions,
 } from '@/common/modules/widgets/types/widget-config-type';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<XAxisFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +32,9 @@ const state = reactive({
                        :required="props.required"
         >
             <div class="field-form-wrapper">
-                <p-select-dropdown :menu="state.menuItems" />
+                <p-select-dropdown :menu="state.menuItems"
+                                   :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
+                />
                 <p-text-input type="number"
                               :min="0"
                 />

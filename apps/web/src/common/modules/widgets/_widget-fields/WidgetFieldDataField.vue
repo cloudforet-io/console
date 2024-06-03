@@ -8,7 +8,7 @@ import type { WidgetFieldSchema, DataFieldOptions } from '@/common/modules/widge
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema;
+    widgetFieldSchema: WidgetFieldSchema<DataFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -19,7 +19,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fieldOptions: computed<DataFieldOptions>(() => props.widgetFieldSchema?.options || {}),
 });
 </script>
 
@@ -29,7 +28,7 @@ const state = reactive({
                        :required="props.required"
         >
             <p-select-dropdown :menu="state.menuItems"
-                               :multi-selectable="state.fieldOptions?.multiSelectable"
+                               :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
             />
         </p-field-group>
     </div>

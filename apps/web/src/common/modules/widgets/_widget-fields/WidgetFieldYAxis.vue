@@ -7,12 +7,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type {
-    CategoryByFieldOptions, WidgetFieldSchema,
+    WidgetFieldSchema, YAxisFieldOptions,
 } from '@/common/modules/widgets/types/widget-config-type';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema<CategoryByFieldOptions>;
+    widgetFieldSchema: WidgetFieldSchema<YAxisFieldOptions>;
     required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -27,14 +27,14 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="widget-field-category-by">
+    <div class="widget-field-y-axis">
         <p-field-group :label="props.widgetFieldSchema.label"
                        :required="props.required"
         >
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems" />
                 <p-text-input type="number"
-                              disabled
+                              :min="0"
                 />
             </div>
         </p-field-group>
