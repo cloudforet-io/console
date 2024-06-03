@@ -33,8 +33,8 @@ const state = reactive({
             title: i18n.t('LADING.DOMAIN.QUICK_GUIDE_TITLE'),
             desc: i18n.t('LADING.DOMAIN.QUICK_GUIDE_DESC'),
             button: i18n.t('LADING.DOMAIN.QUICK_GUIDE_BUTTON'),
-            image: '/images/domain-landing/domain-landing_admin_quick-start-guide.png',
-            srcSet: '/images/domain-landing/domain-landing_admin_quick-start-guide@2x.png 2x, /images/domain-landing/domain-landing_admin_quick-start-guide@3x.png 3x',
+            image: '/images/domain-landing/domain-landing_asset-inventory.png',
+            srcSet: '/images/domain-landing/domain-landing_asset-inventory@2x.png 2x, /images/domain-landing/domain-landing_asset-inventory@3x.png 3x',
         },
         {
             type: 'role-type',
@@ -55,25 +55,25 @@ const state = reactive({
     ])),
     userCardType: computed(() => ([
         {
-            type: 'create-project',
-            title: i18n.t('LADING.DOMAIN.CREATE_PROJECT_TITLE'),
-            desc: i18n.t('LADING.DOMAIN.CREATE_PROJECT_DESC'),
-            image: '/images/domain-landing/domain-landing_create-project.png',
-            srcSet: '/images/domain-landing/domain-landing_create-project@2x.png 2x, /images/domain-landing/domain-landing_create-project@3x.png 3x',
+            type: 'inventory',
+            title: i18n.t('LADING.DOMAIN.INVENTORY_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.INVENTORY_DESC'),
+            image: '/images/domain-landing/domain-landing_asset-inventory.png',
+            srcSet: '/images/domain-landing/domain-landing_asset-inventory@2x.png 2x, /images/domain-landing/domain-landing_asset-inventory@3x.png 3x',
         },
         {
-            type: 'customize-dashboard',
-            title: i18n.t('LADING.DOMAIN.DASHBOARD_TITLE'),
-            desc: i18n.t('LADING.DOMAIN.DASHBOARD_DESC'),
-            image: '/images/domain-landing/domain-landing_customize-dashboard.png',
-            srcSet: '/images/domain-landing/domain-landing_customize-dashboard@2x.png 2x, /images/domain-landing/domain-landing_customize-dashboard@3x.png 3x',
+            type: 'cost-explorer',
+            title: i18n.t('LADING.DOMAIN.COST_EXPLORER_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.COST_EXPLORER_DESC'),
+            image: '/images/domain-landing/domain-landing_cost-explorer.png',
+            srcSet: '/images/domain-landing/domain-landing_cost-explorer@2x.png 2x, /images/domain-landing/domain-landing_cost-explorer@3x.png 3x',
         },
         {
-            type: 'manage-alert',
-            title: i18n.t('LADING.DOMAIN.MANAGED_ALERT_TITLE'),
-            desc: i18n.t('LADING.DOMAIN.MANAGED_ALERT_DESC'),
-            image: '/images/domain-landing/domain-landing_manage-alert.png',
-            srcSet: '/images/domain-landing/domain-landing_manage-alert@2x.png 2x, /images/domain-landing/domain-landing_manage-alert@3x.png 3x',
+            type: 'out-of-the-box-dashboard',
+            title: i18n.t('LADING.DOMAIN.OUT_OF_THE_BOX_DASHBOARD_TITLE'),
+            desc: i18n.t('LADING.DOMAIN.OUT_OF_THE_BOX_DASHBOARD_DESC'),
+            image: '/images/domain-landing/domain-landing_out-of-the-box-dashboard.png',
+            srcSet: '/images/domain-landing/domain-landing_out-of-the-box-dashboard@2x.png 2x, /images/domain-landing/domain-landing_out-of-the-box-dashboard@3x.png 3x',
         },
     ])),
     cardType: computed(() => (storeState.isDomainAdmin ? state.adminCardType : state.userCardType)),
@@ -83,7 +83,7 @@ const handleClickCardButton = (type: string) => {
     let url = '';
 
     if (type === 'quick-start-guide') {
-        url = `https://cloudforet.io/${storeState.language}/docs/guides/getting-started/`;
+        url = `https://cloudforet.io/${storeState.language}/docs/guides/admin-mode/getting-started`;
     } else if (type === 'role-type') {
         url = router.resolve({
             name: makeAdminRouteName(IAM_ROUTE.ROLE._NAME),
