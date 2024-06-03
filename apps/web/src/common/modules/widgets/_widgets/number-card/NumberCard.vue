@@ -8,7 +8,6 @@ import {
 } from '@spaceone/design-system';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
     NewWidgetProps, WidgetEmit,
@@ -18,8 +17,7 @@ import type {
 const props = defineProps<NewWidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState } = useWidget(props, emit);
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const state = reactive({
     loading: false,

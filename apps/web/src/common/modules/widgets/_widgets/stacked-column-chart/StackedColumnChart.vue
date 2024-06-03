@@ -1,49 +1,28 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
 import {
     onMounted, reactive, ref,
 } from 'vue';
 
-import type { XYChart } from '@amcharts/amcharts5/xy';
 import {
     PDataLoader,
 } from '@spaceone/design-system';
 import { init } from 'echarts';
-import type { EChartsOption } from 'echarts';
+import type { EChartsOption, EChartsType } from 'echarts';
 import { BarChart } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
     NewWidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 
-
-// const dataSourceFetcherMap = {
-//     'cost_analysis.Cost': SpaceConnector.clientV2.costAnalysis.cost.analyze,
-//     'cost_analysis.BudgetUsage': SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze,
-//     'inventory.MetricData': SpaceConnector.clientV2.inventory.metricData.analyze,
-// };
-
-// interface SubData { date: string; value: number }
-// interface Data {
-//     value_sum: SubData[];
-//     _total_value_sum: number;
-//     [parsedDataField: string]: any; // provider: aws or provider: azure
-// }
-// interface ChartData {
-//     date: string;
-//     [parsedDataField: string]: any; // e.g. aws: 12333 or azure: 1234
-// }
-// type Response = CostAnalyzeResponse<Data>;
-
-// const DATE_FORMAT = 'YYYY-MM';
-// const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<NewWidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -59,15 +38,14 @@ use([
     LegendComponent,
 ]);
 
-const { widgetState } = useWidget(props, emit);
 // const { widgetChartState } = useWidgetChart(props);
 // const { widgetDataState } = useWidgetDataState(props);
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const state = reactive({
     loading: false,
     data: null as Response | null,
-    chart: null as null | XYChart,
+    chart: null as null | EChartsType,
     chartData: [],
     chartOptions: {
         legend: {
@@ -111,8 +89,13 @@ const state = reactive({
 });
 
 onMounted(() => {
-    init(chartContext.value).setOption(state.chartOptions);
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions);
 });
+
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>

@@ -1,24 +1,24 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core/index';
 import {
     onMounted, reactive, ref,
 } from 'vue';
 
-import type { XYChart } from '@amcharts/amcharts5/xy';
 import {
     PDataLoader,
 } from '@spaceone/design-system';
 import axios from 'axios';
 import { init, registerMap } from 'echarts';
-import type { EChartsOption } from 'echarts';
+import type { EChartsOption, EChartsType } from 'echarts';
 import { MapChart } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GeoComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
-import { useWidget } from '@/common/modules/widgets/_composables/use-widget/use-widget';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
     NewWidgetProps, WidgetEmit,
@@ -40,13 +40,12 @@ use([
     MapChart,
 ]);
 
-const { widgetState } = useWidget(props, emit);
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit, widgetState);
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const state = reactive({
     loading: false,
     data: null as Response | null,
-    chart: null as null | XYChart,
+    chart: null as null | EChartsType,
     chartData: [],
     chartOptions: {
         geo: {
@@ -101,8 +100,13 @@ onMounted(async () => {
     const response = await axios.get('map/geo-data.json');
     const geoJson = response.data;
     registerMap('world', geoJson);
-    init(chartContext.value).setOption(state.chartOptions);
+    state.chart = init(chartContext.value);
+    state.chart.setOption(state.chartOptions);
 });
+
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>
