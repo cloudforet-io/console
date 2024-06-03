@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea,
@@ -18,13 +18,13 @@ const FORM_TITLE_MAP = {
     OPTIONAL_FIELDS: 'OPTIONAL_FIELDS',
 };
 const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     chartTypeMenuItems: computed<MenuItem[]>(() => Object.values(CONSOLE_WIDGET_CONFIG).map((d) => ({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
     }))),
-    selectedChartType: 'table',
-    widgetConfig: computed(() => getWidgetConfig(state.selectedChartType)),
+    widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     // display
@@ -38,9 +38,11 @@ const state = reactive({
 /* Util */
 
 /* Event */
-const handleSelectChartType = (chartType: string) => {
-    console.log('chartType', chartType);
-    state.selectedChartType = chartType;
+const handleSelectWidgetName = (widgetName: string) => {
+    widgetGenerateStore.setSelectedWidgetName(widgetName);
+};
+const handleUpdateWidgetTitle = (title: string) => {
+    widgetGenerateStore.setTitle(title);
 };
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
@@ -48,6 +50,10 @@ const handleClickEditDataTable = () => {
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
+
+watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
+    widgetGenerateStore.initWidgetForm(widgetName);
+}, { immediate: true });
 </script>
 
 <template>
@@ -72,8 +78,8 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
                        required
         >
             <p-select-dropdown :menu="state.chartTypeMenuItems"
-                               :selected="state.selectedChartType"
-                               @select="handleSelectChartType"
+                               :selected="widgetGenerateState.selectedWidgetName"
+                               @select="handleSelectWidgetName"
             />
         </p-field-group>
         <!-- widget info -->
@@ -95,7 +101,9 @@ const handleClickCollapsibleTitle = (collapsedTitle: string) => {
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TITLE')"
                                required
                 >
-                    <p-text-input />
+                    <p-text-input :value="widgetGenerateState.title"
+                                  @update:value="handleUpdateWidgetTitle"
+                    />
                 </p-field-group>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DESCRIPTION')">
                     <p-textarea />

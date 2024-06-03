@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed, onMounted,
     reactive, ref,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { EChartsOption } from 'echarts';
+import type { EChartsOption, EChartsType } from 'echarts';
 import { init } from 'echarts';
 import { LineChart } from 'echarts/charts';
 import {
@@ -13,6 +14,7 @@ import {
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
@@ -34,11 +36,11 @@ use([
     LegendComponent,
 ]);
 
-
+const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 const state = reactive({
     loading: true,
     data: null as any | null,
-    chart: null as null,
+    chart: null as null | EChartsType,
     chartData: computed(() => {
         if (!state.data?.results) return [];
         return state.data?.results;
@@ -89,11 +91,8 @@ const state = reactive({
         ],
     })),
 });
-// const { widgetState } = useWidget(props, emit);
-const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
+
 /* Util */
-
-
 const initWidget = async () => {
     state.loading = true;
     // TODO: data source를 돌며 fetchData
@@ -126,6 +125,10 @@ const initWidget = async () => {
 onMounted(() => {
     initWidget();
 });
+
+useResizeObserver(chartContext, throttle(() => {
+    state.chart?.resize();
+}, 500));
 </script>
 
 <template>

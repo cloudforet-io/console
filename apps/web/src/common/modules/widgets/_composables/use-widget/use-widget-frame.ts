@@ -21,18 +21,21 @@ export const useWidgetFrame = (
     const _dateText = props.baseOnDate; // TODO: set this
     const _widgetLocation = undefined; // TODO: set this
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
-        widgetKey: props.widgetKey,
+        widgetId: props.widgetId,
+        widgetSizes: _widgetConfig.meta.sizes,
+        //
         title: _title.value,
         description: props.description,
         size: _size.value,
-        loading: props.loading,
-        dateText: _dateText,
         width: props.width,
-        widgetSizes: _widgetConfig.meta.sizes,
+        widgetLocation: _widgetLocation,
+        //
+        dateText: _dateText,
+        currency: _currency,
+        //
+        loading: props.loading,
         editMode: props.editMode,
         errorMode: props.errorMode,
-        currency: _currency,
-        widgetLocation: _widgetLocation,
     }));
 
     const widgetFrameEventHandlers = {

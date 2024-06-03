@@ -18,7 +18,10 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         showOverlay: false,
         overlayStep: 1,
         // Widget
-        widget_id: '',
+        widgetId: '',
+        selectedWidgetName: 'stackedColumnChart',
+        title: '',
+        description: '',
         // Data Table
         dataTables: [] as DataTableModel[],
         selectedDataTable: undefined as DataTableModel|undefined,
@@ -35,6 +38,15 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setOverlayStep = (overlayStep: number) => {
         state.overlayStep = overlayStep;
     };
+    const setTitle = (title: string) => {
+        state.title = title;
+    };
+    const setDescription = (description: string) => {
+        state.description = description;
+    };
+    const setSelectedWidgetName = (widgetName: string) => {
+        state.selectedWidgetName = widgetName;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -42,6 +54,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSelectedDataTable: (dataTableId: string) => {
             state.selectedDataTable = state.dataTables.find((dataTable) => dataTable.data_table_id === dataTableId);
         },
+        setSelectedWidgetName,
+        setTitle,
+        setDescription,
     };
     const actions = {
         listDataTable: async () => {
@@ -55,7 +70,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         /* Step - 1 */
         createAddDataTable: async (addParams: Partial<DataTableAddParameters>) => {
             const parameters = {
-                widiget_id: state.widget_id,
+                widget_id: state.widgetId,
                 ...addParams,
             } as DataTableAddParameters;
             try {
@@ -67,7 +82,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         },
         createTransformDataTable: async (transformParams: Partial<DataTableTransformParameters>) => {
             const parameters = {
-                widiget_id: state.widget_id,
+                widget_id: state.widgetId,
                 ...transformParams,
             } as DataTableTransformParameters;
             try {

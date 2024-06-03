@@ -13,6 +13,8 @@ import type {
 
 import WidgetFormOverlayStep2WidgetForm
     from '@/common/modules/widgets/_components/WidgetFormOverlayStep2WidgetForm.vue';
+import { getWidgetComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
@@ -22,6 +24,8 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
+const widgetGenerateStore = useWidgetGenerateStore();
+const widgetGenerateState = widgetGenerateStore.state;
 const state = reactive({
     widgetSizeOptions: [
         { label: 'Full', name: 'FULL' },
@@ -78,6 +82,17 @@ onBeforeMount(() => {
                     </p-select-button>
                 </div>
             </div>
+            <div class="widget-wrapper"
+                 :class="{ 'full-size': state.selectedWidgetSize === 'FULL' }"
+            >
+                <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
+                           :widget-name="widgetGenerateState.selectedWidgetName"
+                           :widget-id="widgetGenerateState.widgetId"
+                           size="lg"
+                           :title="widgetGenerateState.title"
+                           :description="widgetGenerateState.description"
+                />
+            </div>
         </div>
         <widget-form-overlay-step2-widget-form />
     </div>
@@ -112,6 +127,14 @@ onBeforeMount(() => {
             .widget-size-wrapper {
                 display: flex;
                 gap: 0.5rem;
+            }
+        }
+        .widget-wrapper {
+            &.full-size {
+                height: 100%;
+                .widget-frame {
+                    height: 100%;
+                }
             }
         }
     }
