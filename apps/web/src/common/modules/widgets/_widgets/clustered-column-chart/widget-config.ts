@@ -25,7 +25,6 @@ const clusteredColumnChart: WidgetConfig = {
     optionalFieldsSchema: {
         legend: {
             label: 'Legend',
-            componentType: 'toggle',
         },
     },
 };

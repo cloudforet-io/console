@@ -28,7 +28,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div>
+    <div class="widget-field-group-by">
         <p-field-group :label="props.widgetFieldSchema.label"
                        :required="props.required"
         >
