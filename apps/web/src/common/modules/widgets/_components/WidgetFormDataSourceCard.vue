@@ -24,7 +24,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const widgetGenerateStore = useWidgetGenerateStore();
-const widgetGenerateGetters = widgetGenerateStore.getters;
+const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
@@ -34,7 +34,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    selected: computed(() => widgetGenerateGetters.selectedDataTableId === props.item.data_table_id),
+    selected: computed(() => widgetGenerateState.selectedDataTableId === props.item.data_table_id),
     sourceType: computed(() => props.item.source_type),
     options: computed(() => props.item.options),
     dataSourceId: computed(() => state.options[state.sourceType].data_source_id), // COST only
@@ -78,7 +78,7 @@ const state = reactive({
 
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
-    widgetGenerateStore.setSelectedDataTable(dataTableId);
+    widgetGenerateStore.setSelctedDataTableId(dataTableId);
     await widgetGenerateStore.loadDataTable(dataTableId);
 };
 

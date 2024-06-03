@@ -25,12 +25,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         title: '',
         description: '',
         // Data Table
-        dataTables: [] as DataTableModel[],
+        selectedDataTableId: undefined as undefined | string,
         selectedDataTable: undefined as DataTableModel|undefined,
     });
 
     const getters = reactive({
-        selectedDataTableId: computed(() => state.selectedDataTable?.data_table_id),
+        selectedDataTable: computed(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
     });
 
     /* Mutations */
@@ -39,6 +39,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     };
     const setOverlayStep = (overlayStep: number) => {
         state.overlayStep = overlayStep;
+    };
+    const setSelctedDataTableId = (selectedDataTableId: string) => {
+        state.selectedDataTableId = selectedDataTableId;
     };
     const setTitle = (title: string) => {
         state.title = title;
@@ -53,11 +56,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const mutations = {
         setShowOverlay,
         setOverlayStep,
-    };
-    const actions = {
-        setSelectedDataTable: (dataTableId: string) => {
-            state.selectedDataTable = state.dataTables.find((dataTable) => dataTable.data_table_id === dataTableId);
-        },
+        setSelctedDataTableId,
         setSelectedWidgetName,
         setTitle,
         setDescription,
