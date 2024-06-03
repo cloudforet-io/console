@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { WidgetType } from '@/common/modules/widgets/types/model';
+import type { WidgetType } from '@/common/modules/widgets/types/widget-model';
 
 export interface PublicWidgetUpdateParameters {
     widget_id: string;

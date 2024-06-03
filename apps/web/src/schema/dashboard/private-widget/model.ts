@@ -1,4 +1,4 @@
-import type { WidgetModel } from '@/common/modules/widgets/types/model';
+import type { WidgetModel } from '@/common/modules/widgets/types/widget-model';
 
 
 export interface PrivateWidgetModel extends WidgetModel {
