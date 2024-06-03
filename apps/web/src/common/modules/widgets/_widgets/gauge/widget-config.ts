@@ -13,9 +13,19 @@ const gauge: WidgetConfig = {
         },
         min: {
             label: 'Min',
+            options: {
+                min: 0,
+                max: 5,
+                default: 3,
+            },
         },
         max: {
             label: 'Max',
+            options: {
+                min: 0,
+                max: 5,
+                default: 3,
+            },
         },
         formatRules: {
             label: 'Format Rules',

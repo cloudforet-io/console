@@ -31,17 +31,30 @@ export interface TotalFieldOptions {
 export interface BasisFieldOptions {
     dataTarget?: string;
 }
+export interface MinOptions {
+    dataTarget?: string;
+    min: number;
+    max: number;
+    default?: number;
+}
+export interface MaxOptions {
+    dataTarget?: string;
+    min: number;
+    max: number;
+    default?: number;
+}
+
 interface FormatRulesOptions {
     fields: string[];
 }
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
     | TotalFieldOptions | BasisFieldOptions
-    | FormatRulesOptions;
+    | FormatRulesOptions | MinOptions | MaxOptions;
 
-export interface WidgetFieldSchema {
+export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     label: string;
-    options?: Partial<WidgetFieldOptions>;
+    options?: Partial<FieldOption>;
 }
 
 export type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField'
