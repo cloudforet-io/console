@@ -41,7 +41,10 @@ import { gray, white } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    COST_REPORT_GROUP_BY_ITEM_MAP,
+    GROUP_BY,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -113,7 +116,7 @@ const state = reactive({
         };
     })),
     tableFields: computed<DataTableFieldType[]>(() => ([
-        { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
+        { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
         { name: 'value_sum', label: 'Amount', textAlign: 'right' },
     ])),
 });
