@@ -18,11 +18,12 @@ export type WidgetType = string; // TODO: make this widget type enum
 export interface DataTableModel {
     data_table_id: string;
     name: string;
-    action: DataTableAction;
+    data_type: DataTableDataType;
     source_type: DataTableSourceType;
     operator: DataTableOperator;
     options: DataTableOptions;
     tags: Tags;
+    labels_info: LabelsInfo;
     data_info: DataInfo;
     widget_id: string;
     workspace_id: string;
@@ -32,38 +33,59 @@ export interface DataTableModel {
 }
 
 export type DataTableSourceType = 'ASSET' | 'COST';
-export type DataTableAction = 'ADD' | 'TRANSFORM';
+export type DataTableDataType = 'ADD' | 'TRANSFORM';
 export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
-export type AdditionalLabels = Record<string, string>;
+export type AdditionalLabels = Record<string, number>; // year|month|day
 export type TimeDiff = Record<string, any>;
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
-export type DataInfo = Record<string, { unit: string }>;
-export type DataTableAddOptions = MetricOptions | CostOptions;
-export type DataTableTransformOptions = ConcatOptions | JoinOptions | WhereOptions | AggregateOptions | EvalOptions;
+export type LabelsInfo = DataTableLabelKey[];
+export type DataInfo = DataTableDataKey[];
 export type DataTableOptions = DataTableAddOptions | DataTableTransformOptions;
-
-/* ADD Action Options */
-export interface MetricOptions {
-    metric_id: string;
+export interface DataTableLabelKey {
+    key: string;
+    name: string;
+    search_key?: string;
+    default?: boolean;
+    reference?: {
+        resource_type: string;
+        reference_key: string;
+    }
+}
+export interface DataTableDataKey {
+    key: string;
+    name: string;
+    unit: string;
+}
+/* ADD Data Type Options */
+export interface DataTableAddOptions {
+    'ASSET'?: AssetOptions;
+    'COST'?: CostOptions;
+    group_by: string[];
     data_name: string;
+    date_format: 'SINGLE'|'SEPARATE';
     additional_labels: AdditionalLabels;
     time_diff: TimeDiff;
-    query: TimeSeriesAnalyzeQuery;
+}
+export interface AssetOptions {
+    metric_id: string;
 }
 
 export interface CostOptions {
     data_source_id: string;
     data_key: string;
-    data_name: string;
-    additional_labels: AdditionalLabels;
-    time_diff: TimeDiff;
-    query: TimeSeriesAnalyzeQuery;
 }
 
-/* TRANSFORM Action Options */
+/* TRANSFORM Data Type Options */
+export interface DataTableTransformOptions {
+    'CONCAT'?: ConcatOptions;
+    'JOIN'?: JoinOptions;
+    'AGGREGATE'?: AggregateOptions;
+    'WHERE'?: WhereOptions;
+    'EVALUATE'?: EvalOptions;
+}
 export interface ConcatOptions {
     data_tables: string[];
-    data_table_indexes: number[];
+    // data_table_indexes: number[];
 }
 
 export interface JoinOptions {
