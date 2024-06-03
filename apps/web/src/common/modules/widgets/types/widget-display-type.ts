@@ -2,11 +2,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardVariables,
-    DashboardVariablesSchema, DataSource,
 } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    WidgetSize, NewWidgetFilters, DataMapping,
+    WidgetSize, NewWidgetFilters,
 } from '@/schema/dashboard/_types/widget-type';
 
 
@@ -14,23 +12,24 @@ export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inher
 
 export interface NewWidgetProps {
     widgetName: string;
+    // widgetKey: string; // unique widget key to identify widgets in layout
+    widgetId: string;
     title?: string;
     description?: string;
     size?: WidgetSize;
     filters?: NewWidgetFilters;
     filtersSchemaProperties?: string[];
     width?: number;
-    theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
-    widgetKey: string; // unique widget key to identify widgets in layout
+    // theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     editMode?: boolean;
     errorMode?: boolean;
     baseOnDate?: string;
-    variablesSchema?: DashboardVariablesSchema;
-    variables: DashboardVariables;
+    // variablesSchema?: DashboardVariablesSchema;
+    // variables?: DashboardVariables;
     loading?: boolean;
-    dataSources: DataSource[];
-    dataMapping: DataMapping;
-    chartOptions: Record<string, any>;
+    // dataSources: DataSource[];
+    // dataMapping: DataMapping;
+    // chartOptions: Record<string, any>;
 }
 
 export interface WidgetEmit {

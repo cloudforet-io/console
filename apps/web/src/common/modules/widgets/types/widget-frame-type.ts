@@ -5,12 +5,13 @@ import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
 import type { Currency } from '@/store/modules/settings/type';
 
-import type { WidgetTheme } from '@/common/modules/widgets/types/widget-display-type';
-
 
 export interface WidgetFrameProps {
-    title?: TranslateResult;
+    widgetId: string;
     widgetSizes: WidgetSize[];
+
+    title?: TranslateResult;
+    description?: string;
     size?: WidgetSize;
     width?: number;
     widgetLocation?: Location;
@@ -18,8 +19,8 @@ export interface WidgetFrameProps {
     dateText?: string;
     currency?: Currency;
 
+    loading?: boolean;
     editMode?: boolean;
     errorMode?: boolean;
-    widgetKey: string;
-    theme?: WidgetTheme;
+    // theme?: WidgetTheme;
 }
