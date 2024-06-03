@@ -1811,12 +1811,12 @@
 					"SELECT_DATA_SOURCE_TYPE": ""
 				},
 				"STEP_2": {
-					"CHART_OPTIONS": "",
 					"CHART_TYPE": "",
-					"DATA_MAPPING": "",
 					"DATA_TABLE": "",
 					"DESCRIPTION": "説明",
-					"EDIT": "",
+					"EDIT_DATA": "",
+					"OPTIONAL_FIELDS": "",
+					"REQUIRED_FIELDS": "",
 					"TITLE": "",
 					"WIDGET_INFO": ""
 				}
