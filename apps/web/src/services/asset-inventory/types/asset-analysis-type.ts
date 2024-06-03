@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { ManipulateType } from 'dayjs';
 
-import type { NamespaceCategory } from '@/schema/inventory/namespace/type';
+import type { NamespaceCategory, NamespaceGroup } from '@/schema/inventory/namespace/type';
 
 import type {
     GRANULARITY, OPERATOR, METRIC_PERIOD_MENU, CHART_TYPE,
@@ -70,7 +70,8 @@ export interface RealtimeChartData {
 export interface NamespaceSubItemType {
     label: string;
     name: string;
-    provider?: string;
-    category: NamespaceCategory;
+    group: NamespaceGroup;
+    category?: NamespaceCategory;
+    resourceType?: string;
     icon: string;
 }
