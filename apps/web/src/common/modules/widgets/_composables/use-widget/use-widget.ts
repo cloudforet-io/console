@@ -21,7 +21,7 @@ import type { BaseWidgetState } from '@/common/modules/widgets/_composables/use-
 import { useBaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/use-base-widget-state';
 import { useWidgetDateRange } from '@/common/modules/widgets/_composables/use-widget/use-widget-date-range';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
-import type { NewWidgetProps, WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps, WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
 
 
 
@@ -66,7 +66,7 @@ export interface WidgetState extends BaseWidgetState {
     assetWidgetLocation: undefined,
  });
  */
-export const useWidget = (props: NewWidgetProps, emit: WidgetEmit, overrides: OverridableWidgetState = {}) => {
+export const useWidget = (props: WidgetProps, emit: WidgetEmit, overrides: OverridableWidgetState = {}) => {
     const baseState = useBaseWidgetState(props);
 
     // additional states that can be overwritten by each widget

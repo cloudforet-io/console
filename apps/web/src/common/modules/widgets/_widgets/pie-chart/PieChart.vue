@@ -19,10 +19,10 @@ import { throttle } from 'lodash';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
-    NewWidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 
-const props = defineProps<NewWidgetProps>();
+const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -56,8 +56,9 @@ const state = reactive({
         legend: {
             orient: 'vertical',
             type: 'scroll',
-            left: '240px',
-            top: '0%',
+            right: 10,
+            top: 20,
+            bottom: 20,
             icon: 'circle',
             textStyle: {
                 overflow: 'truncate',
@@ -74,7 +75,7 @@ const state = reactive({
                 name: 'Access From',
                 type: 'pie',
                 radius: ['30%', '70%'],
-                center: ['120px', '50%'],
+                center: ['30%', '50%'],
                 data: state.chartData,
                 emphasis: {
                     itemStyle: {

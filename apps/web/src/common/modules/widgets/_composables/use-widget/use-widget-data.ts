@@ -5,7 +5,7 @@ import type { DashboardVariables, DataSource } from '@/schema/dashboard/_types/d
 import type { DataMapping, Granularity, NewWidgetFilters } from '@/schema/dashboard/_types/widget-type';
 
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 
 interface WidgetDataState {
@@ -21,7 +21,7 @@ interface UseWidgetDataReturnType {
     fetcher: () => void;
 }
 
-export const useWidgetData = (props: UnwrapRef<NewWidgetProps>): UseWidgetDataReturnType => {
+export const useWidgetData = (props: UnwrapRef<WidgetProps>): UseWidgetDataReturnType => {
     const config = getWidgetConfig(props.widgetName);
     // TODO: 'useWidgetConsoleFilters' refactoring with dataSource
     // const consoleFilters = useWidgetConsoleFilters(props, baseState, overrides);

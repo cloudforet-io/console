@@ -5,29 +5,23 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PContextMenu, useContextMenuController,
+    PI, PIconButton, PContextMenu, PSelectDropdown, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
+import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
 const props = withDefaults(defineProps<WidgetFrameProps>(), {
-    title: undefined,
-    size: WIDGET_SIZE.full,
-    width: undefined,
-    widgetLink: undefined,
-    widgetLocation: undefined,
-    dateRange: () => ({ start: undefined, end: undefined }),
-    noData: false,
-    currency: undefined,
-    theme: undefined,
 });
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
+    (event: 'update:size', size: WidgetSize): void;
 }>();
 
 const state = reactive({
@@ -36,15 +30,19 @@ const state = reactive({
         {
             type: 'item',
             name: 'expandAndEdit',
-            label: i18n.t('Expand & Edit'),
+            label: i18n.t('Expand & Edit'), // TODO: i18n
         },
         {
             type: 'item',
             name: 'fullData',
-            label: i18n.t('Full Data'),
-            link: props.widgetLink,
+            label: i18n.t('Full Data'), // TODO: i18n
         },
     ])),
+    sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
+        type: 'item',
+        name: size,
+        label: WIDGET_WIDTH_STR_MAP[size],
+    }))),
 });
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
@@ -76,14 +74,17 @@ const handleSelectEtc = (item: MenuItem) => {
     if (item.name === 'expandAndEdit') {
         emit('click-edit');
     } else if (item.name === 'fullData') {
-        window.open(props.widgetLink, '_blank');
+        // window.open(props.widgetLink, '_blank');
     }
+};
+const handleSelectSize = (size: WidgetSize) => {
+    emit('update:size', size);
 };
 </script>
 
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, 'show-etc': visibleContextMenu }"
+         :class="{ full: state.isFull, 'show-etc': visibleContextMenu, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
@@ -95,9 +96,9 @@ const handleSelectEtc = (item: MenuItem) => {
                      width="1rem"
                      height="1rem"
                 />
-                <span class="metadata-text">Metadata</span>
+                <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
                 <div class="metadata-content">
-                    Metadata
+                    Metadata~
                 </div>
             </div>
         </div>
@@ -130,6 +131,12 @@ const handleSelectEtc = (item: MenuItem) => {
         <div class="body">
             <slot />
         </div>
+        <p-select-dropdown class="widget-size-dropdown"
+                           style-type="transparent"
+                           :menu="state.sizeDropdownMenuItems"
+                           :selected="props.size"
+                           @select="handleSelectSize"
+        />
     </div>
 </template>
 
@@ -147,6 +154,9 @@ const handleSelectEtc = (item: MenuItem) => {
         .etc-button {
             display: block;
         }
+    }
+    &.sm {
+        height: 11rem;
     }
 
     .widget-header {
@@ -168,7 +178,11 @@ const handleSelectEtc = (item: MenuItem) => {
             padding-left: 0.75rem;
             &:hover {
                 .metadata-content {
+                    @apply text-label-md;
+                    max-height: 20rem;
+                    overflow-y: auto;
                     display: block;
+                    z-index: 100;
                 }
             }
             .metadata-text {
@@ -202,9 +216,13 @@ const handleSelectEtc = (item: MenuItem) => {
     }
     .body {
         height: auto;
-        overflow-y: auto;
         flex: 1 1;
         padding: 0 1.5rem;
+    }
+    .widget-size-dropdown {
+        position: absolute;
+        bottom: 0;
+        right: 0;
     }
 }
 </style>

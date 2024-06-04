@@ -2,13 +2,12 @@ import type { UnwrapRef } from 'vue';
 import { computed } from 'vue';
 
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetSize } from '@/common/modules/widgets/types/widget-config-type';
-import type { NewWidgetProps, WidgetEmit } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps, WidgetEmit, WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
 
 
 export const useWidgetFrame = (
-    props: UnwrapRef<NewWidgetProps>,
+    props: UnwrapRef<WidgetProps>,
     emit: WidgetEmit,
 ) => {
     const _widgetConfig = getWidgetConfig(props.widgetName);
@@ -18,7 +17,7 @@ export const useWidgetFrame = (
         return _widgetConfig.meta.sizes[0];
     });
     const _currency = undefined; // TODO: set this
-    const _dateText = props.baseOnDate; // TODO: set this
+    // const _dateText = props.baseOnDate; // TODO: set this
     const _widgetLocation = undefined; // TODO: set this
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
         widgetId: props.widgetId,
@@ -30,12 +29,12 @@ export const useWidgetFrame = (
         width: props.width,
         widgetLocation: _widgetLocation,
         //
-        dateText: _dateText,
+        // dateText: _dateText,
         currency: _currency,
         //
-        loading: props.loading,
-        editMode: props.editMode,
-        errorMode: props.errorMode,
+        // loading: props.loading,
+        // editMode: props.editMode,
+        // errorMode: props.errorMode,
     }));
 
     const widgetFrameEventHandlers = {
@@ -44,6 +43,9 @@ export const useWidgetFrame = (
         },
         'click-delete': () => {
             emit('click-delete');
+        },
+        'update:size': (size: WidgetSize) => {
+            emit('update:size', size);
         },
     };
 

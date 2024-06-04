@@ -9,10 +9,10 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 
 import type { BaseWidgetState } from '@/common/modules/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/common/modules/widgets/_composables/use-widget/use-widget';
-import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 
-export const useWidgetDateRange = (props: NewWidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<DateRange> => {
+export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<DateRange> => {
     if (isRef(overrides.dateRange)) return overrides.dateRange;
     const dateRange = computed<DateRange>(() => {
         if (overrides.dateRange) return overrides.dateRange as DateRange;

@@ -15,7 +15,7 @@ import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-refe
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
-// TODO: replace with NewWidgetProps
+// TODO: replace with WidgetProps
 export interface WidgetProps<T = any> {
     widgetConfigId: string;
     title?: string;
@@ -38,7 +38,7 @@ export interface WidgetProps<T = any> {
     data?: T;
 }
 
-// TODO: remove this after replacing WidgetProps with NewWidgetProps
+// TODO: remove this after replacing WidgetProps with WidgetProps
 export interface NewWidgetProps {
     widgetConfigId: string;
     widgetInfo: DashboardLayoutWidgetInfo;

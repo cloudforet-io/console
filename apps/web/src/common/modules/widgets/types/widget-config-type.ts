@@ -1,6 +1,4 @@
-import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
-
-export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
+import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 
 
 export interface DataFieldOptions {

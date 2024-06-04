@@ -20,11 +20,11 @@ import { throttle } from 'lodash';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
-    NewWidgetProps, WidgetEmit,
+    WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-const props = defineProps<NewWidgetProps>();
+const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
