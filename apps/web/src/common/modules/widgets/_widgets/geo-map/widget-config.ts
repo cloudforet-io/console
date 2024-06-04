@@ -10,6 +10,7 @@ const geoMap: WidgetConfig = {
     requiredFieldsSchema: {
     },
     optionalFieldsSchema: {
+        legend: {},
     },
 };
 

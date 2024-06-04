@@ -4,13 +4,13 @@ import { reactive } from 'vue';
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import type {
-    MinOptions,
+    MaxOptions,
     WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
 
 
 interface Props {
-    widgetFieldSchema: WidgetFieldSchema<MinOptions>;
+    widgetFieldSchema: WidgetFieldSchema<MaxOptions>;
     required: boolean;
 }
 
@@ -39,7 +39,7 @@ const handleUpdateValue = (value: number) => {
 </script>
 
 <template>
-    <div class="widget-field-min">
+    <div class="widget-field-max">
         <p-field-group :label="props.widgetFieldSchema.label"
                        :required="props.required"
         >
@@ -54,7 +54,7 @@ const handleUpdateValue = (value: number) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-field-min {
+.widget-field-max {
     /* custom design-system component - p-text-input */
     :deep(.p-text-input) {
         width: 100%;

@@ -19,9 +19,7 @@ const pieChart: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
+        legend: {},
     },
 };
 

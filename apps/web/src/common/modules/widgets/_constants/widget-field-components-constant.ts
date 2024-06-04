@@ -40,6 +40,9 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     formatRules: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldFormatRules.vue'),
     }),
+    legend: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldLegend.vue'),
+    }),
     progressBar: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldProgressBar.vue'),
     }),

@@ -25,9 +25,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
+        legend: {},
     },
 };
 
