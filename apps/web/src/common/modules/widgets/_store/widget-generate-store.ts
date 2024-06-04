@@ -26,6 +26,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         description: '',
         // Data Table
         selectedDataTableId: undefined as undefined | string,
+        dataTables: [] as DataTableModel[],
         selectedDataTable: undefined as DataTableModel|undefined,
     });
 
