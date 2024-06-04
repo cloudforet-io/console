@@ -26,13 +26,13 @@ const stackedAreaChart: WidgetConfig = {
     },
     optionalFieldsSchema: {
         legend: {},
-        // formatRules: {
-        //     type: 'format_rules',
-        //     label: 'Format Rules',
-        //     options: {
-        //         fields: ['number', 'text', 'color'],
-        //     },
-        // },
+        formatRules: {
+            label: 'Format Rules',
+            options: {
+                fields: ['dropdown', 'color'],
+                dataTarget: 'legend', // TODO: this should be updated more
+            },
+        },
     },
 };
 

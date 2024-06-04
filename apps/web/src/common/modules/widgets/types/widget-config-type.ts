@@ -60,12 +60,10 @@ export interface TotalOptions {
     default?: boolean;
 }
 
-type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
+export type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
-    legendOptions?: {
-        dataTarget?: string;
-    }
+    dataTarget?: string;
 }
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
