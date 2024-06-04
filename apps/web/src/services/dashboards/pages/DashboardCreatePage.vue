@@ -21,6 +21,8 @@ export default defineComponent({
 // eslint-disable-next-line import/order,import/no-duplicates
 import { computed, defineExpose, reactive } from 'vue';
 
+import type { TranslateResult } from 'vue-i18n';
+
 import {
     PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
@@ -41,7 +43,6 @@ import { useProperRouteLocation } from '@/common/composables/proper-route-locati
 
 import DashboardCreateStep1 from '@/services/dashboards/components/DashboardCreateStep1.vue';
 import DashboardCreateStep2 from '@/services/dashboards/components/DashboardCreateStep2.vue';
-import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -50,7 +51,7 @@ import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-
 
 interface Step {
     step: number;
-    description?: string;
+    description?: TranslateResult;
 }
 const appContextStore = useAppContextStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -77,37 +78,29 @@ const {
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: false,
-    adminSteps: computed<Step[]>(() => [
-        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
-        { step: 2 },
+    steps: computed<Step[]>(() => [
+        {
+            step: 1,
+            description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC'),
+        },
+        {
+            step: 2,
+            description: state.isAdminMode ? i18n.t('DASHBOARDS.CREATE.STEP2_DESC_FOR_ADMIN') : i18n.t('DASHBOARDS.CREATE.STEP2_DESC'),
+        },
     ]),
-    userSteps: computed<Step[]>(() => [
-        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
-        { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
-        { step: 3 },
-    ]),
-    steps: computed(() => (state.isAdminMode ? state.adminSteps : state.userSteps)),
     currentStep: 1,
     isValid: computed(() => {
         if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
         return true;
     }),
+    isStep2Valid: false,
     closeConfirmModalVisible: false,
+    disableCreateButton: computed<boolean>(() => !isAllValid.value || !state.isStep2Valid),
 });
 
 const goStep = (direction: 'prev'|'next') => {
-    if (state.isAdminMode && (state.currentStep === 1 && direction === 'next')
-        || !state.isAdminMode && (state.currentStep === 2 && direction === 'next')
-    ) {
-        saveCurrentStateToStore();
-    }
     if (direction === 'prev') state.currentStep--;
     else state.currentStep++;
-};
-
-const saveCurrentStateToStore = () => {
-    dashboardDetailStore.setProjectId(dashboardDetailState.dashboardScope === 'PROJECT' ? dashboardProject.value?.id : undefined);
-    dashboardDetailStore.setDashboardTemplate(dashboardTemplate.value);
 };
 
 const createDashboard = async () => {
@@ -166,7 +159,7 @@ defineExpose({ setPathFrom });
 
 <template>
     <div class="dashboard-create-page"
-         :class="[`step-${state.currentStep}`, { 'admin-mode': state.isAdminMode }]"
+         :class="[`step-${state.currentStep}`]"
     >
         <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
                                   :description="state.steps[state.currentStep - 1].description"
@@ -179,8 +172,9 @@ defineExpose({ setPathFrom });
         <dashboard-create-step1 v-if="state.currentStep === 1"
                                 @select-template="handleSelectTemplate"
         />
-        <template v-else-if="!state.isAdminMode && state.currentStep === 2">
+        <template v-else-if="state.currentStep === 2">
             <dashboard-create-step2 :selected-template="dashboardTemplate"
+                                    :is-valid.sync="state.isStep2Valid"
                                     @select-project="handleSelectProject"
             />
             <div class="button-area">
@@ -193,21 +187,13 @@ defineExpose({ setPathFrom });
                 </p-button>
                 <p-button style-type="primary"
                           size="lg"
-                          :disabled="!isAllValid"
-                          @click="goStep('next')"
+                          :disabled="state.disableCreateButton"
+                          @click="createDashboard"
                 >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
+                    {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
                 </p-button>
             </div>
         </template>
-        <div v-if="state.currentStep === 3 || (state.isAdminMode && state.currentStep === 2)">
-            <dashboard-customize :loading="state.loading"
-                                 :save-button-text="$t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
-                                 hide-cancel-button
-                                 @go-back="goStep('prev')"
-                                 @save="createDashboard"
-            />
-        </div>
         <confirm-back-modal :visible.sync="state.closeConfirmModalVisible"
                             @confirm="handleClickBackButton"
         />
@@ -221,11 +207,6 @@ defineExpose({ setPathFrom });
     }
     &.step-2 {
         width: 45rem;
-        &.admin-mode {
-            width: 100%;
-            height: 100%;
-            min-height: calc(100vh - 8rem);
-        }
     }
     &.step-3 {
         width: 100%;
