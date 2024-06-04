@@ -169,6 +169,7 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
     flex-direction: column;
     width: 25%;
     min-width: 2rem;
+    overflow-y: auto;
     .data-table-wrapper {
         @apply bg-gray-150 rounded-md;
     }

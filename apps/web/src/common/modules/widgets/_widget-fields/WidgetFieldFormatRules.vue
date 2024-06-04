@@ -112,6 +112,7 @@ onMounted(() => {
     .p-text-input {
         flex: 1;
         width: 100%;
+        min-width: 30%;
     }
     .delete-button {
         width: 2rem;

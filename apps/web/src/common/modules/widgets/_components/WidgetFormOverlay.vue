@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, POverlayLayout,
@@ -43,6 +43,10 @@ const handleClickContinue = () => {
 const handleUpdateVisible = (value: boolean) => {
     widgetGenerateStore.setShowOverlay(value);
 };
+
+watch(() => widgetGenerateState.showOverlay, (val) => {
+    if (!val) widgetGenerateStore.reset();
+});
 </script>
 
 <template>

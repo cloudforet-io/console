@@ -21,7 +21,7 @@ const handleChangeInput = (event: InputEvent) => {
     <input :value="props.value"
            type="color"
            class="color-input"
-           @mouseleave.native="handleChangeInput"
+           @mouseleave="handleChangeInput"
     >
 </template>
 
