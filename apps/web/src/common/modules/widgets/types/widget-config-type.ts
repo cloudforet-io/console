@@ -51,6 +51,15 @@ export interface IconOptions {
     default?: boolean;
 }
 
+export interface SubTotalOptions {
+    default?: boolean;
+    toggle?: boolean;
+}
+
+export interface TotalOptions {
+    default?: boolean;
+}
+
 type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
@@ -61,7 +70,7 @@ export interface FormatRulesOptions {
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
     | TotalFieldOptions | BasisFieldOptions
-    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions;
+    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     label?: string;

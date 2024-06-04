@@ -30,12 +30,8 @@ const table: WidgetConfig = {
         comparison: {
             label: 'Comparison',
         },
-        subTotal: {
-            label: 'Sub Total',
-        },
-        total: {
-            label: 'Total',
-        },
+        subTotal: {},
+        total: {},
         progressBar: {
             label: 'Progress Bar',
         },

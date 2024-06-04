@@ -1447,6 +1447,9 @@
 			"TOP_PROJECT_SERVER": "サーバ",
 			"TOP_PROJECT_STORAGE": "ストレージ",
 			"TOP_PROJECT_TITLE": "最もリソースを使用しているプロジェクト",
+			"TOTAL": {
+				"DESC": ""
+			},
 			"TRUSTED_ADVISOR": {
 				"LABEL_COST_OPTIMIZATION": "費用最適化",
 				"LABEL_ERROR": "推奨措置",

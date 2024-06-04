@@ -49,4 +49,10 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     icon: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldIcon.vue'),
     }),
+    subTotal: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldSubTotal.vue'),
+    }),
+    total: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue'),
+    }),
 };
