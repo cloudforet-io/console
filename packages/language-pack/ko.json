@@ -2147,7 +2147,7 @@
 			"FORM": {
 				"ADD_TAG": "태그 추가",
 				"ADD_WORKSPACE": "사용자가 접근할 수 있는 워크스페이스",
-				"ADMIN_ROLE_HELP_TEXT": "해당 사용자들은 전체 도메인에 대한 포괄적인 접근 권한을 가지며, Admin 모드 및 모든 워크스페이스에 접근할 수 있습니다.",
+				"ADMIN_ROLE_HELP_TEXT": "",
 				"ALT_E_INVALID_FULL_NAME": "이메일 양식에 맞게 작성해주세요.",
 				"ALT_ING_SEND_INVITATION_EMAIL": "사용자 초대 이메일이 발송되었습니다. 몇분 정도 소요될 수 있습니다.",
 				"ALT_S_SEND_INVITATION_EMAIL": "사용자 초대 완료",

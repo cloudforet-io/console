@@ -2147,7 +2147,7 @@
 			"FORM": {
 				"ADD_TAG": "タグの追加",
 				"ADD_WORKSPACE": "ユーザーがアクセスできるワークスペース",
-				"ADMIN_ROLE_HELP_TEXT": "新規ユーザーは、管理者モードおよびすべてのワークスペースを含む、全ドメインへの包括的なアクセス権を持ちます",
+				"ADMIN_ROLE_HELP_TEXT": "",
 				"ALT_E_INVALID_FULL_NAME": "フルなメールを入力し続けてください。",
 				"ALT_ING_SEND_INVITATION_EMAIL": "招待メールが送信され、数分かかることがあります...",
 				"ALT_S_SEND_INVITATION_EMAIL": "ユーザーが正常に招待されました",
