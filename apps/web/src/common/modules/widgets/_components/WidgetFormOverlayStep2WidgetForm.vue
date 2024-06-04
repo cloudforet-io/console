@@ -27,6 +27,12 @@ const state = reactive({
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
+    fieldValueMap: {
+        // [fieldName]: any
+    },
+    fieldValidationMap: {
+        // [fieldName]: boolean
+    },
     // display
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
@@ -58,7 +64,7 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
 
 <template>
     <div class="widget-form">
-        <div class="data-table-wrapper">
+        <div class="basic-field-wrapper gray">
             <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DATA_TABLE')"
                            required
             >
@@ -74,14 +80,16 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                 <p-select-dropdown :options="[]" />
             </p-field-group>
         </div>
-        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CHART_TYPE')"
-                       required
-        >
-            <p-select-dropdown :menu="state.chartTypeMenuItems"
-                               :selected="widgetGenerateState.selectedWidgetName"
-                               @select="handleSelectWidgetName"
-            />
-        </p-field-group>
+        <div class="basic-field-wrapper">
+            <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CHART_TYPE')"
+                           required
+            >
+                <p-select-dropdown :menu="state.chartTypeMenuItems"
+                                   :selected="widgetGenerateState.selectedWidgetName"
+                                   @select="handleSelectWidgetName"
+                />
+            </p-field-group>
+        </div>
         <!-- widget info -->
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.WIDGET_INFO] }"
@@ -130,7 +138,6 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :required="true"
                     />
                 </template>
             </div>
@@ -155,7 +162,6 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :required="true"
                     />
                 </template>
             </div>
@@ -170,22 +176,16 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
     width: 25%;
     min-width: 2rem;
     overflow-y: auto;
-    .data-table-wrapper {
-        @apply bg-gray-150 rounded-md;
+    .basic-field-wrapper {
+        &.gray {
+            @apply bg-gray-150 rounded-md;
+        }
+        padding: 0.75rem 1.25rem 0 1.25rem;
     }
 }
 
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
-    &.primary {
-        margin-bottom: 0.75rem;
-        padding: 0.75rem 1.25rem 0 1.25rem;
-    }
-    .title {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-    }
     .p-select-dropdown {
         width: 100%;
     }
@@ -198,6 +198,9 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
     @apply border-t border-gray-200;
     .arrow-button {
         transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .form-wrapper {
+        padding: 1rem 1.25rem 0 1.25rem;
     }
     &.collapsed {
         .form-wrapper {

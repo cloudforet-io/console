@@ -5,19 +5,14 @@ import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import type {
     MaxOptions,
-    WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<MaxOptions>;
-    required: boolean;
-}
 
 const emit = defineEmits<{(e: 'update:value', value: number): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {
@@ -40,7 +35,9 @@ const handleUpdateValue = (value: number) => {
 
 <template>
     <div class="widget-field-max">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <p-text-input type="number"
                           :min="props.widgetFieldSchema.options?.min ?? 0"
                           :max="props.widgetFieldSchema.options?.max ?? 0"

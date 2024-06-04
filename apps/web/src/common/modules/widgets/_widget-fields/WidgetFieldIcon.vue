@@ -8,21 +8,16 @@ import {
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import type {
     IconOptions,
-    WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 
 
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<IconOptions>;
-    required: boolean;
-}
-
 const emit = defineEmits<{(e: 'update:value', value: { icon: Icon, color: string }): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {

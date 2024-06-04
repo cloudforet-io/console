@@ -3,18 +3,14 @@ import { reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton, PCheckbox } from '@spaceone/design-system';
 
-import type { SubTotalOptions, WidgetFieldSchema } from '@/common/modules/widgets/types/widget-config-type';
+import type { SubTotalOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<SubTotalOptions>;
-    required: boolean;
-}
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<SubTotalOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {

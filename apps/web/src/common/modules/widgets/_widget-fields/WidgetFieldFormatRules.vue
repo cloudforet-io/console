@@ -7,16 +7,13 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { WidgetFieldSchema, FormatRulesOptions, FormatRulesField } from '@/common/modules/widgets/types/widget-config-type';
+import type { FormatRulesOptions, FormatRulesField } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 
 
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<FormatRulesOptions>;
-    required: boolean;
-}
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
     }),
@@ -65,7 +62,9 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-format-rules">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <div class="format-rules-wrapper">
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
