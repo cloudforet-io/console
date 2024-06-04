@@ -86,9 +86,9 @@ const handleCloseModal = () => {
     dashboardDetailStore.setSettings(state.settingsSnapshot);
     emit('update:visible', false);
 };
-const handleClickEditOption = () => {
-    state.sidebarVisible = true;
-};
+// const handleClickEditOption = () => {
+//     state.sidebarVisible = true;
+// };
 const handleCloseSidebar = async (save: boolean) => {
     state.sidebarVisible = false;
     if (!save) widgetFormStore.returnToInitialSettings();
@@ -153,15 +153,15 @@ onBeforeUnmount(() => {
                                 </span>
                             </p-badge>
                         </template>
-                        <p-button icon-left="ic_edit"
-                                  size="md"
-                                  style-type="tertiary"
-                                  :disabled="state.sidebarVisible"
-                                  class="edit-button"
-                                  @click="handleClickEditOption"
-                        >
-                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
-                        </p-button>
+                        <!--                        <p-button icon-left="ic_edit"-->
+                        <!--                                  size="md"-->
+                        <!--                                  style-type="tertiary"-->
+                        <!--                                  :disabled="state.sidebarVisible"-->
+                        <!--                                  class="edit-button"-->
+                        <!--                                  @click="handleClickEditOption"-->
+                        <!--                        >-->
+                        <!--                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}-->
+                        <!--                        </p-button>-->
                     </div>
                 </div>
                 <div class="filter-wrapper">

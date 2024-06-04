@@ -5,7 +5,7 @@ import type {
 
 
 export interface PrivateDashboardUpdateParameters {
-    private_dashboard_id: string;
+    dashboard_id: string;
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;

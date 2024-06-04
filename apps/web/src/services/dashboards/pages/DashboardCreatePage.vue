@@ -134,7 +134,7 @@ const createDashboard = async () => {
         await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: createdDashboard.dashboard_id || createdDashboard.private_dashboard_id || '',
+                dashboardId: createdDashboard.dashboard_id || '',
             },
         })).catch(() => {});
     } catch (e) {

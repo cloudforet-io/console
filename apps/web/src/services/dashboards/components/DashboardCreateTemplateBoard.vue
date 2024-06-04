@@ -31,7 +31,7 @@ const emit = defineEmits<{(e: 'select-template', value: any)}>();
 
 /* Event */
 const getDashboardViewLink = (template: DashboardModel): Location|undefined => {
-    const dashboardId = template.private_dashboard_id || template.dashboard_id;
+    const dashboardId = template.dashboard_id;
     if (!dashboardId) return undefined;
     return getProperRouteLocation({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
 };

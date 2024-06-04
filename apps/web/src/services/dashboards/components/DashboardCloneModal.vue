@@ -109,7 +109,7 @@ const createDashboard = async () => {
             }
         }
         const res = await dashboardDetailStore.createDashboard(params, state.dashboardType);
-        return res.dashboard_id || res.private_dashboard_id;
+        return res.dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
     }
@@ -135,7 +135,6 @@ const handleConfirm = async () => {
 
 const init = () => {
     initForm('name', `Clone - ${props.dashboard?.name}`);
-    state.isPrivate = !!props.dashboard?.private_dashboard_id;
 };
 
 watch(() => props.visible, (visible) => {

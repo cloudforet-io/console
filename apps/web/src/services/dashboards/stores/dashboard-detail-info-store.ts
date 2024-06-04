@@ -243,9 +243,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const _dashboardInfo = cloneDeep(dashboardInfo);
 
         setDashboardInfo(_dashboardInfo);
-        const _dashboardScope = _dashboardInfo.private_dashboard_id ? 'PRIVATE' : _dashboardInfo.resource_group;
+        const _dashboardScope = _dashboardInfo.resource_group || 'PRIVATE';
         setDashboardScope(_dashboardScope);
-        state.dashboardId = _dashboardInfo.dashboard_id ?? _dashboardInfo.private_dashboard_id;
+        state.dashboardId = _dashboardInfo.dashboard_id;
         setName(_dashboardInfo.name);
         setLabels(_dashboardInfo.labels);
         const _settings = {
@@ -293,7 +293,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
 
-        const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.dashboard_id === dashboardId || dashboard.private_dashboard_id === dashboardId);
+        const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.dashboard_id === dashboardId);
         if (targetDashboards.length > 0) {
             _setDashboardInfoStoreState(targetDashboards[0] as DashboardModel);
             return;
@@ -307,9 +307,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
         try {
-            const params: GetDashboardParameters = isPrivate
-                ? { private_dashboard_id: dashboardId as string }
-                : { dashboard_id: dashboardId as string };
+            const params: GetDashboardParameters = { dashboard_id: dashboardId as string };
             const result = await fetcher<GetDashboardParameters, DashboardModel>(params);
             _setDashboardInfoStoreState(result);
         } catch (e) {
@@ -409,10 +407,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
-        const isPrivate = dashboardId?.startsWith('private');
         const _params: UpdateDashboardParameters = {
             ...params,
-            [isPrivate ? 'private_dashboard_id' : 'dashboard_id']: dashboardId,
+            dashboard_id: dashboardId,
         };
         if (params.variables_schema) {
             _params.variables_schema = {
