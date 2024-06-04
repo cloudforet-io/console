@@ -118,7 +118,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             inheritOptions: dashboardWidgetInfo.value?.inherit_options,
             widgetOptions: dashboardWidgetInfo.value?.widget_options,
             widgetName: state.widgetConfigId,
-            dashboardOptions: dashboardDetailState.settings,
+            dashboardOptions: dashboardDetailState.options,
             dashboardVariablesSchema: dashboardDetailGetters.refinedVariablesSchema,
             dashboardVariables: dashboardDetailState.variables,
             title: dashboardWidgetInfo.value?.title,

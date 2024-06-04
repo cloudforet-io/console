@@ -35,8 +35,8 @@ interface WidgetValidMap {
 }
 
 const DEFAULT_REFRESH_INTERVAL = '5m';
-export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardOptions }>({
-    settings: {
+export const DASHBOARD_DEFAULT = Object.freeze<{ options: DashboardOptions }>({
+    options: {
         date_range: {
             start: undefined,
             end: undefined,
@@ -87,7 +87,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         projectId: undefined as string | undefined,
         name: '',
         placeholder: '',
-        settings: DASHBOARD_DEFAULT.settings as DashboardOptions,
+        options: DASHBOARD_DEFAULT.options as DashboardOptions,
         variables: {} as DashboardVariables,
         variablesSchema: {
             properties: {},
@@ -145,8 +145,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setIsNameValid = (isValid?: boolean) => {
         state.isNameValid = isValid;
     };
-    const setSettings = (settings: DashboardOptions) => {
-        state.settings = settings;
+    const setOptions = (options: DashboardOptions) => {
+        state.options = options;
     };
     const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => {
         state.dashboardWidgetInfoList = dashboardWidgetInfoList;
@@ -187,7 +187,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setProjectId('');
         setName('');
         state.placeholder = '';
-        setSettings(DASHBOARD_DEFAULT.settings);
+        setOptions(DASHBOARD_DEFAULT.options);
         setVariables({});
         setVariablesSchema({ properties: {}, order: [] });
         setVariablesInitMap({});
@@ -210,7 +210,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setName('');
         state.placeholder = _template.name;
         setLabels(_template.labels);
-        setSettings(_template.options);
+        setOptions(_template.options);
         let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
         let _variables = _template.variables ?? {};
         if (state.projectId) {
@@ -248,7 +248,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardId = _dashboardInfo.dashboard_id;
         setName(_dashboardInfo.name);
         setLabels(_dashboardInfo.labels);
-        const _settings = {
+        const _options = {
             date_range: {
                 enabled: _dashboardInfo.options?.date_range?.enabled ?? false,
                 start: _dashboardInfo.options?.date_range?.start,
@@ -256,7 +256,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        setSettings(_settings);
+        setOptions(_options);
 
         // project_id
         const _projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
@@ -427,7 +427,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const mutations = {
         setName,
         setIsNameValid,
-        setSettings,
+        setOptions,
         setDashboardWidgetInfoList,
         setLabels,
         setVariablesSchema,

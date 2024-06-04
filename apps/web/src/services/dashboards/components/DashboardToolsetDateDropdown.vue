@@ -71,10 +71,10 @@ const setSelectedDateRange = (start, end) => {
     state.selectedDateRange = { start: _start, end: _end };
 };
 const updateDashboardDateRange = (dateRange: DashboardOptions['date_range']) => {
-    const _settings = cloneDeep(dashboardDetailState.settings);
-    _settings.date_range.start = dateRange.start;
-    _settings.date_range.end = dateRange.end;
-    dashboardDetailStore.setSettings(_settings);
+    const _options = cloneDeep(dashboardDetailState.options);
+    _options.date_range.start = dateRange.start;
+    _options.date_range.end = dateRange.end;
+    dashboardDetailStore.setOptions(_options);
 };
 
 /* Event */
