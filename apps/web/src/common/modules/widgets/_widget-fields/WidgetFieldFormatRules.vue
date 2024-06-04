@@ -14,7 +14,6 @@ import { gray } from '@/styles/colors';
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<FormatRulesOptions>;
-    required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     widgetFieldSchema: () => ({
@@ -65,7 +64,9 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-format-rules">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <div class="format-rules-wrapper">
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"

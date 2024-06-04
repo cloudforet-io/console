@@ -8,7 +8,6 @@ import type { SubTotalOptions, WidgetFieldSchema } from '@/common/modules/widget
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<SubTotalOptions>;
-    required: boolean;
 }
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;

@@ -8,7 +8,6 @@ import type { TotalOptions, WidgetFieldSchema } from '@/common/modules/widgets/t
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<TotalOptions>;
-    required: boolean;
 }
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;

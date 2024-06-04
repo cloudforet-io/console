@@ -11,7 +11,6 @@ import type {
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<MinOptions>;
-    required: boolean;
 }
 
 const emit = defineEmits<{(e: 'update:value', value: number): void;
@@ -40,7 +39,9 @@ const handleUpdateValue = (value: number) => {
 
 <template>
     <div class="widget-field-min">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <p-text-input type="number"
                           :min="props.widgetFieldSchema.options?.min ?? 0"
                           :max="props.widgetFieldSchema.options?.max ?? 0"

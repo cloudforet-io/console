@@ -13,7 +13,6 @@ import type {
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<GroupByFieldOptions>;
-    required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     widgetFieldSchema: () => ({
@@ -28,7 +27,9 @@ const state = reactive({
 
 <template>
     <div class="widget-field-group-by">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems"
                                    :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"

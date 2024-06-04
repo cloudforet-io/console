@@ -16,7 +16,6 @@ import { gray } from '@/styles/colors';
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<IconOptions>;
-    required: boolean;
 }
 
 const emit = defineEmits<{(e: 'update:value', value: { icon: Icon, color: string }): void;

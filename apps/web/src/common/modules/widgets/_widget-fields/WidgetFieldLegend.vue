@@ -11,7 +11,6 @@ import type {
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<LegendOptions>;
-    required: boolean;
 }
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;

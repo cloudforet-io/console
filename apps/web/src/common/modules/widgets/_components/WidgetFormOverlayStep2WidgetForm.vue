@@ -138,7 +138,6 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :required="true"
                     />
                 </template>
             </div>
@@ -163,7 +162,6 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :required="true"
                     />
                 </template>
             </div>

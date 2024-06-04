@@ -9,7 +9,6 @@ import type { BasisFieldOptions, WidgetFieldSchema } from '@/common/modules/widg
 
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<BasisFieldOptions>;
-    required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     widgetFieldSchema: () => ({
@@ -24,7 +23,9 @@ const state = reactive({
 
 <template>
     <div class="widget-field-basis-field">
-        <p-field-group :label="props.widgetFieldSchema.label">
+        <p-field-group :label="props.widgetFieldSchema.label"
+                       required
+        >
             <p-select-dropdown :menu="state.menuItems" />
         </p-field-group>
     </div>

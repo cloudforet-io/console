@@ -17,7 +17,6 @@ interface FormatRule {
 }
 interface Props {
     widgetFieldSchema: WidgetFieldSchema<BasisFieldOptions>;
-    required: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     widgetFieldSchema: () => ({
