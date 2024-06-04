@@ -1776,6 +1776,7 @@
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "このウィジェットには、ダッシュボードの影響を受けない非継承オプションが含まれています。",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "非継承オプションのリスト:",
+			"METADATA": "",
 			"MONTHLY_COST": {
 				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
 				"PREVIOUS_MONTH": "前月",

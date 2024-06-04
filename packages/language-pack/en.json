@@ -1776,6 +1776,7 @@
 			"ERROR_TITLE": "Unable to load",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "This widget includes non-inherited options which are not affected by the dashboard.",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "List of non-inherited options:",
+			"METADATA": "Metadata",
 			"MONTHLY_COST": {
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
 				"PREVIOUS_MONTH": "Previous month",
