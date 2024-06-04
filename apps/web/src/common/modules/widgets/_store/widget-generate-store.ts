@@ -43,7 +43,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setOverlayStep = (overlayStep: number) => {
         state.overlayStep = overlayStep;
     };
-    const setSelctedDataTableId = (selectedDataTableId: string) => {
+    const setSelectedDataTableId = (selectedDataTableId: string) => {
         state.selectedDataTableId = selectedDataTableId;
     };
     const setTitle = (title: string) => {
@@ -62,7 +62,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const mutations = {
         setShowOverlay,
         setOverlayStep,
-        setSelctedDataTableId,
+        setSelectedDataTableId,
         setSelectedWidgetName,
         setTitle,
         setDescription,

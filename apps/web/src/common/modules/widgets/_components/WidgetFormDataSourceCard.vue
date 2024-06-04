@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
-    PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown,
+    PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PRadioGroup, PRadio, PFieldTitle,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
@@ -12,11 +12,19 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
+import getRandomId from '@/lib/random-id-generator';
+
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/widget-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
+
+interface AdditionalLabel {
+    key: string;
+    name: string;
+    value: string;
+}
 
 interface Props {
     item: DataTableModel;
@@ -49,10 +57,9 @@ const state = reactive({
         }
         return '';
     }),
-    selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
-        ? props.item.options[DATA_SOURCE_DOMAIN.COST].dataKey
-        : props.item.options[DATA_SOURCE_DOMAIN.ASSET].metric_id,
-    selectedGroupByItems: [...(props.item.options?.group_by || [])],
+    selectedSourceEndItem: undefined,
+    selectedGroupByItems: [],
+    dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return props.item.data_info.map((dataKey) => ({
@@ -76,11 +83,69 @@ const state = reactive({
     }))),
 });
 
+const advancedOptionsState = reactive({
+    advancedOptionsCollapsed: false,
+    additionalLabels: [] as AdditionalLabel[],
+    separateDate: false,
+    timeDiffList: computed(() => [
+        { label: 'None', name: 'none' },
+        { label: 'Year', name: 'year' },
+        { label: 'Month', name: 'month' },
+        { label: 'Day', name: 'day' },
+    ]),
+    selectedTimeDiff: 'none',
+});
+
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
-    widgetGenerateStore.setSelctedDataTableId(dataTableId);
+    widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.loadDataTable(dataTableId);
 };
+
+const handleAddFilter = () => {
+    console.debug('handleAddFilter');
+};
+
+const handleClickToggleAdvancedOptionsForm = () => {
+    advancedOptionsState.advancedOptionsCollapsed = !advancedOptionsState.advancedOptionsCollapsed;
+};
+
+const handleClickTimeDiff = (timeDiff: string) => {
+    advancedOptionsState.selectedTimeDiff = timeDiff;
+};
+
+const handleClickAddLabel = () => {
+    advancedOptionsState.additionalLabels.push({
+        key: getRandomId(),
+        name: '',
+        value: '',
+    });
+};
+
+const handleChangeLabel = (key: string, value: string, type: 'name' | 'value') => {
+    const targetIndex = advancedOptionsState.additionalLabels.findIndex((label) => label.key === key);
+    if (targetIndex !== -1) {
+        advancedOptionsState.additionalLabels[targetIndex][type] = value;
+    }
+};
+
+const handleRemoveLabel = (key: string) => {
+    const targetIndex = advancedOptionsState.additionalLabels.findIndex((label) => label.key === key);
+    if (targetIndex !== -1) {
+        advancedOptionsState.additionalLabels.splice(targetIndex, 1);
+    }
+};
+
+onMounted(() => {
+    state.selectedSourceEndItem = props.item.source_type === DATA_SOURCE_DOMAIN.COST
+        ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
+        : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
+    state.selectedGroupByItems = [...(props.item.options?.group_by || [])];
+    state.dataFieldName = props.item.source_type === DATA_SOURCE_DOMAIN.COST
+        ? state.selectableSourceItems[0]?.label
+        : storeState.metrics[state.selectedSourceEndItem]?.data?.unit;
+});
+
 
 </script>
 
@@ -120,26 +185,153 @@ const handleSelectDataTable = async (dataTableId: string) => {
                 </div>
             </div>
             <div class="options-form">
-                <p-field-group label="Group by">
+                <p-field-group label="Group by"
+                               required
+                >
                     <p-select-dropdown class="group-by-select-dropdown"
                                        :menu="state.labelInfoItems"
-                                       :selected="state.selectedGroupByItems"
+                                       :selected.sync="state.selectedGroupByItems"
                                        multi-selectable
                                        appearance-type="badge"
                     />
                 </p-field-group>
+                <p-field-group label="Filters"
+                               required
+                >
+                    <div class="filters-area">
+                        <div>
+                            <p-field-title class="field-title"
+                                           label="Filter Name"
+                                           size="sm"
+                                           color="gray"
+                            />
+                        </div>
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleAddFilter"
+                        >
+                            Add Filter
+                        </p-button>
+                    </div>
+                </p-field-group>
+                <p-field-group label="Data Field Name"
+                               required
+                >
+                    <p-text-input v-model="state.dataFieldName"
+                                  class="data-field-name-input"
+                                  placeholder="Name"
+                    />
+                </p-field-group>
                 <p-divider class="filter-divider" />
+
+                <div class="form-group-wrapper"
+                     :class="{ 'collapsed': advancedOptionsState.advancedOptionsCollapsed }"
+                >
+                    <div class="title-wrapper"
+                         @click="handleClickToggleAdvancedOptionsForm"
+                    >
+                        <p-i name="ic_chevron-down"
+                             width="1.25rem"
+                             height="1.25rem"
+                             color="inherit transparent"
+                             class="arrow-button"
+                        />
+                        <span>Advanced Options</span>
+                    </div>
+                    <div class="form-wrapper">
+                        <p-field-group label="Additional Labels"
+                                       required
+                        >
+                            <div class="additional-labels-wrapper">
+                                <div v-if="advancedOptionsState.additionalLabels.length"
+                                     class="field-title-wrapper"
+                                >
+                                    <p-field-title class="field-title"
+                                                   label="Name"
+                                                   size="sm"
+                                                   color="gray"
+                                                   inline
+                                    />
+                                    <p-field-title class="field-title"
+                                                   label="Value"
+                                                   size="sm"
+                                                   color="gray"
+                                                   inline
+                                    />
+                                </div>
+                                <div v-for="(labelInfo) in advancedOptionsState.additionalLabels"
+                                     :key="labelInfo.key"
+                                     class="label-wrapper"
+                                >
+                                    <p-text-input class="label-input"
+                                                  block
+                                                  :value="labelInfo.name"
+                                                  @update:value="handleChangeLabel(labelInfo.key, $event, 'name')"
+                                    />
+                                    <p-text-input class="label-input"
+                                                  block
+                                                  :value="labelInfo.value"
+                                                  @update:value="handleChangeLabel(labelInfo.key, $event, 'value')"
+                                    />
+                                    <p-icon-button name="ic_delete"
+                                                   @click="handleRemoveLabel(labelInfo.key)"
+                                    />
+                                </div>
+                                <p-button style-type="tertiary"
+                                          icon-left="ic_plus_bold"
+                                          @click="handleClickAddLabel"
+                                >
+                                    Add Label
+                                </p-button>
+                            </div>
+                        </p-field-group>
+                        <p-field-group label="Separate Date"
+                                       required
+                        >
+                            <div class="separate-date-wrapper">
+                                <p class="description">
+                                    Separate date into 3 columns (Year, Month, Day)
+                                </p>
+                                <p-toggle-button :value="advancedOptionsState.separateDate"
+                                                 show-state-text
+                                                 position="left"
+                                />
+                            </div>
+                        </p-field-group>
+                        <p-field-group label="Time Diff"
+                                       required
+                        >
+                            <p-radio-group class="time-diff-radio-group">
+                                <p-radio v-for="(timeDiff) in advancedOptionsState.timeDiffList"
+                                         :key="timeDiff.name"
+                                         :value="timeDiff.name"
+                                         :selected="advancedOptionsState.selectedTimeDiff"
+                                         @click="handleClickTimeDiff(timeDiff.name)"
+                                >
+                                    {{ timeDiff.label }}
+                                </p-radio>
+                            </p-radio-group>
+                        </p-field-group>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group-wrapper">
                 <p-button style-type="tertiary"
-                          icon-left="ic_plus_bold"
-                          block
+                          icon-left="ic_delete"
                 >
-                    Add Filter
+                    Delete
                 </p-button>
-                <p-button class="save-changes-button"
-                          style-type="secondary"
-                >
-                    Save Changes
-                </p-button>
+                <div class="form-button-wrapper">
+                    <p-button style-type="transparent"
+                              icon-left="ic_refresh"
+                    >
+                        Reset
+                    </p-button>
+                    <p-button style-type="secondary">
+                        Apply
+                    </p-button>
+                </div>
             </div>
         </div>
     </div>
@@ -148,11 +340,14 @@ const handleSelectDataTable = async (dataTableId: string) => {
 <style lang="postcss" scoped>
 .widget-form-data-source-card {
     @apply relative flex;
+    height: auto;
 
     .card-wrapper {
-        @apply relative border border-gray-300 rounded-lg w-full;
+        @apply relative border border-gray-300 rounded-lg w-full bg-white;
         width: 24rem;
         overflow: hidden;
+        height: auto;
+
         &.selected {
             @apply border-violet-600;
             box-shadow: 0 0 0 0.1875rem rgba(137, 124, 214, 0.6);
@@ -187,42 +382,79 @@ const handleSelectDataTable = async (dataTableId: string) => {
             }
         }
         .options-form {
-            @apply bg-white;
             padding: 0.75rem;
 
             .filter-divider {
-                margin: 0.75rem 0;
+                margin-top: 1rem;
             }
 
             .group-by-select-dropdown {
                 @apply w-full;
             }
+            .filters-area {
+                @apply bg-gray-100 rounded-lg;
+                padding: 0.5rem;
+                margin-top: 0.25rem;
+            }
+            .data-field-name-input {
+                @apply w-full;
+            }
+
+            .form-group-wrapper {
+                .arrow-button {
+                    transition: opacity 0.3s ease, visibility 0.3s ease;
+                }
+                &.collapsed {
+                    .form-wrapper {
+                        display: none;
+                    }
+                    .arrow-button {
+                        transform: rotate(-90deg);
+                    }
+                }
+                .title-wrapper {
+                    @apply text-label-lg;
+                    font-weight: 700;
+                    padding: 1rem 0;
+                }
+                .form-wrapper {
+                    padding: 0.5rem 0 0.25rem 1.25rem;
+                    .additional-labels-wrapper {
+                        @apply bg-gray-100 rounded-lg;
+                        padding: 0.5rem;
+                        margin-top: 0.25rem;
+
+                        .field-title-wrapper {
+                            margin-bottom: 0.25rem;
+                            .field-title {
+                                width: calc(50% - 0.875rem);
+                            }
+                        }
+                        .label-wrapper {
+                            @apply flex gap-1;
+                            margin-bottom: 0.5rem;
+                        }
+                    }
+
+                    .separate-date-wrapper {
+                        .description {
+                            @apply text-paragraph-sm text-gray-900;
+                            margin-bottom: 0.5rem;
+                        }
+                    }
+                    .time-diff-radio-group {
+                        margin-top: 0.25rem;
+                    }
+                }
+            }
         }
-        .save-changes-button {
-            @apply relative;
-            margin-top: 0.75rem;
-        }
-    }
 
-    .add-data-source-floating-button {
-        @apply flex items-center justify-center;
-        width: 4rem;
-        height: 4rem;
+        .button-group-wrapper {
+            @apply border-t border-gray-200 flex justify-between;
+            padding: 0.75rem 1rem;
 
-        .add-button {
-            @apply relative flex items-center justify-center border border-violet-400 bg-violet-300 rounded-full;
-            width: 2.5rem;
-            height: 2.5rem;
-
-            &::before {
-                @apply bg-violet-400;
-                content: '';
-                position: absolute;
-                left: -0.8125rem;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0.75rem;
-                height: 0.0625rem;
+            .form-button-wrapper {
+                @apply flex gap-2;
             }
         }
     }
