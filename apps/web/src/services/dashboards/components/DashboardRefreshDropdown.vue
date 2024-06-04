@@ -51,8 +51,8 @@ const state = reactive({
         label: interval.label,
     }))),
     intervalDuration: computed<number|undefined>(() => {
-        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
-        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.settings.refresh_interval_option];
+        if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.options.refresh_interval_option)) return undefined;
+        return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.options.refresh_interval_option];
     }),
 });
 
@@ -133,7 +133,7 @@ const handleRefresh = () => {
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :menu="state.intervalOptionItems"
-                           :selected="dashboardDetailState.settings.refresh_interval_option"
+                           :selected="dashboardDetailState.options.refresh_interval_option"
                            :read-only="props.loading"
                            :class="{ loading: props.loading }"
                            menu-position="right"

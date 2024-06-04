@@ -93,8 +93,8 @@ onBeforeUnmount(() => {
         />
         <div class="filters-box">
             <dashboard-labels editable />
-            <dashboard-toolset-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
-                                             :date-range="dashboardDetailState.settings.date_range"
+            <dashboard-toolset-date-dropdown v-show="dashboardDetailState.options.date_range.enabled"
+                                             :date-range="dashboardDetailState.options.date_range"
             />
         </div>
         <p-divider />
