@@ -170,14 +170,11 @@ documentEventMount('mouseup', endResizing);
     gap: 1rem;
     padding: 0 1.5rem 1rem 1.5rem;
     .data-table-contents {
-        @apply bg-gray-150 rounded-md relative;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+        @apply bg-gray-150 rounded-md relative w-full;
+
         padding: 0.125rem;
         .data-source-wrapper {
             @apply flex gap-4;
-            flex: 1;
             overflow: auto;
             padding: 1rem;
         }
@@ -230,7 +227,8 @@ documentEventMount('mouseup', endResizing);
             }
         }
         .data-table-area {
-            @apply relative;
+            @apply absolute;
+            bottom: 0;
             height: 20%;
             max-height: calc(100% - 2rem);
 
