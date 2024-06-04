@@ -46,7 +46,7 @@ const handleDeleteFormatRule = (idx: number) => {
 <template>
     <div class="widget-field-progress-bar">
         <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
+                       required
         >
             <template #label-extra>
                 <p-toggle-button :value="state.enabled"

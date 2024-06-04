@@ -28,9 +28,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-category-by">
-        <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
-        >
+        <p-field-group :label="props.widgetFieldSchema.label">
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems" />
                 <p-text-input type="number"

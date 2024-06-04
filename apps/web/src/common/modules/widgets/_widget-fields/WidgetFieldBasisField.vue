@@ -24,9 +24,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-basis-field">
-        <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
-        >
+        <p-field-group :label="props.widgetFieldSchema.label">
             <p-select-dropdown :menu="state.menuItems" />
         </p-field-group>
     </div>

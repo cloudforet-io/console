@@ -65,9 +65,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-format-rules">
-        <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
-        >
+        <p-field-group :label="props.widgetFieldSchema.label">
             <div class="format-rules-wrapper">
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
