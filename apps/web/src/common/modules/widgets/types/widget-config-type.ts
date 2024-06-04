@@ -47,6 +47,11 @@ export interface LegendOptions { // toggle button
     default?: boolean;
 }
 
+export interface IconOptions {
+    dataTarget?: string;
+    default?: boolean;
+}
+
 type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
@@ -57,7 +62,7 @@ export interface FormatRulesOptions {
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
     | TotalFieldOptions | BasisFieldOptions
-    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions;
+    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     label?: string;

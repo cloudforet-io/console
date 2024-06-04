@@ -13,9 +13,7 @@ const numberCard: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        icon: {
-            label: 'Icon',
-        },
+        icon: {},
         comparison: {
             label: 'Comparison',
         },

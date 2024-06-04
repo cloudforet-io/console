@@ -46,4 +46,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     progressBar: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldProgressBar.vue'),
     }),
+    icon: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldIcon.vue'),
+    }),
 };
