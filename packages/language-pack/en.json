@@ -1447,6 +1447,9 @@
 			"TOP_PROJECT_SERVER": "Server",
 			"TOP_PROJECT_STORAGE": "Storage",
 			"TOP_PROJECT_TITLE": "Top Resource Managing Projects",
+			"TOTAL": {
+				"DESC": "Freeze total column"
+			},
 			"TRUSTED_ADVISOR": {
 				"LABEL_COST_OPTIMIZATION": "Cost Optimization",
 				"LABEL_ERROR": "Action recommended",
