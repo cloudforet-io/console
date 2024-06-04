@@ -16,7 +16,6 @@ import { CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/
 import { getWidgetComponent, getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
-import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 import type { AllReferenceTypeInfo } from '@/services/dashboards/stores/all-reference-type-info-store';
 import {
@@ -35,9 +34,9 @@ const state = reactive({
         name: d,
         label: d,
     }))),
-    selectedChartName: 'stackedColumnChart',
-    widgetRequiredFieldSchema: computed<WidgetConfig['requiredFieldsSchema']>(() => state.widgetConfig.requiredFieldsSchema),
-    widgetOptionalFieldSchema: computed(() => state.widgetConfig.optionalFieldsSchema),
+    selectedChartName: 'table',
+    widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
+    widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
 });
 
 /* Event */
@@ -60,15 +59,11 @@ const handleClickAddWidget = () => {
             <div class="col-span-8">
                 <component :is="getWidgetComponent(state.selectedChartName)"
                            :widget-name="state.selectedChartName"
-                           :widget-key="state.selectedChartName"
+                           widget-id=""
                            size="lg"
-                           :variables="state.variables"
                            title=""
                            description=""
-                           base-on-date=""
-                           :data-sources="[]"
-                           :data-mapping="{}"
-                           :chart-options="{}"
+                           mode="customize"
                 />
             </div>
             <div class="col-span-4 px-2">
@@ -82,8 +77,10 @@ const handleClickAddWidget = () => {
                     </div>
                 </div>
                 <div>
-                    <p>Required Field Schema</p>
-                    <template v-for="[fieldName, fieldSchema] in Object.entries(state.widgetRequiredFieldSchema)">
+                    <p class="mb-2">
+                        Required Field Schema
+                    </p>
+                    <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                         <component :is="getWidgetFieldComponent(fieldName)"
                                    :key="`required-field-${fieldName}`"
                                    :widget-field-schema="fieldSchema"
@@ -91,8 +88,10 @@ const handleClickAddWidget = () => {
                         />
                     </template>
                     <br>
-                    <p>Optional Field Schema</p>
-                    <template v-for="[fieldName, fieldSchema] in Object.entries(state.widgetOptionalFieldSchema)">
+                    <p class="mb-2">
+                        Optional Field Schema
+                    </p>
+                    <template v-for="[fieldName, fieldSchema] in state.widgetOptionalFieldSchemaMap">
                         <component :is="getWidgetFieldComponent(fieldName)"
                                    :key="`optional-field-${fieldName}`"
                                    :widget-field-schema="fieldSchema"
