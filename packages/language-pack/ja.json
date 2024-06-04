@@ -1036,6 +1036,7 @@
 				"ALT_E_UPDATE": "言語編集に失敗",
 				"ALT_S_UPDATE": "言語編集完了",
 				"ALT_S_UPDATE_CURRENCY": "通貨の更新が正常に完了しました",
+				"GO_TO_CONSOLE_HOME": "",
 				"GO_TO_MYPAGE": "マイページ",
 				"LABEL_CURRENCY": "通貨",
 				"LABEL_LANGUAGE": "言語",

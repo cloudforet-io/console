@@ -1036,6 +1036,7 @@
 				"ALT_E_UPDATE": "언어 변경 실패",
 				"ALT_S_UPDATE": "언어 변경 완료",
 				"ALT_S_UPDATE_CURRENCY": "환율 변경 완료",
+				"GO_TO_CONSOLE_HOME": "",
 				"GO_TO_MYPAGE": "마이페이지",
 				"LABEL_CURRENCY": "통화",
 				"LABEL_LANGUAGE": "언어",
