@@ -102,7 +102,8 @@ const handleSelectSize = (size: WidgetSize) => {
                 </div>
             </div>
         </div>
-        <p-icon-button ref="targetRef"
+        <p-icon-button v-if="props.mode === 'view'"
+                       ref="targetRef"
                        name="ic_ellipsis-horizontal"
                        shape="square"
                        class="etc-button"
@@ -114,7 +115,7 @@ const handleSelectSize = (size: WidgetSize) => {
                         :menu="state.etcDropdownMenuItems"
                         @select="handleSelectEtc"
         />
-        <div v-if="props.editMode"
+        <div v-if="props.mode === 'customize'"
              class="action-button-wrapper"
         >
             <p-icon-button name="ic_edit"
