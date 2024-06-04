@@ -129,6 +129,13 @@ const handleClickGoToMyPage = () => {
     }).catch(() => {});
     hideProfileMenu();
 };
+const handleClickGoToConsoleHome = () => {
+    appContextStore.setGlobalGrantLoading(true);
+    router.push({
+        name: LANDING_ROUTE._NAME,
+    }).catch(() => {});
+    hideProfileMenu();
+};
 
 const handleLanguageClick = async (language) => {
     try {
@@ -261,6 +268,17 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('COMMON.PROFILE.TIMEZONE') }}</span>
                     <span class="value">{{ state.timezone }}</span>
                 </div>
+                <div v-if="!route.path.includes('landing')"
+                     class="info-menu"
+                >
+                    <p-button style-type="tertiary"
+                              size="sm"
+                              class="console-home-button"
+                              @click="handleClickGoToConsoleHome"
+                    >
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_CONSOLE_HOME') }}
+                    </p-button>
+                </div>
                 <div v-if="!route.path.includes('my-page')"
                      class="info-menu"
                 >
@@ -374,6 +392,11 @@ const handleClickSignOut = async () => {
                 .label {
                     @apply text-gray-500 font-bold;
                     padding-right: 0.5rem;
+                }
+
+                .console-home-button {
+                    @apply w-full;
+                    margin-top: 0.75rem;
                 }
 
                 .my-page-button {
