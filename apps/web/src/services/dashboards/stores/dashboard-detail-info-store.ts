@@ -22,7 +22,6 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import getRandomId from '@/lib/random-id-generator';
 
 import { MANAGED_DASHBOARD_VARIABLES_SCHEMA } from '@/services/dashboards/constants/dashboard-managed-variables-schema';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
@@ -137,14 +136,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             });
             return _refinedVariablesSchema;
         }),
-        displayInfo: computed<DashboardTemplate['display_info']>(() => {
-            if (!state.templateId || state.templateId === 'blank') return {};
-            const _template = DASHBOARD_TEMPLATES[state.templateId];
-            return {
-                icon: state.dashboardInfo?.display_info?.icon ?? _template.display_info?.icon ?? '',
-                preview_image: state.dashboardInfo?.display_info?.preview_image ?? _template.display_info?.preview_image ?? '',
-            };
-        }),
     });
 
     /* Mutations */
@@ -254,7 +245,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardInfo(_dashboardInfo);
         const _dashboardScope = _dashboardInfo.private_dashboard_id ? 'PRIVATE' : _dashboardInfo.resource_group;
         setDashboardScope(_dashboardScope);
-        state.dashboardId = _dashboardInfo.public_dashboard_id ?? _dashboardInfo.private_dashboard_id;
+        state.dashboardId = _dashboardInfo.dashboard_id ?? _dashboardInfo.private_dashboard_id;
         setName(_dashboardInfo.name);
         setLabels(_dashboardInfo.labels);
         const _settings = {
@@ -302,7 +293,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
 
-        const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.public_dashboard_id === dashboardId || dashboard.private_dashboard_id === dashboardId);
+        const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.dashboard_id === dashboardId || dashboard.private_dashboard_id === dashboardId);
         if (targetDashboards.length > 0) {
             _setDashboardInfoStoreState(targetDashboards[0] as DashboardModel);
             return;
@@ -318,7 +309,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         try {
             const params: GetDashboardParameters = isPrivate
                 ? { private_dashboard_id: dashboardId as string }
-                : { public_dashboard_id: dashboardId as string };
+                : { dashboard_id: dashboardId as string };
             const result = await fetcher<GetDashboardParameters, DashboardModel>(params);
             _setDashboardInfoStoreState(result);
         } catch (e) {
@@ -421,7 +412,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const isPrivate = dashboardId?.startsWith('private');
         const _params: UpdateDashboardParameters = {
             ...params,
-            [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
+            [isPrivate ? 'private_dashboard_id' : 'dashboard_id']: dashboardId,
         };
         if (params.variables_schema) {
             _params.variables_schema = {

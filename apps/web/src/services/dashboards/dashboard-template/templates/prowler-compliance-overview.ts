@@ -44,9 +44,6 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
         DASHBOARD_LABELS.CSPM,
     ],
     version: '1',
-    display_info: {
-        icon: 'ic_prowler',
-    },
     settings: {
         date_range: {
             enabled: true,

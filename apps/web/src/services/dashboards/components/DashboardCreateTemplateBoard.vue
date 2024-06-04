@@ -31,7 +31,7 @@ const emit = defineEmits<{(e: 'select-template', value: any)}>();
 
 /* Event */
 const getDashboardViewLink = (template: DashboardModel): Location|undefined => {
-    const dashboardId = template.private_dashboard_id || template.public_dashboard_id;
+    const dashboardId = template.private_dashboard_id || template.dashboard_id;
     if (!dashboardId) return undefined;
     return getProperRouteLocation({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
 };
@@ -54,10 +54,6 @@ const handleClickBoardItem = (template: DashboardModel) => {
             <div class="board-item-wrapper">
                 <div class="left-part">
                     <div class="board-item-title">
-                        <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
-                             width="1rem"
-                             height="1rem"
-                        />
                         <p-text-highlighting :text="board.name"
                                              :term="props.keyword"
                                              style-type="secondary"

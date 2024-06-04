@@ -73,7 +73,7 @@ const existingTemplateState = reactive({
         .map((d: DashboardModel) => ({
             ...d,
             // below values are used only for render
-            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.public_dashboard_id || d.private_dashboard_id}`,
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.dashboard_id || d.private_dashboard_id}`,
             groupLabel: storeState.projects[d.project_id ?? '']?.label || existingTemplateState.groupLabel,
         }))
         .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
@@ -95,7 +95,7 @@ const existingTemplateState = reactive({
 const getDashboardLocation = (board: DashboardModel): Location => (getProperRouteLocation({
     name: DASHBOARDS_ROUTE.DETAIL._NAME,
     params: {
-        dashboardId: board.public_dashboard_id || board.private_dashboard_id || '',
+        dashboardId: board.dashboard_id || board.private_dashboard_id || '',
     },
 }));
 

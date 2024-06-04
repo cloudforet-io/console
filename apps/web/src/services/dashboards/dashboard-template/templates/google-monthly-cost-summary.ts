@@ -41,9 +41,6 @@ export const googleMonthlyCostSummaryDashboard: DashboardTemplate = {
     template_type: 'EXTENSION',
     labels: [DASHBOARD_LABELS.COST],
     version: '1',
-    display_info: {
-        icon: 'ic_provider-gcp',
-    },
     settings: {
         date_range: {
             enabled: true,

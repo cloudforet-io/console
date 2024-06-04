@@ -58,47 +58,47 @@ const state = reactive({
     ]),
     domainMenuSet: computed<LSBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
-        id: d.public_dashboard_id,
+        id: d.dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: d.public_dashboard_id,
+                dashboardId: d.dashboard_id,
             },
         }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
-            id: d.public_dashboard_id,
+            id: d.dashboard_id,
         },
     }))),
     workspaceMenuSet: computed<LSBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
-        id: d.public_dashboard_id,
+        id: d.dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: d.public_dashboard_id,
+                dashboardId: d.dashboard_id,
             },
         }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
-            id: d.public_dashboard_id,
+            id: d.dashboard_id,
         },
     }))),
     projectMenuSet: computed<LSBMenu[]>(() => dashboardGetters.projectItems.map((d) => ({
         type: MENU_ITEM_TYPE.ITEM,
-        id: d.public_dashboard_id,
+        id: d.dashboard_id,
         label: d.name,
         to: getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: d.public_dashboard_id,
+                dashboardId: d.dashboard_id,
             },
         }),
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
-            id: d.public_dashboard_id,
+            id: d.dashboard_id,
         },
     }))),
     privateMenuSet: computed<LSBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({

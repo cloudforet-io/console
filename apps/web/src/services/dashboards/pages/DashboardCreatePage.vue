@@ -116,15 +116,12 @@ const createDashboard = async () => {
 
         const apiParam: CreateDashboardParameters = {
             name: dashboardDetailState.name,
-            template_id: dashboardDetailState.templateId,
-            template_type: dashboardDetailState.templateType,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailGetters.refinedVariablesSchema,
             tags: { created_by: store.state.user.userId },
-            display_info: dashboardDetailGetters.displayInfo,
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
             apiParam.resource_group = state.isAdminMode ? RESOURCE_GROUP.DOMAIN : dashboardDetailState.dashboardScope;
@@ -137,7 +134,7 @@ const createDashboard = async () => {
         await SpaceRouter.router.push(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
+                dashboardId: createdDashboard.dashboard_id || createdDashboard.private_dashboard_id || '',
             },
         })).catch(() => {});
     } catch (e) {

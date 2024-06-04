@@ -78,10 +78,6 @@ export interface DashboardTemplate {
     template_id: string;
     template_type: TemplateType;
     plugin_ids?: string[];
-    display_info?: {
-        icon?: string;
-        preview_image?: string;
-    }
 }
 
 export interface DashboardLayoutWidgetInfo {
