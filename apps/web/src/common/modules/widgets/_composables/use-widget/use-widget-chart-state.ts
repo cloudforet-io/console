@@ -9,7 +9,7 @@ import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import type { DataMapping, Granularity } from '@/schema/dashboard/_types/widget-type';
 
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 
 interface WidgetChartState {
@@ -22,7 +22,7 @@ interface WidgetChartState {
 }
 
 export const useWidgetChartState = (
-    props: UnwrapRef<NewWidgetProps>,
+    props: UnwrapRef<WidgetProps>,
 ): { widgetChartState: WidgetChartState } => {
     const widgetConfig = getWidgetConfig(props.widgetName);
     let dateRangeFormat = 'YYYY-MM';

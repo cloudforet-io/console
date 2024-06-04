@@ -10,7 +10,7 @@ import type {
 
 
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { NewWidgetProps } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetProps } from '@/common/modules/widgets/types/widget-display-type';
 
 
 /**
@@ -25,7 +25,7 @@ export interface BaseWidgetState {
     dateRange: ComputedRef<DateRange|undefined>;
 }
 
-export function useBaseWidgetState(props: NewWidgetProps): UnwrapRef<BaseWidgetState> {
+export function useBaseWidgetState(props: WidgetProps): UnwrapRef<BaseWidgetState> {
     const widgetConfig = getWidgetConfig(props.widgetName);
 
     const state = reactive<BaseWidgetState>({

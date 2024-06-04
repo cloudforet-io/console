@@ -3,30 +3,31 @@ import type { TranslateResult } from 'vue-i18n';
 import type {
     DashboardLayoutWidgetInfo,
 } from '@/schema/dashboard/_types/dashboard-type';
-import type {
-    WidgetSize, NewWidgetFilters,
-} from '@/schema/dashboard/_types/widget-type';
+
+import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
 
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
-export interface NewWidgetProps {
+export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
+
+export interface WidgetProps {
     widgetName: string;
     // widgetKey: string; // unique widget key to identify widgets in layout
     widgetId: string;
     title?: string;
     description?: string;
     size?: WidgetSize;
-    filters?: NewWidgetFilters;
-    filtersSchemaProperties?: string[];
     width?: number;
+    // filters?: NewWidgetFilters;
+    // filtersSchemaProperties?: string[];
     // theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
-    editMode?: boolean;
-    errorMode?: boolean;
-    baseOnDate?: string;
+    // editMode?: boolean;
+    // errorMode?: boolean;
+    // baseOnDate?: string;
     // variablesSchema?: DashboardVariablesSchema;
     // variables?: DashboardVariables;
-    loading?: boolean;
+    // loading?: boolean;
     // dataSources: DataSource[];
     // dataMapping: DataMapping;
     // chartOptions: Record<string, any>;
@@ -41,6 +42,7 @@ export interface WidgetEmit {
     (event: 'click-delete'): void;
     (event: 'click-expand'): void;
     (event: 'click-edit'): void;
+    (event: 'update:size', size: WidgetSize): void;
 }
 
 export interface WidgetExpose<Data = any> {
