@@ -11,6 +11,7 @@ import type { DataTableTransformParameters } from '@/schema/dashboard/public-dat
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
+import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -24,6 +25,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedWidgetName: 'stackedColumnChart',
         title: '',
         description: '',
+        size: 'full',
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
@@ -53,6 +55,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSelectedWidgetName = (widgetName: string) => {
         state.selectedWidgetName = widgetName;
     };
+    const setSize = (size: WidgetSize) => {
+        state.size = size;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -61,6 +66,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSelectedWidgetName,
         setTitle,
         setDescription,
+        setSize,
     };
     const actions = {
         listDataTable: async () => {
@@ -106,11 +112,22 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         loadDataTable: async (dataTableId: string) => {
             console.debug('loadDataTable', dataTableId);
         },
+        reset: () => {
+            state.showOverlay = false;
+            state.overlayStep = 1;
+            state.widgetId = '';
+            state.selectedDataTableId = undefined;
+            state.selectedDataTable = undefined;
+            state.title = '';
+            state.description = '';
+            state.size = 'full';
+        },
         initWidgetForm: (widgetName = 'table') => {
             state.selectedWidgetName = widgetName;
             const _widgetConfig = getWidgetConfig(widgetName);
             state.title = _widgetConfig.meta.title || '';
             state.description = '';
+            state.size = _widgetConfig.meta.sizes[0];
         },
     };
 
