@@ -27,6 +27,7 @@ export const MENU_ID = Object.freeze({
     PREFERENCE: 'preference',
     DOMAIN_SETTINGS: 'domain_settings',
     WORKSPACES: 'workspaces',
+    BOOKMARK: 'bookmark',
     MY_PAGE: 'my_page',
     ACCOUNT_PROFILE: 'account_profile',
     NOTIFICATIONS: 'notifications',
