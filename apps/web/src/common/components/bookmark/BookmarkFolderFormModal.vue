@@ -8,12 +8,10 @@ import {
 
 import { i18n } from '@/translations';
 
+import type { BookmarkItem, BookmarkModalStateType } from '@/common/components/bookmark/type/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-
-import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList?: BookmarkItem[],

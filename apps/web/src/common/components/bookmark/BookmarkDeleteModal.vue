@@ -9,11 +9,12 @@ import { i18n } from '@/translations';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
+
 import { gray } from '@/styles/colors';
 
-import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkModalType, BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;
