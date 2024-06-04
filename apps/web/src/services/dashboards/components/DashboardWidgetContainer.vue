@@ -248,7 +248,7 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                                :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-refresh-on-variable-change="widgetFullModeState.visibleFullMode"
-                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"

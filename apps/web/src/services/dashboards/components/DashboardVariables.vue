@@ -59,6 +59,7 @@ const state = reactive({
         results.push(...xor(prevUsedProperties.map(([k]) => k), currUsedProperties.map(([k]) => k)));
         return results;
     }),
+    showSaveButton: computed<boolean>(() => !props.disableSaveButton && !dashboardDetailGetters.isDeprecatedDashboard),
     saveLoading: false,
 });
 
@@ -118,10 +119,10 @@ const handleResetVariables = () => {
             />
             <span>{{ $t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
         </p-text-button>
-        <p-divider v-if="state.modifiedVariablesSchemaProperties.length"
+        <p-divider v-if="state.showSaveButton"
                    :vertical="true"
         />
-        <p-text-button v-if="state.modifiedVariablesSchemaProperties.length"
+        <p-text-button v-if="state.showSaveButton"
                        style-type="highlight"
                        :loading="state.saveLoading"
                        :disabled="state.saveLoading"

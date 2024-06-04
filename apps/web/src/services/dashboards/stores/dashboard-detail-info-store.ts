@@ -111,6 +111,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
         isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
+        isDeprecatedDashboard: computed<boolean>(() => state.dashboardInfo?.version === '1.0'),
         refinedVariablesSchema: computed<DashboardVariablesSchema>(() => {
             const _storedVariablesSchema = cloneDeep(state.variablesSchema);
             const _refinedVariablesSchema: DashboardVariablesSchema = {

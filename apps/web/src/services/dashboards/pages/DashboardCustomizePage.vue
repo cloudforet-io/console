@@ -39,7 +39,7 @@ const updateDashboardData = async () => {
         await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
-            settings: dashboardDetailState.settings,
+            options: dashboardDetailState.options,
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailGetters.refinedVariablesSchema,
