@@ -58,6 +58,7 @@ export interface SubTotalOptions {
 
 export interface TotalOptions {
     default?: boolean;
+    toggle?: boolean;
 }
 
 export type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
