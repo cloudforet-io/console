@@ -9,7 +9,7 @@ export interface PrivateDashboardUpdateParameters {
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    settings?: DashboardOptions;
+    options?: DashboardOptions;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
