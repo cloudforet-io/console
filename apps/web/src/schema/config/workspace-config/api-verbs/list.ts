@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-export interface DomainConfigListParameters {
+export interface WorkspaceConfigListParameters {
     query?: Query;
     name?: string;
 }
