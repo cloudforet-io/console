@@ -1811,13 +1811,20 @@
 					"SELECT_DATA_SOURCE_TYPE": ""
 				},
 				"STEP_2": {
+					"ADD_RULE": "",
+					"BASIS_FIELD": "",
 					"CHART_TYPE": "",
 					"DATA_TABLE": "",
 					"DESCRIPTION": "説明",
 					"EDIT_DATA": "",
+					"FIELD_NAME": "",
+					"FORMAT_RULES": "",
 					"OPTIONAL_FIELDS": "",
+					"PROGRESS_BAR_DESCRIPTION_1": "",
+					"PROGRESS_BAR_DESCRIPTION_2": "",
 					"REQUIRED_FIELDS": "",
 					"TITLE": "",
+					"TOTAL_FIELD": "",
 					"WIDGET_INFO": ""
 				}
 			},

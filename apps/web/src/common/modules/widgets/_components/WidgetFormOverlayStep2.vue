@@ -31,7 +31,7 @@ const state = reactive({
         { label: 'Full', name: 'FULL' },
         { label: 'Actual', name: 'ACTUAL' },
     ],
-    selectedWidgetSize: 'FULL',
+    selectedWidgetSize: 'ACTUAL',
     //
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,

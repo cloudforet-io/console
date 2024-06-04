@@ -97,7 +97,7 @@ onMounted(() => {
                       style-type="tertiary"
                       @click="handleClickAddRule"
             >
-                Add Rule
+                {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
             </p-button>
         </p-field-group>
     </div>
