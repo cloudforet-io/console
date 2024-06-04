@@ -87,13 +87,13 @@ const handleClose = () => {
     height: 0;
     z-index: 1001;
 
-    .layout {
+    >.layout {
         @apply fixed flex flex-col;
         height: 100vh;
         top: 0;
         right: 0;
 
-        .header {
+        >.header {
             @apply flex justify-between items-center;
             flex-shrink: 0;
             padding: 1.5rem 1.5rem 1rem 1.5rem;

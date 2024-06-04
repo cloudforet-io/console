@@ -136,6 +136,25 @@ import { reactive, toRefs } from 'vue';
             type: 'boolean'
         }
     },
+    styleType: {
+        name: 'styleType',
+        type: {name: 'string'},
+        description: 'Style type for field group',
+        defaultValue: 'primary',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'select',
+            options: ['primary', 'secondary'],
+        }
+    },
     labelSlot: {
         name: 'label',
         description: 'Slot for label',
@@ -262,6 +281,7 @@ export const Template = (args, { argTypes }) => ({
                         :valid="valid" :valid-text="validText"
                         :help-text="helpText" :required="required"
                         :label="label"
+                        :style-type="styleType"
         >
             <template v-if="labelSlot" #label>
                 <div v-html="labelSlot"/>
@@ -366,6 +386,28 @@ export const Template = (args, { argTypes }) => ({
         <p-field-group label="Name" help-text="Please enter 3 or more and 10 or less alphabets.">
             <p-text-input value="Wanjin"/>
         </p-field-group>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+
+## Style Type
+
+<Canvas>
+    <Story name="Style Type">
+        {{
+            components: { PFieldGroup, PTextInput },
+            template: `
+<div>
+        <p-field-group label="Primary" style-type="primary">
+            <p-text-input value="Wanjin"/>
+        </p-field-group>
+        <p-field-group label="Secondary" style-type="secondary">
+            <p-text-input value="Wanjin"/>
+        </p-field-group>
+</div>
     `,
         }}
     </Story>

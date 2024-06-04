@@ -40,9 +40,7 @@ const handleUpdateValue = (value: number) => {
 
 <template>
     <div class="widget-field-max">
-        <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
-        >
+        <p-field-group :label="props.widgetFieldSchema.label">
             <p-text-input type="number"
                           :min="props.widgetFieldSchema.options?.min ?? 0"
                           :max="props.widgetFieldSchema.options?.max ?? 0"

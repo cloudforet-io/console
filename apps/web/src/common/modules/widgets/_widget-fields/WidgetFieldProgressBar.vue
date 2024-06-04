@@ -46,7 +46,7 @@ const handleDeleteFormatRule = (idx: number) => {
 <template>
     <div class="widget-field-progress-bar">
         <p-field-group :label="props.widgetFieldSchema.label"
-                       :required="props.required"
+                       required
         >
             <template #label-extra>
                 <p-toggle-button :value="state.enabled"
@@ -62,25 +62,36 @@ const handleDeleteFormatRule = (idx: number) => {
                     <code class="formula-text">{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.PROGRESS_BAR_DESCRIPTION_2') }}</code>
                 </div>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FIELD_NAME')"
+                               style-type="secondary"
                                required
                 >
                     <p-text-input :value="''" />
                 </p-field-group>
                 <div class="field-wrapper">
                     <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.BASIS_FIELD')"
+                                   style-type="secondary"
                                    required
                     >
                         <p-select-dropdown :menu="[]" />
                     </p-field-group>
                     <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TOTAL_FIELD')"
+                                   style-type="secondary"
                                    required
                     >
                         <p-select-dropdown :menu="[]" />
                     </p-field-group>
                 </div>
                 <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FORMAT_RULES')"
+                               style-type="secondary"
                                required
                 >
+                    <p-button icon-left="ic_plus_bold"
+                              style-type="tertiary"
+                              class="add-button"
+                              @click="handleClickAddFormatRule"
+                    >
+                        {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
+                    </p-button>
                     <div v-for="(formatRule, idx) in state.formatRules"
                          :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
                          class="format-rules-form-wrapper"
@@ -100,12 +111,6 @@ const handleDeleteFormatRule = (idx: number) => {
                                        @click="handleDeleteFormatRule(idx)"
                         />
                     </div>
-                    <p-button icon-left="ic_plus_bold"
-                              style-type="tertiary"
-                              @click="handleClickAddFormatRule"
-                    >
-                        {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
-                    </p-button>
                 </p-field-group>
             </div>
         </p-field-group>
@@ -141,6 +146,9 @@ const handleDeleteFormatRule = (idx: number) => {
             @apply bg-gray-100 text-gray-700;
             padding-left: 0.25rem;
         }
+    }
+    .add-button {
+        margin-bottom: 0.5rem;
     }
     .field-wrapper {
         display: flex;

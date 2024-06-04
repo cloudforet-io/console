@@ -177,8 +177,10 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
 
 /* custom design-system component - p-field-group */
 :deep(.p-field-group) {
-    margin-bottom: 0.75rem;
-    padding: 0.75rem 1.25rem 0 1.25rem;
+    &.primary {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem 1.25rem 0 1.25rem;
+    }
     .title {
         width: 100%;
         display: flex;
