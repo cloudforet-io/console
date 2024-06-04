@@ -1969,6 +1969,10 @@
 			"REGENERATE": "Client Secret 재생성",
 			"TITLE": "앱"
 		},
+		"BOOKMARK": {
+			"ALL_BOOKMARK": "",
+			"GLOBAL_BOOKMARK": ""
+		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin 이메일",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Admin 이메일 변경 실패",

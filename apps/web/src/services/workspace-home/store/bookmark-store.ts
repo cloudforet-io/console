@@ -18,11 +18,10 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 
 import getRandomId from '@/lib/random-id-generator';
 
+import { fetchFavicon } from '@/common/components/bookmark/composables/use-bookmark';
+import { DEFAULT_BOOKMARK } from '@/common/components/bookmark/constant/constant';
+import type { BookmarkItem, BookmarkModalStateType, BookmarkModalType } from '@/common/components/bookmark/type/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { fetchFavicon } from '@/services/workspace-home/composables/use-bookmark';
-import { DEFAULT_BOOKMARK } from '@/services/workspace-home/constants/workspace-home-constant';
-import type { BookmarkItem, BookmarkModalType, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
 
 export const useBookmarkStore = defineStore('bookmark', () => {
     const userWorkspaceStore = useUserWorkspaceStore();

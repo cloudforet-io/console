@@ -3,9 +3,10 @@ import { computed, reactive } from 'vue';
 
 import { i18n } from '@/translations';
 
+import type { BookmarkItem } from '@/common/components/bookmark/type/type';
+
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem } from '@/services/workspace-home/types/workspace-home-type';
 
 interface Props {
     bookmarkFolderList: BookmarkItem[];

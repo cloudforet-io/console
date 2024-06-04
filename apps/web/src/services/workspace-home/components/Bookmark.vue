@@ -8,19 +8,20 @@ import { screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import BookmarkDeleteModal from '@/common/components/bookmark/BookmarkDeleteModal.vue';
+import BookmarkFolderFormModal from '@/common/components/bookmark/BookmarkFolderFormModal.vue';
+import BookmarkLinkFormModal from '@/common/components/bookmark/BookmarkLinkFormModal.vue';
+import { BOOKMARK_MODAL_TYPE } from '@/common/components/bookmark/constant/constant';
+import type { BookmarkItem, BookmarkModalType } from '@/common/components/bookmark/type/type';
+
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
-import BookmarkDeleteModal from '@/services/workspace-home/components/BookmarkDeleteModal.vue';
-import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
-import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
 import {
-    BOOKMARK_MODAL_TYPE,
     MAX_BOARD_SETS,
     MAX_BOARD_SETS_TABLET,
 } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
-import type { BookmarkItem, BookmarkModalType } from '@/services/workspace-home/types/workspace-home-type';
 
 const bookmarkStore = useBookmarkStore();
 const bookmarkState = bookmarkStore.state;

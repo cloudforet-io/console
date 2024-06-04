@@ -1969,6 +1969,10 @@
 			"REGENERATE": "Regenerate Client Secret",
 			"TITLE": "App"
 		},
+		"BOOKMARK": {
+			"ALL_BOOKMARK": "All Bookmarks",
+			"GLOBAL_BOOKMARK": "Global Bookmark"
+		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
