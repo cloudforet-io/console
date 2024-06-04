@@ -1,14 +1,11 @@
 import type { TranslateResult } from 'vue-i18n';
 
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
 import type { ProviderItem } from '@/store/reference/provider-reference-store';
 import type { ReferenceMap } from '@/store/reference/type';
 
-import type { WORKSPACE_HOME_DATA_TYPE, BOOKMARK_MODAL_TYPE, SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
-
-export type WorkspaceHomeDataType = typeof WORKSPACE_HOME_DATA_TYPE[keyof typeof WORKSPACE_HOME_DATA_TYPE];
+import type { SUMMARY_DATA_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 
 // summary
 export interface CloudServiceData {
@@ -32,25 +29,6 @@ export type ProviderReferenceDataMap = ReferenceMap<ProviderResourceDataItem>;
 export type SummaryDataType = typeof SUMMARY_DATA_TYPE[keyof typeof SUMMARY_DATA_TYPE];
 
 // bookmark
-export interface BookmarkItem {
-    id?: string;
-    name?: string | TranslateResult;
-    folder?: string;
-    icon?: string;
-    imgIcon?: string;
-    link?: string;
-    isShowMore?: boolean;
-    workspaceId?: string;
-}
-export type BookmarkModalType = typeof BOOKMARK_MODAL_TYPE[keyof typeof BOOKMARK_MODAL_TYPE];
-export type BookmarkBoardSet = BookmarkItem & BoardSet;
-
-export type BookmarkModalStateType = {
-    type?: BookmarkModalType;
-    isNew?: boolean;
-    isEdit?: boolean;
-};
-
 export interface EmptyData {
     to?: { name: string };
     title: string | TranslateResult;
