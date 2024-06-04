@@ -38,7 +38,8 @@ const state = reactive({
     }),
     existingTemplateSets: computed<DashboardTemplate[]>(() => {
         const _templates = dashboardGetters.allItems;
-        return getFilteredTemplates(_templates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
+        const _filteredTemplates = _templates.filter((d) => d.version !== '1.0');
+        return getFilteredTemplates(_filteredTemplates, filterState.inputValue, filterState.selectedLabels, filterState.selectedProviders, filterState.selectedPlugins);
     }),
 });
 
