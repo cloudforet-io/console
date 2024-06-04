@@ -43,17 +43,17 @@ const state = reactive({
     contextMenuRef: null as any | null,
     searchText: '',
     variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailGetters.refinedVariablesSchema),
-    variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
+    variableList: computed<MenuItem[]>(() => state.variableSchema?.order?.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
             name: property,
             label: currentProperty?.name ?? property,
             disabled: currentProperty?.fixed,
         });
-    })),
+    }) ?? []),
     selected: computed<MenuItem[]>(() => {
         const result = [] as MenuItem[];
-        state.variableSchema.order.forEach((property) => {
+        state.variableSchema?.order?.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
             result.push({ name: property, label: currentProperty.name, disabled: currentProperty.fixed });

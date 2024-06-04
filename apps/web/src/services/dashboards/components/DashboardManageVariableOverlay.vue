@@ -58,7 +58,7 @@ const state = reactive({
     selectedVariable: '' as string,
     variableNames: computed<string[]>(() => {
         const properties = state.variableSchema.properties;
-        return state.variableSchema.order.map((d) => properties[d]?.name).filter((name) => name !== properties[state.selectedVariable]?.name);
+        return state.variableSchema?.order?.map((d) => properties[d]?.name).filter((name) => name !== properties[state.selectedVariable]?.name) ?? [];
     }),
 });
 
@@ -184,7 +184,7 @@ const {
         <div class="content-wrapper">
             <p-heading heading-type="sub"
                        :use-total-count="contentType === 'LIST'"
-                       :total-count="variableSchema.order.length"
+                       :total-count="variableSchema?.order?.length || 0"
                        :title="titleSet[contentType]"
             >
                 <template #extra>
