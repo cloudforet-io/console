@@ -24,11 +24,7 @@ const stackedColumnChart: WidgetConfig = {
             },
         },
     },
-    optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
-    },
+    optionalFieldsSchema: {},
 };
 
 

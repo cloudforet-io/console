@@ -25,9 +25,7 @@ const stackedAreaChart: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
+        legend: {},
         // formatRules: {
         //     type: 'format_rules',
         //     label: 'Format Rules',

@@ -22,9 +22,7 @@ const clusteredColumnChart: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
+        legend: {},
     },
 };
 
