@@ -5,18 +5,14 @@ import { PFieldTitle, PToggleButton } from '@spaceone/design-system';
 
 import type {
     LegendOptions,
-    WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<LegendOptions>;
-}
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {

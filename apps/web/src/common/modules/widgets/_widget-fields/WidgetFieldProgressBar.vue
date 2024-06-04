@@ -6,7 +6,8 @@ import {
 } from '@spaceone/design-system';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { BasisFieldOptions, WidgetFieldSchema } from '@/common/modules/widgets/types/widget-config-type';
+import type { BasisFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 
@@ -15,10 +16,7 @@ interface FormatRule {
     threshold: number;
     color: string;
 }
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<BasisFieldOptions>;
-}
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<BasisFieldOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
     }),

@@ -4,13 +4,11 @@ import { computed, reactive } from 'vue';
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type { WidgetFieldSchema, DataFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { DataFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<DataFieldOptions>;
-}
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
     }),

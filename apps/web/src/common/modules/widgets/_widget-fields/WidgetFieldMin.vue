@@ -5,18 +5,14 @@ import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import type {
     MinOptions,
-    WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<MinOptions>;
-}
 
 const emit = defineEmits<{(e: 'update:value', value: number): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<MinOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {
