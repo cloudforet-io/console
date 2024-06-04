@@ -8,7 +8,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { cloneDeep, range } from 'lodash';
 
-import type { DateRange, DashboardSettings } from '@/schema/dashboard/_types/dashboard-type';
+import type { DateRange, DashboardOptions } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -70,11 +70,11 @@ const setSelectedDateRange = (start, end) => {
     const _end = dayjs.utc(end).endOf('month').format('YYYY-MM');
     state.selectedDateRange = { start: _start, end: _end };
 };
-const updateDashboardDateRange = (dateRange: DashboardSettings['date_range']) => {
-    const _settings = cloneDeep(dashboardDetailState.settings);
-    _settings.date_range.start = dateRange.start;
-    _settings.date_range.end = dateRange.end;
-    dashboardDetailStore.setSettings(_settings);
+const updateDashboardDateRange = (dateRange: DashboardOptions['date_range']) => {
+    const _options = cloneDeep(dashboardDetailState.options);
+    _options.date_range.start = dateRange.start;
+    _options.date_range.end = dateRange.end;
+    dashboardDetailStore.setOptions(_options);
 };
 
 /* Event */

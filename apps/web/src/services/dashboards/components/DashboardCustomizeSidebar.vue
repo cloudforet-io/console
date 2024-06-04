@@ -52,9 +52,9 @@ const state = reactive({
 
 /* Event */
 const handleChangeDateRangeToggle = () => {
-    const _settings = cloneDeep(dashboardDetailState.settings);
-    _settings.date_range.enabled = !_settings.date_range.enabled;
-    dashboardDetailStore.setSettings(_settings);
+    const _options = cloneDeep(dashboardDetailState.options);
+    _options.date_range.enabled = !_options.date_range.enabled;
+    dashboardDetailStore.setOptions(_options);
 };
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;

@@ -11,7 +11,7 @@ import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import { DASHBOARD_TYPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type {
-    DashboardType, TemplateType,
+    DashboardType,
 } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -47,7 +47,6 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 
 const {
     forms: {
@@ -93,15 +92,12 @@ const createDashboard = async () => {
     try {
         const params: CreateDashboardParameters = {
             name: name.value,
-            template_id: props.dashboard?.template_id as string,
-            template_type: props.dashboard?.template_type as TemplateType,
             labels: props.dashboard?.labels,
-            settings: props.dashboard?.settings,
+            options: props.dashboard?.options,
             layouts: props.dashboard?.layouts,
             variables: props.dashboard?.variables,
             variables_schema: props.dashboard?.variables_schema,
             tags: { created_by: store.state.user.userId },
-            display_info: dashboardDetailGetters.displayInfo,
         };
         if (storeState.isAdminMode) {
             state.dashboardType = DASHBOARD_TYPE.PUBLIC;
@@ -113,7 +109,7 @@ const createDashboard = async () => {
             }
         }
         const res = await dashboardDetailStore.createDashboard(params, state.dashboardType);
-        return res.public_dashboard_id || res.private_dashboard_id;
+        return res.dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
     }
@@ -139,7 +135,6 @@ const handleConfirm = async () => {
 
 const init = () => {
     initForm('name', `Clone - ${props.dashboard?.name}`);
-    state.isPrivate = !!props.dashboard?.private_dashboard_id;
 };
 
 watch(() => props.visible, (visible) => {

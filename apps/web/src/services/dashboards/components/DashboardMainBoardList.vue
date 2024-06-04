@@ -81,28 +81,28 @@ const cloneModalState = reactive({
 });
 
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
-    const dashboardId = dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '';
+    const dashboardId = dashboardItem.dashboard_id || '';
     return [
-        {
-            iconName: 'ic_edit',
-            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-            eventAction: () => {
-                router.push(getProperRouteLocation({
-                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                    params: {
-                        dashboardId,
-                    },
-                }));
-            },
-        },
-        {
-            iconName: 'ic_duplicate',
-            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-            eventAction: () => {
-                cloneModalState.dashboardConfig = { ...dashboardItem };
-                cloneModalState.visible = true;
-            },
-        },
+        // {
+        //     iconName: 'ic_edit',
+        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
+        //     eventAction: () => {
+        //         router.push(getProperRouteLocation({
+        //             name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+        //             params: {
+        //                 dashboardId,
+        //             },
+        //         }));
+        //     },
+        // },
+        // {
+        //     iconName: 'ic_duplicate',
+        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
+        //     eventAction: () => {
+        //         cloneModalState.dashboardConfig = { ...dashboardItem };
+        //         cloneModalState.visible = true;
+        //     },
+        // },
         {
             iconName: 'ic_delete',
             tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
@@ -116,7 +116,7 @@ const handleClickBoardItem = (item: DashboardModel) => {
     router.push(getProperRouteLocation({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
-            dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
+            dashboardId: item.dashboard_id || '',
         },
     }));
 };
@@ -164,14 +164,10 @@ watch(() => props.dashboardList, () => {
                 <div class="content-wrapper">
                     <div class="board-item-title-wrapper">
                         <div class="left-part">
-                            <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
+                            <favorite-button :item-id="board.dashboard_id"
                                              :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                              scale="0.8"
                                              class="favorite-button"
-                            />
-                            <p-i :name="board.display_info?.icon ?? 'ic_dashboard-template_others'"
-                                 width="1rem"
-                                 height="1rem"
                             />
                             <span class="board-item-title">
                                 {{ board.name }}

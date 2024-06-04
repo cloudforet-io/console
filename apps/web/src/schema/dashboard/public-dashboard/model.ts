@@ -4,7 +4,7 @@ import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type
 
 
 export interface PublicDashboardModel extends DashboardTemplate {
-    public_dashboard_id: string;
+    dashboard_id: string;
     tags: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id: string;

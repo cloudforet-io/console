@@ -80,8 +80,8 @@ const executeRefreshInterval = () => {
 };
 
 const handleSelectRefreshIntervalOption = (option) => {
-    dashboardDetailStore.setSettings({
-        ...dashboardDetailState.settings,
+    dashboardDetailStore.setOptions({
+        ...dashboardDetailState.options,
         refresh_interval_option: option,
     });
     if (props.refreshDisabled) return;

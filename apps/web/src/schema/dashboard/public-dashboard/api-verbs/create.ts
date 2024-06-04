@@ -1,23 +1,16 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DashboardLayoutWidgetInfo, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
-    TemplateType,
+    DashboardLayoutWidgetInfo, DashboardOptions, DashboardVariables, DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
 export interface PublicDashboardCreateParameters {
     name: string;
-    template_id: string;
-    template_type: TemplateType;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    settings?: DashboardSettings;
+    options?: DashboardOptions;
     variables_schema?: DashboardVariablesSchema;
-    display_info?: {
-        icon?: string;
-        preview_image?: string;
-    };
     labels?: string[];
     tags?: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;

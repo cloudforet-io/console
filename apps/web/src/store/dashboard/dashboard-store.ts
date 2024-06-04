@@ -189,11 +189,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
         try {
             const result = await fetcher<UpdateDashboardParameters, DashboardModel>(params);
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === get(params, 'private_dashboard_id'));
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1, result as PrivateDashboardModel);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === get(params, 'public_dashboard_id'));
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === get(params, 'dashboard_id'));
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1, result as PublicDashboardModel);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
@@ -208,15 +208,15 @@ export const useDashboardStore = defineStore('dashboard', () => {
         const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
-        const params: DeleteDashboardParameters = isPrivate ? { private_dashboard_id: dashboardId } : { public_dashboard_id: dashboardId };
+        const params: DeleteDashboardParameters = { dashboard_id: dashboardId };
         try {
             await fetcher<DeleteDashboardParameters>(params);
             if (isPrivate) {
-                const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === dashboardId);
+                const targetIndex = state.privateDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);
                 state.privateDashboardItems = cloneDeep(state.privateDashboardItems);
             } else {
-                const targetIndex = state.publicDashboardItems.findIndex((item) => item.public_dashboard_id === dashboardId);
+                const targetIndex = state.publicDashboardItems.findIndex((item) => item.dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }

@@ -44,10 +44,7 @@ export const dCloComplianceOverviewDashboard: DashboardTemplate = {
         DASHBOARD_LABELS.CSPM,
     ],
     version: '1',
-    display_info: {
-        icon: 'ic_dashboard-template_compliance',
-    },
-    settings: {
+    options: {
         date_range: {
             enabled: true,
         },

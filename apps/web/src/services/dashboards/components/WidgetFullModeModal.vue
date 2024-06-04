@@ -10,7 +10,7 @@ import {
 import { cloneDeep, debounce } from 'lodash';
 
 import type {
-    DashboardSettings,
+    DashboardOptions,
     DashboardVariablesSchema,
     DashboardVariables as IDashboardVariables,
     DashboardLayoutWidgetInfo,
@@ -62,7 +62,7 @@ const state = reactive({
     component: null as AsyncComponent|null,
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
-    settingsSnapshot: {} as DashboardSettings,
+    optionsSnapshot: {} as DashboardOptions,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: false,
     originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
@@ -77,18 +77,18 @@ const widgetRef = toRef(state, 'widgetRef');
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
     state.variableSchemaSnapshot = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
-    state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
+    state.optionsSnapshot = cloneDeep(dashboardDetailState.options);
 };
 
 const handleCloseModal = () => {
     dashboardDetailStore.setVariables(state.variablesSnapshot);
     dashboardDetailStore.setVariablesSchema(state.variableSchemaSnapshot);
-    dashboardDetailStore.setSettings(state.settingsSnapshot);
+    dashboardDetailStore.setOptions(state.optionsSnapshot);
     emit('update:visible', false);
 };
-const handleClickEditOption = () => {
-    state.sidebarVisible = true;
-};
+// const handleClickEditOption = () => {
+//     state.sidebarVisible = true;
+// };
 const handleCloseSidebar = async (save: boolean) => {
     state.sidebarVisible = false;
     if (!save) widgetFormStore.returnToInitialSettings();
@@ -153,15 +153,15 @@ onBeforeUnmount(() => {
                                 </span>
                             </p-badge>
                         </template>
-                        <p-button icon-left="ic_edit"
-                                  size="md"
-                                  style-type="tertiary"
-                                  :disabled="state.sidebarVisible"
-                                  class="edit-button"
-                                  @click="handleClickEditOption"
-                        >
-                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}
-                        </p-button>
+                        <!--                        <p-button icon-left="ic_edit"-->
+                        <!--                                  size="md"-->
+                        <!--                                  style-type="tertiary"-->
+                        <!--                                  :disabled="state.sidebarVisible"-->
+                        <!--                                  class="edit-button"-->
+                        <!--                                  @click="handleClickEditOption"-->
+                        <!--                        >-->
+                        <!--                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_OPTION') }}-->
+                        <!--                        </p-button>-->
                     </div>
                 </div>
                 <div class="filter-wrapper">
@@ -175,8 +175,8 @@ onBeforeUnmount(() => {
                     </div>
                     <div class="right-part">
                         <dashboard-toolset-date-dropdown v-if="!state.hideDateDropdown"
-                                                         v-show="dashboardDetailState.settings.date_range.enabled"
-                                                         :date-range="dashboardDetailState.settings.date_range"
+                                                         v-show="dashboardDetailState.options.date_range.enabled"
+                                                         :date-range="dashboardDetailState.options.date_range"
                         />
                     </div>
                 </div>
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
                                :theme="props.theme"
                                :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
-                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-options="dashboardDetailState.options"
                                :dashboard-variables-schema="dashboardDetailGetters.refinedVariablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="state.loadingWidget"

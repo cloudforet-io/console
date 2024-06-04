@@ -26,7 +26,7 @@ const handleSelectProject = (project: ProjectTreeNodeData) => {
 <template>
     <div class="dashboard-create-step2">
         <div class="selected-ootb-wrapper">
-            <p-i :name="props.selectedTemplate?.display_info?.icon ?? 'ic_dashboard-template_others'"
+            <p-i name="ic_dashboard-template_others"
                  width="3.5rem"
                  height="3.5rem"
             />

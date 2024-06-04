@@ -54,8 +54,8 @@ interface MultiSelectDashboardVariables {
 }
 
 export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
-// dashboard settings types
-export interface DashboardSettings {
+// dashboard options types
+export interface DashboardOptions {
     date_range: {
         enabled: boolean;
     } & DateRange;
@@ -72,16 +72,12 @@ export interface DashboardTemplate {
     version: number|string;
     layouts: DashboardLayoutWidgetInfo[][];
     variables: DashboardVariables;
-    settings: DashboardSettings;
+    options: DashboardOptions;
     variables_schema: DashboardVariablesSchema;
     labels: string[];
     template_id: string;
     template_type: TemplateType;
     plugin_ids?: string[];
-    display_info?: {
-        icon?: string;
-        preview_image?: string;
-    }
 }
 
 export interface DashboardLayoutWidgetInfo {

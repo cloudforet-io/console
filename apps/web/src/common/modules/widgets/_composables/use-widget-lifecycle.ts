@@ -99,8 +99,8 @@ export const useWidgetLifecycle = <Data = any>({
     let stopCurrencyWatch;
     let stopLanguageWatch;
 
-    if (widgetState.settings) {
-        stopSettingsWatch = watch(() => widgetState.settings, (current, previous) => {
+    if (widgetState.dashboardOptions) {
+        stopSettingsWatch = watch(() => widgetState.dashboardOptions, (current, previous) => {
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndEmitEvent();

@@ -54,7 +54,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format('YYYY-MM');
+        const end = dayjs.utc(widgetState.dashboardOptions?.date_range?.end).format('YYYY-MM');
         const start = dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
         return { start, end };
     }),

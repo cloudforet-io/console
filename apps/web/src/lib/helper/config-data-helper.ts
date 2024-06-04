@@ -297,17 +297,16 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
     // Create a map to quickly find the index of each dashboard
     const dashboardMap: { [key: string]: number } = {};
     dashboardList.forEach((dashboard, index) => {
-        dashboardMap[dashboard.public_dashboard_id || dashboard.private_dashboard_id] = index;
+        dashboardMap[dashboard.dashboard_id] = index;
     });
 
     config.forEach((d) => {
-        const resource: DashboardModel|undefined = find(dashboardList, { public_dashboard_id: d.itemId })
-            || find(dashboardList, { private_dashboard_id: d.itemId });
+        const resource: DashboardModel|undefined = find(dashboardList, { dashboard_id: d.itemId });
         if (resource) {
-            const index = dashboardMap[resource.public_dashboard_id || resource.private_dashboard_id || ''];
+            const index = dashboardMap[resource.dashboard_id || ''];
             results[index] = {
                 ...d,
-                name: resource.public_dashboard_id || resource.private_dashboard_id,
+                name: resource.dashboard_id,
                 label: resource.name,
                 icon: 'ic_service_dashboard',
             };
