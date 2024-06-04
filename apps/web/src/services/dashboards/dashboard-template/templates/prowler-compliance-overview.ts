@@ -44,7 +44,7 @@ export const prowlerComplianceOverviewDashboard: DashboardTemplate = {
         DASHBOARD_LABELS.CSPM,
     ],
     version: '1',
-    settings: {
+    options: {
         date_range: {
             enabled: true,
         },

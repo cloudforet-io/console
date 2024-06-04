@@ -2,7 +2,7 @@ import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import type {
-    DashboardSettings,
+    DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
@@ -22,7 +22,7 @@ import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_
 export interface MergedBaseWidgetState {
     widgetConfig: ComputedRef<WidgetConfig>;
     options: ComputedRef<WidgetOptions>;
-    settings: ComputedRef<DashboardSettings|undefined>;
+    settings: ComputedRef<DashboardOptions|undefined>;
     inheritOptions: ComputedRef<InheritOptions>;
     title: ComputedRef<string>;
     schemaProperties: ComputedRef<string[]>;
@@ -31,7 +31,7 @@ interface MergeBaseWidgetStateOptions {
     inheritOptions: InheritOptions|undefined|Ref<InheritOptions|undefined>; // inherit information from the dashboard widget layout info.
     widgetOptions: WidgetOptions|undefined|Ref<WidgetOptions|undefined>; // widget options from the dashboard widget layout info.
     widgetName: string|Ref<string>; // widget config name
-    dashboardSettings: DashboardSettings|undefined|Ref<DashboardSettings|undefined>; // dashboard settings
+    dashboardOptions: DashboardOptions|undefined|Ref<DashboardOptions|undefined>; // dashboard settings
     dashboardVariablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
     dashboardVariables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
     title?: string|Ref<string|undefined>; // widget title from the dashboard widget layout info.
@@ -39,14 +39,14 @@ interface MergeBaseWidgetStateOptions {
 }
 export function mergeBaseWidgetState(
     {
-        inheritOptions, widgetOptions, widgetName, dashboardSettings, dashboardVariablesSchema, dashboardVariables, title, schemaProperties,
+        inheritOptions, widgetOptions, widgetName, dashboardOptions, dashboardVariablesSchema, dashboardVariables, title, schemaProperties,
     }: MergeBaseWidgetStateOptions,
 ) {
     const optionState = reactive({
         inheritOptions,
         widgetOptions,
         widgetName,
-        dashboardSettings,
+        dashboardOptions,
         dashboardVariablesSchema,
         dashboardVariables,
         title,
@@ -69,16 +69,16 @@ export function mergeBaseWidgetState(
             optionsErrorMap.value,
         )),
         inheritOptions: computed<InheritOptions>(() => getInitialWidgetInheritOptions(state.widgetConfig, optionState.inheritOptions, optionState.dashboardVariablesSchema)),
-        settings: computed<DashboardSettings|undefined>(() => {
-            if (!optionState.dashboardSettings) return undefined;
-            const dateRange = optionState.dashboardSettings.date_range;
+        settings: computed<DashboardOptions|undefined>(() => {
+            if (!optionState.dashboardOptions) return undefined;
+            const dateRange = optionState.dashboardOptions.date_range;
             return {
                 date_range: dateRange ? {
                     enabled: dateRange.enabled ?? false,
                     start: dateRange.start,
                     end: dateRange.end,
                 } : { enabled: false },
-                refresh_interval_option: optionState.dashboardSettings.refresh_interval_option ?? 'off',
+                refresh_interval_option: optionState.dashboardOptions.refresh_interval_option ?? 'off',
             };
         }),
         title: computed<string>(() => optionState.title ?? state.widgetConfig?.title ?? ''),

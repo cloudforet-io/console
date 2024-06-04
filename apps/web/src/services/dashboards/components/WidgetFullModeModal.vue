@@ -10,7 +10,7 @@ import {
 import { cloneDeep, debounce } from 'lodash';
 
 import type {
-    DashboardSettings,
+    DashboardOptions,
     DashboardVariablesSchema,
     DashboardVariables as IDashboardVariables,
     DashboardLayoutWidgetInfo,
@@ -62,7 +62,7 @@ const state = reactive({
     component: null as AsyncComponent|null,
     variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
-    settingsSnapshot: {} as DashboardSettings,
+    settingsSnapshot: {} as DashboardOptions,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: false,
     originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {

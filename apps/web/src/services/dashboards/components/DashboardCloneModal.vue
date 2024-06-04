@@ -93,7 +93,7 @@ const createDashboard = async () => {
         const params: CreateDashboardParameters = {
             name: name.value,
             labels: props.dashboard?.labels,
-            settings: props.dashboard?.settings,
+            options: props.dashboard?.options,
             layouts: props.dashboard?.layouts,
             variables: props.dashboard?.variables,
             variables_schema: props.dashboard?.variables_schema,

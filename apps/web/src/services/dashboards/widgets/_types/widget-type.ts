@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardSettings,
+    DashboardOptions,
     DashboardVariables,
     DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
@@ -31,7 +31,7 @@ export interface WidgetProps<T = any> {
     allReferenceTypeInfo: AllReferenceTypeInfo;
     disableFullMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
-    dashboardSettings?: DashboardSettings;
+    dashboardOptions?: DashboardOptions;
     dashboardVariablesSchema?: DashboardVariablesSchema;
     dashboardVariables?: DashboardVariables;
     loading?: boolean;
@@ -47,7 +47,7 @@ export interface NewWidgetProps {
     disableFullMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
-    settings?: DashboardSettings;
+    settings?: DashboardOptions;
     variablesSchema?: DashboardVariablesSchema;
     variables?: DashboardVariables;
 }

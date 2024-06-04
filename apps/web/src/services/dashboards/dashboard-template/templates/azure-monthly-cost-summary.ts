@@ -41,7 +41,7 @@ export const azureMonthlyCostSummaryDashboard: DashboardTemplate = {
     template_type: 'EXTENSION',
     labels: [DASHBOARD_LABELS.COST],
     version: '1',
-    settings: {
+    options: {
         date_range: {
             enabled: true,
         },

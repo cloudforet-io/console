@@ -1,7 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DashboardLayoutWidgetInfo, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
+    DashboardLayoutWidgetInfo, DashboardOptions, DashboardVariables, DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
@@ -9,7 +9,7 @@ export interface PublicDashboardCreateParameters {
     name: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    settings?: DashboardSettings;
+    options?: DashboardOptions;
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;

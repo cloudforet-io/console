@@ -10,7 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
-    DashboardSettings, DashboardType,
+    DashboardOptions, DashboardType,
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
     DashboardTemplate,
@@ -35,7 +35,7 @@ interface WidgetValidMap {
 }
 
 const DEFAULT_REFRESH_INTERVAL = '5m';
-export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
+export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardOptions }>({
     settings: {
         date_range: {
             start: undefined,
@@ -87,7 +87,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         projectId: undefined as string | undefined,
         name: '',
         placeholder: '',
-        settings: DASHBOARD_DEFAULT.settings as DashboardSettings,
+        settings: DASHBOARD_DEFAULT.settings as DashboardOptions,
         variables: {} as DashboardVariables,
         variablesSchema: {
             properties: {},
@@ -145,7 +145,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setIsNameValid = (isValid?: boolean) => {
         state.isNameValid = isValid;
     };
-    const setSettings = (settings: DashboardSettings) => {
+    const setSettings = (settings: DashboardOptions) => {
         state.settings = settings;
     };
     const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => {
@@ -210,7 +210,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setName('');
         state.placeholder = _template.name;
         setLabels(_template.labels);
-        setSettings(_template.settings);
+        setSettings(_template.options);
         let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
         let _variables = _template.variables ?? {};
         if (state.projectId) {
@@ -250,11 +250,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLabels(_dashboardInfo.labels);
         const _settings = {
             date_range: {
-                enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
-                start: _dashboardInfo.settings?.date_range?.start,
-                end: _dashboardInfo.settings?.date_range?.end,
+                enabled: _dashboardInfo.options?.date_range?.enabled ?? false,
+                start: _dashboardInfo.options?.date_range?.start,
+                end: _dashboardInfo.options?.date_range?.end,
             },
-            refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
+            refresh_interval_option: _dashboardInfo.options?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
         setSettings(_settings);
 
