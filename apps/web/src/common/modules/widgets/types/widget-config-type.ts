@@ -48,7 +48,6 @@ export interface LegendOptions { // toggle button
 }
 
 export interface IconOptions {
-    dataTarget?: string;
     default?: boolean;
 }
 
