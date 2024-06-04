@@ -265,7 +265,9 @@ const {
                         @clear-selection="handleClearSelection"
                         @update:search-text="handleUpdateSearchText"
         >
-            <template #bottom>
+            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
+                      #bottom
+            >
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_settings-filled"

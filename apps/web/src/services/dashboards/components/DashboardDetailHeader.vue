@@ -6,6 +6,7 @@ import {
 } from '@spaceone/design-system';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
+import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -19,6 +20,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
@@ -32,9 +34,9 @@ const handleVisibleNameEditModal = () => {
 const handleVisibleDeleteModal = () => {
     state.deleteModalVisible = true;
 };
-// const handleVisibleCloneModal = () => {
-//     state.cloneModalVisible = true;
-// };
+const handleVisibleCloneModal = () => {
+    state.cloneModalVisible = true;
+};
 const handleNameUpdate = (name: string) => {
     dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
@@ -64,12 +66,14 @@ const handleNameUpdate = (name: string) => {
                     />
                 </div>
             </template>
-            <!--            <template #extra>-->
-            <!--                <dashboard-control-buttons :dashboard-id="props.dashboardId"-->
-            <!--                                           :name="dashboardDetailState.name"-->
-            <!--                                           @update:visible-clone-modal="handleVisibleCloneModal"-->
-            <!--                />-->
-            <!--            </template>-->
+            <template v-if="!dashboardDetailGetters.isDeprecatedDashboard"
+                      #extra
+            >
+                <dashboard-control-buttons :dashboard-id="props.dashboardId"
+                                           :name="dashboardDetailState.name"
+                                           @update:visible-clone-modal="handleVisibleCloneModal"
+                />
+            </template>
         </p-heading>
         <p v-if="props.templateName"
            class="template-name"

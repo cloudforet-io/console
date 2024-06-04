@@ -40,6 +40,7 @@ const props = defineProps<Props>();
 
 const gnbStore = useGnbStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const { breadcrumbs } = useBreadcrumbs();
 const router = useRouter();
@@ -131,7 +132,7 @@ onUnmounted(() => {
                                  :template-name="state.templateName"
         />
         <div class="filter-box">
-            <dashboard-labels editable
+            <dashboard-labels :editable="!dashboardDetailGetters.isDeprecatedDashboard"
                               @update-labels="handleUpdateLabels"
             />
             <dashboard-toolset-date-dropdown v-show="dashboardDetailState.options.date_range.enabled"

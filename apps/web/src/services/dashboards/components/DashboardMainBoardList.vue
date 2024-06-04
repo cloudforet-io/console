@@ -82,33 +82,37 @@ const cloneModalState = reactive({
 
 const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => {
     const dashboardId = dashboardItem.dashboard_id || '';
-    return [
-        // {
-        //     iconName: 'ic_edit',
-        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-        //     eventAction: () => {
-        //         router.push(getProperRouteLocation({
-        //             name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-        //             params: {
-        //                 dashboardId,
-        //             },
-        //         }));
-        //     },
-        // },
-        // {
-        //     iconName: 'ic_duplicate',
-        //     tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-        //     eventAction: () => {
-        //         cloneModalState.dashboardConfig = { ...dashboardItem };
-        //         cloneModalState.visible = true;
-        //     },
-        // },
+    const manageButtonSet = [
+        {
+            iconName: 'ic_edit',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
+            eventAction: () => {
+                router.push(getProperRouteLocation({
+                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                    params: {
+                        dashboardId,
+                    },
+                }));
+            },
+        },
+        {
+            iconName: 'ic_duplicate',
+            tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
+            eventAction: () => {
+                cloneModalState.dashboardConfig = { ...dashboardItem };
+                cloneModalState.visible = true;
+            },
+        },
+    ];
+    const defaultButtonSet = [
         {
             iconName: 'ic_delete',
             tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
             eventAction: () => handleClickDeleteDashboard(dashboardId),
         },
     ];
+    if (dashboardItem.version === '1.0') return defaultButtonSet;
+    return manageButtonSet.concat(defaultButtonSet);
 };
 
 /* EVENT */
