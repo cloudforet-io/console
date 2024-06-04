@@ -1,91 +1,150 @@
 <script setup lang="ts">
-
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { PI, PTreeView } from '@spaceone/design-system';
 
-import { i18n } from '@/translations';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import { FAVORITE_TYPE } from '@/common/modules/favorites/favorite-button/type';
-import { useGnbStore } from '@/common/modules/navigations/stores/gnb-store';
-import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+import type { BookmarkItem } from '@/common/components/bookmark/type/type';
 
-import { indigo, peacock } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
-import { useProjectTreeData } from '@/services/project/composables/use-project-tree-data';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
+import { useBookmarkPageStore } from '@/services/preference/store/bookmark-page-store';
 import type { TreeNode } from '@/services/project/tree/type';
 
-const {
-    treeData,
-    treeDisplayMap,
-    parentGroupitems,
-    fetchData,
-    setSelectedNodeId,
-} = useProjectTreeData();
+const bookmarkPageStore = useBookmarkPageStore();
+const bookmarkPageGetters = bookmarkPageStore.getters;
+
+const storeState = reactive({
+    allBookmarkFolderItems: computed<BookmarkItem[]>(() => bookmarkPageGetters.allBookmarkFolderItems),
+});
 
 const route = useRoute();
-const gnbStore = useGnbStore();
 
 const state = reactive({
-    projectTreeData: computed<TreeNode[]>(() => treeData.value),
+    bookmarkTreeData: computed<TreeNode[]>(() => convertBookmarkItemsToTreeNodes(storeState.allBookmarkFolderItems)),
     selectedTreeId: undefined as string|undefined,
-    projectGroupNavigation: computed<Breadcrumb[]>(() => {
-        const allPaths = parentGroupitems.value.map((item) => ({
-            name: item.name,
-            to: {
-                name: PROJECT_ROUTE._NAME,
-                params: {
-                    projectGroupId: item.id,
+    // bookmarkGroupNavigation: computed<Breadcrumb[]>(() => {
+    //     const allPaths = parentGroupitems.value.map((item) => ({
+    //         name: item.name,
+    //         to: {
+    //             name: PREFERENCE_ROUTE.BOOKMARK._NAME,
+    //             params: {
+    //                 group: item.id,
+    //             },
+    //         },
+    //     }));
+    //
+    //     return [
+    //         { name: i18n.t('MENU.ADMINISTRATION_PREFERENCE'), data: null },
+    //         { name: i18n.t('MENU.ADMINISTRATION_BOOKMARK'), data: null },
+    //         ...allPaths,
+    //     ];
+    // }),
+});
+const convertBookmarkItemsToTreeNodes = (allBookmarkFolderItems: BookmarkItem[]): TreeNode[] => {
+    const workspaceMap: { [key: string]: TreeNode } = {};
+    const globalChildren: TreeNode[] = [];
+
+    allBookmarkFolderItems?.forEach((item) => {
+        const treeNode: TreeNode = {
+            id: item.id || '',
+            depth: 1,
+            data: {
+                id: item.id,
+                name: item.name,
+                to: {
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                    params: {
+                        folder: item.id,
+                    },
                 },
             },
-        }));
+            children: [],
+        };
 
-        return [{ name: i18n.t('MENU.PROJECT') as string, data: null }, ...allPaths];
-    }),
-});
+        if (item.workspaceId) {
+            if (!workspaceMap[item.workspaceId]) {
+                workspaceMap[item.workspaceId] = {
+                    id: item.workspaceId,
+                    depth: 0,
+                    data: {
+                        id: item.workspaceId,
+                        name: item.workspaceId,
+                        to: {
+                            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                            params: {
+                                group: item.workspaceId,
+                            },
+                        },
+                    },
+                    children: [],
+                };
+            }
+            workspaceMap[item.workspaceId].children?.push(treeNode);
+        } else {
+            globalChildren.push(treeNode);
+        }
+    });
 
-watch(() => state.projectGroupNavigation, async (projectGroupNavigation) => {
-    gnbStore.setBreadcrumbs(projectGroupNavigation);
-});
+    const result: TreeNode[] = Object.values(workspaceMap);
 
-onMounted(() => {
-    const selectedTreeId = (route.params.projectGroupId || route.params.id) as string|undefined;
+    // TODO: translation
+    result.push({
+        id: 'global',
+        depth: 0,
+        data: {
+            id: 'global',
+            name: 'Global Bookmark',
+            to: {
+                name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                params: {
+                    group: 'global',
+                },
+            },
+        },
+        children: globalChildren,
+    });
+
+    return result;
+};
+
+// watch(() => state.bookmarkGroupNavigation, async (bookmarkGroupNavigation) => {
+//     gnbStore.setBreadcrumbs(bookmarkGroupNavigation);
+// });
+
+watch(() => route.params, (params) => {
+    const selectedTreeId = (params.group || params.id) as string|undefined;
     if (selectedTreeId) {
         state.selectedTreeId = selectedTreeId as string;
-        setSelectedNodeId(selectedTreeId);
+    } else {
+        state.selectedTreeId = undefined;
     }
-});
+}, { immediate: true });
 
 </script>
 
 <template>
-    <div class="project-main-tree">
-        <p-tree-view :tree-data="state.projectTreeData"
-                     :tree-display-map.sync="treeDisplayMap"
+    <div class="bookmark-tree">
+        <p-tree-view :tree-data="state.bookmarkTreeData"
                      :selected-id="state.selectedTreeId"
-                     @click-toggle="fetchData"
         >
             <template #content="{ node }">
-                <div class="project-menu-item-content">
+                <div class="bookmark-menu-item-content">
                     <div class="contents-wrapper">
-                        <p-i class="project-icon"
-                             :name="Array.isArray(node.children) ? 'ic_folder-filled' : 'ic_document-filled'"
-                             :color="Array.isArray(node.children) ? indigo[500] : peacock[600]"
+                        <p-i v-if="Array.isArray(node.children)"
+                             class="bookmark-icon"
+                             :name="node.id === 'global' ? 'ic_globe-filled' : 'ic_folder'"
+                             :color="node.id === 'global' ? gray[500] : gray[900]"
                              width="0.875rem"
                              height="0.875rem"
                         />
                         <span class="text">{{ node.data.name }}</span>
                     </div>
-                    <favorite-button :item-id="node.id"
-                                     :favorite-type="Array.isArray(node.children) ? FAVORITE_TYPE.PROJECT_GROUP : FAVORITE_TYPE.PROJECT"
-                                     scale="0.8"
-                                     class="favorite-button"
-                    />
                 </div>
             </template>
         </p-tree-view>
@@ -93,15 +152,15 @@ onMounted(() => {
 </template>
 
 <style scoped lang="postcss">
-.project-main-tree {
+.bookmark-tree {
     width: 100%;
-    .project-menu-item-content {
+    .bookmark-menu-item-content {
         @apply flex items-center justify-between w-full;
         height: 2rem;
         .contents-wrapper {
             @apply flex items-center gap-1 w-full;
 
-            .project-icon {
+            .bookmark-icon {
                 min-width: 0.875rem;
             }
             .text {
