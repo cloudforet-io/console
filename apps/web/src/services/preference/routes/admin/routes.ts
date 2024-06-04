@@ -8,10 +8,9 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { PREFERENCE_ROUTE } from '@/services/preference/routes/route-constant';
 
 const PreferenceContainer = () => import('@/services/preference/PreferenceContainer.vue');
-
 const DomainSettingsPage = () => import('@/services/preference/pages/admin/AdminDomainSettingsPage.vue');
-
 const WorkspacesPage = () => import('@/services/preference/pages/admin/AdminWorkspacesPage.vue');
+const BookmarkPage = () => import('@/services/preference/pages/admin/AdminBookmarkPage.vue');
 
 const adminPreferenceRoutes: RouteConfig = {
     path: 'preference',
@@ -34,6 +33,16 @@ const adminPreferenceRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId,
             },
             component: WorkspacesPage,
+        },
+        {
+            path: 'bookmark',
+            name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+            meta: {
+                lsbVisible: true,
+                menuId: MENU_ID.BOOKMARK,
+                translationId: MENU_INFO_MAP[MENU_ID.BOOKMARK].translationId,
+            },
+            component: BookmarkPage,
         },
         {
             path: 'domain-settings',

@@ -165,6 +165,13 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_WORKSPACES',
         icon: 'ic_service_workspaces',
     },
+    [MENU_ID.BOOKMARK]: {
+        menuId: MENU_ID.BOOKMARK,
+        routeName: PREFERENCE_ROUTE.BOOKMARK._NAME,
+        translationId: 'MENU.ADMINISTRATION_BOOKMARK',
+        highlightTag: 'new',
+        icon: 'ic_service_bookmark',
+    },
     [MENU_ID.MY_PAGE]: {
         menuId: MENU_ID.MY_PAGE,
         routeName: MY_PAGE_ROUTE._NAME,
