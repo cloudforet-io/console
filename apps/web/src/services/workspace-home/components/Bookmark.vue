@@ -8,12 +8,13 @@ import { screens } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
+import BookmarkDeleteModal from '@/common/components/bookmark/BookmarkDeleteModal.vue';
+import BookmarkFolderFormModal from '@/common/components/bookmark/BookmarkFolderFormModal.vue';
+import BookmarkLinkFormModal from '@/common/components/bookmark/BookmarkLinkFormModal.vue';
+
 import BookmarkBoard from '@/services/workspace-home/components/BookmarkBoard.vue';
-import BookmarkDeleteModal from '@/services/workspace-home/components/BookmarkDeleteModal.vue';
-import BookmarkFolderFormModal from '@/services/workspace-home/components/BookmarkFolderFormModal.vue';
 import BookmarkFullMode from '@/services/workspace-home/components/BookmarkFullMode.vue';
 import BookmarkHeader from '@/services/workspace-home/components/BookmarkHeader.vue';
-import BookmarkLinkFormModal from '@/services/workspace-home/components/BookmarkLinkFormModal.vue';
 import {
     BOOKMARK_MODAL_TYPE,
     MAX_BOARD_SETS,

@@ -9,14 +9,14 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFormValidator } from '@/common/composables/form-validator';
-
 import {
     checkValidUrl,
     convertUrlProtocol,
     generateNewFolderName,
-} from '@/services/workspace-home/composables/use-bookmark';
+} from '@/common/components/bookmark/composables/use-bookmark';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
+
 import { BOOKMARK_MODAL_TYPE } from '@/services/workspace-home/constants/workspace-home-constant';
 import { useBookmarkStore } from '@/services/workspace-home/store/bookmark-store';
 import type { BookmarkItem, BookmarkModalStateType } from '@/services/workspace-home/types/workspace-home-type';
