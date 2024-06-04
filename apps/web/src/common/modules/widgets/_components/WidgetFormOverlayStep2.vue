@@ -57,7 +57,7 @@ const state = reactive({
 const initSnapshot = () => {
     state.variablesSnapshot = cloneDeep(dashboardDetailState.variables);
     state.variableSchemaSnapshot = cloneDeep(dashboardDetailGetters.refinedVariablesSchema);
-    state.basedOnDateSnapshot = cloneDeep(dashboardDetailState.settings.date_range);
+    state.basedOnDateSnapshot = cloneDeep(dashboardDetailState.options.date_range);
 };
 
 /* Event */
@@ -78,7 +78,7 @@ onBeforeMount(() => {
         <div class="left-part">
             <div class="dashboard-settings-wrapper">
                 <div class="toolbox-wrapper">
-                    <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.settings.date_range" />
+                    <dashboard-toolset-date-dropdown :date-range="dashboardDetailState.options.date_range" />
                     <p-divider vertical
                                class="divider"
                     />

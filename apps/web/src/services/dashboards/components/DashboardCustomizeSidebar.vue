@@ -46,7 +46,7 @@ const state = reactive({
         });
         return _configMap;
     }),
-    enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
+    enableDateRange: computed(() => dashboardDetailState.options.date_range?.enabled ?? false),
     addWidgetModalVisible: false,
 });
 
