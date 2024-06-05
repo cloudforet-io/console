@@ -6,14 +6,6 @@ import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-q
 export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
-export interface TableDataFieldOptions {
-    fields: Array<{
-        name: string;
-        labelTranslationCode?: string;
-        dataTarget?: string;
-        multiSelectable?: boolean;
-    }>
-}
 export interface XAxisOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
@@ -83,7 +75,7 @@ export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
 }
-type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
+type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions

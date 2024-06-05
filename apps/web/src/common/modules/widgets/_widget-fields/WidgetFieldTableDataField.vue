@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton,
@@ -8,23 +8,19 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { i18n } from '@/translations';
 
-import type {
-    TableDataFieldOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
-
-
-const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
-    widgetFieldSchema: () => ({}),
-});
 
 const state = reactive({
-    selectButtonItems: computed<MenuItem[]>(() => props.widgetFieldSchema.options?.fields?.map((field) => ({
-        name: field.name,
-        label: i18n.t(field.labelTranslationCode || field.name),
-    })) || []),
-    selectedItem: undefined as string | undefined,
-    selectedDataField: computed(() => props.widgetFieldSchema.options?.fields?.find((field) => field.name === state.selectedItem)),
+    selectButtonItems: computed<MenuItem[]>(() => [
+        {
+            name: 'dynamicField',
+            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.DYNAMIC_FIELD'),
+        },
+        {
+            name: 'staticField',
+            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.STATIC_FIELD'),
+        },
+    ]),
+    selectedItem: 'dynamicField',
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
 });
 
@@ -32,10 +28,6 @@ const state = reactive({
 const handleChangeDataFieldType = (value: string) => {
     state.selectedItem = value;
 };
-
-onMounted(() => {
-    state.selectedItem = state.selectButtonItems[0]?.name;
-});
 </script>
 
 <template>
@@ -56,7 +48,7 @@ onMounted(() => {
             </div>
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems"
-                                   :multi-selectable="state.selectedDataField?.multiSelectable"
+                                   :multi-selectable="state.selectedItem === 'staticField'"
                 />
                 <p-text-input type="number"
                               :min="0"
