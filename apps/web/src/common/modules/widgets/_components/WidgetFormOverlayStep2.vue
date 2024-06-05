@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, reactive } from 'vue';
 
 import {
-    PDivider, PSelectButton,
+    PDivider, PSelectButton, PButton,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -113,6 +113,12 @@ onBeforeMount(() => {
                            mode="overlay"
                            @update:size="handleUpdateWidgetSize"
                 />
+                <p-button style-type="substitutive"
+                          icon-left="ic_refresh"
+                          class="update-preview-button"
+                >
+                    {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.UPDATE_PREVIEW') }}
+                </p-button>
             </div>
         </div>
         <widget-form-overlay-step2-widget-form />
@@ -151,11 +157,17 @@ onBeforeMount(() => {
             }
         }
         .widget-wrapper {
+            position: relative;
             &.full-size {
                 height: 100%;
                 .widget-frame {
                     height: 100%;
                 }
+            }
+            .update-preview-button {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
             }
         }
     }
