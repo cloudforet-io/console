@@ -111,7 +111,7 @@ onMounted(() => {
 <template>
     <div class="widget-field-total">
         <div class="header">
-            <p-field-title>{{ props.widgetFieldSchema.label ?? $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}</p-field-title>
+            <p-field-title>{{ $t('COMMON.WIDGETS.COMPARISON.COMPARISON') }}</p-field-title>
             <p-toggle-button :value="state.toggleValue"
                              @update:value="handleUpdateToggle"
             />
