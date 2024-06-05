@@ -42,6 +42,28 @@ const adminPreferenceRoutes: RouteConfig = {
                 translationId: MENU_INFO_MAP[MENU_ID.BOOKMARK].translationId,
             },
             component: BookmarkPage,
+            children: [
+                {
+                    path: ':group?',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                    meta: {
+                        menuId: MENU_ID.BOOKMARK,
+                        lsbVisible: true,
+                    },
+                    props: true,
+                    component: BookmarkPage,
+                },
+                {
+                    path: ':folder?',
+                    name: makeAdminRouteName(PREFERENCE_ROUTE.BOOKMARK._NAME),
+                    meta: {
+                        menuId: MENU_ID.BOOKMARK,
+                        lsbVisible: true,
+                    },
+                    props: true,
+                    component: BookmarkPage,
+                },
+            ],
         },
         {
             path: 'domain-settings',
