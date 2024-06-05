@@ -158,6 +158,10 @@ onBeforeMount(() => {
         }
         .widget-wrapper {
             position: relative;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
             &.full-size {
                 height: 100%;
                 .widget-frame {

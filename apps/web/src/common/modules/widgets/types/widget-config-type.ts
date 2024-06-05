@@ -70,7 +70,7 @@ export interface ComparisonOptions {
     compareTargets?: any[]; // subTotal or X-Axis
 }
 
-type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
+type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
