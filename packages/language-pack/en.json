@@ -1827,6 +1827,7 @@
 					"DATA_TABLE": "Data Table",
 					"DESCRIPTION": "Description",
 					"EDIT_DATA": "Edit Data",
+					"EXPAND_AND_EDIT": "Expand & Edit",
 					"FIELD_NAME": "Field Name",
 					"FORMAT_RULES": "Format Rules",
 					"GROUP_BY": "Group By",
@@ -1845,6 +1846,7 @@
 					"TITLE": "Title",
 					"TOTAL": "Total",
 					"TOTAL_FIELD": "Total Field",
+					"UPDATE_PREVIEW": "Update Preview",
 					"WIDGET_INFO": "Widget Info",
 					"X_AXIS": "X-Axis",
 					"Y_AXIS": "Y-Axis"

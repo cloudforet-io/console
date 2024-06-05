@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core/index';
 import {
-    reactive, computed, ref,
+    reactive, computed,
 } from 'vue';
 
 import {
-    PI, PIconButton, PContextMenu, PSelectDropdown, useContextMenuController,
+    PI, PIconButton, PPopover, PSelectDropdown, PLink,
 } from '@spaceone/design-system';
+import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
-import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -22,43 +21,17 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
     (event: 'update:size', size: WidgetSize): void;
+    (event: 'expand'): void;
 }>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    etcDropdownMenuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'expandAndEdit',
-            label: i18n.t('Expand & Edit'), // TODO: i18n
-        },
-        {
-            type: 'item',
-            name: 'fullData',
-            label: i18n.t('Full Data'), // TODO: i18n
-        },
-    ])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
 });
-const contextMenuRef = ref<any|null>(null);
-const targetRef = ref<HTMLElement | null>(null);
-const {
-    visibleMenu: visibleContextMenu,
-    contextMenuStyle,
-    hideContextMenu,
-    toggleContextMenu,
-} = useContextMenuController({
-    targetRef,
-    contextMenuRef,
-    useFixedStyle: true,
-    position: 'right',
-    menu: state.etcDropdownMenuItems,
-});
-onClickOutside(targetRef, hideContextMenu);
 
 /* Event */
 const handleEditButtonClick = () => {
@@ -67,15 +40,8 @@ const handleEditButtonClick = () => {
 const handleClickDeleteButton = () => {
     emit('click-delete');
 };
-const handleClickEtcButton = () => {
-    toggleContextMenu();
-};
-const handleSelectEtc = (item: MenuItem) => {
-    if (item.name === 'expandAndEdit') {
-        emit('click-edit');
-    } else if (item.name === 'fullData') {
-        // window.open(props.widgetLink, '_blank');
-    }
+const handleClickExpandButton = () => {
+    emit('expand');
 };
 const handleSelectSize = (size: WidgetSize) => {
     emit('update:size', size);
@@ -84,36 +50,60 @@ const handleSelectSize = (size: WidgetSize) => {
 
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, 'show-etc': visibleContextMenu, [props.size]: props.size }"
+         :class="{ full: state.isFull, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <div class="metadata-wrapper">
-                <p-i name="ic_info-circle"
-                     width="1rem"
-                     height="1rem"
-                />
-                <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
-                <div class="metadata-content">
-                    Metadata~
+            <p-popover class="metric-select-guide-popover"
+                       position="bottom-start"
+                       :trigger="POPOVER_TRIGGER.CLICK"
+            >
+                <div class="metadata-button">
+                    <p-i name="ic_info-circle"
+                         width="1rem"
+                         height="1rem"
+                    />
+                    <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
                 </div>
-            </div>
+                <template #content>
+                    <div class="metadata-content">
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
+                            <span class="metadata-value">23/07/01 ~ 23/07/31</span>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
+                            <span class="metadata-value">$USD</span>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
+                            <p-link new-tab
+                                    highlight
+                                    action-icon="internal-link"
+                                    :to="{}"
+                                    class="metadata-value"
+                            >
+                                Storage Data
+                            </p-link>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
+                            <span class="metadata-value">Description</span>
+                        </div>
+                    </div>
+                </template>
+            </p-popover>
         </div>
         <p-icon-button v-if="props.mode === 'view'"
-                       ref="targetRef"
-                       name="ic_ellipsis-horizontal"
+                       v-tooltip.bottom="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.EXPAND_AND_EDIT')"
+                       name="ic_arrows-expand-all"
                        shape="square"
-                       class="etc-button"
-                       @click="handleClickEtcButton"
-        />
-        <p-context-menu v-show="visibleContextMenu"
-                        ref="contextMenuRef"
-                        :style="contextMenuStyle"
-                        :menu="state.etcDropdownMenuItems"
-                        @select="handleSelectEtc"
+                       style-type="tertiary"
+                       class="expand-button"
+                       @click="handleClickExpandButton"
         />
         <div v-if="props.mode === 'customize'"
              class="action-button-wrapper"
@@ -132,7 +122,8 @@ const handleSelectSize = (size: WidgetSize) => {
         <div class="body">
             <slot />
         </div>
-        <p-select-dropdown class="widget-size-dropdown"
+        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
+                           class="widget-size-dropdown"
                            style-type="transparent"
                            :menu="state.sizeDropdownMenuItems"
                            :selected="props.size"
@@ -151,11 +142,6 @@ const handleSelectSize = (size: WidgetSize) => {
     display: inline-flex;
     flex-direction: column;
     padding: 1rem;
-    &:hover, &.show-etc {
-        .etc-button {
-            display: block;
-        }
-    }
     &.sm {
         height: 11rem;
     }
@@ -172,41 +158,41 @@ const handleSelectSize = (size: WidgetSize) => {
             -webkit-box-orient: vertical;
             font-weight: 500;
         }
-        .metadata-wrapper {
+        .metadata-button {
             @apply text-gray-700;
             display: flex;
             align-items: center;
+            cursor: pointer;
             padding-left: 0.75rem;
-            &:hover {
-                .metadata-content {
-                    @apply text-label-md;
-                    max-height: 20rem;
-                    overflow-y: auto;
-                    display: block;
-                    z-index: 100;
-                }
-            }
             .metadata-text {
                 @apply text-label-sm;
                 padding-left: 0.25rem;
             }
-            .metadata-content {
-                @apply bg-white border rounded-lg border-gray-200;
-                position: absolute;
-                top: 2.25rem;
-                display: none;
-                padding: 1.25rem 1rem;
+        }
+        .metadata-content {
+            @apply text-label-md;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 20rem;
+            overflow-y: auto;
+            z-index: 100;
+            padding-top: 0.5rem;
+            .metadata-item-row {
+                display: flex;
+                justify-content: flex-start;
+                gap: 2rem;
+                .metadata-title {
+                    @apply text-gray-600;
+                    width: 7rem;
+                }
             }
         }
     }
-    .etc-button {
+    .expand-button {
         position: absolute;
         top: 0.5rem;
         right: 1rem;
-        display: none;
-    }
-    .p-context-menu {
-        z-index: 100;
     }
     .action-button-wrapper {
         @apply bg-gray-150 rounded-lg;
