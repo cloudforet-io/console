@@ -13,12 +13,13 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
 export interface WidgetProps {
     widgetName: string;
-    // widgetKey: string; // unique widget key to identify widgets in layout
     widgetId: string;
     title?: string;
     description?: string;
     size?: WidgetSize;
     width?: number;
+    //
+    mode?: 'overlay'|'customize'|'view';
     // filters?: NewWidgetFilters;
     // filtersSchemaProperties?: string[];
     // theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet

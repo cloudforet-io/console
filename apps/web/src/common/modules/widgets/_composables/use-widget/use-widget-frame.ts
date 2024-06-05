@@ -16,21 +16,22 @@ export const useWidgetFrame = (
         if (props.size && _widgetConfig.meta.sizes.includes(props.size)) return props.size;
         return _widgetConfig.meta.sizes[0];
     });
-    const _currency = undefined; // TODO: set this
+    // const _currency = undefined; // TODO: set this
     // const _dateText = props.baseOnDate; // TODO: set this
-    const _widgetLocation = undefined; // TODO: set this
+    // const _widgetLocation = undefined; // TODO: set this
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
         widgetId: props.widgetId,
         widgetSizes: _widgetConfig.meta.sizes,
+        mode: props.mode ?? 'view',
         //
         title: _title.value,
         description: props.description,
         size: _size.value,
         width: props.width,
-        widgetLocation: _widgetLocation,
+        // widgetLocation: _widgetLocation,
         //
         // dateText: _dateText,
-        currency: _currency,
+        // currency: _currency,
         //
         // loading: props.loading,
         // editMode: props.editMode,

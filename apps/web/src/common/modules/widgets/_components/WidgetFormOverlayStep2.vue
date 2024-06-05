@@ -110,6 +110,7 @@ onBeforeMount(() => {
                            :width="state.widgetWidth"
                            :title="widgetGenerateState.title"
                            :description="widgetGenerateState.description"
+                           mode="overlay"
                            @update:size="handleUpdateWidgetSize"
                 />
             </div>
