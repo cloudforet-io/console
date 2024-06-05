@@ -14,7 +14,6 @@ const emit = defineEmits<{(e: 'update:value', value: boolean): void;
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<LegendOptions>>(), {
     widgetFieldSchema: () => ({
-        label: '',
         options: {
             default: false,
         },
@@ -33,7 +32,7 @@ const handleUpdateValue = (value: boolean) => {
 
 <template>
     <div class="widget-field-legend">
-        <p-field-title>{{ props.widgetFieldSchema.label ?? 'Legend' }}</p-field-title>
+        <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.LEGEND') }}</p-field-title>
         <p-toggle-button :value="state.value"
                          @update:value="handleUpdateValue"
         />

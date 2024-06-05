@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive,
+} from 'vue';
 
 import {
     PFieldGroup, PTextInput, PIconButton, PButton, PSelectDropdown,
@@ -14,9 +16,7 @@ import { gray } from '@/styles/colors';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
+    widgetFieldSchema: () => ({}),
 });
 interface FormatRule {
     threshold: number;
@@ -62,7 +62,7 @@ onMounted(() => {
 
 <template>
     <div class="widget-field-format-rules">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FORMAT_RULES')"
                        required
         >
             <div class="format-rules-wrapper">

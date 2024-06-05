@@ -12,8 +12,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/components/DashboardManageVariableOverlay.vue';
 import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
-import DashboardVariablesMoreButton
-    from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { useAllReferenceTypeInfoStore } from '@/services/dashboards/stores/all-reference-type-info-store';
@@ -103,10 +101,10 @@ const handleResetVariables = () => {
                 />
             </div>
         </template>
-        <dashboard-variables-more-button v-if="!props.disableMoreButton"
-                                         :is-manageable="props.isManageable"
-                                         :disabled="state.saveLoading"
-        />
+        <!--        <dashboard-variables-more-button v-if="!props.disableMoreButton"-->
+        <!--                                         :is-manageable="props.isManageable"-->
+        <!--                                         :disabled="state.saveLoading"-->
+        <!--        />-->
         <p-text-button style-type="highlight"
                        class="reset-button"
                        :disabled="state.saveLoading"

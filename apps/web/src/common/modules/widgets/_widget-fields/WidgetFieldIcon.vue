@@ -19,7 +19,6 @@ const emit = defineEmits<{(e: 'update:value', value: { icon: Icon, color: string
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions>>(), {
     widgetFieldSchema: () => ({
-        label: '',
         options: {
             default: false,
         },
@@ -95,7 +94,7 @@ watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
 <template>
     <div class="widget-field-icon">
         <div class="header">
-            <p-field-title>{{ props.widgetFieldSchema.label ?? 'Icon' }}</p-field-title>
+            <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ICON') }}</p-field-title>
             <p-toggle-button :value="state.value"
                              @update:value="handleUpdateValue"
             />

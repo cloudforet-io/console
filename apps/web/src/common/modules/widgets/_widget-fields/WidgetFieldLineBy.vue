@@ -6,18 +6,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type {
-    LineByFieldOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-const props = withDefaults(defineProps<WidgetFieldComponentProps<LineByFieldOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
-});
-
+// const props = withDefaults(defineProps<WidgetFieldComponentProps<LineByFieldOptions>>(), {
+// });
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
 });
@@ -25,7 +16,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-line-by">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.LINE_BY')"
                        required
         >
             <div class="field-form-wrapper">
