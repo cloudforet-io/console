@@ -12,7 +12,6 @@ const emit = defineEmits<{(e: 'update:value', value: boolean): void;
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<SubTotalOptions>>(), {
     widgetFieldSchema: () => ({
-        label: '',
         options: {
             toggle: false,
             default: false,
@@ -42,7 +41,7 @@ const handleUpdateToggle = (value: boolean) => {
 <template>
     <div class="widget-field-sub-total">
         <div class="header">
-            <p-field-title>{{ props.widgetFieldSchema.label ?? 'Sub Total' }}</p-field-title>
+            <p-field-title>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.SUB_TOTAL') }}</p-field-title>
             <p-toggle-button :value="state.toggleValue"
                              @update:value="handleUpdateToggle"
             />

@@ -8,11 +8,8 @@ const treemap: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         categoryBy: {
-            label: 'Category By',
             options: {
                 dataTarget: 'label_field',
             },

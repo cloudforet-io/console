@@ -8,15 +8,11 @@ const numberCard: WidgetConfig = {
         sizes: ['sm'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
     },
     optionalFieldsSchema: {
         icon: {},
-        comparison: {
-            label: 'Comparison',
-        },
+        comparison: {},
     },
 };
 

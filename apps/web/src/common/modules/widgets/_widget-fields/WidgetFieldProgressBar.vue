@@ -6,8 +6,8 @@ import {
 } from '@spaceone/design-system';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { BasisFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+// import type { BasisFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
+// import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 
@@ -16,11 +16,9 @@ interface FormatRule {
     threshold: number;
     color: string;
 }
-const props = withDefaults(defineProps<WidgetFieldComponentProps<BasisFieldOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
-});
+// const props = withDefaults(defineProps<WidgetFieldComponentProps<BasisFieldOptions>>(), {
+//     widgetFieldSchema: () => ({}),
+// });
 
 const state = reactive({
     enabled: false,
@@ -42,7 +40,7 @@ const handleDeleteFormatRule = (idx: number) => {
 
 <template>
     <div class="widget-field-progress-bar">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.PROGRESS_BAR')"
                        required
         >
             <template #label-extra>

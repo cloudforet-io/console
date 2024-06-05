@@ -8,18 +8,14 @@ const table: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         xAxisField: {
-            label: 'X-Axis Field',
             options: {
                 dataTarget: 'label_field',
                 multiSelectable: true,
             },
         },
         groupBy: {
-            label: 'Group By',
             options: {
                 dataTarget: 'label_field',
                 multiSelectable: true,
@@ -27,14 +23,10 @@ const table: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        comparison: {
-            label: 'Comparison',
-        },
+        comparison: {},
         subTotal: {},
         total: {},
-        progressBar: {
-            label: 'Progress Bar',
-        },
+        progressBar: {},
     },
 };
 

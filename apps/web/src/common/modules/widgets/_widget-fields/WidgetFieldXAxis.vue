@@ -13,9 +13,7 @@ import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/w
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<XAxisFieldOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
+    widgetFieldSchema: () => ({}),
 });
 
 const state = reactive({
@@ -25,7 +23,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-x-axis">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.X_AXIS')"
                        required
         >
             <div class="field-form-wrapper">

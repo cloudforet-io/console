@@ -14,7 +14,6 @@ const emit = defineEmits<{(e: 'update:value', value: number): void;
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(), {
     widgetFieldSchema: () => ({
-        label: '',
         options: {
             min: 0,
             max: 5,
@@ -35,7 +34,7 @@ const handleUpdateValue = (value: number) => {
 
 <template>
     <div class="widget-field-max">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.MAX')"
                        required
         >
             <p-text-input type="number"

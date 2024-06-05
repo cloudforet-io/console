@@ -6,17 +6,10 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type {
-    CategoryByFieldOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
-
-const props = withDefaults(defineProps<WidgetFieldComponentProps<CategoryByFieldOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
-});
+// const props = withDefaults(defineProps<WidgetFieldComponentProps<CategoryByFieldOptions>>(), {
+//     widgetFieldSchema: () => ({}),
+// });
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
@@ -25,7 +18,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-category-by">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CATEGORY_BY')"
                        required
         >
             <div class="field-form-wrapper">

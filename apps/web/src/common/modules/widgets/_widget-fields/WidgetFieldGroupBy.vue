@@ -13,11 +13,8 @@ import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/w
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByFieldOptions>>(), {
-    widgetFieldSchema: () => ({
-        label: '',
-    }),
+    widgetFieldSchema: () => ({}),
 });
-
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
 });
@@ -25,7 +22,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-group-by">
-        <p-field-group :label="props.widgetFieldSchema.label"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY_FIELD')"
                        required
         >
             <div class="field-form-wrapper">

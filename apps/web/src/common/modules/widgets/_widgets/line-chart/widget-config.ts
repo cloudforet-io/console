@@ -8,26 +8,20 @@ const lineChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         xAxisField: {
-            label: 'X-Axis Field',
             options: {
                 dataTarget: 'label_field',
             },
         },
         lineBy: {
-            label: 'Line By',
             options: {
                 dataTarget: 'label_field',
             },
         },
     },
     optionalFieldsSchema: {
-        legend: {
-            label: 'Legend',
-        },
+        legend: {},
     },
 };
 
