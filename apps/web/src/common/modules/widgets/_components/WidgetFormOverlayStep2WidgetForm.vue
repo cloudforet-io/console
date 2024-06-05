@@ -6,6 +6,7 @@ import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 
@@ -13,6 +14,7 @@ import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widge
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const FORM_TITLE_MAP = {
@@ -35,12 +37,6 @@ const state = reactive({
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
-    fieldValueMap: {
-        // [fieldName]: any
-    },
-    fieldValidMap: {
-        // [fieldName]: boolean
-    },
     // display
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
@@ -67,10 +63,21 @@ const handleClickEditDataTable = () => {
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
+const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
+    const _valueMap = cloneDeep(widgetGenerateState.widgetValueMap);
+    _valueMap[fieldName] = value;
+    widgetGenerateStore.setWidgetValueMap(_valueMap);
+};
+const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
+    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
+    _validMap[fieldName] = isValid;
+    widgetGenerateStore.setWidgetValidMap(_validMap);
+};
 
 watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
     widgetGenerateStore.initWidgetForm(widgetName);
 }, { immediate: true });
+// TODO: state.fieldValueMap 채워주기
 </script>
 
 <template>
@@ -157,8 +164,10 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :value.sync="state.fieldValueMap[fieldName]"
-                               :is-valid.sync="state.fieldValidMap[fieldName]"
+                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                     />
                 </template>
             </div>
@@ -183,8 +192,10 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
-                               :value.sync="state.fieldValueMap[fieldName]"
-                               :is-valid.sync="state.fieldValidMap[fieldName]"
+                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                     />
                 </template>
             </div>

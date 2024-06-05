@@ -8,10 +8,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
+import type { PublicWidgetGetParameters } from '@/schema/dashboard/public-widget/api-verbs/get';
+import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -21,12 +24,15 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         showOverlay: false,
         overlayStep: 1,
         // Widget
+        widget: undefined as undefined | PublicWidgetModel,
         widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
         granularity: 'MONTHLY',
         title: '',
         description: '',
         size: 'full',
+        widgetValueMap: {} as Record<string, WidgetFieldValues>,
+        widgetValidMap: {} as Record<string, boolean>,
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
@@ -62,6 +68,12 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setGranularity = (granularity: string) => {
         state.granularity = granularity;
     };
+    const setWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues>) => {
+        state.widgetValueMap = widgetValueMap;
+    };
+    const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
+        state.widgetValidMap = widgetValidMap;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -72,6 +84,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setDescription,
         setSize,
         setGranularity,
+        setWidgetValueMap,
+        setWidgetValidMap,
     };
     const actions = {
         listDataTable: async () => {
@@ -127,7 +141,17 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.description = '';
             state.size = 'full';
         },
+        loadWidget: async (widgetId: string) => {
+            try {
+                state.widget = await SpaceConnector.clientV2.dashboard.publicWidget.get<PublicWidgetGetParameters, PublicWidgetModel>({
+                    widget_id: widgetId,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
         initWidgetForm: (widgetName = 'table') => {
+            // chart type 바꿀 때 trigger
             state.selectedWidgetName = widgetName;
             const _widgetConfig = getWidgetConfig(widgetName);
             state.title = _widgetConfig.meta.title || '';

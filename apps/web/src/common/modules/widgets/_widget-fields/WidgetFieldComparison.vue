@@ -14,25 +14,17 @@ import type {
     ComparisonOptions,
 } from '@/common/modules/widgets/types/widget-config-type';
 import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { green, red } from '@/styles/colors';
 
 
-interface ComparisonValue {
-    fieldName?: string;
-    compareWith?: string;
-    compareTarget?: string;
-    decreaseColor?: string;
-    increaseColor?: string;
-    format?: 'all'|'percent'|'fixed';
-}
-
 const emit = defineEmits<{(e: 'update:value', value: ComparisonValue[]): void;
+    (e: 'update:is-valid', value: boolean): void;
 }>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions>>(), {
     widgetFieldSchema: () => ({
-        label: '',
         options: {
             toggle: false,
             granularity: GRANULARITY.DAILY,
