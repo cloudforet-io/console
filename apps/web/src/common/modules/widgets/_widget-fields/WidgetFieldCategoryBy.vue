@@ -18,7 +18,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-category-by">
-        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CATEGORY_BY_FIELD')"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CATEGORY_BY')"
                        required
         >
             <div class="field-form-wrapper">
