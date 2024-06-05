@@ -12,16 +12,11 @@ import { i18n } from '@/translations';
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import type {
     ComparisonOptions,
-    WidgetFieldSchema,
 } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { green, red } from '@/styles/colors';
 
-
-interface Props {
-    widgetFieldSchema: WidgetFieldSchema<ComparisonOptions>;
-    required: boolean;
-}
 
 interface ComparisonValue {
     fieldName?: string;
@@ -35,7 +30,7 @@ interface ComparisonValue {
 const emit = defineEmits<{(e: 'update:value', value: ComparisonValue[]): void;
 }>();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions>>(), {
     widgetFieldSchema: () => ({
         label: '',
         options: {
