@@ -1827,6 +1827,7 @@
 					"DATA_TABLE": "データテーブル",
 					"DESCRIPTION": "説明",
 					"EDIT_DATA": "データを編集",
+					"EXPAND_AND_EDIT": "",
 					"FIELD_NAME": "フィールド名",
 					"FORMAT_RULES": "形式ルール",
 					"GROUP_BY": "",
@@ -1845,6 +1846,7 @@
 					"TITLE": "タイトル",
 					"TOTAL": "",
 					"TOTAL_FIELD": "総合フィールド",
+					"UPDATE_PREVIEW": "",
 					"WIDGET_INFO": "ウィジェット情報",
 					"X_AXIS": "",
 					"Y_AXIS": ""
