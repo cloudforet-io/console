@@ -1,5 +1,7 @@
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 
+import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
@@ -61,7 +63,14 @@ export interface TotalOptions {
     toggle?: boolean;
 }
 
-export type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
+export interface ComparisonOptions {
+    toggle?: boolean;
+    granularity?: Granularity;
+    forTable?: boolean;
+    compareTargets?: any[]; // subTotal or X-Axis
+}
+
+type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
@@ -69,7 +78,8 @@ export interface FormatRulesOptions {
 type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
     | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
     | TotalFieldOptions | BasisFieldOptions
-    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions;
+    | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
+    | ComparisonOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;

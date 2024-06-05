@@ -55,4 +55,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     total: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldTotal.vue'),
     }),
+    comparison: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue'),
+    }),
 };

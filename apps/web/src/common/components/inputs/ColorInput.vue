@@ -13,7 +13,6 @@ const emit = defineEmits<{(e: 'update:value', value): void;
 /* Event */
 const handleChangeInput = (event: InputEvent) => {
     const target = event.target as HTMLInputElement;
-    console.log('target.value', target.value);
     emit('update:value', target.value);
 };
 </script>

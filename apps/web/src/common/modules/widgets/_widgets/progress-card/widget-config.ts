@@ -25,6 +25,11 @@ const progressCard: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
+        comparison: {
+            options: {
+                forTable: false,
+            },
+        },
     },
 };
 
