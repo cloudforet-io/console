@@ -294,11 +294,6 @@ watch(() => props.sourceId, async () => {
         state.loading = false;
     }
 });
-
-watch(() => state.selectedItems, (changed) => {
-    console.debug('selected items changed', changed);
-});
-
 </script>
 
 <template>
