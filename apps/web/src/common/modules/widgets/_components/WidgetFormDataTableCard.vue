@@ -11,8 +11,6 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { range } from 'lodash';
 
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -68,7 +66,7 @@ const state = reactive({
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
     selectedGroupByItems: [] as string[],
-    filters: [] as ApiFilter[],
+    filters: {} as Record<string, string[]>,
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
@@ -235,7 +233,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                     />
                 </p-field-group>
                 <widget-form-data-table-card-filters :source-type="state.sourceType"
-                                                     :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.metricId"
+                                                     :source-id="state.selectedSourceEndItem"
                                                      :filters.sync="state.filters"
                 />
                 <p-field-group label="Data Field Name"

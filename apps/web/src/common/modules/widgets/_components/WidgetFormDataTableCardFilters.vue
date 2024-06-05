@@ -10,9 +10,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, isEmpty, sortBy } from 'lodash';
-
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+import {
+    cloneDeep, isEmpty, sortBy, unset,
+} from 'lodash';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
 
@@ -56,14 +56,15 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
 type ManagedGlobalVariable = typeof GROUP_BY[keyof typeof GROUP_BY];
 const MANAGED_GLOBAL_VARIALBE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as (ManagedGlobalVariable|string)[];
+
 interface Props {
     sourceType?: DataTableSourceType;
     sourceId?: string;
-    filters: ApiFilter[];
+    filters: Record<string, string[]>;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:filters', value: ApiFilter[]): void;}>();
+const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
@@ -73,7 +74,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    filters: useProxyValue('filters', props, emit),
+    proxyFilters: useProxyValue('filters', props, emit),
     filterItems: computed(() => {
         if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return [
@@ -148,16 +149,15 @@ onClickOutside(containerRef, hideContextMenu);
 
 
 /* Event */
-const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
+const handleUpdateFiltersDropdown = (filterKey: string, selectedItems: SelectDropdownMenuItem[]) => {
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
-    selectedItemsMap[groupBy] = selectedItems;
+    selectedItemsMap[filterKey] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    // costAnalysisPageStore.setFilters({
-    //     ...costAnalysisPageState.filters,
-    //     [groupBy]: selectedItems.map((d) => d.name as string),
-    // });
-    console.debug('set filter now!');
+    state.proxyFilters = {
+        ...state.proxyFilters,
+        [filterKey]: selectedItems.map((d) => d.name as string),
+    };
 };
 const handleAddFilter = () => {
     if (visibleMenu.value) {
@@ -168,7 +168,7 @@ const handleAddFilter = () => {
     }
 };
 
-const handleSelectAddMoreMenuItem = (item: MenuItem, _: any, isSelected: boolean) => {
+const handleSelectAddFilterMenuItem = (item: MenuItem, _: any, isSelected: boolean) => {
     if (isSelected) {
         state.selectedItems = [
             ...state.selectedItems,
@@ -176,23 +176,29 @@ const handleSelectAddMoreMenuItem = (item: MenuItem, _: any, isSelected: boolean
         ];
     } else {
         state.selectedItems = state.selectedItems.filter((d) => d !== item.name);
+        resetFilterByKey(item.name);
     }
 };
 const handleDeleteFilter = (key: string) => {
     state.selectedItems = state.selectedItems.filter((d) => d.name !== key);
-    resetFilter();
+    resetFilterByKey(key);
 };
-const handleClearAddMoreMenuItems = () => {
-    state.selectedItems = [];
-    resetFilter();
+const handleClearAddFilterMenuItems = () => {
+    resetAllFilter();
 };
 const handleClickShowMore = async () => {
     await showMoreMenu();
 };
 
 /* Util */
-const resetFilter = () => {
-    console.debug('reset specific filters');
+const resetAllFilter = () => {
+    state.proxyFilters = {};
+    state.selectedItemsMap = getInitialSelectedItemsMap();
+    state.selectedItems = [];
+};
+const resetFilterByKey = (key: string) => {
+    unset(state.proxyFilters, key);
+    unset(state.selectedItemsMap, key);
 };
 const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
@@ -293,6 +299,7 @@ watch(() => props.sourceId, async () => {
         costFilterState.tagsFilterItems = tagsResources ? tagsResources.map((d) => ({ name: d.key, label: d.name })) : [];
         state.loading = false;
     }
+    resetAllFilter();
 });
 </script>
 
@@ -357,8 +364,8 @@ watch(() => props.sourceId, async () => {
                                 multi-selectable
                                 show-select-marker
                                 show-clear-selection
-                                @select="handleSelectAddMoreMenuItem"
-                                @clear-selection="handleClearAddMoreMenuItems"
+                                @select="handleSelectAddFilterMenuItem"
+                                @clear-selection="handleClearAddFilterMenuItems"
                                 @click-show-more="handleClickShowMore"
                 />
             </div>
