@@ -10,7 +10,6 @@ const emit = defineEmits<{(e: 'click-add'): void;
     <p-icon-button name="ic_plus"
                    class="widget-form-data-source-add-button"
                    size="lg"
-                   style-type="primary1"
                    shape="square"
                    @click="emit('click-add')"
     />
