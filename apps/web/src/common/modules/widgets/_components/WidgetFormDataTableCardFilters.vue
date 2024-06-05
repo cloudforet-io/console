@@ -120,7 +120,7 @@ const assetFilterState = reactive({
         const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
     }),
-    metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)).map((d) => ({ name: d.key, label: d.name }))),
+    metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
