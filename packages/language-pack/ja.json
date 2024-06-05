@@ -1731,6 +1731,7 @@
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "AWS Trusted Advisorによる各プロジェクトの点検・分析状況を表示します。"
 			},
+			"BASED_ON": "",
 			"BUDGET_STATUS": {
 				"DESC": "選択した期間中の予算使用量の上位 200 件を表示します。"
 			},
@@ -1792,10 +1793,12 @@
 			"DATE_TODAY": "今日",
 			"DELETE_CONTENTS": "このウィジェットを本当に削除しますか？ダッシュボードが保存されると、削除したウィジェットを復元することはできません。",
 			"DELETE_TITLE": "ウィジェットの削除",
+			"DESCRIPTION": "",
 			"DETAILS": "詳細情報",
 			"EDIT_WIDGET": "ウィジェットオプションの修正",
 			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
 			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
+			"FULL_DATA_LINK": "",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_1": "このウィジェットには、ダッシュボードの影響を受けない非継承オプションが含まれています。",
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "非継承オプションのリスト:",
 			"METADATA": "メタデータ",
@@ -1896,6 +1899,7 @@
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
 			},
+			"UNIT": "",
 			"UPDATE_TITLE": "ウィジェットの更新",
 			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
 		}
