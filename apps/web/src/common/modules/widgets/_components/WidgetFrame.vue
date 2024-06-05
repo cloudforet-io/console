@@ -4,8 +4,9 @@ import {
 } from 'vue';
 
 import {
-    PI, PIconButton, PSelectDropdown,
+    PI, PIconButton, PPopover, PSelectDropdown, PLink,
 } from '@spaceone/design-system';
+import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
@@ -56,16 +57,45 @@ const handleSelectSize = (size: WidgetSize) => {
             <h3 class="title">
                 {{ props.title }}
             </h3>
-            <div class="metadata-wrapper">
-                <p-i name="ic_info-circle"
-                     width="1rem"
-                     height="1rem"
-                />
-                <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
-                <div class="metadata-content">
-                    Metadata~
+            <p-popover class="metric-select-guide-popover"
+                       position="bottom-start"
+                       :trigger="POPOVER_TRIGGER.CLICK"
+            >
+                <div class="metadata-button">
+                    <p-i name="ic_info-circle"
+                         width="1rem"
+                         height="1rem"
+                    />
+                    <span class="metadata-text">{{ $t('DASHBOARDS.WIDGET.METADATA') }}</span>
                 </div>
-            </div>
+                <template #content>
+                    <div class="metadata-content">
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.BASED_ON') }}</span>
+                            <span class="metadata-value">23/07/01 ~ 23/07/31</span>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.UNIT') }}</span>
+                            <span class="metadata-value">$USD</span>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.FULL_DATA_LINK') }}</span>
+                            <p-link new-tab
+                                    highlight
+                                    action-icon="internal-link"
+                                    :to="{}"
+                                    class="metadata-value"
+                            >
+                                Storage Data
+                            </p-link>
+                        </div>
+                        <div class="metadata-item-row">
+                            <span class="metadata-title">{{ $t('DASHBOARDS.WIDGET.DESCRIPTION') }}</span>
+                            <span class="metadata-value">Description</span>
+                        </div>
+                    </div>
+                </template>
+            </p-popover>
         </div>
         <p-icon-button v-if="props.mode === 'view'"
                        v-tooltip.bottom="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.EXPAND_AND_EDIT')"
@@ -92,7 +122,8 @@ const handleSelectSize = (size: WidgetSize) => {
         <div class="body">
             <slot />
         </div>
-        <p-select-dropdown class="widget-size-dropdown"
+        <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
+                           class="widget-size-dropdown"
                            style-type="transparent"
                            :menu="state.sizeDropdownMenuItems"
                            :selected="props.size"
@@ -127,30 +158,34 @@ const handleSelectSize = (size: WidgetSize) => {
             -webkit-box-orient: vertical;
             font-weight: 500;
         }
-        .metadata-wrapper {
+        .metadata-button {
             @apply text-gray-700;
             display: flex;
             align-items: center;
+            cursor: pointer;
             padding-left: 0.75rem;
-            &:hover {
-                .metadata-content {
-                    @apply text-label-md;
-                    max-height: 20rem;
-                    overflow-y: auto;
-                    display: block;
-                    z-index: 100;
-                }
-            }
             .metadata-text {
                 @apply text-label-sm;
                 padding-left: 0.25rem;
             }
-            .metadata-content {
-                @apply bg-white border rounded-lg border-gray-200;
-                position: absolute;
-                top: 2.25rem;
-                display: none;
-                padding: 1.25rem 1rem;
+        }
+        .metadata-content {
+            @apply text-label-md;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 20rem;
+            overflow-y: auto;
+            z-index: 100;
+            padding-top: 0.5rem;
+            .metadata-item-row {
+                display: flex;
+                justify-content: flex-start;
+                gap: 2rem;
+                .metadata-title {
+                    @apply text-gray-600;
+                    width: 7rem;
+                }
             }
         }
     }
