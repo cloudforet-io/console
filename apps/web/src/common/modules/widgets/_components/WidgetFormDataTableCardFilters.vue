@@ -10,18 +10,22 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { cloneDeep, sortBy } from 'lodash';
+import { cloneDeep, isEmpty, sortBy } from 'lodash';
 
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
+import type { MetricLabelKey } from '@/schema/inventory/metric/type';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 import { VariableModelFactory } from '@/lib/variable-models';
 import type {
     ManagedVariableModelKey,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import {
-    MANAGED_VARIABLE_MODEL_KEY_MAP,
+    MANAGED_VARIABLE_MODEL_KEY_MAP, MANAGED_VARIABLE_MODELS,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
 import CostTagKeyVariableModel
     from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
@@ -37,6 +41,7 @@ import type { DataTableSourceType } from '@/common/modules/widgets/types/widget-
 
 import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
+
 interface VariableOption {
     key: ManagedVariableModelKey;
     dataKey?: string;
@@ -50,7 +55,7 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
 };
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
 type ManagedGlobalVariable = typeof GROUP_BY[keyof typeof GROUP_BY];
-const MANAGED_GLOBAL_VARIALBE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as ManagedGlobalVariable[];
+const MANAGED_GLOBAL_VARIALBE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as (ManagedGlobalVariable|string)[];
 interface Props {
     sourceType?: DataTableSourceType;
     sourceId?: string;
@@ -61,20 +66,36 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filters', value: ApiFilter[]): void;}>();
 const allReferenceStore = useAllReferenceStore();
 
+const storeState = reactive({
+    metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
+
 const state = reactive({
     loading: false,
     filters: useProxyValue('filters', props, emit),
-    costFilterItems: computed(() => [
-        ...costFilterState.managedGroupByItems,
-        ...costFilterState.additionalInfoGroupByItems,
-        ...costFilterState.tagsFilterItems,
-    ]),
+    filterItems: computed(() => {
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+            return [
+                ...costFilterState.managedGroupByItems,
+                ...costFilterState.additionalInfoGroupByItems,
+                ...costFilterState.tagsFilterItems,
+            ];
+        }
+        return [...assetFilterState.metricFilterItems];
+    }),
     selectedItems: [] as MenuItem[],
     handlerMap: computed(() => {
         const handlerMaps = {};
-        state.selectedItems.forEach(({ name }) => {
-            handlerMaps[name] = getMenuHandler(name, state.listQueryOptions);
-        });
+        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+            state.selectedItems.forEach(({ name }) => {
+                handlerMaps[name] = getCostMenuHandler(name, state.listQueryOptions);
+            });
+        } else {
+            assetFilterState.refinedLabelKeys.forEach((labelInfo) => {
+                handlerMaps[labelInfo.key] = getAssetMenuHandler(labelInfo);
+            });
+        }
         return handlerMaps;
     }),
     listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
@@ -86,13 +107,20 @@ const state = reactive({
 const costFilterState = reactive({
     managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => !MANAGED_GLOBAL_VARIALBE.includes(item.name))),
     additionalInfoGroupByItems: computed(() => {
-        const dataSource = allReferenceStore.getters.costDataSource[props.sourceId ?? ''];
-        return sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
+        const dataSource = storeState.costDataSources[props.sourceId ?? ''];
+        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
             name: `additional_info.${key}`,
             label: key,
-        })), 'label');
+        })), 'label') : [];
     }),
     tagsFilterItems: [] as MenuItem[],
+});
+const assetFilterState = reactive({
+    refinedLabelKeys: computed(() => {
+        const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
+    }),
+    metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)).map((d) => ({ name: d.key, label: d.name }))),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
@@ -112,7 +140,7 @@ const {
     contextMenuRef,
     useFixedStyle: true,
     useReorderBySelection: true,
-    menu: toRef(state, 'costFilterItems'),
+    menu: toRef(state, 'filterItems'),
     selected: toRef(state, 'selectedItems'),
     pageSize: 10,
 });
@@ -166,7 +194,7 @@ const handleClickShowMore = async () => {
 const resetFilter = () => {
     console.debug('reset specific filters');
 };
-const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
+const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
         let variableModelInfo: VariableModelMenuHandlerInfo;
         const _variableOption = GROUP_BY_TO_VAR_MODELS[groupBy];
@@ -203,6 +231,47 @@ const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<Manage
         return async () => ({ results: [] });
     }
 };
+const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
+    try {
+        let variableModelInfo: VariableModelMenuHandlerInfo;
+        if (isEmpty(labelKey.reference)) {
+            const MetricVariableModel = new VariableModelFactory(
+                { type: 'MANAGED', managedModelKey: MANAGED_VARIABLE_MODEL_KEY_MAP.metric_data },
+            );
+            MetricVariableModel[labelKey.key] = MetricVariableModel.generateProperty({ key: labelKey.key });
+            variableModelInfo = {
+                variableModel: MetricVariableModel,
+                dataKey: labelKey.key,
+            };
+        } else {
+            const _resourceType = labelKey.reference?.resource_type;
+            const targetModelConfig = Object.values(MANAGED_VARIABLE_MODELS).find((d) => (d.meta?.resourceType === _resourceType));
+            if (targetModelConfig) {
+                variableModelInfo = {
+                    variableModel: new VariableModelFactory(
+                        { type: 'MANAGED', managedModelKey: targetModelConfig.meta.key as ManagedVariableModelKey },
+                    ),
+                };
+            }
+        }
+        if (!variableModelInfo) return async () => ({ results: [] });
+        const handler = getVariableModelMenuHandler([variableModelInfo]);
+        return async (...args) => {
+            try {
+                state.loading = true;
+                return await handler(...args);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return { results: [] };
+            } finally {
+                state.loading = false;
+            }
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return async () => ({ results: [] });
+    }
+};
 const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
     try {
         const options = {
@@ -225,6 +294,11 @@ watch(() => props.sourceId, async () => {
         state.loading = false;
     }
 });
+
+watch(() => state.selectedItems, (changed) => {
+    console.debug('selected items changed', changed);
+});
+
 </script>
 
 <template>
