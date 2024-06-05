@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core/index';
 import {
-    reactive, computed, ref,
+    reactive, computed,
 } from 'vue';
 
 import {
-    PI, PIconButton, PContextMenu, PSelectDropdown, useContextMenuController,
+    PI, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
-import { i18n } from '@/translations';
 
 import { WIDGET_WIDTH_STR_MAP } from '@/common/modules/widgets/_constants/widget-display-constant';
 import type { WidgetFrameProps } from '@/common/modules/widgets/types/widget-frame-type';
@@ -22,43 +20,17 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
     (event: 'update:size', size: WidgetSize): void;
+    (event: 'expand'): void;
 }>();
 
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    etcDropdownMenuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'expandAndEdit',
-            label: i18n.t('Expand & Edit'), // TODO: i18n
-        },
-        {
-            type: 'item',
-            name: 'fullData',
-            label: i18n.t('Full Data'), // TODO: i18n
-        },
-    ])),
     sizeDropdownMenuItems: computed<MenuItem[]>(() => props.widgetSizes.map((size) => ({
         type: 'item',
         name: size,
         label: WIDGET_WIDTH_STR_MAP[size],
     }))),
 });
-const contextMenuRef = ref<any|null>(null);
-const targetRef = ref<HTMLElement | null>(null);
-const {
-    visibleMenu: visibleContextMenu,
-    contextMenuStyle,
-    hideContextMenu,
-    toggleContextMenu,
-} = useContextMenuController({
-    targetRef,
-    contextMenuRef,
-    useFixedStyle: true,
-    position: 'right',
-    menu: state.etcDropdownMenuItems,
-});
-onClickOutside(targetRef, hideContextMenu);
 
 /* Event */
 const handleEditButtonClick = () => {
@@ -67,15 +39,8 @@ const handleEditButtonClick = () => {
 const handleClickDeleteButton = () => {
     emit('click-delete');
 };
-const handleClickEtcButton = () => {
-    toggleContextMenu();
-};
-const handleSelectEtc = (item: MenuItem) => {
-    if (item.name === 'expandAndEdit') {
-        emit('click-edit');
-    } else if (item.name === 'fullData') {
-        // window.open(props.widgetLink, '_blank');
-    }
+const handleClickExpandButton = () => {
+    emit('expand');
 };
 const handleSelectSize = (size: WidgetSize) => {
     emit('update:size', size);
@@ -84,7 +49,7 @@ const handleSelectSize = (size: WidgetSize) => {
 
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, 'show-etc': visibleContextMenu, [props.size]: props.size }"
+         :class="{ full: state.isFull, [props.size]: props.size }"
          :style="{ width: (props.width && !state.isFull) ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
@@ -103,17 +68,12 @@ const handleSelectSize = (size: WidgetSize) => {
             </div>
         </div>
         <p-icon-button v-if="props.mode === 'view'"
-                       ref="targetRef"
-                       name="ic_ellipsis-horizontal"
+                       v-tooltip.bottom="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.EXPAND_AND_EDIT')"
+                       name="ic_arrows-expand-all"
                        shape="square"
-                       class="etc-button"
-                       @click="handleClickEtcButton"
-        />
-        <p-context-menu v-show="visibleContextMenu"
-                        ref="contextMenuRef"
-                        :style="contextMenuStyle"
-                        :menu="state.etcDropdownMenuItems"
-                        @select="handleSelectEtc"
+                       style-type="tertiary"
+                       class="expand-button"
+                       @click="handleClickExpandButton"
         />
         <div v-if="props.mode === 'customize'"
              class="action-button-wrapper"
@@ -151,11 +111,6 @@ const handleSelectSize = (size: WidgetSize) => {
     display: inline-flex;
     flex-direction: column;
     padding: 1rem;
-    &:hover, &.show-etc {
-        .etc-button {
-            display: block;
-        }
-    }
     &.sm {
         height: 11rem;
     }
@@ -199,14 +154,10 @@ const handleSelectSize = (size: WidgetSize) => {
             }
         }
     }
-    .etc-button {
+    .expand-button {
         position: absolute;
         top: 0.5rem;
         right: 1rem;
-        display: none;
-    }
-    .p-context-menu {
-        z-index: 100;
     }
     .action-button-wrapper {
         @apply bg-gray-150 rounded-lg;
