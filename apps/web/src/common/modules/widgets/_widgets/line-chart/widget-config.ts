@@ -9,7 +9,7 @@ const lineChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         dataField: {},
-        xAxisField: {
+        xAxis: {
             options: {
                 dataTarget: 'label_field',
             },

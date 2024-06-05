@@ -13,7 +13,7 @@ const clusteredColumnChart: WidgetConfig = {
                 multiSelectable: true,
             },
         },
-        xAxisField: {
+        xAxis: {
             options: {
                 dataTarget: 'label_field',
             },

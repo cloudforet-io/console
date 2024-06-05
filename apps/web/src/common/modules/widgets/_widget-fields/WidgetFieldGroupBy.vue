@@ -7,12 +7,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type {
-    GroupByFieldOptions,
+    GroupByOptions,
 } from '@/common/modules/widgets/types/widget-config-type';
 import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
 const state = reactive({

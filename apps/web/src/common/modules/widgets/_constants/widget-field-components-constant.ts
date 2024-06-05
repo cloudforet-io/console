@@ -7,10 +7,10 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     dataField: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue'),
     }),
-    xAxisField: () => ({
+    xAxis: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue'),
     }),
-    yAxisField: () => ({
+    yAxis: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldYAxis.vue'),
     }),
     stackBy: () => ({
