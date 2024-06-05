@@ -23,6 +23,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Widget
         widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
+        granularity: 'MONTHLY',
         title: '',
         description: '',
         size: 'full',
@@ -58,6 +59,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSize = (size: WidgetSize) => {
         state.size = size;
     };
+    const setGranularity = (granularity: string) => {
+        state.granularity = granularity;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -67,6 +71,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setTitle,
         setDescription,
         setSize,
+        setGranularity,
     };
     const actions = {
         listDataTable: async () => {
