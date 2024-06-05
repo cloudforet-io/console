@@ -9,13 +9,11 @@ const clusteredColumnChart: WidgetConfig = {
     },
     requiredFieldsSchema: {
         dataField: {
-            label: 'Data Field',
             options: {
                 multiSelectable: true,
             },
         },
         xAxisField: {
-            label: 'X-Axis Field',
             options: {
                 dataTarget: 'label_field',
             },

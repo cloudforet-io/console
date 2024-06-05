@@ -8,11 +8,8 @@ const gauge: WidgetConfig = {
         sizes: ['md'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         min: {
-            label: 'Min',
             options: {
                 min: 0,
                 max: 5,
@@ -20,7 +17,6 @@ const gauge: WidgetConfig = {
             },
         },
         max: {
-            label: 'Max',
             options: {
                 min: 0,
                 max: 5,
@@ -28,7 +24,6 @@ const gauge: WidgetConfig = {
             },
         },
         formatRules: {
-            label: 'Format Rules',
             options: {
                 fields: ['threshold', 'color'],
             },

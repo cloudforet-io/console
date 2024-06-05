@@ -8,17 +8,13 @@ const stackedHorizontalBarChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         yAxisField: {
-            label: 'Y-Axis Field',
             options: {
                 dataTarget: 'label_field',
             },
         },
         stackBy: {
-            label: 'Stack By',
             options: {
                 dataTarget: 'label_field',
             },

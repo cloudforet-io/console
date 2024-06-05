@@ -71,7 +71,6 @@ type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptio
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions;
 
 export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
-    label?: string;
     options?: Partial<FieldOption>;
 }
 

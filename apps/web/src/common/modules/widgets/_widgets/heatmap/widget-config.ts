@@ -8,24 +8,19 @@ const heatmap: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         yAxisField: {
-            label: 'Y-Axis',
             options: {
                 dataTarget: 'label_field',
             },
         },
         groupBy: {
-            label: 'Group By',
             options: {
                 dataTarget: 'label_field',
                 // multiSelectable: true, HACK: if possible
             },
         },
         formatRules: {
-            label: 'Format Rules',
             options: {
                 fields: ['name', 'threshold', 'color'],
             },

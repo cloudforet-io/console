@@ -8,17 +8,13 @@ const stackedAreaChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
-        dataField: {
-            label: 'Data Field',
-        },
+        dataField: {},
         xAxisField: {
-            label: 'X-Axis Field',
             options: {
                 dataTarget: 'label_field',
             },
         },
         lineBy: {
-            label: 'Line By',
             options: {
                 dataTarget: 'label_field',
             },
@@ -27,7 +23,6 @@ const stackedAreaChart: WidgetConfig = {
     optionalFieldsSchema: {
         legend: {},
         formatRules: {
-            label: 'Format Rules',
             options: {
                 fields: ['dropdown', 'color'],
                 dataTarget: 'legend', // TODO: this should be updated more
