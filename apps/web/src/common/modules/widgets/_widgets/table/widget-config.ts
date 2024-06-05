@@ -10,11 +10,22 @@ const table: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
-        dataField: {},
-        xAxis: {
+        tableDataField: {
             options: {
-                dataTarget: 'label_field',
-                multiSelectable: true,
+                fields: [
+                    {
+                        name: 'dynamicField',
+                        labelTranslationCode: 'DASHBOARDS.WIDGET.OVERLAY.STEP_2.DYNAMIC_FIELD',
+                        dataTarget: 'label_field',
+                        multiSelectable: false,
+                    },
+                    {
+                        name: 'staticField',
+                        labelTranslationCode: 'DASHBOARDS.WIDGET.OVERLAY.STEP_2.STATIC_FIELD',
+                        dataTarget: 'data_field',
+                        multiSelectable: true,
+                    },
+                ],
             },
         },
         groupBy: {
