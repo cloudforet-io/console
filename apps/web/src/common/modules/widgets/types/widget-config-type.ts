@@ -6,24 +6,24 @@ import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-q
 export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
-export interface XAxisFieldOptions {
+export interface XAxisOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
 }
-export interface YAxisFieldOptions {
+export interface YAxisOptions {
     dataTarget?: string;
 }
-export interface LineByFieldOptions {
+export interface LineByOptions {
     dataTarget?: string;
 }
-export interface StackByFieldOptions {
+export interface StackByOptions {
     dataTarget?: string;
 }
-export interface GroupByFieldOptions {
+export interface GroupByOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
 }
-export interface CategoryByFieldOptions {
+export interface CategoryByOptions {
     dataTarget?: string;
 }
 export interface TotalFieldOptions {
@@ -75,8 +75,8 @@ export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
 }
-type WidgetFieldOptions = DataFieldOptions | XAxisFieldOptions | YAxisFieldOptions
-    | LineByFieldOptions | StackByFieldOptions | GroupByFieldOptions | CategoryByFieldOptions
+type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
+    | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions
     | ComparisonOptions;
@@ -85,7 +85,7 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
 }
 
-export type WidgetFieldName = 'dataField' | 'xAxisField' | 'yAxisField'
+export type WidgetFieldName = 'dataField' | 'xAxis' | 'yAxis'
     | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
     | 'totalField' | 'basisField'
     | 'min' | 'max'

@@ -11,7 +11,7 @@ const table: WidgetConfig = {
     },
     requiredFieldsSchema: {
         dataField: {},
-        xAxisField: {
+        xAxis: {
             options: {
                 dataTarget: 'label_field',
                 multiSelectable: true,

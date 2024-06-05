@@ -7,12 +7,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type {
-    XAxisFieldOptions,
+    XAxisOptions,
 } from '@/common/modules/widgets/types/widget-config-type';
 import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<XAxisFieldOptions>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<XAxisOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
 
