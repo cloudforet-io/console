@@ -11,6 +11,8 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 import { range } from 'lodash';
 
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
@@ -18,7 +20,8 @@ import type { NamespaceReferenceMap } from '@/store/reference/namespace-referenc
 
 import getRandomId from '@/lib/random-id-generator';
 
-import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/widget-constant';
+import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
+import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
@@ -65,6 +68,7 @@ const state = reactive({
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
     selectedGroupByItems: [] as string[],
+    filters: [] as ApiFilter[],
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
@@ -127,10 +131,6 @@ const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
 };
 
-const handleAddFilter = () => {
-    console.debug('handleAddFilter');
-};
-
 const handleClickToggleAdvancedOptionsForm = () => {
     advancedOptionsState.advancedOptionsCollapsed = !advancedOptionsState.advancedOptionsCollapsed;
 };
@@ -188,7 +188,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 </script>
 
 <template>
-    <div class="widget-form-data-source-card">
+    <div class="widget-form-data-table-card">
         <div class="card-wrapper"
              :class="{ 'selected': state.selected }"
         >
@@ -234,25 +234,10 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                        appearance-type="badge"
                     />
                 </p-field-group>
-                <p-field-group label="Filters"
-                               required
-                >
-                    <div class="filters-area">
-                        <div>
-                            <p-field-title class="field-title"
-                                           label="Filter Name"
-                                           size="sm"
-                                           color="gray"
-                            />
-                        </div>
-                        <p-button style-type="tertiary"
-                                  icon-left="ic_plus_bold"
-                                  @click="handleAddFilter"
-                        >
-                            Add Filter
-                        </p-button>
-                    </div>
-                </p-field-group>
+                <widget-form-data-table-card-filters :source-type="state.sourceType"
+                                                     :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.metricId"
+                                                     :filters.sync="state.filters"
+                />
                 <p-field-group label="Data Field Name"
                                required
                 >
@@ -382,8 +367,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 </template>
 
 <style lang="postcss" scoped>
-.widget-form-data-source-card {
-    @apply relative flex;
+.widget-form-data-table-card {
+    @apply relative;
     height: auto;
 
     .card-wrapper {
@@ -434,11 +419,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
             .group-by-select-dropdown {
                 @apply w-full;
-            }
-            .filters-area {
-                @apply bg-gray-100 rounded-lg;
-                padding: 0.5rem;
-                margin-top: 0.25rem;
             }
             .data-field-name-input {
                 @apply w-full;

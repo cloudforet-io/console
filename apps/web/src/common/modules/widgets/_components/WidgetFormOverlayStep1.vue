@@ -9,8 +9,8 @@ import {
 
 import { i18n } from '@/translations';
 
-import WidgetFormDataSourceCard from '@/common/modules/widgets/_components/WidgetFormDataSourceCard.vue';
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
+import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -111,9 +111,9 @@ documentEventMount('mouseup', endResizing);
              class="data-table-contents"
         >
             <div class="data-source-wrapper">
-                <widget-form-data-source-card v-for="(dataTable) in storeState.dataTables"
-                                              :key="`data-table-${dataTable.data_table_id}`"
-                                              :item="dataTable"
+                <widget-form-data-table-card v-for="(dataTable) in storeState.dataTables"
+                                             :key="`data-table-${dataTable.data_table_id}`"
+                                             :item="dataTable"
                 />
                 <widget-form-data-source-popover />
             </div>

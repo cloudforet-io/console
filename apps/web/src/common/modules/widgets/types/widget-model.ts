@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/widget-constant';
+import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 
 export interface WidgetModel {
     widget_id: string;
