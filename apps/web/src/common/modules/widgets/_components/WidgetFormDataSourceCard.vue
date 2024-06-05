@@ -1,11 +1,15 @@
 <script setup lang="ts">
 
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
+
 
 import {
-    PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PRadioGroup, PRadio, PFieldTitle,
+    PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import { range } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
@@ -48,7 +52,7 @@ const state = reactive({
     dataSourceId: computed(() => state.options[state.sourceType].data_source_id), // COST only
     metricId: computed(() => state.options[state.sourceType].metric_id), // ASSET only
     namespaceId: computed(() => storeState.metrics[state.metricId]?.data.namespace_id || ''), // ASSET only
-    selectedSourceName: computed(() => {
+    selectedParentSourceName: computed(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return storeState.dataSources[state.dataSourceId]?.label;
         }
@@ -57,8 +61,10 @@ const state = reactive({
         }
         return '';
     }),
-    selectedSourceEndItem: undefined,
-    selectedGroupByItems: [],
+    selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
+        ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
+        : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
+    selectedGroupByItems: [] as string[],
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
@@ -87,19 +93,38 @@ const advancedOptionsState = reactive({
     advancedOptionsCollapsed: false,
     additionalLabels: [] as AdditionalLabel[],
     separateDate: false,
-    timeDiffList: computed(() => [
+    timeDiffList: computed<SelectDropdownMenuItem[]>(() => [
         { label: 'None', name: 'none' },
         { label: 'Year', name: 'year' },
         { label: 'Month', name: 'month' },
         { label: 'Day', name: 'day' },
     ]),
     selectedTimeDiff: 'none',
+    timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
+        year: range(3).map((i) => ({
+            label: i === 0 ? 'Last 1 Year' : `Last ${i + 1} Years`,
+            name: String(i + 1),
+        })),
+        month: range(12).map((i) => ({
+            label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
+            name: String(i + 1),
+        })),
+        day: range(31).map((i) => ({
+            label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
+            name: String(i + 1),
+        })),
+    })),
+    selectedTimeDiffDate: undefined as string|undefined,
 });
 
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     await widgetGenerateStore.loadDataTable(dataTableId);
+};
+
+const handleSelectSourceItem = (selectedItem: string) => {
+    state.selectedSourceEndItem = selectedItem;
 };
 
 const handleAddFilter = () => {
@@ -112,6 +137,10 @@ const handleClickToggleAdvancedOptionsForm = () => {
 
 const handleClickTimeDiff = (timeDiff: string) => {
     advancedOptionsState.selectedTimeDiff = timeDiff;
+    advancedOptionsState.selectedTimeDiffDate = undefined;
+};
+const handleClickTimeDiffDate = (timeDiffDate: string) => {
+    advancedOptionsState.selectedTimeDiffDate = timeDiffDate;
 };
 
 const handleClickAddLabel = () => {
@@ -137,15 +166,24 @@ const handleRemoveLabel = (key: string) => {
 };
 
 onMounted(() => {
-    state.selectedSourceEndItem = props.item.source_type === DATA_SOURCE_DOMAIN.COST
-        ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
-        : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
     state.selectedGroupByItems = [...(props.item.options?.group_by || [])];
     state.dataFieldName = props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? state.selectableSourceItems[0]?.label
         : storeState.metrics[state.selectedSourceEndItem]?.data?.unit;
 });
 
+watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
+    // Base Options
+    state.selectedGroupByItems = [];
+    state.dataFieldName = props.item.source_type === DATA_SOURCE_DOMAIN.COST
+        ? state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label
+        : storeState.metrics[_selectedSourceItem]?.data?.unit;
+    // TODO: reset filters
+    // Advanced Options
+    advancedOptionsState.additionalLabels = [];
+    advancedOptionsState.separateDate = false;
+    advancedOptionsState.selectedTimeDiff = 'none';
+});
 
 </script>
 
@@ -176,11 +214,12 @@ onMounted(() => {
                         <div class="source-img">
                             <img>
                         </div>
-                        <span>{{ state.selectedSourceName }}</span>
+                        <span>{{ state.selectedParentSourceName }}</span>
                     </div>
                     <p-select-dropdown class="selectable-source-dropdown"
                                        :menu="state.selectableSourceItems"
-                                       :selected.sync="state.selectableSourceItems"
+                                       :selected="state.selectedSourceEndItem"
+                                       @update:selected="handleSelectSourceItem"
                     />
                 </div>
             </div>
@@ -292,7 +331,7 @@ onMounted(() => {
                                 <p class="description">
                                     Separate date into 3 columns (Year, Month, Day)
                                 </p>
-                                <p-toggle-button :value="advancedOptionsState.separateDate"
+                                <p-toggle-button :value.sync="advancedOptionsState.separateDate"
                                                  show-state-text
                                                  position="left"
                                 />
@@ -301,16 +340,21 @@ onMounted(() => {
                         <p-field-group label="Time Diff"
                                        required
                         >
-                            <p-radio-group class="time-diff-radio-group">
-                                <p-radio v-for="(timeDiff) in advancedOptionsState.timeDiffList"
-                                         :key="timeDiff.name"
-                                         :value="timeDiff.name"
-                                         :selected="advancedOptionsState.selectedTimeDiff"
-                                         @click="handleClickTimeDiff(timeDiff.name)"
-                                >
-                                    {{ timeDiff.label }}
-                                </p-radio>
-                            </p-radio-group>
+                            <div class="time-diff-dropdown-wrapper">
+                                <p-select-dropdown class="time-diff-dropdown"
+                                                   use-fixed-menu-style
+                                                   :menu="advancedOptionsState.timeDiffList"
+                                                   :selected="advancedOptionsState.selectedTimeDiff"
+                                                   @update:selected="handleClickTimeDiff"
+                                />
+                                <p-select-dropdown class="time-diff-date-dropdown"
+                                                   use-fixed-menu-style
+                                                   :disabled="advancedOptionsState.selectedTimeDiff === 'none'"
+                                                   :menu="advancedOptionsState.timeDiffDateMap[advancedOptionsState.selectedTimeDiff] || []"
+                                                   :selected="advancedOptionsState.selectedTimeDiffDate"
+                                                   @update:selected="handleClickTimeDiffDate"
+                                />
+                            </div>
                         </p-field-group>
                     </div>
                 </div>
@@ -442,8 +486,15 @@ onMounted(() => {
                             margin-bottom: 0.5rem;
                         }
                     }
-                    .time-diff-radio-group {
+                    .time-diff-dropdown-wrapper {
+                        @apply flex gap-2;
                         margin-top: 0.25rem;
+                        .time-diff-dropdown {
+                            width: 25%;
+                        }
+                        .time-diff-date-dropdown {
+                            width: 75%;
+                        }
                     }
                 }
             }
