@@ -1,3 +1,5 @@
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -23,7 +25,12 @@ const table: WidgetConfig = {
         },
     },
     optionalFieldsSchema: {
-        comparison: {},
+        comparison: {
+            options: {
+                granularity: GRANULARITY.DAILY,
+                forTable: true,
+            },
+        },
         subTotal: {},
         total: {},
         progressBar: {},

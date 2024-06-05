@@ -60,7 +60,7 @@ const handleUpdateToggle = (value: boolean) => {
 
 <style lang="postcss" scoped>
 .widget-field-sub-total {
-    .header {
+    .field-header {
         @apply flex items-center gap-1;
         margin-bottom: 0.5rem;
     }

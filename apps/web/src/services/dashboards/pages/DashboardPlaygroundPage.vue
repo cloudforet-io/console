@@ -66,7 +66,7 @@ const handleClickAddWidget = () => {
                            mode="customize"
                 />
             </div>
-            <div class="col-span-4 px-2">
+            <div class="col-span-4 px-2 bg-white">
                 <div class="pb-4">
                     <div>
                         <p-select-dropdown
