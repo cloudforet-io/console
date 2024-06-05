@@ -22,7 +22,7 @@ const state = reactive({
 
 <template>
     <div class="widget-field-group-by">
-        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY_FIELD')"
+        <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GROUP_BY')"
                        required
         >
             <div class="field-form-wrapper">

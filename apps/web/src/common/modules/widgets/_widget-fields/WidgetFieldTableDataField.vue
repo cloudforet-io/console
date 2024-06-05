@@ -22,7 +22,7 @@ const state = reactive({
     selectButtonItems: computed<MenuItem[]>(() => props.widgetFieldSchema.options?.fields?.map((field) => ({
         name: field.name,
         label: i18n.t(field.labelTranslationCode || field.name),
-    }))),
+    })) || []),
     selectedItem: undefined as string | undefined,
     selectedDataField: computed(() => props.widgetFieldSchema.options?.fields?.find((field) => field.name === state.selectedItem)),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
