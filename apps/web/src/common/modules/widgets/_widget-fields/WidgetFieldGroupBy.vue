@@ -8,9 +8,10 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import type {
+    WidgetFieldComponentProps,
+    WidgetFieldComponentEmit,
     GroupByOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {

@@ -10,10 +10,7 @@ import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type {
-    ComparisonOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { ComparisonOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 import type { ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { green, red } from '@/styles/colors';

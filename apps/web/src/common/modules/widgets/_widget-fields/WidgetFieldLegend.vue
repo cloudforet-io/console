@@ -3,10 +3,7 @@ import { reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton } from '@spaceone/design-system';
 
-import type {
-    LegendOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { LegendOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;

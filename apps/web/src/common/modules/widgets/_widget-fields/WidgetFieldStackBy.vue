@@ -7,8 +7,11 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { StackByOptions } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    StackByOptions,
+    WidgetFieldComponentEmit,
+    WidgetFieldComponentProps,
+} from '@/common/modules/widgets/types/widget-field-type';
 import type { StackByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 

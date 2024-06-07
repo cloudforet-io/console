@@ -11,8 +11,11 @@ import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { FormatRulesOptions, FormatRulesField } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps,
+    WidgetFieldComponentEmit,
+    FormatRulesOptions, FormatRulesField,
+} from '@/common/modules/widgets/types/widget-field-type';
 import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';

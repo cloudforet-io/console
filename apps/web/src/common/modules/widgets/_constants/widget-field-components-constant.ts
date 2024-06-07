@@ -1,6 +1,6 @@
 import type { AsyncComponent } from 'vue';
 
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 
 
 export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComponent> = {
