@@ -108,7 +108,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         if (!state.templateWidgetId) return undefined;
         const template = DASHBOARD_TEMPLATES[dashboardDetailState.templateId];
         if (!template) return undefined;
-        const templateWidgetInfoList = flattenDeep(template.layouts ?? []);
+        const templateWidgetInfoList = flattenDeep(template.layouts.map((layout) => layout.widgets ?? []));
         return templateWidgetInfoList.find((widget) => widget.template_widget_id === state.templateWidgetId);
     });
 

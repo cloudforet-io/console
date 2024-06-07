@@ -70,7 +70,7 @@ export interface DateRange {
 export interface DashboardTemplate {
     name: string;
     version: number|string;
-    layouts: DashboardLayoutWidgetInfo[][];
+    layouts: DashboardLayout[];
     variables: DashboardVariables;
     options: DashboardOptions;
     variables_schema: DashboardVariablesSchema;
@@ -80,6 +80,11 @@ export interface DashboardTemplate {
     plugin_ids?: string[];
 }
 
+export interface DashboardLayout {
+    name?: string;
+    widgets?: DashboardLayoutWidgetInfo[];
+    options?: any;
+}
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
     widget_key: string; // widget unique key. used for layout key binding.
