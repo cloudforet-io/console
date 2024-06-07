@@ -5,8 +5,9 @@ import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { BasisFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type {
+    WidgetFieldComponentProps, WidgetFieldComponentEmit, BasisFieldOptions,
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<BasisFieldOptions>>(), {

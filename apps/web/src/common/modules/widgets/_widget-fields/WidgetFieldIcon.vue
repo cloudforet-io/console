@@ -6,10 +6,7 @@ import {
 } from '@spaceone/design-system';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type {
-    IconOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { IconOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 

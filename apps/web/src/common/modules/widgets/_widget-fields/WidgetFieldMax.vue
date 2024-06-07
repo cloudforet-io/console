@@ -3,10 +3,7 @@ import { reactive } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import type {
-    MaxOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { MaxOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const emit = defineEmits<{(e: 'update:value', value: number): void;

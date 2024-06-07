@@ -3,8 +3,7 @@ import { reactive } from 'vue';
 
 import { PFieldTitle, PToggleButton, PCheckbox } from '@spaceone/design-system';
 
-import type { SubTotalOptions } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { SubTotalOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const emit = defineEmits<{(e: 'update:value', value: boolean): void;

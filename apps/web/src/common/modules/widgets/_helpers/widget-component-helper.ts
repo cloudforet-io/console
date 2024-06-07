@@ -3,7 +3,7 @@ import type { AsyncComponent } from 'vue';
 import { WIDGET_COMPONENTS } from '@/common/modules/widgets/_constants/widget-components-constant';
 import { WIDGET_FIELD_COMPONENTS } from '@/common/modules/widgets/_constants/widget-field-components-constant';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 
 
 export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
