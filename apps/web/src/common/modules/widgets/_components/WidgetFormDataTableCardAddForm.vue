@@ -26,6 +26,7 @@ import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explo
 
 interface Props {
     sourceType?: string;
+    sourceId: string;
     sourceKey: string;
     selectedGroupByItems: any[];
     filters: Record<string, string[]>;
@@ -101,12 +102,11 @@ const groupByState = reactive({
         }
         return [...assetFilterState.metricFilterItems];
     }),
-    selectedItems: [] as MenuItem[],
 });
 const costFilterState = reactive({
     managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => !MANAGED_GLOBAL_VARIALBE.includes(item.name))),
     additionalInfoGroupByItems: computed(() => {
-        const dataSource = storeState.costDataSources[props.sourceKey ?? ''];
+        const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
             name: `additional_info.${key}`,
             label: key,
@@ -117,7 +117,7 @@ const costFilterState = reactive({
 
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metircs[props.sourceKey ?? ''].data.labels_info;
+        const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
     }),
     metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
@@ -160,7 +160,7 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
 const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
     try {
         const options = {
-            cost_data_source: props.sourceKey,
+            cost_data_source: props.sourceId,
         };
         const costTagKeyVariableModel = new CostTagKeyVariableModel();
         const response = await costTagKeyVariableModel.list({ options });
@@ -172,10 +172,11 @@ const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
 };
 
 const resetAllFilter = () => {
-    groupByState.selectedItems = [];
+    state.proxySelectedGroupByItems = [];
+    state.proxyFilters = {};
 };
 
-watch(() => props.sourceKey, async () => {
+watch([() => props.sourceId, () => props.sourceKey], async () => {
     if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
         groupByState.loading = true;
         const tagsResources = await getTagsResources();
@@ -194,7 +195,7 @@ watch(() => props.sourceKey, async () => {
         >
             <p-select-dropdown class="group-by-select-dropdown"
                                :menu="groupByState.items"
-                               :selected.sync="groupByState.selectedItems"
+                               :selected.sync="state.proxySelectedGroupByItems"
                                multi-selectable
                                appearance-type="badge"
                                :page-size="10"
@@ -203,7 +204,8 @@ watch(() => props.sourceKey, async () => {
             />
         </p-field-group>
         <widget-form-data-table-card-filters :source-type="props.sourceType"
-                                             :source-id="props.sourceKey"
+                                             :source-id="props.sourceId"
+                                             :source-key="props.sourceKey"
                                              :filter-items="groupByState.items"
                                              :filters.sync="state.proxyFilters"
         />

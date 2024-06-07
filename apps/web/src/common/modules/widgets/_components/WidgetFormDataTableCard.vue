@@ -55,7 +55,7 @@ const state = reactive({
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return state.dataTypeItems;
+            return state.costDataTypeItems;
         }
         if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
             return Object.values(storeState.metrics)
@@ -67,7 +67,7 @@ const state = reactive({
         }
         return [];
     }),
-    dataTypeItems: computed(() => {
+    costDataTypeItems: computed(() => {
         const targetCostDataSource = storeState.costDataSources[state.dataSourceId];
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
         const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
@@ -111,6 +111,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     state.selectedGroupByItems = [];
     state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
     state.filters = {};
+
+
     // Advanced Options
     advancedOptionsState.additionalLabels = [];
     advancedOptionsState.separateDate = false;
@@ -148,7 +150,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                          @select="handleSelectSourceItem"
                 />
             </div>
-            <widget-form-data-table-card-add-form :source-key="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
+            <widget-form-data-table-card-add-form :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
+                                                  :source-key="state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
                                                   :selected-group-by-items.sync="state.selectedGroupByItems"
                                                   :filters.sync="state.filters"

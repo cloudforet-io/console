@@ -55,6 +55,7 @@ const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> 
 interface Props {
     sourceType?: DataTableSourceType;
     sourceId?: string;
+    sourceKey?: string;
     filters: Record<string, string[]>;
     filterItems: MenuItem[];
 }
@@ -253,7 +254,7 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     }
 };
 
-watch([() => props.filterItems, () => props.sourceId], async () => {
+watch([() => props.filterItems, () => props.sourceId, () => props.sourceKey], async () => {
     resetAllFilter();
 });
 </script>
