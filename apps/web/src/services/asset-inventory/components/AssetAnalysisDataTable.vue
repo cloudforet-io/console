@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { PTextPagination, PToolboxTable } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -26,6 +27,7 @@ import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 
+import { GRANULARITY } from '@/services/asset-inventory/constants/asset-analysis-constant';
 import {
     getAssetAnalysisDataTableDateFields,
     getRefinedAssetAnalysisTableData,
@@ -36,6 +38,10 @@ import type { MetricDataAnalyzeResult } from '@/services/asset-inventory/types/a
 
 
 const UNITS = ['bytes', 'Bytes', 'b', 'gb', 'kb', 'mb', 'pb', 'tb', 'B', 'GB', 'KB', 'MB', 'PB', 'TB'];
+const DATE_FORMAT_MAP = {
+    [GRANULARITY.DAILY]: 'M/D',
+    [GRANULARITY.MONTHLY]: 'MMM',
+};
 
 const router = useRouter();
 const route = useRoute();
@@ -84,7 +90,11 @@ const state = reactive({
 /* Util */
 const getRefinedColumnValue = (field, value) => {
     if (field.name?.startsWith('count.') && field.name?.endsWith('.value')) {
-        if (typeof value !== 'number') return 0;
+        if (typeof value !== 'number') {
+            const _dateFormat = DATE_FORMAT_MAP[assetAnalysisPageState.granularity];
+            if (dayjs.utc().format(_dateFormat) === field.label) return '--';
+            return 0;
+        }
         const _unit = assetAnalysisPageState.metric?.unit;
         const _originalVal = bytes.parse(`${value}${_unit}`);
         if (_unit && UNITS.includes(_unit)) {
@@ -169,7 +179,6 @@ const handleExport = async () => {
 };
 const queryHelper = new QueryHelper();
 const handleClickRow = (item) => {
-    if (!assetAnalysisPageState.selectedGroupByList.length) return;
     const _filters: ConsoleFilter[] = [];
 
     // set filters from groupBy
@@ -256,7 +265,7 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
                      :searchable="false"
                      :page-size.sync="state.pageSize"
                      row-height-fixed
-                     :row-cursor-pointer="!!assetAnalysisPageState.selectedGroupByList.length"
+                     row-cursor-pointer
                      exportable
                      @change="handleChange"
                      @refresh="handleChange()"
@@ -286,13 +295,6 @@ watch(() => assetAnalysisPageState.refreshMetricData, async (refresh) => {
 .cell-text {
     &.raised {
         @apply text-alert;
-    }
-}
-
-.no-link {
-    /* custom design-system component - p-link */
-    :deep(.p-link) {
-        @apply cursor-auto;
     }
 }
 </style>

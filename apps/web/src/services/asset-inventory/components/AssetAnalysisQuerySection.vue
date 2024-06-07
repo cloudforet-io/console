@@ -8,8 +8,14 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PButton, PPopover, PBadge, PIconButton,
+    PButton, PPopover, PBadge, PTooltip, PIconButton,
 } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { MetricRunParameters } from '@/schema/inventory/metric/api-verbs/run';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AssetAnalysisFiltersPopper from '@/services/asset-inventory/components/AssetAnalysisFiltersPopper.vue';
 import AssetAnalysisGranularityDropdown from '@/services/asset-inventory/components/AssetAnalysisGranularityDropdown.vue';
@@ -27,6 +33,8 @@ const filtersPopperRef = ref<any|null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
+    currentMetricId: computed<string>(() => route.params.metricId),
+    refreshing: false,
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     selectedFiltersCount: computed(() => {
@@ -38,12 +46,27 @@ const state = reactive({
     }),
 });
 
-/* event */
+/* Api */
+const runMetric = async () => {
+    await SpaceConnector.clientV2.inventory.metric.run<MetricRunParameters>({
+        metric_id: state.currentMetricId,
+    });
+};
+
+/* Event */
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
-const handleClickRefresh = () => {
-    assetAnalysisPageStore.setRefreshMetricData(true);
+const handleClickRun = async () => {
+    try {
+        state.refreshing = true;
+        await runMetric();
+        assetAnalysisPageStore.setRefreshMetricData(true);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.refreshing = false;
+    }
 };
 
 /* watch */
@@ -94,12 +117,16 @@ watch(() => route.params, async () => {
                 <span class="period-text">
                     {{ assetAnalysisPageState.periodText }}
                 </span>
-                <p-icon-button name="ic_renew"
-                               style-type="tertiary"
-                               shape="square"
-                               :disabled="assetAnalysisPageState.refreshMetricData"
-                               @click="handleClickRefresh"
-                />
+                <p-tooltip :contents="$t('INVENTORY.ASSET_ANALYSIS.UPDATE_WITH_THE_LATEST_DATA')"
+                           position="bottom"
+                >
+                    <p-icon-button style-type="secondary"
+                                   name="ic_renew"
+                                   shape="square"
+                                   :disabled="state.refreshing"
+                                   @click="handleClickRun"
+                    />
+                </p-tooltip>
             </div>
         </div>
     </div>

@@ -33,11 +33,12 @@ import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import type { ButtonSize } from '@/inputs/buttons/button/type';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import type {
     IconButtonProps, IconButtonShape, IconButtonSize, IconButtonStyleType,
 } from '@/inputs/buttons/icon-button/type';
 import {
-    ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
+    ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE,
 } from '@/inputs/buttons/icon-button/type';
 
 
@@ -56,9 +57,9 @@ export default defineComponent<IconButtonProps>({
         },
         styleType: {
             type: String,
-            default: ICON_BUTTON_STYLE_TYPE.transparent,
+            default: BUTTON_STYLE.transparent,
             validator(value: IconButtonStyleType) {
-                return Object.values(ICON_BUTTON_STYLE_TYPE).includes(value);
+                return Object.values(BUTTON_STYLE).includes(value);
             },
         },
         color: {

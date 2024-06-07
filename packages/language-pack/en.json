@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"DATA_SOURCES": {
+				"ALL": "All",
 				"ALT_S_RESET": "Reset successfully completed.",
 				"ALT_S_UPDATE": "Update successfully completed.",
 				"CANCELED": "Canceled",
@@ -860,12 +861,16 @@
 				"ERROR_FOUND_OK": "OK",
 				"ERROR_FOUND_TITLE": "Error Details",
 				"GUIDE": "How to register data sources",
+				"LINKED": "Linked",
+				"NOT_LINKED": "Not Linked",
 				"RESET": "Reset",
 				"RESETTING": "Resetting...",
 				"RESET_MODAL_TITLE": "Are you sure you want to reset workspaces for {count} linked accounts?",
 				"SELECT": "Select",
 				"SELECT_WORKSPACE": "Select Workspace",
+				"STATUS": "Status",
 				"SUCCESS": "Success",
+				"SYNC_TOOLTIP": "Sync with Cost Data",
 				"TAB_DETAILS_COLLECTION_JOB": "Recent Data Collection Job",
 				"TAB_DETAILS_TITLE": "Details",
 				"TAB_DETAIL_BASE_INFORMATION": "Base Information",
@@ -2574,6 +2579,7 @@
 				"THIS_MONTH": "This Month",
 				"THIS_YEAR": "This Year"
 			},
+			"REFRESH_DATA": "Refresh Data",
 			"RESET": "Reset",
 			"SAVE": "Save",
 			"SAVE_AS": "Save as",
@@ -2591,6 +2597,7 @@
 			"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 			"TOTAL_COUNT": "Total Count",
 			"UNIT": "Unit",
+			"UPDATE_WITH_THE_LATEST_DATA": "Update with the latest data",
 			"VIEW_QUERY": "View Query"
 		},
 		"CLOUD_SERVICE": {

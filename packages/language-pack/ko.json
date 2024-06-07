@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"DATA_SOURCES": {
+				"ALL": "전체",
 				"ALT_S_RESET": "연결된 어카운트 초기화 완료",
 				"ALT_S_UPDATE": "연결된 어카운트 수정 완료",
 				"CANCELED": "취소됨",
@@ -860,12 +861,16 @@
 				"ERROR_FOUND_OK": "확인",
 				"ERROR_FOUND_TITLE": "오류 내용",
 				"GUIDE": "데이터 소스 등록 방법 알아보기",
+				"LINKED": "연결됨",
+				"NOT_LINKED": "연결되지 않음",
 				"RESET": "초기화",
 				"RESETTING": "초기화 중...",
 				"RESET_MODAL_TITLE": "워크스페이스에 연결된 {count}개 계정을 초기화하시겠습니까?",
 				"SELECT": "선택하기",
 				"SELECT_WORKSPACE": "워크스페이스 선택",
+				"STATUS": "상태",
 				"SUCCESS": "성공",
+				"SYNC_TOOLTIP": "비용 데이터와 동기화",
 				"TAB_DETAILS_COLLECTION_JOB": "최근 데이터 수집 결과",
 				"TAB_DETAILS_TITLE": "상세 정보",
 				"TAB_DETAIL_BASE_INFORMATION": "기본 정보",
@@ -2574,6 +2579,7 @@
 				"THIS_MONTH": "이번 달",
 				"THIS_YEAR": "올해"
 			},
+			"REFRESH_DATA": "",
 			"RESET": "초기화",
 			"SAVE": "저장",
 			"SAVE_AS": "다른 이름으로 저장",
@@ -2591,6 +2597,7 @@
 			"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 			"TOTAL_COUNT": "총합",
 			"UNIT": "단위",
+			"UPDATE_WITH_THE_LATEST_DATA": "최신 데이터로 업데이트",
 			"VIEW_QUERY": "쿼리 확인"
 		},
 		"CLOUD_SERVICE": {

@@ -850,6 +850,7 @@
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
 			"DATA_SOURCES": {
+				"ALL": "すべて",
 				"ALT_S_RESET": "接続されたアカウントのリセットが完了しました",
 				"ALT_S_UPDATE": "接続されたアカウントの更新が完了しました",
 				"CANCELED": "キャンセル",
@@ -860,12 +861,16 @@
 				"ERROR_FOUND_OK": "はい",
 				"ERROR_FOUND_TITLE": "エラーの詳細",
 				"GUIDE": "データソース登録方法を調べる",
+				"LINKED": "リンク済み",
+				"NOT_LINKED": "リンク未設定",
 				"RESET": "初期化",
 				"RESETTING": "リセット中...",
 				"RESET_MODAL_TITLE": "ワークスペースに連携された{count}個のアカウントを初期化しますか？",
 				"SELECT": "選択する",
 				"SELECT_WORKSPACE": "ワークスペースの選択",
+				"STATUS": "状態",
 				"SUCCESS": "成功",
+				"SYNC_TOOLTIP": "コストデータと同期する",
 				"TAB_DETAILS_COLLECTION_JOB": "最近のデータ収集結果",
 				"TAB_DETAILS_TITLE": "詳細情報",
 				"TAB_DETAIL_BASE_INFORMATION": "基本情報",
@@ -2574,6 +2579,7 @@
 				"THIS_MONTH": "今月",
 				"THIS_YEAR": "本年"
 			},
+			"REFRESH_DATA": "",
 			"RESET": "初期化",
 			"SAVE": "保存",
 			"SAVE_AS": "名前を付けて保存",
@@ -2591,6 +2597,7 @@
 			"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
 			"TOTAL_COUNT": "合計",
 			"UNIT": "ユニット",
+			"UPDATE_WITH_THE_LATEST_DATA": "最新のデータに更新する",
 			"VIEW_QUERY": "クエリの表示"
 		},
 		"CLOUD_SERVICE": {

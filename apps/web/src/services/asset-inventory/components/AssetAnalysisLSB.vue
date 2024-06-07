@@ -9,7 +9,7 @@ import {
     PI, PSearch, PTextHighlighting, PDataLoader, PEmpty, PPopover, PButton, PCheckbox, PTooltip, PLazyImg,
 } from '@spaceone/design-system';
 import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popover/type';
-import { isEmpty } from 'lodash';
+import { isEmpty, startCase, toLower } from 'lodash';
 
 
 import type { MetricExampleModel } from '@/schema/inventory/metric-example/model';
@@ -165,14 +165,14 @@ const namespaceState = reactive({
         if (isEmpty(storeState.providers)) return [];
         return [
             ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
-            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
+            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespaces),
         ];
     }),
     namespaceItemsByKeyword: computed<LSBCollapsibleItem<NamespaceSubItemType>[]>(() => {
         if (isEmpty(storeState.providers)) return [];
         return [
             ...convertCommonNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
-            ...convertAssetNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
+            ...convertNamespaceToLSBCollapsibleItems(namespaceState.namespacesFilteredByInput),
         ];
     }),
 });
@@ -185,10 +185,12 @@ const guidePopoverState = reactive({
 
 /* Helper */
 const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
-    const commonNamespaces = namespaces.filter((namespace) => namespace.data.category === 'COMMON').map((namespace) => ({
+    const commonNamespaces = namespaces.filter((namespace) => namespace.data.group === 'common').map((namespace) => ({
         label: namespace.name,
         name: namespace.key,
-        category: namespace.data.category || 'COMMON',
+        category: namespace.data.category,
+        group: namespace.data.group || 'common',
+        resourceType: namespace.data.resource_type,
         icon: 'COMMON',
     }));
     if (commonNamespaces.length === 0) return [];
@@ -199,27 +201,30 @@ const convertCommonNamespaceToLSBCollapsibleItems = (namespaces: NamespaceRefere
         subItems: commonNamespaces,
     }];
 };
-const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
+const convertNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferenceItem[]): LSBCollapsibleItem<NamespaceSubItemType>[] => {
     const namespaceMap = {};
-    namespaces.filter((namespace) => namespace.data.category !== 'COMMON').forEach((namespace) => {
-        const providerData = storeState.providers[namespace.provider];
-        if (namespaceMap[namespace.provider]) {
-            namespaceMap[namespace.provider].subItems.push({
+    namespaces.filter((namespace) => namespace.data.group !== 'common').forEach((namespace) => {
+        const group = namespace.data.group || '';
+        const providerData = storeState.providers[group];
+        if (namespaceMap[group]) {
+            namespaceMap[group].subItems.push({
                 label: namespace.name,
                 name: namespace.key,
-                provider: namespace.provider,
+                group: namespace.data.group,
                 category: namespace.data.category,
                 icon: namespace.data.icon,
             });
         } else {
-            namespaceMap[namespace.provider] = {
+            const label = providerData ? providerData.label : customSnakeToTitleCase(group);
+            const icon = providerData ? providerData.icon : undefined;
+            namespaceMap[group] = {
                 type: MENU_ITEM_TYPE.COLLAPSIBLE,
-                label: providerData.label,
-                icon: providerData.icon,
+                label,
+                icon,
                 subItems: [{
                     label: namespace.name,
                     name: namespace.key,
-                    provider: namespace.provider,
+                    group: namespace.data.group,
                     category: namespace.data.category,
                     icon: namespace.data.icon,
                 }],
@@ -231,8 +236,10 @@ const convertAssetNamespaceToLSBCollapsibleItems = (namespaces: NamespaceReferen
 const isSelectedNamespace = (namespace: NamespaceSubItemType): boolean => {
     if (!storeState.selectedNamespace) return false;
     return storeState.selectedNamespace.name === namespace.name
-        && storeState.selectedNamespace.provider === namespace.provider;
+        && storeState.selectedNamespace.group === namespace.group;
 };
+
+const customSnakeToTitleCase = (title: string) => startCase(toLower(title.replace(/_/g, ' ')));
 
 /* Event */
 const handleSearchNamespace = (keyword: string) => {
@@ -258,9 +265,10 @@ watch(() => route.params, async () => {
         assetAnalysisPageStore.setSelectedNamespace({
             label: targetNamespace?.name,
             name: namespaceState.selectedMetric.data.namespace_id,
-            provider: targetNamespace?.provider,
+            group: targetNamespace?.data.group,
             category: targetNamespace.data.category,
-            icon: targetNamespace.data.category === 'COMMON' ? 'COMMON' : targetNamespace.data.icon,
+            icon: targetNamespace.data.group === 'common' ? 'COMMON' : targetNamespace.data.icon,
+            resourceType: targetNamespace.data.resource_type,
         });
     } else assetAnalysisPageStore.setSelectedNamespace(undefined);
     state.loading = false;

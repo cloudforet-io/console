@@ -11,7 +11,7 @@ import {
 import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import {
-    cloneDeep, find, sortBy,
+    cloneDeep, find, sortBy, sumBy,
 } from 'lodash';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
@@ -23,6 +23,8 @@ import type { WorkspaceReferenceMap } from '@/store/reference/workspace-referenc
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+
+import { gray } from '@/styles/colors';
 
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getDataTableCostFields } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
@@ -43,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
     data: () => ({}),
 });
 
+const OTHER_CATEGORY = 'Others';
 const DATE_FIELD_NAME = 'date';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -95,6 +98,38 @@ const state = reactive({
 });
 
 /* Util */
+const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>): AnalyzeResponse<CostReportDataAnalyzeResult> => {
+    const _results: CostReportDataAnalyzeResult[] = [];
+    const _totalAmount = sumBy(res.results, '_total_value_sum');
+    const _thresholdValue = _totalAmount * 0.02;
+    const _othersResult: CostReportDataAnalyzeResult = {
+        [props.groupBy]: OTHER_CATEGORY,
+        _total_value_sum: 0,
+        value_sum: [],
+    };
+    res.results?.forEach((d) => {
+        if (d._total_value_sum && (d._total_value_sum < _thresholdValue)) {
+            _othersResult._total_value_sum += d._total_value_sum;
+            d.value_sum?.forEach((v) => {
+                const _target = find(_othersResult.value_sum, { date: v.date });
+                if (_target) {
+                    _target.value += v.value;
+                } else {
+                    _othersResult.value_sum?.push({ ...v });
+                }
+            });
+        } else {
+            _results.push(d);
+        }
+    });
+    if (_othersResult._total_value_sum > 0) {
+        _results.push(_othersResult);
+    }
+    return {
+        more: res.more,
+        results: _results,
+    };
+};
 const drawChart = () => {
     chartHelper.refreshRoot();
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
@@ -116,7 +151,12 @@ const drawChart = () => {
             stacked: true,
             stroke: undefined,
         };
-        if (legend.color) seriesSettings.fill = chartHelper.color(legend.color);
+        if (legend.color) {
+            seriesSettings.fill = chartHelper.color(legend.color);
+        }
+        if (legend.name === OTHER_CATEGORY) {
+            seriesSettings.fill = chartHelper.color(gray[500]);
+        }
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
 
         chart.series.push(series);
@@ -142,8 +182,9 @@ const drawChart = () => {
 /* Watcher */
 watch([() => props.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) {
-        state.legends = getLegends(props.data, GRANULARITY.MONTHLY, props.groupBy);
-        state.chartData = getXYChartData(props.data, GRANULARITY.MONTHLY, props.period, props.groupBy);
+        const _refinedData = getRefinedAnalyzeData(props.data);
+        state.legends = getLegends(_refinedData, GRANULARITY.MONTHLY, props.groupBy);
+        state.chartData = getXYChartData(_refinedData, GRANULARITY.MONTHLY, props.period, props.groupBy);
         drawChart();
     }
 }, { immediate: true });
