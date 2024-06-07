@@ -19,6 +19,8 @@ import type { NamespaceReferenceMap } from '@/store/reference/namespace-referenc
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
+import WidgetFormDataTableCardSourceItemDropdown
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceItemDropdown.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
@@ -119,6 +121,8 @@ const advancedOptionsState = reactive({
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
+
+
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
@@ -214,10 +218,9 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                         </div>
                         <span>{{ state.selectedParentSourceName }}</span>
                     </div>
-                    <p-select-dropdown class="selectable-source-dropdown"
-                                       :menu="state.selectableSourceItems"
-                                       :selected="state.selectedSourceEndItem"
-                                       @update:selected="handleSelectSourceItem"
+                    <widget-form-data-table-card-source-item-dropdown :menu="state.selectableSourceItems"
+                                                                      :selected="state.selectedSourceEndItem"
+                                                                      @select="handleSelectSourceItem"
                     />
                 </div>
             </div>
@@ -233,7 +236,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                     />
                 </p-field-group>
                 <widget-form-data-table-card-filters :source-type="state.sourceType"
-                                                     :source-id="state.selectedSourceEndItem"
+                                                     :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                                      :filters.sync="state.filters"
                 />
                 <p-field-group label="Data Field Name"
@@ -296,6 +299,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                   @update:value="handleChangeLabel(labelInfo.key, $event, 'value')"
                                     />
                                     <p-icon-button name="ic_delete"
+                                                   size="sm"
                                                    @click="handleRemoveLabel(labelInfo.key)"
                                     />
                                 </div>
@@ -453,7 +457,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                             }
                         }
                         .label-wrapper {
-                            @apply flex gap-1;
+                            @apply flex gap-1 items-center;
                             margin-bottom: 0.5rem;
                         }
                     }
