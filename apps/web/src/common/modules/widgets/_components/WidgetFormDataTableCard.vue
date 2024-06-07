@@ -8,17 +8,17 @@ import {
 import {
     PIconButton, PI, PButton,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
-import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 
 import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
-import WidgetFormDataTableCardSourceItemDropdown
-    from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceItemDropdown.vue';
+import WidgetFormDataTableCardSourceForm
+    from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceForm.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
@@ -36,9 +36,8 @@ const widgetGenerateState = widgetGenerateStore.state;
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    dataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
-    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
 });
 
 const state = reactive({
@@ -48,15 +47,6 @@ const state = reactive({
     dataSourceId: computed(() => state.options[state.sourceType].data_source_id), // COST only
     metricId: computed(() => state.options[state.sourceType].metric_id), // ASSET only
     namespaceId: computed(() => storeState.metrics[state.metricId]?.data.namespace_id || ''), // ASSET only
-    selectedParentSourceName: computed(() => {
-        if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return storeState.dataSources[state.dataSourceId]?.label;
-        }
-        if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
-            return storeState.namespaces[state.namespaceId]?.label;
-        }
-        return '';
-    }),
     selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
@@ -65,10 +55,7 @@ const state = reactive({
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return props.item.data_info.map((dataKey) => ({
-                label: `${dataKey.name} (${dataKey.unit})`,
-                name: dataKey.key,
-            }));
+            return state.dataTypeItems;
         }
         if (state.sourceType === DATA_SOURCE_DOMAIN.ASSET) {
             return Object.values(storeState.metrics)
@@ -79,6 +66,19 @@ const state = reactive({
                 }));
         }
         return [];
+    }),
+    dataTypeItems: computed(() => {
+        const targetCostDataSource = storeState.costDataSources[state.dataSourceId];
+        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
+        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
+        const additionalMenuItems: MenuItem[] = targetCostDataSource.data?.cost_data_keys?.map((key) => ({
+            name: key, label: key,
+        }));
+        return [
+            { name: 'cost', label: costAlias ? `Cost (${costAlias})` : 'Cost' },
+            { name: 'usage', label: usageAlias ? `Usage (${usageAlias})` : 'Usage' },
+            ...(additionalMenuItems || []),
+        ];
     }),
 });
 
@@ -103,18 +103,14 @@ const handleSelectSourceItem = (selectedItem: string) => {
 
 onMounted(() => {
     state.selectedGroupByItems = [...(props.item.options?.group_by || [])];
-    state.dataFieldName = props.item.source_type === DATA_SOURCE_DOMAIN.COST
-        ? state.selectableSourceItems[0]?.label
-        : storeState.metrics[state.selectedSourceEndItem]?.data?.unit;
+    state.dataFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label;
 });
 
 watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     // Base Options
     state.selectedGroupByItems = [];
-    state.dataFieldName = props.item.source_type === DATA_SOURCE_DOMAIN.COST
-        ? state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label
-        : storeState.metrics[_selectedSourceItem]?.data?.unit;
-    // TODO: reset filters
+    state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
+    state.filters = {};
     // Advanced Options
     advancedOptionsState.additionalLabels = [];
     advancedOptionsState.separateDate = false;
@@ -145,18 +141,12 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                    size="sm"
                     />
                 </div>
-                <div class="data-source-wrapper">
-                    <div class="selected-source">
-                        <div class="source-img">
-                            <img>
-                        </div>
-                        <span>{{ state.selectedParentSourceName }}</span>
-                    </div>
-                    <widget-form-data-table-card-source-item-dropdown :menu="state.selectableSourceItems"
-                                                                      :selected="state.selectedSourceEndItem"
-                                                                      @select="handleSelectSourceItem"
-                    />
-                </div>
+                <widget-form-data-table-card-source-form :source-type="state.sourceType"
+                                                         :parent-source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.namespaceId"
+                                                         :menu="state.selectableSourceItems"
+                                                         :selected="state.selectedSourceEndItem"
+                                                         @select="handleSelectSourceItem"
+                />
             </div>
             <widget-form-data-table-card-add-form :source-key="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
@@ -216,17 +206,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                 .selected-radio-icon {
                     width: 1.5rem;
                     height: 1.5rem;
-                }
-            }
-            .data-source-wrapper {
-                .selected-source {
-                    @apply flex items-center gap-1 text-label-md text-gray-900;
-                    margin-bottom: 0.25rem;
-                    .source-img {
-                        @apply rounded flex items-center justify-center bg-violet-150;
-                        width: 1.5rem;
-                        height: 1.5rem;
-                    }
                 }
             }
         }
