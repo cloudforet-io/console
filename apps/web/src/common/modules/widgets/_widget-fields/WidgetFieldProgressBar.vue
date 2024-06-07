@@ -80,31 +80,33 @@ const handleDeleteFormatRule = (idx: number) => {
                                style-type="secondary"
                                required
                 >
-                    <p-button icon-left="ic_plus_bold"
-                              style-type="tertiary"
-                              class="add-button"
-                              @click="handleClickAddFormatRule"
-                    >
-                        {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
-                    </p-button>
-                    <div v-for="(formatRule, idx) in state.formatRules"
-                         :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
-                         class="format-rules-form-wrapper"
-                    >
-                        <p-text-input :value="formatRule.threshold"
-                                      type="number"
-                                      placeholder="Threshold"
-                        />
-                        <color-input :value="formatRule.color"
-                                     @update:value="formatRule.color = $event"
-                        />
-                        <p-icon-button name="ic_delete"
-                                       style-type="negative-transparent"
-                                       size="sm"
-                                       :disabled="state.formatRules.length === 1"
-                                       class="delete-button"
-                                       @click="handleDeleteFormatRule(idx)"
-                        />
+                    <div class="format-rules-wrapper">
+                        <p-button icon-left="ic_plus_bold"
+                                  style-type="tertiary"
+                                  class="add-button"
+                                  @click="handleClickAddFormatRule"
+                        >
+                            {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
+                        </p-button>
+                        <div v-for="(formatRule, idx) in state.formatRules"
+                             :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
+                             class="format-rules-form-wrapper"
+                        >
+                            <p-text-input :value="formatRule.threshold"
+                                          type="number"
+                                          placeholder="Threshold"
+                            />
+                            <color-input :value="formatRule.color"
+                                         @update:value="formatRule.color = $event"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           style-type="negative-transparent"
+                                           size="sm"
+                                           :disabled="state.formatRules.length === 1"
+                                           class="delete-button"
+                                           @click="handleDeleteFormatRule(idx)"
+                            />
+                        </div>
                     </div>
                 </p-field-group>
             </div>
@@ -166,5 +168,9 @@ const handleDeleteFormatRule = (idx: number) => {
             width: 2rem;
         }
     }
+}
+.format-rules-wrapper {
+    @apply bg-gray-100 rounded-md;
+    padding: 0.5rem 0.5rem 0 0.5rem;
 }
 </style>

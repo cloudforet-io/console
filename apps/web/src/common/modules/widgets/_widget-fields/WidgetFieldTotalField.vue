@@ -1,19 +1,32 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-// import type { TotalFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
-// import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { TotalFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 
-// const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalFieldOptions>>(), {
-//     widgetFieldSchema: () => ({}),
-// });
-
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TotalFieldOptions>>(), {
+});
+const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    isValid: computed<boolean>(() => !!state.proxyValue?.length),
+});
+
+/* Event */
+const handleUpdateSelect = (val: string) => {
+    if (val === state.proxyValue) return;
+    state.proxyValue = val;
+};
+
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 });
 </script>
 
@@ -22,13 +35,10 @@ const state = reactive({
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.TOTAL_FIELD')"
                        required
         >
-            <p-select-dropdown :menu="state.menuItems" />
+            <p-select-dropdown :menu="state.menuItems"
+                               :selected="state.proxyValue"
+                               @update:selected="handleUpdateSelect"
+            />
         </p-field-group>
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.p-select-dropdown {
-    width: 100%;
-}
-</style>

@@ -1,16 +1,19 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 
 import {
     PFieldGroup, PTextInput, PIconButton, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import type { FormatRulesOptions, FormatRulesField } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
+import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { gray } from '@/styles/colors';
 
@@ -18,22 +21,25 @@ import { gray } from '@/styles/colors';
 const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
-interface FormatRule {
-    threshold: number;
-    color: string;
-    name?: string;
-    dropdown?: string;
-}
-
+const emit = defineEmits<WidgetFieldComponentEmit<FormatRulesValue[]>>();
 const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     fields: computed<FormatRulesField[]>(() => props.widgetFieldSchema.options?.fields || []),
-    formatRules: [] as FormatRule[],
+    isValid: computed<boolean>(() => state.proxyValue.every((d) => {
+        if (state.fields.includes('name')) {
+            if (d.name === undefined) return false;
+        }
+        if (state.fields.includes('dropdown')) {
+            if (d.dropdownItem === undefined) return false;
+        }
+        return (d.threshold !== undefined) && (d.color !== undefined);
+    })),
 });
 
 /* Util */
-const getInitialFormatRule = (): FormatRule => {
-    const initialFormatRule: FormatRule = {
+const getInitialFormatRulesValue = (): FormatRulesValue => {
+    const initialFormatRule: FormatRulesValue = {
         threshold: 0,
         color: gray[200],
     };
@@ -41,22 +47,31 @@ const getInitialFormatRule = (): FormatRule => {
         initialFormatRule.name = '';
     }
     if (state.fields.includes('dropdown')) {
-        initialFormatRule.dropdown = '';
+        // TODO: set initial dropdown item
+        initialFormatRule.dropdownItem = '';
     }
     return initialFormatRule;
 };
 
 /* Event */
 const handleClickAddRule = () => {
-    state.formatRules.push(getInitialFormatRule());
+    state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
 };
 const handleDelete = (idx: number) => {
-    state.formatRules.splice(idx, 1);
-    state.formatRules = [...state.formatRules];
+    const _value = cloneDeep(state.proxyValue);
+    _value.splice(idx, 1);
+    state.proxyValue = _value;
 };
 
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
+});
+
 onMounted(() => {
-    state.formatRules.push(getInitialFormatRule());
+    if (!state.proxyValue.length) {
+        state.proxyValue = [getInitialFormatRulesValue()];
+    }
 });
 </script>
 
@@ -73,7 +88,7 @@ onMounted(() => {
                 >
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
                 </p-button>
-                <div v-for="(formatRule, idx) in state.formatRules"
+                <div v-for="(formatRule, idx) in state.proxyValue"
                      :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
                      class="format-rules-input-wrapper"
                 >
@@ -97,7 +112,7 @@ onMounted(() => {
                     <p-icon-button name="ic_delete"
                                    style-type="negative-transparent"
                                    size="sm"
-                                   :disabled="state.formatRules.length === 1"
+                                   :disabled="state.proxyValue.length === 1"
                                    class="delete-button"
                                    @click="handleDelete(idx)"
                     />
