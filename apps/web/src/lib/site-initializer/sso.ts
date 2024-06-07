@@ -21,10 +21,9 @@ export const checkSsoAccessToken = async (store) => {
     const queryString = window.location.search;
     const params = new URLSearchParams(queryString);
     const ssoAccessToken = params.get('sso_access_token');
-    const needToResetPassword = store.state.user.requiredActions?.includes('RESET_PASSWORD');
 
     // signOut
-    if (ssoAccessToken && needToResetPassword) {
+    if (ssoAccessToken) {
         if (SpaceConnector.isTokenAlive) {
             try {
                 const authType = store.state.domain.extendedAuthType;
