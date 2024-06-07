@@ -11,7 +11,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import {
-    cloneDeep, isEmpty, sortBy, unset,
+    cloneDeep, isEmpty, unset,
 } from 'lodash';
 
 import type { MetricLabelKey } from '@/schema/inventory/metric/type';
@@ -27,8 +27,6 @@ import type {
 import {
     MANAGED_VARIABLE_MODEL_KEY_MAP, MANAGED_VARIABLE_MODELS,
 } from '@/lib/variable-models/managed-model-config/base-managed-model-config';
-import CostTagKeyVariableModel
-    from '@/lib/variable-models/managed-model/custom-resource-model/cost-tag-key-variable-model';
 import type { VariableModelMenuHandlerInfo } from '@/lib/variable-models/variable-model-menu-handler';
 import {
     getVariableModelMenuHandler,
@@ -36,10 +34,10 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_SOURCE_DOMAIN, MANAGED_GLOBAL_VARIALBE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
 
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
 interface VariableOption {
@@ -54,13 +52,11 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
     [GROUP_BY.USAGE_TYPE]: { key: MANAGED_VARIABLE_MODEL_KEY_MAP.cost, dataKey: 'usage_type' },
 };
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
-type ManagedGlobalVariable = typeof GROUP_BY[keyof typeof GROUP_BY];
-const MANAGED_GLOBAL_VARIALBE = [GROUP_BY.WORKSPACE, GROUP_BY.PROJECT, GROUP_BY.SERVICE_ACCOUNT, GROUP_BY.REGION] as (ManagedGlobalVariable|string)[];
-
 interface Props {
     sourceType?: DataTableSourceType;
     sourceId?: string;
     filters: Record<string, string[]>;
+    filterItems: MenuItem[];
 }
 
 const props = defineProps<Props>();
@@ -75,16 +71,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     proxyFilters: useProxyValue('filters', props, emit),
-    filterItems: computed(() => {
-        if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-            return [
-                ...costFilterState.managedGroupByItems,
-                ...costFilterState.additionalInfoGroupByItems,
-                ...costFilterState.tagsFilterItems,
-            ];
-        }
-        return [...assetFilterState.metricFilterItems];
-    }),
+    filterItems: computed(() => props.filterItems),
     selectedItems: [] as MenuItem[],
     handlerMap: computed(() => {
         const handlerMaps = {};
@@ -104,24 +91,11 @@ const state = reactive({
     })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
 });
-
-const costFilterState = reactive({
-    managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => !MANAGED_GLOBAL_VARIALBE.includes(item.name))),
-    additionalInfoGroupByItems: computed(() => {
-        const dataSource = storeState.costDataSources[props.sourceId ?? ''];
-        return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
-            name: `additional_info.${key}`,
-            label: key,
-        })), 'label') : [];
-    }),
-    tagsFilterItems: [] as MenuItem[],
-});
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
     }),
-    metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
@@ -278,27 +252,8 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
         return async () => ({ results: [] });
     }
 };
-const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
-    try {
-        const options = {
-            cost_data_source: props.sourceId,
-        };
-        const costTagKeyVariableModel = new CostTagKeyVariableModel();
-        const response = await costTagKeyVariableModel.list({ options });
-        return response.results;
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
 
-watch(() => props.sourceId, async () => {
-    if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-        state.loading = true;
-        const tagsResources = await getTagsResources();
-        costFilterState.tagsFilterItems = tagsResources ? tagsResources.map((d) => ({ name: d.key, label: d.name })) : [];
-        state.loading = false;
-    }
+watch([() => props.filterItems, () => props.sourceId], async () => {
     resetAllFilter();
 });
 </script>
