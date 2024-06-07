@@ -45,3 +45,10 @@ export interface Field {
 export interface WidgetTableData {
     [fieldName: string]: any;
 }
+
+
+export interface AdditionalLabel {
+    key: string;
+    name: string;
+    value: string;
+}

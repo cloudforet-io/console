@@ -6,32 +6,25 @@ import {
 
 
 import {
-    PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
+    PIconButton, PI, PButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
-import { range } from 'lodash';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
-import getRandomId from '@/lib/random-id-generator';
 
-import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
+import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
 import WidgetFormDataTableCardSourceItemDropdown
     from '@/common/modules/widgets/_components/WidgetFormDataTableCardSourceItemDropdown.vue';
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
-
-interface AdditionalLabel {
-    key: string;
-    name: string;
-    value: string;
-}
 
 interface Props {
     item: DataTableModel;
@@ -67,7 +60,7 @@ const state = reactive({
     selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
-    selectedGroupByItems: [] as string[],
+    selectedGroupByItems: [] as any[],
     filters: {} as Record<string, string[]>,
     dataFieldName: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -87,37 +80,12 @@ const state = reactive({
         }
         return [];
     }),
-    labelInfoItems: computed<SelectDropdownMenuItem[]>(() => props.item.labels_info.map((labelKey) => ({
-        label: labelKey.name,
-        name: labelKey.key,
-    }))),
 });
 
 const advancedOptionsState = reactive({
-    advancedOptionsCollapsed: false,
     additionalLabels: [] as AdditionalLabel[],
     separateDate: false,
-    timeDiffList: computed<SelectDropdownMenuItem[]>(() => [
-        { label: 'None', name: 'none' },
-        { label: 'Year', name: 'year' },
-        { label: 'Month', name: 'month' },
-        { label: 'Day', name: 'day' },
-    ]),
     selectedTimeDiff: 'none',
-    timeDiffDateMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => ({
-        year: range(3).map((i) => ({
-            label: i === 0 ? 'Last 1 Year' : `Last ${i + 1} Years`,
-            name: String(i + 1),
-        })),
-        month: range(12).map((i) => ({
-            label: i === 0 ? 'Last 1 Month' : `Last ${i + 1} Months`,
-            name: String(i + 1),
-        })),
-        day: range(31).map((i) => ({
-            label: i === 0 ? 'Last 1 Day' : `Last ${i + 1} Days`,
-            name: String(i + 1),
-        })),
-    })),
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
@@ -131,40 +99,6 @@ const handleSelectDataTable = async (dataTableId: string) => {
 
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
-};
-
-const handleClickToggleAdvancedOptionsForm = () => {
-    advancedOptionsState.advancedOptionsCollapsed = !advancedOptionsState.advancedOptionsCollapsed;
-};
-
-const handleClickTimeDiff = (timeDiff: string) => {
-    advancedOptionsState.selectedTimeDiff = timeDiff;
-    advancedOptionsState.selectedTimeDiffDate = undefined;
-};
-const handleClickTimeDiffDate = (timeDiffDate: string) => {
-    advancedOptionsState.selectedTimeDiffDate = timeDiffDate;
-};
-
-const handleClickAddLabel = () => {
-    advancedOptionsState.additionalLabels.push({
-        key: getRandomId(),
-        name: '',
-        value: '',
-    });
-};
-
-const handleChangeLabel = (key: string, value: string, type: 'name' | 'value') => {
-    const targetIndex = advancedOptionsState.additionalLabels.findIndex((label) => label.key === key);
-    if (targetIndex !== -1) {
-        advancedOptionsState.additionalLabels[targetIndex][type] = value;
-    }
-};
-
-const handleRemoveLabel = (key: string) => {
-    const targetIndex = advancedOptionsState.additionalLabels.findIndex((label) => label.key === key);
-    if (targetIndex !== -1) {
-        advancedOptionsState.additionalLabels.splice(targetIndex, 1);
-    }
 };
 
 onMounted(() => {
@@ -224,129 +158,16 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                     />
                 </div>
             </div>
-            <div class="options-form">
-                <p-field-group label="Group by"
-                               required
-                >
-                    <p-select-dropdown class="group-by-select-dropdown"
-                                       :menu="state.labelInfoItems"
-                                       :selected.sync="state.selectedGroupByItems"
-                                       multi-selectable
-                                       appearance-type="badge"
-                    />
-                </p-field-group>
-                <widget-form-data-table-card-filters :source-type="state.sourceType"
-                                                     :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
-                                                     :filters.sync="state.filters"
-                />
-                <p-field-group label="Data Field Name"
-                               required
-                >
-                    <p-text-input v-model="state.dataFieldName"
-                                  class="data-field-name-input"
-                                  placeholder="Name"
-                    />
-                </p-field-group>
-                <p-divider class="filter-divider" />
-
-                <div class="form-group-wrapper"
-                     :class="{ 'collapsed': advancedOptionsState.advancedOptionsCollapsed }"
-                >
-                    <div class="title-wrapper"
-                         @click="handleClickToggleAdvancedOptionsForm"
-                    >
-                        <p-i name="ic_chevron-down"
-                             width="1.25rem"
-                             height="1.25rem"
-                             color="inherit transparent"
-                             class="arrow-button"
-                        />
-                        <span>Advanced Options</span>
-                    </div>
-                    <div class="form-wrapper">
-                        <p-field-group label="Additional Labels"
-                                       required
-                        >
-                            <div class="additional-labels-wrapper">
-                                <div v-if="advancedOptionsState.additionalLabels.length"
-                                     class="field-title-wrapper"
-                                >
-                                    <p-field-title class="field-title"
-                                                   label="Name"
-                                                   size="sm"
-                                                   color="gray"
-                                                   inline
-                                    />
-                                    <p-field-title class="field-title"
-                                                   label="Value"
-                                                   size="sm"
-                                                   color="gray"
-                                                   inline
-                                    />
-                                </div>
-                                <div v-for="(labelInfo) in advancedOptionsState.additionalLabels"
-                                     :key="labelInfo.key"
-                                     class="label-wrapper"
-                                >
-                                    <p-text-input class="label-input"
-                                                  block
-                                                  :value="labelInfo.name"
-                                                  @update:value="handleChangeLabel(labelInfo.key, $event, 'name')"
-                                    />
-                                    <p-text-input class="label-input"
-                                                  block
-                                                  :value="labelInfo.value"
-                                                  @update:value="handleChangeLabel(labelInfo.key, $event, 'value')"
-                                    />
-                                    <p-icon-button name="ic_delete"
-                                                   size="sm"
-                                                   @click="handleRemoveLabel(labelInfo.key)"
-                                    />
-                                </div>
-                                <p-button style-type="tertiary"
-                                          icon-left="ic_plus_bold"
-                                          @click="handleClickAddLabel"
-                                >
-                                    Add Label
-                                </p-button>
-                            </div>
-                        </p-field-group>
-                        <p-field-group label="Separate Date"
-                                       required
-                        >
-                            <div class="separate-date-wrapper">
-                                <p class="description">
-                                    Separate date into 3 columns (Year, Month, Day)
-                                </p>
-                                <p-toggle-button :value.sync="advancedOptionsState.separateDate"
-                                                 show-state-text
-                                                 position="left"
-                                />
-                            </div>
-                        </p-field-group>
-                        <p-field-group label="Time Diff"
-                                       required
-                        >
-                            <div class="time-diff-dropdown-wrapper">
-                                <p-select-dropdown class="time-diff-dropdown"
-                                                   use-fixed-menu-style
-                                                   :menu="advancedOptionsState.timeDiffList"
-                                                   :selected="advancedOptionsState.selectedTimeDiff"
-                                                   @update:selected="handleClickTimeDiff"
-                                />
-                                <p-select-dropdown class="time-diff-date-dropdown"
-                                                   use-fixed-menu-style
-                                                   :disabled="advancedOptionsState.selectedTimeDiff === 'none'"
-                                                   :menu="advancedOptionsState.timeDiffDateMap[advancedOptionsState.selectedTimeDiff] || []"
-                                                   :selected="advancedOptionsState.selectedTimeDiffDate"
-                                                   @update:selected="handleClickTimeDiffDate"
-                                />
-                            </div>
-                        </p-field-group>
-                    </div>
-                </div>
-            </div>
-
+            <widget-form-data-table-card-add-form :source-key="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
+                                                  :source-type="state.sourceType"
+                                                  :selected-group-by-items.sync="state.selectedGroupByItems"
+                                                  :filters.sync="state.filters"
+                                                  :data-field-name.sync="state.dataFieldName"
+                                                  :additional-labels.sync="advancedOptionsState.additionalLabels"
+                                                  :separate-date.sync="advancedOptionsState.separateDate"
+                                                  :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
+                                                  :selected-time-diff-date.sync="advancedOptionsState.selectedTimeDiffDate"
+            />
             <div class="button-group-wrapper">
                 <p-button style-type="tertiary"
                           icon-left="ic_delete"
@@ -405,78 +226,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                         @apply rounded flex items-center justify-center bg-violet-150;
                         width: 1.5rem;
                         height: 1.5rem;
-                    }
-                }
-                .selectable-source-dropdown {
-                    @apply w-full;
-                }
-            }
-        }
-        .options-form {
-            padding: 0.75rem;
-
-            .filter-divider {
-                margin-top: 1rem;
-            }
-
-            .group-by-select-dropdown {
-                @apply w-full;
-            }
-            .data-field-name-input {
-                @apply w-full;
-            }
-
-            .form-group-wrapper {
-                .arrow-button {
-                    transition: opacity 0.3s ease, visibility 0.3s ease;
-                }
-                &.collapsed {
-                    .form-wrapper {
-                        display: none;
-                    }
-                    .arrow-button {
-                        transform: rotate(-90deg);
-                    }
-                }
-                .title-wrapper {
-                    @apply text-label-lg;
-                    font-weight: 700;
-                    padding: 1rem 0;
-                }
-                .form-wrapper {
-                    padding: 0.5rem 0 0.25rem 1.25rem;
-                    .additional-labels-wrapper {
-                        @apply bg-gray-100 rounded-lg;
-                        padding: 0.5rem;
-                        margin-top: 0.25rem;
-
-                        .field-title-wrapper {
-                            margin-bottom: 0.25rem;
-                            .field-title {
-                                width: calc(50% - 0.875rem);
-                            }
-                        }
-                        .label-wrapper {
-                            @apply flex gap-1 items-center;
-                            margin-bottom: 0.5rem;
-                        }
-                    }
-
-                    .separate-date-wrapper {
-                        .description {
-                            @apply text-paragraph-sm text-gray-900;
-                            margin-bottom: 0.5rem;
-                        }
-                    }
-                    .time-diff-dropdown-wrapper {
-                        @apply flex gap-2;
-                        margin-top: 0.25rem;
-                        .time-diff-dropdown {
-                            width: 25%;
-                        }
-                        .time-diff-date-dropdown {
-                            width: 75%;
-                        }
                     }
                 }
             }
