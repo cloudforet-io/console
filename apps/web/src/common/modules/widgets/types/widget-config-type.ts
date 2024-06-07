@@ -70,7 +70,7 @@ export interface ComparisonOptions {
     compareTargets?: any[]; // subTotal or X-Axis
 }
 
-type FormatRulesField = 'name' | 'threshold' | 'color'| 'legend';
+type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
@@ -85,7 +85,7 @@ export interface WidgetFieldSchema<FieldOption=WidgetFieldOptions> {
     options?: Partial<FieldOption>;
 }
 
-export type WidgetFieldName = 'dataField' | 'xAxis' | 'yAxis'
+export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'stackBy' | 'lineBy' | 'groupBy' | 'categoryBy'
     | 'totalField' | 'basisField'
     | 'min' | 'max'

@@ -1,15 +1,20 @@
 <script lang="ts" setup>
+import { asyncComputed } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldGroup, PSelectDropdown, PButton, PI, PTextInput, PTextarea,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
+
+import { VariableModelFactory } from '@/lib/variable-models';
 
 import { CONSOLE_WIDGET_CONFIG } from '@/common/modules/widgets/_constants/widget-config-list-constant';
 import { getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const FORM_TITLE_MAP = {
@@ -24,15 +29,14 @@ const state = reactive({
         name: d.widgetName,
         label: d.meta?.title || d.widgetName,
     }))),
+    granularityMenuItems: asyncComputed<MenuItem[]>(async () => {
+        const model = new VariableModelFactory({ type: 'MANAGED', managedModelKey: 'granularity' });
+        const { results } = await model.list();
+        return results.map((d) => ({ name: d.key, label: d.name }));
+    }),
     widgetConfig: computed(() => getWidgetConfig(widgetGenerateState.selectedWidgetName)),
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
-    fieldValueMap: {
-        // [fieldName]: any
-    },
-    fieldValidationMap: {
-        // [fieldName]: boolean
-    },
     // display
     collapsedTitleMap: {
         [FORM_TITLE_MAP.WIDGET_INFO]: false,
@@ -50,16 +54,30 @@ const handleSelectWidgetName = (widgetName: string) => {
 const handleUpdateWidgetTitle = (title: string) => {
     widgetGenerateStore.setTitle(title);
 };
+const handleUpdateGranularity = (granularity: string) => {
+    widgetGenerateStore.setGranularity(granularity);
+};
 const handleClickEditDataTable = () => {
     widgetGenerateStore.setOverlayStep(1);
 };
 const handleClickCollapsibleTitle = (collapsedTitle: string) => {
     state.collapsedTitleMap[collapsedTitle] = !state.collapsedTitleMap[collapsedTitle];
 };
+const handleUpdateFieldValue = (fieldName: string, value: WidgetFieldValues) => {
+    const _valueMap = cloneDeep(widgetGenerateState.widgetValueMap);
+    _valueMap[fieldName] = value;
+    widgetGenerateStore.setWidgetValueMap(_valueMap);
+};
+const handleUpdateFieldValidation = (fieldName: string, isValid: boolean) => {
+    const _validMap = cloneDeep(widgetGenerateState.widgetValidMap);
+    _validMap[fieldName] = isValid;
+    widgetGenerateStore.setWidgetValidMap(_validMap);
+};
 
 watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
     widgetGenerateStore.initWidgetForm(widgetName);
 }, { immediate: true });
+// TODO: state.fieldValueMap 채워주기
 </script>
 
 <template>
@@ -118,7 +136,7 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                 </p-field-group>
             </div>
         </div>
-        <!-- data mapping -->
+        <!-- required fields -->
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.REQUIRED_FIELDS] }"
         >
@@ -134,15 +152,27 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                 <span>{{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.REQUIRED_FIELDS') }}</span>
             </div>
             <div class="form-wrapper">
+                <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.GRANULARITY')"
+                               required
+                >
+                    <p-select-dropdown :menu="state.granularityMenuItems"
+                                       :selected="widgetGenerateState.granularity"
+                                       @select="handleUpdateGranularity"
+                    />
+                </p-field-group>
                 <template v-for="[fieldName, fieldSchema] in state.widgetRequiredFieldSchemaMap">
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
+                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                     />
                 </template>
             </div>
         </div>
-        <!-- chart options -->
+        <!-- optional fields -->
         <div class="form-group-wrapper"
              :class="{ 'collapsed': state.collapsedTitleMap[FORM_TITLE_MAP.OPTIONAL_FIELDS] }"
         >
@@ -162,6 +192,10 @@ watch(() => widgetGenerateState.selectedWidgetName, (widgetName) => {
                     <component :is="getWidgetFieldComponent(fieldName)"
                                :key="`required-field-${fieldName}`"
                                :widget-field-schema="fieldSchema"
+                               :value="widgetGenerateState.widgetValueMap[fieldName]"
+                               :is-valid="widgetGenerateState.widgetValidMap[fieldName]"
+                               @update:value="handleUpdateFieldValue(fieldName, $event)"
+                               @update:is-valid="handleUpdateFieldValidation(fieldName, $event)"
                     />
                 </template>
             </div>

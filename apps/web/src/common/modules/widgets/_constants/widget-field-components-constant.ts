@@ -7,6 +7,9 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     dataField: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldDataField.vue'),
     }),
+    tableDataField: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldTableDataField.vue'),
+    }),
     xAxis: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldXAxis.vue'),
     }),

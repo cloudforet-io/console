@@ -10,13 +10,7 @@ const table: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
-        dataField: {},
-        xAxis: {
-            options: {
-                dataTarget: 'label_field',
-                multiSelectable: true,
-            },
-        },
+        tableDataField: {},
         groupBy: {
             options: {
                 dataTarget: 'label_field',
