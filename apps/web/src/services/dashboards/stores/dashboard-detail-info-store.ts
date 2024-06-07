@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    cloneDeep, isEmpty, isEqual,
+    cloneDeep, flattenDeep, isEmpty, isEqual,
 } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -227,7 +227,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         });
         setVariablesInitMap(_variablesInitMap);
 
-        const _dashboardWidgetInfoList = _template?.layouts?.flat()?.map((info) => ({
+        const _dashboardWidgetInfoList = flattenDeep(_template?.layouts.map((layout) => layout.widgets ?? [])).map((info) => ({
             ...info,
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
@@ -283,7 +283,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap(_variablesInitMap);
 
         // widget info states
-        const _dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
+        const _dashboardWidgetInfoList = flattenDeep(_dashboardInfo?.layouts.map((layout) => layout.widgets ?? [])).map((info) => ({
             ...info,
             widget_key: info.widget_key ?? getRandomId(),
         })) ?? [];
