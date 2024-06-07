@@ -8,7 +8,6 @@ export interface DataFieldOptions {
 }
 export interface XAxisOptions {
     dataTarget?: string;
-    multiSelectable?: boolean;
 }
 export interface YAxisOptions {
     dataTarget?: string;
@@ -70,7 +69,7 @@ export interface ComparisonOptions {
     compareTargets?: any[]; // subTotal or X-Axis
 }
 
-type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
+export type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
 export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;

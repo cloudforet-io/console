@@ -6,3 +6,8 @@ export interface WidgetFieldComponentProps<FieldOptions> {
     isValid?: boolean;
     value?: any;
 }
+
+export interface WidgetFieldComponentEmit<ValueType> {
+    (e: 'update:value', value: ValueType): void;
+    (e: 'update:is-valid', value: boolean): void;
+}

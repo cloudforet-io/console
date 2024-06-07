@@ -1,19 +1,43 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
 import type { DataFieldOptions } from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<DataFieldOptions>>(), {
     widgetFieldSchema: () => ({}),
 });
-
+const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
 const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    selectedItem: undefined as undefined | MenuItem[] | string,
+    isValid: computed<boolean>(() => {
+        if (Array.isArray(state.selectedItem)) {
+            return !!state.selectedItem.length;
+        }
+        return !!state.selectedItem;
+    }),
+});
+
+/* Event */
+const handleUpdateSelect = (val: string|MenuItem[]) => {
+    state.selectedItem = val;
+    if (Array.isArray(val)) {
+        state.proxyValue = val.map((item) => item.name);
+    } else {
+        state.proxyValue = val;
+    }
+};
+
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 });
 </script>
 
@@ -23,7 +47,11 @@ const state = reactive({
                        required
         >
             <p-select-dropdown :menu="state.menuItems"
+                               :selected="state.selectedItem"
                                :multi-selectable="props.widgetFieldSchema.options?.multiSelectable"
+                               show-select-marker
+                               appearance-type="badge"
+                               @update:selected="handleUpdateSelect"
             />
         </p-field-group>
     </div>

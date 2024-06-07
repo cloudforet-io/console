@@ -1,16 +1,41 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { LineByOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { LineByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-// const props = withDefaults(defineProps<WidgetFieldComponentProps<LineByFieldOptions>>(), {
-// });
+
+const props = withDefaults(defineProps<WidgetFieldComponentProps<LineByOptions>>(), {
+});
+const emit = defineEmits<WidgetFieldComponentEmit<LineByValue>>();
 const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
+    selectedValue: '',
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    isValid: computed<boolean>(() => !!state.proxyValue.value && !!state.proxyValue.count),
+});
+
+/* Event */
+const handleUpdateSelect = (val: string) => {
+    if (val === state.selectedValue) return;
+    state.selectedValue = val;
+    state.proxyValue = { ...state.proxyValue, value: val };
+};
+const handleUpdateCount = (val: number) => {
+    if (val === state.proxyValue.count) return;
+    state.proxyValue = { ...state.proxyValue, count: val };
+};
+
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 });
 </script>
 
@@ -20,9 +45,13 @@ const state = reactive({
                        required
         >
             <div class="field-form-wrapper">
-                <p-select-dropdown :menu="state.menuItems" />
+                <p-select-dropdown :menu="state.menuItems"
+                                   :selected="state.proxyValue"
+                                   @update:selected="handleUpdateSelect"
+                />
                 <p-text-input type="number"
                               :min="0"
+                              @update:value="handleUpdateCount"
                 />
             </div>
         </p-field-group>

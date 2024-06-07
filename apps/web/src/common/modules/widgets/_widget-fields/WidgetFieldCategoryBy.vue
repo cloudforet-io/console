@@ -1,18 +1,34 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+import type { CategoryByOptions } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
-// const props = withDefaults(defineProps<WidgetFieldComponentProps<CategoryByFieldOptions>>(), {
-//     widgetFieldSchema: () => ({}),
-// });
 
+const props = withDefaults(defineProps<WidgetFieldComponentProps<CategoryByOptions>>(), {
+});
+const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({
+    proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    isValid: computed<boolean>(() => !!state.proxyValue?.length),
+});
+
+/* Event */
+const handleUpdateSelect = (val: string) => {
+    if (val === state.proxyValue) return;
+    state.proxyValue = val;
+};
+
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
 });
 </script>
 
@@ -22,8 +38,13 @@ const state = reactive({
                        required
         >
             <div class="field-form-wrapper">
-                <p-select-dropdown :menu="state.menuItems" />
+                <p-select-dropdown :menu="state.menuItems"
+                                   :selected="state.proxyValue"
+                                   @update:selected="handleUpdateSelect"
+                />
+                <!--TODO: set value-->
                 <p-text-input type="number"
+                              :value="0"
                               disabled
                 />
             </div>
