@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput,
@@ -20,15 +22,13 @@ const props = withDefaults(defineProps<WidgetFieldComponentProps<StackByOptions>
 const emit = defineEmits<WidgetFieldComponentEmit<StackByValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
-    selectedValue: '',
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     isValid: computed<boolean>(() => !!state.proxyValue.value && !!state.proxyValue.count),
 });
 
 /* Event */
 const handleUpdateSelect = (val: string) => {
-    if (val === state.selectedValue) return;
-    state.selectedValue = val;
+    if (val === state.proxyValue.value) return;
     state.proxyValue = { ...state.proxyValue, value: val };
 };
 const handleUpdateCount = (val: number) => {
@@ -39,6 +39,15 @@ const handleUpdateCount = (val: number) => {
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
+});
+
+/* Init */
+onMounted(() => {
+    // TODO: set state.proxyValue with the value from the widget or set default value
+    state.proxyValue = {
+        value: state.menuItems[0]?.name,
+        count: props.widgetFieldSchema.options?.default,
+    };
 });
 </script>
 
@@ -53,7 +62,8 @@ watch(() => state.isValid, (isValid) => {
                                    @update:selected="handleUpdateSelect"
                 />
                 <p-text-input type="number"
-                              :min="0"
+                              :min="1"
+                              :max="props.widgetFieldSchema.options?.max || 100"
                               @update:value="handleUpdateCount"
                 />
             </div>

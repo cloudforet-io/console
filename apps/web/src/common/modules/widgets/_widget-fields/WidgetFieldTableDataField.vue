@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton,
@@ -9,11 +9,11 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<undefined>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 const state = reactive({
@@ -47,6 +47,14 @@ const handleUpdateCount = (val: number) => {
     state.proxyValue = { ...state.proxyValue, count: val };
 };
 
+/* Init */
+onMounted(() => {
+    // TODO: set state.proxyValue with the value from the widget or set default value
+    state.proxyValue = {
+        value: state.menuItems[0]?.name, // TODO: string | string[]
+        count: props.widgetFieldSchema.options?.default,
+    };
+});
 </script>
 
 <template>
@@ -74,7 +82,8 @@ const handleUpdateCount = (val: number) => {
                                    @update:selected="handleUpdateSelect"
                 />
                 <p-text-input type="number"
-                              :min="0"
+                              :min="1"
+                              :max="props.widgetFieldSchema.options?.max || 100"
                               @update:value="handleUpdateCount"
                 />
             </div>

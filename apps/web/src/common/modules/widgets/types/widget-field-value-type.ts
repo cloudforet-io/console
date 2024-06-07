@@ -32,6 +32,10 @@ export interface TableDataFieldValue {
     value: string | string[];
     count: number;
 }
+export interface GroupByValue {
+    value: string | string[];
+    count: number;
+}
 
 export type WidgetFieldValues = string | string[] | ComparisonValue | FormatRulesValue
-    | LineByValue | StackByValue | XAxisValue | YAxisValue | TableDataFieldValue;
+    | LineByValue | StackByValue | XAxisValue | YAxisValue | TableDataFieldValue | GroupByValue;
