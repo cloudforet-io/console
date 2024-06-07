@@ -90,10 +90,9 @@ onMounted(async () => {
            :menu-set="state.menuSet"
     >
         <template #slot-search>
-            <!-- TODO: translation -->
             <p-text-input v-model="state.bookmarkKeyword"
                           class="bookmark-search"
-                          placeholder="Search"
+                          :placeholder="$t('HOME.BOOKMARK_SEARCH')"
             />
         </template>
         <template #slot-bookmark>
