@@ -36,55 +36,47 @@ const state = reactive({
     proxySelectedMetricId: useProxyValue('selectedMetricId', props, emit),
     // category
     categoryMenuItems: computed<MenuItem[]>(() => {
-        const _commonMenuItems: MenuItem = {
-            type: 'item',
-            name: 'COMMON',
-            label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON'),
-        };
-        const _providerMenuItems: MenuItem[] = [];
-        const _providers: string[] = Object.values(storeState.namespaces)
-            .filter((namespace) => namespace.data.category === props.dataSourceDomain)
-            .map((namespace) => namespace.provider);
-        const _uniqueProviders = Array.from(new Set(_providers));
-        _uniqueProviders.forEach((provider) => {
-            const providerData = storeState.providers[provider];
-            _providerMenuItems.push({
-                type: 'item',
-                name: providerData.key,
-                label: providerData.label,
-                imageUrl: providerData.data.icon,
-            });
+        const groups = Object.values(storeState.namespaces)
+            .filter((d) => d.data.category === props.dataSourceDomain)
+            .map((namespace) => namespace.data.group);
+        const _groupMenuItems: MenuItem[] = [];
+        const _uniqueGroups = Array.from(new Set(groups));
+        _uniqueGroups.forEach((group) => {
+            if (group === 'common') {
+                _groupMenuItems.push({
+                    type: 'item',
+                    name: group,
+                    label: i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.COMMON'),
+                });
+            } else {
+                // provider case
+                const providerData = storeState.providers[group];
+                if (providerData) {
+                    _groupMenuItems.push({
+                        type: 'item',
+                        name: providerData.key,
+                        label: providerData.label,
+                        imageUrl: providerData.data.icon,
+                    });
+                }
+            }
         });
-        return [_commonMenuItems, ..._providerMenuItems];
+        return _groupMenuItems;
     }),
     selectedCategory: undefined as undefined|string,
     // namespace
     namespaceMenuItems: computed<MenuItem[]>(() => {
         if (!state.selectedCategory) return [];
-        if (state.selectedCategory === 'COMMON') {
-            return Object.values(storeState.namespaces)
-                .filter((namespace) => namespace.data.category === 'COMMON')
-                .filter((namespace) => namespace.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
-                .map((namespace) => ({
-                    type: 'item',
-                    name: namespace.key,
-                    label: namespace.label,
-                    imageUrl: namespace.data.icon,
-                }));
-        }
-        const _namespaceMenuItems: MenuItem[] = [];
-        Object.values(storeState.namespaces)
-            .filter((namespace) => namespace.data.category === props.dataSourceDomain)
-            .filter((namespace) => namespace.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
-            .forEach((namespace) => {
-                _namespaceMenuItems.push({
-                    type: 'item',
-                    name: namespace.key,
-                    label: namespace.label,
-                    imageUrl: namespace.data.icon,
-                });
-            });
-        return _namespaceMenuItems;
+        return Object.values(storeState.namespaces)
+            .filter((d) => d.data.category === props.dataSourceDomain)
+            .filter((d) => d.data.group === state.selectedCategory)
+            .filter((d) => d.label.toLowerCase().includes(state.namespaceSearchText.toLowerCase()))
+            .map((namespace) => ({
+                type: 'item',
+                name: namespace.key,
+                label: namespace.label,
+                imageUrl: namespace.data?.icon,
+            }));
     }),
     namespaceSearchText: '',
     selectedNamespaceId: undefined as undefined|string,
