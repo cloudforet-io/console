@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-export interface WorkspaceConfigModel<T = Record<string, any>> {
+export interface PublicConfigModel<T = Record<string, any>> {
     name: string;
     data: T;
     tags: Tags;

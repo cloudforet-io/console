@@ -10,9 +10,6 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DomainConfigCreateParameters } from '@/schema/config/domain-config/api-verbs/create';
 import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
-import type { WorkspaceConfigCreateParameters } from '@/schema/config/workspace-config/api-verbs/create';
-import type { WorkspaceConfigListParameters } from '@/schema/config/workspace-config/api-verbs/list';
-import type { WorkspaceConfigModel } from '@/schema/config/workspace-config/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -34,25 +31,21 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
     });
 
     const state = reactive({
-        globalBookmarkData: [] as BookmarkItem[],
-        workspaceBookmarkData: [] as BookmarkItem[],
+        publicBookmarkData: [] as BookmarkItem[],
     });
 
     const getters = reactive({
         allBookmarkFolderItems: computed<BookmarkItem[]>(() => ([
-            ...getters.globalBookmarkFolderData,
-            ...getters.workspaceBookmarkFolderData,
+            ...getters.publicBookmarkFolderData,
         ])),
-        globalBookmarkFolderData: computed<BookmarkItem[]>(() => state.globalBookmarkData.filter((f) => !f.link) || []),
-        workspaceBookmarkFolderData: computed<BookmarkItem[]>(() => state.workspaceBookmarkData.filter((f) => !f.link) || []),
+        publicBookmarkFolderData: computed<BookmarkItem[]>(() => state.publicBookmarkData.filter((f) => !f.link) || []),
     });
 
     const actions = {
         resetState: () => {
-            state.globalBookmarkData = [];
-            state.workspaceBookmarkData = [];
+            state.publicBookmarkData = [];
         },
-        fetchGlobalBookmarkList: async () => {
+        fetchPublicBookmarkList: async () => {
             const bookmarkListApiQuery = new ApiQueryHelper()
                 .setSort('created_at', false)
                 .setFilters([
@@ -63,37 +56,17 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                 const { results } = await SpaceConnector.clientV2.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
                     query: bookmarkListApiQuery.data,
                 });
-                state.globalBookmarkData = (results ?? []).map((i) => ({
+                state.publicBookmarkData = (results ?? []).map((i) => ({
                     ...i.data,
                     id: i.name,
                 } as BookmarkItem));
-                if (state.globalBookmarkData.length === 0) {
+                if (state.publicBookmarkData.length === 0) {
                     await actions.createDefaultBookmark();
                     return;
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.globalBookmarkData = [];
-            }
-        },
-        fetchWorkspaceBookmarkList: async () => {
-            const bookmarkListApiQuery = new ApiQueryHelper()
-                .setSort('created_at', true)
-                .setFilters([
-                    { k: 'domain_id', v: _getters.domainId, o: '=' },
-                    { k: 'name', v: 'console:bookmark:workspace', o: '' },
-                ]);
-            try {
-                const { results } = await SpaceConnector.clientV2.config.workspaceConfig.list<WorkspaceConfigListParameters, ListResponse<WorkspaceConfigModel>>({
-                    query: bookmarkListApiQuery.data,
-                });
-                state.workspaceBookmarkData = (results ?? []).map((i) => ({
-                    ...i.data,
-                    id: i.name,
-                } as BookmarkItem));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.workspaceBookmarkData = [];
+                state.publicBookmarkData = [];
             }
         },
         createDefaultBookmark: async () => {
@@ -126,27 +99,7 @@ export const useBookmarkPageStore = defineStore('page-bookmark', () => {
                         imgIcon,
                     },
                 });
-                await actions.fetchGlobalBookmarkList();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
-        createWorkspaceBookmark: async ({
-            name, link, folder, imgIcon,
-        }: { name?: string|TranslateResult, link?: string, folder?: string, imgIcon?: string}) => {
-            try {
-                await SpaceConnector.clientV2.config.workspaceConfig.create<WorkspaceConfigCreateParameters, WorkspaceConfigModel>({
-                    name: `console:bookmark:workspace:${name}-${getRandomId()}`,
-                    data: {
-                        workspaceId: _getters.currentWorkspaceId,
-                        name,
-                        folder,
-                        link,
-                        imgIcon,
-                    },
-                });
-                await actions.fetchWorkspaceBookmarkList();
+                await actions.fetchPublicBookmarkList();
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

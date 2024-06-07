@@ -81,8 +81,7 @@ onUnmounted(() => {
 });
 
 onMounted(async () => {
-    await bookmarkPageStore.fetchGlobalBookmarkList();
-    // await bookmarkPageStore.fetchWorkspaceBookmarkList();
+    await bookmarkPageStore.fetchPublicBookmarkList();
 });
 </script>
 
