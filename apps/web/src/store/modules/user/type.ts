@@ -36,7 +36,7 @@ export interface UserState {
 
 export interface SignInRequest {
     credentials: Record<string, any>;
-    authType: AuthType;
+    authType: AuthType | 'SAML';
     timeout?: number;
     refresh_count?: number;
     verify_code?: string;
