@@ -11,6 +11,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -42,6 +43,7 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
 
 const state = reactive({
@@ -124,7 +126,7 @@ const modalState = reactive({
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await widgetGenerateStore.loadDataTable(dataTableId);
+    widgetGenerateStore.setSelectedDataTableGranularity(GRANULARITY.MONTHLY);
 };
 
 const handleSelectSourceItem = (selectedItem: string) => {
@@ -181,6 +183,7 @@ const handleUpdateDataTable = async () => {
         },
     };
     await widgetGenerateStore.updateDataTable(updateParams);
+    if (storeState.selectedDataTableId === props.item.data_table_id) await widgetGenerateStore.loadDataTable(props.item.data_table_id);
 };
 
 /* Utils */

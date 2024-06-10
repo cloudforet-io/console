@@ -5,9 +5,12 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
+import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicWidgetGetParameters } from '@/schema/dashboard/public-widget/api-verbs/get';
@@ -18,7 +21,6 @@ import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config
 import type { WidgetSize } from '@/common/modules/widgets/types/widget-display-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
-
 
 export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const state = reactive({
@@ -37,6 +39,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
+        selectedDataTable: undefined as DataTableModel|undefined,
+        selectedDataTableGranularity: GRANULARITY.MONTHLY as Granularity,
+        previewData: [] as Record<string, any>[],
     });
 
     const getters = reactive({
@@ -71,6 +76,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
     };
+    const setSelectedDataTableGranularity = (granularity: Granularity) => {
+        state.selectedDataTableGranularity = granularity;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -82,6 +90,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSize,
         setWidgetValueMap,
         setWidgetValidMap,
+        setSelectedDataTableGranularity,
     };
     const actions = {
         listDataTable: async () => {
@@ -104,6 +113,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             try {
                 const result = await SpaceConnector.clientV2.dashboard.publicDataTable.add<DataTableAddParameters, DataTableModel>(parameters);
                 state.dataTables.push(result);
+                if (!state.selectedDataTableId) {
+                    state.selectedDataTableId = result.data_table_id;
+                }
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -138,7 +150,15 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             }
         },
         loadDataTable: async (dataTableId: string) => {
-            console.debug('loadDataTable', dataTableId);
+            try {
+                const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>({
+                    data_table_id: dataTableId,
+                    granularity: state.selectedDataTableGranularity || 'MONTHLY',
+                });
+                state.previewData = results ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
         },
         reset: () => {
             state.showOverlay = false;
