@@ -5,48 +5,35 @@ import {
 } from 'vue';
 
 import {
-    debounce,
-    isEqual,
+    debounce, isEqual,
 } from 'lodash';
 
 import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
 import type { InheritOptions } from '@/schema/dashboard/_types/widget-type';
-import { i18n } from '@/translations';
-
-import type { Currency } from '@/store/modules/settings/type';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { WidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import {
-    validateWidgetByVariablesSchemaUpdate,
-} from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/services/dashboards/widgets/_types/widget-type';
 
 
-interface UseWidgetLifecycleOptions<Data> {
+interface UseWidgetInitAndRefreshOptions<Data> {
     props: WidgetProps;
     emit: WidgetEmit;
     widgetState: UnwrapRef<WidgetState>;
     initWidget: (data?: Data) => Promise<Data>;
     refreshWidget: () => Promise<Data>;
     disposeWidget?: () => void;
-    onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
-    onLanguageUpdate?: () => void;
 }
 
-export const useWidgetLifecycle = <Data = any>({
+export const useWidgetInitAndRefresh = <Data = any>({
     props,
     emit,
     widgetState,
     initWidget,
     refreshWidget,
     disposeWidget,
-    onCurrencyUpdate,
-    onLanguageUpdate,
-}: UseWidgetLifecycleOptions<Data>): void => {
+}: UseWidgetInitAndRefreshOptions<Data>): void => {
     const initiated = ref(false);
 
     const refreshWidgetAndEmitEvent = debounce(() => {
@@ -60,33 +47,6 @@ export const useWidgetLifecycle = <Data = any>({
         if (_isRefreshable) refreshWidgetAndEmitEvent();
     }, { deep: true });
 
-    const stopVariablesSchemaWatch = watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!initiated.value || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
-            || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
-
-        const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
-            updatedVariablesSchema: after,
-            previousVariablesSchema: before,
-            widgetConfig: widgetState.widgetConfig,
-            widgetInfo: {
-                title: widgetState.title,
-                inherit_options: widgetState.inheritOptions,
-                schema_properties: widgetState.schemaProperties,
-                widget_options: widgetState.options,
-            },
-        });
-
-        if (isValid !== undefined) {
-            emit('update-widget-validation', isValid);
-        }
-        if (updatedWidgetInfo) {
-            emit('update-widget-info', updatedWidgetInfo);
-        }
-        if (isWidgetUpdated) {
-            refreshWidgetAndEmitEvent();
-        }
-    }, { immediate: true, deep: true });
-
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
         if (!initiated.value && !loading) {
             const data = await initWidget(props.data);
@@ -95,12 +55,10 @@ export const useWidgetLifecycle = <Data = any>({
         }
     }, { immediate: true });
 
-    let stopSettingsWatch;
-    let stopCurrencyWatch;
-    let stopLanguageWatch;
+    let stopDashboardOptionsWatch;
 
     if (widgetState.dashboardOptions) {
-        stopSettingsWatch = watch(() => widgetState.dashboardOptions, (current, previous) => {
+        stopDashboardOptionsWatch = watch(() => widgetState.dashboardOptions, (current, previous) => {
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndEmitEvent();
@@ -108,32 +66,13 @@ export const useWidgetLifecycle = <Data = any>({
         });
     }
 
-    if (onCurrencyUpdate) {
-        stopCurrencyWatch = watch(() => widgetState.currency, (current, previous) => {
-            if (current !== previous) {
-                onCurrencyUpdate(current, previous);
-            }
-        });
-    }
-
-    if (onLanguageUpdate) {
-        try {
-            stopLanguageWatch = watch(() => i18n.locale, async () => {
-                onLanguageUpdate();
-            });
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    }
+    // TODO: add widget options watch
 
     onBeforeUnmount(() => {
         if (disposeWidget) disposeWidget();
         stopVariablesWatch();
-        stopVariablesSchemaWatch();
         stopLoadingWatch();
-        if (stopSettingsWatch) stopSettingsWatch();
-        if (stopCurrencyWatch) stopCurrencyWatch();
-        if (stopLanguageWatch) stopLanguageWatch();
+        if (stopDashboardOptionsWatch) stopDashboardOptionsWatch();
     });
 
     onMounted(() => {
