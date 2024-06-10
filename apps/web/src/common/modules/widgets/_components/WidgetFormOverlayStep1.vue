@@ -103,6 +103,7 @@ const documentEventMount = (eventName: string, func: any) => {
 
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
+
 </script>
 
 <template>
@@ -174,7 +175,7 @@ documentEventMount('mouseup', endResizing);
 
         padding: 0.125rem;
         .data-source-wrapper {
-            @apply flex gap-4;
+            @apply flex gap-4 h-full;
             overflow: auto;
             padding: 1rem;
         }

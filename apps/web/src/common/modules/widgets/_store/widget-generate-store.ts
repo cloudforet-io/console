@@ -7,6 +7,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
+import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { PublicWidgetGetParameters } from '@/schema/dashboard/public-widget/api-verbs/get';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
@@ -89,8 +90,11 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     };
     const actions = {
         listDataTable: async () => {
+            const listParams: DataTableListParameters = {
+                widget_id: state.widgetId,
+            };
             try {
-                const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableModel, ListResponse<DataTableModel>>();
+                const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.list<DataTableListParameters, ListResponse<DataTableModel>>(listParams);
                 state.dataTables = results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
