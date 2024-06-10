@@ -15,7 +15,7 @@ const clusteredColumnChart: WidgetConfig = {
         },
         xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 5,
                 max: 8,
             },

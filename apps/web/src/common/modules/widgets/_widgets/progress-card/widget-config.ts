@@ -10,12 +10,12 @@ const progressCard: WidgetConfig = {
     requiredFieldsSchema: {
         totalField: {
             options: {
-                dataTarget: 'data_field',
+                dataTarget: 'data_info',
             },
         },
         basisField: {
             options: {
-                dataTarget: 'data_field',
+                dataTarget: 'data_info',
             },
         },
         formatRules: {

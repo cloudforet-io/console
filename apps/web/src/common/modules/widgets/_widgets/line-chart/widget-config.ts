@@ -11,14 +11,14 @@ const lineChart: WidgetConfig = {
         dataField: {},
         xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 5,
                 max: 10,
             },
         },
         lineBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 5,
                 max: 10,
             },

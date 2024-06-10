@@ -18,7 +18,7 @@ const table: WidgetConfig = {
         },
         groupBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: false,
             },
