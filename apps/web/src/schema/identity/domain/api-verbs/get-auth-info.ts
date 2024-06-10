@@ -21,9 +21,8 @@ export interface Metadata {
     end_session_endpoint?: string;
     userinfo_endpoint?: string;
     realm?: string; // only keycloack
-    // for saml
-    icon?: string;
-    idp_name?: string;
-    sso_url?: string;
+    icon?: string; // only for saml
+    idp_name?: string; // only for saml
+    sso_url?: string; // only for saml
     [key: string]: any;
 }
