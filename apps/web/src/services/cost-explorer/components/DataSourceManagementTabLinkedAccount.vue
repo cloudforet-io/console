@@ -127,7 +127,7 @@ watch([() => state.selectedStatusFilter, () => storeState.selectedDataSourceIndi
     if (selectedStatusFilter === 'all') {
         linkedAccountListApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
     } else {
-        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked' || null, o: '=' }]);
+        linkedAccountListApiQueryHelper.setOrFilters([{ k: 'is_linked', v: selectedStatusFilter === 'linked', o: '=' }]);
     }
 
     await fetchLinkedAccountList();
