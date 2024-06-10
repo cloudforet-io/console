@@ -34,7 +34,7 @@ export interface TableDataFieldValue {
 }
 export interface GroupByValue {
     value: string | string[];
-    count: number;
+    count?: number;
 }
 
 export type WidgetFieldValues = string | string[] | ComparisonValue | FormatRulesValue

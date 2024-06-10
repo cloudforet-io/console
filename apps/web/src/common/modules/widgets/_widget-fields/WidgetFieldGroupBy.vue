@@ -25,9 +25,8 @@ const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
-        if (Array.isArray(state.selectedItem)) {
-            return !!state.selectedItem.length;
-        }
+        if (!props.widgetFieldSchema.options?.hideCount && !state.proxyValue?.count) return false;
+        if (props.widgetFieldSchema.options?.multiSelectable && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
 });
@@ -74,7 +73,8 @@ onMounted(() => {
                                    appearance-type="badge"
                                    @update:selected="handleUpdateSelect"
                 />
-                <p-text-input type="number"
+                <p-text-input v-if="!widgetFieldSchema.options?.hideCount"
+                              type="number"
                               :min="1"
                               :max="props.widgetFieldSchema.options?.max || 100"
                               @update:value="handleUpdateCount"

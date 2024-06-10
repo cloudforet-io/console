@@ -31,8 +31,9 @@ export interface StackByOptions {
 export interface GroupByOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
+    hideCount?: boolean;
     max?: number;
-    default: number;
+    default?: number;
 }
 export interface CategoryByOptions {
     dataTarget?: string;
