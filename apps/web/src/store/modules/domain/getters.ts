@@ -9,7 +9,7 @@ import { DOMAIN_CONFIG_TYPE } from './type';
 
 
 export const extendedAuthTypeLabel = (state: DomainState): string => {
-    const idpName = state.authOptions?.idp_name.replace('Sign In with ', '');
+    const idpName = state.authOptions?.idp_name?.replace('Sign In with ', '');
     return extendedAuthTypes[state.extendedAuthType as string] || (`${state.extendedAuthType} (${idpName})`);
 };
 
