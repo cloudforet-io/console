@@ -12,8 +12,6 @@ const emit = defineEmits<{(e: 'update:value', value: number): void;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<MaxOptions>>(), {
     widgetFieldSchema: () => ({
         options: {
-            min: 0,
-            max: 5,
             default: 0,
         },
     }),
@@ -23,9 +21,9 @@ const state = reactive({
     value: props.widgetFieldSchema.options?.default ?? props.widgetFieldSchema.options?.min ?? 0,
 });
 
-const handleUpdateValue = (value: number) => {
-    state.value = value;
-    emit('update:value', value);
+const handleUpdateValue = (value: number|'') => {
+    state.value = (value < 0) || (value === '') ? 0 : value;
+    emit('update:value', state.value);
 };
 </script>
 
@@ -35,8 +33,7 @@ const handleUpdateValue = (value: number) => {
                        required
         >
             <p-text-input type="number"
-                          :min="props.widgetFieldSchema.options?.min ?? 0"
-                          :max="props.widgetFieldSchema.options?.max ?? 0"
+                          :min="0"
                           :value="state.value"
                           @update:value="handleUpdateValue"
             />

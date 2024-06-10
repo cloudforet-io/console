@@ -31,14 +31,10 @@ export interface BasisFieldOptions {
 }
 export interface MinOptions {
     dataTarget?: string;
-    min: number;
-    max: number;
     default?: number;
 }
 export interface MaxOptions {
     dataTarget?: string;
-    min: number;
-    max: number;
     default?: number;
 }
 export interface LegendOptions { // toggle button

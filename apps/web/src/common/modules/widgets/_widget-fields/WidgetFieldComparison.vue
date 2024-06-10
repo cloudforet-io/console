@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PFieldTitle, PToggleButton, PFieldGroup, PSelectDropdown, PButton, PTextInput, PDivider,
@@ -10,15 +12,13 @@ import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import { i18n } from '@/translations';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { ComparisonOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { ComparisonOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 import type { ComparisonValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 import { green, red } from '@/styles/colors';
 
 
-const emit = defineEmits<{(e: 'update:value', value: ComparisonValue[]): void;
-    (e: 'update:is-valid', value: boolean): void;
-}>();
+const emit = defineEmits<WidgetFieldComponentEmit<ComparisonValue[]>>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<ComparisonOptions>>(), {
     widgetFieldSchema: () => ({
@@ -54,10 +54,13 @@ const state = reactive({
         { label: `${i18n.t('COMMON.WIDGETS.COMPARISON.PERCENT')}(%)`, name: 'percent' },
         { label: i18n.t('COMMON.WIDGETS.COMPARISON.FIXED'), name: 'fixed' },
     ],
+    isFieldNameValid: [undefined],
+    isAllValid: computed(() => state.isFieldNameValid.every((valid:boolean) => valid === true)),
 });
 
 const handleAddComparison = () => {
     state.value.push(cloneDeep(state.initialValue));
+    state.isFieldNameValid.push(undefined);
     emit('update:value', state.value);
 };
 
@@ -73,8 +76,9 @@ const handleUpdateToggle = (value: boolean) => {
     state.toggleValue = value;
     if (value) emit('update:value', state.value);
     else {
-        state.value = [];
+        state.value = [state.initialValue];
         emit('update:value', []);
+        emit('update:is-valid', true);
     }
 };
 
@@ -86,8 +90,19 @@ const handleUpdateFormat = (format: string, index: number) => {
     emit('update:value', state.value);
 };
 
+const handleUpdateFieldName = (fieldName: string, index:number) => {
+    state.value[index].fieldName = fieldName;
+    const updatedValue = cloneDeep(state.isFieldNameValid);
+    updatedValue[index] = fieldName.length > 0;
+    state.isFieldNameValid = updatedValue;
+};
+
+watch(() => state.isAllValid, (isValid) => {
+    emit('update:is-valid', isValid);
+});
+
 onMounted(() => {
-    state.value = [state.initialValue];
+    state.value = [cloneDeep(state.initialValue)];
 });
 
 </script>
@@ -113,12 +128,15 @@ onMounted(() => {
                 </div>
                 <p-field-group v-if="state.isForTable"
                                :label="$t('COMMON.WIDGETS.COMPARISON.FIELD_NAME')"
+                               :invalid="state.isFieldNameValid[index] === false"
+                               :invalid-text="$t('COMMON.WIDGETS.COMPARISON.NAME_INVALID_TEXT')"
                                style-type="secondary"
                                required
                 >
                     <p-text-input :value="state.value[index].fieldName"
+                                  :invalid="state.isFieldNameValid[index] === false"
                                   class="w-full"
-                                  @update:value="(value) => state.value[index].fieldName = value"
+                                  @update:value="(name) => handleUpdateFieldName(name, index)"
                     />
                 </p-field-group>
                 <div class="row-1">

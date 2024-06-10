@@ -33,5 +33,5 @@ export interface TableDataFieldValue {
     count: number;
 }
 
-export type WidgetFieldValues = string | string[] | ComparisonValue | FormatRulesValue
+export type WidgetFieldValues = string | string[] | ComparisonValue[] | FormatRulesValue
     | LineByValue | StackByValue | XAxisValue | YAxisValue | TableDataFieldValue;
