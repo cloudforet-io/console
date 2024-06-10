@@ -8,6 +8,7 @@ const clusteredColumnChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {
             options: {
                 multiSelectable: true,

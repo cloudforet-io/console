@@ -8,6 +8,7 @@ const heatmap: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         xAxis: {
             options: {
                 dataTarget: 'labels_info',

@@ -8,6 +8,7 @@ const progressCard: WidgetConfig = {
         sizes: ['sm'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         totalField: {
             options: {
                 dataTarget: 'data_info',

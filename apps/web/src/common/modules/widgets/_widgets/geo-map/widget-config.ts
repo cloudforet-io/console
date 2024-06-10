@@ -8,6 +8,7 @@ const geoMap: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
     },
     optionalFieldsSchema: {

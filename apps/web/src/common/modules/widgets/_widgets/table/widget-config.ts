@@ -10,6 +10,7 @@ const table: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         tableDataField: {
             options: {
                 default: 5,

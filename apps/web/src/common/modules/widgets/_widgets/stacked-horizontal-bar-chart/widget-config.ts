@@ -8,6 +8,7 @@ const stackedHorizontalBarChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         yAxis: {
             options: {

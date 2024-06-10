@@ -61,4 +61,7 @@ export const WIDGET_FIELD_COMPONENTS: Record<Partial<WidgetFieldName>, AsyncComp
     comparison: () => ({
         component: import('@/common/modules/widgets/_widget-fields/WidgetFieldComparison.vue'),
     }),
+    granularity: () => ({
+        component: import('@/common/modules/widgets/_widget-fields/WidgetFieldGranularity.vue'),
+    }),
 };

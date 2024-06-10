@@ -8,6 +8,7 @@ const lineChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         xAxis: {
             options: {

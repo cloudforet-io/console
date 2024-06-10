@@ -8,6 +8,7 @@ const stackedAreaChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         xAxis: {
             options: {

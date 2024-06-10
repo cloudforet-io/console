@@ -8,6 +8,7 @@ const numberCard: WidgetConfig = {
         sizes: ['sm'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
     },
     optionalFieldsSchema: {

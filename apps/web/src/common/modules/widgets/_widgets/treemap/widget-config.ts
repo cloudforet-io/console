@@ -8,6 +8,7 @@ const treemap: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         categoryBy: {
             options: {

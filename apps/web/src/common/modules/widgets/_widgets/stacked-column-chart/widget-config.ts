@@ -8,6 +8,7 @@ const stackedColumnChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         xAxis: {
             options: {

@@ -1,5 +1,7 @@
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
+import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
+
 
 export interface DataFieldOptions {
     multiSelectable?: boolean;
@@ -100,9 +102,11 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'icon' | 'comparison' | 'legend'
     | 'subTotal' | 'total'
     | 'progressBar'
-    | 'formatRules';
+    | 'formatRules'
+    | 'granularity';
 
 export interface WidgetFieldComponentProps<FieldOptions> {
+    dataTable: DataTableModel;
     widgetFieldSchema: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
     value?: any;

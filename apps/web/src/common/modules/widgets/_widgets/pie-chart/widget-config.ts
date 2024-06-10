@@ -8,6 +8,7 @@ const pieChart: WidgetConfig = {
         sizes: ['md'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         groupBy: {
             options: {
