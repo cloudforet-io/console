@@ -4,9 +4,9 @@ import { reactive } from 'vue';
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import type {
+    WidgetFieldComponentProps,
     MinOptions,
-} from '@/common/modules/widgets/types/widget-config-type';
-import type { WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+} from '@/common/modules/widgets/types/widget-field-type';
 
 
 const emit = defineEmits<{(e: 'update:value', value: number): void;
@@ -15,20 +15,18 @@ const emit = defineEmits<{(e: 'update:value', value: number): void;
 const props = withDefaults(defineProps<WidgetFieldComponentProps<MinOptions>>(), {
     widgetFieldSchema: () => ({
         options: {
-            min: 0,
-            max: 5,
             default: 0,
         },
     }),
 });
 
 const state = reactive({
-    value: props.widgetFieldSchema.options?.default ?? props.widgetFieldSchema.options?.min ?? 0,
+    value: props.widgetFieldSchema.options?.default ?? 0,
 });
 
-const handleUpdateValue = (value: number) => {
-    state.value = value;
-    emit('update:value', value);
+const handleUpdateValue = (value: number|'') => {
+    state.value = (value < 0) || (value === '') ? 0 : value;
+    emit('update:value', state.value);
 };
 </script>
 
@@ -38,8 +36,7 @@ const handleUpdateValue = (value: number) => {
                        required
         >
             <p-text-input type="number"
-                          :min="props.widgetFieldSchema.options?.min ?? 0"
-                          :max="props.widgetFieldSchema.options?.max ?? 0"
+                          :min="0"
                           :value="state.value"
                           @update:value="handleUpdateValue"
             />
