@@ -40,7 +40,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     });
 
     const getters = reactive({
-        selectedDataTable: computed(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
+        selectedDataTable: computed<DataTableModel|undefined>(() => state.dataTables.find((dataTable) => dataTable.data_table_id === state.selectedDataTableId)),
     });
 
     /* Mutations */
