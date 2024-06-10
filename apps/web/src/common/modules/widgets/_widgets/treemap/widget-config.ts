@@ -12,6 +12,8 @@ const treemap: WidgetConfig = {
         categoryBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 20,
+                max: 30,
             },
         },
     },
