@@ -41,5 +41,6 @@ export interface GroupByValue {
     count?: number;
 }
 
-export type WidgetFieldValues = string | string[] | ComparisonValue[] | FormatRulesValue
-    | LineByValue | StackByValue | CategoryByValue | XAxisValue | YAxisValue | TableDataFieldValue;
+export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue
+    | LineByValue | StackByValue | CategoryByValue | GroupByValue
+    | XAxisValue | YAxisValue | TableDataFieldValue;

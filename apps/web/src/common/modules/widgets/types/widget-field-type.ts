@@ -47,11 +47,9 @@ export interface BasisFieldOptions {
     dataTarget?: string;
 }
 export interface MinOptions {
-    dataTarget?: string;
     default?: number;
 }
 export interface MaxOptions {
-    dataTarget?: string;
     default?: number;
 }
 export interface LegendOptions { // toggle button
