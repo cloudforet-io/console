@@ -17,6 +17,8 @@ const lineChart: WidgetConfig = {
         lineBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 5,
+                max: 10,
             },
         },
     },

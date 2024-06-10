@@ -23,16 +23,16 @@ const emit = defineEmits<WidgetFieldComponentEmit<YAxisValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    isValid: computed<boolean>(() => !!state.proxyValue.value && !!state.proxyValue.count),
+    isValid: computed<boolean>(() => !!state.proxyValue?.value && !!state.proxyValue?.count),
 });
 
 /* Event */
 const handleUpdateSelect = (val: string) => {
-    if (val === state.proxyValue.value) return;
+    if (val === state.proxyValue?.value) return;
     state.proxyValue = { ...state.proxyValue, value: val };
 };
 const handleUpdateCount = (val: number) => {
-    if (val === state.proxyValue.count) return;
+    if (val === state.proxyValue?.count) return;
     state.proxyValue = { ...state.proxyValue, count: val };
 };
 
@@ -58,12 +58,13 @@ onMounted(() => {
         >
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems"
-                                   :selected="state.proxyValue"
+                                   :selected="state.proxyValue?.value"
                                    @update:selected="handleUpdateSelect"
                 />
                 <p-text-input type="number"
                               :min="1"
                               :max="props.widgetFieldSchema.options?.max || 100"
+                              :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />
             </div>

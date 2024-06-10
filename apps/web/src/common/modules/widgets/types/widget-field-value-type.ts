@@ -20,6 +20,10 @@ export interface StackByValue {
     value: string;
     count: number;
 }
+export interface CategoryByValue {
+    value: string;
+    count: number;
+}
 export interface XAxisValue {
     value: string;
     count: number;
@@ -38,4 +42,4 @@ export interface GroupByValue {
 }
 
 export type WidgetFieldValues = string | string[] | ComparisonValue | FormatRulesValue
-    | LineByValue | StackByValue | XAxisValue | YAxisValue | TableDataFieldValue | GroupByValue;
+    | LineByValue | StackByValue | CategoryByValue | XAxisValue | YAxisValue | TableDataFieldValue | GroupByValue;

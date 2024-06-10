@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton,
@@ -31,6 +33,11 @@ const state = reactive({
     selectedFieldType: 'dynamicField',
     selectedItem: undefined as undefined | MenuItem[] | string,
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    isValid: computed<boolean>(() => {
+        if (!state.proxyValue?.count) return false;
+        if (state.selectedFieldType === 'staticField' && !state.selectedItem?.length) return false;
+        return !!state.selectedItem;
+    }),
 });
 
 /* Event */
@@ -43,9 +50,14 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.proxyValue = { ...state.proxyValue, value: _val };
 };
 const handleUpdateCount = (val: number) => {
-    if (val === state.proxyValue.count) return;
+    if (val === state.proxyValue?.count) return;
     state.proxyValue = { ...state.proxyValue, count: val };
 };
+
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
+});
 
 /* Init */
 onMounted(() => {
@@ -84,6 +96,7 @@ onMounted(() => {
                 <p-text-input type="number"
                               :min="1"
                               :max="props.widgetFieldSchema.options?.max || 100"
+                              :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />
             </div>
