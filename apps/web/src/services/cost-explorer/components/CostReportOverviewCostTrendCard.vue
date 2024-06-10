@@ -65,10 +65,10 @@ const state = reactive({
     }),
     selectedDate: 'last12Months',
     targetSelectItems: computed(() => ([
-        { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+        { name: GROUP_BY.WORKSPACE_NAME, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
         { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
     ] as SelectButtonType[])),
-    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
+    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
     previousTotalAmount: computed<number>(() => {
         if (!costReportPageState.recentReportMonth) return 0;
         return getPreviousTotalAmount(costReportPageState.recentReportMonth, state.data?.results);

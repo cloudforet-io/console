@@ -149,86 +149,88 @@ onMounted(async () => {
                  color="inherit"
             />
         </p-tooltip>
-        <div v-for="(item, idx) in state.visibleGnbMenuList"
-             :key="`navigation-rail-item-${idx}`"
-             class="navigation-rail-wrapper"
-        >
-            <router-link v-if="item.to"
-                         :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
-                         class="service-menu"
-                         :class="{
-                             'is-selected': state.selectedMenuId === item.id,
-                             'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
-                         }"
+        <div class="navigation-rail-container">
+            <div v-for="(item, idx) in state.visibleGnbMenuList"
+                 :key="`navigation-rail-item-${idx}`"
+                 class="navigation-rail-wrapper"
             >
-                <div v-if="!storeState.isHideNavRail"
-                     class="menu-wrapper"
+                <router-link v-if="item.to"
+                             :to="(item.type === 'header' && item.subMenuList?.length > 0) ? '' : item.to"
+                             class="service-menu"
+                             :class="{
+                                 'is-selected': state.selectedMenuId === item.id,
+                                 'is-only-label': item.type === 'header' && item.subMenuList?.length > 0
+                             }"
                 >
-                    <p-i v-if="item.subMenuList?.length === 0"
-                         :name="item.icon"
-                         class="menu-button"
-                         height="1.25rem"
-                         width="1.25rem"
-                         color="inherit"
-                    />
-                    <div class="menu-container">
-                        <span v-if="!storeState.isMinimizeNavRail || state.isHovered"
-                              class="menu-title"
-                        >
-                            {{ item.label }}
-                        </span>
-                        <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeNavRail"
-                                  icon-right="ic_arrow-right"
-                                  style-type="tertiary"
-                                  size="sm"
-                                  class="learn-more-button"
-                                  @click.stop.prevent="handleMenuDescription(true)"
-                        >
-                            {{ $t('MENU.LEARN_MORE') }}
-                        </p-button>
-                        <span v-if="item.highlightTag && (!storeState.isMinimizeNavRail || state.isHovered)"
-                              class="mark"
-                        >
-                            <new-mark v-if="item.highlightTag === 'new'"
-                                      class="mark-item"
-                            />
-                            <update-mark v-else-if="item.highlightTag === 'update'"
-                                         class="mark-item"
-                            />
-                            <beta-mark v-else-if="item.highlightTag === 'beta'"
-                                       class="mark-item"
-                            />
-                        </span>
+                    <div v-if="!storeState.isHideNavRail"
+                         class="menu-wrapper"
+                    >
+                        <p-i v-if="item.subMenuList?.length === 0"
+                             :name="item.icon"
+                             class="menu-button"
+                             height="1.25rem"
+                             width="1.25rem"
+                             color="inherit"
+                        />
+                        <div class="menu-container">
+                            <span v-if="!storeState.isMinimizeNavRail || state.isHovered"
+                                  class="menu-title"
+                            >
+                                {{ item.label }}
+                            </span>
+                            <p-button v-if="item.disabled && !state.isMenuDescription && !storeState.isMinimizeNavRail"
+                                      icon-right="ic_arrow-right"
+                                      style-type="tertiary"
+                                      size="sm"
+                                      class="learn-more-button"
+                                      @click.stop.prevent="handleMenuDescription(true)"
+                            >
+                                {{ $t('MENU.LEARN_MORE') }}
+                            </p-button>
+                            <span v-if="item.highlightTag && (!storeState.isMinimizeNavRail || state.isHovered)"
+                                  class="mark"
+                            >
+                                <new-mark v-if="item.highlightTag === 'new'"
+                                          class="mark-item"
+                                />
+                                <update-mark v-else-if="item.highlightTag === 'update'"
+                                             class="mark-item"
+                                />
+                                <beta-mark v-else-if="item.highlightTag === 'beta'"
+                                           class="mark-item"
+                                />
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <!--            TODO: low priority -->
-                <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
-                <!--                             class="favorite-button"-->
-                <!--                             :item-id="item.id"-->
-                <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
-                <!--                             scale="0.65"-->
-                <!--            />-->
-            </router-link>
-            <div v-else>
-                <div v-if="state.isMenuDescription"
-                     class="menu-description"
-                >
-                    <span class="title">{{ $t('MENU.COST_EXPLORER_TITLE') }}</span>
-                    <span class="desc">{{ $t('MENU.COST_EXPLORER_DESC') }}</span>
-                    <div class="toolbox">
-                        <p-text-button style-type="highlight"
-                                       class="dismiss-button"
-                                       @click="handleMenuDescription(false)"
-                        >
-                            {{ $t('MENU.DISMISS') }}
-                        </p-text-button>
-                        <p-text-button icon-right="ic_arrow-right"
-                                       style-type="highlight"
-                                       class="learn-more-button"
-                                       @click="handleMenuDescription(true)"
-                        >
-                            {{ $t('MENU.LEARN_MORE') }}
-                        </p-text-button>
+                    <!--            TODO: low priority -->
+                    <!--            <favorite-button v-if="item.subMenuList?.length === 0"-->
+                    <!--                             class="favorite-button"-->
+                    <!--                             :item-id="item.id"-->
+                    <!--                             :favorite-type="FAVORITE_TYPE.MENU"-->
+                    <!--                             scale="0.65"-->
+                    <!--            />-->
+                </router-link>
+                <div v-else>
+                    <div v-if="state.isMenuDescription"
+                         class="menu-description"
+                    >
+                        <span class="title">{{ $t('MENU.COST_EXPLORER_TITLE') }}</span>
+                        <span class="desc">{{ $t('MENU.COST_EXPLORER_DESC') }}</span>
+                        <div class="toolbox">
+                            <p-text-button style-type="highlight"
+                                           class="dismiss-button"
+                                           @click="handleMenuDescription(false)"
+                            >
+                                {{ $t('MENU.DISMISS') }}
+                            </p-text-button>
+                            <p-text-button icon-right="ic_arrow-right"
+                                           style-type="highlight"
+                                           class="learn-more-button"
+                                           @click="handleMenuDescription(true)"
+                            >
+                                {{ $t('MENU.LEARN_MORE') }}
+                            </p-text-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,64 +240,67 @@ onMounted(async () => {
 
 <style scoped lang="postcss">
 .g-n-b-navigation-rail {
-    @apply relative flex-col items-start bg-white border-r overflow-y-auto overflow-x-hidden;
+    @apply relative flex-col items-start bg-white border-r;
     top: $gnb-toolbox-height;
-    width: $gnb-navigation-rail-max-width;
     height: calc(100% - $gnb-toolbox-height);
-    padding: 1rem 0.75rem;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
     z-index: 51;
-    transition: width 0.3s ease;
-    .navigation-rail-wrapper {
-        width: calc($gnb-navigation-rail-max-width - 1.625rem);
+    .navigation-rail-container {
+        @apply overflow-y-auto overflow-x-hidden;
+        width: $gnb-navigation-rail-max-width;
         transition: width 0.3s ease;
-        .service-menu {
-            @apply flex items-center justify-between text-label-md;
-            width: 100%;
-            height: 2rem;
-            padding-right: 0.5rem;
-            padding-left: 0.5rem;
-            gap: 0.75rem;
-            border-radius: 0.25rem;
-            .menu-wrapper {
-                @apply flex items-center;
-                gap: 0.625rem;
-                .menu-container {
-                    @apply flex items-end;
-                    .mark-item {
-                        margin-left: 0.125rem;
-                    }
-                    .learn-more-button {
-                        margin-bottom: -0.125rem;
-                        margin-left: 0.5rem;
+        padding: 1rem 0.75rem;
+        .navigation-rail-wrapper {
+            width: calc($gnb-navigation-rail-max-width - 1.625rem);
+            transition: width 0.3s ease;
+            .service-menu {
+                @apply flex items-center justify-between text-label-md;
+                width: 100%;
+                height: 2rem;
+                padding-right: 0.5rem;
+                padding-left: 0.5rem;
+                gap: 0.75rem;
+                border-radius: 0.25rem;
+                .menu-wrapper {
+                    @apply flex items-center;
+                    gap: 0.625rem;
+                    .menu-container {
+                        @apply flex items-end;
+                        .mark-item {
+                            margin-left: 0.125rem;
+                        }
+                        .learn-more-button {
+                            margin-bottom: -0.125rem;
+                            margin-left: 0.5rem;
+                        }
                     }
                 }
-            }
-            .favorite-button {
-                @apply hidden;
-            }
-            &:hover:not(.is-only-label) {
-                @apply bg-violet-100 cursor-pointer;
                 .favorite-button {
-                    @apply block;
+                    @apply hidden;
                 }
-            }
-            &.is-only-label {
-                @apply items-end text-gray-500 cursor-default;
-                height: 2.625rem;
-                padding-bottom: 0.5rem;
-            }
-            &.is-selected {
-                @apply relative bg-violet-100 text-violet-600;
-                &::before {
-                    @apply absolute bg-violet;
-                    content: '';
-                    top: 0.125rem;
-                    left: -0.75rem;
-                    width: 0.25rem;
-                    height: 1.75rem;
-                    border-top-right-radius: 0.25rem;
-                    border-bottom-right-radius: 0.25rem;
+                &:hover:not(.is-only-label) {
+                    @apply bg-violet-100 cursor-pointer;
+                    .favorite-button {
+                        @apply block;
+                    }
+                }
+                &.is-only-label {
+                    @apply items-end text-gray-500 cursor-default;
+                    height: 2.625rem;
+                    padding-bottom: 0.5rem;
+                }
+                &.is-selected {
+                    @apply relative bg-violet-100 text-violet-600;
+                    &::before {
+                        @apply absolute bg-violet;
+                        content: '';
+                        top: 0.125rem;
+                        left: -0.75rem;
+                        width: 0.25rem;
+                        height: 1.75rem;
+                        border-top-right-radius: 0.25rem;
+                        border-bottom-right-radius: 0.25rem;
+                    }
                 }
             }
         }
@@ -326,13 +331,14 @@ onMounted(async () => {
         width: 0;
         padding: 0;
         transition: width 0.3s ease;
-        .minimize-button-wrapper, .service-menu, .menu-wrapper {
+        .navigation-rail-container, .minimize-button-wrapper, .service-menu, .menu-wrapper {
             width: 0;
             padding: 0;
         }
     }
     &.is-mobile {
         .minimize-button-wrapper {
+            @apply hidden;
             width: 0;
             padding: 0;
         }
@@ -340,13 +346,19 @@ onMounted(async () => {
             transition: width 0.3s ease;
             width: 0;
             padding: 0;
+            .navigation-rail-container {
+                width: 0;
+                padding: 0;
+            }
         }
     }
     &.is-minimize:not(.is-mobile, .is-hide) {
         @apply bg-gray-100 cursor-pointer;
         z-index: 49;
-        width: $gnb-navigation-rail-min-width;
         box-shadow: unset;
+        .navigation-rail-container {
+            width: $gnb-navigation-rail-min-width;
+        }
         .minimize-button-wrapper {
             @apply hidden;
         }
@@ -361,8 +373,10 @@ onMounted(async () => {
         }
         &:hover {
             @apply bg-white;
-            width: $gnb-navigation-rail-max-width;
             z-index: 51;
+            .navigation-rail-container {
+                width: $gnb-navigation-rail-max-width;
+            }
             .minimize-button-wrapper {
                 @apply block;
             }

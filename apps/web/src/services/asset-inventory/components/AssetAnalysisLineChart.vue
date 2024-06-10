@@ -71,7 +71,8 @@ const drawChart = () => {
     });
 
     // set series
-    props.legends.forEach((legend) => {
+    const _legends = props.stacked ? cloneDeep(props.legends).reverse() : props.legends;
+    _legends.forEach((legend) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: legend.label as string,
             valueYField: legend.name,

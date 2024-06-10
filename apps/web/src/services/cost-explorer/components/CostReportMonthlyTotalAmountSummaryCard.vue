@@ -41,7 +41,10 @@ import { gray, white } from '@/styles/colors';
 import { MASSIVE_CHART_COLORS } from '@/styles/colorsets';
 
 import CostReportOverviewCardTemplate from '@/services/cost-explorer/components/CostReportOverviewCardTemplate.vue';
-import { GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import {
+    COST_REPORT_GROUP_BY_ITEM_MAP,
+    GROUP_BY,
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostReportPageStore } from '@/services/cost-explorer/stores/cost-report-page-store';
 
 
@@ -83,10 +86,10 @@ const state = reactive({
     loading: true,
     data: undefined as AnalyzeResponse<CostReportDataAnalyzeResult>|undefined,
     targetSelectItems: computed(() => ([
-        { name: GROUP_BY.WORKSPACE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
+        { name: GROUP_BY.WORKSPACE_NAME, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.WORKSPACE') },
         { name: GROUP_BY.PROVIDER, label: i18n.t('BILLING.COST_MANAGEMENT.COST_REPORT.PROVIDER') },
     ] as SelectButtonType[])),
-    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE : GROUP_BY.PROVIDER,
+    selectedTarget: storeState.isAdminMode ? GROUP_BY.WORKSPACE_NAME : GROUP_BY.PROVIDER,
     totalAmount: computed(() => sum(state.data?.results.map((d) => d.value_sum))),
     currentDate: undefined as Dayjs | undefined,
     currentDateRangeText: computed<string>(() => {
@@ -97,10 +100,10 @@ const state = reactive({
     //
     chartData: computed<ChartData[]>(() => state.data?.results?.map((d, idx) => {
         const _category = d[state.selectedTarget];
-        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE
-            ? storeState.workspaces[_category]?.label ?? d.workspace_id
+        const _categoryLabel = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
+            ? _category ?? d.workspace_name
             : storeState.providers[_category]?.name ?? d.provider;
-        let _color = state.selectedTarget === GROUP_BY.WORKSPACE
+        let _color = state.selectedTarget === GROUP_BY.WORKSPACE_NAME
             ? MASSIVE_CHART_COLORS[idx]
             : storeState.providers[_category]?.color ?? MASSIVE_CHART_COLORS[idx];
         if (_category === OTHER_CATEGORY) _color = gray[500];
@@ -113,7 +116,7 @@ const state = reactive({
         };
     })),
     tableFields: computed<DataTableFieldType[]>(() => ([
-        { name: state.selectedTarget, label: GROUP_BY_ITEM_MAP[state.selectedTarget].label },
+        { name: state.selectedTarget, label: COST_REPORT_GROUP_BY_ITEM_MAP[state.selectedTarget].label },
         { name: 'value_sum', label: 'Amount', textAlign: 'right' },
     ])),
 });
@@ -144,7 +147,7 @@ const getRefinedAnalyzeData = (res: AnalyzeResponse<CostReportDataAnalyzeResult>
 };
 const getLegendColor = (field: string, value: string, rowIndex: number) => {
     if (value === OTHER_CATEGORY) return gray[500];
-    if (field === GROUP_BY.WORKSPACE) {
+    if (field === GROUP_BY.WORKSPACE_NAME) {
         return MASSIVE_CHART_COLORS[rowIndex];
     }
     return storeState.providers[value]?.color ?? MASSIVE_CHART_COLORS[rowIndex];
@@ -353,7 +356,7 @@ watch(() => state.currentDate, () => {
                                   class="summary-data-table"
                     >
                         <template #col-format="{field, value, rowIndex}">
-                            <span v-if="field.name === GROUP_BY.WORKSPACE">
+                            <span v-if="field.name === GROUP_BY.WORKSPACE_NAME">
                                 <span class="toggle-button"
                                       :style="{ 'background-color': getLegendColor(field.name, value, rowIndex) }"
                                 />

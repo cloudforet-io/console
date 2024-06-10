@@ -274,6 +274,8 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
 <style scoped lang="postcss">
 .asset-analysis-query-form-overlay {
     .sidebar-contents {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         padding: 0 1.5rem;
         :deep(.p-text-input) {
@@ -282,11 +284,16 @@ watch(() => assetAnalysisPageState.showMetricQueryFormSidebar, (visible) => {
 
         .query-field {
             @apply col-span-12;
+            flex: 1;
             overflow: hidden;
 
             :deep(.p-text-editor) {
+                height: 100%;
+                .p-data-loader {
+                    height: 100%;
+                }
                 .CodeMirror {
-                    height: 30rem;
+                    height: 100%;
                 }
             }
         }
