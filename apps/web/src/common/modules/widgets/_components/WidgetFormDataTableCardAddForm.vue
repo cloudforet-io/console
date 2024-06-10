@@ -31,6 +31,7 @@ interface Props {
     selectedGroupByItems: any[];
     filters: Record<string, string[]>;
     dataFieldName: string;
+    dataUnit: string;
 
     /* Advanced Options */
     additionalLabels: AdditionalLabel[];
@@ -43,6 +44,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
     (e: 'update:data-field-name', value: string): void;
+    (e: 'update:data-unit', value: string): void;
     (e: 'update:addtional-labels', value: AdditionalLabel[]): void;
     (e: 'update:separate-date', value: boolean): void;
     (e: 'update:selected-time-diff', value: string): void;
@@ -59,6 +61,7 @@ const storeState = reactive({
 const state = reactive({
     proxySelectedGroupByItems: useProxyValue('selectedGroupByItems', props, emit),
     proxyDataFieldName: useProxyValue('dataFieldName', props, emit),
+    proxyDataUnit: useProxyValue('dataUnit', props, emit),
     proxyFilters: useProxyValue('filters', props, emit),
 });
 
@@ -213,8 +216,13 @@ watch([() => props.sourceId, () => props.sourceKey], async () => {
                        required
         >
             <p-text-input v-model="state.proxyDataFieldName"
-                          class="data-field-name-input"
+                          class="data-text-input"
                           placeholder="Name"
+            />
+        </p-field-group>
+        <p-field-group label="Data Unit">
+            <p-text-input v-model="state.proxyDataUnit"
+                          class="data-text-input"
             />
         </p-field-group>
         <p-divider class="filter-divider" />
@@ -329,7 +337,7 @@ watch([() => props.sourceId, () => props.sourceKey], async () => {
     .group-by-select-dropdown {
         @apply w-full;
     }
-    .data-field-name-input {
+    .data-text-input {
         @apply w-full;
     }
 

@@ -67,6 +67,7 @@ export interface DataTableAddOptions {
     'COST'?: CostOptions;
     group_by?: string[];
     data_name: string;
+    data_unit?: string;
     date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
     timediff?: TimeDiff;

@@ -117,6 +117,7 @@ const handleConfirmDataSource = async () => {
         };
         const assetOptions = {
             data_name: storeState.metrics[state.selectedMetricId]?.label,
+            data_unit: storeState.metrics[state.selectedMetricId]?.data.unit,
             ASSET: {
                 metric_id: state.selectedMetricId,
             },

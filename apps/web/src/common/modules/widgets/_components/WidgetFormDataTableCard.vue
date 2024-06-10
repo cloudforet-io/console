@@ -57,6 +57,7 @@ const state = reactive({
     selectedGroupByItems: [] as any[],
     filters: {} as Record<string, string[]>,
     dataFieldName: '',
+    dataUnit: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return state.costDataTypeItems;
@@ -171,6 +172,7 @@ const handleUpdateDataTable = async () => {
             filters: [],
             filters_or: [],
             data_name: state.dataFieldName,
+            data_unit: state.dataUnit,
             additional_labels: additionalLabelsRequest,
             date_format: (advancedOptionsState.separateDate ? 'SEPARATE' : 'SINGLE') as DateFormat,
             timediff: advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
@@ -192,6 +194,7 @@ const setInitialDataTableForm = () => {
     // TODO: refactor groupBy & set filters
     state.selectedGroupByItems = [...initialGroupBy];
     state.dataFieldName = props.item.options.data_name || '';
+    state.dataUnit = props.item.options.data_unit || '';
 
     // Advanced Options
     const initialAdditionalLabels = (props.item.options.additional_labels || {})as AdditionalLabels;
@@ -218,6 +221,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     // Base Options
     state.selectedGroupByItems = [];
     state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
+    state.dataUnit = state.sourceType === DATA_SOURCE_DOMAIN.ASSET ? storeState.metrics[_selectedSourceItem]?.data?.unit || '' : '';
     state.filters = {};
 
 
@@ -264,6 +268,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                   :selected-group-by-items.sync="state.selectedGroupByItems"
                                                   :filters.sync="state.filters"
                                                   :data-field-name.sync="state.dataFieldName"
+                                                  :data-unit.sync="state.dataUnit"
                                                   :additional-labels.sync="advancedOptionsState.additionalLabels"
                                                   :separate-date.sync="advancedOptionsState.separateDate"
                                                   :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
