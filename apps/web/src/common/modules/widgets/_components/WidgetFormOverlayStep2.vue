@@ -106,10 +106,12 @@ onBeforeMount(() => {
                 <component :is="getWidgetComponent(widgetGenerateState.selectedWidgetName)"
                            :widget-name="widgetGenerateState.selectedWidgetName"
                            :widget-id="widgetGenerateState.widgetId"
+                           :data-table-id="widgetGenerateState.selectedDataTableId"
                            :size="state.widgetSize"
                            :width="state.widgetWidth"
                            :title="widgetGenerateState.title"
                            :description="widgetGenerateState.description"
+                           :widget-options="widgetGenerateState.widgetValueMap"
                            mode="overlay"
                            @update:size="handleUpdateWidgetSize"
                 />

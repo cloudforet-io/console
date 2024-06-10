@@ -7,6 +7,7 @@ export interface PublicWidgetCreateParameters {
     name?: string;
     description?: string;
     widget_type?: WidgetType;
+    data_table_id?: string;
     options?: Record<string, any>;
     tags?: Tags;
 }

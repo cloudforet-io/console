@@ -106,8 +106,8 @@ export type WidgetFieldName = 'dataField' | 'tableDataField' | 'xAxis' | 'yAxis'
     | 'granularity';
 
 export interface WidgetFieldComponentProps<FieldOptions> {
-    dataTable: DataTableModel;
-    widgetFieldSchema: WidgetFieldSchema<FieldOptions>;
+    dataTable?: DataTableModel;
+    widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
     value?: any;
 }

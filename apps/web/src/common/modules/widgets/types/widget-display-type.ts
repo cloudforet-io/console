@@ -5,6 +5,8 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import type { WIDGET_SIZE } from '@/common/modules/widgets/_constants/widget-display-constant';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
@@ -14,10 +16,12 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export interface WidgetProps {
     widgetName: string;
     widgetId: string;
+    dataTableId: string;
     title?: string;
     description?: string;
     size?: WidgetSize;
     width?: number;
+    widgetOptions?: Record<WidgetFieldName, WidgetFieldValues>;
     //
     mode?: 'overlay'|'customize'|'view';
     // filters?: NewWidgetFilters;
