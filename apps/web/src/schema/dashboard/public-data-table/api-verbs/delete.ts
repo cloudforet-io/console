@@ -1,3 +1,3 @@
-export interface DataTableUpdateParameters {
+export interface DataTableDeleteParameters {
     data_table_id: string;
 }

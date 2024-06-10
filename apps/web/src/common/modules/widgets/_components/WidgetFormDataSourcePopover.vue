@@ -74,8 +74,12 @@ const state = reactive({
         const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
         const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
         const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
-        if (costAlias) return `Cost (${costAlias})`;
-        if (usageAlias) return `Usage (${usageAlias})`;
+        if (state.selectedCostDataType === 'cost') {
+            return costAlias ? `Cost (${costAlias})` : 'Cost';
+        }
+        if (state.selectedCostDataType === 'usage') {
+            return usageAlias ? `Usage (${usageAlias})` : 'Usage';
+        }
         return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType);
     }),
 });
@@ -113,6 +117,7 @@ const handleConfirmDataSource = async () => {
         };
         const assetOptions = {
             data_name: storeState.metrics[state.selectedMetricId]?.label,
+            data_unit: storeState.metrics[state.selectedMetricId]?.data.unit,
             ASSET: {
                 metric_id: state.selectedMetricId,
             },

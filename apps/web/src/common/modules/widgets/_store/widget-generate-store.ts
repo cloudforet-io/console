@@ -6,9 +6,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
-import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
+import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
+import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 import type { PublicWidgetGetParameters } from '@/schema/dashboard/public-widget/api-verbs/get';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
@@ -127,7 +128,17 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         },
         updateDataTable: async (updateParams: DataTableUpdateParameters) => {
             try {
-                await SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>(updateParams);
+                const result = await SpaceConnector.clientV2.dashboard.publicDataTable.update<DataTableUpdateParameters, DataTableModel>(updateParams);
+                state.dataTables = state.dataTables.map((dataTable) => (dataTable.data_table_id === result.data_table_id ? result : dataTable));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        deleteDataTable: async (deleteParams: DataTableDeleteParameters) => {
+            try {
+                await SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters, DataTableModel>(deleteParams);
+                state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
+                state.selectedDataTableId = undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
