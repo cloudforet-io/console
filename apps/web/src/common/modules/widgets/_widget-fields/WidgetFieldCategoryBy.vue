@@ -58,12 +58,13 @@ onMounted(() => {
         >
             <div class="field-form-wrapper">
                 <p-select-dropdown :menu="state.menuItems"
-                                   :selected="state.proxyValue"
+                                   :selected="state.proxyValue?.value"
                                    @update:selected="handleUpdateSelect"
                 />
                 <p-text-input type="number"
                               :min="1"
-                              :max="props.widgetFieldSchema.options?.max || 100"
+                              :max="props.widgetFieldSchema.options?.max"
+                              :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />
             </div>

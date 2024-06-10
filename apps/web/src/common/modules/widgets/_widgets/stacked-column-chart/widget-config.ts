@@ -19,6 +19,8 @@ const stackedColumnChart: WidgetConfig = {
         stackBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 5,
+                max: 10,
             },
         },
     },

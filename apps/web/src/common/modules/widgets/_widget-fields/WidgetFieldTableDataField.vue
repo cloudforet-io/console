@@ -95,7 +95,7 @@ onMounted(() => {
                 />
                 <p-text-input type="number"
                               :min="1"
-                              :max="props.widgetFieldSchema.options?.max || 100"
+                              :max="props.widgetFieldSchema.options?.max"
                               :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />

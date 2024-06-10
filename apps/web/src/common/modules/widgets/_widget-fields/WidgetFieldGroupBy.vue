@@ -76,7 +76,8 @@ onMounted(() => {
                 <p-text-input v-if="!widgetFieldSchema.options?.hideCount"
                               type="number"
                               :min="1"
-                              :max="props.widgetFieldSchema.options?.max || 100"
+                              :max="props.widgetFieldSchema.options?.max"
+                              :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />
             </div>
