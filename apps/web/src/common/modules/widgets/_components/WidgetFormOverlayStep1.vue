@@ -104,10 +104,6 @@ const documentEventMount = (eventName: string, func: any) => {
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
 
-onMounted(async () => {
-    await widgetGenerateStore.listDataTable();
-});
-
 </script>
 
 <template>
