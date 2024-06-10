@@ -161,7 +161,7 @@ const handleUpdateDataTable = async () => {
     });
     const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
         ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
-        : { metric_id: state.metricId };
+        : { metric_id: state.selectedSourceEndItem };
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: props.item.data_table_id,
