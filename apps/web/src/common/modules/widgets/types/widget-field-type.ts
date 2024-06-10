@@ -4,24 +4,41 @@ import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 export interface DataFieldOptions {
     multiSelectable?: boolean;
 }
+export interface TableDataFieldOptions {
+    max?: number;
+    default: number;
+}
 export interface XAxisOptions {
     dataTarget?: string;
+    max?: number;
+    default: number;
 }
 export interface YAxisOptions {
     dataTarget?: string;
+    max?: number;
+    default: number;
 }
 export interface LineByOptions {
     dataTarget?: string;
+    max?: number;
+    default: number;
 }
 export interface StackByOptions {
     dataTarget?: string;
+    max?: number;
+    default: number;
 }
 export interface GroupByOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
+    hideCount?: boolean;
+    max?: number;
+    default?: number;
 }
 export interface CategoryByOptions {
     dataTarget?: string;
+    max?: number;
+    default: number;
 }
 export interface TotalFieldOptions {
     dataTarget?: string;
@@ -30,11 +47,9 @@ export interface BasisFieldOptions {
     dataTarget?: string;
 }
 export interface MinOptions {
-    dataTarget?: string;
     default?: number;
 }
 export interface MaxOptions {
-    dataTarget?: string;
     default?: number;
 }
 export interface LegendOptions { // toggle button
@@ -68,7 +83,7 @@ export interface FormatRulesOptions {
     fields: FormatRulesField[];
     dataTarget?: string;
 }
-type WidgetFieldOptions = DataFieldOptions | XAxisOptions | YAxisOptions
+type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
     | TotalFieldOptions | BasisFieldOptions
     | FormatRulesOptions | MinOptions | MaxOptions | LegendOptions | IconOptions | SubTotalOptions | TotalOptions

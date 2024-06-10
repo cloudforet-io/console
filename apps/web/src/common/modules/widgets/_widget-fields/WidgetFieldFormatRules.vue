@@ -58,11 +58,20 @@ const getInitialFormatRulesValue = (): FormatRulesValue => {
 
 /* Event */
 const handleClickAddRule = () => {
-    state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
+    if (state.proxyValue) {
+        state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
+    } else {
+        state.proxyValue = [getInitialFormatRulesValue()];
+    }
 };
 const handleDelete = (idx: number) => {
     const _value = cloneDeep(state.proxyValue);
     _value.splice(idx, 1);
+    state.proxyValue = _value;
+};
+const handleFormatRuleInput = (idx: number, key: string, val: string) => {
+    const _value = cloneDeep(state.proxyValue);
+    _value[idx][key] = val;
     state.proxyValue = _value;
 };
 
@@ -97,20 +106,25 @@ onMounted(() => {
                 >
                     <p-text-input v-if="state.fields.includes('name')"
                                   :value="formatRule.name"
+                                  :invalid="!formatRule.name?.length"
                                   placeholder="Name"
+                                  @update:value="handleFormatRuleInput(idx, 'name', $event)"
                     />
                     <p-select-dropdown v-if="state.fields.includes('dropdown')"
-                                       :value="formatRule.dropdown"
+                                       :value="formatRule.dropdownItem"
                                        :menu="state.menuItems"
+                                       @update:value="handleFormatRuleInput(idx, 'dropdownItem', $event)"
                     />
                     <p-text-input v-if="state.fields.includes('threshold')"
                                   :value="formatRule.threshold"
+                                  :invalid="!formatRule.threshold && (formatRule.threshold !== 0)"
                                   type="number"
                                   placeholder="Threshold"
+                                  @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
                     />
                     <color-input v-if="state.fields.includes('color')"
                                  :value="formatRule.color"
-                                 @update:value="formatRule.color = $event"
+                                 @update:value="handleFormatRuleInput(idx, 'color', $event)"
                     />
                     <p-icon-button name="ic_delete"
                                    style-type="negative-transparent"

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput,
@@ -12,20 +14,19 @@ import type {
     WidgetFieldComponentEmit,
     GroupByOptions,
 } from '@/common/modules/widgets/types/widget-field-type';
+import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<GroupByOptions>>(), {
-    widgetFieldSchema: () => ({}),
 });
-const emit = defineEmits<WidgetFieldComponentEmit<string | string[]>>();
+const emit = defineEmits<WidgetFieldComponentEmit<GroupByValue>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
-        if (Array.isArray(state.selectedItem)) {
-            return !!state.selectedItem.length;
-        }
+        if (!props.widgetFieldSchema.options?.hideCount && !state.proxyValue?.count) return false;
+        if (props.widgetFieldSchema.options?.multiSelectable && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
 });
@@ -39,10 +40,23 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
         state.proxyValue = val;
     }
 };
+const handleUpdateCount = (val: number) => {
+    if (val === state.proxyValue.count) return;
+    state.proxyValue = { ...state.proxyValue, count: val };
+};
 
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
+});
+
+/* Init */
+onMounted(() => {
+    // TODO: set state.proxyValue with the value from the widget or set default value
+    state.proxyValue = {
+        value: state.menuItems[0]?.name, // TODO: string | string[]
+        count: props.widgetFieldSchema.options?.default,
+    };
 });
 </script>
 
@@ -59,8 +73,12 @@ watch(() => state.isValid, (isValid) => {
                                    appearance-type="badge"
                                    @update:selected="handleUpdateSelect"
                 />
-                <p-text-input type="number"
-                              :min="0"
+                <p-text-input v-if="!widgetFieldSchema.options?.hideCount"
+                              type="number"
+                              :min="1"
+                              :max="props.widgetFieldSchema.options?.max"
+                              :value="state.proxyValue?.count"
+                              @update:value="handleUpdateCount"
                 />
             </div>
         </p-field-group>

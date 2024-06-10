@@ -12,6 +12,8 @@ const pieChart: WidgetConfig = {
         groupBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 10,
+                max: 15,
             },
         },
     },

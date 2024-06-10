@@ -12,11 +12,15 @@ const stackedColumnChart: WidgetConfig = {
         xAxis: {
             options: {
                 dataTarget: 'label_field',
+                default: 10,
+                max: 12,
             },
         },
         stackBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 5,
+                max: 10,
             },
         },
     },

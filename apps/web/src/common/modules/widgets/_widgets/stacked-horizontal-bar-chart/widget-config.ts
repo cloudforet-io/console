@@ -12,11 +12,15 @@ const stackedHorizontalBarChart: WidgetConfig = {
         yAxis: {
             options: {
                 dataTarget: 'label_field',
+                default: 4,
+                max: 8,
             },
         },
         stackBy: {
             options: {
                 dataTarget: 'label_field',
+                default: 5,
+                max: 10,
             },
         },
     },
