@@ -23,7 +23,7 @@ export interface Metadata {
     realm?: string; // only keycloack
     // for saml
     icon?: string;
-    label?: string;
+    idp_name?: string;
     sso_url?: string;
     [key: string]: any;
 }

@@ -43,7 +43,7 @@ const handleLogin = () => {
                     <span />
                 </template>
             </p-lazy-img>
-            <span class="saml-signin-button-label"> {{ state.authOptions.label ?? 'SAML' }} </span>
+            <span class="saml-signin-button-label"> {{ state.authOptions.idp_name ?? 'SAML' }} </span>
         </div>
     </p-button>
 </template>
