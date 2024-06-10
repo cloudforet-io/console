@@ -11,6 +11,10 @@ import { POPOVER_TRIGGER } from '@spaceone/design-system/src/data-display/popove
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
+
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
 import WidgetFormCostDataSourcePopper from '@/common/modules/widgets/_components/WidgetFormCostDataSourcePopper.vue';
@@ -20,7 +24,14 @@ import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-g
 import type { DataTableDataType, DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
 
 
+
 const widgetGenerateStore = useWidgetGenerateStore();
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
 
 const state = reactive({
     showPopover: false,
@@ -57,6 +68,16 @@ const state = reactive({
     selectedCostDataType: undefined as undefined|string,
     // asset & security
     selectedMetricId: undefined as undefined|string,
+
+    selectedCostDataTypeLabel: computed(() => {
+        if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
+        const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
+        const costAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.cost;
+        const usageAlias: string|undefined = targetCostDataSource?.data?.plugin_info?.metadata?.alias?.usage;
+        if (costAlias) return `Cost (${costAlias})`;
+        if (usageAlias) return `Usage (${usageAlias})`;
+        return targetCostDataSource.data?.cost_data_keys?.find((key) => key === state.selectedCostDataType);
+    }),
 });
 
 /* Util */
@@ -84,12 +105,14 @@ const handleConfirmDataSource = async () => {
             source_type: state.selectedDataSourceDomain,
         } as DataTableAddParameters;
         const costOptions = {
+            data_name: state.selectedCostDataTypeLabel,
             COST: {
                 data_source_id: state.selectedCostDataSourceId,
                 data_key: state.selectedCostDataType,
             },
         };
         const assetOptions = {
+            data_name: storeState.metrics[state.selectedMetricId]?.label,
             ASSET: {
                 metric_id: state.selectedMetricId,
             },
