@@ -8,16 +8,17 @@ const heatmap: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 10,
                 max: 10,
             },
         },
         groupBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 7,
                 max: 14,
             },

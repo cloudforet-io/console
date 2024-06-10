@@ -1,7 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 
 import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 export interface WidgetModel {

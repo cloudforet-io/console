@@ -8,17 +8,18 @@ const stackedHorizontalBarChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         yAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 4,
                 max: 8,
             },
         },
         stackBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 5,
                 max: 10,
             },

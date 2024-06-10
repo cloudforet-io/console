@@ -29,7 +29,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         widget: undefined as undefined | PublicWidgetModel,
         widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
-        granularity: 'MONTHLY',
         title: '',
         description: '',
         size: 'full',
@@ -38,7 +37,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         // Data Table
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
-        selectedDataTable: undefined as DataTableModel|undefined,
     });
 
     const getters = reactive({
@@ -67,9 +65,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSize = (size: WidgetSize) => {
         state.size = size;
     };
-    const setGranularity = (granularity: string) => {
-        state.granularity = granularity;
-    };
     const setWidgetValueMap = (widgetValueMap: Record<string, WidgetFieldValues>) => {
         state.widgetValueMap = widgetValueMap;
     };
@@ -85,7 +80,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setTitle,
         setDescription,
         setSize,
-        setGranularity,
         setWidgetValueMap,
         setWidgetValidMap,
     };
@@ -151,7 +145,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.overlayStep = 1;
             state.widgetId = '';
             state.selectedDataTableId = undefined;
-            state.selectedDataTable = undefined;
             state.title = '';
             state.description = '';
             state.size = 'full';

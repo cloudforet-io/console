@@ -8,17 +8,18 @@ const stackedColumnChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 10,
                 max: 12,
             },
         },
         stackBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 default: 5,
                 max: 10,
             },

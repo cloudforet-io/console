@@ -10,6 +10,7 @@ const table: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         tableDataField: {
             options: {
                 default: 5,
@@ -18,7 +19,7 @@ const table: WidgetConfig = {
         },
         groupBy: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
                 multiSelectable: true,
                 hideCount: false,
             },
