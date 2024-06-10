@@ -33,16 +33,10 @@ const state = reactive({
     data: undefined,
     labelFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.labels_info ?? {})),
     dataFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.data_info ?? {})),
-    fields: computed<DataTableFieldType[]>(() => {
-        console.debug('fields', [
-            ...state.labelFields,
-            ...state.dataFields,
-        ]);
-        return [
-            ...state.labelFields.map((key) => ({ name: key, sortable: true, sortKey: key })),
-            ...state.dataFields.map((key) => ({ name: key })),
-        ];
-    }),
+    fields: computed<DataTableFieldType[]>(() => [
+        ...state.labelFields.map((key) => ({ name: key, sortable: true, sortKey: key })),
+        ...state.dataFields.map((key) => ({ name: key })),
+    ]),
     sortBy: '',
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -65,7 +59,6 @@ const state = reactive({
 
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    console.debug('handleSelectGranularity', granularity);
     if (!storeState.selectedDataTableId) return;
     widgetGenerateStore.setSelectedDataTableGranularity(granularity);
     await widgetGenerateStore.loadDataTable(storeState.selectedDataTableId);
