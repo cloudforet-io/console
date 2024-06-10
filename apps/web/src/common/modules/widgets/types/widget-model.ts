@@ -39,8 +39,9 @@ export interface DataTableModel {
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
-export type AdditionalLabels = Record<string, number>; // year|month|day
-export type TimeDiff = Record<string, any>;
+export type AdditionalLabels = Record<string, string>;
+export type DateFormat = 'SINGLE' | 'SEPARATE';
+export type TimeDiff = Record<string, any>; // year|month|day
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
 export type LabelsInfo = DataTableLabelKey[];
 export type DataInfo = DataTableDataKey[];
@@ -66,9 +67,11 @@ export interface DataTableAddOptions {
     'COST'?: CostOptions;
     group_by?: string[];
     data_name: string;
-    date_format?: 'SINGLE'|'SEPARATE';
+    date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
-    time_diff?: TimeDiff;
+    timediff?: TimeDiff;
+    filters?: any[];
+    filters_or?: any[];
 }
 export interface AssetOptions {
     metric_id: string;
