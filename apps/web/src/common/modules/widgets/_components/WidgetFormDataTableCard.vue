@@ -6,7 +6,7 @@ import {
 
 
 import {
-    PIconButton, PI, PButton, PButtonModal, PTextInput,
+    PIconButton, PI, PButton, PButtonModal, PTextInput, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
@@ -131,6 +131,11 @@ const modalState = reactive({
 
 
 /* Events */
+const handleUpdateDataTableName = (value: string) => {
+    if (value.length <= 60) {
+        dataTableNameState.dataTableName = value;
+    }
+};
 const handleClickNameConfirm = async () => {
     const editedDataTableName = dataTableNameState.dataTableName.trim();
     if (props.item.name === editedDataTableName) {
@@ -292,9 +297,11 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                     <div v-if="dataTableNameState.editMode"
                          class="data-table-name-form"
                     >
-                        <p-text-input v-model="dataTableNameState.dataTableName"
+                        <p-text-input :value="dataTableNameState.dataTableName"
                                       class="name-input"
                                       size="sm"
+                                      @update:value="handleUpdateDataTableName"
+                                      @keydown.enter="handleClickNameConfirm"
                         />
                         <p-icon-button name="ic_check"
                                        size="sm"
@@ -309,7 +316,13 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                              width="1.25rem"
                              height="1.25rem"
                         />
-                        <p>{{ props.item.name }}</p>
+                        <p-tooltip class="data-table-name"
+                                   :contents="props.item.name"
+                        >
+                            <p>
+                                {{ props.item.name }}
+                            </p>
+                        </p-tooltip>
                         <p-icon-button class="edit-button"
                                        style-type="transparent"
                                        name="ic_edit-text"
@@ -399,7 +412,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             padding: 0.5rem 0.75rem;
 
             .title-wrapper {
-                @apply flex items-center text-paragraph-sm font-bold;
+                @apply flex items-center text-paragraph-sm font-bold w-full;
                 gap: 0.125rem;
                 margin-bottom: 0.5rem;
                 .selected-radio-icon {
@@ -407,8 +420,17 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                     height: 1.5rem;
                 }
                 .data-table-name-wrapper {
-                    @apply flex items-center gap-1;
+                    @apply inline-flex items-center gap-1;
+                    overflow: hidden;
+                    width: auto;
+                    .data-table-name {
+                        overflow: hidden;
+                        p {
+                            @apply truncate;
+                        }
+                    }
                     .data-table-icon {
+                        min-width: 1.25rem;
                         margin-right: 0.125rem;
                     }
                 }
