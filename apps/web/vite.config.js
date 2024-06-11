@@ -35,6 +35,13 @@ export default defineConfig(async ({ command, mode }) => {
                 emitFile: true,
                 filename: 'stats.html',
             })]),
+            visualizer({
+                filename: './dist/report.html',
+                open: true,
+                brotliSize: true,
+                sourcemap: false,
+                gzipSize: true,
+            }),
         ],
         build: {
             rollupOptions: {
