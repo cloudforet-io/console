@@ -1,3 +1,4 @@
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -25,7 +26,7 @@ const heatmap: WidgetConfig = {
         },
         formatRules: {
             options: {
-                fields: ['name', 'threshold', 'color'],
+                formatRulesType: FORMAT_RULE_TYPE.nameAndThreshold,
             },
         },
     },

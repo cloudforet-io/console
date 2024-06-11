@@ -4,17 +4,18 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PIconButton, PButton, PSelectDropdown,
+    PFieldGroup, PTextInput, PIconButton, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type {
     WidgetFieldComponentProps,
     WidgetFieldComponentEmit,
-    FormatRulesOptions, FormatRulesField,
+    FormatRulesOptions, FormatRulesType,
 } from '@/common/modules/widgets/types/widget-field-type';
 import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
@@ -23,21 +24,19 @@ import { gray } from '@/styles/colors';
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
     widgetFieldSchema: () => ({}),
+    value: () => [{
+        threshold: 0,
+        name: '',
+        color: gray[200],
+    }],
 });
 const emit = defineEmits<WidgetFieldComponentEmit<FormatRulesValue[]>>();
 const state = reactive({
-    proxyValue: useProxyValue('value', props, emit),
+    proxyValue: useProxyValue<FormatRulesValue[]>('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    fields: computed<FormatRulesField[]>(() => props.widgetFieldSchema.options?.fields || []),
-    isValid: computed<boolean>(() => state.proxyValue.every((d) => {
-        if (state.fields.includes('name')) {
-            if (d.name === undefined) return false;
-        }
-        if (state.fields.includes('dropdown')) {
-            if (d.dropdownItem === undefined) return false;
-        }
-        return (d.threshold !== undefined) && (d.color !== undefined);
-    })),
+    type: computed<FormatRulesType>(() => props.widgetFieldSchema.options?.formatRulesType ?? FORMAT_RULE_TYPE.nameAndThreshold),
+    isFieldNameValid: [undefined],
+    isAllValid: computed(() => state.isFieldNameValid.every((valid:boolean) => valid === true)),
 });
 
 /* Util */
@@ -46,37 +45,38 @@ const getInitialFormatRulesValue = (): FormatRulesValue => {
         threshold: 0,
         color: gray[200],
     };
-    if (state.fields.includes('name')) {
+    if (state.type === FORMAT_RULE_TYPE.nameAndThreshold) {
         initialFormatRule.name = '';
-    }
-    if (state.fields.includes('dropdown')) {
-        // TODO: set initial dropdown item
-        initialFormatRule.dropdownItem = '';
     }
     return initialFormatRule;
 };
 
 /* Event */
 const handleClickAddRule = () => {
-    if (state.proxyValue) {
-        state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
-    } else {
-        state.proxyValue = [getInitialFormatRulesValue()];
-    }
+    state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
+    state.isFieldNameValid = [...state.isFieldNameValid, undefined];
 };
 const handleDelete = (idx: number) => {
     const _value = cloneDeep(state.proxyValue);
     _value.splice(idx, 1);
     state.proxyValue = _value;
+    const updatedValue = cloneDeep(state.isFieldNameValid);
+    updatedValue.splice(idx, 1);
+    state.isFieldNameValid = updatedValue;
 };
-const handleFormatRuleInput = (idx: number, key: string, val: string) => {
+const handleFormatRuleInput = (idx: number|string, key: string, val: string) => {
     const _value = cloneDeep(state.proxyValue);
     _value[idx][key] = val;
     state.proxyValue = _value;
+    if (key === 'name') {
+        const updatedValue = cloneDeep(state.isFieldNameValid);
+        updatedValue[idx] = val.length > 0;
+        state.isFieldNameValid = updatedValue;
+    }
 };
 
 /* Watcher */
-watch(() => state.isValid, (isValid) => {
+watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
@@ -104,35 +104,44 @@ onMounted(() => {
                      :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
                      class="format-rules-input-wrapper"
                 >
-                    <p-text-input v-if="state.fields.includes('name')"
-                                  :value="formatRule.name"
-                                  :invalid="!formatRule.name?.length"
-                                  placeholder="Name"
-                                  @update:value="handleFormatRuleInput(idx, 'name', $event)"
-                    />
-                    <p-select-dropdown v-if="state.fields.includes('dropdown')"
-                                       :value="formatRule.dropdownItem"
-                                       :menu="state.menuItems"
-                                       @update:value="handleFormatRuleInput(idx, 'dropdownItem', $event)"
-                    />
-                    <p-text-input v-if="state.fields.includes('threshold')"
-                                  :value="formatRule.threshold"
-                                  :invalid="!formatRule.threshold && (formatRule.threshold !== 0)"
-                                  type="number"
-                                  placeholder="Threshold"
-                                  @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
-                    />
-                    <color-input v-if="state.fields.includes('color')"
-                                 :value="formatRule.color"
-                                 @update:value="handleFormatRuleInput(idx, 'color', $event)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   style-type="negative-transparent"
-                                   size="sm"
-                                   :disabled="state.proxyValue.length === 1"
-                                   class="delete-button"
-                                   @click="handleDelete(idx)"
-                    />
+                    <p-field-group v-if="state.type === FORMAT_RULE_TYPE.nameAndThreshold"
+                                   :invalid="state.isFieldNameValid[idx] === false"
+                                   :invalid-text="$t('COMMON.WIDGETS.COMPARISON.NAME_INVALID_TEXT')"
+                                   required
+                    >
+                        <p-text-input :value="formatRule.name"
+                                      :invalid="state.isFieldNameValid[idx] === false"
+                                      placeholder="Name"
+                                      multi-input
+                                      @update:value="handleFormatRuleInput(idx, 'name', $event)"
+                        />
+                    </p-field-group>
+                    <p-field-group required>
+                        <p-text-input :value="formatRule.threshold"
+                                      type="number"
+                                      :min="0"
+                                      @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
+                        >
+                            <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
+                                      #input-right
+                            >
+                                %
+                            </template>
+                        </p-text-input>
+                    </p-field-group>
+                    <div class="right-part">
+                        <color-input :value="formatRule.color"
+                                     class="color-input"
+                                     @update:value="handleFormatRuleInput(idx, 'color', $event)"
+                        />
+                        <p-icon-button name="ic_delete"
+                                       style-type="negative-transparent"
+                                       size="sm"
+                                       :disabled="state.proxyValue.length === 1"
+                                       class="delete-button"
+                                       @click="handleDelete(idx)"
+                        />
+                    </div>
                 </div>
             </div>
         </p-field-group>
@@ -153,21 +162,30 @@ onMounted(() => {
         margin-bottom: 0.5rem;
     }
     .format-rules-input-wrapper {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
+        @apply flex gap-2 items-start;
         padding-bottom: 0.5rem;
-        .p-select-dropdown {
-            flex: 1;
+
+        .right-part {
+            @apply flex gap-2 items-center;
+            .color-input {
+                flex-shrink: 0;
+            }
+
+            .delete-button {
+                flex-shrink: 0;
+                width: 2rem;
+            }
+        }
+
+        /* custom design-system component - p-text-input */
+        :deep(.p-text-input) {
             width: 100%;
         }
-        .p-text-input {
-            flex: 1;
+
+        :deep(.p-field-group) {
+            margin-bottom: 0;
             width: 100%;
-            min-width: 30%;
-        }
-        .delete-button {
-            width: 2rem;
+            flex-shrink: 1;
         }
     }
 }
