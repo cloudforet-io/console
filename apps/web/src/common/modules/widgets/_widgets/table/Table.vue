@@ -7,6 +7,8 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
 import type {
@@ -14,14 +16,18 @@ import type {
 } from '@/common/modules/widgets/types/widget-display-type';
 
 
-const props = defineProps<WidgetProps>();
+type Data = ListResponse<{
+    [key: string]: string|number;
+}>;
+
+const props = defineProps<WidgetProps<Data>>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const state = reactive({
     loading: false,
-    data: null as Response | null,
+    data: null as Data | null,
 });
 </script>
 

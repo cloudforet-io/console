@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
+    computed,
     onMounted, reactive, ref,
 } from 'vue';
 
@@ -12,16 +13,27 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { throttle } from 'lodash';
+import { isEmpty, throttle } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { CategoryByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetProps>();
+type Data = ListResponse<{
+    [key: string]: string|number;
+}>;
+const props = defineProps<WidgetProps<Data>>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -30,10 +42,14 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 const state = reactive({
     loading: false,
-    data: null as Response | null,
-    chart: null as null | EChartsType,
+    data: null as Data | null,
+    chart: null as EChartsType | null,
     chartData: [],
-    chartOptions: {
+    chartOptions: computed<TreemapSeriesOption>(() => ({
+        tooltip: {
+            trigger: 'item',
+            position: 'inside',
+        },
         legend: {
             bottom: 0,
             left: 0,
@@ -51,32 +67,68 @@ const state = reactive({
                 label: {
                     fontSize: 12,
                 },
-                data: [
-                    {
-                        name: 'AWS',
-                        value: 103,
-                    },
-                    {
-                        name: 'Google Cloud',
-                        value: 64,
-                    },
-                    {
-                        name: 'Azure',
-                        value: 21,
-                    },
-                    {
-                        name: 'Alibaba Cloud',
-                        value: 2,
-                    },
-                ],
+                data: state.chartData,
             },
         ],
-    } as TreemapSeriesOption,
+    })),
+    //
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    categoryByField: computed<string|undefined>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.value as string),
+    categoryByCount: computed<number>(() => (props.widgetOptions?.categoryBy as CategoryByValue)?.count as number),
 });
 
-onMounted(() => {
+/* Util */
+const loadWidget = async (): Promise<Data|null> => {
+    try {
+        state.loading = true;
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
+        return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
+            widget_id: 'public-widget-74bd848364d0',
+            data_table_id: 'public-dt-3d35c80a0cee',
+            query: {
+                granularity: state.granularity,
+                start: _start,
+                end: _end,
+                group_by: [state.categoryByField],
+                fields: {
+                    [state.dataField]: {
+                        key: state.dataField,
+                        operator: 'sum',
+                    },
+                },
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    } finally {
+        state.loading = false;
+    }
+};
+const drawChart = (rawData: Data|null) => {
+    if (isEmpty(rawData)) return;
+
+    // get chart data
+    const _slicedData = rawData.results?.slice(0, state.categoryByCount);
+    state.chartData = _slicedData?.map((v) => ({
+        name: v[state.categoryByField],
+        value: v[state.dataField],
+    })) || [];
+
+    // init chart and set options
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions);
+};
+
+const initWidget = async (data?: Data) => {
+    state.data = data ?? await loadWidget();
+    drawChart(state.data);
+};
+
+onMounted(() => {
+    initWidget();
 });
 
 useResizeObserver(chartContext, throttle(() => {

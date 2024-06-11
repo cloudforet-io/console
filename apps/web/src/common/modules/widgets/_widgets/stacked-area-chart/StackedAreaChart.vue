@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core/index';
 import {
+    computed,
     onMounted, reactive, ref,
 } from 'vue';
 
@@ -12,16 +13,32 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { throttle } from 'lodash';
+import { groupBy, isEmpty, throttle } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import {
+    getWidgetBasedOnDate,
+    getWidgetDateFields,
+    getWidgetDateRange,
+} from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { LineByValue, XAxisValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = defineProps<WidgetProps>();
+type Data = ListResponse<{
+    [key: string]: string|number;
+}>;
+const props = defineProps<WidgetProps<Data>>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -30,10 +47,11 @@ const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emi
 
 const state = reactive({
     loading: false,
-    data: null as Response | null,
-    chart: null as null | EChartsType,
+    data: null as Data | null,
+    chart: null as EChartsType | null,
+    xAxisData: [],
     chartData: [],
-    chartOptions: {
+    chartOptions: computed<LineSeriesOption>(() => ({
         legend: {
             bottom: 0,
             left: 0,
@@ -47,51 +65,98 @@ const state = reactive({
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['AmazonEC2', 'AmazonQuickSight', 'AWSELB', 'DocumentDB'],
+            data: state.xAxisData,
         },
         yAxis: {
             type: 'value',
+            axisLabel: {
+                formatter: (val) => numberFormatter(val, { notation: 'compact' }),
+            },
         },
-        series: [
-            {
-                name: 'project1',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [100, 200, 300, 400, 220, 300, 500],
-            },
-            {
-                name: 'project2',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [150, 232, 201, 154, 190, 330, 410],
-            },
-            {
-                name: 'project3',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                data: [23, 200, 24, 400, 220, 45, 500],
-            },
-            {
-                name: 'project4',
-                type: 'line',
-                stack: 'total',
-                areaStyle: {},
-                label: {
-                    show: true,
-                    position: 'top',
-                },
-                data: [23, 346, 24, 400, 220, 4, 500],
-            },
-        ],
-    } as LineSeriesOption,
+        series: state.chartData,
+    })),
+    //
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    xAxisField: computed<string>(() => (props.widgetOptions?.xAxis as XAxisValue)?.value),
+    xAxisCount: computed<number>(() => (props.widgetOptions?.xAxis as XAxisValue)?.count),
+    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    lineByField: computed<string|undefined>(() => (props.widgetOptions?.lineBy as LineByValue)?.value as string),
+    lineByCount: computed<number>(() => (props.widgetOptions?.lineBy as LineByValue)?.count as number),
 });
 
-onMounted(() => {
+
+/* Util */
+const loadWidget = async (): Promise<Data|null> => {
+    try {
+        let _start = state.basedOnDate;
+        let _end = state.basedOnDate;
+        if (state.xAxisField === 'Date') {
+            [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        }
+        return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
+            widget_id: 'public-widget-74bd848364d0',
+            data_table_id: 'public-dt-3d35c80a0cee',
+            query: {
+                granularity: state.granularity,
+                start: _start,
+                end: _end,
+                group_by: [state.xAxisField, state.lineByField],
+                fields: {
+                    [state.dataField]: {
+                        key: state.dataField,
+                        operator: 'sum',
+                    },
+                },
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    }
+};
+const drawChart = (rawData: Data|null) => {
+    if (isEmpty(rawData)) return;
+
+    // set xAxisData
+    let _xAxisData: string[] = [];
+    if (state.xAxisField === 'Date') {
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
+        _xAxisData = getWidgetDateFields(state.granularity, _start, _end);
+    } else {
+        _xAxisData = Array.from(new Set(rawData.results?.map((v) => v[state.xAxisField] as string)));
+    }
+    state.xAxisData = _xAxisData.slice(0, state.xAxisCount);
+
+    // set chart data
+    const _seriesData: any[] = [];
+    const _sliceResults = Object.entries(groupBy(rawData.results, state.lineByField)).slice(0, state.lineByCount);
+    _sliceResults.forEach(([key, value]) => {
+        _seriesData.push({
+            name: key,
+            type: 'line',
+            stack: true,
+            areaStyle: {},
+            data: _xAxisData.map((date) => {
+                const _data = value.find((v) => v[state.xAxisField] === date);
+                return _data ? _data[state.dataField] : undefined;
+            }),
+        });
+    });
+    state.chartData = _seriesData;
+
+    // init chart and set options
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions);
+};
+
+const initWidget = async (data?: Data) => {
+    state.data = data ?? await loadWidget();
+    drawChart(state.data);
+};
+
+onMounted(async () => {
+    await initWidget();
 });
 
 useResizeObserver(chartContext, throttle(() => {
