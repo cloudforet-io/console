@@ -149,13 +149,15 @@ watch(() => state.sortBy, async () => {
                     <span class="view-table-title">
                         Preview
                     </span>
-                    <div class="granularity-wrapper">
+                    <div v-if="storeState.selectedDataTableId"
+                         class="granularity-wrapper"
+                    >
                         <div class="data-label">
                             <p-i name="ic_service_data-sources"
                                  width="1rem"
                                  height="1rem"
                             />
-                            <span>Data 1</span>
+                            <span>{{ storeState.selectedDataTable.name }}</span>
                         </div>
                         <p-select-dropdown class="granularity-dropdown"
                                            :menu="state.granularityItems"
