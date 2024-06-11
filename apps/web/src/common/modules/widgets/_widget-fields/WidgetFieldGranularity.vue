@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { asyncComputed } from '@vueuse/core/index';
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import { PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -36,6 +38,10 @@ const handleUpdateSelect = (val: string) => {
 /* Watcher */
 watch(() => state.isValid, (isValid) => {
     emit('update:is-valid', isValid);
+});
+
+onMounted(() => {
+    state.proxyValue = 'MONTHLY';
 });
 </script>
 

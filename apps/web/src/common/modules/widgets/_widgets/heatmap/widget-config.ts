@@ -22,6 +22,7 @@ const heatmap: WidgetConfig = {
                 dataTarget: 'labels_info',
                 default: 7,
                 max: 14,
+                multiSelectable: false,
             },
         },
         formatRules: {

@@ -119,7 +119,7 @@ const handleSelectSize = (size: WidgetSize) => {
                            @click="handleClickDeleteButton"
             />
         </div>
-        <div class="body">
+        <div class="body-wrapper">
             <slot />
         </div>
         <p-select-dropdown v-if="state.sizeDropdownMenuItems.length > 1"
@@ -188,6 +188,9 @@ const handleSelectSize = (size: WidgetSize) => {
                 }
             }
         }
+    }
+    .body-wrapper {
+        height: 100%;
     }
     .expand-button {
         position: absolute;
