@@ -9,6 +9,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/src/navigation/toolbox/type';
+import { union } from 'lodash';
 
 import type { Page } from '@/schema/_common/type';
 
@@ -39,8 +40,8 @@ const storeState = reactive({
 
 const state = reactive({
     data: undefined,
-    labelFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.labels_info ?? {})),
-    dataFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.data_info ?? {})),
+    labelFields: computed<string[]>(() => sortFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {}))),
+    dataFields: computed<string[]>(() => sortFields(Object.keys(storeState.selectedDataTable?.data_info ?? {}))),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
         { type: 'DIVIDER', name: '' },
@@ -103,6 +104,21 @@ const handleClickSort = (sortKey: string) => {
         return;
     }
     state.sortBy = sortKey;
+};
+
+/* Utils */
+const sortFields = (fields: string[]) => {
+    const single = ['Date'];
+    const separate = ['Year', 'Month', 'Day'];
+
+    const hasDate = fields.includes('Date');
+    const hasYearMonthDay = fields.includes('Year') && fields.includes('Month') && fields.includes('Day');
+    if (hasDate) {
+        return union(single, fields.filter((item) => !single.includes(item)));
+    } if (hasYearMonthDay) {
+        return union(separate, fields.filter((item) => !separate.includes(item)));
+    }
+    return fields;
 };
 
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
