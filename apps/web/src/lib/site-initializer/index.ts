@@ -18,6 +18,7 @@ import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
+import { initEcharts } from '@/lib/site-initializer/echarts';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 // import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
@@ -72,6 +73,7 @@ const init = async (store) => {
         initGtm(config);
         initAmcharts(config);
         initAmcharts5(config);
+        initEcharts();
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);

@@ -6,13 +6,12 @@ import {
 } from '@spaceone/design-system';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import type { IconOptions, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { IconOptions, WidgetFieldComponentProps, WidgetFieldComponentEmit } from '@/common/modules/widgets/types/widget-field-type';
 
 import { gray } from '@/styles/colors';
 
 
-const emit = defineEmits<{(e: 'update:value', value: { icon: Icon, color: string }): void;
-}>();
+const emit = defineEmits<WidgetFieldComponentEmit<{ icon: Icon, color: string }>>();
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<IconOptions>>(), {
     widgetFieldSchema: () => ({
@@ -79,11 +78,20 @@ const handleUpdateColor = (color: string) => {
     state.color = color;
 };
 
+const checkValue = ():boolean => {
+    if (state.color && state.iconList.find((icon) => icon.name === state.selectedIcon?.name)) {
+        return true;
+    }
+    return false;
+};
+
 watch([() => state.selectedIcon, () => state.color], ([icon, color]) => {
     emit('update:value', {
         icon,
         color,
     });
+    const isValid = checkValue();
+    emit('update:is-valid', isValid);
 });
 
 </script>

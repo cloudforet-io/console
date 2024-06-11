@@ -1,3 +1,4 @@
+import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
 
@@ -8,21 +9,24 @@ const heatmap: WidgetConfig = {
         sizes: ['md', 'full'],
     },
     requiredFieldsSchema: {
-        dataField: {},
-        yAxis: {
+        granularity: {},
+        xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
+                default: 10,
+                max: 10,
             },
         },
         groupBy: {
             options: {
-                dataTarget: 'label_field',
-                // multiSelectable: true, HACK: if possible
+                dataTarget: 'labels_info',
+                default: 7,
+                max: 14,
             },
         },
         formatRules: {
             options: {
-                fields: ['name', 'threshold', 'color'],
+                formatRulesType: FORMAT_RULE_TYPE.nameAndThreshold,
             },
         },
     },

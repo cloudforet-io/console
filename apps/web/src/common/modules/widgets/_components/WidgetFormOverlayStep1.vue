@@ -4,13 +4,12 @@ import {
 } from 'vue';
 
 import {
-    PToolboxTable, PI, PTooltip,
+    PI, PTooltip,
 } from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
 
 import WidgetFormDataSourcePopover from '@/common/modules/widgets/_components/WidgetFormDataSourcePopover.vue';
 import WidgetFormDataTableCard from '@/common/modules/widgets/_components/WidgetFormDataTableCard.vue';
+import WidgetFormOverlayPreviewTable from '@/common/modules/widgets/_components/WidgetFormOverlayPreviewTable.vue';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
 const widgetGenerateStore = useWidgetGenerateStore();
@@ -22,14 +21,14 @@ const storeState = reactive({
     dataTables: computed(() => widgetGenerateState.dataTables),
 });
 
-const state = reactive({
-    // data table
-    fields: computed(() => [
-        { name: 'key', label: 'something', type: 'item' },
-        { name: 'value', label: 'table', type: 'item' },
-    ]),
-    selectedData: undefined as string|undefined,
-});
+// const state = reactive({
+//     // data table
+//     fields: computed(() => [
+//         { name: 'key', label: 'something', type: 'item' },
+//         { name: 'value', label: 'table', type: 'item' },
+//     ]),
+//     selectedData: undefined as string|undefined,
+// });
 
 const displayState = reactive({
     dataTableAreaOpen: true,
@@ -103,6 +102,7 @@ const documentEventMount = (eventName: string, func: any) => {
 
 documentEventMount('mousemove', isResizing);
 documentEventMount('mouseup', endResizing);
+
 </script>
 
 <template>
@@ -140,24 +140,7 @@ documentEventMount('mouseup', endResizing);
                  :class="{ 'transition': displayState.transition, 'unselectable': displayState.resizing }"
                  :style="displayState.tableContainerStyle"
             >
-                <div class="data-table-wrapper">
-                    <p-toolbox-table :fields="state.fields"
-                                     :style="displayState.tableStyle"
-                                     :items="[]"
-                                     :searchable="false"
-                                     :page-size-changeable="false"
-                                     :refreshable="false"
-                                     class="view-table-wrapper"
-                    >
-                        <template #toolbox-left>
-                            <div class="toolbox-left-wrapper">
-                                <span class="view-table-title">
-                                    {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.DATA_TABLE') }}
-                                </span>
-                            </div>
-                        </template>
-                    </p-toolbox-table>
-                </div>
+                <widget-form-overlay-preview-table />
             </div>
         </div>
     </div>
@@ -174,7 +157,7 @@ documentEventMount('mouseup', endResizing);
 
         padding: 0.125rem;
         .data-source-wrapper {
-            @apply flex gap-4;
+            @apply flex gap-4 h-full;
             overflow: auto;
             padding: 1rem;
         }

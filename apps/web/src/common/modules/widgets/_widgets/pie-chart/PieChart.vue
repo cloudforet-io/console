@@ -6,14 +6,11 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { EChartsOption, EChartsType } from 'echarts';
-import { init } from 'echarts';
-import { LineChart } from 'echarts/charts';
-import {
-    DatasetComponent, GridComponent, LegendComponent, TooltipComponent,
-} from 'echarts/components';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
+import type { PieSeriesOption } from 'echarts/charts';
+import { init } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
@@ -27,15 +24,6 @@ const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
 
-use([
-    CanvasRenderer,
-    GridComponent,
-    DatasetComponent,
-    LineChart,
-    TooltipComponent,
-    LegendComponent,
-]);
-
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 const state = reactive({
     loading: true,
@@ -45,7 +33,7 @@ const state = reactive({
         if (!state.data?.results) return [];
         return state.data?.results;
     }),
-    chartOptions: computed<EChartsOption>(() => ({
+    chartOptions: computed<PieSeriesOption>(() => ({
         tooltip: {
             trigger: 'item',
             position: 'inside',

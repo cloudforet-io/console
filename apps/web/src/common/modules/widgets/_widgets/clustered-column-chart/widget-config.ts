@@ -8,6 +8,7 @@ const clusteredColumnChart: WidgetConfig = {
         sizes: ['full'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {
             options: {
                 multiSelectable: true,
@@ -15,7 +16,9 @@ const clusteredColumnChart: WidgetConfig = {
         },
         xAxis: {
             options: {
-                dataTarget: 'label_field',
+                dataTarget: 'labels_info',
+                default: 5,
+                max: 8,
             },
         },
     },

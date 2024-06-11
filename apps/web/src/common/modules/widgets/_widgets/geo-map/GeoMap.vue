@@ -8,14 +8,11 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import axios from 'axios';
-import { init, registerMap } from 'echarts';
-import type { EChartsOption, EChartsType } from 'echarts';
-import { MapChart } from 'echarts/charts';
-import {
-    TooltipComponent, LegendComponent, GeoComponent,
-} from 'echarts/components';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
+import type { MapSeriesOption } from 'echarts/charts';
+import { init, registerMap } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
@@ -32,14 +29,6 @@ const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
 
-use([
-    CanvasRenderer,
-    GeoComponent,
-    TooltipComponent,
-    LegendComponent,
-    MapChart,
-]);
-
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
 const state = reactive({
@@ -48,6 +37,7 @@ const state = reactive({
     chart: null as null | EChartsType,
     chartData: [],
     chartOptions: {
+        map: 'world',
         geo: {
             type: 'map',
             map: 'world',
@@ -93,7 +83,7 @@ const state = reactive({
                 ],
             },
         ],
-    } as EChartsOption,
+    } as MapSeriesOption,
 });
 
 onMounted(async () => {

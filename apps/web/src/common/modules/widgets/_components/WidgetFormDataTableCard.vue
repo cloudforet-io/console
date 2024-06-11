@@ -6,15 +6,20 @@ import {
 
 
 import {
-    PIconButton, PI, PButton,
+    PIconButton, PI, PButton, PButtonModal,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
+
+import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
 import WidgetFormDataTableCardSourceForm
@@ -22,7 +27,7 @@ import WidgetFormDataTableCardSourceForm
 import { DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
-import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
+import type { DataTableModel, AdditionalLabels, DateFormat } from '@/common/modules/widgets/types/widget-model';
 
 import { gray, violet } from '@/styles/colors';
 
@@ -38,6 +43,7 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
 });
 
 const state = reactive({
@@ -53,6 +59,7 @@ const state = reactive({
     selectedGroupByItems: [] as any[],
     filters: {} as Record<string, string[]>,
     dataFieldName: '',
+    dataUnit: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.sourceType === DATA_SOURCE_DOMAIN.COST) {
             return state.costDataTypeItems;
@@ -89,27 +96,140 @@ const advancedOptionsState = reactive({
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
+const modalState = reactive({
+    visible: false,
+    mode: '' as 'DELETE'|'DELETE_UNABLED'|'RESET',
+    headerTitle: computed(() => {
+        if (modalState.mode === 'DELETE') {
+            return 'Delete Data';
+        } if (modalState.mode === 'DELETE_UNABLED') {
+            return 'Cannot Delete the Data';
+        } if (modalState.mode === 'RESET') {
+            return 'Are you sure you want to reset the data options?';
+        }
+        return '';
+    }),
+    description: computed(() => {
+        if (modalState.mode === 'DELETE') {
+            return 'Are you sure you want to delete this data?';
+        } if (modalState.mode === 'DELETE_UNABLED') {
+            return 'This data is currently in use by {data_name}. \nDelete {data_name} first before deleting this data.';
+        } if (modalState.mode === 'RESET') {
+            return 'Resetting the data options will revert all inputss to their most recent values. This action cannot be undone.';
+        }
+        return '';
+    }),
+});
+
 
 
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    await widgetGenerateStore.loadDataTable(dataTableId);
+    widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
 };
 
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
 };
 
+const handleClickDeleteDataTable = async () => {
+    // TODO: Check if the data is in use
+    modalState.mode = 'DELETE';
+    modalState.visible = true;
+};
+const handleClickResetDataTable = () => {
+    modalState.mode = 'RESET';
+    modalState.visible = true;
+};
+const handleConfirmModal = async () => {
+    if (modalState.mode === 'DELETE') {
+        const deleteParams = {
+            data_table_id: props.item.data_table_id,
+        };
+        await widgetGenerateStore.deleteDataTable(deleteParams);
+    }
+    if (modalState.mode === 'RESET') {
+        setInitialDataTableForm();
+    }
+    modalState.visible = false;
+};
+const handleCancelModal = () => {
+    modalState.visible = false;
+};
+const handleUpdateDataTable = async () => {
+    const additionalLabelsRequest = {} as AdditionalLabels;
+    advancedOptionsState.additionalLabels.forEach((label) => {
+        additionalLabelsRequest[label.name] = label.value;
+    });
+    const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
+        ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
+        : { metric_id: state.selectedSourceEndItem };
+
+    const updateParams: DataTableUpdateParameters = {
+        data_table_id: props.item.data_table_id,
+        options: {
+            [state.sourceType]: domainOptions,
+            group_by: [],
+            filters: [],
+            filters_or: [],
+            data_name: state.dataFieldName,
+            data_unit: state.dataUnit,
+            additional_labels: additionalLabelsRequest,
+            date_format: (advancedOptionsState.separateDate ? 'SEPARATE' : 'SINGLE') as DateFormat,
+            timediff: advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
+                ? { [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }
+                : undefined,
+        },
+    };
+    await widgetGenerateStore.updateDataTable(updateParams);
+    if (storeState.selectedDataTableId === props.item.data_table_id) {
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({
+            data_table_id: props.item.data_table_id,
+        });
+    }
+};
+
+/* Utils */
+const setInitialDataTableForm = () => {
+    // Initial Form Setting
+    // Basic Options
+    const initialGroupBy = (props.item.options?.group_by || []).map((group) => ({
+        label: group.name,
+        name: group.key,
+    }));
+    // TODO: refactor groupBy & set filters
+    state.selectedGroupByItems = [...initialGroupBy];
+    state.dataFieldName = props.item.options.data_name || '';
+    state.dataUnit = props.item.options.data_unit || '';
+
+    // Advanced Options
+    const initialAdditionalLabels = (props.item.options.additional_labels || {})as AdditionalLabels;
+    advancedOptionsState.additionalLabels = Object.entries(initialAdditionalLabels).map(([key, value]) => ({
+        key: getRandomId(),
+        name: key,
+        value,
+    }));
+    const initialSeparateDate = props.item.options?.date_format;
+    advancedOptionsState.separateDate = !!(initialSeparateDate && initialSeparateDate === 'SEPARATE');
+    const timeDiff = props.item.options?.timediff;
+    const timeDiffKeys = Object.keys(timeDiff || {});
+    const selectedKey = timeDiffKeys.length ? timeDiffKeys[0] : 'none';
+    advancedOptionsState.selectedTimeDiff = selectedKey;
+    advancedOptionsState.selectedTimeDiffDate = selectedKey === 'none' ? undefined : `${-timeDiff[selectedKey]}`;
+};
+
 onMounted(() => {
-    state.selectedGroupByItems = [...(props.item.options?.group_by || [])];
-    state.dataFieldName = state.selectableSourceItems.find((source) => source.name === state.selectedSourceEndItem)?.label;
+    // Initial Form Setting
+    setInitialDataTableForm();
 });
 
 watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     // Base Options
     state.selectedGroupByItems = [];
     state.dataFieldName = state.selectableSourceItems.find((source) => source.name === _selectedSourceItem)?.label;
+    state.dataUnit = state.sourceType === DATA_SOURCE_DOMAIN.ASSET ? storeState.metrics[_selectedSourceItem]?.data?.unit || '' : '';
     state.filters = {};
 
 
@@ -156,6 +276,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                   :selected-group-by-items.sync="state.selectedGroupByItems"
                                                   :filters.sync="state.filters"
                                                   :data-field-name.sync="state.dataFieldName"
+                                                  :data-unit.sync="state.dataUnit"
                                                   :additional-labels.sync="advancedOptionsState.additionalLabels"
                                                   :separate-date.sync="advancedOptionsState.separateDate"
                                                   :selected-time-diff.sync="advancedOptionsState.selectedTimeDiff"
@@ -164,21 +285,42 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             <div class="button-group-wrapper">
                 <p-button style-type="tertiary"
                           icon-left="ic_delete"
+                          @click="handleClickDeleteDataTable"
                 >
                     Delete
                 </p-button>
                 <div class="form-button-wrapper">
                     <p-button style-type="transparent"
                               icon-left="ic_refresh"
+                              @click="handleClickResetDataTable"
                     >
                         Reset
                     </p-button>
-                    <p-button style-type="secondary">
+                    <p-button style-type="secondary"
+                              @click="handleUpdateDataTable"
+                    >
                         Apply
                     </p-button>
                 </div>
             </div>
         </div>
+        <p-button-modal :visible="modalState.visible"
+                        size="sm"
+                        theme-color="alert"
+                        :header-title="modalState.headerTitle"
+                        :hide-footer-close-button="modalState.mode === 'DELETE_UNABLED'"
+                        @confirm="handleConfirmModal"
+                        @cancel="handleCancelModal"
+        >
+            <template #body>
+                <p>{{ modalState.description }}</p>
+            </template>
+            <template v-if="modalState.mode === 'DELETE_UNABLED'"
+                      #confirm-button
+            >
+                OK
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -190,7 +332,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     .card-wrapper {
         @apply relative border border-gray-300 rounded-lg w-full bg-white;
         width: 24rem;
-        overflow: hidden;
         height: auto;
 
         &.selected {
@@ -199,7 +340,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
         }
 
         .card-header {
-            @apply bg-gray-100;
+            @apply bg-gray-100 rounded-lg;
             padding: 0.5rem 0.75rem;
 
             .title-wrapper {

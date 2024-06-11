@@ -8,14 +8,15 @@ const progressCard: WidgetConfig = {
         sizes: ['sm'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         totalField: {
             options: {
-                dataTarget: 'data_field',
+                dataTarget: 'data_info',
             },
         },
         basisField: {
             options: {
-                dataTarget: 'data_field',
+                dataTarget: 'data_info',
             },
         },
         formatRules: {

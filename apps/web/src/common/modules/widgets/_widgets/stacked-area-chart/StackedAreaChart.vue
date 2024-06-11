@@ -7,14 +7,11 @@ import {
 import {
     PDataLoader,
 } from '@spaceone/design-system';
-import { init } from 'echarts';
-import type { EChartsOption, EChartsType } from 'echarts';
-import { LineChart } from 'echarts/charts';
-import {
-    TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
-} from 'echarts/components';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
+import type { LineSeriesOption } from 'echarts/charts';
+import { init } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
@@ -28,15 +25,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
-
-use([
-    CanvasRenderer,
-    GridComponent,
-    DatasetComponent,
-    LineChart,
-    TooltipComponent,
-    LegendComponent,
-]);
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
@@ -98,7 +86,7 @@ const state = reactive({
                 data: [23, 346, 24, 400, 220, 4, 500],
             },
         ],
-    } as EChartsOption,
+    } as LineSeriesOption,
 });
 
 onMounted(() => {

@@ -1367,6 +1367,7 @@
 				"FIXED": "Fixed Amount",
 				"FORMAT": "Format",
 				"INCREASE": "Increase",
+				"NAME_INVALID_TEXT": "Please write at least one letter.",
 				"PERCENT": "Percentage",
 				"PREVIOUS_DAY": "Previous Day",
 				"PREVIOUS_MONTH": "Previous Month",

@@ -1,3 +1,4 @@
+import type { Page } from '@/schema/_common/type';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
 export interface DataTableLoadParameters {
@@ -6,5 +7,5 @@ export interface DataTableLoadParameters {
     start?: string;
     end?: string;
     sort?: any[];
-    page?: Record<string, any>;
+    page?: Page;
 }

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PFieldGroup, PTextInput, PSelectButton,
@@ -9,11 +11,11 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { WidgetFieldComponentEmit, WidgetFieldComponentProps } from '@/common/modules/widgets/types/widget-field-type';
+import type { WidgetFieldComponentEmit, WidgetFieldComponentProps, TableDataFieldOptions } from '@/common/modules/widgets/types/widget-field-type';
 import type { TableDataFieldValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
 
-const props = withDefaults(defineProps<WidgetFieldComponentProps<undefined>>(), {
+const props = withDefaults(defineProps<WidgetFieldComponentProps<TableDataFieldOptions>>(), {
 });
 const emit = defineEmits<WidgetFieldComponentEmit<TableDataFieldValue>>();
 const state = reactive({
@@ -31,6 +33,11 @@ const state = reactive({
     selectedFieldType: 'dynamicField',
     selectedItem: undefined as undefined | MenuItem[] | string,
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
+    isValid: computed<boolean>(() => {
+        if (!state.proxyValue?.count) return false;
+        if (state.selectedFieldType === 'staticField' && !state.selectedItem?.length) return false;
+        return !!state.selectedItem;
+    }),
 });
 
 /* Event */
@@ -43,10 +50,23 @@ const handleUpdateSelect = (val: string|MenuItem[]) => {
     state.proxyValue = { ...state.proxyValue, value: _val };
 };
 const handleUpdateCount = (val: number) => {
-    if (val === state.proxyValue.count) return;
+    if (val === state.proxyValue?.count) return;
     state.proxyValue = { ...state.proxyValue, count: val };
 };
 
+/* Watcher */
+watch(() => state.isValid, (isValid) => {
+    emit('update:is-valid', isValid);
+});
+
+/* Init */
+onMounted(() => {
+    // TODO: set state.proxyValue with the value from the widget or set default value
+    state.proxyValue = {
+        value: state.menuItems[0]?.name, // TODO: string | string[]
+        count: props.widgetFieldSchema.options?.default,
+    };
+});
 </script>
 
 <template>
@@ -74,7 +94,9 @@ const handleUpdateCount = (val: number) => {
                                    @update:selected="handleUpdateSelect"
                 />
                 <p-text-input type="number"
-                              :min="0"
+                              :min="1"
+                              :max="props.widgetFieldSchema.options?.max"
+                              :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />
             </div>

@@ -8,18 +8,15 @@ const gauge: WidgetConfig = {
         sizes: ['md'],
     },
     requiredFieldsSchema: {
+        granularity: {},
         dataField: {},
         min: {
             options: {
-                min: 0,
-                max: 5,
                 default: 3,
             },
         },
         max: {
             options: {
-                min: 0,
-                max: 5,
                 default: 3,
             },
         },

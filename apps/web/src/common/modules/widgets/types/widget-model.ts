@@ -1,13 +1,14 @@
 import type { Tags } from '@/schema/_common/model';
 
 import type { DATA_TABLE_TYPE, DATA_SOURCE_DOMAIN } from '@/common/modules/widgets/_constants/data-table-constant';
-import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-config-type';
+import type { WidgetFieldName } from '@/common/modules/widgets/types/widget-field-type';
 import type { WidgetFieldValues } from '@/common/modules/widgets/types/widget-field-value-type';
 
 export interface WidgetModel {
     widget_id: string;
     name: string;
     description: string;
+    data_table_id?: string;
     widget_type: WidgetType;
     options: Record<WidgetFieldName, WidgetFieldValues>;
     tags: Tags;
@@ -39,8 +40,9 @@ export interface DataTableModel {
 export type DataTableSourceType = typeof DATA_SOURCE_DOMAIN[keyof typeof DATA_SOURCE_DOMAIN];
 export type DataTableOperator = 'CONCAT' | 'JOIN' | 'WHERE' | 'AGGREGATE' | 'EVAL';
 export type DataTableDataType = typeof DATA_TABLE_TYPE[keyof typeof DATA_TABLE_TYPE];
-export type AdditionalLabels = Record<string, number>; // year|month|day
-export type TimeDiff = Record<string, any>;
+export type AdditionalLabels = Record<string, string>;
+export type DateFormat = 'SINGLE' | 'SEPARATE';
+export type TimeDiff = Record<string, any>; // year|month|day
 export type TimeSeriesAnalyzeQuery = Record<string, any>;
 export type LabelsInfo = DataTableLabelKey[];
 export type DataInfo = DataTableDataKey[];
@@ -65,10 +67,13 @@ export interface DataTableAddOptions {
     'ASSET'?: AssetOptions;
     'COST'?: CostOptions;
     group_by?: string[];
-    data_name?: string;
-    date_format?: 'SINGLE'|'SEPARATE';
+    data_name: string;
+    data_unit?: string;
+    date_format?: DateFormat;
     additional_labels?: AdditionalLabels;
-    time_diff?: TimeDiff;
+    timediff?: TimeDiff;
+    filters?: any[];
+    filters_or?: any[];
 }
 export interface AssetOptions {
     metric_id: string;

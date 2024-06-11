@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PButton, POverlayLayout,
@@ -47,6 +49,11 @@ const handleUpdateVisible = (value: boolean) => {
 watch(() => widgetGenerateState.showOverlay, (val) => {
     if (!val) widgetGenerateStore.reset();
 });
+
+onMounted(async () => {
+    await widgetGenerateStore.listDataTable();
+});
+
 </script>
 
 <template>
@@ -63,6 +70,7 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
                 <div class="footer-wrapper">
                     <p-button style-type="substitutive"
                               icon-right="ic_arrow-right"
+                              :disabled="!widgetGenerateState.selectedDataTableId"
                               @click="handleClickContinue"
                     >
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CONTINUE') }}
