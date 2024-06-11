@@ -5,14 +5,14 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PToolbox, PI, PSelectDropdown,
+    PDataLoader, PToolbox, PI, PSelectDropdown, PEmpty,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 
-import { gray } from '@/styles/colors';
+import { gray, white } from '@/styles/colors';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
@@ -65,7 +65,7 @@ const state = reactive({
         padding: '0',
         width: '1px',
         'min-width': '1px',
-        backgroundColor: gray[300],
+        backgroundColor: storeState.selectedDataTableId ? gray[900] : white,
     })),
 });
 
@@ -123,7 +123,7 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                         <tr>
                             <th v-for="(field, idx) in state.fields"
                                 :key="`th-preview-${idx}`"
-                                :style="field.type === 'DIVIDER' ? {...state.dividerStyle, 'background-color': gray[900] } : {}"
+                                :style="field.type === 'DIVIDER' ? {...state.dividerStyle } : {}"
                             >
                                 <span v-if="field.type === 'DIVIDER'" />
                                 <span v-else
@@ -139,21 +139,28 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, rowIdx) in storeState.previewData"
-                            :key="`tr-preview-${rowIdx}`"
-                            :data-index="rowIdx"
-                        >
-                            <td v-for="(field, idx) in state.fields"
-                                :key="`td-preview-${idx}`"
-                                :style="field.type === 'DIVIDER' ? state.dividerStyle : {}"
+                        <template v-if="storeState.selectedDataTableId">
+                            <tr v-for="(item, rowIdx) in storeState.previewData"
+                                :key="`tr-preview-${rowIdx}`"
+                                :data-index="rowIdx"
                             >
-                                <span v-if="field.type === 'DIVIDER'" />
-                                <span v-else
-                                      :class="{'td-contents': true, 'data-field': field.type === 'DATA'}"
+                                <td v-for="(field, idx) in state.fields"
+                                    :key="`td-preview-${idx}`"
+                                    :style="field.type === 'DIVIDER' ? {...state.dividerStyle, 'background-color': gray[300]} : {}"
                                 >
-                                    {{ item[field.name] ?? '-' }}
-                                </span>
-                            </td>
+                                    <span v-if="field.type === 'DIVIDER'" />
+                                    <span v-else
+                                          :class="{'td-contents': true, 'data-field': field.type === 'DATA'}"
+                                    >
+                                        {{ item[field.name] ?? '-' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr v-else
+                            class="no-data-wrapper"
+                        >
+                            <p-empty />
                         </tr>
                     </tbody>
                 </table>
@@ -188,7 +195,8 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
             }
         }
         th {
-            @apply text-label-md font-bold border-t border-b border-gray-900;
+            @apply text-label-md font-bold border-t border-b border-gray-900 bg-white;
+            height: 2rem;
             min-width: 8rem;
 
             .th-contents {
@@ -232,17 +240,16 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
             }
         }
         tbody {
+            tr {
+                &:hover {
+                    @apply bg-blue-100;
+                }
+            }
             .no-data-wrapper {
                 position: absolute;
                 width: 100%;
                 height: calc(100% - 2rem);
                 max-height: 12.875rem;
-            }
-
-            tr {
-                &:hover {
-                    @apply bg-blue-100;
-                }
             }
         }
         td {
