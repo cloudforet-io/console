@@ -238,14 +238,16 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                 height: calc(100% - 2rem);
                 max-height: 12.875rem;
             }
+
+            tr {
+                &:hover {
+                    @apply bg-blue-100;
+                }
+            }
         }
         td {
             @apply px-4 z-0 align-middle min-w-28 text-sm border-b;
             min-width: 8rem;
-
-            &:hover {
-                @apply bg-gray-200;
-            }
 
             .td-contents {
                 @apply inline-flex gap-2 items-center;
