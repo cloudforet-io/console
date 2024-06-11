@@ -26,7 +26,6 @@ export default defineConfig(({ mode }) => ({
                 'vue',
                 'vue-router',
                 'vue-i18n',
-                '@amcharts/amcharts4',
             ],
             output: {
                 globals: {
