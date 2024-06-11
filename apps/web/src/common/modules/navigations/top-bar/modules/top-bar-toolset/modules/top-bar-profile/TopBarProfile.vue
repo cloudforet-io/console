@@ -132,7 +132,10 @@ const handleClickGoToMyPage = () => {
 const handleClickGoToConsoleHome = () => {
     appContextStore.setGlobalGrantLoading(true);
     router.push({
-        name: LANDING_ROUTE._NAME,
+        name: LANDING_ROUTE.DOMAIN._NAME,
+        params: {
+            force: 'true',
+        },
     }).catch(() => {});
     hideProfileMenu();
 };

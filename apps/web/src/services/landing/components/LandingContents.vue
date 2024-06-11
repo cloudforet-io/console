@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import Vue, {
+import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
@@ -12,11 +12,9 @@ import { sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
@@ -41,7 +39,6 @@ const recentStore = useRecentStore();
 const recentState = recentStore.state;
 const landingPageStore = useLandingPageStore();
 const landingPageStoreGetters = landingPageStore.getters;
-const appContextStore = useAppContextStore();
 
 const router = useRouter();
 const { width } = useWindowSize();
@@ -70,20 +67,12 @@ const handleSearch = (value: string) => {
     state.searchText = value;
 };
 const handleClickButton = () => {
-    appContextStore.enterAdminMode();
     window.open(router.resolve({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace: 'true',
         },
     }).href, '_blank');
-    Vue.notify({
-        group: 'toastTopCenter',
-        type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
-        duration: 2000,
-        speed: 1,
-    });
 };
 
 onMounted(async () => {

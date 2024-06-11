@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -15,6 +15,7 @@ const userWorkspaceStore = useUserWorkspaceStore();
 const workspaceStoreGetters = userWorkspaceStore.getters;
 
 const router = useRouter();
+const route = useRoute();
 
 const storeState = reactive({
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -24,6 +25,7 @@ const state = reactive({
 });
 
 watch(() => storeState.workspaceList, () => {
+    if (route.params.force === 'true') return;
     if (state.isDomainLandingPage) {
         router.push({ name: LANDING_ROUTE.DOMAIN._NAME }).catch(() => {});
     } else {
