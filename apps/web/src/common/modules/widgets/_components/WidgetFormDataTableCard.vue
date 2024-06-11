@@ -126,7 +126,7 @@ const modalState = reactive({
 /* Events */
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
-    widgetGenerateStore.setSelectedDataTableGranularity(GRANULARITY.MONTHLY);
+    widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
 };
 
 const handleSelectSourceItem = (selectedItem: string) => {

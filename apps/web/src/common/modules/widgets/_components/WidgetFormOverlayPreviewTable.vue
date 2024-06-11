@@ -5,9 +5,8 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PToolbox, PI, PSelectDropdown,
+    PDataLoader, PToolbox, PI, PSelectDropdown, PEmpty,
 } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 
 
@@ -17,6 +16,12 @@ import { gray, white } from '@/styles/colors';
 
 import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
+interface PreviewTableField {
+    type: 'LABEL' | 'DATA' | 'DIVIDER';
+    name: string;
+    sortKey?: string;
+}
 
 const widgetGenerateStore = useWidgetGenerateStore();
 const widgetGenerateState = widgetGenerateStore.state;
@@ -33,9 +38,10 @@ const state = reactive({
     data: undefined,
     labelFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.labels_info ?? {})),
     dataFields: computed<string[]>(() => Object.keys(storeState.selectedDataTable?.data_info ?? {})),
-    fields: computed<DataTableFieldType[]>(() => [
-        ...state.labelFields.map((key) => ({ name: key, sortable: true, sortKey: key })),
-        ...state.dataFields.map((key) => ({ name: key })),
+    fields: computed<PreviewTableField[]>(() => [
+        ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
+        { type: 'DIVIDER', name: '' },
+        ...state.dataFields.map((key) => ({ type: 'DATA', name: key })),
     ]),
     sortBy: '',
     granularityItems: computed<MenuItem[]>(() => ([
@@ -55,12 +61,18 @@ const state = reactive({
             label: 'Yearly',
         },
     ])),
+    dividerStyle: computed(() => ({
+        padding: '0',
+        width: '1px',
+        'min-width': '1px',
+        backgroundColor: storeState.selectedDataTableId ? gray[900] : white,
+    })),
 });
 
 /* Events */
 const handleSelectGranularity = async (granularity: Granularity) => {
     if (!storeState.selectedDataTableId) return;
-    widgetGenerateStore.setSelectedDataTableGranularity(granularity);
+    widgetGenerateStore.setSelectedPreviewGranularity(granularity);
     await widgetGenerateStore.loadDataTable(storeState.selectedDataTableId);
 };
 
@@ -98,7 +110,7 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                                 </div>
                                 <p-select-dropdown class="granularity-dropdown"
                                                    :menu="state.granularityItems"
-                                                   :selected="widgetGenerateState.selectedDataTableGranularity"
+                                                   :selected="widgetGenerateState.selectedPreviewGranularity"
                                                    use-fixed-menu-style
                                                    @select="handleSelectGranularity"
                                 />
@@ -111,11 +123,14 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                         <tr>
                             <th v-for="(field, idx) in state.fields"
                                 :key="`th-preview-${idx}`"
-                                :style="{ 'background-color': state.dataFields.includes(field.name) ? gray[100] : white}"
+                                :style="field.type === 'DIVIDER' ? {...state.dividerStyle } : {}"
                             >
-                                <span :class="{'th-contents': true, 'data-field': state.dataFields.includes(field.name)}">
+                                <span v-if="field.type === 'DIVIDER'" />
+                                <span v-else
+                                      :class="{'th-contents': true, 'data-field': field.type === 'DATA'}"
+                                >
                                     {{ field.name }}
-                                    <p-i v-if="field.sortable"
+                                    <p-i v-if="field.type === 'LABEL'"
                                          :name="(field.sortKey|| field.name) === state.sortBy ? 'ic_caret-down-filled' : 'ic_caret-down'"
                                          class="sort-icon"
                                     />
@@ -124,18 +139,28 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, rowIdx) in storeState.previewData"
-                            :key="`tr-preview-${rowIdx}`"
-                            :data-index="rowIdx"
-                        >
-                            <td v-for="(field, idx) in state.fields"
-                                :key="`td-preview-${idx}`"
-                                :style="{ 'background-color': state.dataFields.includes(field.name) ? gray[100] : white}"
+                        <template v-if="storeState.selectedDataTableId">
+                            <tr v-for="(item, rowIdx) in storeState.previewData"
+                                :key="`tr-preview-${rowIdx}`"
+                                :data-index="rowIdx"
                             >
-                                <span :class="{'td-contents': true, 'data-field': state.dataFields.includes(field.name)}">
-                                    {{ item[field.name] ?? '-' }}
-                                </span>
-                            </td>
+                                <td v-for="(field, idx) in state.fields"
+                                    :key="`td-preview-${idx}`"
+                                    :style="field.type === 'DIVIDER' ? {...state.dividerStyle, 'background-color': gray[300]} : {}"
+                                >
+                                    <span v-if="field.type === 'DIVIDER'" />
+                                    <span v-else
+                                          :class="{'td-contents': true, 'data-field': field.type === 'DATA'}"
+                                    >
+                                        {{ item[field.name] ?? '-' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr v-else
+                            class="no-data-wrapper"
+                        >
+                            <p-empty />
                         </tr>
                     </tbody>
                 </table>
@@ -150,14 +175,12 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     height: 100%;
     overflow-y: scroll;
     .table-container {
+        @apply overflow-auto h-full w-full;
 
         .preview-toolbox {
             padding-top: 1rem;
         }
 
-        .table-container {
-            @apply overflow-auto h-full w-full;
-        }
         table {
             @apply min-w-full;
             border-collapse: separate;
@@ -172,14 +195,10 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
             }
         }
         th {
-            vertical-align: bottom;
-            line-height: 1.25rem;
-            font-size: 0.875rem;
-            text-align: left;
-            letter-spacing: 0;
-            white-space: nowrap;
-            border-top: 1px solid black;
-            border-bottom: 1px solid black;
+            @apply text-label-md font-bold border-t border-b border-gray-900 bg-white;
+            height: 2rem;
+            min-width: 8rem;
+
             .th-contents {
                 @apply flex justify-between pl-4;
                 line-height: 2;
@@ -221,6 +240,11 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
             }
         }
         tbody {
+            tr {
+                &:hover {
+                    @apply bg-blue-100;
+                }
+            }
             .no-data-wrapper {
                 position: absolute;
                 width: 100%;
@@ -229,27 +253,17 @@ watch(() => storeState.selectedDataTableId, async (dataTableId) => {
             }
         }
         td {
-            @apply px-4 z-0 align-middle min-w-28 text-sm;
-
-            &:hover {
-                @apply bg-gray-200;
-            }
+            @apply px-4 z-0 align-middle min-w-28 text-sm border-b;
+            min-width: 8rem;
 
             .td-contents {
-                @apply inline-flex gap-2;
+                @apply inline-flex gap-2 items-center;
                 width: 100%;
+                height: 2.25rem;
 
                 &.data-field {
                     @apply justify-end;
                 }
-            }
-
-            &.has-width {
-                word-break: break-word;
-            }
-
-            i, span, div, input, textarea, article, main, ul, li {
-                vertical-align: baseline;
             }
         }
     }
