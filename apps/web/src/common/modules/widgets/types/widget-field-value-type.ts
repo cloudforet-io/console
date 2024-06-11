@@ -7,10 +7,9 @@ export interface ComparisonValue {
     format?: 'all'|'percent'|'fixed';
 }
 export interface FormatRulesValue {
-    threshold: number;
+    threshold?: number;
     color: string;
     name?: string;
-    dropdownItem?: string; // TODO: weired name...
 }
 export interface LineByValue {
     value: string;
@@ -41,6 +40,6 @@ export interface GroupByValue {
     count?: number;
 }
 
-export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue
+export type WidgetFieldValues = string | string[] | number | ComparisonValue[] | FormatRulesValue[]
     | LineByValue | StackByValue | CategoryByValue | GroupByValue
     | XAxisValue | YAxisValue | TableDataFieldValue;

@@ -1,5 +1,6 @@
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
+import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -80,9 +81,9 @@ export interface ComparisonOptions {
     compareTargets?: any[]; // subTotal or X-Axis
 }
 
-export type FormatRulesField = 'name' | 'threshold' | 'color'| 'dropdown';
+export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_TYPE];
 export interface FormatRulesOptions {
-    fields: FormatRulesField[];
+    formatRulesType: FormatRulesType;
     dataTarget?: string;
 }
 type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
