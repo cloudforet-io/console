@@ -97,19 +97,38 @@ const handleChangeToolbox = async (options: ToolboxOptions) => {
     });
 };
 
+const handleClickSort = (sortKey: string) => {
+    if (state.sortBy === sortKey) {
+        state.sortBy = '';
+        return;
+    }
+    state.sortBy = sortKey;
+};
+
 watch(() => storeState.selectedDataTableId, async (dataTableId) => {
     if (dataTableId) {
         await widgetGenerateStore.loadDataTable({
             data_table_id: dataTableId,
         });
         state.thisPage = 1;
+        state.sortBy = '';
     }
 });
 
 watch(() => storeState.dataTableUpdating, () => {
     if (storeState.dataTableUpdating) {
         state.thisPage = 1;
+        state.sortBy = '';
     }
+});
+
+watch(() => state.sortBy, async () => {
+    if (!storeState.selectedDataTableId) return;
+    await widgetGenerateStore.loadDataTable({
+        data_table_id: storeState.selectedDataTableId,
+        sort: [state.sortBy],
+    });
+    state.thisPage = 1;
 });
 
 </script>
@@ -163,6 +182,7 @@ watch(() => storeState.dataTableUpdating, () => {
                             <p-i v-if="field.type === 'LABEL'"
                                  :name="(field.sortKey|| field.name) === state.sortBy ? 'ic_caret-down-filled' : 'ic_caret-down'"
                                  class="sort-icon"
+                                 @click="handleClickSort(field.name)"
                             />
                         </span>
                     </th>
