@@ -41,7 +41,7 @@ export interface GroupByOptions {
 export interface CategoryByOptions {
     dataTarget?: string;
     max?: number;
-    default: number;
+    default: string;
 }
 export interface TotalFieldOptions {
     dataTarget?: string;
