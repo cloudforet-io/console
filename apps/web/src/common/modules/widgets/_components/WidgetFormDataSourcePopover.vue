@@ -14,6 +14,7 @@ import { i18n } from '@/translations';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
+import type { NamespaceReferenceMap } from '@/store/reference/namespace-reference-store';
 
 import WidgetFormAssetSecurityDataSourcePopper
     from '@/common/modules/widgets/_components/WidgetFormAssetSecurityDataSourcePopper.vue';
@@ -31,6 +32,8 @@ const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    namespaces: computed<NamespaceReferenceMap>(() => allReferenceStore.getters.namespace),
+    dataTables: computed(() => widgetGenerateStore.state.dataTables),
 });
 
 const state = reactive({
@@ -68,7 +71,12 @@ const state = reactive({
     selectedCostDataType: undefined as undefined|string,
     // asset & security
     selectedMetricId: undefined as undefined|string,
-
+    selectedNamespace: computed(() => {
+        if (!state.selectedMetricId) return undefined;
+        const namespaceId = storeState.metrics[state.selectedMetricId]?.data.namespace_id;
+        if (!namespaceId) return undefined;
+        return storeState.namespaces[namespaceId];
+    }),
     selectedCostDataTypeLabel: computed(() => {
         if (!state.selectedCostDataSourceId || !state.selectedCostDataType) return '';
         const targetCostDataSource = storeState.costDataSources[state.selectedCostDataSourceId];
@@ -105,8 +113,12 @@ const handleSelectPopperCondition = (condition: DataTableDataType) => {
 };
 const handleConfirmDataSource = async () => {
     if (state.selectedPopperCondition === DATA_TABLE_TYPE.ADD) {
+        const dataTableBaseName = state.selectedDataSourceDomain === DATA_SOURCE_DOMAIN.COST
+            ? `${storeState.costDataSources[state.selectedCostDataSourceId].name} - ${state.selectedCostDataTypeLabel}`
+            : `${state.selectedNamespace.name} - ${storeState.metrics[state.selectedMetricId]?.label}`;
         const addParameters = {
             source_type: state.selectedDataSourceDomain,
+            name: getDuplicatedDataTableName(dataTableBaseName),
         } as DataTableAddParameters;
         const costOptions = {
             data_name: state.selectedCostDataTypeLabel,
@@ -133,6 +145,26 @@ const handleConfirmDataSource = async () => {
         await widgetGenerateStore.createTransformDataTable({});
     }
     state.showPopover = false;
+};
+
+/* Utils */
+const getDuplicatedDataTableName = (name: string): string => {
+    let _name = name;
+    const _regex = /^(.*?)\s*\((\d+)\)$/i;
+    const dataTableNames = widgetGenerateStore.state.dataTables.map((dataTable) => dataTable.name);
+
+    while (dataTableNames.includes(_name)) {
+        const match = _regex.exec(_name);
+        if (match) {
+            const baseName = match[1];
+            const numberStr = match[2];
+            const newNumber = numberStr ? parseInt(numberStr) + 1 : 2;
+            _name = `${baseName} (${newNumber})`;
+        } else {
+            _name = `${_name} (2)`;
+        }
+    }
+    return _name;
 };
 
 watch(() => state.showPopover, (val) => {
