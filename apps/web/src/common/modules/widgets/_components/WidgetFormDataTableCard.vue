@@ -6,7 +6,7 @@ import {
 
 
 import {
-    PIconButton, PI, PButton, PButtonModal,
+    PIconButton, PI, PButton, PButtonModal, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
@@ -19,6 +19,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import type { MetricReferenceMap } from '@/store/reference/metric-reference-store';
 
 
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import getRandomId from '@/lib/random-id-generator';
 
 import WidgetFormDataTableCardAddForm from '@/common/modules/widgets/_components/WidgetFormDataTableCardAddForm.vue';
@@ -44,6 +45,7 @@ const storeState = reactive({
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
+    dataTables: computed(() => widgetGenerateState.dataTables),
 });
 
 const state = reactive({
@@ -89,6 +91,11 @@ const state = reactive({
     }),
 });
 
+const dataTableNameState = reactive({
+    editMode: false,
+    dataTableName: props.item.name,
+});
+
 const advancedOptionsState = reactive({
     additionalLabels: [] as AdditionalLabel[],
     separateDate: false,
@@ -124,6 +131,27 @@ const modalState = reactive({
 
 
 /* Events */
+const handleClickNameConfirm = async () => {
+    const editedDataTableName = dataTableNameState.dataTableName.trim();
+    if (props.item.name === editedDataTableName) {
+        dataTableNameState.editMode = false;
+        return;
+    }
+    const dataTableNames = storeState.dataTables.map((dataTable) => dataTable.name);
+    if (dataTableNames.includes(editedDataTableName)) {
+        showErrorMessage('A data with this name already exists.', '');
+        return;
+    }
+    await widgetGenerateStore.updateDataTable({
+        data_table_id: props.item.data_table_id,
+        name: editedDataTableName,
+    });
+    showSuccessMessage('Data name successfully changed.', '');
+    dataTableNameState.editMode = false;
+};
+const handleClickNameEdit = () => {
+    dataTableNameState.editMode = true;
+};
 const handleSelectDataTable = async (dataTableId: string) => {
     widgetGenerateStore.setSelectedDataTableId(dataTableId);
     widgetGenerateStore.setSelectedPreviewGranularity(GRANULARITY.MONTHLY);
@@ -144,10 +172,15 @@ const handleClickResetDataTable = () => {
 };
 const handleConfirmModal = async () => {
     if (modalState.mode === 'DELETE') {
+        const beforeSelectedDataTableId = storeState.selectedDataTableId;
         const deleteParams = {
             data_table_id: props.item.data_table_id,
         };
         await widgetGenerateStore.deleteDataTable(deleteParams);
+        if (beforeSelectedDataTableId === props.item.data_table_id) {
+            const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
+            widgetGenerateStore.setSelectedDataTableId(dataTableId);
+        }
     }
     if (modalState.mode === 'RESET') {
         setInitialDataTableForm();
@@ -256,12 +289,34 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                              size="md"
                         />
                     </button>
-                    <p>Data Source 1</p>
-                    <p-icon-button class="edit-button"
-                                   style-type="transparent"
-                                   name="ic_edit-text"
-                                   size="sm"
-                    />
+                    <div v-if="dataTableNameState.editMode"
+                         class="data-table-name-form"
+                    >
+                        <p-text-input v-model="dataTableNameState.dataTableName"
+                                      class="name-input"
+                                      size="sm"
+                        />
+                        <p-icon-button name="ic_check"
+                                       size="sm"
+                                       @click="handleClickNameConfirm"
+                        />
+                    </div>
+                    <div v-else
+                         class="data-table-name-wrapper"
+                    >
+                        <p-i class="data-table-icon"
+                             name="ic_service_data-sources"
+                             width="1.25rem"
+                             height="1.25rem"
+                        />
+                        <p>{{ props.item.name }}</p>
+                        <p-icon-button class="edit-button"
+                                       style-type="transparent"
+                                       name="ic_edit-text"
+                                       size="sm"
+                                       @click="handleClickNameEdit"
+                        />
+                    </div>
                 </div>
                 <widget-form-data-table-card-source-form :source-type="state.sourceType"
                                                          :parent-source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.namespaceId"
@@ -350,6 +405,26 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                 .selected-radio-icon {
                     width: 1.5rem;
                     height: 1.5rem;
+                }
+                .data-table-name-wrapper {
+                    @apply flex items-center gap-1;
+                    .data-table-icon {
+                        margin-right: 0.125rem;
+                    }
+                }
+                .data-table-name-form {
+                    @apply flex items-center;
+                    width: calc(100% - 1.625rem);
+                    gap: 0.0625rem;
+
+                    /* custom design-system component - p-text-input */
+                    :deep(.p-text-input) {
+                        @apply w-full font-normal;
+                        height: 1.5rem;
+                        .tag-container {
+                            padding: 0;
+                        }
+                    }
                 }
             }
         }

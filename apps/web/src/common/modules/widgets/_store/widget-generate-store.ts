@@ -57,7 +57,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setOverlayStep = (overlayStep: number) => {
         state.overlayStep = overlayStep;
     };
-    const setSelectedDataTableId = (selectedDataTableId: string) => {
+    const setSelectedDataTableId = (selectedDataTableId?: string) => {
         state.selectedDataTableId = selectedDataTableId;
     };
     const setTitle = (title: string) => {
@@ -150,7 +150,6 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             try {
                 await SpaceConnector.clientV2.dashboard.publicDataTable.delete<DataTableDeleteParameters, DataTableModel>(deleteParams);
                 state.dataTables = state.dataTables.filter((dataTable) => dataTable.data_table_id !== deleteParams.data_table_id);
-                state.selectedDataTableId = undefined;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
