@@ -1387,11 +1387,15 @@
 				"TOGGLE_LESS": "show less",
 				"TOGGLE_MORE": "show more"
 			},
+			"FIELD": "Field",
 			"HEALTH_DASHBOARD_DESC_1": "You can use the AWS Health Dashboard. If you have a Business or Enterprise support plan of AWS.",
 			"HEALTH_DASHBOARD_DESC_2": "Can't see the widget? even you are using a suitable plan. Please contact us.",
 			"HEALTH_DASHBOARD_DESC_3": "Check your AWS Support Plans first.",
 			"HEALTH_DASHBOARD_HELP": "Get a notice the status of AWS services.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
+			"MAX_ITEMS": "Max Items",
+			"MAX_ITEMS_DESC": "The maximum number of {fieldName} values is {max}",
+			"NUMBER_FIELD_VALIDATION": "The value must be {max} or less.",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "Account ID",
 				"AGO": "ago",

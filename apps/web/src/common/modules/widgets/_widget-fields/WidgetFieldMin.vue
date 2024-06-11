@@ -24,8 +24,8 @@ const state = reactive({
     value: props.widgetFieldSchema.options?.default ?? 0,
 });
 
-const handleUpdateValue = (value: number|'') => {
-    state.value = (value < 0) || (value === '') ? 0 : value;
+const handleUpdateValue = (value: number) => {
+    state.value = value;
     emit('update:value', state.value);
 };
 </script>
@@ -36,7 +36,6 @@ const handleUpdateValue = (value: number|'') => {
                        required
         >
             <p-text-input type="number"
-                          :min="0"
                           :value="state.value"
                           @update:value="handleUpdateValue"
             />
