@@ -41,7 +41,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         dataTables: [] as DataTableModel[],
         selectedDataTable: undefined as DataTableModel|undefined,
         selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
-        previewData: [] as Record<string, any>[],
+        previewData: { results: [], total_count: 0 } as ListResponse<any>,
+        dataTableUpdating: false,
+        dataTableLoadLoading: false,
     });
 
     const getters = reactive({
@@ -79,6 +81,9 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setSelectedPreviewGranularity = (granularity: Granularity) => {
         state.selectedPreviewGranularity = granularity;
     };
+    const setDataTableUpdating = (status: boolean) => {
+        state.dataTableUpdating = status;
+    };
 
     const mutations = {
         setShowOverlay,
@@ -91,6 +96,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setWidgetValueMap,
         setWidgetValidMap,
         setSelectedPreviewGranularity,
+        setDataTableUpdating,
     };
     const actions = {
         listDataTable: async () => {
@@ -149,15 +155,23 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
                 ErrorHandler.handleError(e);
             }
         },
-        loadDataTable: async (dataTableId: string) => {
+        loadDataTable: async (loadParams: Omit<DataTableLoadParameters, 'granularity'>) => {
             try {
-                const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>({
-                    data_table_id: dataTableId,
+                state.dataTableLoadLoading = true;
+                const { results, total_count } = await SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>({
                     granularity: state.selectedPreviewGranularity || 'MONTHLY',
+                    page: {
+                        start: 1,
+                        limit: 15,
+                    },
+                    ...loadParams,
                 });
-                state.previewData = results ?? [];
+                state.previewData = { results: results ?? [], total_count: total_count ?? 0 };
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                state.dataTableUpdating = false;
+                state.dataTableLoadLoading = false;
             }
         },
         reset: () => {
