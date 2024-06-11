@@ -6,13 +6,15 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { EChartsOption, EChartsType } from 'echarts';
-import { init } from 'echarts';
 import { LineChart } from 'echarts/charts';
+import type { PieSeriesOption } from 'echarts/charts';
 import {
     DatasetComponent, GridComponent, LegendComponent, TooltipComponent,
 } from 'echarts/components';
-import { use } from 'echarts/core';
+import { use, init } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
@@ -45,7 +47,7 @@ const state = reactive({
         if (!state.data?.results) return [];
         return state.data?.results;
     }),
-    chartOptions: computed<EChartsOption>(() => ({
+    chartOptions: computed<PieSeriesOption>(() => ({
         tooltip: {
             trigger: 'item',
             position: 'inside',

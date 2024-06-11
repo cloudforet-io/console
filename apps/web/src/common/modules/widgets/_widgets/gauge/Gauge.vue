@@ -7,13 +7,15 @@ import {
 import {
     PDataLoader,
 } from '@spaceone/design-system';
-import { init } from 'echarts';
-import type { EChartsOption, EChartsType } from 'echarts';
 import { GaugeChart } from 'echarts/charts';
+import type { GaugeSeriesOption } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GridComponent,
 } from 'echarts/components';
-import { use } from 'echarts/core';
+import { use, init } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
@@ -102,7 +104,7 @@ const state = reactive({
                 ],
             },
         ],
-    } as EChartsOption,
+    } as GaugeSeriesOption,
 });
 
 onMounted(() => {
