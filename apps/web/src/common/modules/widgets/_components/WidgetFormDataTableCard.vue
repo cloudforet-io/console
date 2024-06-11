@@ -183,7 +183,12 @@ const handleUpdateDataTable = async () => {
         },
     };
     await widgetGenerateStore.updateDataTable(updateParams);
-    if (storeState.selectedDataTableId === props.item.data_table_id) await widgetGenerateStore.loadDataTable(props.item.data_table_id);
+    if (storeState.selectedDataTableId === props.item.data_table_id) {
+        widgetGenerateStore.setDataTableUpdating(true);
+        await widgetGenerateStore.loadDataTable({
+            data_table_id: props.item.data_table_id,
+        });
+    }
 };
 
 /* Utils */
@@ -327,7 +332,6 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
     .card-wrapper {
         @apply relative border border-gray-300 rounded-lg w-full bg-white;
         width: 24rem;
-        overflow: hidden;
         height: auto;
 
         &.selected {
@@ -336,7 +340,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
         }
 
         .card-header {
-            @apply bg-gray-100;
+            @apply bg-gray-100 rounded-lg;
             padding: 0.5rem 0.75rem;
 
             .title-wrapper {
