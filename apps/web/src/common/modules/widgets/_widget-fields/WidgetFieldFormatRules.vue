@@ -45,7 +45,7 @@ const getInitialFormatRulesValue = (): FormatRulesValue => {
         threshold: 0,
         color: gray[200],
     };
-    if (state.type.includes(FORMAT_RULE_TYPE.nameAndThreshold)) {
+    if (state.type === FORMAT_RULE_TYPE.nameAndThreshold) {
         initialFormatRule.name = '';
     }
     return initialFormatRule;
@@ -104,7 +104,7 @@ onMounted(() => {
                      :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
                      class="format-rules-input-wrapper"
                 >
-                    <p-field-group v-if="state.type.includes(FORMAT_RULE_TYPE.nameAndThreshold)"
+                    <p-field-group v-if="state.type === FORMAT_RULE_TYPE.nameAndThreshold"
                                    :invalid="state.isFieldNameValid[idx] === false"
                                    :invalid-text="$t('COMMON.WIDGETS.COMPARISON.NAME_INVALID_TEXT')"
                                    required
