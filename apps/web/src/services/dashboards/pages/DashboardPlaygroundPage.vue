@@ -25,6 +25,7 @@ import {
 
 const allReferenceTypeInfoStore = useAllReferenceTypeInfoStore();
 const widgetGenerateStore = useWidgetGenerateStore();
+// const widgetGenerateState = widgetGenerateStore.state;
 
 const state = reactive({
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceTypeInfoStore.getters.allReferenceTypeInfo),
@@ -34,9 +35,17 @@ const state = reactive({
         name: d,
         label: d,
     }))),
-    selectedChartName: 'stackedColumnChart',
+    selectedChartName: 'heatmap',
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
+    sampleWidgetOptions: {
+        granularity: 'MONTHLY',
+        xAxis: { value: 'Date', count: 10 },
+        dataField: 'Storage Size',
+        groupBy: { value: 'Region', count: 5 },
+        lineBy: { value: 'Provider', count: 5 },
+        categoryBy: { value: 'Region', count: 5 },
+    },
 });
 
 /* Event */
@@ -59,10 +68,12 @@ const handleClickAddWidget = () => {
             <div class="col-span-8">
                 <component :is="getWidgetComponent(state.selectedChartName)"
                            :widget-name="state.selectedChartName"
+                           :widget-options="state.sampleWidgetOptions"
                            widget-id=""
                            size="lg"
                            title=""
                            description=""
+                           data-table-id="asdfds"
                            mode="customize"
                 />
             </div>
