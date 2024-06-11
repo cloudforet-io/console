@@ -8,15 +8,10 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import type { HeatmapSeriesOption } from 'echarts/charts';
-import { HeatmapChart } from 'echarts/charts';
-import {
-    TooltipComponent, LegendComponent, GridComponent, VisualMapComponent,
-} from 'echarts/components';
-import { use, init } from 'echarts/core';
+import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
@@ -30,15 +25,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
-
-use([
-    CanvasRenderer,
-    GridComponent,
-    VisualMapComponent,
-    HeatmapChart,
-    TooltipComponent,
-    LegendComponent,
-]);
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 

@@ -34,7 +34,7 @@ const state = reactive({
         name: d,
         label: d,
     }))),
-    selectedChartName: 'table',
+    selectedChartName: 'stackedColumnChart',
     widgetRequiredFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.requiredFieldsSchema)),
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
 });

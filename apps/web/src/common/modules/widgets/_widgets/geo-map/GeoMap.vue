@@ -8,16 +8,11 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import axios from 'axios';
-import { MapChart } from 'echarts/charts';
 import type { MapSeriesOption } from 'echarts/charts';
-import {
-    TooltipComponent, LegendComponent, GeoComponent,
-} from 'echarts/components';
-import { use, init, registerMap } from 'echarts/core';
+import { init, registerMap } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
@@ -33,14 +28,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
-
-use([
-    CanvasRenderer,
-    GeoComponent,
-    TooltipComponent,
-    LegendComponent,
-    MapChart,
-]);
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 
