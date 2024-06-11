@@ -13,7 +13,7 @@ const treemap: WidgetConfig = {
         categoryBy: {
             options: {
                 dataTarget: 'labels_info',
-                default: 20,
+                defaultMaxCount: 20,
                 max: 30,
             },
         },

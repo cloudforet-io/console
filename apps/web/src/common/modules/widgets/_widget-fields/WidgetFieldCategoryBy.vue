@@ -40,8 +40,7 @@ const handleIsValid = (isValid: boolean) => {
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CATEGORY_BY')"
                        required
         >
-            <widget-field-dropdown-and-max :default-count="1"
-                                           :default-value="props.widgetFieldSchema?.options?.default"
+            <widget-field-dropdown-and-max :default-count="props.widgetFieldSchema?.options?.defaultMaxCount ?? 1"
                                            :menu-items="state.menuItems"
                                            :max="props.widgetFieldSchema?.options?.max"
                                            :field-name="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.CATEGORY_BY')"

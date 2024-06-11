@@ -16,13 +16,11 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 const props = withDefaults(defineProps<{
     defaultCount: number;
-    defaultValue?: string;
     max?: number;
     menuItems: MenuItem[];
     fieldName?:string|TranslateResult;
 }>(), {
     defaultCount: 1,
-    defaultValue: '',
     max: undefined,
     fieldName: '',
     menuItems: () => ([]),
@@ -57,7 +55,7 @@ watch(() => state.isMaxValid, (isValid) => {
 /* Init */
 onMounted(() => {
     state.proxyValue = {
-        value: props.defaultValue,
+        value: props.menuItems[0]?.name ?? '',
         count: props.defaultCount,
     };
 });
