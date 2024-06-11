@@ -8,13 +8,15 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 import axios from 'axios';
-import { init, registerMap } from 'echarts';
-import type { EChartsOption, EChartsType } from 'echarts';
 import { MapChart } from 'echarts/charts';
+import type { MapSeriesOption } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GeoComponent,
 } from 'echarts/components';
-import { use } from 'echarts/core';
+import { use, init, registerMap } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
@@ -48,6 +50,7 @@ const state = reactive({
     chart: null as null | EChartsType,
     chartData: [],
     chartOptions: {
+        map: 'world',
         geo: {
             type: 'map',
             map: 'world',
@@ -93,7 +96,7 @@ const state = reactive({
                 ],
             },
         ],
-    } as EChartsOption,
+    } as MapSeriesOption,
 });
 
 onMounted(async () => {

@@ -7,13 +7,15 @@ import {
 import {
     PDataLoader,
 } from '@spaceone/design-system';
-import { init } from 'echarts';
-import type { EChartsOption, EChartsType } from 'echarts';
+import type { BarSeriesOption } from 'echarts/charts';
 import { BarChart } from 'echarts/charts';
 import {
     TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
 } from 'echarts/components';
-import { use } from 'echarts/core';
+import { use, init } from 'echarts/core';
+import type {
+    EChartsType,
+} from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { throttle } from 'lodash';
 
@@ -85,7 +87,7 @@ const state = reactive({
                 data: [23, 346, 24, 400, 220, 4, 500],
             },
         ],
-    } as EChartsOption,
+    } as BarSeriesOption,
 });
 
 onMounted(() => {
