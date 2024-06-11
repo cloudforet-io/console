@@ -40,7 +40,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         selectedDataTableId: undefined as undefined | string,
         dataTables: [] as DataTableModel[],
         selectedDataTable: undefined as DataTableModel|undefined,
-        selectedDataTableGranularity: GRANULARITY.MONTHLY as Granularity,
+        selectedPreviewGranularity: GRANULARITY.MONTHLY as Granularity,
         previewData: [] as Record<string, any>[],
     });
 
@@ -76,8 +76,8 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
     const setWidgetValidMap = (widgetValidMap: Record<string, boolean>) => {
         state.widgetValidMap = widgetValidMap;
     };
-    const setSelectedDataTableGranularity = (granularity: Granularity) => {
-        state.selectedDataTableGranularity = granularity;
+    const setSelectedPreviewGranularity = (granularity: Granularity) => {
+        state.selectedPreviewGranularity = granularity;
     };
 
     const mutations = {
@@ -90,7 +90,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         setSize,
         setWidgetValueMap,
         setWidgetValidMap,
-        setSelectedDataTableGranularity,
+        setSelectedPreviewGranularity,
     };
     const actions = {
         listDataTable: async () => {
@@ -153,7 +153,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             try {
                 const { results } = await SpaceConnector.clientV2.dashboard.publicDataTable.load<DataTableLoadParameters, ListResponse<Record<string, any>[]>>({
                     data_table_id: dataTableId,
-                    granularity: state.selectedDataTableGranularity || 'MONTHLY',
+                    granularity: state.selectedPreviewGranularity || 'MONTHLY',
                 });
                 state.previewData = results ?? [];
             } catch (e) {
