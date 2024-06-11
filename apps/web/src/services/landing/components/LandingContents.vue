@@ -44,6 +44,7 @@ const router = useRouter();
 const { width } = useWindowSize();
 
 const storeState = reactive({
+    userId: computed<string>(() => store.state.user.userId),
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -99,17 +100,13 @@ onUnmounted(() => {
         <div class="title-wrapper">
             <strong class="title">{{ $t('LADING.TITLE') }}</strong>
             <div class="desc">
-                <div v-if="storeState.isDomainAdmin">
-                    <p>{{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN', { cnt: storeState.workspaceList.length }) }}</p>
-                    <p v-if="storeState.workspaceList.length > 0">
-                        {{ $t('LADING.DESC_CLICK_OR_CREATE') }}
-                    </p>
-                </div>
+                <p v-if="storeState.isDomainAdmin">
+                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN') }}
+                </p>
                 <p v-else
                    class="desc"
                 >
-                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE', { cnt: storeState.workspaceList.length }) }}
-                    <span v-if="storeState.workspaceList.length > 0"> {{ $t('LADING.DESC_CLICK') }}</span>
+                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE', { user_id: storeState.userId }) }}
                 </p>
             </div>
         </div>

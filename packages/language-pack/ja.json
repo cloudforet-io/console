@@ -3174,11 +3174,11 @@
 	},
 	"LADING": {
 		"ALL_WORKSPACE": "すべてのワークスペース",
-		"BANNER_DESC": "新しいワークスペースを作成しますか？",
+		"BANNER_DESC": "新しいセットアップが必要ですか?",
 		"CREATE": "作成",
 		"CREATE_WORKSPACE": "ワークスペースの作成",
-		"DESC_ACCESSIBLE_WORKSPACE": "以下の{cnt}つのワークスペースにアクセスできます。",
-		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "現在、ドメインには合計{cnt}のワークスペースが作成されています。",
+		"DESC_ACCESSIBLE_WORKSPACE": "{user_id} がアクセス可能なすべてのワークスペース",
+		"DESC_ACCESSIBLE_WORKSPACE_ADMIN": "ドメインに作成されたすべてのワークスペース",
 		"DESC_CLICK": "ワークスペースを選択して移動してください。",
 		"DESC_CLICK_OR_CREATE": "特定のワークスペースを選択して移動するか、新しいワークスペースを作成してください。",
 		"DESC_CREATE_WORKSPACE": "作成'ボタンをクリックして作成してください。",
@@ -3219,7 +3219,7 @@
 		"ROLE_TYPE_OWNER": "オーナー",
 		"SEARCH_WORKSPACE": "ワークスペース検索",
 		"SHOW_ALL": "すべて表示",
-		"TITLE": "ワークスペースを選択"
+		"TITLE": "ワークスペースを選択してください。"
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
