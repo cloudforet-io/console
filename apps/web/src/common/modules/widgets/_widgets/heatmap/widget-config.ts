@@ -13,14 +13,14 @@ const heatmap: WidgetConfig = {
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
-                default: 10,
+                defaultMaxCount: 10,
                 max: 10,
             },
         },
         groupBy: {
             options: {
                 dataTarget: 'labels_info',
-                default: 7,
+                defaultMaxCount: 7,
                 max: 14,
             },
         },

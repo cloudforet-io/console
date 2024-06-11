@@ -13,14 +13,14 @@ const stackedColumnChart: WidgetConfig = {
         xAxis: {
             options: {
                 dataTarget: 'labels_info',
-                default: 10,
+                defaultMaxCount: 10,
                 max: 12,
             },
         },
         stackBy: {
             options: {
                 dataTarget: 'labels_info',
-                default: 5,
+                defaultMaxCount: 5,
                 max: 10,
             },
         },

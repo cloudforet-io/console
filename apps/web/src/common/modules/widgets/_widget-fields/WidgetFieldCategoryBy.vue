@@ -50,21 +50,3 @@ const handleIsValid = (isValid: boolean) => {
         </p-field-group>
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.field-form-wrapper {
-    display: flex;
-    gap: 0.5rem;
-    .p-select-dropdown {
-        width: 100%;
-    }
-
-    /* custom design-system component - p-text-input */
-    :deep(.p-text-input) {
-        width: 6.5rem;
-        .input-container {
-            padding-right: 1.5rem;
-        }
-    }
-}
-</style>

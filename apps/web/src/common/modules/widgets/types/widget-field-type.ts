@@ -14,29 +14,29 @@ export interface TableDataFieldOptions {
 export interface XAxisOptions {
     dataTarget?: string;
     max?: number;
-    default: number;
+    defaultMaxCount: number;
 }
 export interface YAxisOptions {
     dataTarget?: string;
     max?: number;
-    default: number;
+    defaultMaxCount: number;
 }
 export interface LineByOptions {
     dataTarget?: string;
     max?: number;
-    default: number;
+    defaultMaxCount: number;
 }
 export interface StackByOptions {
     dataTarget?: string;
     max?: number;
-    default: number;
+    defaultMaxCount: number;
 }
 export interface GroupByOptions {
     dataTarget?: string;
     multiSelectable?: boolean;
     hideCount?: boolean;
     max?: number;
-    default?: number;
+    defaultMaxCount: number;
 }
 export interface CategoryByOptions {
     dataTarget?: string;
