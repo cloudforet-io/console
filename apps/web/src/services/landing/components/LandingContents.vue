@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core';
-import Vue, {
+import {
     computed, onMounted, onUnmounted, reactive,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
@@ -12,11 +12,9 @@ import { sortBy } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
@@ -41,12 +39,12 @@ const recentStore = useRecentStore();
 const recentState = recentStore.state;
 const landingPageStore = useLandingPageStore();
 const landingPageStoreGetters = landingPageStore.getters;
-const appContextStore = useAppContextStore();
 
 const router = useRouter();
 const { width } = useWindowSize();
 
 const storeState = reactive({
+    userId: computed<string>(() => store.state.user.userId),
     loading: computed<boolean>(() => landingPageStoreGetters.loading),
     isDomainAdmin: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     workspaceList: computed<WorkspaceModel[]>(() => workspaceStoreGetters.workspaceList),
@@ -70,20 +68,12 @@ const handleSearch = (value: string) => {
     state.searchText = value;
 };
 const handleClickButton = () => {
-    appContextStore.enterAdminMode();
     window.open(router.resolve({
         name: makeAdminRouteName(PREFERENCE_ROUTE.WORKSPACES._NAME),
         query: {
             hasNoWorkspace: 'true',
         },
     }).href, '_blank');
-    Vue.notify({
-        group: 'toastTopCenter',
-        type: 'info',
-        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN') as string,
-        duration: 2000,
-        speed: 1,
-    });
 };
 
 onMounted(async () => {
@@ -110,17 +100,13 @@ onUnmounted(() => {
         <div class="title-wrapper">
             <strong class="title">{{ $t('LADING.TITLE') }}</strong>
             <div class="desc">
-                <div v-if="storeState.isDomainAdmin">
-                    <p>{{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN', { cnt: storeState.workspaceList.length }) }}</p>
-                    <p v-if="storeState.workspaceList.length > 0">
-                        {{ $t('LADING.DESC_CLICK_OR_CREATE') }}
-                    </p>
-                </div>
+                <p v-if="storeState.isDomainAdmin">
+                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE_ADMIN') }}
+                </p>
                 <p v-else
                    class="desc"
                 >
-                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE', { cnt: storeState.workspaceList.length }) }}
-                    <span v-if="storeState.workspaceList.length > 0"> {{ $t('LADING.DESC_CLICK') }}</span>
+                    {{ $t('LADING.DESC_ACCESSIBLE_WORKSPACE', { user_id: storeState.userId }) }}
                 </p>
             </div>
         </div>
