@@ -113,6 +113,7 @@ const costExplorerRoutes: RouteConfig = {
                     name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.CONFIGURATION._NAME,
                     meta: {
                         lsbVisible: true,
+                        menuId: MENU_ID.COST_ANOMALY_DETECTION_CONFIGURATION,
                         translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.CONFIG_TITLE',
                     },
                     component: CostAnomalyDetectionConfigurationPage as any,
@@ -122,6 +123,7 @@ const costExplorerRoutes: RouteConfig = {
                     name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.POLICY._NAME,
                     meta: {
                         lsbVisible: true,
+                        menuId: MENU_ID.COST_ANOMALY_DETECTION_POLICY,
                         translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.POLICY_TITLE',
                     },
                     component: CostAnomalyDetectionPolicyPage as any,
@@ -131,6 +133,7 @@ const costExplorerRoutes: RouteConfig = {
                     name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.HISTORY._NAME,
                     meta: {
                         lsbVisible: true,
+                        menuId: MENU_ID.COST_ANOMALY_DETECTION_HISTORY,
                         translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.HISTORY_TITLE',
                     },
                     component: CostAnomalyDetectionHistoryPage as any,
