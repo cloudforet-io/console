@@ -199,6 +199,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         initWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
             const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
+            state.widgetId = widgetInfo?.widget_id || '';
             state.title = widgetInfo?.name || _widgetConfig.meta.title || '';
             state.description = widgetInfo?.description || '';
             state.size = _widgetConfig.meta.sizes[0]; // TODO
