@@ -199,6 +199,7 @@ const state = reactive({
             padding: 1rem 1.5rem;
             .label-wrapper {
                 @apply relative flex text-gray-700;
+                min-height: 1.125rem;
                 .label {
                     margin-left: 0.5rem;
                 }
