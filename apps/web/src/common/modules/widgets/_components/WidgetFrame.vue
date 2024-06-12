@@ -20,7 +20,6 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 });
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
-    (event: 'click-expand'): void;
     (event: 'update-size', size: WidgetSize): void;
 }>();
 
@@ -39,9 +38,6 @@ const handleEditButtonClick = () => {
 };
 const handleClickDeleteButton = () => {
     emit('click-delete');
-};
-const handleClickExpandButton = () => {
-    emit('click-expand');
 };
 const handleSelectSize = (size: WidgetSize) => {
     emit('update-size', size);
@@ -97,15 +93,7 @@ const handleSelectSize = (size: WidgetSize) => {
                 </template>
             </p-popover>
         </div>
-        <p-icon-button v-if="props.mode === 'view'"
-                       v-tooltip.bottom="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.EXPAND_AND_EDIT')"
-                       name="ic_arrows-expand-all"
-                       shape="square"
-                       style-type="tertiary"
-                       class="expand-button"
-                       @click="handleClickExpandButton"
-        />
-        <div v-if="props.mode === 'customize'"
+        <div v-if="props.mode === 'view'"
              class="action-button-wrapper"
         >
             <p-icon-button name="ic_edit"
@@ -192,11 +180,6 @@ const handleSelectSize = (size: WidgetSize) => {
     }
     .body-wrapper {
         height: 100%;
-    }
-    .expand-button {
-        position: absolute;
-        top: 0.5rem;
-        right: 1rem;
     }
     .action-button-wrapper {
         @apply bg-gray-150 rounded-lg;

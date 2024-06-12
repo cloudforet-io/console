@@ -8,19 +8,17 @@ import type { TranslateResult } from 'vue-i18n';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PDivider, PI, PToggleButton, PFieldTitle,
+    PButton, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
-import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { store } from '@/store';
 
 import { red } from '@/styles/colors';
 
-import DashboardWidgetAddModal from '@/services/dashboards/components/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+
 
 interface Props {
     loading?: boolean;
@@ -29,8 +27,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: string, value: string): void,
-    (e: 'save'): void,
+const emit = defineEmits<{(e: 'save'): void,
     (e: 'cancel'): void,
 }>();
 
@@ -39,15 +36,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
-    widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
-        const _configMap: Record<string, WidgetConfig> = {};
-        state.widgetInfoList.forEach((d) => {
-            _configMap[d.widget_key] = getWidgetConfig(d.widget_name);
-        });
-        return _configMap;
-    }),
     enableDateRange: computed(() => dashboardDetailState.options.date_range?.enabled ?? false),
-    addWidgetModalVisible: false,
 });
 
 /* Event */
@@ -56,18 +45,12 @@ const handleChangeDateRangeToggle = () => {
     _options.date_range.enabled = !_options.date_range.enabled;
     dashboardDetailStore.setOptions(_options);
 };
-const handleClickAddWidget = () => {
-    state.addWidgetModalVisible = true;
-};
 const handleClickCancelButton = () => {
     emit('cancel');
     // TODO: revert dashboardState here
 };
 const handleClickSaveButton = () => {
     emit('save');
-};
-const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
-    dashboardDetailStore.setDashboardWidgetInfoList(dashboardDetailState.dashboardWidgetInfoList.concat([newWidget]));
 };
 
 onMounted(() => {
@@ -97,16 +80,6 @@ onUnmounted(() => {
                         </template>
                     </p-field-title>
                 </div>
-                <p-divider class="divider" />
-                <p-button style-type="tertiary"
-                          size="lg"
-                          icon-left="ic_plus_bold"
-                          block
-                          class="add-button"
-                          @click="handleClickAddWidget"
-                >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD') }}
-                </p-button>
                 <draggable class="draggable-wrapper"
                            ghost-class="ghost"
                            :list="state.widgetInfoList"
@@ -120,7 +93,7 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             /></span>
-                        <span class="text">{{ widget.title ?? state.widgetConfigMap[widget.widget_key]?.title }}</span>
+                        <span class="text">{{ widget.title }}</span>
                         <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                               class="error-icon-wrapper"
                         >
@@ -152,9 +125,6 @@ onUnmounted(() => {
                 </p-button>
             </div>
         </portal>
-        <dashboard-widget-add-modal :visible.sync="state.addWidgetModalVisible"
-                                    @add-widget="handleAddWidget"
-        />
     </div>
 </template>
 
@@ -178,12 +148,6 @@ onUnmounted(() => {
         .toggle-button {
             margin-right: 0.25rem;
         }
-    }
-    .divider {
-        margin: 1.5rem 0;
-    }
-    .add-button {
-        margin-bottom: 1rem;
     }
     .draggable-wrapper {
         display: flex;

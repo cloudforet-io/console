@@ -59,6 +59,10 @@ const handleNameUpdate = (name: string) => {
                                    size="md"
                                    @click="handleVisibleNameEditModal"
                     />
+                    <p-icon-button name="ic_duplicate"
+                                   size="md"
+                                   @click="handleVisibleCloneModal"
+                    />
                     <p-icon-button name="ic_delete"
                                    size="md"
                                    class="delete-button"
@@ -71,7 +75,6 @@ const handleNameUpdate = (name: string) => {
             >
                 <dashboard-control-buttons :dashboard-id="props.dashboardId"
                                            :name="dashboardDetailState.name"
-                                           @update:visible-clone-modal="handleVisibleCloneModal"
                 />
             </template>
         </p-heading>
@@ -103,7 +106,6 @@ const handleNameUpdate = (name: string) => {
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
         margin-bottom: -0.25rem;
-        gap: 0.5rem;
         .favorite-button {
             margin: 0 0.25rem;
         }
