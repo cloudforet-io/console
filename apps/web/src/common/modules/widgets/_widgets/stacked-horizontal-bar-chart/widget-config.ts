@@ -13,14 +13,14 @@ const stackedHorizontalBarChart: WidgetConfig = {
         yAxis: {
             options: {
                 dataTarget: 'labels_info',
-                default: 4,
+                defaultMaxCount: 4,
                 max: 8,
             },
         },
         stackBy: {
             options: {
                 dataTarget: 'labels_info',
-                default: 5,
+                defaultMaxCount: 5,
                 max: 10,
             },
         },

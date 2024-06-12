@@ -109,6 +109,13 @@ onMounted(() => {
     display: flex;
     gap: 0.5rem;
 
+    /* custom design-system component - p-text-input */
+    :deep(.p-text-input) {
+        width: 6.5rem;
+        .input-container {
+            padding-right: 1.5rem;
+        }
+    }
     .max-items {
         width: 7.5rem;
 
