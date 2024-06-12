@@ -648,6 +648,11 @@
 				"TOTAL_COST": "トータルコスト",
 				"YEARLY": "年間"
 			},
+			"COST_ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "",
+				"HISTORY_TITLE": "",
+				"POLICY_TITLE": ""
+			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "追加の受信者",
 				"ADD_EMAIL": "メールを追加する",
@@ -3071,6 +3076,7 @@
 		"COST_EXPLORER": "費用管理",
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
+		"COST_EXPLORER_COST_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
 		"COST_EXPLORER_DATA_SOURCES": "データソース",
 		"COST_EXPLORER_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",

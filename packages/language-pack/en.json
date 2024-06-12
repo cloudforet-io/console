@@ -648,6 +648,11 @@
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
 			},
+			"COST_ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "Detection Configuration",
+				"HISTORY_TITLE": "Anomaly Detection History",
+				"POLICY_TITLE": "Policy Management"
+			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "Additional Recipients",
 				"ADD_EMAIL": "Add Email",
@@ -3071,6 +3076,7 @@
 		"COST_EXPLORER": "Cost Explorer",
 		"COST_EXPLORER_BUDGET": "Budget",
 		"COST_EXPLORER_COST_ANALYSIS": "Cost Analysis",
+		"COST_EXPLORER_COST_ANOMALY_DETECTION": "Cost Anomaly Detection",
 		"COST_EXPLORER_DASHBOARD": "Dashboard",
 		"COST_EXPLORER_DATA_SOURCES": "Data Sources",
 		"COST_EXPLORER_DESC": "This contains Cost Analysis, Budget, Cost Report.",
