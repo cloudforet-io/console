@@ -33,7 +33,7 @@ interface Props {
     sourceId: string;
     sourceKey: string;
     selectedGroupByItems: any[];
-    filters: Record<string, string[]>;
+    filter: Record<string, string[]>;
     dataFieldName: string;
     dataUnit: string;
 
@@ -45,7 +45,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>): void;
+const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;
     (e: 'update:selected-group-by-items', value: any[]): void;
     (e: 'update:data-field-name', value: string): void;
     (e: 'update:data-unit', value: string): void;
@@ -66,7 +66,7 @@ const state = reactive({
     proxySelectedGroupByItems: useProxyValue('selectedGroupByItems', props, emit),
     proxyDataFieldName: useProxyValue('dataFieldName', props, emit),
     proxyDataUnit: useProxyValue('dataUnit', props, emit),
-    proxyFilters: useProxyValue('filters', props, emit),
+    proxyFilter: useProxyValue('filter', props, emit),
 });
 
 const advancedOptionsState = reactive({
@@ -183,7 +183,7 @@ const setTagsResources = async (): Promise<void> => {
 
 const resetAllFilter = () => {
     state.proxySelectedGroupByItems = [];
-    state.proxyFilters = {};
+    state.proxyFilter = {};
 };
 
 watch([() => props.sourceId, () => props.sourceKey], async () => {
@@ -222,7 +222,7 @@ onMounted(async () => {
                                              :source-id="props.sourceId"
                                              :source-key="props.sourceKey"
                                              :filter-items="groupByState.items"
-                                             :filters.sync="state.proxyFilters"
+                                             :filter.sync="state.proxyFilter"
         />
         <p-field-group label="Data Field Name"
                        required

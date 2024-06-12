@@ -58,12 +58,12 @@ interface Props {
     sourceType?: DataTableSourceType;
     sourceId?: string;
     sourceKey?: string;
-    filters: Record<string, string[]>;
+    filter: Record<string, string[]>;
     filterItems: MenuItem[];
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>): void;}>();
+const emit = defineEmits<{(e: 'update:filter', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
 const widgetGenerateStore = useWidgetGenerateStore();
 
@@ -75,7 +75,7 @@ const storeState = reactive({
 
 const state = reactive({
     loading: false,
-    proxyFilters: useProxyValue('filters', props, emit),
+    proxyFilter: useProxyValue('filter', props, emit),
     filterItems: computed(() => props.filterItems),
     selectedItems: [] as MenuItem[],
     handlerMap: computed(() => {
@@ -128,13 +128,13 @@ onClickOutside(containerRef, hideContextMenu);
 
 
 /* Event */
-const handleUpdateFiltersDropdown = (filterKey: string, selectedItems: SelectDropdownMenuItem[]) => {
+const handleUpdateFilterDropdown = (filterKey: string, selectedItems: SelectDropdownMenuItem[]) => {
     const selectedItemsMap = cloneDeep(state.selectedItemsMap);
     selectedItemsMap[filterKey] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    state.proxyFilters = {
-        ...state.proxyFilters,
+    state.proxyFilter = {
+        ...state.proxyFilter,
         [filterKey]: selectedItems.map((d) => d.name as string),
     };
 };
@@ -171,14 +171,14 @@ const handleClickShowMore = async () => {
 
 /* Util */
 const resetAllFilter = () => {
-    state.proxyFilters = {};
+    state.proxyFilter = {};
     state.selectedItemsMap = getInitialSelectedItemsMap();
     state.selectedItems = [];
 };
 const resetFilterByKey = (key: string) => {
-    unset(state.proxyFilters, key);
+    unset(state.proxyFilter, key);
     unset(state.selectedItemsMap, key);
-    state.proxyFilters = { ...state.proxyFilters };
+    state.proxyFilter = { ...state.proxyFilter };
     state.selectedItemsMap = { ...state.selectedItemsMap };
 };
 const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
@@ -266,9 +266,9 @@ watch(() => props.sourceKey, async () => {
 
 onMounted(() => {
     if (!storeState.dataTable) return;
-    const initialFilters = storeState.dataTable.options?.filters ?? [];
+    const initialFilter = storeState.dataTable.options?.filter ?? [];
 
-    initialFilters.forEach((filter) => {
+    initialFilter.forEach((filter) => {
         const selectedFilteritemLabel = state.filterItems.find((d) => d.name === filter.k)?.label;
         state.selectedItems = [
             ...state.selectedItems,
@@ -311,7 +311,7 @@ onMounted(() => {
                                            :selection-label="item.label"
                                            :show-delete-all-button="false"
                                            :page-size="10"
-                                           @update:selected="handleUpdateFiltersDropdown(item.name, $event)"
+                                           @update:selected="handleUpdateFilterDropdown(item.name, $event)"
                         />
                         <p-icon-button name="ic_delete"
                                        style-type="transparent"
@@ -365,7 +365,7 @@ onMounted(() => {
             @apply relative;
 
             .add-filter-context-menu {
-                z-index: 1;
+                z-index: 100;
             }
         }
     }
