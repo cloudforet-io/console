@@ -1396,6 +1396,14 @@
 			"MAX_ITEMS": "Max Items",
 			"MAX_ITEMS_DESC": "The maximum number of {fieldName} values is {max}",
 			"NUMBER_FIELD_VALIDATION": "The value must be {max} or less.",
+			"NUMBER_CARD": {
+				"LESS_THAN_PREVIOUS_DAY": "less than previous day",
+				"LESS_THAN_PREVIOUS_MONTH": "less than previous month",
+				"LESS_THAN_PREVIOUS_YEAR": "less than previous year",
+				"MORE_THAN_PREVIOUS_DAY": "more than previous day",
+				"MORE_THAN_PREVIOUS_MONTH": "more than previous month",
+				"MORE_THAN_PREVIOUS_YEAR": "more than previous year"
+			},
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "Account ID",
 				"AGO": "ago",

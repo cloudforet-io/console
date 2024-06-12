@@ -2,7 +2,7 @@
 import { useResizeObserver } from '@vueuse/core/index';
 import {
     computed, onMounted,
-    reactive, ref,
+    reactive, ref, watch,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -11,15 +11,27 @@ import { init } from 'echarts/core';
 import type {
     EChartsType,
 } from 'echarts/core';
-import { throttle } from 'lodash';
+import { isEmpty, throttle } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widget/api-verbs/load';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { getWidgetBasedOnDate, getWidgetDateRange } from '@/common/modules/widgets/_helpers/widget-date-helper';
 import type {
     WidgetProps, WidgetEmit,
 } from '@/common/modules/widgets/types/widget-display-type';
+import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-const props = defineProps<WidgetProps>();
+
+type Data = ListResponse<{
+    [key: string]: string|number;
+}>;
+const props = defineProps<WidgetProps<Data>>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -27,12 +39,9 @@ const chartContext = ref<HTMLElement|null>(null);
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
 const state = reactive({
     loading: true,
-    data: null as any | null,
-    chart: null as null | EChartsType,
-    chartData: computed(() => {
-        if (!state.data?.results) return [];
-        return state.data?.results;
-    }),
+    data: null as Data | null,
+    chart: null as EChartsType | null,
+    chartData: [],
     chartOptions: computed<PieSeriesOption>(() => ({
         tooltip: {
             trigger: 'item',
@@ -50,11 +59,11 @@ const state = reactive({
             icon: 'circle',
             textStyle: {
                 overflow: 'truncate',
-                width: 150,
+                width: props.size === 'full' ? 200 : 150,
             },
             formatter: (name: string) => {
                 const series = state.chart.getOption().series[0];
-                const value = series.data.filter((row) => row.name === name)[0].value;
+                const value = series.data.filter((row) => row.name === name)[0]?.value;
                 return `${(name.length > 10 ? `${name.slice(0, 10)}...` : name)}     ${value}`;
             },
         },
@@ -63,7 +72,7 @@ const state = reactive({
                 name: 'Access From',
                 type: 'pie',
                 radius: ['30%', '70%'],
-                center: ['30%', '50%'],
+                center: props.size === 'full' ? ['40%', '50%'] : ['30%', '50%'],
                 data: state.chartData,
                 emphasis: {
                     itemStyle: {
@@ -79,41 +88,68 @@ const state = reactive({
             },
         ],
     })),
+    //
+    granularity: computed<string>(() => props.widgetOptions?.granularity as string),
+    basedOnDate: computed(() => getWidgetBasedOnDate(state.granularity, props.dashboardOptions?.date_range?.end)),
+    dataField: computed<string|undefined>(() => props.widgetOptions?.dataField as string),
+    groupByField: computed<string|undefined>(() => (props.widgetOptions?.groupBy as GroupByValue)?.value as string),
+    groupByCount: computed<number>(() => (props.widgetOptions?.groupBy as GroupByValue)?.count as number),
 });
 
 /* Util */
-const initWidget = async () => {
-    state.loading = true;
-    // TODO: data source를 돌며 fetchData
-    state.data = {
-        results: [
-            { name: 'google cloudgoogle cloudgoogle cloudgoogle ', value: 5000 },
-            { name: 'aws', value: 1000 },
-            { name: 'azure', value: 1000 },
-            { name: 'alibaba', value: 1000 },
-            { name: '22google cloudgoogle cloudgoogle cloudgoogle ', value: 5000 },
-            { name: '2aws', value: 1000 },
-            { name: '2azure', value: 1000 },
-            { name: '2alibaba', value: 1000 },
-            { name: '3google cloudgoogle cloudgoogle cloudgoogle ', value: 5000 },
-            { name: '3aws', value: 1000 },
-            { name: '3azure', value: 1000 },
-            { name: '3alibaba', value: 1000 },
-            { name: '4google cloudgoogle cloudgoogle cloudgoogle ', value: 5000 },
-            { name: '4aws', value: 1000 },
-            { name: '4azure', value: 1000 },
-            { name: '4alibaba', value: 1000 },
-        ],
-    };
-    // await nextTick();
+const loadWidget = async (): Promise<Data|null> => {
+    try {
+        state.loading = true;
+        const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, 1);
+        return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
+            widget_id: 'public-widget-74bd848364d0',
+            query: {
+                granularity: state.granularity,
+                start: _start,
+                end: _end,
+                group_by: [state.groupByField],
+                fields: {
+                    [state.dataField]: {
+                        key: state.dataField,
+                        operator: 'sum',
+                    },
+                },
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    } finally {
+        state.loading = false;
+    }
+};
+const drawChart = (rawData: Data|null) => {
+    if (isEmpty(rawData)) return;
+
+    // get chart data
+    const _slicedData = rawData.results?.slice(0, state.groupByCount);
+    state.chartData = _slicedData?.map((v) => ({
+        name: v[state.groupByField],
+        value: v[state.dataField],
+    })) || [];
+
+    // init chart and set options
     state.chart = init(chartContext.value);
     state.chart.setOption(state.chartOptions);
-    state.loading = false;
 };
 
-onMounted(() => {
-    initWidget();
+const initWidget = async (data?: Data) => {
+    state.data = data ?? await loadWidget();
+    drawChart(state.data);
+    return state.data;
+};
+onMounted(async () => {
+    await initWidget();
 });
+
+watch(() => props.size, () => {
+    state.chart.setOption(state.chartOptions);
+}, { immediate: false });
 
 useResizeObserver(chartContext, throttle(() => {
     state.chart?.resize();
