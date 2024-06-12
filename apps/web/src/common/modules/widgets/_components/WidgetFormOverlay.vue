@@ -53,7 +53,6 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
 onMounted(async () => {
     await widgetGenerateStore.listDataTable();
 });
-
 </script>
 
 <template>
@@ -70,7 +69,6 @@ onMounted(async () => {
                 <div class="footer-wrapper">
                     <p-button style-type="substitutive"
                               icon-right="ic_arrow-right"
-                              :disabled="!widgetGenerateState.selectedDataTableId"
                               @click="handleClickContinue"
                     >
                         {{ i18n.t('DASHBOARDS.WIDGET.OVERLAY.STEP_1.CONTINUE') }}
