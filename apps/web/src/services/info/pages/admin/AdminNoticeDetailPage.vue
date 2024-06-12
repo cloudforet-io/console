@@ -84,6 +84,12 @@ onBeforeMount(async () => {
                     >
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
                     </p-button>
+                    <!-- TODO: apply event after the API call is completed -->
+                    <p-button style-type="negative-secondary"
+                              icon-left="ic_paper-airplane"
+                    >
+                        {{ $t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE') }}
+                    </p-button>
                     <p-button style-type="negative-secondary"
                               @click="handleDeleteModalOpen"
                     >
