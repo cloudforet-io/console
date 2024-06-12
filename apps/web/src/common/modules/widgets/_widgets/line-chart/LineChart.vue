@@ -24,6 +24,7 @@ import type { PublicWidgetLoadParameters } from '@/schema/dashboard/public-widge
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getWidgetBasedOnDate,
     getWidgetDateFields,
@@ -92,7 +93,7 @@ const loadWidget = async (): Promise<Data|null> => {
     try {
         let _start = state.basedOnDate;
         let _end = state.basedOnDate;
-        if (state.xAxisField === 'Date') {
+        if (state.xAxisField === DATE_FIELD) {
             [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         }
         return await SpaceConnector.clientV2.dashboard.publicWidget.load<PublicWidgetLoadParameters, Data>({
@@ -120,7 +121,7 @@ const drawChart = (rawData: Data|null) => {
 
     // set xAxis data
     let _xAxisData: string[] = [];
-    if (state.xAxisField === 'Date') {
+    if (state.xAxisField === DATE_FIELD) {
         const [_start, _end] = getWidgetDateRange(state.granularity, state.basedOnDate, state.xAxisCount);
         _xAxisData = getWidgetDateFields(state.granularity, _start, _end);
     } else {

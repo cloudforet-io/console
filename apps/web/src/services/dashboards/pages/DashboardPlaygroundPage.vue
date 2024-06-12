@@ -13,6 +13,7 @@ import type {
 
 import WidgetFormOverlay from '@/common/modules/widgets/_components/WidgetFormOverlay.vue';
 import { CONSOLE_WIDGET_CONFIG_KEYS } from '@/common/modules/widgets/_constants/widget-config-list-constant';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import { getWidgetComponent, getWidgetFieldComponent } from '@/common/modules/widgets/_helpers/widget-component-helper';
 import { getWidgetConfig } from '@/common/modules/widgets/_helpers/widget-config-helper';
 import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
@@ -40,9 +41,10 @@ const state = reactive({
     widgetOptionalFieldSchemaMap: computed(() => Object.entries(state.widgetConfig.optionalFieldsSchema)),
     sampleWidgetOptions: {
         granularity: 'MONTHLY',
-        xAxis: { value: 'Date', count: 10 },
+        xAxis: { value: DATE_FIELD, count: 10 },
         dataField: 'Storage Size',
         groupBy: { value: 'Region', count: 5 },
+        stackBy: { value: 'Provider', count: 5 },
         lineBy: { value: 'Provider', count: 5 },
         categoryBy: { value: 'Region', count: 5 },
     },

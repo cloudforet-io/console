@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import WidgetFrame from '@/common/modules/widgets/_components/WidgetFrame.vue';
 import { useWidgetFrame } from '@/common/modules/widgets/_composables/use-widget/use-widget-frame';
+import { DATE_FIELD } from '@/common/modules/widgets/_constants/widget-constant';
 import {
     getDateFormat,
     getTimeUnit,
@@ -91,7 +92,7 @@ const loadWidget = async (): Promise<Data|null> => {
                 granularity: state.granularity,
                 start: _start,
                 end: _end,
-                group_by: ['Date'],
+                group_by: [DATE_FIELD],
                 fields: {
                     [state.dataField]: {
                         key: state.dataField,
