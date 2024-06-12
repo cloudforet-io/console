@@ -25,7 +25,7 @@ interface DashboardVariableOptions {
 }
 
 export interface DashboardVariableSchemaProperty {
-    name?: string;
+    name: string;
     variable_type: VariableModelType;
     use: boolean;
     selection_type?: VariableSelectionType;

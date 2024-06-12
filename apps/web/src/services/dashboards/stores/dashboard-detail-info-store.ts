@@ -358,7 +358,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
         // reset variables schema
         let _variableSchema = cloneDeep(state.variablesSchema);
-        state.variablesSchema.order.forEach((property) => {
+        state.variablesSchema.order?.forEach((property) => {
             if (!_originVariablesSchema?.properties[property]) return;
             _variableSchema.properties[property].use = _originVariablesSchema?.properties[property].use;
         });
