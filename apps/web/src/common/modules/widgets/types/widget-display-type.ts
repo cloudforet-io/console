@@ -37,7 +37,6 @@ export interface WidgetEmit {
     (e: 'mounted'): void;
     (e: 'update-size', size: WidgetSize): void;
     (event: 'click-delete'): void;
-    (event: 'click-expand'): void;
     (event: 'click-edit'): void;
 }
 
