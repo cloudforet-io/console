@@ -396,6 +396,11 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "",
+				"HISTORY_TITLE": "",
+				"POLICY_TITLE": ""
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "選択したデータソース（{dataSourceName}）には、すでに同じターゲット（{name}）の予算が作成されています。",
@@ -647,11 +652,6 @@
 				"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
 				"TOTAL_COST": "トータルコスト",
 				"YEARLY": "年間"
-			},
-			"COST_ANOMALY_DETECTION": {
-				"CONFIG_TITLE": "",
-				"HISTORY_TITLE": "",
-				"POLICY_TITLE": ""
 			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "追加の受信者",
@@ -3074,9 +3074,9 @@
 		"ASSET_INVENTORY_SERVER": "サーバ",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "サービスアカウント",
 		"COST_EXPLORER": "費用管理",
+		"COST_EXPLORER_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_BUDGET": "予算",
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
-		"COST_EXPLORER_COST_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
 		"COST_EXPLORER_DATA_SOURCES": "データソース",
 		"COST_EXPLORER_DESC": "これにはコスト分析、予算、コストレポートが含まれます。",

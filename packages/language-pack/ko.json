@@ -396,6 +396,11 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"ANOMALY_DETECTION": {
+				"CONFIG_TITLE": "",
+				"HISTORY_TITLE": "",
+				"POLICY_TITLE": ""
+			},
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
 				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "선택한 데이터 소스({dataSourceName})에 동일한 타겟({name})으로 이미 예산이 생성되어 있습니다.",
@@ -647,11 +652,6 @@
 				"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 				"TOTAL_COST": "총 비용",
 				"YEARLY": "연도별 데이터"
-			},
-			"COST_ANOMALY_DETECTION": {
-				"CONFIG_TITLE": "",
-				"HISTORY_TITLE": "",
-				"POLICY_TITLE": ""
 			},
 			"COST_REPORT": {
 				"ADDITIONAL_RECIPIENTS": "추가 수신인",
@@ -3074,9 +3074,9 @@
 		"ASSET_INVENTORY_SERVER": "서버",
 		"ASSET_INVENTORY_SERVICE_ACCOUNT": "서비스 어카운트",
 		"COST_EXPLORER": "비용 관리",
+		"COST_EXPLORER_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_BUDGET": "예산",
 		"COST_EXPLORER_COST_ANALYSIS": "비용 분석",
-		"COST_EXPLORER_COST_ANOMALY_DETECTION": "",
 		"COST_EXPLORER_DASHBOARD": "대시보드",
 		"COST_EXPLORER_DATA_SOURCES": "데이터 소스",
 		"COST_EXPLORER_DESC": "비용 분석, 예산, 비용 리포트를 이용할 수 있습니다.",

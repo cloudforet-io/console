@@ -8,8 +8,8 @@ import { clone } from 'lodash';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import CostAnomalyDetectionLSB from '@/services/cost-explorer/components/AnomalyDetectionLSB.vue';
 import CostAnalysisLSB from '@/services/cost-explorer/components/CostAnalysisLSB.vue';
-import CostAnomalyDetectionLSB from '@/services/cost-explorer/components/CostAnomalyDetectionLSB.vue';
 
 const route = useRoute();
 
@@ -26,6 +26,6 @@ const state = reactive({
 <template>
     <aside class="sidebar-menu">
         <cost-analysis-l-s-b v-if="state.selectedMenuId === MENU_ID.COST_ANALYSIS" />
-        <cost-anomaly-detection-l-s-b v-if="state.selectedMenuId.includes(MENU_ID.COST_ANOMALY_DETECTION)" />
+        <cost-anomaly-detection-l-s-b v-if="state.selectedMenuId.includes(MENU_ID.ANOMALY_DETECTION)" />
     </aside>
 </template>
