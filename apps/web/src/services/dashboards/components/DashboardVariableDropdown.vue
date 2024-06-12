@@ -16,7 +16,7 @@ import {
     cloneDeep, debounce, flattenDeep,
 } from 'lodash';
 
-import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardVariableSchemaProperty, DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
 
 import type { ReferenceMap } from '@/store/reference/type';
 
@@ -27,12 +27,16 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 
 
 interface Props {
+    dashboardVariables?: DashboardVariables;
+    property: DashboardVariableSchemaProperty;
     propertyName: string;
     referenceMap: ReferenceMap;
     disabled?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    dashboardVariables: () => ({}),
+});
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailGetters = dashboardDetailStore.getters;
@@ -42,11 +46,10 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as any|null,
     searchText: '',
-    variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailGetters.refinedVariablesSchema.properties[props.propertyName]),
-    variableName: computed<string|undefined>(() => state.variableProperty?.name),
+    variableName: computed<string|undefined>(() => props.propertyName),
     selected: [] as MenuItem[],
     menuHandler: computed<AutocompleteHandler|undefined>(() => {
-        const options = state.variableProperty?.options;
+        const options = props.property?.options;
         const fixedOptions = dashboardDetailGetters.refinedVariablesSchema.fixed_options;
         if (!Array.isArray(options)) return undefined;
         const variableModelInfoList = options.map((config) => ({
@@ -100,11 +103,11 @@ const handleClearSelection = () => {
 
 // helper
 const changeVariables = (changedSelected: MenuItem[]) => {
-    const variables = cloneDeep(dashboardDetailState.variables);
+    const variables = cloneDeep(props.dashboardVariables);
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete variables[props.propertyName];
-    } else if (state.variableProperty?.selection_type === 'SINGLE') {
+    } else if (props.property?.selection_type === 'SINGLE') {
         variables[props.propertyName] = reconvertedSelected[0];
     } else {
         variables[props.propertyName] = reconvertedSelected;
@@ -158,13 +161,13 @@ watch(visibleMenu, (_visibleMenu) => {
     } else state.searchText = '';
 }, { immediate: true });
 
-watch(() => state.variableProperty, async (property) => {
+watch([() => props.property, () => props.dashboardVariables], async ([property]) => {
     dashboardDetailStore.setVariablesInitMap({
         ...dashboardDetailState.variablesInitMap,
         [props.propertyName]: false,
     });
 
-    const value = dashboardDetailState.variables[props.propertyName];
+    const value = props.dashboardVariables[props.propertyName];
     if (value) {
         await initSelected(value);
     } else if (property?.required) {
@@ -183,7 +186,6 @@ watch(() => state.variableProperty, async (property) => {
 const {
     targetRef,
     contextMenuRef,
-    variableProperty,
     variableName,
 } = toRefs(state);
 
@@ -197,8 +199,8 @@ const {
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length,
-                          invalid: dashboardDetailGetters.isAllVariablesInitialized && state.variableProperty?.required && !state.selected.length }"
-                :disabled="state.variableProperty?.readonly || props.disabled"
+                          invalid: dashboardDetailGetters.isAllVariablesInitialized && props.property?.required && !state.selected.length }"
+                :disabled="props.property?.readonly || props.disabled"
                 @click="toggleMenu"
         >
             <span class="variable-contents">
@@ -215,7 +217,7 @@ const {
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty?.readonly && !state.variableProperty?.required"
+                <button v-if="!props.property?.readonly && !props.property?.required"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
@@ -243,9 +245,9 @@ const {
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
                         :selected.sync="state.selected"
-                        :multi-selectable="variableProperty?.selection_type === 'MULTI'"
+                        :multi-selectable="props.property?.selection_type === 'MULTI'"
                         show-select-marker
-                        :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
+                        :show-clear-selection="props.property?.selection_type === 'MULTI' && !props.property?.fixed"
                         @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
                         @select="handleSelectOption"
