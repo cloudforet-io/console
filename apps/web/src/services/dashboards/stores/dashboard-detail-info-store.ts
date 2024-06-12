@@ -1,7 +1,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    cloneDeep, flattenDeep, isEmpty, isEqual,
+    cloneDeep, isEmpty, isEqual,
 } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -12,8 +12,8 @@ import type {
     DashboardOptions, DashboardType,
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
-    DashboardTemplate,
-    TemplateType, DashboardLayoutWidgetInfoV2,
+    TemplateType,
+    DashboardLayout,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -98,7 +98,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         templateId: 'blank', // "templateId" exists in new dashboard, but not in existing dashboard.
         templateType: 'MANAGED' as TemplateType,
         // widget info states
-        dashboardWidgetInfoList: [] as Array<DashboardLayoutWidgetInfo|DashboardLayoutWidgetInfoV2>,
+        dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[], // only for 1.0 dashboard
+        dashboardLayouts: [] as DashboardLayout[], // only for 2.0 dashboard
         loadingWidgets: false,
         // validation
         isNameValid: undefined as boolean | undefined,
@@ -148,6 +149,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
     const setDashboardWidgetInfoList = (dashboardWidgetInfoList: DashboardLayoutWidgetInfo[]) => {
         state.dashboardWidgetInfoList = dashboardWidgetInfoList;
+    };
+    const setDashboardLayouts = (dashboardLayouts: DashboardLayout[]) => {
+        state.dashboardLayouts = dashboardLayouts;
     };
     const setLabels = (labels: string[]) => {
         state.labels = labels;
@@ -202,36 +206,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
-    const setDashboardTemplate = (dashboardTemplate: DashboardTemplate) => {
-        const _template = cloneDeep(dashboardTemplate);
-        state.dashboardId = undefined;
-        setName('');
-        state.placeholder = _template.name;
-        setLabels(_template.labels);
-        setOptions(_template.options);
-        let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
-        let _variables = _template.variables ?? {};
-        if (state.projectId) {
-            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
-            _variables = refineProjectDashboardVariables(_variables, state.projectId);
-        }
-        setVariablesSchema(_variablesSchema);
-        setVariables(_variables);
-
-        const _variablesInitMap = {};
-        Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
-            if (property.use) _variablesInitMap[propertyName] = false;
-        });
-        setVariablesInitMap(_variablesInitMap);
-
-        const _dashboardWidgetInfoList = flattenDeep(_template?.layouts.map((layout) => layout.widgets ?? [])).map((info) => ({
-            ...info,
-            widget_key: info.widget_key ?? getRandomId(),
-        })) ?? [];
-        setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        setTemplateId(_template.template_id);
-        setTemplateType(_template.template_type);
-    };
     const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
@@ -280,11 +254,17 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesInitMap(_variablesInitMap);
 
         // widget info states
-        const _dashboardWidgetInfoList = flattenDeep(_dashboardInfo?.layouts.map((layout) => layout.widgets ?? [])).map((info) => ({
-            ...info,
-            widget_key: info.widget_key ?? getRandomId(),
-        })) ?? [];
-        setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        const _dashboardVersion = _dashboardInfo.version;
+        if (_dashboardVersion === '1.0') {
+            const _dashboardWidget = _dashboardInfo.layouts[0].widgets as DashboardLayoutWidgetInfo[];
+            const _dashboardWidgetInfoList = _dashboardWidget.map((info) => ({
+                ...info,
+                widget_key: info.widget_key ?? getRandomId(),
+            })) ?? [];
+            setDashboardWidgetInfoList(_dashboardWidgetInfoList);
+        } else {
+            setDashboardLayouts(_dashboardInfo.layouts);
+        }
         setTemplateId(_dashboardInfo.template_id);
         setTemplateType(_dashboardInfo.template_type);
     };
@@ -315,12 +295,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             state.loadingDashboard = false;
         }
     };
-    const deleteWidget = (widgetKey: string) => {
-        const _dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
-        setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        const _widgetValidMap = { ...state.widgetValidMap };
-        delete _widgetValidMap[widgetKey];
-        state.widgetValidMap = _widgetValidMap;
+    const deleteDashboardWidget = async (widgetId?: string) => {
+        if (!widgetId) return;
+        const _dashboardLayouts = cloneDeep(state.dashboardLayouts ?? []);
+        const deletedWidgetIndex = _dashboardLayouts[0]?.widgets?.findIndex((d) => d === widgetId);
+        if (!deletedWidgetIndex || deletedWidgetIndex === -1) return;
+        _dashboardLayouts[0]?.widgets?.splice(deletedWidgetIndex, 1);
+        setDashboardLayouts(_dashboardLayouts);
+        await updateDashboard(state.dashboardId as string, { layouts: _dashboardLayouts });
     };
     const resetVariables = (originVariables?: DashboardVariables, originVariablesSchema?: DashboardVariablesSchema) => {
         const _originVariables: DashboardVariables = originVariables ?? state.dashboardInfo?.variables ?? {};
@@ -400,6 +382,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setIsNameValid,
         setOptions,
         setDashboardWidgetInfoList,
+        setDashboardLayouts,
         setLabels,
         setVariablesSchema,
         setVariables,
@@ -415,13 +398,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardInfo,
         setDashboardInfo,
         setOriginDashboardName,
-        deleteWidget,
+        deleteDashboardWidget,
         resetVariables,
         updateWidgetValidation,
         createDashboard,
         updateDashboard,
         deleteDashboard,
-        setDashboardTemplate,
     };
 
     return {

@@ -7,13 +7,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+import type { PrivateWidgetModel } from '@/schema/dashboard/private-widget/model';
 import type { DataTableAddParameters } from '@/schema/dashboard/public-data-table/api-verbs/add';
 import type { DataTableDeleteParameters } from '@/schema/dashboard/public-data-table/api-verbs/delete';
 import type { DataTableListParameters } from '@/schema/dashboard/public-data-table/api-verbs/list';
 import type { DataTableLoadParameters } from '@/schema/dashboard/public-data-table/api-verbs/load';
 import type { DataTableTransformParameters } from '@/schema/dashboard/public-data-table/api-verbs/transform';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
-import type { PublicWidgetGetParameters } from '@/schema/dashboard/public-widget/api-verbs/get';
 import type { PublicWidgetModel } from '@/schema/dashboard/public-widget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -29,7 +29,7 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
         showOverlay: false,
         overlayStep: 1,
         // Widget
-        widget: undefined as undefined | PublicWidgetModel,
+        widget: undefined as undefined | PublicWidgetModel | PrivateWidgetModel,
         widgetId: '',
         selectedWidgetName: 'stackedColumnChart',
         title: '',
@@ -187,22 +187,14 @@ export const useWidgetGenerateStore = defineStore('widget-generate', () => {
             state.description = '';
             state.size = 'full';
         },
-        loadWidget: async (widgetId: string) => {
-            try {
-                state.widget = await SpaceConnector.clientV2.dashboard.publicWidget.get<PublicWidgetGetParameters, PublicWidgetModel>({
-                    widget_id: widgetId,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        },
         initWidgetForm: (widgetInfo?: WidgetModel) => {
             state.selectedWidgetName = widgetInfo?.widget_type || 'table';
             const _widgetConfig = getWidgetConfig(widgetInfo?.widget_type || 'table');
+            state.widget = widgetInfo;
             state.widgetId = widgetInfo?.widget_id || '';
-            state.title = widgetInfo?.name || _widgetConfig.meta.title || '';
+            state.title = widgetInfo?.name || _widgetConfig.meta?.title || '';
             state.description = widgetInfo?.description || '';
-            state.size = _widgetConfig.meta.sizes[0]; // TODO
+            state.size = _widgetConfig.meta?.sizes[0]; // TODO
             state.selectedDataTableId = widgetInfo?.data_table_id || undefined;
             state.widgetValueMap = widgetInfo?.options || {};
         },
