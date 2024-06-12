@@ -2,7 +2,7 @@
 
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, reactive, ref, toRef, watch,
+    computed, onMounted, reactive, ref, toRef, watch,
 } from 'vue';
 
 import {
@@ -35,6 +35,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { DATA_SOURCE_DOMAIN, MANAGED_GLOBAL_VARIABLE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { useWidgetGenerateStore } from '@/common/modules/widgets/_store/widget-generate-store';
 import type { DataTableSourceType } from '@/common/modules/widgets/types/widget-model';
 
 import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -53,6 +54,7 @@ const GROUP_BY_TO_VAR_MODELS: Record<string, VariableOption> = {
 };
 const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({});
 interface Props {
+    dataTableId: string;
     sourceType?: DataTableSourceType;
     sourceId?: string;
     sourceKey?: string;
@@ -63,10 +65,12 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>): void;}>();
 const allReferenceStore = useAllReferenceStore();
+const widgetGenerateStore = useWidgetGenerateStore();
 
 const storeState = reactive({
     metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+    dataTable: computed(() => widgetGenerateStore.state.dataTables.find((d) => d.data_table_id === props.dataTableId)),
 });
 
 const state = reactive({
@@ -174,6 +178,8 @@ const resetAllFilter = () => {
 const resetFilterByKey = (key: string) => {
     unset(state.proxyFilters, key);
     unset(state.selectedItemsMap, key);
+    state.proxyFilters = { ...state.proxyFilters };
+    state.selectedItemsMap = { ...state.selectedItemsMap };
 };
 const getCostMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
@@ -254,9 +260,24 @@ const getAssetMenuHandler = (labelKey: MetricLabelKey): AutocompleteHandler => {
     }
 };
 
-watch([() => props.filterItems, () => props.sourceId, () => props.sourceKey], async () => {
+watch(() => props.sourceKey, async () => {
     resetAllFilter();
 });
+
+onMounted(() => {
+    if (!storeState.dataTable) return;
+    const initialFilters = storeState.dataTable.options?.filters ?? [];
+
+    initialFilters.forEach((filter) => {
+        const selectedFilteritemLabel = state.filterItems.find((d) => d.name === filter.k)?.label;
+        state.selectedItems = [
+            ...state.selectedItems,
+            { name: filter.k, label: selectedFilteritemLabel },
+        ];
+        state.selectedItemsMap[filter.k] = filter.v.map((d) => ({ name: d }));
+    });
+});
+
 </script>
 
 <template>
