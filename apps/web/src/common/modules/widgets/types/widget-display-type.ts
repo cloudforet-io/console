@@ -15,7 +15,7 @@ export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inher
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 
-export interface WidgetProps<T> {
+export interface WidgetProps {
     widgetName: string;
     widgetId: string;
     dataTableId: string;
@@ -31,19 +31,14 @@ export interface WidgetProps<T> {
     dashboardOptions?: DashboardOptions;
     dashboardVariables?: DashboardVariables;
     disableRefreshOnVariableChange?: boolean;
-    data?: T;
 }
 
 export interface WidgetEmit {
     (e: 'mounted'): void;
-    (e: 'initiated', data: any): void;
-    (e: 'refreshed', data: any): void;
-    (e: 'update-widget-info', widgetInfo: UpdatableWidgetInfo): void;
-    (e: 'update-widget-validation', validation: boolean): void;
+    (e: 'update-size', size: WidgetSize): void;
     (event: 'click-delete'): void;
     (event: 'click-expand'): void;
     (event: 'click-edit'): void;
-    (event: 'update:size', size: WidgetSize): void;
 }
 
 export interface WidgetExpose<Data = any> {

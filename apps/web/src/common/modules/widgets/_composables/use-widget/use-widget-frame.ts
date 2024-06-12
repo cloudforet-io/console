@@ -48,8 +48,8 @@ export const useWidgetFrame = (
         'click-expand': () => {
             emit('click-expand');
         },
-        'update:size': (size: WidgetSize) => {
-            emit('update:size', size);
+        'update-size': (size: WidgetSize) => {
+            emit('update-size', size);
         },
     };
 
