@@ -34,8 +34,7 @@ const storeState = reactive({
     previewData: computed(() => widgetGenerateState.previewData),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
     selectedDataTable: computed(() => widgetGenrateGetters.selectedDataTable),
-    // loading: computed(() => widgetGenerateState.dataTableLoadLoading),
-    loading: computed(() => true),
+    loading: computed(() => widgetGenerateState.dataTableLoadLoading),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
 });
 
