@@ -44,7 +44,7 @@ const state = reactive({
         { name: 'ic_warning-filled', label: 'Warning' },
         { name: 'ic_sparkle-filled', label: 'Sparkle' },
         { name: 'ic_arrow-right-up-with-sparkles', label: 'Arrow Right-up with sparkles' },
-        { name: 'ic_service_metric-explorer', label: 'Guage' },
+        { name: 'ic_service_metric-explorer', label: 'Gauge' },
         { name: 'ic_service_cloud-service', label: 'Cloud' },
         { name: 'ic_service_project', label: 'Planet' },
         { name: 'ic_service_budget', label: 'Budget' },

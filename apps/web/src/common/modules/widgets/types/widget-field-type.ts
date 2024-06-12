@@ -1,6 +1,7 @@
 import type { Granularity } from '@/schema/dashboard/_types/widget-type';
 
 import type { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
+import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 import type { DataTableModel } from '@/common/modules/widgets/types/widget-model';
 
 
@@ -85,6 +86,9 @@ export type FormatRulesType = typeof FORMAT_RULE_TYPE[keyof typeof FORMAT_RULE_T
 export interface FormatRulesOptions {
     formatRulesType: FormatRulesType;
     dataTarget?: string;
+    description?: string;
+    default?: FormatRulesValue[];
+    baseColor?: string;
 }
 type WidgetFieldOptions = DataFieldOptions | TableDataFieldOptions | XAxisOptions | YAxisOptions
     | LineByOptions | StackByOptions | GroupByOptions | CategoryByOptions
@@ -110,7 +114,6 @@ export interface WidgetFieldComponentProps<FieldOptions> {
     dataTable?: DataTableModel;
     widgetFieldSchema?: WidgetFieldSchema<FieldOptions>;
     isValid?: boolean;
-    value?: any;
 }
 
 export interface WidgetFieldComponentEmit<ValueType> {

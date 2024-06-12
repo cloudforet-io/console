@@ -25,8 +25,8 @@ const state = reactive({
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
     selectedItem: undefined as undefined | MenuItem[] | string,
     isValid: computed<boolean>(() => {
-        if (!props.widgetFieldSchema.options?.hideCount && !state.proxyValue?.count) return false;
-        if (props.widgetFieldSchema.options?.multiSelectable && !state.selectedItem?.length) return false;
+        if (!props.widgetFieldSchema?.options?.hideCount && !state.proxyValue?.count) return false;
+        if (props.widgetFieldSchema?.options?.multiSelectable && !state.selectedItem?.length) return false;
         return !!state.selectedItem;
     }),
 });
@@ -55,7 +55,7 @@ onMounted(() => {
     // TODO: set state.proxyValue with the value from the widget or set default value
     state.proxyValue = {
         value: state.menuItems[0]?.name, // TODO: string | string[]
-        count: props.widgetFieldSchema.options?.default,
+        count: props.widgetFieldSchema?.options?.defaultMaxCount,
     };
 });
 </script>
@@ -73,10 +73,10 @@ onMounted(() => {
                                    appearance-type="badge"
                                    @update:selected="handleUpdateSelect"
                 />
-                <p-text-input v-if="!widgetFieldSchema.options?.hideCount"
+                <p-text-input v-if="!widgetFieldSchema?.options?.hideCount"
                               type="number"
                               :min="1"
-                              :max="props.widgetFieldSchema.options?.max"
+                              :max="props.widgetFieldSchema?.options?.max"
                               :value="state.proxyValue?.count"
                               @update:value="handleUpdateCount"
                 />

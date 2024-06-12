@@ -1,5 +1,7 @@
 import type { WidgetConfig } from '@/common/modules/widgets/types/widget-config-type';
 
+import { indigo, red, yellow } from '@/styles/colors';
+
 
 const gauge: WidgetConfig = {
     widgetName: 'gauge',
@@ -22,7 +24,16 @@ const gauge: WidgetConfig = {
         },
         formatRules: {
             options: {
-                fields: ['threshold', 'color'],
+                default: [{
+                    threshold: 90,
+                    color: yellow[500],
+                },
+                {
+                    threshold: 100,
+                    color: red[400],
+                }],
+                baseColor: indigo[100],
+                description: 'COMMON.WIDGETS.FORMAT_RULES.GAUGE_DESC',
             },
         },
     },

@@ -1,78 +1,68 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PIconButton, PButton,
+    PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
 import ColorInput from '@/common/components/inputs/ColorInput.vue';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import { FORMAT_RULE_TYPE } from '@/common/modules/widgets/configs/widget-field-config';
 import type {
-    WidgetFieldComponentProps,
+    FormatRulesOptions,
+    FormatRulesType,
     WidgetFieldComponentEmit,
-    FormatRulesOptions, FormatRulesType,
+    WidgetFieldComponentProps,
 } from '@/common/modules/widgets/types/widget-field-type';
 import type { FormatRulesValue } from '@/common/modules/widgets/types/widget-field-value-type';
 
-import { gray } from '@/styles/colors';
+import { violet } from '@/styles/colors';
 
 
 const props = withDefaults(defineProps<WidgetFieldComponentProps<FormatRulesOptions>>(), {
     widgetFieldSchema: () => ({}),
-    value: () => [{
-        threshold: 0,
-        name: '',
-        color: gray[200],
-    }],
 });
 const emit = defineEmits<WidgetFieldComponentEmit<FormatRulesValue[]>>();
 const state = reactive({
-    proxyValue: useProxyValue<FormatRulesValue[]>('value', props, emit),
+    customValue: props.widgetFieldSchema.options?.default ?? [],
+    baseColor: props.widgetFieldSchema.options?.baseColor ?? violet[400],
+    value: computed(() => [{ threshold: 0, color: state.baseColor }, ...state.customValue]),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    type: computed<FormatRulesType>(() => props.widgetFieldSchema.options?.formatRulesType ?? FORMAT_RULE_TYPE.nameAndThreshold),
+    type: computed<FormatRulesType>(() => props.widgetFieldSchema.options?.formatRulesType ?? FORMAT_RULE_TYPE.threshold),
     isFieldNameValid: [undefined],
-    isAllValid: computed(() => state.isFieldNameValid.every((valid:boolean) => valid === true)),
+    isAllValid: computed(() => state.isFieldNameValid.every((valid:boolean) => valid)),
 });
 
 /* Util */
-const getInitialFormatRulesValue = (): FormatRulesValue => {
-    const initialFormatRule: FormatRulesValue = {
-        threshold: 0,
-        color: gray[200],
-    };
-    if (state.type === FORMAT_RULE_TYPE.nameAndThreshold) {
-        initialFormatRule.name = '';
-    }
-    return initialFormatRule;
-};
+const getInitialFormatRulesValue = (): FormatRulesValue => ({
+    threshold: undefined,
+    color: props.widgetFieldSchema?.options?.baseColor ?? violet[400],
+});
 
 /* Event */
 const handleClickAddRule = () => {
-    state.proxyValue = [...state.proxyValue, getInitialFormatRulesValue()];
+    state.customValue = [...state.customValue, getInitialFormatRulesValue()];
     state.isFieldNameValid = [...state.isFieldNameValid, undefined];
 };
 const handleDelete = (idx: number) => {
-    const _value = cloneDeep(state.proxyValue);
-    _value.splice(idx, 1);
-    state.proxyValue = _value;
-    const updatedValue = cloneDeep(state.isFieldNameValid);
-    updatedValue.splice(idx, 1);
-    state.isFieldNameValid = updatedValue;
+    const _customValue = cloneDeep(state.customValue);
+    _customValue.splice(idx, 1);
+    state.customValue = _customValue;
+    const updatedCustomValue = cloneDeep(state.isFieldNameValid);
+    updatedCustomValue.splice(idx, 1);
+    state.isFieldNameValid = updatedCustomValue;
 };
-const handleFormatRuleInput = (idx: number|string, key: string, val: string) => {
-    const _value = cloneDeep(state.proxyValue);
-    _value[idx][key] = val;
-    state.proxyValue = _value;
-    if (key === 'name') {
-        const updatedValue = cloneDeep(state.isFieldNameValid);
-        updatedValue[idx] = val.length > 0;
-        state.isFieldNameValid = updatedValue;
-    }
+const handleFormatRuleInput = (idx: number|string, key: 'threshold'|'color', val: string) => {
+    const _customValue = cloneDeep(state.customValue);
+    _customValue[idx][key] = val;
+    state.customValue = _customValue;
+};
+
+const handleBaseColor = (val: string) => {
+    state.baseColor = val;
 };
 
 /* Watcher */
@@ -80,10 +70,8 @@ watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 
-onMounted(() => {
-    if (!state.proxyValue.length) {
-        state.proxyValue = [getInitialFormatRulesValue()];
-    }
+watch(() => state.value, (value) => {
+    emit('update:value', value);
 });
 </script>
 
@@ -92,6 +80,9 @@ onMounted(() => {
         <p-field-group :label="$t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.FORMAT_RULES')"
                        required
         >
+            <template #help>
+                <span>{{ $t(props.widgetFieldSchema?.options?.description) }}</span>
+            </template>
             <div class="format-rules-wrapper">
                 <p-button icon-left="ic_plus_bold"
                           style-type="tertiary"
@@ -100,47 +91,52 @@ onMounted(() => {
                 >
                     {{ $t('DASHBOARDS.WIDGET.OVERLAY.STEP_2.ADD_RULE') }}
                 </p-button>
-                <div v-for="(formatRule, idx) in state.proxyValue"
-                     :key="`format-rule-${formatRule.threshold}-${formatRule.color}-${idx}`"
-                     class="format-rules-input-wrapper"
-                >
-                    <p-field-group v-if="state.type === FORMAT_RULE_TYPE.nameAndThreshold"
-                                   :invalid="state.isFieldNameValid[idx] === false"
-                                   :invalid-text="$t('COMMON.WIDGETS.COMPARISON.NAME_INVALID_TEXT')"
-                                   required
+                <div class="custom-menu-box">
+                    <div v-for="(formatRule, idx) in state.customValue"
+                         :key="idx"
+                         class="format-rules-input-wrapper"
                     >
-                        <p-text-input :value="formatRule.name"
-                                      :invalid="state.isFieldNameValid[idx] === false"
-                                      placeholder="Name"
-                                      multi-input
-                                      @update:value="handleFormatRuleInput(idx, 'name', $event)"
-                        />
-                    </p-field-group>
-                    <p-field-group required>
-                        <p-text-input :value="formatRule.threshold"
-                                      type="number"
-                                      :min="0"
-                                      @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
-                        >
-                            <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
-                                      #input-right
+                        <p-field-group required>
+                            <p-text-input :value="formatRule.threshold"
+                                          type="number"
+                                          :name="`format-rule-threshold-${idx}`"
+                                          :min="0"
+                                          @update:value="handleFormatRuleInput(idx, 'threshold', $event)"
                             >
-                                %
-                            </template>
-                        </p-text-input>
-                    </p-field-group>
+                                <template v-if="state.type === FORMAT_RULE_TYPE.percentThreshold"
+                                          #input-right
+                                >
+                                    %
+                                </template>
+                            </p-text-input>
+                        </p-field-group>
+                        <div class="right-part">
+                            <color-input :value="formatRule.color"
+                                         class="color-input"
+                                         @update:value="handleFormatRuleInput(idx, 'color', $event)"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           style-type="negative-transparent"
+                                           size="sm"
+                                           class="delete-button"
+                                           @click="handleDelete(idx)"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="format-rules-input-wrapper">
+                    <p-text-input :value="0"
+                                  type="number"
+                                  disabled
+                    >
+                        <span class="base-label">{{ $t('COMMON.WIDGETS.FORMAT_RULES.BASE') }}</span>
+                    </p-text-input>
                     <div class="right-part">
-                        <color-input :value="formatRule.color"
+                        <color-input :value="state.baseColor"
                                      class="color-input"
-                                     @update:value="handleFormatRuleInput(idx, 'color', $event)"
+                                     @update:value="handleBaseColor"
                         />
-                        <p-icon-button name="ic_delete"
-                                       style-type="negative-transparent"
-                                       size="sm"
-                                       :disabled="state.proxyValue.length === 1"
-                                       class="delete-button"
-                                       @click="handleDelete(idx)"
-                        />
+                        <div class="block" />
                     </div>
                 </div>
             </div>
@@ -161,9 +157,19 @@ onMounted(() => {
     .add-button {
         margin-bottom: 0.5rem;
     }
+
+    .custom-menu-box {
+        @apply flex flex-col-reverse;
+    }
+
     .format-rules-input-wrapper {
         @apply flex gap-2 items-start;
         padding-bottom: 0.5rem;
+
+        .base-label {
+            @apply text-label-md;
+            line-height: 1.09375rem;
+        }
 
         .right-part {
             @apply flex gap-2 items-center;
@@ -174,6 +180,11 @@ onMounted(() => {
             .delete-button {
                 flex-shrink: 0;
                 width: 2rem;
+            }
+
+            .block {
+                flex-shrink: 0;
+                width: 1.5rem;
             }
         }
 
