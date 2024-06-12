@@ -112,7 +112,7 @@ const signIn = async () => {
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="state.userId"
-                                  :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
+                                  :placeholder="!isMobile() ? 'Email Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkUserId"
@@ -127,6 +127,7 @@ const signIn = async () => {
                     <p-text-input v-model="state.password"
                                   type="password"
                                   placeholder="Password"
+                                  appearance-type="masking"
                                   :invalid="invalid"
                                   block
                                   @update:value="checkPassword"
@@ -145,7 +146,7 @@ const signIn = async () => {
                     {{ $t('AUTH.PASSWORD.FIND.FORGOT_PASSWORD') }}
                 </router-link>
             </p>
-            <p-button style-type="substitutive"
+            <p-button style-type="primary"
                       type="submit"
                       size="lg"
                       class="sign-in-btn"
@@ -191,7 +192,7 @@ const signIn = async () => {
     }
     .util-wrapper {
         @apply flex flex-col;
-        gap: 2.5rem;
+        gap: 1.5rem;
         width: 100%;
         margin-top: 1.125rem;
         .reset-pw-button {

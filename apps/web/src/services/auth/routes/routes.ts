@@ -11,6 +11,8 @@ const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
 const ValidationEmailPage = () => import('@/services/auth/pages/ValidationEmailPage.vue');
 const MultiFactorAuthPage = () => import('@/services/auth/pages/MultiFactorAuthPage.vue');
 
+const SamlRedirectPage = () => import('@/services/auth/pages/SamlRedirectPage.vue');
+
 export default [
     {
         path: '/sign-out',
@@ -61,6 +63,11 @@ export default [
                 component: MultiFactorAuthPage,
             },
         ],
+    },
+    {
+        path: '/saml',
+        name: AUTH_ROUTE.SAML._NAME,
+        component: SamlRedirectPage,
     },
     {
         path: '/find-password',
