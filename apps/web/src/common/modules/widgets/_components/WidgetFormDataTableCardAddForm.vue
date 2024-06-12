@@ -27,6 +27,7 @@ import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 interface Props {
+    filterFormKey: string;
     dataTableId: string;
     sourceType?: string;
     sourceId: string;
@@ -204,6 +205,8 @@ onMounted(async () => {
     <div class="widget-form-data-table-card-add-form">
         <p-field-group label="Group by"
                        required
+                       :invalid="state.proxySelectedGroupByItems.length === 0"
+                       :invalid-text="'Please select at least one item'"
         >
             <p-select-dropdown class="group-by-select-dropdown"
                                :menu="groupByState.items"
@@ -215,7 +218,8 @@ onMounted(async () => {
                                is-filterable
             />
         </p-field-group>
-        <widget-form-data-table-card-filters :data-table-id="props.dataTableId"
+        <widget-form-data-table-card-filters :key="props.filterFormKey"
+                                             :data-table-id="props.dataTableId"
                                              :source-type="props.sourceType"
                                              :source-id="props.sourceId"
                                              :source-key="props.sourceKey"
@@ -224,6 +228,8 @@ onMounted(async () => {
         />
         <p-field-group label="Data Field Name"
                        required
+                       :invalid="state.proxyDataFieldName.length === 0"
+                       :invalid-text="'Please enter the name'"
         >
             <p-text-input v-model="state.proxyDataFieldName"
                           class="data-text-input"

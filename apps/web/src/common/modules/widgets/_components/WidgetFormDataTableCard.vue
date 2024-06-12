@@ -10,6 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import { isEqual } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -106,6 +107,7 @@ const state = reactive({
             ...(additionalMenuItems || []),
         ];
     }),
+    filterFormKey: getRandomId(),
 });
 
 const dataTableNameState = reactive({
@@ -120,6 +122,43 @@ const advancedOptionsState = reactive({
     selectedTimeDiffDate: undefined as string|undefined,
 });
 
+const applyState = reactive({
+    optionsChanged: computed(() => {
+        const _initialOptions = props.item.options;
+        const _originSourceKey = state.sourceType === DATA_SOURCE_DOMAIN.COST ? _initialOptions[DATA_SOURCE_DOMAIN.COST]?.data_key : _initialOptions[DATA_SOURCE_DOMAIN.ASSET]?.metric_id;
+        const sourceKeyChanged = state.selectedSourceEndItem !== _originSourceKey;
+
+        const costGroupBy = state.selectedGroupByItems.map((group) => ({
+            key: group.name,
+            name: group.label,
+        }));
+        const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
+        const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+        const _targetGroupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
+        const groupByChanged = !isEqual(_targetGroupBy, _initialOptions.group_by);
+
+        const changedCheckApiQueryHelper = new ApiQueryHelper();
+        changedCheckApiQueryHelper.setFilters(state.consoleFilters);
+        const filtersChanged = !isEqual(changedCheckApiQueryHelper.data.filter, _initialOptions.filters);
+
+        const dataTableNameChanged = state.dataFieldName !== _initialOptions.data_name;
+        const dataUnitChanged = state.dataUnit !== _initialOptions.data_unit;
+
+        const _targetAdditionalLabels = {} as AdditionalLabels;
+        advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
+            _targetAdditionalLabels[label.name] = label.value;
+        });
+        const additionalLabelChanged = !isEqual(_targetAdditionalLabels, _initialOptions.additional_labels);
+
+        const seperateDateChanged = advancedOptionsState.separateDate !== (_initialOptions.date_format === 'SEPARATE');
+
+        const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== 'none' && Number(advancedOptionsState.selectedTimeDiffDate)
+            ? !isEqual({ [advancedOptionsState.selectedTimeDiff]: -Number(advancedOptionsState.selectedTimeDiffDate) }, _initialOptions.timediff)
+            : _initialOptions.timediff !== undefined;
+
+        return sourceKeyChanged || groupByChanged || filtersChanged || dataTableNameChanged || dataUnitChanged || additionalLabelChanged || seperateDateChanged || timeDiffChanged;
+    }),
+});
 const modalState = reactive({
     visible: false,
     mode: '' as 'DELETE'|'DELETE_UNABLED'|'RESET',
@@ -181,6 +220,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
 
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
+    showSuccessMessage('Data successfully changed.', '');
 };
 
 const handleClickDeleteDataTable = async () => {
@@ -206,6 +246,7 @@ const handleConfirmModal = async () => {
     }
     if (modalState.mode === 'RESET') {
         setInitialDataTableForm();
+        state.filterFormKey = getRandomId();
     }
     modalState.visible = false;
 };
@@ -214,7 +255,7 @@ const handleCancelModal = () => {
 };
 const handleUpdateDataTable = async () => {
     const additionalLabelsRequest = {} as AdditionalLabels;
-    advancedOptionsState.additionalLabels.forEach((label) => {
+    advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
         additionalLabelsRequest[label.name] = label.value;
     });
     const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
@@ -227,14 +268,20 @@ const handleUpdateDataTable = async () => {
     }));
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+    const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
     const dataTableApiQueryHelper = new ApiQueryHelper();
     dataTableApiQueryHelper.setFilters(state.consoleFilters);
+
+    if (!groupBy.length || !state.dataFieldName.length) {
+        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        return;
+    }
 
     const updateParams: DataTableUpdateParameters = {
         data_table_id: state.dataTableId,
         options: {
             [state.sourceType]: domainOptions,
-            group_by: state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy,
+            group_by: groupBy,
             filters: dataTableApiQueryHelper.data.filter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
@@ -252,6 +299,9 @@ const handleUpdateDataTable = async () => {
             data_table_id: state.dataTableId,
         });
     }
+    showSuccessMessage('Changes have been successfully applied.', '');
+    setInitialDataTableForm();
+    state.filterFormKey = getRandomId();
 };
 
 /* Utils */
@@ -369,7 +419,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                          @select="handleSelectSourceItem"
                 />
             </div>
-            <widget-form-data-table-card-add-form :data-table-id="state.dataTableId"
+            <widget-form-data-table-card-add-form :filter-form-key="state.filterFormKey"
+                                                  :data-table-id="state.dataTableId"
                                                   :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                                   :source-key="state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
@@ -397,9 +448,13 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                         Reset
                     </p-button>
                     <p-button style-type="secondary"
+                              class="apply-button"
                               @click="handleUpdateDataTable"
                     >
                         Apply
+                        <div v-if="applyState.optionsChanged"
+                             class="update-dot"
+                        />
                     </p-button>
                 </div>
             </div>
@@ -487,6 +542,16 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             @apply border-t border-gray-200 flex justify-between;
             padding: 0.75rem 1rem;
 
+            .apply-button {
+                @apply relative;
+                .update-dot {
+                    @apply absolute rounded-full bg-blue-500 border-2 border-white;
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    right: -0.25rem;
+                    top: -0.25rem;
+                }
+            }
             .form-button-wrapper {
                 @apply flex gap-2;
             }
