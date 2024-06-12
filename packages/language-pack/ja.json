@@ -1387,6 +1387,10 @@
 				"TOGGLE_MORE": "もっと見る"
 			},
 			"FIELD": "",
+			"FORMAT_RULES": {
+				"BASE": "",
+				"GAUGE_DESC": ""
+			},
 			"HEALTH_DASHBOARD_DESC_1": "AWSビジネスもしくはエンタープライズサポートプランを使用している場合、AWS Health Dashboardが利用できます",
 			"HEALTH_DASHBOARD_DESC_2": "適切なプランを利用しているが、ウィジェットが利用できない場合、以下のメールにてお問い合わせください",
 			"HEALTH_DASHBOARD_DESC_3": "先にAWSプランを確認してください",
@@ -1394,7 +1398,6 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"MAX_ITEMS": "",
 			"MAX_ITEMS_DESC": "",
-			"NUMBER_FIELD_VALIDATION": "",
 			"NUMBER_CARD": {
 				"LESS_THAN_PREVIOUS_DAY": "",
 				"LESS_THAN_PREVIOUS_MONTH": "",
@@ -1403,6 +1406,7 @@
 				"MORE_THAN_PREVIOUS_MONTH": "",
 				"MORE_THAN_PREVIOUS_YEAR": ""
 			},
+			"NUMBER_FIELD_VALIDATION": "",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",
 				"AGO": "前",
