@@ -8,5 +8,6 @@ export interface PublicWidgetUpdateParameters {
     description?: string;
     widget_type: WidgetType;
     options?: Record<string, any>;
+    data_table_id?: string;
     tags?: Tags;
 }
