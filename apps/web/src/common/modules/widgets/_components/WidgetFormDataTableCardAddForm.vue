@@ -27,6 +27,7 @@ import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 interface Props {
+    dataTableId: string;
     sourceType?: string;
     sourceId: string;
     sourceKey: string;
@@ -214,7 +215,8 @@ onMounted(async () => {
                                is-filterable
             />
         </p-field-group>
-        <widget-form-data-table-card-filters :source-type="props.sourceType"
+        <widget-form-data-table-card-filters :data-table-id="props.dataTableId"
+                                             :source-type="props.sourceType"
                                              :source-id="props.sourceId"
                                              :source-key="props.sourceKey"
                                              :filter-items="groupByState.items"

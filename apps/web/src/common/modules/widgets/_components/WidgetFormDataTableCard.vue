@@ -11,6 +11,9 @@ import {
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { DataTableUpdateParameters } from '@/schema/dashboard/public-data-table/api-verbs/update';
 
@@ -49,7 +52,8 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    selected: computed(() => widgetGenerateState.selectedDataTableId === props.item.data_table_id),
+    dataTableId: computed(() => props.item.data_table_id),
+    selected: computed(() => widgetGenerateState.selectedDataTableId === state.dataTableId),
     sourceType: computed(() => props.item.source_type),
     options: computed(() => props.item.options),
     dataSourceId: computed(() => state.options[state.sourceType].data_source_id), // COST only
@@ -60,6 +64,19 @@ const state = reactive({
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
     selectedGroupByItems: [] as { name: string; label: string; }[],
     filters: {} as Record<string, string[]>,
+    consoleFilters: computed<ConsoleFilter[]>(() => {
+        const results: ConsoleFilter[] = [];
+        Object.entries(state.filters ?? {}).forEach(([category, filterItems]) => {
+            if (filterItems.length) {
+                results.push({
+                    k: category,
+                    v: filterItems,
+                    o: '=',
+                });
+            }
+        });
+        return results;
+    }),
     dataFieldName: '',
     dataUnit: '',
     selectableSourceItems: computed<SelectDropdownMenuItem[]>(() => {
@@ -148,7 +165,7 @@ const handleClickNameConfirm = async () => {
         return;
     }
     await widgetGenerateStore.updateDataTable({
-        data_table_id: props.item.data_table_id,
+        data_table_id: state.dataTableId,
         name: editedDataTableName,
     });
     showSuccessMessage('Data name successfully changed.', '');
@@ -179,10 +196,10 @@ const handleConfirmModal = async () => {
     if (modalState.mode === 'DELETE') {
         const beforeSelectedDataTableId = storeState.selectedDataTableId;
         const deleteParams = {
-            data_table_id: props.item.data_table_id,
+            data_table_id: state.dataTableId,
         };
         await widgetGenerateStore.deleteDataTable(deleteParams);
-        if (beforeSelectedDataTableId === props.item.data_table_id) {
+        if (beforeSelectedDataTableId === state.dataTableId) {
             const dataTableId = storeState.dataTables.length ? storeState.dataTables[0]?.data_table_id : undefined;
             widgetGenerateStore.setSelectedDataTableId(dataTableId);
         }
@@ -210,15 +227,15 @@ const handleUpdateDataTable = async () => {
     }));
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
-
+    const dataTableApiQueryHelper = new ApiQueryHelper();
+    dataTableApiQueryHelper.setFilters(state.consoleFilters);
 
     const updateParams: DataTableUpdateParameters = {
-        data_table_id: props.item.data_table_id,
+        data_table_id: state.dataTableId,
         options: {
             [state.sourceType]: domainOptions,
             group_by: state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy,
-            filters: [],
-            filters_or: [],
+            filters: dataTableApiQueryHelper.data.filter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
             additional_labels: additionalLabelsRequest,
@@ -229,10 +246,10 @@ const handleUpdateDataTable = async () => {
         },
     };
     await widgetGenerateStore.updateDataTable(updateParams);
-    if (storeState.selectedDataTableId === props.item.data_table_id) {
+    if (storeState.selectedDataTableId === state.dataTableId) {
         widgetGenerateStore.setDataTableUpdating(true);
         await widgetGenerateStore.loadDataTable({
-            data_table_id: props.item.data_table_id,
+            data_table_id: state.dataTableId,
         });
     }
 };
@@ -247,6 +264,11 @@ const setInitialDataTableForm = () => {
     }));
     // TODO: refactor groupBy & set filters
     state.selectedGroupByItems = [...initialGroupBy];
+    const _filters = {} as Record<string, string[]>;
+    props.item.options?.filters?.forEach((filter) => {
+        _filters[filter.k] = filter.v;
+    });
+    state.filters = _filters;
 
     state.dataFieldName = props.item.options.data_name || '';
     state.dataUnit = props.item.options.data_unit || '';
@@ -296,7 +318,7 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             <div class="card-header">
                 <div class="title-wrapper">
                     <button class="selected-radio-icon"
-                            @click="handleSelectDataTable(props.item.data_table_id)"
+                            @click="handleSelectDataTable(state.dataTableId)"
                     >
                         <p-i :name="state.selected ? 'ic_checkbox-circle-selected' : 'ic_radio'"
                              :color="state.selected ? violet[500] : gray[400]"
@@ -347,7 +369,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                          @select="handleSelectSourceItem"
                 />
             </div>
-            <widget-form-data-table-card-add-form :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
+            <widget-form-data-table-card-add-form :data-table-id="state.dataTableId"
+                                                  :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                                   :source-key="state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
                                                   :selected-group-by-items.sync="state.selectedGroupByItems"
