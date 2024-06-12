@@ -21,6 +21,9 @@ const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPa
 const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 const CostReportPage = () => import('@/services/cost-explorer/pages/CostReportPage.vue');
+const CostAnomalyDetectionConfigurationPage = () => import('@/services/cost-explorer/pages/CostAnomalyDetectionConfigurationPage.vue');
+const CostAnomalyDetectionPolicyPage = () => import('@/services/cost-explorer/pages/CostAnomalyDetectionPolicyPage.vue');
+const CostAnomalyDetectionHistoryPage = () => import('@/services/cost-explorer/pages/CostAnomalyDetectionHistoryPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -91,6 +94,46 @@ const costExplorerRoutes: RouteConfig = {
                     },
                     props: true,
                     component: CostAnalysisPage as any,
+                },
+            ],
+        },
+        {
+            path: 'cost-anomaly-detection',
+            name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION._NAME,
+            meta: {
+                menuId: MENU_ID.COST_ANOMALY_DETECTION,
+                translationId: MENU_INFO_MAP[MENU_ID.COST_ANOMALY_DETECTION].translationId,
+            },
+            redirect: () => ({
+                name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.CONFIGURATION._NAME,
+            }),
+            children: [
+                {
+                    path: 'config',
+                    name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.CONFIGURATION._NAME,
+                    meta: {
+                        lsbVisible: true,
+                        translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.CONFIG_TITLE',
+                    },
+                    component: CostAnomalyDetectionConfigurationPage as any,
+                },
+                {
+                    path: 'policy',
+                    name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.POLICY._NAME,
+                    meta: {
+                        lsbVisible: true,
+                        translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.POLICY_TITLE',
+                    },
+                    component: CostAnomalyDetectionPolicyPage as any,
+                },
+                {
+                    path: 'history',
+                    name: COST_EXPLORER_ROUTE.COST_ANOMALY_DETECTION.HISTORY._NAME,
+                    meta: {
+                        lsbVisible: true,
+                        translationId: 'BILLING.COST_MANAGEMENT.COST_ANOMALY_DETECTION.HISTORY_TITLE',
+                    },
+                    component: CostAnomalyDetectionHistoryPage as any,
                 },
             ],
         },
