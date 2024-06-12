@@ -10,6 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import { isEqual } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -106,6 +107,21 @@ const state = reactive({
             ...(additionalMenuItems || []),
         ];
     }),
+    filterFormKey: getRandomId(),
+    optionsChanged: computed(() => {
+        const sourceKeyChanged = state.selectedSourceEndItem !== originDataState.sourceKey;
+        const groupByChanged = !isEqual(state.selectedGroupByItems, originDataState.groupBy);
+        const filtersChanged = !isEqual(state.filters, originDataState.filters);
+        const dataTableNameChanged = state.dataFieldName !== originDataState.dataName;
+        const dataUnitChanged = state.dataUnit !== originDataState.dataUnit;
+        const additionalLabelChanged = !isEqual(advancedOptionsState.additionalLabels.map(({ name, value }) => ({ name, value })), originDataState.additionalLabels);
+        const seperateDateChanged = advancedOptionsState.separateDate !== originDataState.separateDate;
+        const timeDiffChanged = advancedOptionsState.selectedTimeDiff !== originDataState.timeDiff;
+        const timeDiffDateChanged = advancedOptionsState.selectedTimeDiffDate !== originDataState.timeDiffDate;
+
+        return sourceKeyChanged || groupByChanged || filtersChanged || dataTableNameChanged || dataUnitChanged
+        || additionalLabelChanged || seperateDateChanged || timeDiffChanged || timeDiffDateChanged;
+    }),
 });
 
 const dataTableNameState = reactive({
@@ -118,6 +134,38 @@ const advancedOptionsState = reactive({
     separateDate: false,
     selectedTimeDiff: 'none',
     selectedTimeDiffDate: undefined as string|undefined,
+});
+
+const originDataState = reactive({
+    sourceKey: computed(() => (state.sourceType === DATA_SOURCE_DOMAIN.COST ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id)),
+    groupBy: computed(() => (props.item.options.group_by ?? []).map((group) => ({
+        name: group.key,
+        label: group.name,
+    }))),
+    filters: computed(() => {
+        const _filters = {} as Record<string, string[]>;
+        (props.item.options.filters ?? []).forEach((filter) => {
+            _filters[filter.k] = filter.v;
+        });
+        return _filters;
+    }),
+    dataName: computed(() => props.item.options.data_name ?? ''),
+    dataUnit: computed(() => props.item.options.data_unit ?? ''),
+    additionalLabels: computed(() => Object.entries((props.item.options.additional_labels ?? {})).map(([key, value]) => ({
+        name: key,
+        value: value as string,
+    }))),
+    separateDate: computed(() => props.item.options.date_format === 'SEPARATE'),
+    timeDiff: computed(() => {
+        const timeDiff = props.item.options.timediff;
+        const timeDiffKeys = Object.keys(timeDiff || {});
+        return timeDiffKeys.length ? timeDiffKeys[0] : 'none';
+    }),
+    timeDiffDate: computed(() => {
+        const timeDiff = props.item.options.timediff;
+        const timeDiffKeys = Object.keys(timeDiff || {});
+        return timeDiffKeys.length ? `${-timeDiff[timeDiffKeys[0]]}` : undefined;
+    }),
 });
 
 const modalState = reactive({
@@ -181,6 +229,7 @@ const handleSelectDataTable = async (dataTableId: string) => {
 
 const handleSelectSourceItem = (selectedItem: string) => {
     state.selectedSourceEndItem = selectedItem;
+    showSuccessMessage('Data successfully changed.', '');
 };
 
 const handleClickDeleteDataTable = async () => {
@@ -206,6 +255,7 @@ const handleConfirmModal = async () => {
     }
     if (modalState.mode === 'RESET') {
         setInitialDataTableForm();
+        state.filterFormKey = getRandomId();
     }
     modalState.visible = false;
 };
@@ -213,8 +263,12 @@ const handleCancelModal = () => {
     modalState.visible = false;
 };
 const handleUpdateDataTable = async () => {
+    if (!state.dataFieldName.length) {
+        showErrorMessage('Unable to apply changes. Please check the form.', '');
+        return;
+    }
     const additionalLabelsRequest = {} as AdditionalLabels;
-    advancedOptionsState.additionalLabels.forEach((label) => {
+    advancedOptionsState.additionalLabels.filter((label) => label.name.length && label.value.length).forEach((label) => {
         additionalLabelsRequest[label.name] = label.value;
     });
     const domainOptions = state.sourceType === DATA_SOURCE_DOMAIN.COST
@@ -227,6 +281,7 @@ const handleUpdateDataTable = async () => {
     }));
     const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
     const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+    const groupBy = state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy;
     const dataTableApiQueryHelper = new ApiQueryHelper();
     dataTableApiQueryHelper.setFilters(state.consoleFilters);
 
@@ -234,7 +289,7 @@ const handleUpdateDataTable = async () => {
         data_table_id: state.dataTableId,
         options: {
             [state.sourceType]: domainOptions,
-            group_by: state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy,
+            group_by: groupBy,
             filters: dataTableApiQueryHelper.data.filter,
             data_name: state.dataFieldName,
             data_unit: state.dataUnit,
@@ -252,41 +307,28 @@ const handleUpdateDataTable = async () => {
             data_table_id: state.dataTableId,
         });
     }
+    showSuccessMessage('Changes have been successfully applied.', '');
+    setInitialDataTableForm();
+    state.filterFormKey = getRandomId();
 };
 
 /* Utils */
 const setInitialDataTableForm = () => {
     // Initial Form Setting
     // Basic Options
-    const initialGroupBy = (props.item.options?.group_by || []).map((group) => ({
-        label: group.name,
-        name: group.key,
-    }));
-    // TODO: refactor groupBy & set filters
-    state.selectedGroupByItems = [...initialGroupBy];
-    const _filters = {} as Record<string, string[]>;
-    props.item.options?.filters?.forEach((filter) => {
-        _filters[filter.k] = filter.v;
-    });
-    state.filters = _filters;
-
-    state.dataFieldName = props.item.options.data_name || '';
-    state.dataUnit = props.item.options.data_unit || '';
+    state.selectedGroupByItems = [...originDataState.groupBy];
+    state.filters = originDataState.filters;
+    state.dataFieldName = originDataState.dataName;
+    state.dataUnit = originDataState.dataUnit;
 
     // Advanced Options
-    const initialAdditionalLabels = (props.item.options.additional_labels || {})as AdditionalLabels;
-    advancedOptionsState.additionalLabels = Object.entries(initialAdditionalLabels).map(([key, value]) => ({
+    advancedOptionsState.additionalLabels = originDataState.additionalLabels.map((label) => ({
+        ...label,
         key: getRandomId(),
-        name: key,
-        value,
     }));
-    const initialSeparateDate = props.item.options?.date_format;
-    advancedOptionsState.separateDate = !!(initialSeparateDate && initialSeparateDate === 'SEPARATE');
-    const timeDiff = props.item.options?.timediff;
-    const timeDiffKeys = Object.keys(timeDiff || {});
-    const selectedKey = timeDiffKeys.length ? timeDiffKeys[0] : 'none';
-    advancedOptionsState.selectedTimeDiff = selectedKey;
-    advancedOptionsState.selectedTimeDiffDate = selectedKey === 'none' ? undefined : `${-timeDiff[selectedKey]}`;
+    advancedOptionsState.separateDate = originDataState.separateDate;
+    advancedOptionsState.selectedTimeDiff = originDataState.timeDiff;
+    advancedOptionsState.selectedTimeDiffDate = originDataState.timeDiffDate;
 };
 
 onMounted(() => {
@@ -369,7 +411,8 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                                                          @select="handleSelectSourceItem"
                 />
             </div>
-            <widget-form-data-table-card-add-form :data-table-id="state.dataTableId"
+            <widget-form-data-table-card-add-form :filter-form-key="state.filterFormKey"
+                                                  :data-table-id="state.dataTableId"
                                                   :source-id="state.sourceType === DATA_SOURCE_DOMAIN.COST ? state.dataSourceId : state.selectedSourceEndItem"
                                                   :source-key="state.selectedSourceEndItem"
                                                   :source-type="state.sourceType"
@@ -397,9 +440,13 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
                         Reset
                     </p-button>
                     <p-button style-type="secondary"
+                              class="apply-button"
                               @click="handleUpdateDataTable"
                     >
                         Apply
+                        <div v-if="state.optionsChanged"
+                             class="update-dot"
+                        />
                     </p-button>
                 </div>
             </div>
@@ -426,13 +473,12 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
 
 <style lang="postcss" scoped>
 .widget-form-data-table-card {
-    @apply relative;
     height: auto;
 
     .card-wrapper {
-        @apply relative border border-gray-300 rounded-lg w-full bg-white;
+        @apply border border-gray-300 rounded-lg w-full bg-white;
         width: 24rem;
-        height: auto;
+        margin-bottom: 2rem;
 
         &.selected {
             @apply border-violet-600;
@@ -487,6 +533,16 @@ watch(() => state.selectedSourceEndItem, (_selectedSourceItem) => {
             @apply border-t border-gray-200 flex justify-between;
             padding: 0.75rem 1rem;
 
+            .apply-button {
+                @apply relative;
+                .update-dot {
+                    @apply absolute rounded-full bg-blue-500 border-2 border-white;
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    right: -0.25rem;
+                    top: -0.25rem;
+                }
+            }
             .form-button-wrapper {
                 @apply flex gap-2;
             }
