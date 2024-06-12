@@ -34,14 +34,15 @@ const storeState = reactive({
     previewData: computed(() => widgetGenerateState.previewData),
     selectedDataTableId: computed(() => widgetGenerateState.selectedDataTableId),
     selectedDataTable: computed(() => widgetGenrateGetters.selectedDataTable),
-    loading: computed(() => widgetGenerateState.dataTableLoadLoading),
+    // loading: computed(() => widgetGenerateState.dataTableLoadLoading),
+    loading: computed(() => true),
     dataTableUpdating: computed(() => widgetGenerateState.dataTableUpdating),
 });
 
 const state = reactive({
     data: undefined,
-    labelFields: computed<string[]>(() => sortFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {}))),
-    dataFields: computed<string[]>(() => sortFields(Object.keys(storeState.selectedDataTable?.data_info ?? {}))),
+    labelFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.labels_info ?? {})))),
+    dataFields: computed<string[]>(() => (storeState.loading ? [] : sortFields(Object.keys(storeState.selectedDataTable?.data_info ?? {})))),
     fields: computed<PreviewTableField[]>(() => [
         ...state.labelFields.map((key) => ({ type: 'LABEL', name: key, sortKey: key })),
         { type: 'DIVIDER', name: '' },
@@ -69,7 +70,7 @@ const state = reactive({
         padding: '0',
         width: '1px',
         'min-width': '1px',
-        backgroundColor: storeState.selectedDataTableId ? gray[900] : white,
+        backgroundColor: storeState.selectedDataTableId && !storeState.loading ? gray[900] : white,
     })),
     thisPage: 1,
 });
@@ -330,15 +331,14 @@ watch(() => state.sortBy, async () => {
             }
         }
         .no-data-wrapper {
-            position: absolute;
             width: 100%;
-            padding: 2rem 0;
 
             &:hover {
                 @apply bg-white;
             }
             .preview-empty-contents {
                 @apply text-paragraph-md;
+                padding: 2rem 0;
                 .title {
                     @apply font-bold text-violet-300;
                 }
@@ -347,8 +347,8 @@ watch(() => state.sortBy, async () => {
                 }
             }
             .preview-loader-contents {
-                @apply flex flex-col items-center gap-2;
-                padding: 1rem 0;
+                @apply flex flex-col items-center gap-2 w-full;
+                padding: 3rem 0;
             }
         }
     }
