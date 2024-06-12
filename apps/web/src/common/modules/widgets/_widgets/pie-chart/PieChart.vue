@@ -31,7 +31,7 @@ import type { GroupByValue } from '@/common/modules/widgets/types/widget-field-v
 type Data = ListResponse<{
     [key: string]: string|number;
 }>;
-const props = defineProps<WidgetProps<Data>>();
+const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement|null>(null);

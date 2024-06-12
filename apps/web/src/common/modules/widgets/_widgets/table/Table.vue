@@ -20,7 +20,7 @@ type Data = ListResponse<{
     [key: string]: string|number;
 }>;
 
-const props = defineProps<WidgetProps<Data>>();
+const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetFrameProps, widgetFrameEventHandlers } = useWidgetFrame(props, emit);
