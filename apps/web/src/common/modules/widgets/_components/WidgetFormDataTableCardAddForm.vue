@@ -21,7 +21,7 @@ import CostTagKeyVariableModel
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import WidgetFormDataTableCardFilters from '@/common/modules/widgets/_components/WidgetFormDataTableCardFilters.vue';
-import { DATA_SOURCE_DOMAIN, MANAGED_GLOBAL_VARIALBE } from '@/common/modules/widgets/_constants/data-table-constant';
+import { DATA_SOURCE_DOMAIN, MANAGED_GLOBAL_VARIABLE } from '@/common/modules/widgets/_constants/data-table-constant';
 import type { AdditionalLabel } from '@/common/modules/widgets/types/widget-data-table-type';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
@@ -109,7 +109,7 @@ const groupByState = reactive({
     }),
 });
 const costFilterState = reactive({
-    managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => !MANAGED_GLOBAL_VARIALBE.includes(item.name))),
+    managedGroupByItems: computed(() => Object.values(GROUP_BY_ITEM_MAP).filter((item) => !MANAGED_GLOBAL_VARIABLE.includes(item.name))),
     additionalInfoGroupByItems: computed(() => {
         const dataSource = storeState.costDataSources[props.sourceId ?? ''];
         return dataSource ? sortBy(dataSource.data?.cost_additional_info_keys.map((key) => ({
@@ -123,7 +123,7 @@ const costFilterState = reactive({
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
         const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
-        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
+        return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIABLE.includes(labelInfo.key)) : [];
     }),
     metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
 });
