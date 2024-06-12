@@ -58,7 +58,7 @@ const state = reactive({
     selectedSourceEndItem: props.item.source_type === DATA_SOURCE_DOMAIN.COST
         ? props.item.options[DATA_SOURCE_DOMAIN.COST]?.data_key
         : props.item.options[DATA_SOURCE_DOMAIN.ASSET]?.metric_id,
-    selectedGroupByItems: [] as any[],
+    selectedGroupByItems: [] as { name: string; label: string; }[],
     filters: {} as Record<string, string[]>,
     dataFieldName: '',
     dataUnit: '',
@@ -204,11 +204,19 @@ const handleUpdateDataTable = async () => {
         ? { data_source_id: state.dataSourceId, data_key: state.selectedSourceEndItem }
         : { metric_id: state.selectedSourceEndItem };
 
+    const costGroupBy = state.selectedGroupByItems.map((group) => ({
+        key: group.name,
+        name: group.label,
+    }));
+    const metricLabelsInfo = storeState.metrics[state.metricId ?? '']?.data?.labels_info;
+    const assetGroupBy = (metricLabelsInfo ?? []).filter((label) => state.selectedGroupByItems.map((group) => group.name).includes(label.key));
+
+
     const updateParams: DataTableUpdateParameters = {
         data_table_id: props.item.data_table_id,
         options: {
             [state.sourceType]: domainOptions,
-            group_by: [],
+            group_by: state.sourceType === DATA_SOURCE_DOMAIN.COST ? costGroupBy : assetGroupBy,
             filters: [],
             filters_or: [],
             data_name: state.dataFieldName,
@@ -239,6 +247,7 @@ const setInitialDataTableForm = () => {
     }));
     // TODO: refactor groupBy & set filters
     state.selectedGroupByItems = [...initialGroupBy];
+
     state.dataFieldName = props.item.options.data_name || '';
     state.dataUnit = props.item.options.data_unit || '';
 

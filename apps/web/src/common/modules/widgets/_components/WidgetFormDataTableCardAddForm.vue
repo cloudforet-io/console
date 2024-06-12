@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 
 import {
     PFieldGroup, PDivider, PIconButton, PI, PButton, PSelectDropdown, PTextInput, PToggleButton, PFieldTitle,
@@ -54,7 +56,7 @@ const emit = defineEmits<{(e: 'update:filters', value: Record<string, string[]>)
 const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    metircs: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
+    metrics: computed<MetricReferenceMap>(() => allReferenceStore.getters.metric),
     costDataSources: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 
@@ -120,7 +122,7 @@ const costFilterState = reactive({
 
 const assetFilterState = reactive({
     refinedLabelKeys: computed(() => {
-        const metricLabelsInfo = storeState.metircs[props.sourceId ?? ''].data.labels_info;
+        const metricLabelsInfo = storeState.metrics[props.sourceId ?? ''].data.labels_info;
         return metricLabelsInfo ? metricLabelsInfo.filter((labelInfo) => !MANAGED_GLOBAL_VARIALBE.includes(labelInfo.key)) : [];
     }),
     metricFilterItems: computed(() => assetFilterState.refinedLabelKeys.map((d) => ({ name: d.key, label: d.name }))),
@@ -160,17 +162,20 @@ const handleClickTimeDiffDate = (timeDiffDate: string) => {
 };
 
 /* Utils */
-const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
+const setTagsResources = async (): Promise<void> => {
     try {
+        groupByState.loading = true;
         const options = {
             cost_data_source: props.sourceId,
         };
         const costTagKeyVariableModel = new CostTagKeyVariableModel();
         const response = await costTagKeyVariableModel.list({ options });
-        return response.results;
+        costFilterState.tagsFilterItems = response.results ? response.results.map((d) => ({ name: d.key, label: d.name })) : [];
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        return [];
+        costFilterState.tagsFilterItems = [];
+    } finally {
+        groupByState.loading = false;
     }
 };
 
@@ -181,12 +186,15 @@ const resetAllFilter = () => {
 
 watch([() => props.sourceId, () => props.sourceKey], async () => {
     if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
-        groupByState.loading = true;
-        const tagsResources = await getTagsResources();
-        costFilterState.tagsFilterItems = tagsResources ? tagsResources.map((d) => ({ name: d.key, label: `${d.name} (Tags)` })) : [];
-        groupByState.loading = false;
+        await setTagsResources();
     }
     resetAllFilter();
+});
+
+onMounted(async () => {
+    if (props.sourceType === DATA_SOURCE_DOMAIN.COST) {
+        await setTagsResources();
+    }
 });
 
 </script>
