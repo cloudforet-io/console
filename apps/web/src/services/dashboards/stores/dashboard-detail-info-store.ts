@@ -7,7 +7,6 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
     DashboardOptions, DashboardType,
@@ -26,8 +25,6 @@ import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface WidgetValidMap {
@@ -318,33 +315,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             state.loadingDashboard = false;
         }
     };
-    const toggleWidgetSize = (widgetKey: string) => {
-        const _targetIndex = state.dashboardWidgetInfoList.findIndex((info) => info.widget_key === widgetKey);
-        if (_targetIndex > -1) {
-            const _dashboardWidgetInfoList = cloneDeep(state.dashboardWidgetInfoList);
-            const widgetInfo = _dashboardWidgetInfoList[_targetIndex];
-            const widgetSizes = getWidgetConfig(widgetInfo.widget_name)?.sizes;
-            _dashboardWidgetInfoList[_targetIndex] = {
-                ...widgetInfo,
-                size: (widgetInfo.size === WIDGET_SIZE.full) ? (widgetSizes[0] ?? WIDGET_SIZE.md) : WIDGET_SIZE.full,
-            };
-            setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        }
-    };
-    const updateWidgetInfo = (widgetKey: string, data: UpdatableWidgetInfo) => {
-        const targetIndex = state.dashboardWidgetInfoList.findIndex((info) => info.widget_key === widgetKey);
-        if (targetIndex > -1) {
-            const _dashboardWidgetInfoList = cloneDeep(state.dashboardWidgetInfoList);
-            _dashboardWidgetInfoList[targetIndex] = {
-                ...state.dashboardWidgetInfoList[targetIndex],
-                title: data.title,
-                inherit_options: data.inherit_options,
-                widget_options: data.widget_options,
-                schema_properties: data.schema_properties,
-            };
-            setDashboardWidgetInfoList(_dashboardWidgetInfoList);
-        }
-    };
     const deleteWidget = (widgetKey: string) => {
         const _dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
         setDashboardWidgetInfoList(_dashboardWidgetInfoList);
@@ -445,8 +415,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardInfo,
         setDashboardInfo,
         setOriginDashboardName,
-        toggleWidgetSize,
-        updateWidgetInfo,
         deleteWidget,
         resetVariables,
         updateWidgetValidation,

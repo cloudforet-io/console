@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 const emit = defineEmits<{(event: 'click-delete'): void;
     (event: 'click-edit'): void;
     (event: 'click-expand'): void;
-    (event: 'update:size', size: WidgetSize): void;
+    (event: 'update-size', size: WidgetSize): void;
 }>();
 
 const state = reactive({
@@ -44,7 +44,7 @@ const handleClickExpandButton = () => {
     emit('click-expand');
 };
 const handleSelectSize = (size: WidgetSize) => {
-    emit('update:size', size);
+    emit('update-size', size);
 };
 </script>
 

@@ -115,7 +115,7 @@ onUnmounted(() => {
                            :description="widgetGenerateState.description"
                            :widget-options="widgetGenerateState.widgetValueMap"
                            mode="overlay"
-                           @update:size="handleUpdateWidgetSize"
+                           @update-size="handleUpdateWidgetSize"
                 />
                 <p-button style-type="substitutive"
                           icon-left="ic_refresh"

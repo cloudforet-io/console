@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 
 import {
@@ -52,6 +52,9 @@ watch(() => widgetGenerateState.showOverlay, (val) => {
 
 onMounted(async () => {
     await widgetGenerateStore.listDataTable();
+});
+onUnmounted(() => {
+    widgetGenerateStore.reset();
 });
 </script>
 
