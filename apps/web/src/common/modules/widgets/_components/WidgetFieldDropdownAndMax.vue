@@ -35,6 +35,7 @@ const state = reactive({
         fieldName: props.fieldName,
         max: props.max,
     })),
+    isAllValid: computed<boolean>(() => ((props.menuItems.length) ? state.isMaxValid : false)),
 });
 
 /* Event */
@@ -48,7 +49,7 @@ const handleUpdateCount = (val: number) => {
 };
 
 /* Watcher */
-watch(() => state.isMaxValid, (isValid) => {
+watch(() => state.isAllValid, (isValid) => {
     emit('update:is-valid', isValid);
 });
 

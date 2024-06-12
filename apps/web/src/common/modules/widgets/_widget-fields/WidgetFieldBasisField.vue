@@ -16,7 +16,7 @@ const emit = defineEmits<WidgetFieldComponentEmit<string>>();
 const state = reactive({
     proxyValue: useProxyValue('value', props, emit),
     menuItems: computed<MenuItem[]>(() => []), // TODO: generate menu items with options.dataTarget
-    isValid: computed<boolean>(() => !!state.proxyValue?.length),
+    isValid: computed<boolean>(() => ((state.menuItems.length) ? !!state.proxyValue?.length : false)),
 });
 
 /* Event */
